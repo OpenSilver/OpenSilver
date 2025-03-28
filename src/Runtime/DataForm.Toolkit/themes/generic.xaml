@@ -121,17 +121,17 @@
                                                 </VisualStateManager.VisualStateGroups>
                                                 <Border x:Name="OuterBtnBorder"
                                                         BorderBrush="#00FFFFFF"
-                                                        Background="{TemplateBinding Background}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                                         CornerRadius="3">
                                                     <Border x:Name="InnerBtnBorder"
                                                             BorderBrush="#00A9A9A9"
                                                             Background="#00A9A9A9"
-                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                                             CornerRadius="2">
                                                         <ContentPresenter x:Name="contentPresenter"
-                                                                          Content="{TemplateBinding Content}"
-                                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                          Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                                           Height="Auto"
                                                                           Width="Auto"
                                                                           HorizontalAlignment="Center"
@@ -140,8 +140,8 @@
                                                 </Border>
                                                 <Border x:Name="FocusVisualElement"
                                                         BorderBrush="#FF6DBDD1"
-                                                        Background="{TemplateBinding Background}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                                         CornerRadius="2"
                                                         Margin="1"
                                                         Opacity="0" />
@@ -312,9 +312,9 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="DataFormBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                 CornerRadius="2">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -324,7 +324,7 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Grid MinHeight="27"
-                                      Visibility="{TemplateBinding HeaderVisibility}">
+                                      Visibility="{TemplateBinding Property={x:Static DataForm.HeaderVisibilityProperty}}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition />
@@ -333,15 +333,15 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Horizontal">
                                         <ContentControl x:Name="HeaderElement"
-                                                        Content="{TemplateBinding Header}"
-                                                        ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                                        Content="{TemplateBinding Property={x:Static DataForm.HeaderProperty}}"
+                                                        ContentTemplate="{TemplateBinding Property={x:Static DataForm.HeaderTemplateProperty}}"
                                                         FontWeight="Bold"
-                                                        Foreground="{TemplateBinding Foreground}"
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                         Margin="10,0,0,0"
                                                         VerticalAlignment="Center" />
                                         <TextBlock x:Name="ChangeIndicator"
                                                    FontWeight="Bold"
-                                                   Foreground="{TemplateBinding Foreground}"
+                                                   Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                    Margin="3,-2,8,2"
                                                    Opacity="0"
                                                    Text="*"
@@ -384,11 +384,11 @@
                                                       Margin="0"
                                                       Width="5"
                                                       Data="M1,0 L1,2 L0,1 Z"
-                                                      Fill="{TemplateBinding Foreground}"
+                                                      Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                       Opacity="0.85" />
                                                 <Rectangle HorizontalAlignment="Left"
                                                            Width="2"
-                                                           Fill="{TemplateBinding Foreground}"
+                                                           Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                            Opacity="0.85" />
                                             </Grid>
                                         </Button>
@@ -400,7 +400,7 @@
                                                   Width="5"
                                                   Data="M1,0 L1,2 L0,1 Z"
                                                   Opacity="0.85"
-                                                  Fill="{TemplateBinding Foreground}">
+                                                  Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}">
                                                 <!-- #if WORKINPROGRESS -->
                                                 <!--
                                                 <Path.OpacityMask>
@@ -432,7 +432,7 @@
                                                   Width="5"
                                                   Data="M0,0 L1,1 L0,2 Z"
                                                   Opacity="0.85"
-                                                  Fill="{TemplateBinding Foreground}">
+                                                  Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}">
                                                 <!-- #if WORKINPROGRESS -->
                                                 <!--
                                                 <Path.OpacityMask>
@@ -488,16 +488,16 @@
                                                       HorizontalAlignment="Left"
                                                       Width="5"
                                                       Data="M0,0 L1,1 L0,2 Z"
-                                                      Fill="{TemplateBinding Foreground}"
+                                                      Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                       Opacity="0.85" />
                                                 <Rectangle HorizontalAlignment="Right"
                                                            Width="2"
-                                                           Fill="{TemplateBinding Foreground}"
+                                                           Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                            Opacity="0.85" />
                                             </Grid>
                                         </Button>
                                         <Border x:Name="ButtonSeparator"
-                                                Background="{TemplateBinding BorderBrush}"
+                                                Background="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                                 BorderBrush="#59FFFFFF"
                                                 BorderThickness="1,0,1,0"
                                                 Margin="2,4,2,4"
@@ -534,7 +534,7 @@
                                                           Canvas.Top="3.01"
                                                           Stretch="Fill"
                                                           Data="F1 M 2.53,9.96L 4.96,11.1L 6.08,13.50L 13.09,6.50L 9.6,3L 2.53,9.96 Z "
-                                                          Fill="{TemplateBinding Foreground}">
+                                                          Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}">
                                                         <!-- #if WORKINPROGRESS -->
                                                         <!--
                                                         <Path.OpacityMask>
@@ -555,7 +555,7 @@
                                                         -->
                                                         <!-- #endif -->
                                                     </Path>
-                                                    <Path Fill="{TemplateBinding Foreground}"
+                                                    <Path Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                           Stretch="Fill"
                                                           Height="6.74"
                                                           Width="6.81"
@@ -569,13 +569,13 @@
                                                           Stretch="Fill"
                                                           Data="F1 M 13.77,4.22L 11.73,2.18C 11.12,1.78 10.46,2.15 10,2.5L 3.04,9.45C 2.65,9.86 2.53,10.47 2.53,10.73L 2.53,13.5L 5.32,13.5C 5.57,13.5 6.33,13.36 6.64,12.93L 13.54,6.03C 13.86,5.72 14.17,4.74 13.77,4.22 Z"
                                                           StrokeLineJoin="Round"
-                                                          Stroke="{TemplateBinding Foreground}" />
+                                                          Stroke="{TemplateBinding Property={x:Static Control.ForegroundProperty}}" />
                                                     <Path Width="2.33"
                                                           Height="2.29"
                                                           Canvas.Left="2.58"
                                                           Canvas.Top="11.18"
                                                           Stretch="Fill"
-                                                          Fill="{TemplateBinding Foreground}"
+                                                          Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                           Data="F1 M 2.033,11.71L 4.33,14L 2.62,14C 2.17,13.93 2.09,13.79 2,13.31L 2.03,11.71 Z" />
                                                 </Canvas>
                                             </Grid>
@@ -588,7 +588,7 @@
                                                   Margin="5"
                                                   Width="9"
                                                   Data="F1 M18.41,61.67 L19.56,60.52 L21.92,62.88 L24.22,60.57 L25.36,61.72 L23.06,64.03 L25.43,66.4 L24.22,67.60 L21.87,65.25 L19.56,67.56 L18.41,66.41 L20.73,64.08 L18.41,61.67 z"
-                                                  Fill="{TemplateBinding Foreground}"
+                                                  Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                   Opacity="0.85"
                                                   RenderTransformOrigin="0.5,0.5"
                                                   HorizontalAlignment="Center"
@@ -633,7 +633,7 @@
                                                   Margin="5,5,5,5"
                                                   Width="9"
                                                   Data="F1 M24.32,60.48 L25.60,61.76 L19.65,67.75 L18.37,66.46 z"
-                                                  Fill="{TemplateBinding Foreground}"
+                                                  Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                   Opacity="0.85"
                                                   RenderTransformOrigin="0.5,0.5"
                                                   HorizontalAlignment="Center"
@@ -673,7 +673,7 @@
                                 <ScrollViewer Background="{x:Null}"
                                               Grid.Row="1"
                                               IsTabStop="False"
-                                              Padding="{TemplateBinding Padding}"
+                                              Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                               Style="{StaticResource CustomScrollViewerStyle}"
                                               VerticalScrollBarVisibility="Auto">
                                     <ContentPresenter x:Name="ContentPresenter"
@@ -728,7 +728,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="toolkit:DataField">
                     <ContentControl x:Name="ContentControl"
-                                    Foreground="{TemplateBinding Foreground}"
+                                    Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                     IsTabStop="False"
                                     VerticalAlignment="Center"
                                     HorizontalContentAlignment="Stretch" />

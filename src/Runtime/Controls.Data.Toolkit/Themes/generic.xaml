@@ -13,7 +13,10 @@
 // if the XAML is regenerated.
 -->
 
-<ResourceDictionary xmlns:controlsDataToolkit="clr-namespace:System.Windows.Controls" xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/client/2007">
+<ResourceDictionary xmlns:controlsDataToolkit="clr-namespace:System.Windows.Controls"
+                    xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=OpenSilver.Controls.Toolkit"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns="http://schemas.microsoft.com/client/2007">
 
     <!--  controlsDataToolkit:DataGridDragDropTarget  -->
     <Style TargetType="controlsDataToolkit:DataGridDragDropTarget">
@@ -22,13 +25,26 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controlsDataToolkit:DataGridDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        <Canvas x:Name="InsertionIndicatorContainer" IsHitTestVisible="False">
-                            <Path x:Name="InsertionIndicator" IsHitTestVisible="False" Stroke="{x:Static Brushes.Gray}" StrokeThickness="2" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
+                        <Canvas x:Name="InsertionIndicatorContainer"
+                                IsHitTestVisible="False">
+                            <Path x:Name="InsertionIndicator"
+                                  IsHitTestVisible="False"
+                                  Stroke="{x:Static Brushes.Gray}"
+                                  StrokeThickness="2" />
                         </Canvas>
-                        <Popup x:Name="DragPopup" IsHitTestVisible="False">
-                            <Canvas x:Name="DragContainer" IsHitTestVisible="False">
-                                <controlsToolkit:DragDecorator x:Name="DragDecorator" IsHitTestVisible="False" Visibility="Collapsed" />
+                        <Popup x:Name="DragPopup"
+                               IsHitTestVisible="False">
+                            <Canvas x:Name="DragContainer"
+                                    IsHitTestVisible="False">
+                                <controlsToolkit:DragDecorator x:Name="DragDecorator"
+                                                               IsHitTestVisible="False"
+                                                               Visibility="Collapsed" />
                             </Canvas>
                         </Popup>
                     </Grid>

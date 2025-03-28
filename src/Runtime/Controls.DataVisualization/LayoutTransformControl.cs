@@ -112,10 +112,9 @@ namespace System.Windows.Controls.DataVisualization
                     OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_SetTemplatedParent(context, layoutRoot);
                     layoutRoot.SetValue(NameProperty, "LayoutRoot");
                     OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_RegisterName(context, "LayoutRoot", layoutRoot);
-                    var templateBinding = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new TemplateBindingExtension());
-                    templateBinding.DependencyPropertyName = "Background";
+                    var templateBinding = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new TemplateBindingExtension(BackgroundProperty));
                     OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteEndObject(context);
-                    layoutRoot.SetValue(Panel.BackgroundProperty, templateBinding.ProvideValue(new ServiceProvider(owner, null)));
+                    layoutRoot.SetValue(Panel.BackgroundProperty, OpenSilver.Internal.Xaml.RuntimeHelpers.CallProvideValue(context, templateBinding));
                     var matrixTransform = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new MatrixTransform());
                     matrixTransform.SetValue(NameProperty, "MatrixTransform");
                     OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_RegisterName(context, "MatrixTransform", matrixTransform);

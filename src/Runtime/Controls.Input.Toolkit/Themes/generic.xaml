@@ -62,13 +62,13 @@
                         </VisualStateManager.VisualStateGroups>
 
                         <ListBox x:Name="ListBox"
-                                 Style="{TemplateBinding ListBoxStyle}"
-                                 ItemContainerStyle="{TemplateBinding ListBoxItemStyle}"
+                                 Style="{TemplateBinding Property={x:Static ListTimePickerPopup.ListBoxStyleProperty}}"
+                                 ItemContainerStyle="{TemplateBinding Property={x:Static ListTimePickerPopup.ListBoxItemStyleProperty}}"
                                  IsTabStop="True"
                                  TabIndex="1"
                                  MaxHeight="130"
                                  DisplayMemberPath="Key"
-                                 DataContext="{TemplateBinding TimeItemsSelection}"
+                                 DataContext="{TemplateBinding Property={x:Static ListTimePickerPopup.TimeItemsSelectionProperty}}"
                                  ItemsSource="{Binding Items}"
                                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                             <ListBox.ItemsPanel>
@@ -115,7 +115,7 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="Button">
                                 <TextBlock x:Name="label"
-                                           Text="{TemplateBinding Content}"
+                                           Text="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                            Foreground="Black"
                                            Margin="0"
                                            Padding="0">
@@ -147,7 +147,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:RangeTimePickerPopup">
-                    <Grid Background="{TemplateBinding Background}">
+                    <Grid Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                         <VisualStateManager.VisualStateGroups>
 
                             <!-- Common States -->
@@ -317,11 +317,11 @@
                                                 </VisualStateManager.VisualStateGroups>
                                                 <Border x:Name="Background"
                                                         Background="White"
-                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                                         CornerRadius="3">
                                                     <Grid Margin="1"
-                                                          Background="{TemplateBinding Background}">
+                                                          Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                                                         <Border x:Name="BackgroundAnimation"
                                                                 Opacity="0"
                                                                 Background="#FF448DCA" />
@@ -495,11 +495,11 @@
                                                 </VisualStateManager.VisualStateGroups>
                                                 <Border x:Name="Background"
                                                         Background="White"
-                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                                         CornerRadius="3">
                                                     <Grid Margin="1"
-                                                          Background="{TemplateBinding Background}">
+                                                          Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                                                         <Border x:Name="BackgroundAnimation"
                                                                 Opacity="0"
                                                                 Background="#FF448DCA" />
@@ -586,7 +586,7 @@
 
                             <Slider x:Name="HoursSlider"
                                     Grid.Column="0"
-                                    Style="{TemplateBinding SliderStyle}"
+                                    Style="{TemplateBinding Property={x:Static RangeTimePickerPopup.SliderStyleProperty}}"
                                     Margin="5"
                                     Minimum="0"
                                     Maximum="23" />
@@ -596,8 +596,8 @@
 
                             <Slider x:Name="MinutesSlider"
                                     Grid.Column="2"
-                                    Style="{TemplateBinding SliderStyle}"
-                                    SmallChange="{TemplateBinding PopupMinutesInterval}"
+                                    Style="{TemplateBinding Property={x:Static RangeTimePickerPopup.SliderStyleProperty}}"
+                                    SmallChange="{TemplateBinding Property={x:Static TimePickerPopup.PopupMinutesIntervalProperty}}"
                                     Margin="5"
                                     Minimum="0"
                                     Maximum="59" />
@@ -607,8 +607,8 @@
 
                             <Slider x:Name="SecondsSlider"
                                     Grid.Column="4"
-                                    Style="{TemplateBinding SliderStyle}"
-                                    SmallChange="{TemplateBinding PopupSecondsInterval}"
+                                    Style="{TemplateBinding Property={x:Static RangeTimePickerPopup.SliderStyleProperty}}"
+                                    SmallChange="{TemplateBinding Property={x:Static TimePickerPopup.PopupSecondsIntervalProperty}}"
                                     Margin="5"
                                     Minimum="0"
                                     Maximum="59" />
@@ -1035,18 +1035,18 @@
                         <!-- Value is being synched in code, because of inability to do TwoWay TemplateBinding -->
                         <controls:TimeUpDown x:Name="TimeUpDown"
                                              Height="Auto"
-                                             Background="{TemplateBinding Background}"
-                                             BorderBrush="{TemplateBinding BorderBrush}"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
-                                             Padding="{TemplateBinding Padding}"
-                                             Style="{TemplateBinding TimeUpDownStyle}"
-                                             SpinnerStyle="{TemplateBinding SpinnerStyle}"
-                                             Minimum="{TemplateBinding Minimum}"
-                                             Maximum="{TemplateBinding Maximum}"
-                                             TimeParsers="{TemplateBinding TimeParsers}"
-                                             Format="{TemplateBinding Format}"
-                                             Culture="{TemplateBinding Culture}"
-                                             TimeGlobalizationInfo="{TemplateBinding TimeGlobalizationInfo}"
+                                             Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                             BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                             BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                             Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                             Style="{TemplateBinding Property={x:Static TimePicker.TimeUpDownStyleProperty}}"
+                                             SpinnerStyle="{TemplateBinding Property={x:Static TimePicker.SpinnerStyleProperty}}"
+                                             Minimum="{TemplateBinding Property={x:Static TimePicker.MinimumProperty}}"
+                                             Maximum="{TemplateBinding Property={x:Static TimePicker.MaximumProperty}}"
+                                             TimeParsers="{TemplateBinding Property={x:Static TimePicker.TimeParsersProperty}}"
+                                             Format="{TemplateBinding Property={x:Static TimePicker.FormatProperty}}"
+                                             Culture="{TemplateBinding Property={x:Static TimePicker.CultureProperty}}"
+                                             TimeGlobalizationInfo="{TemplateBinding Property={x:Static TimePicker.TimeGlobalizationInfoProperty}}"
                                              Grid.Column="0" />
                         <ToggleButton x:Name="DropDownToggle"
                                       Template="{StaticResource PopupButtonTemplate}"
@@ -1184,7 +1184,7 @@
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
                                     <Rectangle x:Name="Background"
-                                               Fill="{TemplateBinding Background}"
+                                               Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                                StrokeThickness="1"
                                                RadiusX="2"
                                                RadiusY="2">
@@ -1235,7 +1235,7 @@
                                             Opacity="0"
                                             Background="#A5F7F7F7"
                                             BorderBrush="#A5F7F7F7"
-                                            BorderThickness="{TemplateBinding BorderThickness}" />
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}" />
                                     <Rectangle x:Name="FocusVisualElement"
                                                IsHitTestVisible="false"
                                                Visibility="Collapsed"
@@ -1347,7 +1347,7 @@
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
                                     <Rectangle x:Name="Background"
-                                               Fill="{TemplateBinding Background}"
+                                               Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                                StrokeThickness="1"
                                                RadiusX="2"
                                                RadiusY="2">
@@ -1398,7 +1398,7 @@
                                             Opacity="0"
                                             Background="#A5F7F7F7"
                                             BorderBrush="#A5F7F7F7"
-                                            BorderThickness="{TemplateBinding BorderThickness}" />
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}" />
                                     <Rectangle x:Name="FocusVisualElement"
                                                IsHitTestVisible="false"
                                                Visibility="Collapsed"
@@ -1476,10 +1476,10 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="ElementContainer"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}">
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                             <Border x:Name="MouseOverBorder"
                                     BorderThickness="1"
                                     BorderBrush="Transparent">
@@ -1495,9 +1495,9 @@
                                     <ContentControl x:Name="presentationSite"
                                                     Grid.RowSpan="2"
                                                     IsTabStop="False"
-                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                    Content="{TemplateBinding Content}" />
+                                                    HorizontalContentAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                    VerticalContentAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                                    Content="{TemplateBinding Property={x:Static ButtonSpinner.ContentProperty}}" />
                                     <Button IsTabStop="False"
                                             IsHitTestVisible="True"
                                             Grid.Row="0"
@@ -1528,7 +1528,7 @@
                                 IsHitTestVisible="false"
                                 Visibility="Collapsed"
                                 BorderBrush="#FF45D6FA"
-                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                 CornerRadius="1,1,1,1" />
                     </Grid>
                 </ControlTemplate>
@@ -1613,15 +1613,15 @@
                         </VisualStateManager.VisualStateGroups>
                         <!-- the actual control -->
                         <controls:ButtonSpinner x:Name="Spinner"
-                                                Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                Padding="{TemplateBinding Padding}"
+                                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                                Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                                 HorizontalAlignment="Stretch"
                                                 VerticalAlignment="Stretch"
                                                 HorizontalContentAlignment="Stretch"
                                                 VerticalContentAlignment="Stretch"
-                                                Style="{TemplateBinding SpinnerStyle}"
+                                                Style="{TemplateBinding Property={x:Static UpDownBase.SpinnerStyleProperty}}"
                                                 IsTabStop="False"
                                                 TabIndex="3">
                             <Grid>
@@ -1631,27 +1631,27 @@
                                                 Opacity="1"
                                                 IsTabStop="False"
                                                 IsHitTestVisible="False"
-                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                Content="{TemplateBinding Value}"
-                                                ContentTemplate="{TemplateBinding ItemTemplate}"
-                                                FontFamily="{TemplateBinding FontFamily}"
-                                                FontSize="{TemplateBinding FontSize}"
-                                                FontStretch="{TemplateBinding FontStretch}"
-                                                Foreground="{TemplateBinding Foreground}" />
+                                                HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                                Content="{TemplateBinding Property={x:Static DomainUpDown.ValueProperty}}"
+                                                ContentTemplate="{TemplateBinding Property={x:Static DomainUpDown.ItemTemplateProperty}}"
+                                                FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
+                                                FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
+                                                Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}" />
                                 <TextBox x:Name="Text"
                                          Opacity="0"
                                          Margin="0"
                                          Padding="0"
                                          IsTabStop="True"
                                          Background="{x:Static Brushes.Red}"
-                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                         VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                         HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                          BorderThickness="0"
-                                         FontFamily="{TemplateBinding FontFamily}"
-                                         FontSize="{TemplateBinding FontSize}"
-                                         FontStretch="{TemplateBinding FontStretch}"
-                                         Foreground="{TemplateBinding Foreground}"
+                                         FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
+                                         FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                         FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
+                                         Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                          AcceptsReturn="False"
                                          IsHitTestVisible="False"
                                          TextWrapping="NoWrap">
@@ -1729,16 +1729,16 @@
                                                 HorizontalContentAlignment="Stretch"
                                                 VerticalContentAlignment="Stretch">
                             <TextBox BorderThickness="0"
-                                     FontFamily="{TemplateBinding FontFamily}"
-                                     FontSize="{TemplateBinding FontSize}"
-                                     FontStretch="{TemplateBinding FontStretch}"
-                                     FontStyle="{TemplateBinding FontStyle}"
-                                     FontWeight="{TemplateBinding FontWeight}"
-                                     Foreground="{TemplateBinding Foreground}"
+                                     FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
+                                     FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                     FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
+                                     FontStyle="{TemplateBinding Property={x:Static Control.FontStyleProperty}}"
+                                     FontWeight="{TemplateBinding Property={x:Static Control.FontWeightProperty}}"
+                                     Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                      MinWidth="20"
                                      x:Name="Text"
                                      AcceptsReturn="False"
-                                     Text="{TemplateBinding Value}"
+                                     Text="{TemplateBinding Property={x:Static NumericUpDown.ValueProperty}}"
                                      TextAlignment="Right"
                                      TextWrapping="NoWrap">
                                 <TextBox.Style>
@@ -1765,7 +1765,7 @@
                                 IsHitTestVisible="False"
                                 Opacity="0"
                                 BorderBrush="#FF45D6FA"
-                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                 CornerRadius="1,1,1,1" />
                     </Grid>
                 </ControlTemplate>
@@ -1877,9 +1877,9 @@
                                 <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
+                        <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}">
                             <ItemsPresenter />
                         </Border>
                         <Border x:Name="ReadOnlyVisualElement"
@@ -1887,13 +1887,13 @@
                                 Opacity="0"
                                 Background="#83FFFFFF"
                                 BorderBrush="#A5F7F7F7"
-                                BorderThickness="{TemplateBinding BorderThickness}" />
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}" />
                         <Border x:Name="DisabledVisualElement"
                                 IsHitTestVisible="False"
                                 Opacity="0"
                                 Background="#FF4D4D4D"
                                 BorderBrush="#A5F7F7F7"
-                                BorderThickness="{TemplateBinding BorderThickness}" />
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}" />
                         <Rectangle x:Name="FocusVisualElement"
                                    StrokeThickness="1"
                                    RadiusX="1"
@@ -1913,7 +1913,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:RatingItem">
-                    <Grid Background="{TemplateBinding Background}"
+                    <Grid Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                           Width="20">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
@@ -2024,16 +2024,16 @@
                         <Path x:Name="DefaultRatingItem"
                               Fill="{x:Static Brushes.White}"
                               Stretch="Fill"
-                              Stroke="{TemplateBinding BorderBrush}"
+                              Stroke="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                               StrokeLineJoin="Round"
                               StrokeThickness="0.4"
                               VerticalAlignment="Stretch"
                               Opacity="1"
                               UseLayoutRounding="False"
                               Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z" />
-                        <primitives:LinearClipper RatioVisible="{TemplateBinding DisplayValue}"
+                        <primitives:LinearClipper RatioVisible="{TemplateBinding Property={x:Static RatingItem.DisplayValueProperty}}"
                                                   ExpandDirection="Right">
-                            <Path Fill="{TemplateBinding Foreground}"
+                            <Path Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                   Stretch="Fill"
                                   Stroke="{x:Null}"
                                   StrokeLineJoin="Round"
@@ -2043,7 +2043,7 @@
                                   Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z" />
                         </primitives:LinearClipper>
                         <Path x:Name="MouseOverRatingItem"
-                              Fill="{TemplateBinding Foreground}"
+                              Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                               Stretch="Fill"
                               Stroke="{x:Null}"
                               StrokeLineJoin="Round"
@@ -2081,7 +2081,7 @@
                         <Path x:Name="ReadOnlyRatingItem"
                               Fill="#18FFFFFF"
                               Stretch="Fill"
-                              Stroke="{TemplateBinding BorderBrush}"
+                              Stroke="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                               StrokeLineJoin="Round"
                               StrokeThickness="0.4"
                               VerticalAlignment="Stretch"
@@ -2099,7 +2099,7 @@
                               Fill="{x:Static Brushes.Gainsboro}"
                               Opacity="0" />
                         <primitives:LinearClipper x:Name="DisabledRatingItem"
-                                                  RatioVisible="{TemplateBinding DisplayValue}"
+                                                  RatioVisible="{TemplateBinding Property={x:Static RatingItem.DisplayValueProperty}}"
                                                   ExpandDirection="Right"
                                                   Opacity="0">
                             <Path Stretch="Fill"
@@ -2112,11 +2112,11 @@
                                   Fill="#FF5E5E5E" />
                         </primitives:LinearClipper>
                         <ContentPresenter x:Name="Content"
-                                          Cursor="{TemplateBinding Cursor}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           HorizontalAlignment="Left"
-                                          Margin="{TemplateBinding Padding}"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                           Grid.RowSpan="2"
                                           Grid.Row="1" />
                     </Grid>
@@ -2312,7 +2312,7 @@
                                                     VerticalAlignment="Center"
                                                     Foreground="#FF4A4A4A"
                                                     FontSize="10"
-                                                    Content="{TemplateBinding TimeHintContent}" />
+                                                    Content="{TemplateBinding Property={x:Static TimeUpDown.TimeHintContentProperty}}" />
                                     <ContentControl x:Name="emptyicon"
                                                     IsTabStop="False"
                                                     IsHitTestVisible="False"
@@ -2441,26 +2441,26 @@
                             </Border>
                         </Popup>
                         <controls:ButtonSpinner x:Name="Spinner"
-                                                Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                Padding="{TemplateBinding Padding}"
-                                                Style="{TemplateBinding SpinnerStyle}"
+                                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                                Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                Style="{TemplateBinding Property={x:Static UpDownBase.SpinnerStyleProperty}}"
                                                 MinWidth="35"
                                                 HorizontalContentAlignment="Stretch"
                                                 VerticalContentAlignment="Stretch"
                                                 IsTabStop="False">
                             <TextBox x:Name="Text"
                                      BorderThickness="0"
-                                     FontFamily="{TemplateBinding FontFamily}"
-                                     FontSize="{TemplateBinding FontSize}"
-                                     FontStretch="{TemplateBinding FontStretch}"
-                                     FontStyle="{TemplateBinding FontStyle}"
-                                     FontWeight="{TemplateBinding FontWeight}"
-                                     Foreground="{TemplateBinding Foreground}"
+                                     FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
+                                     FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                     FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
+                                     FontStyle="{TemplateBinding Property={x:Static Control.FontStyleProperty}}"
+                                     FontWeight="{TemplateBinding Property={x:Static Control.FontWeightProperty}}"
+                                     Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                      MinWidth="20"
                                      AcceptsReturn="False"
-                                     Text="{TemplateBinding Value}"
+                                     Text="{TemplateBinding Property={x:Static TimeUpDown.ValueProperty}}"
                                      TextAlignment="Right"
                                      TextWrapping="NoWrap">
                                 <TextBox.Style>
@@ -2526,21 +2526,21 @@
                                 <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}">
+                        <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                             <controls:ButtonSpinner x:Name="Spinner"
                                                     MinWidth="35"
                                                     HorizontalContentAlignment="Stretch"
                                                     VerticalContentAlignment="Stretch">
                                 <TextBox BorderThickness="0"
-                                         FontFamily="{TemplateBinding FontFamily}"
-                                         FontSize="{TemplateBinding FontSize}"
-                                         FontStretch="{TemplateBinding FontStretch}"
-                                         FontStyle="{TemplateBinding FontStyle}"
-                                         FontWeight="{TemplateBinding FontWeight}"
-                                         Foreground="{TemplateBinding Foreground}"
+                                         FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
+                                         FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                         FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
+                                         FontStyle="{TemplateBinding Property={x:Static Control.FontStyleProperty}}"
+                                         FontWeight="{TemplateBinding Property={x:Static Control.FontWeightProperty}}"
+                                         Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                          MinWidth="20"
                                          x:Name="Text"
                                          AcceptsReturn="False"
@@ -2571,7 +2571,7 @@
                                 IsHitTestVisible="False"
                                 Opacity="0"
                                 BorderBrush="#FF45D6FA"
-                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                 CornerRadius="1,1,1,1" />
                     </Grid>
                 </ControlTemplate>

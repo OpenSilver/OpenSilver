@@ -133,15 +133,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="input:AutoCompleteBox">
-                    <Grid Opacity="{TemplateBinding Opacity}">
-                        <TextBox Padding="{TemplateBinding Padding}"
-                                 Background="{TemplateBinding Background}"
+                    <Grid Opacity="{TemplateBinding Property={x:Static UIElement.OpacityProperty}}">
+                        <TextBox Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                 Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                  IsTabStop="True"
                                  x:Name="Text"
-                                 Style="{TemplateBinding TextBoxStyle}"
-                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                 Foreground="{TemplateBinding Foreground}"
+                                 Style="{TemplateBinding Property={x:Static AutoCompleteBox.TextBoxStyleProperty}}"
+                                 BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                 BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                 Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                  Margin="0" />
                         <Border x:Name="ValidationErrorElement"
                                 Visibility="Collapsed"
@@ -155,7 +155,7 @@
                                          Placement="Right"
                                          PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}">
                                     <ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                             <BeginStoryboard>
                                                 <Storyboard>
                                                     <BooleanAnimationUsingKeyFrames Storyboard.TargetName="validationTooltip"
@@ -184,7 +184,7 @@
                             </Grid>
                         </Border>
                         <Popup x:Name="Popup">
-                            <Grid Opacity="{TemplateBinding Opacity}">
+                            <Grid Opacity="{TemplateBinding Property={x:Static UIElement.OpacityProperty}}">
                                 <Border x:Name="PopupBorder"
                                         HorizontalAlignment="Stretch"
                                         Opacity="0"
@@ -199,8 +199,8 @@
                                     <Border HorizontalAlignment="Stretch"
                                             Opacity="1.0"
                                             Padding="0"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                            BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                             CornerRadius="0">
                                         <Border.RenderTransform>
                                             <TransformGroup>
@@ -220,11 +220,11 @@
                                         <ListBox x:Name="Selector"
                                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                                 ItemContainerStyle="{TemplateBinding ItemContainerStyle}"
-                                                 Background="{TemplateBinding Background}"
-                                                 Foreground="{TemplateBinding Foreground}"
+                                                 ItemContainerStyle="{TemplateBinding Property={x:Static AutoCompleteBox.ItemContainerStyleProperty}}"
+                                                 Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                 Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                  BorderThickness="0"
-                                                 ItemTemplate="{TemplateBinding ItemTemplate}" />
+                                                 ItemTemplate="{TemplateBinding Property={x:Static AutoCompleteBox.ItemTemplateProperty}}" />
                                     </Border>
                                 </Border>
                             </Grid>

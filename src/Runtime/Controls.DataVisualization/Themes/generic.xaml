@@ -16,7 +16,7 @@
 <ResourceDictionary 
     xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting"
     xmlns:chartingprimitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives"
-    xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=OpenSilver.Controls.Toolkit"
     xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
@@ -77,9 +77,9 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <ToolTipService.ToolTip>
-                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            <ContentControl Content="{TemplateBinding Property={x:Static DataPoint.FormattedDependentValueProperty}}" />
                         </ToolTipService.ToolTip>
-                        <Ellipse Stroke="{TemplateBinding BorderBrush}" Fill="{TemplateBinding Background}" />
+                        <Ellipse Stroke="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}" Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
                         <Ellipse RenderTransformOrigin="0.661,0.321">
                             <Ellipse.Fill>
                                 <RadialGradientBrush GradientOrigin="0.681,0.308">
@@ -110,7 +110,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="charting:AreaSeries">
                     <Canvas x:Name="PlotArea">
-                        <Path Data="{TemplateBinding Geometry}" Fill="{TemplateBinding Background}" Style="{TemplateBinding PathStyle}" />
+                        <Path Data="{TemplateBinding Property={x:Static AreaSeries.GeometryProperty}}"
+                              Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                              Style="{TemplateBinding Property={x:Static AreaSeries.PathStyleProperty}}" />
                     </Canvas>
                 </ControlTemplate>
             </Setter.Value>
@@ -124,7 +126,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:AxisLabel">
-                    <TextBlock Text="{TemplateBinding FormattedContent}">
+                    <TextBlock Text="{TemplateBinding Property={x:Static AxisLabel.FormattedContentProperty}}">
                     </TextBlock>
                 </ControlTemplate>
             </Setter.Value>
@@ -140,7 +142,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:BarDataPoint">
-                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Opacity="0" x:Name="Root">
+                    <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                            Opacity="0"
+                            x:Name="Root">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualStateGroup.Transitions>
@@ -180,7 +185,7 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Grid Background="{TemplateBinding Background}">
+                        <Grid Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                             <Rectangle>
                                 <Rectangle.Fill>
                                     <LinearGradientBrush>
@@ -196,7 +201,7 @@
                             <Rectangle x:Name="MouseOverHighlight" Fill="{x:Static Brushes.White}" Opacity="0" />
                         </Grid>
                         <ToolTipService.ToolTip>
-                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            <ContentControl Content="{TemplateBinding Property={x:Static DataPoint.FormattedDependentValueProperty}}" />
                         </ToolTipService.ToolTip>
                     </Border>
                 </ControlTemplate>
@@ -253,7 +258,9 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}" />
+                        <Ellipse Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                 Stroke="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                 StrokeThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}" />
                         <Ellipse>
                             <Ellipse.Fill>
                                 <LinearGradientBrush>
@@ -265,7 +272,7 @@
                         <Ellipse x:Name="SelectionHighlight" Fill="{x:Static Brushes.Red}" Opacity="0" />
                         <Ellipse x:Name="MouseOverHighlight" Fill="{x:Static Brushes.White}" Opacity="0" />
                         <ToolTipService.ToolTip>
-                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            <ContentControl Content="{TemplateBinding Property={x:Static DataPoint.FormattedDependentValueProperty}}" />
                         </ToolTipService.ToolTip>
                     </Grid>
                 </ControlTemplate>
@@ -576,14 +583,18 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:Chart">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                    <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                            BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                            Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <datavis:Title Content="{TemplateBinding Title}" Style="{TemplateBinding TitleStyle}" />
+                            <datavis:Title Content="{TemplateBinding Property={x:Static Chart.TitleProperty}}"
+                                           Style="{TemplateBinding Property={x:Static Chart.TitleStyleProperty}}" />
 
                             <!-- Use a nested Grid to avoid possible clipping behavior resulting from ColumnSpan+Width=Auto -->
                             <Grid Grid.Row="1" Margin="0,15,0,15">
@@ -592,9 +603,14 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <datavis:Legend x:Name="Legend" Header="{TemplateBinding LegendTitle}" Style="{TemplateBinding LegendStyle}" Grid.Column="1" />
-                                <chartingprimitives:EdgePanel x:Name="ChartArea" Style="{TemplateBinding ChartAreaStyle}">
-                                    <Grid Canvas.ZIndex="-1" Style="{TemplateBinding PlotAreaStyle}" />
+                                <datavis:Legend x:Name="Legend"
+                                                Header="{TemplateBinding Property={x:Static Chart.LegendTitleProperty}}"
+                                                Style="{TemplateBinding Property={x:Static Chart.LegendStyleProperty}}"
+                                                Grid.Column="1" />
+                                <chartingprimitives:EdgePanel x:Name="ChartArea"
+                                                              Style="{TemplateBinding Property={x:Static Chart.ChartAreaStyleProperty}}">
+                                    <Grid Canvas.ZIndex="-1"
+                                          Style="{TemplateBinding Property={x:Static Chart.PlotAreaStyleProperty}}" />
                                     <Border Canvas.ZIndex="10" BorderBrush="#FF919191" BorderThickness="1" />
                                 </chartingprimitives:EdgePanel>
                             </Grid>
@@ -614,7 +630,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:ColumnDataPoint">
-                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Opacity="0" x:Name="Root">
+                    <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                            Opacity="0"
+                            x:Name="Root">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualStateGroup.Transitions>
@@ -654,7 +673,7 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Grid Background="{TemplateBinding Background}">
+                        <Grid Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                             <Rectangle>
                                 <Rectangle.Fill>
                                     <LinearGradientBrush>
@@ -670,7 +689,7 @@
                             <Rectangle x:Name="MouseOverHighlight" Fill="{x:Static Brushes.White}" Opacity="0" />
                         </Grid>
                         <ToolTipService.ToolTip>
-                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            <ContentControl Content="{TemplateBinding Property={x:Static DataPoint.FormattedDependentValueProperty}}" />
                         </ToolTipService.ToolTip>
                     </Border>
                 </ControlTemplate>
@@ -691,13 +710,20 @@
     </Style>
 
     <!--  charting:DataPointSeriesDragDropTarget  -->
-    <Style TargetType="charting:DataPointSeriesDragDropTarget" xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" xmlns="http://schemas.microsoft.com/client/2007">
+    <Style TargetType="charting:DataPointSeriesDragDropTarget"
+           xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting"
+           xmlns="http://schemas.microsoft.com/client/2007">
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:DataPointSeriesDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                         <Canvas x:Name="InsertionIndicatorContainer" IsHitTestVisible="False">
                             <Path x:Name="InsertionIndicator" IsHitTestVisible="False" Stroke="{x:Static Brushes.Gray}" StrokeThickness="2" />
                         </Canvas>
@@ -726,7 +752,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:DateTimeAxisLabel">
-                    <TextBlock Text="{TemplateBinding FormattedContent}">
+                    <TextBlock Text="{TemplateBinding Property={x:Static AxisLabel.FormattedContentProperty}}">
                     </TextBlock>
                 </ControlTemplate>
             </Setter.Value>
@@ -739,7 +765,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:DefinitionSeries">
-                    <Grid x:Name="SeriesArea" Background="{TemplateBinding Background}">
+                    <Grid x:Name="SeriesArea"
+                          Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                         <chartingprimitives:DelegatingListBox x:Name="ItemContainer" Background="{x:Static Brushes.Transparent}" BorderThickness="0">
                             <chartingprimitives:DelegatingListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -751,7 +778,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="ListBoxItem">
-                                                <Border Child="{TemplateBinding Content}" />
+                                                <Border Child="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}" />
                                             </ControlTemplate>
                                         </Setter.Value>
                                     </Setter>
@@ -793,8 +820,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:DisplayAxis">
-                    <Grid x:Name="AxisGrid" Background="{TemplateBinding Background}">
-                        <datavis:Title x:Name="AxisTitle" Style="{TemplateBinding TitleStyle}" />
+                    <Grid x:Name="AxisGrid"
+                          Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
+                        <datavis:Title x:Name="AxisTitle"
+                                       Style="{TemplateBinding Property={x:Static DisplayAxis.TitleStyleProperty}}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -807,10 +836,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:LegendItem">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                            BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle Width="8" Height="8" Fill="{Binding Background}" Stroke="{Binding BorderBrush}" StrokeThickness="1" Margin="0,0,3,0" />
-                            <datavis:Title Content="{TemplateBinding Content}" />
+                            <datavis:Title Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}" />
                         </StackPanel>
                     </Border>
                 </ControlTemplate>
@@ -874,20 +905,21 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <ToolTipService.ToolTip>
-                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            <ContentControl Content="{TemplateBinding Property={x:Static DataPoint.FormattedDependentValueProperty}}" />
                         </ToolTipService.ToolTip>
-                         <Ellipse Stroke="{TemplateBinding BorderBrush}" Fill="{TemplateBinding Background}" />
-                            <Ellipse RenderTransformOrigin="0.661,0.321">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush GradientOrigin="0.681,0.308">
-                                        <GradientStop Color="#00FFFFFF" />
-                                        <GradientStop Color="#FF3D3A3A" Offset="1" />
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                            </Ellipse>
-                            <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="{x:Static Brushes.Red}" />
-                            <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="{x:Static Brushes.White}" />
-                        </Grid>
+                        <Ellipse Stroke="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                 Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
+                        <Ellipse RenderTransformOrigin="0.661,0.321">
+                            <Ellipse.Fill>
+                                <RadialGradientBrush GradientOrigin="0.681,0.308">
+                                    <GradientStop Color="#00FFFFFF" />
+                                    <GradientStop Color="#FF3D3A3A" Offset="1" />
+                                </RadialGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="{x:Static Brushes.Red}" />
+                        <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="{x:Static Brushes.White}" />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -908,7 +940,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="charting:LineSeries">
                     <Canvas x:Name="PlotArea">
-                        <Polyline Points="{TemplateBinding Points}" Stroke="{TemplateBinding Background}" Style="{TemplateBinding PolylineStyle}" />
+                        <Polyline Points="{TemplateBinding Property={x:Static LineSeries.PointsProperty}}"
+                                  Stroke="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                  Style="{TemplateBinding Property={x:Static LineSeries.PolylineStyleProperty}}" />
                     </Canvas>
                 </ControlTemplate>
             </Setter.Value>
@@ -922,7 +956,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:NumericAxisLabel">
-                    <TextBlock Text="{TemplateBinding FormattedContent}">
+                    <TextBlock Text="{TemplateBinding Property={x:Static AxisLabel.FormattedContentProperty}}">
                     </TextBlock>
                 </ControlTemplate>
             </Setter.Value>
@@ -979,16 +1013,30 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Path x:Name="Slice" Data="{TemplateBinding Geometry}" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeMiterLimit="1">
+                        <Path x:Name="Slice"
+                              Data="{TemplateBinding Property={x:Static PieDataPoint.GeometryProperty}}"
+                              Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                              Stroke="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                              StrokeMiterLimit="1">
                             <ToolTipService.ToolTip>
                                 <StackPanel>
-                                    <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
-                                    <ContentControl Content="{TemplateBinding FormattedRatio}" />
+                                    <ContentControl Content="{TemplateBinding Property={x:Static DataPoint.FormattedDependentValueProperty}}" />
+                                    <ContentControl Content="{TemplateBinding Property={x:Static PieDataPoint.FormattedRatioProperty}}" />
                                 </StackPanel>
                             </ToolTipService.ToolTip>
                         </Path>
-                        <Path x:Name="SelectionHighlight" Data="{TemplateBinding GeometrySelection}" Fill="{x:Static Brushes.Red}" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
-                        <Path x:Name="MouseOverHighlight" Data="{TemplateBinding GeometryHighlight}" Fill="{x:Static Brushes.White}" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
+                        <Path x:Name="SelectionHighlight"
+                              Data="{TemplateBinding Property={x:Static PieDataPoint.GeometrySelectionProperty}}"
+                              Fill="{x:Static Brushes.Red}"
+                              StrokeMiterLimit="1"
+                              IsHitTestVisible="False"
+                              Opacity="0" />
+                        <Path x:Name="MouseOverHighlight"
+                              Data="{TemplateBinding Property={x:Static PieDataPoint.GeometryHighlightProperty}}"
+                              Fill="{x:Static Brushes.White}"
+                              StrokeMiterLimit="1"
+                              IsHitTestVisible="False"
+                              Opacity="0" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -1046,8 +1094,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:RangeAxis">
-                    <Grid x:Name="AxisGrid" Background="{TemplateBinding Background}">
-                        <datavis:Title x:Name="AxisTitle" Style="{TemplateBinding TitleStyle}" />
+                    <Grid x:Name="AxisGrid"
+                          Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
+                        <datavis:Title x:Name="AxisTitle"
+                                       Style="{TemplateBinding Property={x:Static DisplayAxis.TitleStyleProperty}}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -1111,9 +1161,14 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <ToolTipService.ToolTip>
-                            <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            <ContentControl Content="{TemplateBinding Property={x:Static DataPoint.FormattedDependentValueProperty}}" />
                         </ToolTipService.ToolTip>
-                            <Path Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " />
+                        <Path Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                              Stroke="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                              Stretch="Fill"
+                              StrokeThickness="1"
+                              StrokeLineJoin="Round"
+                              Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " />
                             <Path x:Name="MouseOverHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z  " Opacity="0" Fill="{x:Static Brushes.White}" />
                             <Path x:Name="SelectionHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " Fill="{x:Static Brushes.Red}" Opacity="0" />
                         </Grid>
@@ -1144,13 +1199,20 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="datavis:Legend">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="2">
+                    <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                            BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                            Padding="2">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <datavis:Title Grid.Row="0" x:Name="HeaderContent" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" Style="{TemplateBinding TitleStyle}" />
+                            <datavis:Title Grid.Row="0"
+                                           x:Name="HeaderContent"
+                                           Content="{TemplateBinding Property={x:Static HeaderedItemsControl.HeaderProperty}}"
+                                           ContentTemplate="{TemplateBinding Property={x:Static HeaderedItemsControl.HeaderTemplateProperty}}"
+                                           Style="{TemplateBinding Property={x:Static Legend.TitleStyleProperty}}" />
                             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" BorderThickness="0" Padding="0" IsTabStop="False">
                                 <ItemsPresenter x:Name="Items" Margin="10,0,10,10" />
                             </ScrollViewer>
@@ -1169,8 +1231,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="datavis:Title">
-                    <Grid Background="{TemplateBinding Background}">
-                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    <Grid Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -1185,7 +1252,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="datavis:TreeMap">
-                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Cursor="{TemplateBinding Cursor}" Opacity="{TemplateBinding Opacity}" OpacityMask="{TemplateBinding OpacityMask}">
+                    <Border Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                            BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                            Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                            Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                            Opacity="{TemplateBinding Property={x:Static UIElement.OpacityProperty}}"
+                            OpacityMask="{TemplateBinding Property={x:Static UIElement.OpacityMaskProperty}}">
                         <Canvas x:Name="Container" />
                     </Border>
                 </ControlTemplate>

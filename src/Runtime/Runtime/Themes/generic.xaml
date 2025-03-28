@@ -124,12 +124,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:ContentControl">
-                    <controls:ContentPresenter Content="{TemplateBinding Content}"
-                                               ContentTemplate="{TemplateBinding ContentTemplate}"
-                                               Cursor="{TemplateBinding Cursor}"
-                                               Margin="{TemplateBinding Padding}"
-                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                               ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                               Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                               Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                               HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                               VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}" />
                 </controls:ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -237,9 +237,9 @@
                         <controls:Border x:Name="Background"
                                          CornerRadius="3"
                                          Background="{x:Static media:Brushes.White}"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
-                                         BorderBrush="{TemplateBinding BorderBrush}">
-                            <controls:Grid Background="{TemplateBinding Background}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
+                            <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                            Margin="1">
                                 <controls:Border Opacity="0"
                                                  x:Name="BackgroundAnimation"
@@ -262,11 +262,11 @@
                             </controls:Grid>
                         </controls:Border>
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   Margin="{TemplateBinding Padding}" />
+                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="3"
                                          Background="{x:Static media:Brushes.White}"
@@ -391,9 +391,9 @@
                         <controls:Border x:Name="Background"
                                          CornerRadius="3"
                                          Background="{x:Static media:Brushes.White}"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
-                                         BorderBrush="{TemplateBinding BorderBrush}">
-                            <controls:Grid Background="{TemplateBinding Background}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
+                            <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                            Margin="1">
                                 <controls:Border Opacity="0"
                                                  x:Name="BackgroundAnimation"
@@ -416,11 +416,11 @@
                             </controls:Grid>
                         </controls:Border>
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   Margin="{TemplateBinding Padding}" />
+                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="3"
                                          Background="{x:Static media:Brushes.White}"
@@ -604,8 +604,8 @@
                                              Width="14"
                                              Height="14"
                                              CornerRadius="1"
-                                             BorderBrush="{TemplateBinding BorderBrush}"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                              Background="{x:Static media:Brushes.White}"
                                              Margin="1" />
                             <controls:Border x:Name="BackgroundOverlay"
@@ -621,7 +621,7 @@
                                              Width="10"
                                              Height="10"
                                              CornerRadius="1"
-                                             Background="{TemplateBinding Background}"
+                                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                              BorderBrush="{x:Static media:Brushes.Transparent}"
                                              BorderThickness="1" />
                             <controls:Border x:Name="BoxMiddle"
@@ -648,7 +648,7 @@
                                              Width="10"
                                              Height="10"
                                              CornerRadius="1"
-                                             BorderBrush="{TemplateBinding BorderBrush}"
+                                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
                                              BorderThickness="1"
                                              Opacity=".2" />
                             <shapes:Path x:Name="CheckIcon"
@@ -693,7 +693,7 @@
                                                       Placement="Right"
                                                       PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                         <controls:ToolTip.Triggers>
-                                            <EventTrigger RoutedEvent="controls:Canvas.Loaded">
+                                            <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                                 <EventTrigger.Actions>
                                                     <animation:BeginStoryboard>
                                                         <animation:Storyboard>
@@ -727,11 +727,11 @@
                         </controls:Grid>
                         <controls:ContentPresenter controls:Grid.Column="1"
                                                    x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                   Margin="{TemplateBinding Padding}" />
+                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                     </controls:Grid>
                 </controls:ControlTemplate>
             </Setter.Value>
@@ -894,8 +894,8 @@
                             <controls:Border x:Name="Background"
                                              Width="14"
                                              Height="14"
-                                             BorderBrush="{TemplateBinding BorderBrush}"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                              Background="{x:Static media:Brushes.White}"
                                              Margin="1"
                                              CornerRadius="14" />
@@ -911,7 +911,7 @@
                             <controls:Border x:Name="BoxMiddleBackground"
                                              Width="10"
                                              Height="10"
-                                             Background="{TemplateBinding Background}"
+                                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                              BorderBrush="{x:Static media:Brushes.Transparent}"
                                              BorderThickness="1"
                                              CornerRadius="10" />
@@ -972,7 +972,7 @@
                                                       Placement="Right"
                                                       PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                         <controls:ToolTip.Triggers>
-                                            <EventTrigger RoutedEvent="controls:Canvas.Loaded">
+                                            <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                                 <EventTrigger.Actions>
                                                     <animation:BeginStoryboard>
                                                         <animation:Storyboard>
@@ -1011,11 +1011,11 @@
                         </controls:Grid>
                         <controls:ContentPresenter controls:Grid.Column="1"
                                                    x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                   Margin="{TemplateBinding Padding}" />
+                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                     </controls:Grid>
                 </controls:ControlTemplate>
             </Setter.Value>
@@ -1113,9 +1113,9 @@
                         <controls:Border x:Name="Background"
                                          CornerRadius="3"
                                          Background="{x:Static media:Brushes.White}"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
-                                         BorderBrush="{TemplateBinding BorderBrush}">
-                            <controls:Grid Background="{TemplateBinding Background}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
+                            <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                            Margin="1">
                                 <controls:Border Opacity="0"
                                                  x:Name="BackgroundAnimation"
@@ -1138,11 +1138,11 @@
                             </controls:Grid>
                         </controls:Border>
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   Margin="{TemplateBinding Padding}" />
+                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="3"
                                          Background="{x:Static media:Brushes.White}"
@@ -1178,8 +1178,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:HyperlinkButton">
-                    <controls:Grid Cursor="{TemplateBinding Cursor}"
-                                   Background="{TemplateBinding Background}">
+                    <controls:Grid Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                   Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
@@ -1254,18 +1254,18 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <controls:TextBlock x:Name="OverlayTextBlock"
-                                            Text="{TemplateBinding Content}"
-                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                            Margin="{TemplateBinding Padding}"
+                                            Text="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                            HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                            VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                             controls:Canvas.ZIndex="1"
                                             Visibility="Collapsed" />
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   Margin="{TemplateBinding Padding}" />
+                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         <controls:Border x:Name="FocusVisualElement"
                                          BorderBrush="#FF6DBDD1"
                                          BorderThickness="1"
@@ -1309,9 +1309,9 @@
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:ScrollViewer">
                     <controls:Border CornerRadius="2"
-                                     BorderBrush="{TemplateBinding BorderBrush}"
-                                     BorderThickness="{TemplateBinding BorderThickness}">
-                        <controls:Grid Background="{TemplateBinding Background}">
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}">
+                        <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
                             <controls:Grid.RowDefinitions>
                                 <controls:RowDefinition Height="*" />
                                 <controls:RowDefinition Height="Auto" />
@@ -1322,10 +1322,10 @@
                             </controls:Grid.ColumnDefinitions>
 
                             <controls:ScrollContentPresenter x:Name="ScrollContentPresenter"
-                                                             Cursor="{TemplateBinding Cursor}"
-                                                             Margin="{TemplateBinding Padding}"
-                                                             Content="{TemplateBinding Content}"
-                                                             ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                             Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                                             Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                                             Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                             ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}" />
 
                             <controls:Border controls:Grid.Column="1"
                                              controls:Grid.Row="1"
@@ -1334,27 +1334,27 @@
                             <primitives:ScrollBar x:Name="VerticalScrollBar"
                                                   Width="18"
                                                   IsTabStop="False"
-                                                  Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                                  Visibility="{TemplateBinding Property={x:Static controls:ScrollViewer.ComputedVerticalScrollBarVisibilityProperty}}"
                                                   controls:Grid.Column="1"
                                                   controls:Grid.Row="0"
                                                   Orientation="Vertical"
-                                                  ViewportSize="{TemplateBinding ViewportHeight}"
-                                                  Maximum="{TemplateBinding ScrollableHeight}"
+                                                  ViewportSize="{TemplateBinding Property={x:Static controls:ScrollViewer.ViewportHeightProperty}}"
+                                                  Maximum="{TemplateBinding Property={x:Static controls:ScrollViewer.ScrollableHeightProperty}}"
                                                   Minimum="0"
-                                                  Value="{TemplateBinding VerticalOffset}"
+                                                  Value="{TemplateBinding Property={x:Static controls:ScrollViewer.VerticalOffsetProperty}}"
                                                   Margin="0,-1,-1,-1" />
 
                             <primitives:ScrollBar x:Name="HorizontalScrollBar"
                                                   Height="18"
                                                   IsTabStop="False"
-                                                  Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                                  Visibility="{TemplateBinding Property={x:Static controls:ScrollViewer.ComputedHorizontalScrollBarVisibilityProperty}}"
                                                   controls:Grid.Column="0"
                                                   controls:Grid.Row="1"
                                                   Orientation="Horizontal"
-                                                  ViewportSize="{TemplateBinding ViewportWidth}"
-                                                  Maximum="{TemplateBinding ScrollableWidth}"
+                                                  ViewportSize="{TemplateBinding Property={x:Static controls:ScrollViewer.ViewportWidthProperty}}"
+                                                  Maximum="{TemplateBinding Property={x:Static controls:ScrollViewer.ScrollableWidthProperty}}"
                                                   Minimum="0"
-                                                  Value="{TemplateBinding HorizontalOffset}"
+                                                  Value="{TemplateBinding Property={x:Static controls:ScrollViewer.HorizontalOffsetProperty}}"
                                                   Margin="-1,0,-1,-1" />
                         </controls:Grid>
                     </controls:Border>
@@ -1459,11 +1459,11 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <controls:Border x:Name="Border"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          CornerRadius="1"
                                          Opacity="1"
-                                         Background="{TemplateBinding Background}"
-                                         BorderBrush="{TemplateBinding BorderBrush}">
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
                             <controls:Grid>
                                 <controls:Border x:Name="ReadOnlyVisualElement"
                                                  Opacity="0"
@@ -1472,7 +1472,7 @@
                                                  BorderThickness="1"
                                                  BorderBrush="{x:Static media:Brushes.Transparent}">
                                     <controls:ScrollViewer x:Name="ContentElement"
-                                                           Padding="{TemplateBinding Padding}"
+                                                           Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                            BorderThickness="0"
                                                            IsTabStop="False" />
                                 </controls:Border>
@@ -1481,12 +1481,12 @@
                         <controls:Border x:Name="DisabledVisualElement"
                                          Background="#A5F7F7F7"
                                          BorderBrush="#A5F7F7F7"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          Opacity="0"
                                          IsHitTestVisible="False" />
                         <controls:Border x:Name="FocusVisualElement"
                                          BorderBrush="#FF6DBDD1"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          Margin="1"
                                          Opacity="0"
                                          IsHitTestVisible="False" />
@@ -1502,7 +1502,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
@@ -1638,27 +1638,27 @@
                         </VisualStateManager.VisualStateGroups>
 
                         <controls:Border x:Name="Border"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          CornerRadius="1"
                                          Opacity="1"
-                                         Background="{TemplateBinding Background}"
-                                         BorderBrush="{TemplateBinding BorderBrush}">
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
                             <controls:Border x:Name="MouseOverBorder"
                                              BorderThickness="1"
                                              BorderBrush="{x:Static media:Brushes.Transparent}">
                                 <controls:Border x:Name="ContentElement"
-                                                 Margin="{TemplateBinding Padding}" />
+                                                 Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                             </controls:Border>
                         </controls:Border>
                         <controls:Border x:Name="DisabledVisualElement"
                                          Background="#A5F7F7F7"
                                          BorderBrush="#A5F7F7F7"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          Opacity="0"
                                          IsHitTestVisible="False" />
                         <controls:Border x:Name="FocusVisualElement"
                                          BorderBrush="#FF6DBDD1"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          Margin="1"
                                          Opacity="0"
                                          IsHitTestVisible="False" />
@@ -1674,7 +1674,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
@@ -1727,7 +1727,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:ListBoxItem">
-                    <controls:Grid Background="{TemplateBinding Background}">
+                    <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
@@ -1787,10 +1787,10 @@
                                          IsHitTestVisible="False"
                                          CornerRadius="1" />
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Content}"
-                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                   Margin="{TemplateBinding Padding}" />
+                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         <controls:Border x:Name="FocusVisualElement"
                                          BorderBrush="#FF6DBDD1"
                                          BorderThickness="1"
@@ -1829,23 +1829,23 @@
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:ToolTip">
                     <controls:Border x:Name="Root"
-                                     BorderBrush="{TemplateBinding BorderBrush}"
-                                     BorderThickness="{TemplateBinding BorderThickness}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                      Background="{x:Static media:Brushes.White}"
                                      CornerRadius="2">
                         <controls:Border BorderBrush="{x:Static media:Brushes.White}"
                                          BorderThickness="1"
-                                         Background="{TemplateBinding Background}"
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                          CornerRadius="1"
-                                         Padding="{TemplateBinding Padding}">
+                                         Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}">
                             <controls:Border.Resources>
                                 <animation:Storyboard x:Key="Visible State" />
                                 <animation:Storyboard x:Key="Normal State" />
                             </controls:Border.Resources>
-                            <controls:ContentPresenter Cursor="{TemplateBinding Cursor}"
-                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                       Content="{TemplateBinding Content}"
-                                                       Margin="{TemplateBinding Padding}" />
+                            <controls:ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                       Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                       Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         </controls:Border>
                     </controls:Border>
                 </controls:ControlTemplate>
@@ -1861,10 +1861,10 @@
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:Viewbox">
                     <controls:ContentPresenter x:Name="Child"
-                                               Content="{TemplateBinding Content}"
-                                               ContentTemplate="{TemplateBinding ContentTemplate}"
-                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                               VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                                               Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                               ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                               HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                               VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}">
                     </controls:ContentPresenter>
                 </controls:ControlTemplate>
             </Setter.Value>
@@ -1934,19 +1934,19 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <controls:Border CornerRadius="2"
-                                         BorderBrush="{TemplateBinding BorderBrush}"
-                                         BorderThickness="{TemplateBinding BorderThickness}">
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}">
                             <controls:ScrollViewer x:Name="ScrollViewer"
-                                                   Padding="{TemplateBinding Padding}"
-                                                   Background="{TemplateBinding Background}"
+                                                   Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                                   Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                                    BorderBrush="{x:Static media:Brushes.Transparent}"
                                                    BorderThickness="0"
-                                                   TabNavigation="{TemplateBinding TabNavigation}">
+                                                   TabNavigation="{TemplateBinding Property={x:Static controls:Control.TabNavigationProperty}}">
                                 <controls:ItemsPresenter />
                             </controls:ScrollViewer>
                         </controls:Border>
                         <controls:Border x:Name="ValidationErrorElement"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          CornerRadius="2"
                                          BorderBrush="#FFDB000C"
                                          Visibility="Collapsed">
@@ -1957,7 +1957,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
@@ -2138,25 +2138,25 @@
                                             </VisualStateManager.VisualStateGroups>
                                             <controls:Border x:Name="Background"
                                                              CornerRadius="3"
-                                                             Background="{TemplateBinding Background}"
-                                                             BorderThickness="{TemplateBinding BorderThickness}"
-                                                             BorderBrush="{TemplateBinding BorderBrush}" />
+                                                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}" />
                                             <controls:Border x:Name="BackgroundOverlay"
                                                              Opacity="0"
                                                              CornerRadius="3"
                                                              Background="#FF448DCA"
-                                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                                              BorderBrush="{x:Static media:Brushes.Transparent}" />
                                             <controls:Border x:Name="BackgroundOverlay2"
                                                              Opacity="0"
                                                              CornerRadius="3"
                                                              Background="#FF448DCA"
-                                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                                              BorderBrush="{x:Static media:Brushes.Transparent}" />
                                             <controls:Border x:Name="BackgroundGradient"
                                                              CornerRadius="2"
                                                              BorderThickness="1"
-                                                             Margin="{TemplateBinding BorderThickness}"
+                                                             Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                                              BorderBrush="{x:Static media:Brushes.White}">
                                                 <controls:Border.Background>
                                                     <media:LinearGradientBrush StartPoint=".7,0"
@@ -2176,13 +2176,13 @@
                                                              x:Name="BackgroundOverlay3"
                                                              CornerRadius="3"
                                                              Background="#FF448DCA"
-                                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                                              BorderBrush="{x:Static media:Brushes.Transparent}" />
                                             <controls:Border Opacity="0"
                                                              x:Name="BackgroundGradient2"
                                                              CornerRadius="2"
                                                              BorderThickness="1"
-                                                             Margin="{TemplateBinding BorderThickness}"
+                                                             Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                                              BorderBrush="{x:Static media:Brushes.White}">
                                                 <controls:Border.Background>
                                                     <media:LinearGradientBrush StartPoint=".7,0"
@@ -2204,13 +2204,13 @@
                                                              IsHitTestVisible="false"
                                                              BorderBrush="#FF6DBDD1"
                                                              BorderThickness="1"
-                                                             Margin="{TemplateBinding BorderThickness}" />
+                                                             Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}" />
                                             <controls:ContentPresenter x:Name="contentPresenter"
-                                                                       Content="{TemplateBinding Content}"
-                                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                       Margin="{TemplateBinding Padding}" />
+                                                                       Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                                       HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                                       VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                                       Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                                             <controls:Border x:Name="FocusVisualElement"
                                                              CornerRadius="3.5"
                                                              Margin="1"
@@ -2303,9 +2303,9 @@
                                                          VerticalAlignment="Stretch"
                                                          Margin="0"
                                                          HorizontalContentAlignment="Right"
-                                                         Background="{TemplateBinding Background}"
-                                                         BorderThickness="{TemplateBinding BorderThickness}"
-                                                         BorderBrush="{TemplateBinding BorderBrush}">
+                                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
                                     <shapes:Path x:Name="BtnArrow"
                                                  Height="4"
                                                  Width="8"
@@ -2322,9 +2322,9 @@
                                 <controls:ContentPresenter x:Name="ContentPresenter"
                                                            Content="{markup:Null}"
                                                            ContentTemplate="{markup:Null}"
-                                                           Margin="{TemplateBinding Padding}"
-                                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                                           Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                                           HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                           VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}">
                                     <controls:TextBlock Text=" " />
                                 </controls:ContentPresenter>
                             </controls:Grid>
@@ -2353,7 +2353,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
@@ -2387,8 +2387,8 @@
                             <controls:Border x:Name="PopupBorder"
                                              HorizontalAlignment="Stretch"
                                              Height="Auto"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
-                                             BorderBrush="{TemplateBinding BorderBrush}"
+                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
                                              CornerRadius="3">
                                 <controls:Border.Background>
                                     <media:LinearGradientBrush EndPoint="0.5,1"
@@ -2465,15 +2465,15 @@
                         <!--Default Root Visuals for either type of ProgressBar-->
                         <controls:Border Name="ProgressBarTrack"
                                          CornerRadius="3"
-                                         Background="{TemplateBinding Background}"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
-                                         BorderBrush="{TemplateBinding BorderBrush}" />
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}" />
                         <controls:Grid x:Name="ProgressBarRootGrid">
                             <!-- Beginning of Gradient over all visuals -->
                             <controls:Border controls:Canvas.ZIndex="1"
                                              x:Name="ProgressBarRootGradient"
                                              BorderThickness="1"
-                                             Margin="{TemplateBinding BorderThickness}"
+                                             Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                              BorderBrush="{x:Static media:Brushes.White}"
                                              CornerRadius="1.5">
                                 <controls:Border.Background>
@@ -2505,15 +2505,15 @@
                                                  BorderBrush="#FF448DCA"
                                                  CornerRadius="2"
                                                  BorderThickness="0"
-                                                 Margin="{TemplateBinding BorderThickness}"
-                                                 Background="{TemplateBinding Foreground}"
+                                                 Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                                 Background="{TemplateBinding Property={x:Static controls:Control.ForegroundProperty}}"
                                                  Opacity="1"
                                                  RenderTransformOrigin="0.5,0.5" />
                                 <shapes:Rectangle x:Name="IndeterminateGradientFill"
                                                   RadiusX="2"
                                                   RadiusY="2"
                                                   StrokeThickness="1"
-                                                  Margin="{TemplateBinding BorderThickness}"
+                                                  Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                                   Opacity="0.7">
                                     <shapes:Rectangle.Fill>
                                         <media:LinearGradientBrush SpreadMethod="Repeat"
@@ -2542,10 +2542,10 @@
                                 <!--Background -->
                                 <controls:Border HorizontalAlignment="Left"
                                                  x:Name="ProgressBarIndicator"
-                                                 Margin="{TemplateBinding BorderThickness}"
+                                                 Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                                  BorderThickness="0.5"
                                                  CornerRadius="1.5"
-                                                 Background="{TemplateBinding Foreground}" />
+                                                 Background="{TemplateBinding Property={x:Static controls:Control.ForegroundProperty}}" />
                             </controls:Grid>
                         </controls:Grid>
                     </controls:Grid>
@@ -3490,7 +3490,7 @@
                                              CornerRadius="1"
                                              BorderThickness="1"
                                              BorderBrush="{x:Static media:Brushes.Transparent}"
-                                             Background="{TemplateBinding Background}" />
+                                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}" />
                             <controls:Border controls:Grid.ColumnSpan="5"
                                              CornerRadius="1"
                                              BorderThickness="1"
@@ -3538,7 +3538,7 @@
                                                      Interval="50"
                                                      IsTabStop="False" />
                             <primitives:Thumb x:Name="HorizontalThumb"
-                                              Background="{TemplateBinding Background}"
+                                              Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                               MinWidth="18"
                                               Width="18"
                                               controls:Grid.Column="2"
@@ -3735,7 +3735,7 @@
 
                         <!-- Horizontal Template -->
                         <controls:Grid x:Name="HorizontalTemplate"
-                                       Background="{TemplateBinding Background}">
+                                       Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
                             <controls:Grid.ColumnDefinitions>
                                 <controls:ColumnDefinition Width="Auto" />
                                 <controls:ColumnDefinition Width="Auto" />
@@ -3745,7 +3745,7 @@
                             <!-- Track Layer -->
                             <controls:Border x:Name="TrackRectangle"
                                              BorderBrush="#FFA3AEB9"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                              Background="#FFE6EFF7"
                                              controls:Grid.Column="0"
                                              controls:Grid.ColumnSpan="3"
@@ -3789,7 +3789,7 @@
                         <!-- Vertical Template -->
                         <controls:Grid x:Name="VerticalTemplate"
                                        Visibility="Collapsed"
-                                       Background="{TemplateBinding Background}">
+                                       Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
                             <controls:Grid.RowDefinitions>
                                 <controls:RowDefinition Height="*" />
                                 <controls:RowDefinition Height="Auto" />
@@ -3798,7 +3798,7 @@
 
                             <!-- Track Layer -->
                             <controls:Border BorderBrush="#FFA3AEB9"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
+                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                              Background="#FFE6EFF7"
                                              controls:Grid.Row="0"
                                              controls:Grid.RowSpan="3"
@@ -3940,9 +3940,9 @@
                         <controls:Border x:Name="Background"
                                          CornerRadius="2"
                                          Background="{x:Static media:Brushes.White}"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
-                                         BorderBrush="{TemplateBinding BorderBrush}">
-                            <controls:Grid Background="{TemplateBinding Background}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
+                            <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                            Margin="1">
                                 <controls:Border Opacity="0"
                                                  x:Name="BackgroundAnimation"
@@ -4053,16 +4053,16 @@
                         </VisualStateManager.VisualStateGroups>
 
                         <controls:Border x:Name="Border"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          CornerRadius="1"
                                          Opacity="1"
-                                         Background="{TemplateBinding Background}"
-                                         BorderBrush="{TemplateBinding BorderBrush}">
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
                             <controls:Border x:Name="MouseOverBorder"
                                              BorderThickness="1"
                                              BorderBrush="{x:Static media:Brushes.Transparent}">
                                 <controls:ScrollViewer x:Name="ContentElement"
-                                                       Padding="{TemplateBinding Padding}"
+                                                       Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                        BorderThickness="0"
                                                        IsTabStop="False" />
                             </controls:Border>
@@ -4070,12 +4070,12 @@
                         <controls:Border x:Name="DisabledVisualElement"
                                          Background="#A5F7F7F7"
                                          BorderBrush="#A5F7F7F7"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          Opacity="0"
                                          IsHitTestVisible="False" />
                         <controls:Border x:Name="FocusVisualElement"
                                          BorderBrush="#FF6DBDD1"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          Margin="1"
                                          Opacity="0"
                                          IsHitTestVisible="False" />
@@ -4100,9 +4100,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:ContextMenu">
-                    <controls:Border BorderBrush="{TemplateBinding BorderBrush}"
-                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                     Background="{TemplateBinding Background}"
+                    <controls:Border BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                     Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                      CornerRadius="2">
                         <controls:Border.Effect>
                             <effects:DropShadowEffect Color="LightGray"
@@ -4127,7 +4127,7 @@
                             controls:Grid.ColumnSpan="2"
                             BorderThickness="0"
                             VerticalScrollBarVisibility="Auto">-->
-                            <controls:ItemsPresenter Margin="{TemplateBinding Padding}" />
+                            <controls:ItemsPresenter Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                             <!--</controls:ScrollViewer>-->
                         </controls:Grid>
                     </controls:Border>
@@ -4177,8 +4177,8 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <controls:Border CornerRadius="2"
-                                         Background="{TemplateBinding Background}"
-                                         BorderBrush="{TemplateBinding BorderBrush}"
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
                                          BorderThickness="1" />
                         <controls:Border x:Name="Bg"
                                          CornerRadius="2"
@@ -4212,7 +4212,7 @@
                             <controls:ColumnDefinition Width="Auto"/>-->
                                 <controls:ColumnDefinition Width="17" />
                             </controls:Grid.ColumnDefinitions>
-                            <controls:ContentPresenter Content="{TemplateBinding Icon}"
+                            <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
                                                        ContentTemplate="{markup:Null}"
                                                        Margin="1"
                                                        VerticalAlignment="Center" />
@@ -4235,9 +4235,9 @@
                                 FlowDirection="LeftToRight"/>
                         </controls:Border>-->
                             <controls:ContentPresenter x:Name="Presenter"
-                                                       Content="{TemplateBinding Header}"
-                                                       ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                                       Margin="{TemplateBinding Padding}"
+                                                       Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
+                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
+                                                       Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                        controls:Grid.Column="2" />
                             <!--<controls:TextBlock
                             Text="{TemplateBinding InputGestureText}"
@@ -4261,9 +4261,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:Separator">
-                    <controls:Border BorderThickness="{TemplateBinding BorderThickness}"
-                                     BorderBrush="{TemplateBinding BorderBrush}"
-                                     Background="{TemplateBinding Background}"
+                    <controls:Border BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                      Height="1" />
                 </controls:ControlTemplate>
             </Setter.Value>
@@ -4585,14 +4585,14 @@
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Top"
                                        Margin="0"
-                                       Background="{TemplateBinding OverlayBrush}"
-                                       Opacity="{TemplateBinding OverlayOpacity}" />
+                                       Background="{TemplateBinding Property={x:Static controls:ChildWindow.OverlayBrushProperty}}"
+                                       Opacity="{TemplateBinding Property={x:Static controls:ChildWindow.OverlayOpacityProperty}}" />
                         <controls:Grid x:Name="ContentRoot"
-                                       HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                       VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                       HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                       VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
                                        RenderTransformOrigin="0.5,0.5"
-                                       Height="{TemplateBinding Height}"
-                                       Width="{TemplateBinding Width}">
+                                       Height="{TemplateBinding Property={x:Static FrameworkElement.HeightProperty}}"
+                                       Width="{TemplateBinding Property={x:Static FrameworkElement.WidthProperty}}">
                             <controls:Grid.RenderTransform>
                                 <media:TransformGroup>
                                     <media:ScaleTransform />
@@ -4630,8 +4630,8 @@
                                              Margin="-4"
                                              VerticalAlignment="Stretch" />
                             <controls:Border Background="{x:Static media:Brushes.White}"
-                                             BorderThickness="{TemplateBinding BorderThickness}"
-                                             BorderBrush="{TemplateBinding BorderBrush}"
+                                             BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
                                              CornerRadius="2">
                                 <controls:Border CornerRadius="1.5"
                                                  Margin="1">
@@ -4668,7 +4668,7 @@
                                                     <controls:ColumnDefinition />
                                                     <controls:ColumnDefinition Width="30" />
                                                 </controls:Grid.ColumnDefinitions>
-                                                <controls:ContentControl Content="{TemplateBinding Title}"
+                                                <controls:ContentControl Content="{TemplateBinding Property={x:Static controls:ChildWindow.TitleProperty}}"
                                                                          IsTabStop="False"
                                                                          FontWeight="Bold"
                                                                          HorizontalAlignment="Stretch"
@@ -4684,14 +4684,14 @@
                                                                  Style="{markup:StaticResource ButtonStyle}" />
                                             </controls:Grid>
                                         </controls:Border>
-                                        <controls:Border Background="{TemplateBinding Background}"
+                                        <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                                          Margin="7"
                                                          controls:Grid.Row="1">
                                             <controls:ContentPresenter x:Name="ContentPresenter"
-                                                                       Content="{TemplateBinding Content}"
-                                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                                                       Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
+                                                                       HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                                       VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}" />
                                         </controls:Border>
                                     </controls:Grid>
                                 </controls:Border>
@@ -4714,8 +4714,8 @@
                             <controls:RowDefinition Height="*" />
                         </controls:Grid.RowDefinitions>
                         <controls:ContentControl x:Name="HeaderContent"
-                                                 Content="{TemplateBinding Header}"
-                                                 ContentTemplate="{TemplateBinding HeaderTemplate}" />
+                                                 Content="{TemplateBinding Property={x:Static controls:HeaderedItemsControl.HeaderProperty}}"
+                                                 ContentTemplate="{TemplateBinding Property={x:Static controls:HeaderedItemsControl.HeaderTemplateProperty}}" />
                         <controls:ItemsPresenter x:Name="Items"
                                                  controls:Grid.Row="1" />
                     </controls:Grid>
@@ -4789,11 +4789,11 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
-                        <controls:Border BorderBrush="{TemplateBinding BorderBrush}"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                        <controls:Border BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          CornerRadius="2">
-                            <controls:Border Padding="{TemplateBinding Padding}"
-                                             Background="{TemplateBinding Background}"
+                            <controls:Border Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                              Margin="1">
                                 <controls:ScrollViewer x:Name="ScrollViewer"
                                                        HorizontalScrollBarVisibility="Auto"
@@ -4811,7 +4811,7 @@
 
                         <controls:Border x:Name="Validation"
                                          controls:Grid.Column="1"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          BorderBrush="#FFDB000C"
                                          CornerRadius="2"
                                          Visibility="Collapsed">
@@ -5069,18 +5069,18 @@
                         <controls:Button x:Name="Header"
                                          controls:Grid.Column="1"
                                          ClickMode="Hover"
-                                         Background="{TemplateBinding Background}"
-                                         Foreground="{TemplateBinding Foreground}"
-                                         BorderBrush="{TemplateBinding BorderBrush}"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
-                                         Cursor="{TemplateBinding Cursor}"
-                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                         Foreground="{TemplateBinding Property={x:Static controls:Control.ForegroundProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                         HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                         VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                          IsTabStop="False"
                                          TabNavigation="Once">
                             <controls:Button.Template>
                                 <controls:ControlTemplate TargetType="controls:Button">
-                                    <controls:Grid Background="{TemplateBinding Background}">
+                                    <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
                                         <VisualStateManager.VisualStateGroups>
                                             <VisualStateGroup x:Name="CommonStates">
                                                 <VisualState x:Name="Normal" />
@@ -5111,23 +5111,23 @@
                                                           RadiusX="2"
                                                           RadiusY="2" />
                                         <controls:ContentPresenter x:Name="Content"
-                                                                   Cursor="{TemplateBinding Cursor}"
-                                                                   Content="{TemplateBinding Content}"
-                                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                   Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
+                                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                                    HorizontalAlignment="Left"
-                                                                   Margin="{TemplateBinding Padding}" />
+                                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                                     </controls:Grid>
                                 </controls:ControlTemplate>
                             </controls:Button.Template>
                             <controls:Button.Content>
-                                <controls:ContentPresenter Content="{TemplateBinding Header}"
-                                                           ContentTemplate="{TemplateBinding HeaderTemplate}" />
+                                <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:TreeViewItem.HeaderProperty}}"
+                                                           ContentTemplate="{TemplateBinding Property={x:Static controls:TreeViewItem.HeaderTemplateProperty}}" />
                             </controls:Button.Content>
                         </controls:Button>
 
                         <controls:Border x:Name="Validation"
                                          controls:Grid.Column="1"
-                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
                                          BorderBrush="#FFDB000C"
                                          CornerRadius="2"
                                          Visibility="Collapsed">

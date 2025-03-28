@@ -130,12 +130,12 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <ContentControl x:Name="content"
-                                        Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                        Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                        ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        HorizontalContentAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                        VerticalContentAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                         <Rectangle x:Name="overlay"
-                                   Style="{TemplateBinding OverlayStyle}" />
+                                   Style="{TemplateBinding Property={x:Static BusyIndicator.OverlayStyleProperty}}" />
                         <ContentPresenter x:Name="busycontent"
                                           ContentTemplate="{x:Null}">
                             <Grid HorizontalAlignment="Center"
@@ -160,11 +160,11 @@
                                                 <RowDefinition />
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
-                                            <ContentPresenter Content="{TemplateBinding BusyContent}"
-                                                              ContentTemplate="{TemplateBinding BusyContentTemplate}"
+                                            <ContentPresenter Content="{TemplateBinding Property={x:Static BusyIndicator.BusyContentProperty}}"
+                                                              ContentTemplate="{TemplateBinding Property={x:Static BusyIndicator.BusyContentTemplateProperty}}"
                                                               Margin="8" />
                                             <ProgressBar Grid.Row="1"
-                                                         Style="{TemplateBinding ProgressBarStyle}" />
+                                                         Style="{TemplateBinding Property={x:Static BusyIndicator.ProgressBarStyleProperty}}" />
                                         </Grid>
                                     </Border>
                                 </Border>
@@ -265,12 +265,12 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Margin="{TemplateBinding Margin}"
-                                          Cursor="{TemplateBinding Cursor}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static FrameworkElement.MarginProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
                                           Opacity="0.25" />
                         <Grid Canvas.Left="{Binding IconPosition.X, RelativeSource={RelativeSource TemplatedParent}}"
                               Canvas.Top="{Binding IconPosition.Y, RelativeSource={RelativeSource TemplatedParent}}">
@@ -565,7 +565,7 @@
                                             <VisualState x:Name="Unfocused" />
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
-                                    <Border Padding="{TemplateBinding Padding}">
+                                    <Border Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                                         <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="19" />
@@ -587,8 +587,8 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                               Grid.Column="1"
                                                               HorizontalAlignment="Stretch"
                                                               Margin="4,0,0,0"
@@ -685,7 +685,7 @@
                                             <VisualState x:Name="Unfocused" />
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
-                                    <Border Padding="{TemplateBinding Padding}">
+                                    <Border Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                                         <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="19" />
@@ -718,8 +718,8 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                               Grid.Column="1"
                                                               HorizontalAlignment="Stretch"
                                                               Margin="4,0,0,0"
@@ -816,7 +816,7 @@
                                             <VisualState x:Name="Unfocused" />
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
-                                    <Border Padding="{TemplateBinding Padding}">
+                                    <Border Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                                         <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="19" />
@@ -849,8 +849,8 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                               Grid.Row="1"
                                                               HorizontalAlignment="Center"
                                                               Margin="0,4,0,0"
@@ -947,7 +947,7 @@
                                             <VisualState x:Name="Unfocused" />
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
-                                    <Border Padding="{TemplateBinding Padding}">
+                                    <Border Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                                         <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="19" />
@@ -980,8 +980,8 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                               Grid.Row="1"
                                                               HorizontalAlignment="Center"
                                                               Margin="0,4,0,0"
@@ -1153,9 +1153,9 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="Background"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                 CornerRadius="3">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -1170,41 +1170,41 @@
                                     <ColumnDefinition Width="Auto"
                                                       x:Name="cd1" />
                                 </Grid.ColumnDefinitions>
-                                <ToggleButton Content="{TemplateBinding Header}"
-                                              ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                              FontFamily="{TemplateBinding FontFamily}"
-                                              FontSize="{TemplateBinding FontSize}"
-                                              FontStretch="{TemplateBinding FontStretch}"
-                                              FontStyle="{TemplateBinding FontStyle}"
-                                              FontWeight="{TemplateBinding FontWeight}"
-                                              Foreground="{TemplateBinding Foreground}"
+                                <ToggleButton Content="{TemplateBinding Property={x:Static Expander.HeaderProperty}}"
+                                              ContentTemplate="{TemplateBinding Property={x:Static Expander.HeaderTemplateProperty}}"
+                                              FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
+                                              FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                              FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
+                                              FontStyle="{TemplateBinding Property={x:Static Control.FontStyleProperty}}"
+                                              FontWeight="{TemplateBinding Property={x:Static Control.FontWeightProperty}}"
+                                              Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                               Grid.Column="0"
                                               Grid.Row="0"
-                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              IsChecked="{TemplateBinding IsExpanded}"
+                                              HorizontalContentAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                              IsChecked="{TemplateBinding Property={x:Static Expander.IsExpandedProperty}}"
                                               Margin="1"
                                               MinHeight="0"
                                               MinWidth="0"
                                               x:Name="ExpanderButton"
-                                              Padding="{TemplateBinding Padding}"
+                                              Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                               Template="{StaticResource ExpanderDownHeaderTemplate}"
-                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-                                <ContentControl Content="{TemplateBinding Content}"
-                                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                FontFamily="{TemplateBinding FontFamily}"
-                                                FontSize="{TemplateBinding FontSize}"
-                                                FontStretch="{TemplateBinding FontStretch}"
-                                                FontStyle="{TemplateBinding FontStyle}"
-                                                FontWeight="{TemplateBinding FontWeight}"
-                                                Foreground="{TemplateBinding Foreground}"
+                                              VerticalContentAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
+                                <ContentControl Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                                FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
+                                                FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
+                                                FontStyle="{TemplateBinding Property={x:Static Control.FontStyleProperty}}"
+                                                FontWeight="{TemplateBinding Property={x:Static Control.FontWeightProperty}}"
+                                                Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                                 Grid.Column="0"
                                                 Grid.Row="1"
-                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                Margin="{TemplateBinding Padding}"
+                                                HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                HorizontalContentAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                                 x:Name="ExpandSite"
-                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                                VerticalContentAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
                                                 Visibility="Collapsed" />
                             </Grid>
                         </Border>
@@ -1250,18 +1250,18 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:HeaderedContentControl">
                     <StackPanel>
-                        <ContentPresenter Content="{TemplateBinding Header}"
-                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                          Cursor="{TemplateBinding Cursor}"
-                                          Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Cursor="{TemplateBinding Cursor}"
-                                          Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static HeaderedContentControl.HeaderProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static HeaderedContentControl.HeaderTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                     </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
@@ -1277,12 +1277,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:ListBoxDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Cursor="{TemplateBinding Cursor}"
-                                          Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                         <Canvas x:Name="InsertionIndicatorContainer"
                                 IsHitTestVisible="False">
                             <Path x:Name="InsertionIndicator"
@@ -1314,12 +1314,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:PanelDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Cursor="{TemplateBinding Cursor}"
-                                          Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                         <Canvas x:Name="InsertionIndicatorContainer"
                                 IsHitTestVisible="False">
                             <Path x:Name="InsertionIndicator"
@@ -1351,12 +1351,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:TreeViewDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Cursor="{TemplateBinding Cursor}"
-                                          Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                         <Canvas x:Name="InsertionIndicatorContainer"
                                 IsHitTestVisible="False">
                             <Path x:Name="InsertionIndicator"
@@ -1426,9 +1426,9 @@
                     <StackPanel x:Name="Root"
                                 HorizontalAlignment="Center">
                         <primitives:GlobalCalendarItem x:Name="CalendarItem"
-                                                       Background="{TemplateBinding Background}"
-                                                       BorderBrush="{TemplateBinding BorderBrush}"
-                                                       BorderThickness="{TemplateBinding BorderThickness}" />
+                                                       Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                       BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                       BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}" />
                     </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
@@ -1535,19 +1535,19 @@
                                    RadiusX="1"
                                    RadiusY="1"
                                    Opacity="0"
-                                   Fill="{TemplateBinding Background}" />
+                                   Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
                         <Rectangle x:Name="Background"
                                    RadiusX="1"
                                    RadiusY="1"
                                    Opacity="0"
-                                   Fill="{TemplateBinding Background}" />
+                                   Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
 
                         <ContentControl IsTabStop="False"
-                                        Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        FontSize="{TemplateBinding FontSize}"
+                                        Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                        ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                        VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
                                         Margin="1,0,1,1">
                             <ContentControl.Foreground>
                                 <SolidColorBrush x:Name="ContentBrush"
@@ -1724,20 +1724,20 @@
                                    RadiusX="1"
                                    RadiusY="1"
                                    Opacity="0"
-                                   Fill="{TemplateBinding Background}" />
+                                   Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
                         <Rectangle x:Name="Background"
                                    RadiusX="1"
                                    RadiusY="1"
                                    Opacity="0"
-                                   Fill="{TemplateBinding Background}" />
+                                   Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
 
                         <ContentControl x:Name="Content"
                                         IsTabStop="False"
-                                        Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        FontSize="{TemplateBinding FontSize}"
+                                        Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                        ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                        VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
                                         Margin="5,1,5,1">
                             <ContentControl.Foreground>
                                 <LinearGradientBrush>
@@ -1802,9 +1802,9 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{TemplateBinding Background}"
+                        <Border BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                 Margin="0,2,0,2"
                                 CornerRadius="1">
                             <Border CornerRadius="1"
@@ -1849,11 +1849,11 @@
 
                                                 <ContentControl x:Name="Content"
                                                                 IsTabStop="False"
-                                                                Content="{TemplateBinding Content}"
-                                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                                ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                                 Margin="1,5,1,9"
-                                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                                                HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                                VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}">
                                                     <ContentControl.Foreground>
                                                         <SolidColorBrush x:Name="ContentBrush"
                                                                          Color="#FF333333" />

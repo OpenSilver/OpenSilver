@@ -122,9 +122,9 @@
                     <StackPanel x:Name="Root"
                                 HorizontalAlignment="Center">
                         <primitives:CalendarItem x:Name="CalendarItem"
-                                                 Background="{TemplateBinding Background}"
-                                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                                 BorderThickness="{TemplateBinding BorderThickness}" />
+                                                 Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                 BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                 BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}" />
                     </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
@@ -390,11 +390,11 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <primitives:DatePickerTextBox x:Name="TextBox"
-                                                      SelectionBackground="{TemplateBinding SelectionBackground}"
-                                                      Background="{TemplateBinding Background}"
-                                                      BorderBrush="{TemplateBinding BorderBrush}"
-                                                      BorderThickness="{TemplateBinding BorderThickness}"
-                                                      Padding="{TemplateBinding Padding}"
+                                                      SelectionBackground="{TemplateBinding Property={x:Static DatePicker.SelectionBackgroundProperty}}"
+                                                      Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                      BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                      BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                                      Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                                       Grid.Column="0" />
                         <Border x:Name="ValidationErrorElement"
                                 Grid.Column="0"
@@ -409,7 +409,7 @@
                                          PlacementTarget="{Binding ElementName=TextBox}"
                                          DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
                                     <ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="{x:Static FrameworkElement.LoadedEvent}">
                                             <EventTrigger.Actions>
                                                 <BeginStoryboard>
                                                     <Storyboard>
@@ -443,9 +443,9 @@
                                 Template="{StaticResource DropDownButtonTemplate}"
                                 Grid.Column="1"
                                 Width="20"
-                                Foreground="{TemplateBinding Foreground}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                 Margin="2,0,2,0" />
                         <Grid x:Name="DisabledVisual"
                               Opacity="0"
@@ -491,7 +491,7 @@
                                       Opacity=".5">
 
                                     <!-- Background -->
-                                    <Border Background="{TemplateBinding Background}" />
+                                    <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
 
                                     <!-- Horizontal Template -->
                                     <Grid x:Name="HorizontalTemplate"
@@ -517,7 +517,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:GridSplitter">
                     <Grid x:Name="Root"
-                          IsHitTestVisible="{TemplateBinding IsEnabled}">
+                          IsHitTestVisible="{TemplateBinding Property={x:Static UIElement.IsEnabledProperty}}">
 
                         <!-- VSM -->
                         <VisualStateManager.VisualStateGroups>
@@ -550,7 +550,7 @@
                         </VisualStateManager.VisualStateGroups>
 
                         <!-- Background -->
-                        <Border Background="{TemplateBinding Background}"
+                        <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                 BorderThickness="0" />
 
                         <!-- Horizontal Template -->
@@ -677,9 +677,9 @@
                                                  Canvas.ZIndex="1"
                                                  Margin="2,2,2,-1" />
 
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Background="{TemplateBinding Background}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                    BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     Grid.Row="1"
                                     MinHeight="10"
                                     MinWidth="10"
@@ -688,10 +688,10 @@
                                 <ContentPresenter x:Name="ContentTop"
                                                   Content="{x:Null}"
                                                   ContentTemplate="{x:Null}"
-                                                  HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                  VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                  Margin="{TemplateBinding Padding}"
-                                                  Cursor="{TemplateBinding Cursor}" />
+                                                  HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                  VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                  Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                  Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                             </Border>
                             <Border x:Name="DisabledVisualTop"
                                     IsHitTestVisible="False"
@@ -716,9 +716,9 @@
                                                  Grid.Row="1"
                                                  Margin="2,-1,2,2" />
 
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Background="{TemplateBinding Background}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                    BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     MinHeight="10"
                                     MinWidth="10"
                                     CornerRadius="3,3,0,0">
@@ -726,10 +726,10 @@
                                 <ContentPresenter x:Name="ContentBottom"
                                                   Content="{x:Null}"
                                                   ContentTemplate="{x:Null}"
-                                                  HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                  VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                  Margin="{TemplateBinding Padding}"
-                                                  Cursor="{TemplateBinding Cursor}" />
+                                                  HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                  VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                  Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                  Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                             </Border>
                             <Border x:Name="DisabledVisualBottom"
                                     IsHitTestVisible="False"
@@ -751,9 +751,9 @@
                                                  Canvas.ZIndex="1"
                                                  Margin="2,2,-1,2" />
 
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Background="{TemplateBinding Background}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                    BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     Grid.Column="1"
                                     MinHeight="10"
                                     MinWidth="10"
@@ -762,10 +762,10 @@
                                 <ContentPresenter x:Name="ContentLeft"
                                                   Content="{x:Null}"
                                                   ContentTemplate="{x:Null}"
-                                                  HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                  VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                  Margin="{TemplateBinding Padding}"
-                                                  Cursor="{TemplateBinding Cursor}" />
+                                                  HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                  VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                  Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                  Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                             </Border>
                             <Border x:Name="DisabledVisualLeft"
                                     IsHitTestVisible="False"
@@ -789,9 +789,9 @@
                                                  Canvas.ZIndex="1"
                                                  Margin="-1,2,2,2" />
 
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Background="{TemplateBinding Background}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                    BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     MinHeight="10"
                                     MinWidth="10"
                                     CornerRadius="3,0,0,3">
@@ -799,10 +799,10 @@
                                 <ContentPresenter x:Name="ContentRight"
                                                   Content="{x:Null}"
                                                   ContentTemplate="{x:Null}"
-                                                  HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                  VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                  Margin="{TemplateBinding Padding}"
-                                                  Cursor="{TemplateBinding Cursor}" />
+                                                  HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                  VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                  Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                  Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                             </Border>
                             <Border x:Name="DisabledVisualRight"
                                     IsHitTestVisible="False"
@@ -1081,9 +1081,9 @@
                         <Grid x:Name="TemplateTopSelected"
                               Visibility="Collapsed"
                               Canvas.ZIndex="1">
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                     BorderThickness="1,1,1,0"
-                                    Background="{TemplateBinding Background}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     Margin="-2,-2,-2,0"
                                     CornerRadius="3,3,0,0">
                                 <Border BorderThickness="1"
@@ -1107,12 +1107,12 @@
                                                    Margin="0,0,0,-2" />
                                         <ContentControl x:Name="HeaderTopSelected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1137,9 +1137,9 @@
                         <Grid x:Name="TemplateTopUnselected"
                               Visibility="Collapsed">
                             <Border x:Name="BorderTop"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                     BorderThickness="1"
-                                    Background="{TemplateBinding Background}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     CornerRadius="3,3,0,0">
                                 <Border x:Name="GradientTop"
                                         BorderThickness="1"
@@ -1161,12 +1161,12 @@
                                     <Grid>
                                         <ContentControl x:Name="HeaderTopUnselected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1181,9 +1181,9 @@
                         <Grid x:Name="TemplateBottomSelected"
                               Visibility="Collapsed"
                               Canvas.ZIndex="1">
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                     BorderThickness="1,0,1,1"
-                                    Background="{TemplateBinding Background}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     Margin="-2,0,-2,-2"
                                     CornerRadius="0,0,3,3">
                                 <Border BorderThickness="1"
@@ -1207,12 +1207,12 @@
                                                    Margin="0,-2,0,0" />
                                         <ContentControl x:Name="HeaderBottomSelected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1237,9 +1237,9 @@
                         <Grid x:Name="TemplateBottomUnselected"
                               Visibility="Collapsed">
                             <Border x:Name="BorderBottom"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                     BorderThickness="1"
-                                    Background="{TemplateBinding Background}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     CornerRadius="0,0,3,3">
                                 <Border x:Name="GradientBottom"
                                         BorderThickness="1"
@@ -1261,12 +1261,12 @@
                                     <Grid>
                                         <ContentControl x:Name="HeaderBottomUnselected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1281,9 +1281,9 @@
                         <Grid x:Name="TemplateLeftSelected"
                               Visibility="Collapsed"
                               Canvas.ZIndex="1">
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                     BorderThickness="1,1,0,1"
-                                    Background="{TemplateBinding Background}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     Margin="-2,-2,0,-2"
                                     CornerRadius="3,0,0,3">
                                 <Border BorderThickness="1"
@@ -1307,12 +1307,12 @@
                                                    Margin="0,0,-2,0" />
                                         <ContentControl x:Name="HeaderLeftSelected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1337,9 +1337,9 @@
                         <Grid x:Name="TemplateLeftUnselected"
                               Visibility="Collapsed">
                             <Border x:Name="BorderLeft"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                    BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     CornerRadius="3,0,0,3">
                                 <Border x:Name="GradientLeft"
                                         BorderThickness="1"
@@ -1361,12 +1361,12 @@
                                     <Grid>
                                         <ContentControl x:Name="HeaderLeftUnselected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1381,9 +1381,9 @@
                         <Grid x:Name="TemplateRightSelected"
                               Visibility="Collapsed"
                               Canvas.ZIndex="1">
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            <Border BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                     BorderThickness="0,1,1,1"
-                                    Background="{TemplateBinding Background}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     Margin="0,-2,-2,-2"
                                     CornerRadius="0,3,3,0">
                                 <Border BorderThickness="1"
@@ -1407,12 +1407,12 @@
                                                    Margin="-2,0,0,0" />
                                         <ContentControl x:Name="HeaderRightSelected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1437,9 +1437,9 @@
                         <Grid x:Name="TemplateRightUnselected"
                               Visibility="Collapsed">
                             <Border x:Name="BorderRight"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
                                     BorderThickness="1"
-                                    Background="{TemplateBinding Background}"
+                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                     CornerRadius="0,3,3,0">
                                 <Border x:Name="GradientRight"
                                         BorderThickness="1"
@@ -1461,12 +1461,12 @@
                                     <Grid>
                                         <ContentControl x:Name="HeaderRightUnselected"
                                                         IsTabStop="False"
-                                                        Foreground="{TemplateBinding Foreground}"
-                                                        FontSize="{TemplateBinding FontSize}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                                                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                                        Margin="{TemplateBinding Padding}"
-                                                        Cursor="{TemplateBinding Cursor}" />
+                                                        Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                        HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
+                                                        VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}"
+                                                        Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                        Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}" />
                                     </Grid>
                                 </Border>
                             </Border>
@@ -1589,20 +1589,20 @@
                         <Border x:Name="SelectedBackground"
                                 CornerRadius="1"
                                 Opacity="0"
-                                Background="{TemplateBinding Background}" />
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
                         <Border x:Name="Background"
                                 CornerRadius="1"
                                 Opacity="0"
-                                Background="{TemplateBinding Background}" />
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
 
                         <ContentControl x:Name="Content"
                                         IsTabStop="False"
                                         Foreground="#FF333333"
-                                        Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        FontSize="{TemplateBinding FontSize}"
+                                        Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                        ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                        VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
                                         Margin="1,0,1,1" />
 
                         <Border x:Name="FocusVisual"
@@ -1772,19 +1772,19 @@
                         <Border x:Name="SelectedBackground"
                                 CornerRadius="1"
                                 Opacity="0"
-                                Background="{TemplateBinding Background}" />
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
                         <Border x:Name="Background"
                                 CornerRadius="1"
                                 Opacity="0"
-                                Background="{TemplateBinding Background}" />
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}" />
 
                         <ContentControl x:Name="Content"
                                         IsTabStop="False"
-                                        Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        FontSize="{TemplateBinding FontSize}"
+                                        Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                        ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                        VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                        FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
                                         Margin="5,1,5,1">
                             <ContentControl.Foreground>
                                 <LinearGradientBrush>
@@ -1845,9 +1845,9 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{TemplateBinding Background}"
+                        <Border BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                 Margin="0,2,0,2"
                                 CornerRadius="1">
                             <Border CornerRadius="1"
@@ -1893,11 +1893,11 @@
                                                 <ContentControl x:Name="Content"
                                                                 IsTabStop="False"
                                                                 Foreground="#FF333333"
-                                                                Content="{TemplateBinding Content}"
-                                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                                ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                                 Margin="1,5,1,9"
-                                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                                                HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                                VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                                             </Grid>
                                         </ControlTemplate>
 
@@ -2148,16 +2148,16 @@
 
                         <!--Start UI-->
                         <Border x:Name="Border"
-                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                 CornerRadius="1"
                                 Opacity="1"
-                                BorderBrush="{TemplateBinding BorderBrush}">
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}">
                             <Grid x:Name="WatermarkContent"
-                                  Background="{TemplateBinding Background}">
+                                  Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                                 <Border x:Name="ContentElement"
-                                        Background="{TemplateBinding Background}"
+                                        Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
                                         BorderThickness="1"
-                                        Padding="{TemplateBinding Padding}">
+                                        Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                                     <Border.BorderBrush>
                                         <SolidColorBrush Color="#FFFFFFFF" />
                                     </Border.BorderBrush>
@@ -2171,19 +2171,19 @@
                                                     Opacity="0"
                                                     IsTabStop="False"
                                                     IsHitTestVisible="False"
-                                                    Content="{TemplateBinding Watermark}"
+                                                    Content="{TemplateBinding Property={x:Static DatePickerTextBox.WatermarkProperty}}"
                                                     Foreground="{StaticResource WatermarkBrush}"
-                                                    FontSize="{TemplateBinding FontSize}"
-                                                    Background="{TemplateBinding Background}"
-                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                    FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
+                                                    Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                                    HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                    VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                                    HorizontalContentAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                                    VerticalContentAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
                                                     Padding="2" />
                                 </Border>
                                 <Border x:Name="FocusVisual"
                                         BorderBrush="#FF6DBDD1"
-                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                         CornerRadius="1"
                                         Opacity="0"
                                         IsHitTestVisible="False" />

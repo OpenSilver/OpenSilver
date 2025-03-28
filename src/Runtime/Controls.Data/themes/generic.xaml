@@ -78,13 +78,15 @@
                                         </Rectangle.Fill>
                                     </Rectangle>
                                     
-                                    <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}">
+                                    <Grid HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"/>
 
                                         <Path Grid.Column="1" Name="SortIcon" Fill="#7FFFFFFF" RenderTransformOrigin=".5,.5" HorizontalAlignment="Left" VerticalAlignment="Center" Opacity="0" Stretch="Uniform" Width="8" Margin="4,0,0,0" Data="F1 M -5.215,6.099L 5.215,6.099L 0,0L -5.215,6.099 Z ">
                                             <Path.RenderTransform>
@@ -107,7 +109,9 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ContentControl">
-                                <Rectangle Fill="{TemplateBinding Background}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"/>
+                                <Rectangle Fill="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                           Width="{TemplateBinding Property={x:Static FrameworkElement.WidthProperty}}"
+                                           Height="{TemplateBinding Property={x:Static FrameworkElement.HeightProperty}}"/>
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
@@ -132,8 +136,11 @@
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
                         </vsm:VisualStateManager.VisualStateGroups>
-                        <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="2">
-                            <Grid Name="Root" Background="{TemplateBinding Background}">
+                        <Border BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                CornerRadius="2">
+                            <Grid Name="Root"
+                                  Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                                 <Grid.Resources>
                                     <!--Start: TopLeftHeaderTemplate-->
                                     <ControlTemplate x:Key="TopLeftHeaderTemplate" TargetType="localprimitives:DataGridColumnHeader">
@@ -234,7 +241,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:DataGridCell">
-                    <Grid Name="Root" Background="{TemplateBinding Background}">
+                    <Grid Name="Root"
+                          Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                         <vsm:VisualStateManager.VisualStateGroups>
                             <vsm:VisualStateGroup x:Name="CurrentStates">
                                 <vsm:VisualState x:Name="Regular" />
@@ -263,12 +271,11 @@
                         <Border x:Name="FocusVisual" BorderBrush="#FF6DBDD1" BorderThickness="1" Background="#66FFFFFF" HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch" IsHitTestVisible="false" Opacity="0" />
 
-                        <ContentPresenter
-                            Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            Margin="{TemplateBinding Padding}" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}" />
 
                         <Border x:Name="InvalidVisualElement" IsHitTestVisible="False" BorderThickness="1" BorderBrush="#FFDC000C" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0" />
 
@@ -345,13 +352,15 @@
                             </Rectangle.Fill>
                         </Rectangle>
 
-                        <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}">
+                        <Grid HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                              VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
+                              Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <ContentPresenter Content="{TemplateBinding Content}"/>
+                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"/>
 
                             <Path Grid.Column="1" Name="SortIcon" Fill="#FF444444" RenderTransformOrigin=".5,.5" HorizontalAlignment="Left" VerticalAlignment="Center" Opacity="0" Stretch="Uniform" Width="8" Margin="4,0,0,0" Data="F1 M -5.215,6.099L 5.215,6.099L 0,0L -5.215,6.099 Z ">
                                 <Path.RenderTransform>
@@ -360,7 +369,12 @@
                             </Path>
                         </Grid>
 
-                        <Rectangle Name="VerticalSeparator" Grid.Column="1" Width="1" VerticalAlignment="Stretch" Fill="{TemplateBinding SeparatorBrush}" Visibility="{TemplateBinding SeparatorVisibility}" />
+                        <Rectangle Name="VerticalSeparator"
+                                   Grid.Column="1"
+                                   Width="1"
+                                   VerticalAlignment="Stretch"
+                                   Fill="{TemplateBinding Property={x:Static DataGridColumnHeader.SeparatorBrushProperty}}"
+                                   Visibility="{TemplateBinding Property={x:Static DataGridColumnHeader.SeparatorVisibilityProperty}}" />
 
                     </Grid>
                 </ControlTemplate>
@@ -453,7 +467,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:DataGridRowGroupHeader">
-                    <localprimitives:DataGridFrozenGrid Name="Root" Background="{TemplateBinding Background}">
+                    <localprimitives:DataGridFrozenGrid Name="Root"
+                                                        Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                         <vsm:VisualStateManager.VisualStateGroups>
                             <vsm:VisualStateGroup x:Name="CurrentStates">
                                 <vsm:VisualState x:Name="Regular"/>
@@ -528,9 +543,13 @@
                         <ToggleButton Grid.Column="2" Grid.Row="1" Name="ExpanderButton" Height="15" Width="15" IsTabStop="False" Template="{StaticResource ToggleButtonTemplate}" Margin="2,0,0,0"/>
 
                         <StackPanel Grid.Column="3" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,1,0,1">
-                            <TextBlock x:Name="PropertyNameElement" Margin="4,0,0,0" Visibility="{TemplateBinding PropertyNameVisibility}"/>
+                            <TextBlock x:Name="PropertyNameElement"
+                                       Margin="4,0,0,0"
+                                       Visibility="{TemplateBinding Property={x:Static DataGridRowGroupHeader.PropertyNameVisibilityProperty}}"/>
                             <TextBlock Margin="4,0,0,0" Text="{Binding Name}" />
-                            <TextBlock x:Name="ItemCountElement" Margin="4,0,0,0" Visibility="{TemplateBinding ItemCountVisibility}"/>
+                            <TextBlock x:Name="ItemCountElement"
+                                       Margin="4,0,0,0"
+                                       Visibility="{TemplateBinding Property={x:Static DataGridRowGroupHeader.ItemCountVisibilityProperty}}"/>
                         </StackPanel>
 
                         <Rectangle Grid.Column="1" Grid.ColumnSpan="5" Fill="#FFD3D3D3" Height="1" Grid.Row="2"/>
@@ -620,14 +639,25 @@
                         </Grid.ColumnDefinitions>
 
                         <Border BorderBrush="{x:Static Brushes.White}" BorderThickness="1,0,1,0" Grid.RowSpan="3" Grid.ColumnSpan="2">
-                            <Grid Background="{TemplateBinding Background}">
+                            <Grid Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
                                 <Rectangle x:Name="RowInvalidVisualElement" Stretch="Fill" Grid.RowSpan="3" Grid.ColumnSpan="2" Fill="#FFF7D8DB" Opacity="0" />
                                 <Rectangle x:Name="BackgroundRectangle" Stretch="Fill" Grid.RowSpan="3" Grid.ColumnSpan="2" Fill="Transparent" />
                             </Grid>
                         </Border>
-                        <Rectangle Name="HorizontalSeparator" Grid.ColumnSpan="2" Grid.Row="2" Height="1" Margin="1,0,1,0" HorizontalAlignment="Stretch" Fill="{TemplateBinding SeparatorBrush}" Visibility="{TemplateBinding SeparatorVisibility}" />
+                        <Rectangle Name="HorizontalSeparator"
+                                   Grid.ColumnSpan="2"
+                                   Grid.Row="2"
+                                   Height="1"
+                                   Margin="1,0,1,0"
+                                   HorizontalAlignment="Stretch"
+                                   Fill="{TemplateBinding Property={x:Static DataGridRowHeader.SeparatorBrushProperty}}"
+                                   Visibility="{TemplateBinding Property={x:Static DataGridRowHeader.SeparatorVisibilityProperty}}" />
 
-                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" />
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"
+                                          Grid.Column="1"
+                                          Grid.RowSpan="2" />
 
                         <Path Name="CurrentRowGlyph" VerticalAlignment="Center" HorizontalAlignment="Center" Width="6" Height="10"  Margin="8,0,8,0" Grid.RowSpan="2" Stretch="Fill" Opacity="0" Data="F1 M 511.047,352.682L 511.047,342.252L 517.145,347.467L 511.047,352.682 Z ">
                             <Path.Fill>
@@ -722,13 +752,35 @@
                                             <vsm:VisualState x:Name="Unfocused"/>
                                         </vsm:VisualStateGroup>
                                     </vsm:VisualStateManager.VisualStateGroups>
-                                    <Border x:Name="CheckedStateOuterBorder" Background="#7FA9A9A9" BorderBrush="{x:Static Brushes.Transparent}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3" Opacity="0"/>
-                                    <Border x:Name="OuterBtnBorder" Background="{TemplateBinding Background}" BorderBrush="#00FFFFFF" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
-                                        <Border x:Name="InnerBtnBorder" BorderBrush="#00CCD1D6" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
-                                            <ContentPresenter x:Name="contentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <Border x:Name="CheckedStateOuterBorder"
+                                            Background="#7FA9A9A9"
+                                            BorderBrush="{x:Static Brushes.Transparent}"
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                            CornerRadius="3"
+                                            Opacity="0"/>
+                                    <Border x:Name="OuterBtnBorder"
+                                            Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                            BorderBrush="#00FFFFFF"
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                            CornerRadius="3">
+                                        <Border x:Name="InnerBtnBorder"
+                                                BorderBrush="#00CCD1D6"
+                                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                                CornerRadius="2">
+                                            <ContentPresenter x:Name="contentPresenter"
+                                                              Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center" />
                                         </Border>
                                     </Border>
-                                    <Border x:Name="FocusVisualElement" Background="{TemplateBinding Background}" BorderBrush="#FF6DBDD1" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Margin="1" Opacity="0"/>
+                                    <Border x:Name="FocusVisualElement"
+                                            Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                            BorderBrush="#FF6DBDD1"
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                            CornerRadius="2"
+                                            Margin="1"
+                                            Opacity="0"/>
                                 </Grid>
                             </ControlTemplate>
                         </Setter.Value>
@@ -775,12 +827,26 @@
                                             <vsm:VisualState x:Name="Unfocused"/>
                                         </vsm:VisualStateGroup>
                                     </vsm:VisualStateManager.VisualStateGroups>
-                                    <Border x:Name="OuterBtnBorder" BorderBrush="#00FFFFFF" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
-                                        <Border x:Name="InnerBtnBorder" BorderBrush="#00CCD1D6" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
-                                            <ContentPresenter x:Name="path" Content="{TemplateBinding Content}"/>
+                                    <Border x:Name="OuterBtnBorder"
+                                            BorderBrush="#00FFFFFF"
+                                            Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                            CornerRadius="3">
+                                        <Border x:Name="InnerBtnBorder"
+                                                BorderBrush="#00CCD1D6"
+                                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                                CornerRadius="2">
+                                            <ContentPresenter x:Name="path"
+                                                              Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"/>
                                         </Border>
                                     </Border>
-                                    <Border x:Name="FocusVisualElement" BorderBrush="#FF6DBDD1" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Margin="1" Opacity="0"/>
+                                    <Border x:Name="FocusVisualElement"
+                                            BorderBrush="#FF6DBDD1"
+                                            Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                            CornerRadius="2"
+                                            Margin="1"
+                                            Opacity="0"/>
                                 </Grid>
                             </ControlTemplate>
 
@@ -821,16 +887,36 @@
                                                         <vsm:VisualState x:Name="Unfocused"/>
                                                     </vsm:VisualStateGroup>
                                                 </vsm:VisualStateManager.VisualStateGroups>
-                                                <Border x:Name="Border" Opacity="1" Background="#66FFFFFF" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="1">
+                                                <Border x:Name="Border"
+                                                        Opacity="1"
+                                                        Background="#66FFFFFF"
+                                                        BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                                        CornerRadius="1">
                                                     <Grid>
                                                         <Border x:Name="ReadOnlyVisualElement" Opacity="0" Background="#72F7F7F7"/>
                                                         <Border x:Name="MouseOverBorder" BorderBrush="Transparent" BorderThickness="1">
-                                                            <ScrollViewer BorderThickness="0" IsTabStop="False" Padding="{TemplateBinding Padding}" x:Name="ContentElement" Margin="0,-3,0,0" VerticalAlignment="Top"/>
+                                                            <ScrollViewer BorderThickness="0"
+                                                                          IsTabStop="False"
+                                                                          Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                                                          x:Name="ContentElement"
+                                                                          Margin="0,-3,0,0"
+                                                                          VerticalAlignment="Top"/>
                                                         </Border>
                                                     </Grid>
                                                 </Border>
-                                                <Border x:Name="DisabledVisualElement" IsHitTestVisible="False" Opacity="0" Background="#A5F7F7F7" BorderBrush="#A5F7F7F7" BorderThickness="{TemplateBinding BorderThickness}"/>
-                                                <Border Margin="1" x:Name="FocusVisualElement" IsHitTestVisible="False" Opacity="0" BorderBrush="#FF6DBDD1" BorderThickness="{TemplateBinding BorderThickness}"/>
+                                                <Border x:Name="DisabledVisualElement"
+                                                        IsHitTestVisible="False"
+                                                        Opacity="0"
+                                                        Background="#A5F7F7F7"
+                                                        BorderBrush="#A5F7F7F7"
+                                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"/>
+                                                <Border Margin="1"
+                                                        x:Name="FocusVisualElement"
+                                                        IsHitTestVisible="False"
+                                                        Opacity="0"
+                                                        BorderBrush="#FF6DBDD1"
+                                                        BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"/>
                                             </Grid>
                                         </ControlTemplate>
                                     </Setter.Value>
@@ -1047,14 +1133,29 @@
                         </vsm:VisualStateManager.VisualStateGroups>
 
                         <!-- DataPager Control Parts -->
-                        <Border MinHeight="24" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" VerticalAlignment="Bottom" CornerRadius="2">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Stretch">
+                        <Border MinHeight="24"
+                                Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                                BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                                BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                                Padding="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                VerticalAlignment="Bottom"
+                                CornerRadius="2">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                        VerticalAlignment="Stretch">
                                 <!--FirstPage Button-->
                                 <Button x:Name="FirstPageButton" Height="20" Width="20" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
                                         <Grid Height="9" Width="8" >
-                                            <Path Stretch="Fill" Data="M0,1 L1,0 L1,2 Z" Width="5" Height="9" HorizontalAlignment="Right" Fill="{TemplateBinding Foreground}"/>
-                                            <Rectangle Width="2" HorizontalAlignment="Left" Fill="{TemplateBinding Foreground}"/>
+                                            <Path Stretch="Fill"
+                                                  Data="M0,1 L1,0 L1,2 Z"
+                                                  Width="5"
+                                                  Height="9"
+                                                  HorizontalAlignment="Right"
+                                                  Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
+                                            <Rectangle Width="2"
+                                                       HorizontalAlignment="Left"
+                                                       Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
                                         </Grid>
                                     </Button.Content>
                                 </Button>
@@ -1062,26 +1163,58 @@
                                 <!--PreviousPage Button-->
                                 <Button Name="PreviousPageButton" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
-                                        <Path Stretch="Fill" Data="M0,1 L1,0 L1,2 Z" Width="5" Height="9" HorizontalAlignment="Center" Fill="{TemplateBinding Foreground}"/>
+                                        <Path Stretch="Fill"
+                                              Data="M0,1 L1,0 L1,2 Z"
+                                              Width="5"
+                                              Height="9"
+                                              HorizontalAlignment="Center"
+                                              Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
                                     </Button.Content>
                                 </Button>
 
-                                <Border x:Name="Separator1" Width="1" Background="#FFCCD1D6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0,1,0" Margin="0,3,0,3"/>
+                                <Border x:Name="Separator1"
+                                        Width="1"
+                                        Background="#FFCCD1D6"
+                                        BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}" BorderThickness="1,0,1,0" Margin="0,3,0,3"/>
                                 <!--Numeric Button Panel-->
                                 <StackPanel x:Name="NumericButtonPanel" Orientation="Horizontal" Margin="1"/>
 
                                 <!--Page Display-->
                                 <StackPanel x:Name="PageDisplay" Orientation="Horizontal">
-                                    <TextBlock x:Name="CurrentPagePrefixTextBlock" Width="Auto" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{TemplateBinding Foreground}"/>
-                                    <TextBox x:Name="CurrentPageTextBox" TextWrapping="Wrap" Width="40" Height="Auto" VerticalAlignment="Center" Margin="4,2,4,2" Style="{StaticResource PagingTextBoxStyle}" Foreground="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding BorderBrush}"/>
-                                    <TextBlock x:Name="CurrentPageSuffixTextBlock" Width="Auto" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="{TemplateBinding Foreground}"/>
+                                    <TextBlock x:Name="CurrentPagePrefixTextBlock"
+                                               Width="Auto"
+                                               VerticalAlignment="Center"
+                                               Margin="4,0,0,0"
+                                               Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
+                                    <TextBox x:Name="CurrentPageTextBox"
+                                             TextWrapping="Wrap"
+                                             Width="40"
+                                             Height="Auto"
+                                             VerticalAlignment="Center"
+                                             Margin="4,2,4,2"
+                                             Style="{StaticResource PagingTextBoxStyle}"
+                                             Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
+                                             BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"/>
+                                    <TextBlock x:Name="CurrentPageSuffixTextBlock"
+                                               Width="Auto"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,4,0"
+                                               Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
                                 </StackPanel>
-                                <Border x:Name="Separator2" Width="1" Background="#FFCCD1D6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0,1,0" Margin="0,3,0,3"/>
+                                <Border x:Name="Separator2"
+                                        Width="1"
+                                        Background="#FFCCD1D6"
+                                        BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}" BorderThickness="1,0,1,0" Margin="0,3,0,3"/>
 
                                 <!--NextPage Button-->
                                 <Button x:Name="NextPageButton" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
-                                        <Path Stretch="Fill" Data="M0,0 L1,1 L0,2 Z" Width="5" Height="9" HorizontalAlignment="Center" Fill="{TemplateBinding Foreground}"/>
+                                        <Path Stretch="Fill"
+                                              Data="M0,0 L1,1 L0,2 Z"
+                                              Width="5"
+                                              Height="9"
+                                              HorizontalAlignment="Center"
+                                              Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
                                     </Button.Content>
                                 </Button>
 
@@ -1089,8 +1222,15 @@
                                 <Button x:Name="LastPageButton" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
                                         <Grid Height="9" Width="8">
-                                            <Path Stretch="Fill" Data="M0,0 L1,1 L0,2 Z" Width="5" Height="9" HorizontalAlignment="Left" Fill="{TemplateBinding Foreground}"/>
-                                            <Rectangle Width="2" HorizontalAlignment="Right" Fill="{TemplateBinding Foreground}"/>
+                                            <Path Stretch="Fill"
+                                                  Data="M0,0 L1,1 L0,2 Z"
+                                                  Width="5"
+                                                  Height="9"
+                                                  HorizontalAlignment="Left"
+                                                  Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
+                                            <Rectangle Width="2"
+                                                       HorizontalAlignment="Right"
+                                                       Fill="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"/>
                                         </Grid>
                                     </Button.Content>
                                 </Button>

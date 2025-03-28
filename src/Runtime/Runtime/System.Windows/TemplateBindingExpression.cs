@@ -15,94 +15,109 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Supports template binding.
+/// </summary>
+public sealed class TemplateBindingExpression : Expression
 {
-    /// <summary>
-    /// Supports template binding.
-    /// </summary>
-    public sealed class TemplateBindingExpression : Expression
+    private readonly DependencyObject _source;
+    private readonly DependencyProperty _sourceProperty;
+    private DependencyObject _target;
+    private DependencyProperty _targetProperty;
+    private PropertyChangeListener _listener;
+    private bool _skipTypeCheck;
+
+    internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP)
     {
-        private readonly IInternalControl _source;
-        private readonly DependencyProperty _sourceProperty;
-        private DependencyObject _target;
-        private DependencyProperty _targetProperty;
-        private PropertyChangeListener _listener;
-        private bool _skipTypeCheck;
-
-        internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP)
+        if (templatedParent is null)
         {
-            _source = templatedParent ?? throw new ArgumentNullException(nameof(templatedParent));
-            _sourceProperty = sourceDP ?? throw new ArgumentNullException(nameof(sourceDP));
+            throw new ArgumentNullException(nameof(templatedParent));
         }
 
-        internal override bool CanSetValue(DependencyObject d, DependencyProperty dp)
+        if (sourceDP is null)
         {
-            return false;
+            throw new ArgumentNullException(nameof(sourceDP));
         }
 
-        internal override object GetValue(DependencyObject d, DependencyProperty dp)
+        if (templatedParent is not DependencyObject source)
         {
-            var value = _source.GetValue(_sourceProperty);
-            if (_skipTypeCheck || ValidateValue(ref value, dp))
+            throw new ArgumentException(string.Format(Strings.General_Expected_Type, nameof(DependencyObject)), nameof(templatedParent));
+        }
+
+        _source = source;
+        _sourceProperty = sourceDP;
+    }
+
+    internal override bool CanSetValue(DependencyObject d, DependencyProperty dp)
+    {
+        return false;
+    }
+
+    internal override object GetValue(DependencyObject d, DependencyProperty dp)
+    {
+        var value = _source.GetValue(_sourceProperty);
+        if (_skipTypeCheck || ValidateValue(ref value, dp))
+        {
+            return value;
+        }
+
+        // Note: consider caching the default value as we should always have d == Target.
+        return _targetProperty.GetDefaultValue(_target);
+    }
+
+    internal override void OnAttach(DependencyObject d, DependencyProperty dp)
+    {
+        Debug.Assert(d != null);
+        Debug.Assert(dp != null);
+
+        _target = d;
+        _targetProperty = dp;
+
+        _skipTypeCheck = _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
+        _listener = PropertyChangeListener.CreateListener((DependencyObject)_source, _sourceProperty, OnPropertyChanged);
+    }
+
+    internal override void OnDetach(DependencyObject d, DependencyProperty dp)
+    {
+        _skipTypeCheck = false;
+        var listener = _listener;
+        _listener = null;
+        listener?.Dispose();
+    }
+
+    private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
+    {
+        _target.ApplyExpression(_targetProperty, this);
+    }
+
+    private bool ValidateValue(ref object value, DependencyProperty targetProperty)
+    {
+        if (targetProperty.IsValidValue(value))
+        {
+            return true;
+        }
+
+        if (value != null
+            && _sourceProperty == ContentControl.ContentProperty
+            && TypeConverterHelper.IsCoreType(targetProperty.OwnerType))
+        {
+            TypeConverter converter = TypeConverterHelper.GetBuiltInConverter(targetProperty.PropertyType);
+            if (converter?.CanConvertFrom(value.GetType()) ?? false)
             {
-                return value;
-            }
-
-            // Note: consider caching the default value as we should always have d == Target.
-            return _targetProperty.GetDefaultValue(_target);
-        }
-
-        internal override void OnAttach(DependencyObject d, DependencyProperty dp)
-        {
-            Debug.Assert(d != null);
-            Debug.Assert(dp != null);
-
-            _target = d;
-            _targetProperty = dp;
-
-            _skipTypeCheck = _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
-            _listener = PropertyChangeListener.CreateListener((DependencyObject)_source, _sourceProperty, OnPropertyChanged);
-        }
-
-        internal override void OnDetach(DependencyObject d, DependencyProperty dp)
-        {
-            _skipTypeCheck = false;
-            var listener = _listener;
-            _listener = null;
-            listener?.Dispose();
-        }
-
-        private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            _target.ApplyExpression(_targetProperty, this);
-        }
-
-        private bool ValidateValue(ref object value, DependencyProperty targetProperty)
-        {
-            if (targetProperty.IsValidValue(value))
-            {
-                return true;
-            }
-
-            if (value != null
-                && _sourceProperty == ContentControl.ContentProperty
-                && TypeConverterHelper.IsCoreType(targetProperty.OwnerType))
-            {
-                TypeConverter converter = TypeConverterHelper.GetBuiltInConverter(targetProperty.PropertyType);
-                if (converter?.CanConvertFrom(value.GetType()) ?? false)
+                try
                 {
-                    try
-                    {
-                        value = converter.ConvertFrom(value);
-                        return true;
-                    }
-                    catch { }
+                    value = converter.ConvertFrom(value);
+                    return true;
                 }
+                catch { }
             }
-
-            return false;
         }
+
+        return false;
     }
 }

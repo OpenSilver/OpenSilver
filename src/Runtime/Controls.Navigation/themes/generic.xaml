@@ -19,17 +19,16 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="nav_controls:Frame">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                        <ContentPresenter
-                            Content="{TemplateBinding Content}"
-                            Cursor="{TemplateBinding Cursor}"
-                            Margin="{TemplateBinding Padding}"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    <Border Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}"
+                            BorderBrush="{TemplateBinding Property={x:Static Control.BorderBrushProperty}}"
+                            BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
+                            HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                            VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}">
+                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
+                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
+                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
