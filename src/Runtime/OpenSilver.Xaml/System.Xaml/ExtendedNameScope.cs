@@ -7,13 +7,13 @@ using System.Windows.Markup;
 
 namespace System.Xaml
 {
-	class NameScope : INameScope
+	class ExtendedNameScope : INameScope
 	{
 		Dictionary<string, object> table = new Dictionary<string, object>();
 		// It is an external read-only namescope.
 		INameScope external;
 
-		public NameScope(INameScope external)
+		public ExtendedNameScope(INameScope external)
 		{
 			this.external = external;
 		}

@@ -458,11 +458,17 @@
   <data name="NameScopeDuplicateNamesNotAllowed" xml:space="preserve">
     <value>Cannot register duplicate Name '{0}' in this scope.</value>
   </data>
+  <data name="NameScopeNameNotEmptyString" xml:space="preserve">
+    <value>Name cannot be an empty string.</value>
+  </data>
   <data name="NameScopeNameNotFound" xml:space="preserve">
     <value>'{0}' Name is not found.</value>
   </data>
   <data name="NameScopeNotFound" xml:space="preserve">
     <value>No NameScope found to {1} the Name '{0}'.</value>
+  </data>
+  <data name="NamesNotSupportedInsideResourceDictionary" xml:space="preserve">
+    <value>Names not supported under ResourceDictionary scope.</value>
   </data>
   <data name="NestedBeginInitNotSupported" xml:space="preserve">
     <value>Cannot have nested BeginInit calls on the same instance.</value>
@@ -550,6 +556,9 @@
   </data>
   <data name="Rect_Empty" xml:space="preserve">
     <value>Rectangle cannot be empty.</value>
+  </data>
+  <data name="ReferenceIsNull" xml:space="preserve">
+    <value>Value cannot be null. Object reference: '{0}'.</value>
   </data>
   <data name="RemovedItemNotFound" xml:space="preserve">
     <value>Collection Remove event must specify item position.</value>

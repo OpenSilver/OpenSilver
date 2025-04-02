@@ -720,12 +720,15 @@ namespace System.Windows
         }
 
         /// <summary>
-        ///     Retrieves the element in the VisualTree of thie element that corresponds to
-        ///     the element with the given childName in this element's style definition
+        /// Returns the named element in the visual tree of an instantiated <see cref="ControlTemplate"/>.
         /// </summary>
-        /// <param name="childName">the Name to find the matching element for</param>
-        /// <returns>The Named element.  Null if no element has this Name.</returns>
-        internal DependencyObject GetTemplateChild(string childName)
+        /// <param name="childName">
+        /// Name of the child to find.
+        /// </param>
+        /// <returns>
+        /// The requested element. May be null if no element of the requested name exists.
+        /// </returns>
+        protected internal DependencyObject GetTemplateChild(string childName)
         {
             if (FrameworkTemplate.GetTemplateNameScope(this) is INameScope namescope)
             {
@@ -735,32 +738,39 @@ namespace System.Windows
             return null;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        /// <summary>
+        /// Provides an accessor that simplifies access to the <see cref="NameScope"/> registration method.
+        /// </summary>
+        /// <param name="name">
+        /// Name to use for the specified name-object mapping.
+        /// </param>
+        /// <param name="scopedElement">
+        /// Object for the mapping.
+        /// </param>
         public void RegisterName(string name, object scopedElement)
         {
-            INameScope nameScope = FindScope(this);
-            if (nameScope != null)
-            {
-                nameScope.RegisterName(name, scopedElement);
-            }
-            else
+            if (FindScope(this) is not INameScope nameScope)
             {
                 throw new InvalidOperationException(string.Format(Strings.NameScopeNotFound, name, "register"));
             }
+
+            nameScope.RegisterName(name, scopedElement);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        /// <summary>
+        /// Simplifies access to the <see cref="NameScope"/> de-registration method.
+        /// </summary>
+        /// <param name="name">
+        /// Name of the name-object pair to remove from the current scope.
+        /// </param>
         public void UnregisterName(string name)
         {
-            INameScope nameScope = FindScope(this);
-            if (nameScope != null)
-            {
-                nameScope.UnregisterName(name);
-            }
-            else
+            if (FindScope(this) is not INameScope nameScope)
             {
                 throw new InvalidOperationException(string.Format(Strings.NameScopeNotFound, name, "unregister"));
             }
+
+            nameScope.UnregisterName(name);
         }
 
         /// <summary>

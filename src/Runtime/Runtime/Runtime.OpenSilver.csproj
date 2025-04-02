@@ -121,6 +121,7 @@
     <Compile Include="System.Windows.Data\MultiBindingExpression.cs" />
     <Compile Include="System.Windows.Documents\InlineImageContainer.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\StoryboardPathResolver.cs" />
+    <Compile Include="System.Windows.Markup\INameScopeDictionary.cs" />
     <Compile Include="System.Windows.Media.Animation\BooleanAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\BooleanKeyFrame.cs" />
     <Compile Include="System.Windows.Media.Animation\ByteAnimation.cs" />
@@ -221,7 +222,7 @@
     <Compile Include="OpenSilver\Internal\Data\PropertyPathParser.cs" />
     <Compile Include="OpenSilver\Internal\Data\PropertyPathWalker.cs" />
     <Compile Include="OpenSilver\Internal\Data\StandardPropertyPathNode.cs" />
-    <Compile Include="OpenSilver\Internal\NameScope.cs" />
+    <Compile Include="System.Windows\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
@@ -635,7 +636,7 @@
     <Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherSynchronizationContext.cs" />
     <Compile Include="APP_SUPPORT\ClientSideResourceManager.cs" />
     <Compile Include="APP_SUPPORT\Cshtml5Initializer.cs" />
-    <Compile Include="Core\Main\INameScope.cs" />
+    <Compile Include="System.Windows.Markup\INameScope.cs" />
     <Compile Include="Core\Main\INTERNAL_Simulator.cs" />
     <Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
     <Compile Include="Core\Main\TypeFromStringConverters.cs" />

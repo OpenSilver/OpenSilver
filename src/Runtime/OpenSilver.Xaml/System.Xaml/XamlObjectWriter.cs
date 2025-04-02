@@ -319,7 +319,7 @@ namespace System.Xaml
         {
             this.source = source;
             var ext = source.Settings.ExternalNameScope;
-            name_scope = ext != null && source.Settings.RegisterNamesOnExternalNamescope ? ext : new NameScope(ext);
+            name_scope = ext != null && source.Settings.RegisterNamesOnExternalNamescope ? ext : new ExtendedNameScope(ext);
         }
 
         XamlObjectWriter source;

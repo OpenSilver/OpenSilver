@@ -1196,49 +1196,49 @@ namespace System.Windows
 
         #region INameScope implementation
 
-        private Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
-
-        //
-        // Note: WPF always returns null
-        //
         /// <summary>
-        /// Finds the UIElement with the specified name.
+        /// Not supported by this Dictionary implementation.
         /// </summary>
-        /// <param name="name">The name to look for.</param>
-        /// <returns>The object with the specified name if any; otherwise null.</returns>
-        [Obsolete("INameScope is not supported on ResourceDictionaries.")]
-        public object FindName(string name)
-        {
-            if (_nameScopeDictionary.ContainsKey(name))
-                return _nameScopeDictionary[name];
-            else
-                return null;
-        }
+        /// <param name="name">
+        /// The name identifier for the object being requested.
+        /// </param>
+        /// <returns>
+        /// Always returns null.
+        /// </returns>
+        /// <remarks>
+        /// The <see cref="ResourceDictionary"/> class does not support registering by name. It uses keys instead.
+        /// </remarks>
+        public object FindName(string name) => null;
 
-        //
-        // Note: WPF does not support RegisterName,
-        // A NotSupportedException is thrown
-        //
-        [Obsolete("INameScope is not supported on ResourceDictionaries.")]
-        public void RegisterName(string name, object scopedElement)
-        {
-            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
-                throw new ArgumentException(string.Format(Strings.NameScopeDuplicateNamesNotAllowed, name));
+        /// <summary>
+        /// Not supported by this Dictionary implementation.
+        /// </summary>
+        /// <param name="name">
+        /// Not supported.
+        /// </param>
+        /// <param name="scopedElement">
+        /// Not supported.
+        /// </param>
+        /// <exception cref="NotSupportedException">
+        /// In all cases when this method is called.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="ResourceDictionary"/> class does not support registering by name. It uses keys instead. The XAML namescope methods are 
+        /// implemented as inoperative versions in <see cref="ResourceDictionary"/> to make it clear that XAML names do not apply to resources.
+        /// Calling this method will cause a <see cref="NotSupportedException"/> to be thrown.
+        /// </remarks>
+        public void RegisterName(string name, object scopedElement) => throw new NotSupportedException(Strings.NamesNotSupportedInsideResourceDictionary);
 
-            _nameScopeDictionary[name] = scopedElement;
-        }
-
-        //
-        // Note: does nothing in WPF as name can't be registered...
-        //
-        [Obsolete("INameScope is not supported on ResourceDictionaries.")]
-        public void UnregisterName(string name)
-        {
-            if (!_nameScopeDictionary.ContainsKey(name))
-                throw new ArgumentException(string.Format(Strings.NameScopeNameNotFound, name));
-
-            _nameScopeDictionary.Remove(name);
-        }
+        /// <summary>
+        /// Not supported by this Dictionary implementation.
+        /// </summary>
+        /// <param name="name">
+        /// Not supported.
+        /// </param>
+        /// <remarks>
+        /// The <see cref="ResourceDictionary"/> class does not support registering by name. It uses keys instead. Calling this method does nothing.
+        /// </remarks>
+        public void UnregisterName(string name) { }
 
         #endregion
 

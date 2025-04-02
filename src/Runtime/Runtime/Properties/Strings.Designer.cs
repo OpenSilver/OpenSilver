@@ -1078,6 +1078,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Name cannot be an empty string..
+        /// </summary>
+        internal static string NameScopeNameNotEmptyString {
+            get {
+                return ResourceManager.GetString("NameScopeNameNotEmptyString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; Name is not found..
         /// </summary>
         internal static string NameScopeNameNotFound {
@@ -1092,6 +1101,15 @@ namespace OpenSilver.Internal {
         internal static string NameScopeNotFound {
             get {
                 return ResourceManager.GetString("NameScopeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Names not supported under ResourceDictionary scope..
+        /// </summary>
+        internal static string NamesNotSupportedInsideResourceDictionary {
+            get {
+                return ResourceManager.GetString("NamesNotSupportedInsideResourceDictionary", resourceCulture);
             }
         }
         
@@ -1353,6 +1371,15 @@ namespace OpenSilver.Internal {
         internal static string Rect_Empty {
             get {
                 return ResourceManager.GetString("Rect_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value cannot be null. Object reference: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReferenceIsNull {
+            get {
+                return ResourceManager.GetString("ReferenceIsNull", resourceCulture);
             }
         }
         
