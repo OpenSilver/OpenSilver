@@ -99,17 +99,6 @@ namespace System.Windows.Controls
         }
 
         //-----------------------
-        // ISENABLED (OVERRIDE)
-        //-----------------------
-
-        protected internal override void ManageIsEnabled(bool isEnabled)
-        {
-            base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
-
-            UpdateVisualStates();
-        }
-
-        //-----------------------
         // BACKGROUND
         //-----------------------
 
