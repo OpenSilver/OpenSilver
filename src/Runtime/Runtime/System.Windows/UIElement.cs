@@ -413,7 +413,7 @@ namespace System.Windows
 
         private void OnClipGeometryChanged(object sender, GeometryInvalidatedEventsArgs e)
         {
-            if (e.AffectsMeasure)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && e.AffectsMeasure)
             {
                 this.SetClipPath(Clip);
             }
