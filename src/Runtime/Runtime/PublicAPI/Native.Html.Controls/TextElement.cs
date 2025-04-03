@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -74,7 +69,10 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (_jsCanvasForMeasuringTextWidth == null)
                     _jsCanvasForMeasuringTextWidth = OpenSilver.Interop.ExecuteJavaScriptAsync("document.createElement('canvas').getContext('2d')");
-                return Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("$0.measureText($1).width", _jsCanvasForMeasuringTextWidth, this.Text)) * FontHeight / DEFAULT_FONT_HEIGHT;
+
+                string canvas = OpenSilver.Interop.GetVariableStringForJS(_jsCanvasForMeasuringTextWidth);
+                string escapedText = OpenSilver.Interop.GetVariableStringForJS(Text);
+                return OpenSilver.Interop.ExecuteJavaScriptDouble($"{canvas}.measureText({escapedText}).width") * FontHeight / DEFAULT_FONT_HEIGHT;
             }
         }
 
@@ -103,8 +101,15 @@ namespace CSHTML5.Native.Html.Controls
             {
                 currentDrawingStyle = this.ApplyStyle(currentDrawingStyle, jsContext2d);
 
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.font = $1", jsContext2d, this.FontWeight.ToString() + " " + this.FontHeight.ToString() + "px " + this.Font); //todo: use "InvariantCulture" in the ToString() when supported.
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.fillText($1, $2, $3)", jsContext2d, this.Text, this.X + xParent, this.Y + yParent + this.FontHeight);
+                string context2d = OpenSilver.Interop.GetVariableStringForJS(jsContext2d);
+                string text = OpenSilver.Interop.GetVariableStringForJS(Text);
+                string font = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(Font);
+
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"""
+                    {context2d}.font = "{FontWeight.ToOpenTypeWeight().ToInvariantString()} {FontHeight.ToInvariantString()}px {font}";
+                    {context2d}.fillText({text}, {(X + xParent).ToInvariantString()}, {(Y + yParent + FontHeight).ToInvariantString()});
+                    """);
             }
 
             return currentDrawingStyle;

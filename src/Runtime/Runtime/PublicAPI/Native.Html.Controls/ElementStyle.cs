@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -50,7 +43,7 @@ namespace CSHTML5.Native.Html.Controls
             get { return _fillColor; }
             set
             {
-                fillColorStr = ConvertColorToHtml(value);
+                fillColorStr = value.ToHtmlString(1);
                 _fillColor = value;
             }
         }
@@ -63,7 +56,7 @@ namespace CSHTML5.Native.Html.Controls
             get { return _strokeColor; }
             set
             {
-                strokeColorStr = ConvertColorToHtml(value);
+                strokeColorStr = value.ToHtmlString(1);
                 _strokeColor = value;
             }
         }
@@ -76,7 +69,7 @@ namespace CSHTML5.Native.Html.Controls
             get { return _shadowColor; }
             set
             {
-                shadowColorStr = ConvertColorToHtml(value);
+                shadowColorStr = value.ToHtmlString(1);
                 _shadowColor = value;
             }
         }
@@ -150,37 +143,41 @@ namespace CSHTML5.Native.Html.Controls
         /// <param name="jsContext2d">Canvas 2d javascript context</param>
         internal void Apply(object jsContext2d)
         {
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"
-$0.fillStyle = $1;
-$0.strokeStyle = $2;
-$0.shadowColor = $3;
-$0.shadowBlur = $4;
-$0.shadowOffsetX = $5;
-$0.shadowOffsetY = $6;
-$0.lineCap = $7;
-$0.lineJoin = $8;
-$0.lineWidth = $9", jsContext2d,
-                      this.fillColorStr,
-                      this.strokeColorStr,
-                      this.shadowColorStr,
-                      this.ShadowBlur,
-                      this.ShadowOffsetX,
-                      this.ShadowOffsetY,
-                      this.LineCap.ToString().ToLower(),
-                      this.LineJoin.ToString().ToLower(),
-                      this.LineWidth);
+            string context2d = OpenSilver.Interop.GetVariableStringForJS(jsContext2d);
 
-            // Note: the following is done on a separate line because of a limitation of JSIL where $10 is understood as $1 followed by a 0.
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"
-$0.miterLimit = $1", jsContext2d,
-                      this.MiterLimit);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"""
+                {context2d}.fillStyle = '{fillColorStr}';
+                {context2d}.strokeStyle = '{strokeColorStr}';
+                {context2d}.shadowColor = '{shadowColorStr}';
+                {context2d}.shadowBlur = {ShadowBlur.ToInvariantString()};
+                {context2d}.shadowOffsetX = {ShadowOffsetX.ToInvariantString()};
+                {context2d}.shadowOffsetY = {ShadowOffsetY.ToInvariantString()};
+                {context2d}.lineCap = '{LineCapToHtmlString(LineCap)}';
+                {context2d}.lineJoin = '{LineJoinToHtmlString(LineJoin)}';
+                {context2d}.lineWidth = {LineWidth.ToInvariantString()};
+                {context2d}.miterLimit = {MiterLimit.ToInvariantString()};
+                """);
         }
 
-        static private string ConvertColorToHtml(Color color)
+        internal static string LineJoinToHtmlString(LineJoin lineJoin)
         {
-            return string.Format(CultureInfo.InvariantCulture,
-                "rgba({0}, {1}, {2}, {3})",
-                color.R, color.G, color.B, color.A / 255d);
+            return lineJoin switch
+            {
+                LineJoin.Bevel => "bevel",
+                LineJoin.Round => "round",
+                _ => "miter",
+            };
+        }
+
+        internal static string LineCapToHtmlString(LineCap lineCap)
+        {
+            return lineCap switch
+            {
+                LineCap.Butt => "butt",
+                LineCap.Round => "round",
+                _ => "square",
+            };
         }
     }
 }

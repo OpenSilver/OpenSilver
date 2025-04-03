@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -108,10 +102,15 @@ namespace CSHTML5.Native.Html.Controls
             if (this.Visibility == Visibility.Visible)
             {
                 currentDrawingStyle = this.ApplyStyle(currentDrawingStyle, jsContext2d);
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.beginPath()", jsContext2d);
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.moveTo($1, $2)", jsContext2d, this.X1 + xParent, this.Y1 + yParent);
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.lineTo($1, $2)", jsContext2d, this.X2 + xParent, this.Y2 + yParent);
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.stroke()", jsContext2d);
+
+                string context2d = OpenSilver.Interop.GetVariableStringForJS(jsContext2d);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"""
+                    {context2d}.beginPath();
+                    {context2d}.moveTo({(X1 + xParent).ToInvariantString()}, {(Y1 + yParent).ToInvariantString()});
+                    {context2d}.lineTo({(X2 + xParent).ToInvariantString()}, {(Y2 + yParent).ToInvariantString()});
+                    {context2d}.stroke();
+                    """);
             }
 
             return currentDrawingStyle;

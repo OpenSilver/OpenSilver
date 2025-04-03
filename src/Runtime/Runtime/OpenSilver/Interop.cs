@@ -443,6 +443,16 @@ public static partial class Interop
         }
     }
 
+    internal static string GetVariableStringForJS(string s)
+    {
+        if (s is null)
+        {
+            return "null";
+        }
+
+        return $"\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(s)}\"";
+    }
+
     internal static string GetVariableStringForJS(IJavaScriptConvertible jsObject)
     {
         Debug.Assert(jsObject is not null);

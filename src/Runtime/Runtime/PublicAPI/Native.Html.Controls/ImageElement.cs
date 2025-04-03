@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -104,24 +98,27 @@ namespace CSHTML5.Native.Html.Controls
             {
                 currentDrawingStyle = this.ApplyStyle(currentDrawingStyle, jsContext2d);
 
+                string context2d = OpenSilver.Interop.GetVariableStringForJS(jsContext2d);
+                string image = OpenSilver.Interop.GetVariableStringForJS(_jsImage);
+
                 if (this._lastDrawnSource != this._sourceCache
                     || this._lastDrawnWidth != this.Width
                     || this._lastDrawnHeight != this.Height)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptAsync(@"
-$0.width = $1;
-$0.height = $2;
-$0.src = $3",
-                        this._jsImage,
-                        this.Width,
-                        this.Height,
-                        this._sourceCache);
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                        $"""
+                        {image}.width = {Width.ToInvariantString()};
+                        {image}.height = {Height.ToInvariantString()};
+                        {image}.src = {OpenSilver.Interop.GetVariableStringForJS(_sourceCache)};
+                        """);
+
                     this._lastDrawnSource = this._sourceCache;
                     this._lastDrawnWidth = this.Width;
                     this._lastDrawnHeight = this.Height;
                 }
 
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.drawImage($1, $2, $3)", jsContext2d, this._jsImage, this.X + xParent, this.Y + yParent);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"{context2d}.drawImage({image}, {(X + xParent).ToInvariantString()}, {(Y + yParent).ToInvariantString()})");
             }
 
             return currentDrawingStyle;

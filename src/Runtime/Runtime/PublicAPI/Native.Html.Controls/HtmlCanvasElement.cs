@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,13 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using CSHTML5.Native.Html.Input;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -111,7 +105,7 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (_fillColor == null)
                     _isStyleOverrided = true;
-                _fillStyleStr = ConvertColorToHtml(value);
+                _fillStyleStr = value.ToHtmlString(1);
                 _fillColor = value;
             }
         }
@@ -126,7 +120,7 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (_strokeColor == null)
                     _isStyleOverrided = true;
-                _strokeStyleStr = ConvertColorToHtml(value);
+                _strokeStyleStr = value.ToHtmlString(1);
                 _strokeColor = value;
             }
         }
@@ -141,7 +135,7 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (_shadowColor == null)
                     _isStyleOverrided = true;
-                _shadowColorStr = ConvertColorToHtml(value);
+                _shadowColorStr = value.ToHtmlString(1);
                 _shadowColor = value;
             }
         }
@@ -411,30 +405,21 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (this._isStyleOverrided)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(@"
-$0.fillStyle = $1;
-$0.strokeStyle = $2;
-$0.shadowColor = $3;
-$0.shadowBlur = $4;
-$0.shadowOffsetX = $5;
-$0.shadowOffsetY = $6;
-$0.lineCap = $7;
-$0.lineJoin = $8;
-$0.lineWidth = $9", jsContext2d,
-                      (this._fillColor != null) ? this._fillStyleStr : this.Style.fillColorStr,
-                      (this._strokeColor != null) ? this._strokeStyleStr : this.Style.strokeColorStr,
-                      (this._shadowColor != null) ? this._shadowColorStr : this.Style.shadowColorStr,
-                      this.ShadowBlur,
-                      this.ShadowOffsetX,
-                      this.ShadowOffsetY,
-                      this.LineCap.ToString().ToLower(),
-                      this.LineJoin.ToString().ToLower(),
-                      this.LineWidth);
+                string context2d = OpenSilver.Interop.GetVariableStringForJS(jsContext2d);
 
-                // Note: the following is done on a separate line because of a limitation of JSIL where $10 is understood as $1 followed by a 0.
-                OpenSilver.Interop.ExecuteJavaScriptAsync(@"
-$0.miterLimit = $1", jsContext2d,
-                      this.MiterLimit);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"""
+                    {context2d}.fillStyle = '{(_fillColor != null ? _fillStyleStr : Style.fillColorStr)}';
+                    {context2d}.strokeStyle = '{(_strokeColor != null ? _strokeStyleStr : Style.strokeColorStr)}';
+                    {context2d}.shadowColor = '{(_shadowColor != null ? _shadowColorStr : Style.shadowColorStr)}';
+                    {context2d}.shadowBlur = {ShadowBlur.ToInvariantString()};
+                    {context2d}.shadowOffsetX = {ShadowOffsetX.ToInvariantString()};
+                    {context2d}.shadowOffsetY = {ShadowOffsetY.ToInvariantString()};
+                    {context2d}.lineCap = '{ElementStyle.LineCapToHtmlString(LineCap)}';
+                    {context2d}.lineJoin = '{ElementStyle.LineJoinToHtmlString(LineJoin)}';
+                    {context2d}.lineWidth = {LineWidth.ToInvariantString()};
+                    {context2d}.miterLimit = {MiterLimit.ToInvariantString()};
+                    """);
 
                 return null;
             }
@@ -449,26 +434,7 @@ $0.miterLimit = $1", jsContext2d,
             }
         }
 
-        internal string StyleToString()
-        {
-            string s = "IsVisible = " + this.IsVisible + "\n";
-            s += "fillStyle = '" + this._fillStyleStr + "'\n";
-            s += "strokeStyle = '" + this._strokeStyleStr + "'\n";
-            s += "shadowColor = '" + this._shadowColorStr + "'\n";
-            s += "shadowBlur = " + this.ShadowBlur + "\n";
-            s += "shadowOffsetX = " + this.ShadowOffsetX + "\n";
-            s += "shadowOffsetY = " + this.ShadowOffsetY + "\n";
-            return s;
-        }
-
         public abstract bool IsPointed(double x, double y);
-
-        static private string ConvertColorToHtml(Color color)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "rgba({0}, {1}, {2}, {3})",
-                color.R, color.G, color.B, color.A / 255d);
-        }
 
         public virtual void OnPointerMoved(HtmlCanvasPointerRoutedEventArgs e)
         {

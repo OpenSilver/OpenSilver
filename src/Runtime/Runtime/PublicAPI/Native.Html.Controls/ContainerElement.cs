@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
-using System.Diagnostics;
 using System.Windows;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -91,8 +85,18 @@ namespace CSHTML5.Native.Html.Controls
             if (this.Visibility == Visibility.Visible)
             {
                 currentDrawingStyle = this.ApplyStyle(currentDrawingStyle, jsContext2d);
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.fillRect($1, $2, $3, $4)", jsContext2d, this.X + xParent, this.Y + yParent, this.Width, this.Height);
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.strokeRect($1, $2, $3, $4)", jsContext2d, this.X + xParent, this.Y + yParent, this.Width, this.Height);
+
+                string context2d = OpenSilver.Interop.GetVariableStringForJS(jsContext2d);
+                string x = (X + xParent).ToInvariantString();
+                string y = (Y + yParent).ToInvariantString();
+                string width = Width.ToInvariantString();
+                string height = Height.ToInvariantString();
+
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"""
+                    {context2d}.fillRect({x}, {y}, {width}, {height});
+                    {context2d}.strokeRect({x}, {y}, {width}, {height});
+                    """);
 
                 foreach (HtmlCanvasElement elem in this.Children)
                 {

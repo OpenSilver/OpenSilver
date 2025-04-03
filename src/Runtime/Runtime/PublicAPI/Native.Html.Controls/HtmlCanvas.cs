@@ -313,9 +313,11 @@ namespace CSHTML5.Native.Html.Controls
 
             // Use the div2 as the js canvas object
             this._jsCanvas = div1;
-            this._jsContext2d = OpenSilver.Interop.ExecuteJavaScriptAsync("$0.getContext('2d')", this._jsCanvas);
+            this._jsContext2d = OpenSilver.Interop.ExecuteJavaScriptAsync(
+                $"{OpenSilver.Interop.GetVariableStringForJS(_jsCanvas)}.getContext('2d')");
 
-            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this._jsCanvas);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"{OpenSilver.Interop.GetVariableStringForJS(_jsCanvas)}.onselectstart = function() {{ return false; }}");
 
             return div1;
         }
@@ -327,8 +329,13 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (this.IsLoaded)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.width = $0.scrollWidth", this._jsCanvas);
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.height = $0.scrollHeight", this._jsCanvas);
+                string canvas = OpenSilver.Interop.GetVariableStringForJS(_jsCanvas);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"""
+                    {canvas}.width = {canvas}.scrollWidth;
+                    {canvas}.height = {canvas}.scrollHeight;
+                    """);
+
                 foreach (HtmlCanvasElement elem in this.Children)
                 {
                     this._currentDrawingStyle = elem.Draw(this._currentDrawingStyle, this._jsContext2d);
