@@ -148,7 +148,7 @@ namespace System.Windows.Controls
         private void DrawStroke(Stroke stroke)
         {
             var points = stroke.StylusPoints;
-            if (points.InternalCount <= 1)
+            if (points.InternalCount < 1)
             {
                 return;
             }
@@ -161,14 +161,26 @@ namespace System.Windows.Controls
             sb.AppendLine("ctx.beginPath();");
 
             var firstPoint = points[0];
-            sb.AppendLine($"ctx.moveTo({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()});");
 
-            for (int i = 1; i < points.InternalCount; i++)
+            if (points.InternalCount == 1)
             {
-                sb.AppendLine($"ctx.lineTo({points[i].X.ToInvariantString()}, {points[i].Y.ToInvariantString()});");
+                sb.AppendLine($"ctx.fillStyle = '{stroke.DrawingAttributes.Color.ToHtmlString(1)}';");
+                sb.AppendLine($"ctx.arc({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()}, ctx.lineWidth / 2, 0, 2 * Math.PI);");
+                sb.AppendLine("ctx.fill();");
+            }
+            else
+            {
+                sb.AppendLine($"ctx.moveTo({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()});");
+
+                for (int i = 1; i < points.InternalCount; i++)
+                {
+                    sb.AppendLine($"ctx.lineTo({points[i].X.ToInvariantString()}, {points[i].Y.ToInvariantString()});");
+                }
+
+                sb.AppendLine("ctx.stroke();");
             }
 
-            sb.AppendLine($"ctx.stroke(); }})({sCanvas})");
+            sb.AppendLine($"}})({sCanvas})");
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(StringBuilderCache.GetStringAndRelease(sb));
         }
 
