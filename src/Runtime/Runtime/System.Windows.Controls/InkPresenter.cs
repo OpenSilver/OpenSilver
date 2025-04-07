@@ -153,23 +153,32 @@ namespace System.Windows.Controls
                 return;
             }
 
+            string js;
             string sCanvas = OpenSilver.Interop.GetVariableStringForJS(_canvasDom);
-            var sb = StringBuilderCache.Acquire();
-            sb.AppendLine("(function(cvs) { const ctx = cvs.getContext('2d');");
-            sb.AppendLine($"ctx.strokeStyle = '{stroke.DrawingAttributes.Color.ToHtmlString(1)}';");
-            sb.AppendLine($"ctx.lineWidth = '{stroke.DrawingAttributes.Width.ToInvariantString()}';");
-            sb.AppendLine("ctx.beginPath();");
 
-            var firstPoint = points[0];
+            StylusPoint firstPoint = points[0];
+            DrawingAttributes drawingAttributes = stroke.DrawingAttributes;
 
             if (points.InternalCount == 1)
             {
-                sb.AppendLine($"ctx.fillStyle = '{stroke.DrawingAttributes.Color.ToHtmlString(1)}';");
-                sb.AppendLine($"ctx.arc({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()}, ctx.lineWidth / 2, 0, 2 * Math.PI);");
-                sb.AppendLine("ctx.fill();");
+                js = $$"""
+                     (function(cvs) {
+                       const ctx = cvs.getContext('2d');
+                       ctx.beginPath();
+                       ctx.fillStyle = '{{drawingAttributes.Color.ToHtmlString(1)}}';
+                       ctx.arc({{firstPoint.X.ToInvariantString()}}, {{firstPoint.Y.ToInvariantString()}}, {{drawingAttributes.Width.ToInvariantString()}} / 2, 0, 2 * Math.PI);
+                       ctx.fill();
+                     })({{sCanvas}})
+                     """;
             }
             else
             {
+                var sb = StringBuilderCache.Acquire();
+
+                sb.AppendLine("(function(cvs) { const ctx = cvs.getContext('2d');");
+                sb.AppendLine($"ctx.strokeStyle = '{drawingAttributes.Color.ToHtmlString(1)}';");
+                sb.AppendLine($"ctx.lineWidth = '{drawingAttributes.Width.ToInvariantString()}';");
+                sb.AppendLine("ctx.beginPath();");
                 sb.AppendLine($"ctx.moveTo({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()});");
 
                 for (int i = 1; i < points.InternalCount; i++)
@@ -177,11 +186,12 @@ namespace System.Windows.Controls
                     sb.AppendLine($"ctx.lineTo({points[i].X.ToInvariantString()}, {points[i].Y.ToInvariantString()});");
                 }
 
-                sb.AppendLine("ctx.stroke();");
+                sb.AppendLine($"ctx.stroke(); }})({sCanvas})");
+
+                js = StringBuilderCache.GetStringAndRelease(sb);
             }
 
-            sb.AppendLine($"}})({sCanvas})");
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(StringBuilderCache.GetStringAndRelease(sb));
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(js);
         }
 
 
