@@ -160,12 +160,20 @@ internal sealed class InputManager
 
     internal bool CaptureMouse(UIElement uie)
     {
+        Debug.Assert(uie is not null);
+
         if (Pointer.Captured is null && _mouseLeftDown)
         {
             Pointer.Captured = uie;
 
             string sDiv = OpenSilver.Interop.GetVariableStringForJS(uie.OuterDiv);
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.capturePointer({sDiv})");
+
+            RaiseUserInitiatedEvent(uie, new MouseEventArgs
+            {
+                RoutedEvent = Mouse.GotMouseCaptureEvent,
+                Source = uie,
+            });
 
             return true;
         }

@@ -191,6 +191,40 @@ public static class Mouse
         => RemoveHandler(element, MouseLeaveEvent, handler);
 
     /// <summary>
+    /// Identifies the Mouse.GotMouseCapture attached event.
+    /// </summary>
+    public static readonly RoutedEvent GotMouseCaptureEvent =
+        EventManager.RegisterRoutedEvent(
+            "GotMouseCapture",
+            RoutingStrategy.Bubble,
+            typeof(MouseEventHandler),
+            typeof(Mouse));
+
+    /// <summary>
+    /// Adds a handler for the Mouse.GotMouseCapture attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> or that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void AddGotMouseCaptureHandler(DependencyObject element, MouseEventHandler handler)
+        => AddHandler(element, GotMouseCaptureEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Mouse.GotMouseCapture attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void RemoveGotMouseCaptureHandler(DependencyObject element, MouseEventHandler handler)
+        => RemoveHandler(element, GotMouseCaptureEvent, handler);
+
+    /// <summary>
     /// Identifies the Mouse.LostMouseCapture attached event.
     /// </summary>
     public static readonly RoutedEvent LostMouseCaptureEvent =

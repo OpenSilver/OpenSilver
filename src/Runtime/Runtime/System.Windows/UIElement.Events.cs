@@ -40,6 +40,7 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseWheelEvent, new MouseWheelEventHandler(OnMouseWheelThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnterThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.GotMouseCaptureEvent, new MouseEventHandler(OnGotMouseCaptureThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
@@ -105,6 +106,8 @@ namespace System.Windows
         private static void OnGotFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnGotFocus(e);
 
         private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
+
+        private static void OnGotMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnGotMouseCapture(e);
 
         private static void OnLostMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnLostMouseCapture(e);
 
@@ -931,6 +934,33 @@ namespace System.Windows
         /// </summary>
         /// <param name="e">The arguments for the event.</param>
         protected virtual void OnLostFocus(RoutedEventArgs e) { }
+
+        #endregion
+
+        #region GotMouseCapture
+
+        /// <summary>
+        /// Identifies the <see cref="GotMouseCapture"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent GotMouseCaptureEvent = Mouse.GotMouseCaptureEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when this element captures the mouse.
+        /// </summary>
+        public event MouseEventHandler GotMouseCapture
+        {
+            add => AddHandler(GotMouseCaptureEvent, value, false);
+            remove => RemoveHandler(GotMouseCaptureEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Mouse.GotMouseCapture attached event reaches an element in its route 
+        /// that is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnGotMouseCapture(MouseEventArgs e) { }
 
         #endregion
 
