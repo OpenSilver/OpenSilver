@@ -30,22 +30,50 @@ namespace System.Windows
 
         private static void RegisterEvents()
         {
-            EventManager.RegisterClassHandler<UIElement>(MouseMoveEvent, new MouseEventHandler(OnMouseMoveThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.MouseDownEvent, new MouseButtonEventHandler(OnMouseDownThunk), true);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.MouseUpEvent, new MouseButtonEventHandler(OnMouseUpThunk), true);
             EventManager.RegisterClassHandler<UIElement>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseLeftButtonDownThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(MouseRightButtonDownEvent, new MouseButtonEventHandler(OnMouseRightButtonDownThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(MouseWheelEvent, new MouseWheelEventHandler(OnMouseWheelThunk), false);
             EventManager.RegisterClassHandler<UIElement>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnMouseLeftButtonUpThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(MouseEnterEvent, new MouseEventHandler(OnMouseEnterThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(MouseRightButtonDownEvent, new MouseButtonEventHandler(OnMouseRightButtonDownThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(MouseRightButtonUpEvent, new MouseButtonEventHandler(OnMouseRightButtonUpThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.MouseMoveEvent, new MouseEventHandler(OnMouseMoveThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.MouseWheelEvent, new MouseWheelEventHandler(OnMouseWheelThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnterThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TappedEvent, new TappedEventHandler(OnTappedThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(MouseRightButtonUpEvent, new MouseButtonEventHandler(OnMouseRightButtonUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(KeyDownEvent, new KeyEventHandler(OnKeyDownThunk), false);
             EventManager.RegisterClassHandler<UIElement>(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk), false);
             EventManager.RegisterClassHandler<UIElement>(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), false);
+        }
+
+        private static void OnMouseDownThunk(object sender, MouseButtonEventArgs e)
+        {
+            UIElement uie = (UIElement)sender;
+
+            if (!e.Handled)
+            {
+                uie.OnMouseDown(e);
+            }
+
+            // Always raise this "sub-event", but we pass along the handledness.
+            CrackMouseButtonEventAndReRaiseEvent(uie, e);
+        }
+
+        private static void OnMouseUpThunk(object sender, MouseButtonEventArgs e)
+        {
+            UIElement uie = (UIElement)sender;
+
+            if (!e.Handled)
+            {
+                uie.OnMouseUp(e);
+            }
+
+            // Always raise this "sub-event", but we pass along the handledness.
+            CrackMouseButtonEventAndReRaiseEvent(uie, e);
         }
 
         private static void OnMouseMoveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseMove(e);
@@ -204,6 +232,89 @@ namespace System.Windows
             RaiseEventImpl(this, e);
         }
 
+        private static RoutedEvent CrackMouseButtonEvent(MouseButtonEventArgs e)
+        {
+            RoutedEvent newEvent = null;
+
+            switch (e.ChangedButton)
+            {
+                case MouseButton.Left:
+                    if (e.RoutedEvent == Mouse.MouseDownEvent)
+                    {
+                        newEvent = MouseLeftButtonDownEvent;
+                    }
+                    else
+                    {
+                        newEvent = MouseLeftButtonUpEvent;
+                    }
+                    break;
+                case MouseButton.Right:
+                    if (e.RoutedEvent == Mouse.MouseDownEvent)
+                    {
+                        newEvent = MouseRightButtonDownEvent;
+                    }
+                    else
+                    {
+                        newEvent = MouseRightButtonUpEvent;
+                    }
+                    break;
+                default:
+                    // No wrappers exposed for the other buttons.
+                    break;
+            }
+            return newEvent;
+        }
+
+        private static void CrackMouseButtonEventAndReRaiseEvent(UIElement uie, MouseButtonEventArgs e)
+        {
+            if (CrackMouseButtonEvent(e) is RoutedEvent newEvent)
+            {
+                ReRaiseEventAs(uie, e, newEvent);
+            }
+        }
+
+        /// <summary>
+        ///     Re-raises an event with as a different RoutedEvent.
+        /// </summary>
+        /// <remarks>
+        ///     Only used internally.  Added to support cracking generic MouseButtonDown/Up events
+        ///     into MouseLeft/RightButtonDown/Up events.
+        /// </remarks>
+        /// <param name="uie">
+        ///     The Source associated with the RoutedEventArgs
+        /// </param>
+        /// <param name="args">
+        ///     RoutedEventsArgs to re-raise with a new RoutedEvent
+        /// </param>
+        /// <param name="newEvent">
+        ///     The new RoutedEvent to be associated with the RoutedEventArgs
+        /// </param>
+        private static void ReRaiseEventAs(UIElement uie, RoutedEventArgs args, RoutedEvent newEvent)
+        {
+            // Preseve and change the RoutedEvent
+            RoutedEvent preservedRoutedEvent = args.RoutedEvent;
+            args.OverrideRoutedEvent(newEvent);
+
+            // Preserve Source
+            object preservedSource = args.Source;
+
+            EventRoute route = EventRouteFactory.FetchObject(args.RoutedEvent);
+
+            // Build the route and invoke the handlers
+            BuildRouteHelper(uie, route, args);
+
+            route.InvokeHandlers(args);
+
+            // Restore Source
+            args.OverrideSource(preservedSource);
+
+            // Restore RoutedEvent
+            args.OverrideRoutedEvent(preservedRoutedEvent);
+
+            // Recycle the route object
+            EventRouteFactory.RecycleObject(route);
+        }
+
         private static void RaiseEventImpl(UIElement sender, RoutedEventArgs args)
         {
             EventRoute route = EventRouteFactory.FetchObject(args.RoutedEvent);
@@ -323,17 +434,68 @@ namespace System.Windows
         /// </summary>
         internal virtual void AddToEventRouteCore(EventRoute route, RoutedEventArgs args) { }
 
-        #region Pointer moved event
+        #region MouseDown
+
+        /// <summary>
+        /// Identifies the <see cref="MouseDown"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent MouseDownEvent = Mouse.MouseDownEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when any mouse button is pressed while the pointer is over this element.
+        /// </summary>
+        public event MouseButtonEventHandler MouseDown
+        {
+            add => AddHandler(Mouse.MouseDownEvent, value, false);
+            remove => RemoveHandler(Mouse.MouseDownEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Mouse.MouseDown attached event reaches an element in its route that is 
+        /// derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. This event data reports details 
+        /// about the mouse button that was pressed and the handled state.
+        /// </param>
+        protected virtual void OnMouseDown(MouseButtonEventArgs e) { }
+
+        #endregion
+
+        #region MouseUp
+
+        /// <summary>
+        /// Identifies the <see cref="MouseUp"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent MouseUpEvent = Mouse.MouseUpEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when any mouse button is released over this element.
+        /// </summary>
+        public event MouseButtonEventHandler MouseUp
+        {
+            add => AddHandler(Mouse.MouseUpEvent, value, false);
+            remove => RemoveHandler(Mouse.MouseUpEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Mouse.MouseUp routed event reaches an element in its route that is derived 
+        /// from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports that the 
+        /// mouse button was released.
+        /// </param>
+        protected virtual void OnMouseUp(MouseButtonEventArgs e) { }
+
+        #endregion
+
+        #region MouseMove
 
         /// <summary>
         /// Identifies the <see cref="MouseMove"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent MouseMoveEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(MouseMove),
-                RoutingStrategy.Bubble,
-                typeof(MouseEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent MouseMoveEvent = Mouse.MouseMoveEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when the pointer device that previously initiated a Press action is
@@ -341,8 +503,8 @@ namespace System.Windows
         /// </summary>
         public event MouseEventHandler MouseMove
         {
-            add => AddHandler(MouseMoveEvent, value, false);
-            remove => RemoveHandler(MouseMoveEvent, value);
+            add => AddHandler(Mouse.MouseMoveEvent, value, false);
+            remove => RemoveHandler(Mouse.MouseMoveEvent, value);
         }
 
         /// <summary>
@@ -353,7 +515,7 @@ namespace System.Windows
 
         #endregion
 
-        #region Pointer pressed event
+        #region MouseLeftButtonDown
 
         /// <summary>
         /// Identifies the <see cref="MouseLeftButtonDown"/> routed event.
@@ -361,7 +523,7 @@ namespace System.Windows
         public static readonly RoutedEvent MouseLeftButtonDownEvent =
             EventManager.RegisterRoutedEvent(
                 nameof(MouseLeftButtonDown),
-                RoutingStrategy.Bubble,
+                RoutingStrategy.Direct,
                 typeof(MouseButtonEventHandler),
                 typeof(UIElement));
 
@@ -391,7 +553,7 @@ namespace System.Windows
         public static readonly RoutedEvent MouseRightButtonDownEvent =
             EventManager.RegisterRoutedEvent(
                 nameof(MouseRightButtonDown),
-                RoutingStrategy.Bubble,
+                RoutingStrategy.Direct,
                 typeof(MouseButtonEventHandler),
                 typeof(UIElement));
 
@@ -409,17 +571,12 @@ namespace System.Windows
 
         #endregion
 
-        #region PointerWheelChanged event (or MouseWheel)
+        #region MouseWheel
 
         /// <summary>
         /// Identifies the <see cref="MouseWheel"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent MouseWheelEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(MouseWheel),
-                RoutingStrategy.Bubble,
-                typeof(MouseWheelEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent MouseWheelEvent = Mouse.MouseWheelEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
@@ -427,8 +584,8 @@ namespace System.Windows
         /// </summary>
         public event MouseWheelEventHandler MouseWheel
         {
-            add => AddHandler(MouseWheelEvent, value, false);
-            remove => RemoveHandler(MouseWheelEvent, value);
+            add => AddHandler(Mouse.MouseWheelEvent, value, false);
+            remove => RemoveHandler(Mouse.MouseWheelEvent, value);
         }
 
         /// <summary>
@@ -439,8 +596,7 @@ namespace System.Windows
 
         #endregion
 
-
-        #region Pointer released event
+        #region MouseLeftButtonUp
 
         /// <summary>
         /// Identifies the <see cref="MouseLeftButtonUp"/> routed event.
@@ -448,7 +604,7 @@ namespace System.Windows
         public static readonly RoutedEvent MouseLeftButtonUpEvent =
             EventManager.RegisterRoutedEvent(
                 nameof(MouseLeftButtonUp),
-                RoutingStrategy.Bubble,
+                RoutingStrategy.Direct,
                 typeof(MouseButtonEventHandler),
                 typeof(UIElement));
 
@@ -470,25 +626,20 @@ namespace System.Windows
 
         #endregion
 
-        #region Pointer entered event
+        #region MouseEnter
 
         /// <summary>
         /// Identifies the <see cref="MouseEnter"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent MouseEnterEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(MouseEnter),
-                RoutingStrategy.Direct,
-                typeof(MouseEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent MouseEnterEvent = Mouse.MouseEnterEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when a pointer enters the hit test area of this element.
         /// </summary>
         public event MouseEventHandler MouseEnter
         {
-            add => AddHandler(MouseEnterEvent, value, false);
-            remove => RemoveHandler(MouseEnterEvent, value);
+            add => AddHandler(Mouse.MouseEnterEvent, value, false);
+            remove => RemoveHandler(Mouse.MouseEnterEvent, value);
         }
 
         /// <summary>
@@ -499,25 +650,20 @@ namespace System.Windows
 
         #endregion
 
-        #region Pointer exited event
+        #region MouseLeave
 
         /// <summary>
         /// Identifies the <see cref="MouseLeave"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent MouseLeaveEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(MouseLeave),
-                RoutingStrategy.Direct,
-                typeof(MouseEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent MouseLeaveEvent = Mouse.MouseLeaveEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when a pointer leaves the hit test area of this element.
         /// </summary>
         public event MouseEventHandler MouseLeave
         {
-            add => AddHandler(MouseLeaveEvent, value, false);
-            remove => RemoveHandler(MouseLeaveEvent, value);
+            add => AddHandler(Mouse.MouseLeaveEvent, value, false);
+            remove => RemoveHandler(Mouse.MouseLeaveEvent, value);
         }
 
         /// <summary>
@@ -528,7 +674,7 @@ namespace System.Windows
 
         #endregion
 
-        #region Text events
+        #region TextInputStart, TextInput, TextInputUpdate
 
         /// <summary>
         /// Identifies the <see cref="TextInputStart"/> routed event.
@@ -610,7 +756,7 @@ namespace System.Windows
 
         #endregion
 
-        #region Tapped event
+        #region Tapped
 
         /// <summary>
         /// Identifies the <see cref="Tapped"/> routed event.
@@ -640,7 +786,7 @@ namespace System.Windows
 
         #endregion
 
-        #region RightTapped (aka MouseRightButtonUp) event
+        #region MouseRightButtonUp
 
         /// <summary>
         /// Identifies the <see cref="MouseRightButtonUp"/> routed event.
@@ -648,7 +794,7 @@ namespace System.Windows
         public static readonly RoutedEvent MouseRightButtonUpEvent =
             EventManager.RegisterRoutedEvent(
                 nameof(MouseRightButtonUp),
-                RoutingStrategy.Bubble,
+                RoutingStrategy.Direct,
                 typeof(MouseButtonEventHandler),
                 typeof(UIElement));
 
@@ -788,25 +934,20 @@ namespace System.Windows
 
         #endregion
 
-        #region LostMouseCapture event
+        #region LostMouseCapture
 
         /// <summary>
         /// Identifies the <see cref="LostMouseCapture"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent LostMouseCaptureEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(LostMouseCapture),
-                RoutingStrategy.Bubble,
-                typeof(MouseEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent LostMouseCaptureEvent = Mouse.LostMouseCaptureEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when the <see cref="UIElement"/> loses mouse capture.
         /// </summary>
         public event MouseEventHandler LostMouseCapture
         {
-            add => AddHandler(LostMouseCaptureEvent, value, false);
-            remove => RemoveHandler(LostMouseCaptureEvent, value);
+            add => AddHandler(Mouse.LostMouseCaptureEvent, value, false);
+            remove => RemoveHandler(Mouse.LostMouseCaptureEvent, value);
         }
 
         /// <summary>

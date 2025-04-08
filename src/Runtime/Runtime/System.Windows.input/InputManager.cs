@@ -43,24 +43,6 @@ internal sealed class InputManager
         WINDOW_BLUR = 14,
     }
 
-    private enum MouseButton
-    {
-        /// <summary>
-        /// The left mouse button.
-        /// </summary>
-        Left,
-
-        /// <summary>
-        /// The middle mouse button.
-        /// </summary>
-        Middle,
-
-        /// <summary>
-        /// The right mouse button.
-        /// </summary>
-        Right,
-    }
-
     private struct PointerCallbackParameters
     {
         public bool IsTouchEvent;
@@ -200,7 +182,7 @@ internal sealed class InputManager
 
             RaiseUserInitiatedEvent(uie, new MouseEventArgs
             {
-                RoutedEvent = UIElement.LostMouseCaptureEvent,
+                RoutedEvent = Mouse.LostMouseCaptureEvent,
                 Source = uie,
             });
         }
@@ -272,7 +254,7 @@ internal sealed class InputManager
 
                 RaiseUserInitiatedEvent(uie, new MouseEventArgs
                 {
-                    RoutedEvent = UIElement.MouseLeaveEvent,
+                    RoutedEvent = Mouse.MouseLeaveEvent,
                     Source = uie,
                 });
             }
@@ -507,7 +489,7 @@ internal sealed class InputManager
     {
         if (uie.MouseTarget is UIElement mouseTarget)
         {
-            ProcessPointerEvent(mouseTarget, UIElement.MouseMoveEvent, parameters);
+            ProcessPointerEvent(mouseTarget, Mouse.MouseMoveEvent, parameters);
         }
     }
 
@@ -517,7 +499,7 @@ internal sealed class InputManager
         {
             ProcessMouseButtonEvent(
                 mouseTarget,
-                UIElement.MouseLeftButtonDownEvent,
+                Mouse.MouseDownEvent,
                 parameters,
                 MouseButton.Left,
                 Environment.TickCount,
@@ -532,7 +514,7 @@ internal sealed class InputManager
         {
             ProcessMouseButtonEvent(
                 mouseTarget,
-                UIElement.MouseLeftButtonUpEvent,
+                Mouse.MouseUpEvent,
                 parameters,
                 MouseButton.Left,
                 Environment.TickCount,
@@ -551,7 +533,7 @@ internal sealed class InputManager
         {
             bool handled = ProcessMouseButtonEvent(
                 mouseTarget,
-                UIElement.MouseRightButtonDownEvent,
+                Mouse.MouseDownEvent,
                 parameters,
                 MouseButton.Right,
                 Environment.TickCount,
@@ -569,9 +551,9 @@ internal sealed class InputManager
     {
         if (uie.MouseTarget is UIElement mouseTarget)
         {
-            var e = new MouseButtonEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+            var e = new MouseButtonEventArgs(MouseButton.Right, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
             {
-                RoutedEvent = UIElement.MouseRightButtonUpEvent,
+                RoutedEvent = Mouse.MouseUpEvent,
                 Source = mouseTarget,
                 UIEventArg = parameters.UIEventArg,
             };
@@ -591,7 +573,7 @@ internal sealed class InputManager
 
             var e = new MouseWheelEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY, delta)
             {
-                RoutedEvent = UIElement.MouseWheelEvent,
+                RoutedEvent = Mouse.MouseWheelEvent,
                 Source = mouseTarget,
                 UIEventArg = parameters.UIEventArg,
             };
@@ -611,7 +593,7 @@ internal sealed class InputManager
         {
             mouseTarget.SetValueInternal(UIElement.IsMouseOverPropertyKey, true);
 
-            ProcessPointerEvent(mouseTarget, UIElement.MouseEnterEvent, parameters);
+            ProcessPointerEvent(mouseTarget, Mouse.MouseEnterEvent, parameters);
         }
     }
 
@@ -621,7 +603,7 @@ internal sealed class InputManager
         {
             mouseTarget.ClearValue(UIElement.IsMouseOverPropertyKey);
 
-            ProcessPointerEvent(mouseTarget, UIElement.MouseLeaveEvent, parameters);
+            ProcessPointerEvent(mouseTarget, Mouse.MouseLeaveEvent, parameters);
         }
     }
 
@@ -801,7 +783,7 @@ internal sealed class InputManager
         bool refreshClickCount,
         bool closeToolTips)
     {
-        var e = new MouseButtonEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        var e = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
         {
             RoutedEvent = routedEvent,
             Source = uie,

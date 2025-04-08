@@ -745,6 +745,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid type for IInputElement. UIElement expected..
+        /// </summary>
+        internal static string Invalid_IInputElement {
+            get {
+                return ResourceManager.GetString("Invalid_IInputElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; parameter cannot be Infinity..
         /// </summary>
         internal static string InvalidCtorParameterNoInfinity {

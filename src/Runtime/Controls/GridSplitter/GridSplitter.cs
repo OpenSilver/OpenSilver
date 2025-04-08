@@ -125,8 +125,8 @@ namespace System.Windows.Controls
         static GridSplitter()
         {
             EventManager.RegisterClassHandler<GridSplitter>(KeyDownEvent, new KeyEventHandler(GridSplitter_KeyDown));
-            EventManager.RegisterClassHandler<GridSplitter>(MouseEnterEvent, new MouseEventHandler(GridSplitter_MouseEnter));
-            EventManager.RegisterClassHandler<GridSplitter>(MouseLeaveEvent, new MouseEventHandler(GridSplitter_MouseLeave));
+            EventManager.RegisterClassHandler<GridSplitter>(Mouse.MouseEnterEvent, new MouseEventHandler(GridSplitter_MouseEnter));
+            EventManager.RegisterClassHandler<GridSplitter>(Mouse.MouseLeaveEvent, new MouseEventHandler(GridSplitter_MouseLeave));
             EventManager.RegisterClassHandler<GridSplitter>(GotFocusEvent, new RoutedEventHandler(GridSplitter_GotFocus));
             EventManager.RegisterClassHandler<GridSplitter>(LostFocusEvent, new RoutedEventHandler(GridSplitter_LostFocus));
 

@@ -46,8 +46,8 @@ namespace System.Windows.Controls
         static DataGridCell()
         {
             EventManager.RegisterClassHandler<DataGridCell>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridCell_MouseLeftButtonDown), true);
-            EventManager.RegisterClassHandler<DataGridCell>(MouseEnterEvent, new MouseEventHandler(DataGridCell_MouseEnter));
-            EventManager.RegisterClassHandler<DataGridCell>(MouseLeaveEvent, new MouseEventHandler(DataGridCell_MouseLeave));
+            EventManager.RegisterClassHandler<DataGridCell>(Mouse.MouseEnterEvent, new MouseEventHandler(DataGridCell_MouseEnter));
+            EventManager.RegisterClassHandler<DataGridCell>(Mouse.MouseLeaveEvent, new MouseEventHandler(DataGridCell_MouseLeave));
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridCell), new PropertyMetadata(typeof(DataGridCell)));
         }

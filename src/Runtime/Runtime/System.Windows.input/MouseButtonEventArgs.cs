@@ -24,10 +24,21 @@ public class MouseButtonEventArgs : MouseEventArgs
     /// </summary>
     public MouseButtonEventArgs() { }
 
-    internal MouseButtonEventArgs(bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
+    internal MouseButtonEventArgs(MouseButton button, bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
         : base(isTouchDevice, keyModifiers, x, y)
     {
+        MouseButtonUtilities.Validate(button);
+
+        ChangedButton = button;
     }
+
+    /// <summary>
+    /// Gets the button associated with the event.
+    /// </summary>
+    /// <returns>
+    /// The button which was pressed.
+    /// </returns>
+    public MouseButton ChangedButton { get; }
 
     /// <inheritdoc />
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>

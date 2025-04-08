@@ -57,12 +57,12 @@ namespace System.Windows.Controls.Primitives
 
         static DataGridColumnHeader()
         {
-            EventManager.RegisterClassHandler<DataGridColumnHeader>(LostMouseCaptureEvent, new MouseEventHandler(DataGridColumnHeader_LostMouseCapture));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(DataGridColumnHeader_LostMouseCapture));
             EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonDown));
             EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonUp));
-            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseMoveEvent, new MouseEventHandler(DataGridColumnHeader_MouseMove));
-            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseEnterEvent, new MouseEventHandler(DataGridColumnHeader_MouseEnter));
-            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseLeaveEvent, new MouseEventHandler(DataGridColumnHeader_MouseLeave));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(Mouse.MouseMoveEvent, new MouseEventHandler(DataGridColumnHeader_MouseMove));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(Mouse.MouseEnterEvent, new MouseEventHandler(DataGridColumnHeader_MouseEnter));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(Mouse.MouseLeaveEvent, new MouseEventHandler(DataGridColumnHeader_MouseLeave));
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridColumnHeader), new PropertyMetadata(typeof(DataGridColumnHeader)));
         }

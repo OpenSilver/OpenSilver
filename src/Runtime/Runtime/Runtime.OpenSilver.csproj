@@ -121,6 +121,8 @@
     <Compile Include="System.Windows.Data\MultiBindingExpression.cs" />
     <Compile Include="System.Windows.Documents\InlineImageContainer.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\StoryboardPathResolver.cs" />
+    <Compile Include="System.Windows.Input\Mouse.cs" />
+    <Compile Include="System.Windows.Input\MouseButton.cs" />
     <Compile Include="System.Windows.Markup\INameScopeDictionary.cs" />
     <Compile Include="System.Windows.Media.Animation\BooleanAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\BooleanKeyFrame.cs" />

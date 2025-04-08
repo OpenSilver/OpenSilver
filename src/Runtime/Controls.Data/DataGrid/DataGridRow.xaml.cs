@@ -185,8 +185,8 @@ namespace System.Windows.Controls
         static DataGridRow()
         {
             EventManager.RegisterClassHandler<DataGridRow>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRow_MouseLeftButtonDown), true);
-            EventManager.RegisterClassHandler<DataGridRow>(MouseEnterEvent, new MouseEventHandler(DataGridRow_MouseEnter));
-            EventManager.RegisterClassHandler<DataGridRow>(MouseLeaveEvent, new MouseEventHandler(DataGridRow_MouseLeave));
+            EventManager.RegisterClassHandler<DataGridRow>(Mouse.MouseEnterEvent, new MouseEventHandler(DataGridRow_MouseEnter));
+            EventManager.RegisterClassHandler<DataGridRow>(Mouse.MouseLeaveEvent, new MouseEventHandler(DataGridRow_MouseLeave));
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridRow), new PropertyMetadata(typeof(DataGridRow)));
         }

@@ -31,8 +31,8 @@ namespace System.Windows.Controls.Primitives
 
         static DatePickerTextBox()
         {
-            EventManager.RegisterClassHandler<DatePickerTextBox>(MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
-            EventManager.RegisterClassHandler<DatePickerTextBox>(MouseLeaveEvent, new MouseEventHandler(OnMouseLeave));
+            EventManager.RegisterClassHandler<DatePickerTextBox>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
+            EventManager.RegisterClassHandler<DatePickerTextBox>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeave));
             EventManager.RegisterClassHandler<DatePickerTextBox>(GotFocusEvent, new RoutedEventHandler(OnGotFocus));
             EventManager.RegisterClassHandler<DatePickerTextBox>(LostFocusEvent, new RoutedEventHandler(OnLostFocus));
 

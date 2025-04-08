@@ -64,7 +64,7 @@ namespace System.Windows.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollViewer), new PropertyMetadata(typeof(ScrollViewer)));
             EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnTouchStartThunk), true);
             EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnTouchEndThunk), true);
-            EventManager.RegisterClassHandler<ScrollViewer>(MouseMoveEvent, new MouseEventHandler(OnTouchMoveThunk), true);
+            EventManager.RegisterClassHandler<ScrollViewer>(Mouse.MouseMoveEvent, new MouseEventHandler(OnTouchMoveThunk), true);
         }
 
         /// <summary>

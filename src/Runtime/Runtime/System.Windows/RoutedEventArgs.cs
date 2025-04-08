@@ -261,6 +261,18 @@ public class RoutedEventArgs : EventArgs
     }
 
     /// <summary>
+    ///     Changes the RoutedEvent assocatied with these RoutedEventArgs
+    /// </summary>
+    /// <remarks>
+    ///     Only used internally.  Added to support cracking generic MouseButtonDown/Up events
+    ///     into MouseLeft/RightButtonDown/Up events.
+    /// </remarks>
+    /// <param name="newRoutedEvent">
+    ///     The new RoutedEvent to associate with these RoutedEventArgs
+    /// </param>
+    internal void OverrideRoutedEvent(RoutedEvent newRoutedEvent) => _routedEvent = newRoutedEvent;
+
+    /// <summary>
     ///     Changes the Source assocatied with these RoutedEventArgs
     /// </summary>
     /// <remarks>

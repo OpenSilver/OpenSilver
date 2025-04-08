@@ -44,8 +44,8 @@ namespace System.Windows.Controls
         {
             EventManager.RegisterClassHandler<TabItem>(GotFocusEvent, new RoutedEventHandler(OnGotFocus));
             EventManager.RegisterClassHandler<TabItem>(LostFocusEvent, new RoutedEventHandler(OnLostFocus));
-            EventManager.RegisterClassHandler<TabItem>(MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
-            EventManager.RegisterClassHandler<TabItem>(MouseLeaveEvent, new MouseEventHandler(OnMouseLeave));
+            EventManager.RegisterClassHandler<TabItem>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
+            EventManager.RegisterClassHandler<TabItem>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeave));
             EventManager.RegisterClassHandler<TabItem>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseLeftButtonDown));
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TabItem), new PropertyMetadata(typeof(TabItem)));

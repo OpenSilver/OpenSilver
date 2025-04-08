@@ -81,7 +81,7 @@ namespace System.Windows.Controls
             if (e.ClickCount == 2)
             {
                 var ctrl = (Control)sender;
-                var doubleClick = new MouseButtonEventArgs(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
+                var doubleClick = new MouseButtonEventArgs(e.ChangedButton, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
                 {
                     RoutedEvent = MouseDoubleClickEvent,
                     Source = e.OriginalSource, // Set OriginalSource because initially is null

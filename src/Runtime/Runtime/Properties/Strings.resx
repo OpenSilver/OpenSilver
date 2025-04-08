@@ -374,6 +374,9 @@
   <data name="InvalidTextDecorationCollectionString" xml:space="preserve">
     <value>The requested TextDecorationCollection string is not valid: '{0}'.</value>
   </data>
+  <data name="Invalid_IInputElement" xml:space="preserve">
+    <value>'{0}' is not a valid type for IInputElement. UIElement expected.</value>
+  </data>
   <data name="ItemsPanelNotAPanel" xml:space="preserve">
     <value>VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.</value>
   </data>

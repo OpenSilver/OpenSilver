@@ -31,7 +31,16 @@ namespace CSHTML5.Native.Html.Input
 
         // Note: there are multiple constructor overloads.
         public HtmlCanvasPointerRoutedEventArgs(MouseEventArgs e, HtmlCanvas htmlCanvas)
-            : base(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
+            : base(MouseButton.Left, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
+        {
+            this.Source = e.OriginalSource;
+            this.Handled = e.Handled;
+            this.Pointer = e.Pointer;
+            this.HtmlCanvas = htmlCanvas;
+        }
+
+        internal HtmlCanvasPointerRoutedEventArgs(MouseButtonEventArgs e, HtmlCanvas htmlCanvas)
+            : base(e.ChangedButton, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
             this.Source = e.OriginalSource;
             this.Handled = e.Handled;
@@ -41,7 +50,7 @@ namespace CSHTML5.Native.Html.Input
 
         // Note: there are multiple constructor overloads.
         public HtmlCanvasPointerRoutedEventArgs(RightTappedRoutedEventArgs e, HtmlCanvas htmlCanvas)
-            : base(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
+            : base(MouseButton.Right, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
             this.Source = e.OriginalSource;
             this.Handled = e.Handled;

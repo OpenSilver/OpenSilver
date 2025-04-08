@@ -27,7 +27,7 @@ internal static class PopupService
     internal static void TrackMousePosition(Window owner)
     {
         Debug.Assert(owner is not null);
-        owner.AddHandler(UIElement.MouseMoveEvent, new MouseEventHandler(OnMouseMove), true);
+        owner.AddHandler(Mouse.MouseMoveEvent, new MouseEventHandler(OnMouseMove), true);
     }
 
     internal static void OnMouseEvent(MouseEventArgs e) => MousePosition = e.GetPosition(null);
