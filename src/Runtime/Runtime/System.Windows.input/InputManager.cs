@@ -31,16 +31,18 @@ internal sealed class InputManager
         POINTER_LEFT_UP = 2,
         POINTER_RIGHT_DOWN = 3,
         POINTER_RIGHT_UP = 4,
-        POINTER_ENTER = 5,
-        POINTER_LEAVE = 6,
-        WHEEL = 7,
-        KEYDOWN = 8,
-        KEYUP = 9,
-        KEYPRESS = 10,
-        FOCUS_MANAGED = 11,
-        FOCUS_UNMANAGED = 12,
-        WINDOW_FOCUS = 13,
-        WINDOW_BLUR = 14,
+        POINTER_MIDDLE_DOWN = 5,
+        POINTER_MIDDLE_UP = 6,
+        POINTER_ENTER = 7,
+        POINTER_LEAVE = 8,
+        WHEEL = 9,
+        KEYDOWN = 10,
+        KEYUP = 11,
+        KEYPRESS = 12,
+        FOCUS_MANAGED = 13,
+        FOCUS_UNMANAGED = 14,
+        WINDOW_FOCUS = 15,
+        WINDOW_BLUR = 16,
     }
 
     private struct PointerCallbackParameters
@@ -385,6 +387,14 @@ internal sealed class InputManager
                 ProcessOnMouseRightButtonUp(uie, parameters);
                 break;
 
+            case EVENTS.POINTER_MIDDLE_DOWN:
+                ProcessOnMouseMiddleButtonDown(uie, parameters);
+                break;
+
+            case EVENTS.POINTER_MIDDLE_UP:
+                ProcessOnMouseMiddleButtonUp(uie, parameters);
+                break;
+
             case EVENTS.POINTER_ENTER:
                 ProcessOnMouseEnter(uie, parameters);
                 break;
@@ -410,6 +420,10 @@ internal sealed class InputManager
 
             case EVENTS.POINTER_RIGHT_DOWN:
                 RefreshClickCount(MouseButton.Right, Environment.TickCount, new Point());
+                break;
+
+            case EVENTS.POINTER_MIDDLE_DOWN:
+                RefreshClickCount(MouseButton.Middle, Environment.TickCount, new Point());
                 break;
 
             case EVENTS.POINTER_LEFT_UP:
@@ -570,6 +584,36 @@ internal sealed class InputManager
         }
 
         ReleaseMouseCapture();
+    }
+
+    private void ProcessOnMouseMiddleButtonDown(UIElement uie, PointerCallbackParameters parameters)
+    {
+        if (uie.MouseTarget is UIElement mouseTarget)
+        {
+            ProcessMouseButtonEvent(
+                mouseTarget,
+                Mouse.MouseDownEvent,
+                parameters,
+                MouseButton.Middle,
+                Environment.TickCount,
+                refreshClickCount: true,
+                closeToolTips: false);
+        }
+    }
+
+    private void ProcessOnMouseMiddleButtonUp(UIElement uie, PointerCallbackParameters parameters)
+    {
+        if (uie.MouseTarget is UIElement mouseTarget)
+        {
+            ProcessMouseButtonEvent(
+                mouseTarget,
+                Mouse.MouseUpEvent,
+                parameters,
+                MouseButton.Middle,
+                Environment.TickCount,
+                refreshClickCount: false,
+                closeToolTips: false);
+        }
     }
 
     private void ProcessOnWheel(UIElement uie, PointerCallbackParameters parameters)

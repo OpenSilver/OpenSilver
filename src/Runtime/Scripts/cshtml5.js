@@ -480,16 +480,18 @@ document.createInputManager = function (callback, pointerCallback) {
         POINTER_LEFT_UP: 2,
         POINTER_RIGHT_DOWN: 3,
         POINTER_RIGHT_UP: 4,
-        POINTER_ENTER: 5,
-        POINTER_LEAVE: 6,
-        WHEEL: 7,
-        KEYDOWN: 8,
-        KEYUP: 9,
-        KEYPRESS: 10,
-        FOCUS_MANAGED: 11,
-        FOCUS_UNMANAGED: 12,
-        WINDOW_FOCUS: 13,
-        WINDOW_BLUR: 14,
+        POINTER_MIDDLE_DOWN: 5,
+        POINTER_MIDDLE_UP: 6,
+        POINTER_ENTER: 7,
+        POINTER_LEAVE: 8,
+        WHEEL: 9,
+        KEYDOWN: 10,
+        KEYUP: 11,
+        KEYPRESS: 12,
+        FOCUS_MANAGED: 13,
+        FOCUS_UNMANAGED: 14,
+        WINDOW_FOCUS: 15,
+        WINDOW_BLUR: 16,
     };
 
     const MODIFIERKEYS = {
@@ -599,6 +601,9 @@ document.createInputManager = function (callback, pointerCallback) {
                     case 0:
                         callback('', EVENTS.POINTER_LEFT_DOWN, e);
                         break;
+                    case 1:
+                        callback('', EVENTS.POINTER_MIDDLE_DOWN, e);
+                        break;
                     case 2:
                         callback('', EVENTS.POINTER_RIGHT_DOWN, e);
                         break;
@@ -612,6 +617,9 @@ document.createInputManager = function (callback, pointerCallback) {
                 switch (e.button) {
                     case 0:
                         invokePointerCallback(getClosestElement(target), EVENTS.POINTER_LEFT_UP, e);
+                        break;
+                    case 1:
+                        invokePointerCallback(getClosestElement(target), EVENTS.POINTER_MIDDLE_UP, e);
                         break;
                     case 2:
                         invokePointerCallback(getClosestElement(target), EVENTS.POINTER_RIGHT_UP, e);
@@ -712,6 +720,9 @@ document.createInputManager = function (callback, pointerCallback) {
                     case 0:
                         invokePointerCallback(element, EVENTS.POINTER_LEFT_DOWN, e);
                         break;
+                    case 1:
+                        invokePointerCallback(element, EVENTS.POINTER_MIDDLE_DOWN, e);
+                        break;
                     case 2:
                         invokePointerCallback(element, EVENTS.POINTER_RIGHT_DOWN, e);
                         break;
@@ -724,6 +735,9 @@ document.createInputManager = function (callback, pointerCallback) {
                 switch (e.button) {
                     case 0:
                         invokePointerCallback(getClosestElement(target), EVENTS.POINTER_LEFT_UP, e);
+                        break;
+                    case 1:
+                        invokePointerCallback(getClosestElement(target), EVENTS.POINTER_MIDDLE_UP, e);
                         break;
                     case 2:
                         invokePointerCallback(getClosestElement(target), EVENTS.POINTER_RIGHT_UP, e);
