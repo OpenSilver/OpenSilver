@@ -58,10 +58,11 @@ namespace OpenSilver.Compiler
         //
         private Dictionary<string, Func<XElement, string, string>> GetSupportedCoreTypes()
         {
-            return new Dictionary<string, Func<XElement, string, string>>(32, StringComparer.OrdinalIgnoreCase)
+            return new Dictionary<string, Func<XElement, string, string>>(33, StringComparer.OrdinalIgnoreCase)
             {
                 ["system.windows.input.cursor"] = ConvertToCursor,
                 ["system.windows.input.modifierkeys"] = ConvertToModifierKeys,
+                ["system.windows.input.key"] = ConvertToKey,
                 ["system.windows.media.animation.keytime"] = ConvertToKeyTime,
                 ["system.windows.media.animation.repeatbehavior"] = ConvertToRepeatBehavior,
                 ["system.windows.media.animation.keyspline"] = ConvertToKeySpline,
@@ -182,6 +183,98 @@ namespace OpenSilver.Compiler
                 };
 
                 return modifier is not null;
+            }
+        }
+
+        private string ConvertToKey(XElement context, string source)
+        {
+            string keyToken = source.Trim();
+
+            if (keyToken.Length == 0)
+            {
+                return "global::System.Windows.Input.Key.None";
+            }
+
+            // In case we're dealing with a lowercase character, we uppercase it
+            char firstChar = keyToken[0];
+            if (firstChar >= 'a' && firstChar <= 'z')
+            {
+                firstChar = char.ToUpper(firstChar);
+            }
+
+            // If this is a single-character we're dealing with, match digits/letters
+            if (keyToken.Length == 1 && char.IsLetterOrDigit(firstChar))
+            {
+                if (firstChar >= '0' && firstChar <= '9')
+                {
+                    return $"global::System.Windows.Input.Key.D{firstChar}";
+                }
+                else if (firstChar >= 'A' && firstChar <= 'Z')
+                {
+                    return $"global::System.Windows.Input.Key.{firstChar}";
+                }
+                else
+                {
+                    throw GetConvertException(source, "System.Windows.Input.Key");
+                }
+            }
+
+            return keyToken switch
+            {
+                _ when keyToken.Equals("ENTER", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Return",
+                _ when keyToken.Equals("ESC", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Escape",
+                _ when keyToken.Equals("PGUP", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.PageUp",
+                _ when keyToken.Equals("PGDN", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.PageDown",
+                //_ when keyToken.Equals("PRTSC", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.PrintScreen",
+                _ when keyToken.Equals("INS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Insert",
+                _ when keyToken.Equals("DEL", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Delete",
+                _ when keyToken.Equals("WINDOWS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.LWin",
+                _ when keyToken.Equals("WIN", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.LWin",
+                _ when keyToken.Equals("LEFTWINDOWS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.LWin",
+                _ when keyToken.Equals("RIGHTWINDOWS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.RWin",
+                _ when keyToken.Equals("APPS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Apps",
+                _ when keyToken.Equals("APPLICATION", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Apps",
+                _ when keyToken.Equals("BREAK", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Cancel",
+                _ when keyToken.Equals("BACKSPACE", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Back",
+                _ when keyToken.Equals("BKSP", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Back",
+                _ when keyToken.Equals("BS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Back",
+                _ when keyToken.Equals("SHIFT", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Shift", // Key.LeftShift,
+                _ when keyToken.Equals("LEFTSHIFT", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Shift", // Key.LeftShift,
+                //_ when keyToken.Equals("RIGHTSHIFT", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.RightShift",
+                _ when keyToken.Equals("CONTROL", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Ctrl", // Key.LeftCtrl,
+                _ when keyToken.Equals("CTRL", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Ctrl", // Key.LeftCtrl,
+                _ when keyToken.Equals("LEFTCTRL", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Ctrl", // Key.LeftCtrl,
+                //_ when keyToken.Equals("RIGHTCTRL", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.RightCtrl",
+                _ when keyToken.Equals("ALT", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Alt", // Key.LeftAlt,
+                _ when keyToken.Equals("LEFTALT", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Alt", // Key.LeftAlt,
+                //_ when keyToken.Equals("RIGHTALT", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.RightAlt",
+                //_ when keyToken.Equals("SEMICOLON", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemSemicolon",
+                //_ when keyToken.Equals("PLUS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemPlus",
+                //_ when keyToken.Equals("COMMA", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemComma",
+                //_ when keyToken.Equals("MINUS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemMinus",
+                //_ when keyToken.Equals("PERIOD", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemPeriod",
+                //_ when keyToken.Equals("QUESTION", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemQuestion",
+                //_ when keyToken.Equals("TILDE", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemTilde",
+                //_ when keyToken.Equals("OPENBRACKETS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemOpenBrackets",
+                //_ when keyToken.Equals("PIPE", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemPipe",
+                //_ when keyToken.Equals("CLOSEBRACKETS", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemCloseBrackets",
+                //_ when keyToken.Equals("QUOTES", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemQuotes",
+                //_ when keyToken.Equals("BACKSLASH", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemBackslash",
+                //_ when keyToken.Equals("FINISH", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.OemFinish",
+                //_ when keyToken.Equals("ATTN", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Attn",
+                //_ when keyToken.Equals("CRSEL", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.CrSel",
+                //_ when keyToken.Equals("EXSEL", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.ExSel",
+                //_ when keyToken.Equals("ERASEEOF", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.EraseEof",
+                //_ when keyToken.Equals("PLAY", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Play",
+                //_ when keyToken.Equals("ZOOM", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Zoom",
+                //_ when keyToken.Equals("PA1", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Pa1",
+                _ => Parse(keyToken, _inspector) ?? throw GetConvertException(source, "System.Windows.Input.Key"),
+            };
+
+            static string Parse(string source, AssembliesInspector inspector)
+            {
+                TypeDefinition keyType = inspector.GetTypeDefinition("System.Windows.Input", "Key", "OpenSilver");
+                return inspector.GetEnumValue(keyType, source, true, true);
             }
         }
 

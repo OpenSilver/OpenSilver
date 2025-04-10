@@ -163,6 +163,9 @@
   <data name="CannotChangeAfterSealed" xml:space="preserve">
     <value>Cannot modify a '{0}' after it is sealed.</value>
   </data>
+  <data name="CannotConvertStringToType" xml:space="preserve">
+    <value>Cannot convert string value '{0}' to type '{1}'.</value>
+  </data>
   <data name="CannotDetermineSortByPropertiesForCollection" xml:space="preserve">
     <value>Cannot find type information on collection; property names to SortBy cannot be resolved.</value>
   </data>

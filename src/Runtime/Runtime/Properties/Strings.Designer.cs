@@ -196,6 +196,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot convert string value &apos;{0}&apos; to type &apos;{1}&apos;..
+        /// </summary>
+        internal static string CannotConvertStringToType {
+            get {
+                return ResourceManager.GetString("CannotConvertStringToType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find type information on collection; property names to SortBy cannot be resolved..
         /// </summary>
         internal static string CannotDetermineSortByPropertiesForCollection {
