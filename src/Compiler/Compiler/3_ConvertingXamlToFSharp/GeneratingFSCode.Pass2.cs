@@ -1766,38 +1766,17 @@ namespace GlobalResource
                     //----------------------------
                     // PROPERTY IS AN ENUM
                     //----------------------------
-                    if (value.IndexOf(',') != -1)
-                    {
-                        string[] split = value.Split(new char[] { ',' });
-                        for (int i = 0; i < split.Length; i++)
-                        {
-                            string fieldName = _settings.Inspector.GetEnumValue(
-                                split[i].Trim(),
-                                valueNamespaceName,
-                                valueLocalTypeName,
-                                valueAssemblyName,
-                                true,
-                                false) ?? throw new XamlParseException(
-                                    $"Field '{split[i].Trim()}' not found in type: '{valueTypeFullName}'.");
 
-                            split[i] = fieldName;
-                        }
+                    TypeDefinition enumType = _settings.Inspector.GetTypeDefinition(
+                        valueNamespaceName,
+                        valueLocalTypeName,
+                        valueAssemblyName);
 
-                        return string.Join(" | ", split);
-                    }
-                    else
-                    {
-                        string fieldName = _settings.Inspector.GetEnumValue(
-                            value.Trim(),
-                            valueNamespaceName,
-                            valueLocalTypeName,
-                            valueAssemblyName,
-                            true,
-                            true);
-
-                        return fieldName ?? throw new XamlParseException(
-                            $"Field '{value.Trim()}' not found in type: '{valueTypeFullName}'.");
-                    }
+                    return string.Join(" | ", _settings.Inspector.GetEnumValues(
+                        enumType,
+                        value.Trim(),
+                        true,
+                        true));
                 }
                 else if (valueTypeFullName == "global.System.Type")
                 {

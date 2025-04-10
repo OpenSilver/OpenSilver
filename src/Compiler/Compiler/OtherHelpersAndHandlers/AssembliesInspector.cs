@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Xml.Linq;
 using Mono.Cecil;
@@ -96,9 +97,6 @@ namespace OpenSilver.Compiler
         public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName, string assemblyNameIfAny = null, bool isAttached = false)
             => _monoCecilVersion.GetPropertyOrFieldInfo(propertyOrFieldName, namespaceName, localTypeName, out memberDeclaringTypeName, out memberTypeNamespace, out memberTypeName, assemblyNameIfAny, isAttached);
 
-        public string GetEnumValue(string name, string namespaceName, string enumName, string assembly, bool ignoreCase, bool allowIntegerValue)
-            => _monoCecilVersion.GetEnumValue(name, namespaceName, enumName, assembly, ignoreCase, allowIntegerValue);
-
         public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName)
             => _monoCecilVersion.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName);
 
@@ -116,6 +114,9 @@ namespace OpenSilver.Compiler
 
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
             => _monoCecilVersion.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
+
+        public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+            => _monoCecilVersion.GetEnumValues(enumType, name, ignoreCase, allowIntegerValue);
 
         public (FieldDefinition Field, TypeReference DeclaringType) GetField(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
         {

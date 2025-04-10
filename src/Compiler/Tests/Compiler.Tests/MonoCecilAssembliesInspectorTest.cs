@@ -159,7 +159,9 @@ namespace Compiler.Tests
         [TestMethod]
         public void GetEnumValue_Should_Handle_Nested_Enum_Type()
         {
-            var res = MonoCecilVersion.GetEnumValue(nameof(ClassWithNestedEnum.InputBehavior.SelectFromList).ToLower(),typeof(ClassWithNestedEnum).FullName, nameof(ClassWithNestedEnum.InputBehavior), null, true, true);
+            var enumType = MonoCecilVersion.FindType(typeof(ClassWithNestedEnum).FullName, nameof(ClassWithNestedEnum.InputBehavior));
+
+            var res = MonoCecilVersion.GetEnumValue(enumType, nameof(ClassWithNestedEnum.InputBehavior.SelectFromList).ToLower(), true, true);
 
             Assert.AreEqual(res, $"{GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)}.{nameof(ClassWithNestedEnum.InputBehavior.SelectFromList)}");
         }
@@ -167,7 +169,9 @@ namespace Compiler.Tests
         [TestMethod]
         public void GetEnumValue_Should_Handle_Integer_Input_Value()
         {
-            var res = MonoCecilVersion.GetEnumValue("1", typeof(ClassWithNestedEnum).FullName, nameof(ClassWithNestedEnum.InputBehavior), null, true, true);
+            var enumType = MonoCecilVersion.FindType(typeof(ClassWithNestedEnum).FullName, nameof(ClassWithNestedEnum.InputBehavior));
+
+            var res = MonoCecilVersion.GetEnumValue(enumType, "1", true, true);
 
             Assert.AreEqual(res, $"({GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)})1");
         }
@@ -175,7 +179,9 @@ namespace Compiler.Tests
         [TestMethod]
         public void GetEnumValue_Should_Return_Value_For_Enum_Without_Namespace()
         {
-            var res = MonoCecilVersion.GetEnumValue(nameof(EnumWithoutNamespace.Item), "", nameof(EnumWithoutNamespace), null, true, false);
+            var enumType = MonoCecilVersion.FindType("", nameof(EnumWithoutNamespace));
+
+            var res = MonoCecilVersion.GetEnumValue(enumType, nameof(EnumWithoutNamespace.Item), true, false);
 
             Assert.AreEqual(res, $"{GlobalPrefix}{typeof(EnumWithoutNamespace).FullName}.{nameof(EnumWithoutNamespace.Item)}");
         }
