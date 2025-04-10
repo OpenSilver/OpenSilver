@@ -386,8 +386,7 @@ namespace OpenSilver.Compiler
 
                 bool isRootElement = IsElementTheRootElement(element);
                 bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
-                    elementType.Substring("global::".Length), assemblyNameIfAny
-                );
+                    elementType.Substring("global::".Length), assemblyNameIfAny);
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
 
@@ -1679,9 +1678,13 @@ namespace OpenSilver.Compiler
                 }
 
                 string valueTypeFullName = GetFullTypeName(valueNamespaceName, valueLocalTypeName);
+                bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
+                        valueTypeFullName.Substring("global::".Length), valueAssemblyName);
+                bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
+                    valueTypeFullName.Substring("global::".Length), valueAssemblyName);
 
                 // Generate the code or instantiating the attribute
-                if (isValueEnum)
+                if (isValueEnum && !isKnownSystemType && !isKnownCoreType)
                 {
                     //----------------------------
                     // PROPERTY IS AN ENUM
@@ -1715,12 +1718,6 @@ namespace OpenSilver.Compiler
                         valueTypeFullName,
                         propertyName,
                         xName);
-
-                    bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
-                        valueTypeFullName.Substring("global::".Length), valueAssemblyName);
-
-                    bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
-                        valueTypeFullName.Substring("global::".Length), valueAssemblyName);
 
                     if (isAttachedProperty)
                     {

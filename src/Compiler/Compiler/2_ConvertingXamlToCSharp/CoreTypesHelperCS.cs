@@ -58,9 +58,10 @@ namespace OpenSilver.Compiler
         //
         private Dictionary<string, Func<XElement, string, string>> GetSupportedCoreTypes()
         {
-            return new Dictionary<string, Func<XElement, string, string>>(29, StringComparer.OrdinalIgnoreCase)
+            return new Dictionary<string, Func<XElement, string, string>>(32, StringComparer.OrdinalIgnoreCase)
             {
                 ["system.windows.input.cursor"] = ConvertToCursor,
+                ["system.windows.input.modifierkeys"] = ConvertToModifierKeys,
                 ["system.windows.media.animation.keytime"] = ConvertToKeyTime,
                 ["system.windows.media.animation.repeatbehavior"] = ConvertToRepeatBehavior,
                 ["system.windows.media.animation.keyspline"] = ConvertToKeySpline,
@@ -102,6 +103,86 @@ namespace OpenSilver.Compiler
         private static string ConvertToCursor(XElement context, string source)
         {
             return $"global::System.Windows.Input.Cursors.{source}";
+        }
+
+        private string ConvertToModifierKeys(XElement context, string source)
+        {
+            char[] separator = ['+'];
+
+            string modifiersToken = source.Trim();
+
+            // Empty token means there were no modifiers, exit early
+            if (modifiersToken.Length == 0 || modifiersToken.Equals("None", StringComparison.OrdinalIgnoreCase))
+            {
+                return "global::System.Windows.Input.ModifierKeys.None";
+            }
+
+            // Silverlight uses the default enum converter. To remain compatible, in case there is no + in the source string, we
+            // use the default converter to support the comma based syntax ("Alt,Control,Windows" instead of "Alt+Control+Windows"
+            // for instance).
+            if (modifiersToken.IndexOfAny(separator) == -1)
+            {
+                if (TryParseModifier(modifiersToken, out string modifier))
+                {
+                    return modifier;
+                }
+
+                TypeDefinition modifierKeysType = _inspector.GetTypeDefinition("System.Windows.Input", "ModifierKeys", "OpenSilver");
+                return string.Join(" | ", _inspector.GetEnumValues(modifierKeysType, modifiersToken, true, true));
+            }
+
+            var sb = new StringBuilder();
+
+            // Split modifier keys by the delimiter
+            string[] modifiers = modifiersToken.Split(separator);
+
+            for (int i = 0; i < modifiers.Length; i++)
+            {
+                string modifier = modifiers[i].Trim();
+
+                // This would be a case where we have a token like "Ctrl + " for example,
+                // which itself is invalid but we choose to support this malformed behaviour.
+                if (modifier.Length == 0)
+                {
+                    break;
+                }
+
+                if (!TryParseModifier(modifier, out string key))
+                {
+                    throw GetConvertException(source, "System.Windows.Input.ModifierKeys");
+                }
+
+                if (sb.Length > 0)
+                {
+                    sb.Append(" | ");
+                }
+
+                sb.Append(key);
+            }
+
+            if (sb.Length == 0)
+            {
+                return "global::System.Windows.Input.ModifierKeys.None";
+            }
+
+            return sb.ToString();
+
+            static bool TryParseModifier(string source, out string modifier)
+            {
+                modifier = source switch
+                {
+                    _ when source.Equals("Ctrl", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.ModifierKeys.Control",
+                    _ when source.Equals("Control", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.ModifierKeys.Control",
+                    _ when source.Equals("Win", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.ModifierKeys.Windows",
+                    _ when source.Equals("Windows", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.ModifierKeys.Windows",
+                    _ when source.Equals("Apple", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.ModifierKeys.Apple",
+                    _ when source.Equals("Alt", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.ModifierKeys.Alt",
+                    _ when source.Equals("Shift", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.ModifierKeys.Shift",
+                    _ => null,
+                };
+
+                return modifier is not null;
+            }
         }
 
         private static string ConvertToKeyTime(XElement context, string source)

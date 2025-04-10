@@ -11,42 +11,44 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Input
+using System.ComponentModel;
+
+namespace System.Windows.Input;
+
+/// <summary>
+/// Specifies the set of modifier keys.
+/// </summary>
+[Flags]
+[TypeConverter(typeof(ModifierKeysConverter))]
+public enum ModifierKeys
 {
     /// <summary>
-    /// Specifies the virtual key used to modify another keypress.
+    /// No modifiers are pressed.
     /// </summary>
-    [Flags]
-    public enum ModifierKeys
-    {
-        /// <summary>
-        /// No virtual key modifier.
-        /// </summary>
-        None = 0,
+    None = 0,
 
-        /// <summary>
-        /// The Ctrl (control) virtual key.
-        /// </summary>
-        Control = 1,
+    /// <summary>
+    /// The CTRL key.
+    /// </summary>
+    Control = 1,
 
-        /// <summary>
-        /// The Menu (Alt) virtual key.
-        /// </summary>
-        Alt = 2,
+    /// <summary>
+    /// The ALT key.
+    /// </summary>
+    Alt = 2,
 
-        /// <summary>
-        /// The Shift virtual key.
-        /// </summary>
-        Shift = 4,
+    /// <summary>
+    /// The SHIFT key.
+    /// </summary>
+    Shift = 4,
 
-        /// <summary>
-        /// The Windows virtual key.
-        /// </summary>
-        Windows = 8,
+    /// <summary>
+    /// The Windows logo key.
+    /// </summary>
+    Windows = 8,
 
-        /// <summary>
-        /// The Apple key (also known as the Open Apple key) is pressed.
-        /// </summary>
-        Apple = 8
-    }
+    /// <summary>
+    /// The Apple key (also known as the Open Apple key).
+    /// </summary>
+    Apple = Windows,
 }

@@ -816,6 +816,9 @@
   <data name="UnexpectedParameterType" xml:space="preserve">
     <value>Parameter is unexpected type '{0}'. Expected type is '{1}'.</value>
   </data>
+  <data name="Unsupported_Modifier" xml:space="preserve">
+    <value>Unrecognized ModifierKeys '{0}'.</value>
+  </data>
   <data name="Validation_ConversionFailed" xml:space="preserve">
     <value>Value '{0}' could not be converted.</value>
   </data>

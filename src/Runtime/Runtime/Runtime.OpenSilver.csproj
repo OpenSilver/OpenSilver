@@ -718,6 +718,7 @@
     <Compile Include="System.Windows\Size.cs" />
     <Compile Include="System.Windows.Input\Key.cs" />
     <Compile Include="System.Windows.Input\ModifierKeys.cs" />
+    <Compile Include="System.Windows.Input\ModifierKeysConverter.cs" />
     <Compile Include="System.Windows.Threading\Dispatcher.cs" />
     <Compile Include="System.Windows\WindowSizeChangedEventArgs.cs" />
     <Compile Include="System.Windows.Threading\DispatcherOperation.cs" />

@@ -328,9 +328,10 @@ namespace System.ComponentModel
         /// </summary>
         private static Dictionary<Type, TypeConverter> GetCoreTypeConverters()
         {
-            return new Dictionary<Type, TypeConverter>(29)
+            return new Dictionary<Type, TypeConverter>(30)
             {
                 [typeof(Cursor)] = new CursorConverter(),
+                [typeof(ModifierKeys)] = new ModifierKeysConverter(),
                 [typeof(KeyTime)] = new KeyTimeConverter(),
                 [typeof(RepeatBehavior)] = new RepeatBehaviorConverter(),
                 [typeof(KeySpline)] = new KeySplineConverter(),

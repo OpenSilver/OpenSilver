@@ -392,8 +392,7 @@ End Sub
 
                 bool isRootElement = IsElementTheRootElement(element);
                 bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
-                    elementType.Substring("Global.".Length), assemblyNameIfAny
-                );
+                    elementType.Substring("Global.".Length), assemblyNameIfAny);
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
 
@@ -1688,9 +1687,13 @@ End Sub
                 }
 
                 string valueTypeFullName = GetFullTypeName(valueNamespaceName, valueLocalTypeName);
+                bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
+                        valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
+                bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
+                    valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
 
                 // Generate the code or instantiating the attribute
-                if (isValueEnum)
+                if (isValueEnum && !isKnownSystemType && !isKnownCoreType)
                 {
                     //----------------------------
                     // PROPERTY IS AN ENUM
@@ -1724,12 +1727,6 @@ End Sub
                         valueTypeFullName,
                         propertyName,
                         xName);
-
-                    bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
-                        valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
-
-                    bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
-                        valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
 
                     if (isAttachedProperty)
                     {

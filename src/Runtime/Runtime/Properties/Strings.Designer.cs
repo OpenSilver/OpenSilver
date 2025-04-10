@@ -2140,6 +2140,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unrecognized ModifierKeys &apos;{0}&apos;..
+        /// </summary>
+        internal static string Unsupported_Modifier {
+            get {
+                return ResourceManager.GetString("Unsupported_Modifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value &apos;{0}&apos; could not be converted..
         /// </summary>
         internal static string Validation_ConversionFailed {
