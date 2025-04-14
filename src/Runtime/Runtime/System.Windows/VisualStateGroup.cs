@@ -29,8 +29,8 @@ namespace System.Windows
     [RuntimeNameProperty(nameof(Name))]
     public sealed class VisualStateGroup : DependencyObject
     {
-        private Collection<VisualState> _states;
-        private Collection<VisualTransition> _transitions;
+        private VisualStatesCollection _states;
+        private VisualTransitionsCollection _transitions;
 
         /// <summary>
         /// Gets the most recently set <see cref="VisualState"/> from a successful call to the 
@@ -61,7 +61,7 @@ namespace System.Windows
         /// <returns>
         /// The collection of mutually exclusive <see cref="VisualState"/> objects.
         /// </returns>
-        public IList States => _states ??= new(new VisualStatesCollection(this));
+        public IList States => _states ??= new VisualStatesCollection(this);
 
         /// <summary>
         /// Gets the collection of <see cref="VisualTransition"/> objects.
@@ -70,7 +70,7 @@ namespace System.Windows
         /// The collection of <see cref="VisualTransition"/> objects.
         /// </returns>
         [OpenSilver.NotImplemented]
-        public IList Transitions => _transitions ??= new(new VisualTransitionsCollection(this));
+        public IList Transitions => _transitions ??= new VisualTransitionsCollection(this);
 
         internal VisualState GetState(string stateName)
         {

@@ -11,35 +11,89 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 
-namespace OpenSilver.Internal
+namespace OpenSilver.Internal;
+
+internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
 {
-    internal sealed class VisualStateGroupCollection : PresentationFrameworkCollection<VisualStateGroup>
+    private readonly WeakReference<DependencyObject> _owner;
+
+    public VisualStateGroupCollection(DependencyObject owner)
     {
-        public VisualStateGroupCollection(DependencyObject owner)
+        Debug.Assert(owner is not null);
+        _owner = new(owner);
+    }
+
+    private DependencyObject Owner
+    {
+        get
         {
-            Debug.Assert(owner != null);
-            owner.ProvideSelfAsInheritanceContext(this, null);
+            _owner.TryGetTarget(out DependencyObject owner);
+            return owner;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void InsertItem(int index, VisualStateGroup item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
         }
 
-        internal override void AddOverride(VisualStateGroup value)
-            => AddDependencyObjectInternal(value);
+        base.InsertItem(index, item);
 
-        internal override void ClearOverride()
-            => ClearDependencyObjectInternal();
+        Owner?.ProvideSelfAsInheritanceContext(item, null);
+    }
 
-        internal override VisualStateGroup GetItemOverride(int index)
-            => GetItemInternal(index);
+    /// <inheritdoc />
+    protected override void ClearItems()
+    {
+        if (Count > 0)
+        {
+            DependencyObject owner = Owner;
 
-        internal override void InsertOverride(int index, VisualStateGroup value)
-            => InsertDependencyObjectInternal(index, value);
+            VisualStateGroup[] groups = owner is not null ? [.. this] : [];
 
-        internal override void RemoveAtOverride(int index)
-            => RemoveAtDependencyObjectInternal(index);
+            base.ClearItems();
 
-        internal override void SetItemOverride(int index, VisualStateGroup value)
-            => SetItemDependencyObjectInternal(index, value);
+            foreach (VisualStateGroup group in groups)
+            {
+                owner.RemoveSelfAsInheritanceContext(group, null);
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void RemoveItem(int index)
+    {
+        VisualStateGroup oldGroup = this[index];
+
+        base.RemoveItem(index);
+
+        Owner?.RemoveSelfAsInheritanceContext(oldGroup, null);
+    }
+
+    /// <inheritdoc />
+    protected override void SetItem(int index, VisualStateGroup item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+
+        VisualStateGroup oldGroup = this[index];
+
+        base.SetItem(index, item);
+
+        if (Owner is DependencyObject owner)
+        {
+            owner.RemoveSelfAsInheritanceContext(oldGroup, null);
+            owner.ProvideSelfAsInheritanceContext(item, null);
+        }
     }
 }

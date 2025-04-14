@@ -11,35 +11,75 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 
-namespace OpenSilver.Internal
+namespace OpenSilver.Internal;
+
+internal sealed class VisualStatesCollection : Collection<VisualState>
 {
-    internal sealed class VisualStatesCollection : PresentationFrameworkCollection<VisualState>
+    private readonly VisualStateGroup _owner;
+
+    public VisualStatesCollection(VisualStateGroup owner)
     {
-        public VisualStatesCollection(VisualStateGroup owner)
+        Debug.Assert(owner is not null);
+        _owner = owner;
+    }
+
+    /// <inheritdoc />
+    protected override void InsertItem(int index, VisualState item)
+    {
+        if (item is null)
         {
-            Debug.Assert(owner != null);
-            owner.ProvideSelfAsInheritanceContext(this, null);
+            throw new ArgumentNullException(nameof(item));
         }
 
-        internal override void AddOverride(VisualState value)
-            => AddDependencyObjectInternal(value);
+        base.InsertItem(index, item);
 
-        internal override void ClearOverride()
-            => ClearDependencyObjectInternal();
+        _owner.ProvideSelfAsInheritanceContext(item, null);
+    }
 
-        internal override void InsertOverride(int index, VisualState value)
-            => InsertDependencyObjectInternal(index, value);
+    /// <inheritdoc />
+    protected override void ClearItems()
+    {
+        if (Count > 0)
+        {
+            VisualState[] states = [.. this];
 
-        internal override void RemoveAtOverride(int index)
-            => RemoveAtDependencyObjectInternal(index);
+            base.ClearItems();
 
-        internal override VisualState GetItemOverride(int index)
-            => GetItemInternal(index);
+            foreach (VisualState state in states)
+            {
+                _owner.RemoveSelfAsInheritanceContext(state, null);
+            }
+        }
+    }
 
-        internal override void SetItemOverride(int index, VisualState value)
-            => SetItemDependencyObjectInternal(index, value);
+    /// <inheritdoc />
+    protected override void RemoveItem(int index)
+    {
+        VisualState oldState = this[index];
+
+        base.RemoveItem(index);
+
+        _owner.RemoveSelfAsInheritanceContext(oldState, null);
+    }
+
+    /// <inheritdoc />
+    protected override void SetItem(int index, VisualState item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+
+        VisualState oldState = this[index];
+
+        base.SetItem(index, item);
+
+        _owner.RemoveSelfAsInheritanceContext(oldState, null);
+        _owner.ProvideSelfAsInheritanceContext(item, null);
     }
 }

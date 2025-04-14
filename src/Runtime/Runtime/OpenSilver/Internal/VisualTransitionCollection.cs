@@ -11,29 +11,75 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 
-namespace OpenSilver.Internal
+namespace OpenSilver.Internal;
+
+internal sealed class VisualTransitionsCollection : Collection<VisualTransition>
 {
-    internal sealed class VisualTransitionsCollection : PresentationFrameworkCollection<VisualTransition>
+    private readonly VisualStateGroup _owner;
+
+    public VisualTransitionsCollection(VisualStateGroup owner)
     {
-        public VisualTransitionsCollection(VisualStateGroup owner)
+        Debug.Assert(owner is not null);
+        _owner = owner;
+    }
+
+    /// <inheritdoc />
+    protected override void InsertItem(int index, VisualTransition item)
+    {
+        if (item is null)
         {
-            Debug.Assert(owner != null);
-            owner.ProvideSelfAsInheritanceContext(this, null);
+            throw new ArgumentNullException(nameof(item));
         }
 
-        internal override void AddOverride(VisualTransition value) => AddDependencyObjectInternal(value);
+        base.InsertItem(index, item);
 
-        internal override void ClearOverride() => ClearDependencyObjectInternal();
+        _owner.ProvideSelfAsInheritanceContext(item, null);
+    }
 
-        internal override void InsertOverride(int index, VisualTransition value) => InsertDependencyObjectInternal(index, value);
+    /// <inheritdoc />
+    protected override void ClearItems()
+    {
+        if (Count > 0)
+        {
+            VisualTransition[] transitions = [.. this];
 
-        internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+            base.ClearItems();
 
-        internal override VisualTransition GetItemOverride(int index) => GetItemInternal(index);
+            foreach (VisualTransition transition in transitions)
+            {
+                _owner.RemoveSelfAsInheritanceContext(transition, null);
+            }
+        }
+    }
 
-        internal override void SetItemOverride(int index, VisualTransition value) => SetItemDependencyObjectInternal(index, value);
+    /// <inheritdoc />
+    protected override void RemoveItem(int index)
+    {
+        VisualTransition oldTransition = this[index];
+
+        base.RemoveItem(index);
+
+        _owner.RemoveSelfAsInheritanceContext(oldTransition, null);
+    }
+
+    /// <inheritdoc />
+    protected override void SetItem(int index, VisualTransition item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+
+        VisualTransition oldTransition = this[index];
+
+        base.SetItem(index, item);
+
+        _owner.RemoveSelfAsInheritanceContext(oldTransition, null);
+        _owner.ProvideSelfAsInheritanceContext(item, null);
     }
 }

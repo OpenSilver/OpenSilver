@@ -47,7 +47,7 @@ public class VisualStateManager : DependencyObject
 
         VisualState state = null;
         VisualStateGroup group = null;
-        if (GetVisualStateGroupsInternal(stateGroupsRoot) is Collection<VisualStateGroup> groups)
+        if (GetVisualStateGroupsInternal(stateGroupsRoot) is VisualStateGroupCollection groups)
         {
             TryGetState(groups, stateName, out group, out state);
         }
@@ -225,10 +225,10 @@ public class VisualStateManager : DependencyObject
     /// </summary>
     public static readonly DependencyProperty VisualStateGroupsProperty = VisualStateGroupsPropertyKey.DependencyProperty;
 
-    internal static Collection<VisualStateGroup> GetVisualStateGroupsInternal(FrameworkElement obj)
+    internal static VisualStateGroupCollection GetVisualStateGroupsInternal(FrameworkElement obj)
     {
         Debug.Assert(obj is not null);
-        return (Collection<VisualStateGroup>)obj.GetValue(VisualStateGroupsProperty);
+        return (VisualStateGroupCollection)obj.GetValue(VisualStateGroupsProperty);
     }
 
     /// <summary>
@@ -251,9 +251,9 @@ public class VisualStateManager : DependencyObject
             throw new ArgumentNullException(nameof(obj));
         }
 
-        if (obj.GetValue(VisualStateGroupsProperty) is not Collection<VisualStateGroup> value)
+        if (obj.GetValue(VisualStateGroupsProperty) is not VisualStateGroupCollection value)
         {
-            value = new(new VisualStateGroupCollection(obj));
+            value = new VisualStateGroupCollection(obj);
             obj.SetValueInternal(VisualStateGroupsPropertyKey, value);
         }
 
@@ -264,7 +264,7 @@ public class VisualStateManager : DependencyObject
 
     #region State Change
 
-    internal static bool TryGetState(Collection<VisualStateGroup> groups, string stateName, out VisualStateGroup group, out VisualState state)
+    internal static bool TryGetState(VisualStateGroupCollection groups, string stateName, out VisualStateGroup group, out VisualState state)
     {
         for (int groupIndex = 0; groupIndex < groups.Count; ++groupIndex)
         {
