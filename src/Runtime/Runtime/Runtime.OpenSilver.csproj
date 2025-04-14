@@ -87,6 +87,7 @@
     <Compile Include="OpenSilver\Internal\Data\BindingCollection.cs" />
     <Compile Include="OpenSilver\Internal\MatrixUtil.cs" />
     <Compile Include="OpenSilver\Internal\UncommonField.cs" />
+    <Compile Include="OpenSilver\Internal\WeakEventTable.cs" />
     <Compile Include="OpenSilver\Theming\Theme.cs" />
     <Compile Include="Properties\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -182,6 +183,7 @@
     <Compile Include="System.Windows\FrameworkElement.Resources.cs" />
     <Compile Include="System.Windows\GlobalEventManager.cs" />
     <Compile Include="System.Windows\HierarchicalDataTemplate.cs" />
+    <Compile Include="System.Windows\IWeakEventListener.cs" />
     <Compile Include="System.Windows\LengthConverter.cs" />
     <Compile Include="System.Windows\LocalValueEnumerator.cs" />
     <Compile Include="System.Windows\ResourceReferenceExpression.cs" />
@@ -462,6 +464,8 @@
     <Compile Include="System.Windows\UIElement.Layout.cs" />
     <Compile Include="System.Windows\Vector.cs" />
     <Compile Include="System.Windows\VectorConverter.cs" />
+    <Compile Include="System.Windows\WeakEventManager.cs" />
+    <Compile Include="System.Windows\WeakEventManagerOfT.cs" />
     <Compile Include="System.Windows\WindowStartupLocation.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\Typography.cs" />

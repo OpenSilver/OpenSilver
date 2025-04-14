@@ -308,6 +308,9 @@
   <data name="Enumerator_VerifyContext" xml:space="preserve">
     <value>No current object to return.</value>
   </data>
+  <data name="EventNotFound" xml:space="preserve">
+    <value>'{1}' event not found on type '{0}'.</value>
+  </data>
   <data name="FrugalMap_CannotPromoteBeyondHashtable" xml:space="preserve">
     <value>Cannot promote from Hashtable.</value>
   </data>
@@ -397,6 +400,12 @@
   </data>
   <data name="ListBoxSelectAllSelectionMode" xml:space="preserve">
     <value>Can only call SelectAll when SelectionMode is Multiple or Extended.</value>
+  </data>
+  <data name="ListenerDidNotHandleEvent" xml:space="preserve">
+    <value>Listener did not handle requested event.</value>
+  </data>
+  <data name="ListenerDidNotHandleEventDetail" xml:space="preserve">
+    <value>Listener of type '{0}' registered with event manager of type '{1}', but then did not handle the event. The listener is coded incorrectly.</value>
   </data>
   <data name="LocalValueEnumerationOutOfBounds" xml:space="preserve">
     <value>Local value enumeration position is out of range.</value>

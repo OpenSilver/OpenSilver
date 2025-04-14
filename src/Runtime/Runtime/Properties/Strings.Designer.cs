@@ -628,6 +628,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{1}&apos; event not found on type &apos;{0}&apos;..
+        /// </summary>
+        internal static string EventNotFound {
+            get {
+                return ResourceManager.GetString("EventNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot promote from Hashtable..
         /// </summary>
         internal static string FrugalMap_CannotPromoteBeyondHashtable {
@@ -894,6 +903,24 @@ namespace OpenSilver.Internal {
         internal static string ListBoxSelectAllSelectionMode {
             get {
                 return ResourceManager.GetString("ListBoxSelectAllSelectionMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listener did not handle requested event..
+        /// </summary>
+        internal static string ListenerDidNotHandleEvent {
+            get {
+                return ResourceManager.GetString("ListenerDidNotHandleEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listener of type &apos;{0}&apos; registered with event manager of type &apos;{1}&apos;, but then did not handle the event. The listener is coded incorrectly..
+        /// </summary>
+        internal static string ListenerDidNotHandleEventDetail {
+            get {
+                return ResourceManager.GetString("ListenerDidNotHandleEventDetail", resourceCulture);
             }
         }
         
