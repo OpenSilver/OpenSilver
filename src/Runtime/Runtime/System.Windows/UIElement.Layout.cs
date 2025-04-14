@@ -518,71 +518,56 @@ namespace System.Windows
             {
                 LayoutEventList.ListItem item = GetLayoutUpdatedHandler(value);
 
-                if (item == null)
+                if (item is null)
                 {
-                    //set a weak ref in LM
+                    // set a weak ref in LM
                     item = LayoutManager.Current.LayoutEvents.Add(value);
                     AddLayoutUpdatedHandler(value, item);
                 }
             }
             remove
             {
-                LayoutEventList.ListItem item = GetLayoutUpdatedHandler(value);
-
-                if (item != null)
+                if (GetLayoutUpdatedHandler(value) is LayoutEventList.ListItem item)
                 {
                     RemoveLayoutUpdatedHandler(value);
-                    //remove a weak ref from LM
+                    // remove a weak ref from LM
                     LayoutManager.Current.LayoutEvents.Remove(item);
                 }
             }
         }
 
-        private static readonly DependencyProperty LayoutUpdatedListItemsField =
-            DependencyProperty.Register(
-                "_LayoutUpdatedListItems",
-                typeof(object),
-                typeof(FrameworkElement),
-                null);
+        private static readonly UncommonField<object> LayoutUpdatedListItemsField = new();
 
-        private static readonly DependencyProperty LayoutUpdatedHandlersField =
-            DependencyProperty.Register(
-                "_LayoutUpdatedHandlers",
-                typeof(EventHandler),
-                typeof(FrameworkElement),
-                null);
+        private static readonly UncommonField<EventHandler> LayoutUpdatedHandlersField = new();
 
         private void AddLayoutUpdatedHandler(EventHandler handler, LayoutEventList.ListItem item)
         {
-            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
-
-            if (cachedLayoutUpdatedItems == null)
+            if (LayoutUpdatedListItemsField.GetValue(this) is not object cachedLayoutUpdatedItems)
             {
-                SetValueInternal(LayoutUpdatedListItemsField, item);
-                SetValueInternal(LayoutUpdatedHandlersField, handler);
+                LayoutUpdatedListItemsField.SetValue(this, item);
+                LayoutUpdatedHandlersField.SetValue(this, handler);
             }
             else
             {
-                EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
-                if (cachedLayoutUpdatedHandler != null)
+                if (LayoutUpdatedHandlersField.GetValue(this) is EventHandler cachedLayoutUpdatedHandler)
                 {
-                    //second unique handler is coming in.
-                    //allocate a datastructure
-                    var list = new Dictionary<EventHandler, object>(2)
+                    // second unique handler is coming in.
+                    // allocate a datastructure
+                    var list = new Dictionary<EventHandler, LayoutEventList.ListItem>(2)
                     {
-                        //add previously cached handler
-                        { cachedLayoutUpdatedHandler, cachedLayoutUpdatedItems },
+                        // add previously cached handler
+                        [cachedLayoutUpdatedHandler] = (LayoutEventList.ListItem)cachedLayoutUpdatedItems,
 
-                        //add new handler
-                        { handler, item }
+                        // add new handler
+                        [handler] = item,
                     };
 
-                    ClearValue(LayoutUpdatedHandlersField);
-                    SetValueInternal(LayoutUpdatedListItemsField, list);
+                    LayoutUpdatedHandlersField.ClearValue(this);
+                    LayoutUpdatedListItemsField.SetValue(this, list);
                 }
-                else //already have a list
+                else // already have a list
                 {
-                    var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                    var list = (Dictionary<EventHandler, LayoutEventList.ListItem>)cachedLayoutUpdatedItems;
                     list.Add(handler, item);
                 }
             }
@@ -590,25 +575,22 @@ namespace System.Windows
 
         private LayoutEventList.ListItem GetLayoutUpdatedHandler(EventHandler d)
         {
-            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
-
-            if (cachedLayoutUpdatedItems == null)
+            if (LayoutUpdatedListItemsField.GetValue(this) is not object cachedLayoutUpdatedItems)
             {
                 return null;
             }
             else
             {
-                EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
-                if (cachedLayoutUpdatedHandler != null)
+                if (LayoutUpdatedHandlersField.GetValue(this) is EventHandler cachedLayoutUpdatedHandler)
                 {
                     if (cachedLayoutUpdatedHandler == d) return (LayoutEventList.ListItem)cachedLayoutUpdatedItems;
                 }
-                else //already have a list
+                else // already have a list
                 {
-                    var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
-                    if (list.TryGetValue(d, out object item))
+                    var list = (Dictionary<EventHandler, LayoutEventList.ListItem>)cachedLayoutUpdatedItems;
+                    if (list.TryGetValue(d, out LayoutEventList.ListItem item))
                     {
-                        return (LayoutEventList.ListItem)item;
+                        return item;
                     }
                 }
                 return null;
@@ -617,20 +599,18 @@ namespace System.Windows
 
         private void RemoveLayoutUpdatedHandler(EventHandler d)
         {
-            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
-            EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
-
-            if (cachedLayoutUpdatedHandler != null) //single handler
+            if (LayoutUpdatedHandlersField.GetValue(this) is EventHandler cachedLayoutUpdatedHandler) // single handler
             {
                 if (cachedLayoutUpdatedHandler == d)
                 {
-                    ClearValue(LayoutUpdatedListItemsField);
-                    ClearValue(LayoutUpdatedHandlersField);
+                    LayoutUpdatedListItemsField.ClearValue(this);
+                    LayoutUpdatedHandlersField.ClearValue(this);
                 }
             }
-            else //there is an ArrayList allocated
+            else // there is an ArrayList allocated
             {
-                var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                object cachedLayoutUpdatedItems = LayoutUpdatedListItemsField.GetValue(this);
+                var list = (Dictionary<EventHandler, LayoutEventList.ListItem>)cachedLayoutUpdatedItems;
                 list.Remove(d);
             }
         }

@@ -12,10 +12,10 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -54,12 +54,7 @@ namespace System.Windows.Controls
         {
             RadioButton radioButton = (RadioButton)d;
             string groupName = e.NewValue as string;
-
-            string currentlyRegisteredGroupName;
-            lock (_currentlyRegisteredGroupName)
-            {
-                _currentlyRegisteredGroupName.TryGetValue(radioButton, out currentlyRegisteredGroupName);
-            }
+            string currentlyRegisteredGroupName = _currentlyRegisteredGroupName.GetValue(radioButton);
 
             if (groupName != currentlyRegisteredGroupName)
             {
@@ -75,7 +70,7 @@ namespace System.Windows.Controls
 
         private static void Register(string groupName, RadioButton radioButton)
         {
-            _groupNameToElements ??= new();
+            _groupNameToElements ??= [];
 
             lock (_groupNameToElements)
             {
@@ -92,14 +87,8 @@ namespace System.Windows.Controls
 
                 elements.Add(new WeakReference<RadioButton>(radioButton));
             }
-            lock (_currentlyRegisteredGroupName)
-            {
-                if (_currentlyRegisteredGroupName.TryGetValue(radioButton, out _))
-                {
-                    _currentlyRegisteredGroupName.Remove(radioButton);
-                }
-                _currentlyRegisteredGroupName.Add(radioButton, groupName);
-            }
+
+            _currentlyRegisteredGroupName.SetValue(radioButton, groupName);
         }
 
         private static void Unregister(string groupName, RadioButton radioButton)
@@ -119,10 +108,7 @@ namespace System.Windows.Controls
                     }
                 }
             }
-            lock (_currentlyRegisteredGroupName)
-            {
-                _currentlyRegisteredGroupName.Remove(radioButton);
-            }
+            _currentlyRegisteredGroupName.ClearValue(radioButton);
         }
 
         private static void PurgeDead(List<WeakReference<RadioButton>> elements, RadioButton elementToRemove)
@@ -147,7 +133,7 @@ namespace System.Windows.Controls
             if (!string.IsNullOrEmpty(groupName))
             {
                 DependencyObject rootScope = VisualTreeHelper.GetRoot(this);
-                _groupNameToElements ??= new();
+                _groupNameToElements ??= [];
 
                 lock (_groupNameToElements)
                 {
@@ -260,7 +246,7 @@ namespace System.Windows.Controls
         #region private data
 
         [ThreadStatic] private static Dictionary<string, List<WeakReference<RadioButton>>> _groupNameToElements;
-        private static readonly ConditionalWeakTable<RadioButton, string> _currentlyRegisteredGroupName = new();
+        private static readonly UncommonField<string> _currentlyRegisteredGroupName = new();
 
         #endregion private data
     }

@@ -121,7 +121,7 @@ public static class BindingOperations
             throw new ArgumentNullException(nameof(dp));
         }
 
-        if (target.GetStorage(dp) is Storage storage && storage.Entry.IsExpression)
+        if (target.GetStorage(dp.GlobalIndex) is Storage storage && storage.Entry.IsExpression)
         {
             return storage.Entry.ModifiedValue.BaseValue as BindingExpressionBase;
         }
@@ -323,7 +323,7 @@ public static class BindingOperations
             throw new ArgumentNullException(nameof(dp));
         }
 
-        return target.GetStorage(dp) is Storage storage &&
+        return target.GetStorage(dp.GlobalIndex) is Storage storage &&
                storage.Entry.IsExpression &&
                storage.Entry.ModifiedValue.BaseValue is BindingExpressionBase;
     }

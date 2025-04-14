@@ -1464,7 +1464,7 @@ namespace System.Windows
                 int length = 0;
                 foreach (KeyValuePair<int, Storage> kvp in EffectiveValues)
                 {
-                    if (kvp.Value.Entry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
+                    if (kvp.Value.Entry is null || kvp.Value.Entry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
                     {
                         continue;
                     }
@@ -1478,6 +1478,8 @@ namespace System.Windows
                     foreach (Storage storage in span)
                     {
                         DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
+                        Debug.Assert(dp is not null);
+
                         if (dp.GetMetadata(DependencyObjectType) is not PropertyMetadata metadata)
                         {
                             continue;

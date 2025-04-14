@@ -172,7 +172,7 @@ internal struct DescendentsWalker<T>
         //
         // If a popup is attached to the framework element visit each popup node.
         //
-        if (feParent.GetValue(Popup.RegisteredPopupsField) is List<Popup> registeredPopups)
+        if (Popup.RegisteredPopupsField.GetValue((DependencyObject)feParent) is List<Popup> registeredPopups)
         {
             foreach (Popup p in registeredPopups)
             {
@@ -261,7 +261,7 @@ internal struct DescendentsWalker<T>
         //
         // If a popup is attached to the framework element visit each popup node.
         //
-        if (feParent.GetValue(Popup.RegisteredPopupsField) is List<Popup> registeredPopups)
+        if (Popup.RegisteredPopupsField.GetValue((DependencyObject)feParent) is List<Popup> registeredPopups)
         {
             foreach (Popup p in registeredPopups)
             {

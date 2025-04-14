@@ -13,7 +13,6 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using OpenSilver.Internal;
 using OpenSilver.Utility;
 
@@ -199,7 +198,7 @@ namespace System.Windows
         // struct.  Given the simplicity of this scenario, we can get away with this.
         private object GetCachedDefaultValue(DependencyObject owner, DependencyProperty property)
         {
-            if (!_defaultValueFactoryCache.TryGetValue(owner, out FrugalMapBase map))
+            if (_defaultValueFactoryCache.GetValue(owner) is not FrugalMapBase map)
             {
                 return DependencyProperty.UnsetValue;
             }
@@ -209,18 +208,17 @@ namespace System.Windows
 
         private void SetCachedDefaultValue(DependencyObject owner, DependencyProperty property, object value)
         {
-            if (!_defaultValueFactoryCache.TryGetValue(owner, out FrugalMapBase map))
+            if (_defaultValueFactoryCache.GetValue(owner) is not FrugalMapBase map)
             {
                 map = new SingleObjectMap();
-                _defaultValueFactoryCache.Add(owner, map);
+                _defaultValueFactoryCache.SetValue(owner, map);
             }
             else if (map is not HashObjectMap)
             {
                 FrugalMapBase newMap = new HashObjectMap();
                 map.Promote(newMap);
                 map = newMap;
-                _defaultValueFactoryCache.Remove(owner);
-                _defaultValueFactoryCache.Add(owner, map);
+                _defaultValueFactoryCache.SetValue(owner, map);
             }
 
             map.InsertEntry(property.GlobalIndex, value);
@@ -236,14 +234,14 @@ namespace System.Windows
         /// </summary>
         internal void ClearCachedDefaultValue(DependencyObject owner, DependencyProperty property)
         {
-            if (!_defaultValueFactoryCache.TryGetValue(owner, out FrugalMapBase map))
+            if (_defaultValueFactoryCache.GetValue(owner) is not FrugalMapBase map)
             {
                 return;
             }
 
             if (map.Count == 1)
             {
-                _defaultValueFactoryCache.Remove(owner);
+                _defaultValueFactoryCache.ClearValue(owner);
             }
             else
             {
@@ -531,7 +529,7 @@ namespace System.Windows
 
         // We use this uncommon field to stash values created by our default value factory
         // in the owner's _localStore.
-        private static readonly ConditionalWeakTable<DependencyObject, FrugalMapBase> _defaultValueFactoryCache = new();
+        private static readonly UncommonField<FrugalMapBase> _defaultValueFactoryCache = new();
 
         /// <summary>
         /// Gets or sets a value that indicates whether the value of the dependency property

@@ -46,7 +46,7 @@ namespace System.Windows
 
         internal event EventHandler InheritedContextChanged;
 
-        internal Dictionary<int, Storage> EffectiveValues => _effectiveValues ??= new();
+        internal Dictionary<int, Storage> EffectiveValues => _effectiveValues ??= [];
 
         internal int EffectiveValuesCount => _effectiveValues?.Count ?? 0;
 
@@ -238,7 +238,7 @@ namespace System.Windows
                 }
             }
 
-            if (GetStorage(dependencyProperty) is Storage storage)
+            if (GetStorage(dependencyProperty.GlobalIndex) is Storage storage)
             {
                 return DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
             }
@@ -341,7 +341,7 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            if (GetStorage(dp) is Storage storage)
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
             {
                 return ReadLocalValueEntry(storage);
             }
@@ -365,7 +365,7 @@ namespace System.Windows
 
         internal bool HasDefaultValue(DependencyProperty dp)
         {
-            return GetStorage(dp) is not Storage storage ||
+            return GetStorage(dp.GlobalIndex) is not Storage storage ||
                 storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default;
         }
 
@@ -374,7 +374,7 @@ namespace System.Windows
             Debug.Assert(dp is not null);
             Debug.Assert(clock is not null);
 
-            if (GetStorage(dp) is Storage storage && storage.Clock == clock)
+            if (GetStorage(dp.GlobalIndex) is Storage storage && storage.Clock == clock)
             {
                 PropertyMetadata metadata = SetupPropertyChange(dp);
 
@@ -405,7 +405,7 @@ namespace System.Windows
             Debug.Assert(dp is not null);
             Debug.Assert(clock is not null);
 
-            if (GetStorage(dp) is Storage storage)
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
             {
                 if (storage.Clock == clock)
                 {
@@ -419,7 +419,7 @@ namespace System.Windows
 
         internal void DetachAnimationClock(DependencyProperty dp, bool clearAnimatedValue)
         {
-            if (GetStorage(dp) is Storage storage)
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
             {
                 storage.Clock = null;
 
@@ -596,7 +596,7 @@ namespace System.Windows
 
             if (value == DependencyProperty.UnsetValue)
             {
-                if (GetStorage(dp) is Storage storage)
+                if (GetStorage(dp.GlobalIndex) is Storage storage)
                 {
                     DependencyObjectStore.ClearLocalStyleValue(storage,
                         this,
@@ -623,7 +623,7 @@ namespace System.Windows
 
             if (value == DependencyProperty.UnsetValue)
             {
-                if (GetStorage(dp) is Storage storage)
+                if (GetStorage(dp.GlobalIndex) is Storage storage)
                 {
                     DependencyObjectStore.ClearThemeStyleValue(storage,
                         this,
@@ -695,11 +695,13 @@ namespace System.Windows
 
         internal static void InvalidateInheritedProperties(DependencyObject d, DependencyObject newParent)
         {
-            if (newParent == null)
+            if (newParent is null)
             {
                 foreach (Storage storage in CopyInheritedStorages(d))
                 {
                     DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
+                    Debug.Assert(dp is not null);
+
                     DependencyObjectStore.ClearInheritedValue(storage,
                         d,
                         dp,
@@ -712,6 +714,8 @@ namespace System.Windows
                 foreach (Storage storage in CopyInheritedStorages(newParent))
                 {
                     DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
+                    Debug.Assert(dp is not null);
+
                     PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
                     if (TreeWalkHelper.IsInheritanceNode(metadata))
                     {
@@ -806,7 +810,7 @@ namespace System.Windows
                 throw new InvalidOperationException(string.Format(Strings.ClearOnReadOnlyObjectNotAllowed, this));
             }
 
-            if (GetStorage(dp) is Storage storage)
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
             {
                 PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
                 DependencyObjectStore.ClearValueCommon(storage, this, dp, metadata);
@@ -837,7 +841,7 @@ namespace System.Windows
                 throw new InvalidOperationException(string.Format(Strings.ClearOnReadOnlyObjectNotAllowed, this));
             }
 
-            if (GetStorage(dp) is Storage storage)
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
             {
                 DependencyObjectStore.ClearValueCommon(storage, this, dp, metadata);
             }
@@ -871,7 +875,7 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            if (GetStorage(dp) is Storage storage)
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
             {
                 return DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.AnimationBaseValue);
             }
@@ -907,7 +911,7 @@ namespace System.Windows
             Debug.Assert(!IsSealed);
 
             int propertyIndex = dp.GlobalIndex;
-            _dependentListMap ??= new();
+            _dependentListMap ??= [];
             if (!_dependentListMap.TryGetValue(propertyIndex, out var dependents))
             {
                 _dependentListMap[propertyIndex] = dependents = new();
@@ -966,9 +970,9 @@ namespace System.Windows
             return dp.GetMetadata(DependencyObjectType);
         }
 
-        internal Storage GetStorage(DependencyProperty dp)
+        internal Storage GetStorage(int targetIndex)
         {
-            if (_effectiveValues is not null && _effectiveValues.TryGetValue(dp.GlobalIndex, out Storage storage))
+            if (_effectiveValues is not null && _effectiveValues.TryGetValue(targetIndex, out Storage storage))
             {
                 return storage;
             }
@@ -985,7 +989,7 @@ namespace System.Windows
                 return storage;
             }
 
-            storage = Storage.CreateDefaultValueEntry(dp, metadata.Inherits, metadata.GetDefaultValue(this, dp));
+            storage = new Storage(dp, metadata.Inherits, metadata.GetDefaultValue(this, dp));
             EffectiveValues.Add(propertyIndex, storage);
             if (metadata.Inherits)
             {
@@ -997,6 +1001,8 @@ namespace System.Windows
 
         internal void RemoveStorage(Storage storage)
         {
+            Debug.Assert(_effectiveValues is not null);
+
             if (_effectiveValues.Remove(storage.PropertyIndex) && storage.Inheritable)
             {
                 _inheritableEffectiveValuesCount--;

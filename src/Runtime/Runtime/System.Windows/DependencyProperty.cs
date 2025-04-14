@@ -1291,7 +1291,7 @@ namespace System.Windows
         }
 
         // Synchronized: Covered by DependencyProperty.Synchronized
-        private static int GetUniqueGlobalIndex()
+        internal static int GetUniqueGlobalIndex()
         {
             // Covered by Synchronized by caller
             return GlobalIndexCount++;
@@ -1326,20 +1326,20 @@ namespace System.Windows
         // Synchronized (write locks, lock-free reads): Covered by DependencyProperty instance
         // This is a map that contains the IDs of derived classes that have overriden metadata
         /* property */
-        private InsertionSortMap _metadataMap = new InsertionSortMap();
+        private InsertionSortMap _metadataMap = new();
 
         // Synchronized (write locks, lock-free reads): Covered by DependencyProperty.Synchronized
         /* property */
-        internal static readonly List<DependencyProperty> RegisteredPropertyList = new List<DependencyProperty>(768);
+        internal static readonly List<DependencyProperty> RegisteredPropertyList = new(768);
 
         // Synchronized: Covered by DependencyProperty.Synchronized
-        private static readonly Dictionary<FromNameKey, DependencyProperty> PropertyFromName = new Dictionary<FromNameKey, DependencyProperty>();
+        private static readonly Dictionary<FromNameKey, DependencyProperty> PropertyFromName = [];
 
         // Synchronized: Covered by DependencyProperty.Synchronized
         private static int GlobalIndexCount;
 
         // Global, cross-object synchronization
-        private static readonly object Synchronized = new object();
+        internal static readonly object Synchronized = new();
 
         // Nullable Type
         private static readonly Type NullableType = typeof(Nullable<>);

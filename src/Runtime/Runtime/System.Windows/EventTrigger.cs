@@ -43,6 +43,8 @@ public sealed class EventTrigger : TriggerBase
     // This is the SourceId-ed element.
     private IInternalFrameworkElement _source;
 
+    internal static readonly UncommonField<TriggerCollection> TriggerCollectionField = new();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EventTrigger"/> class.
     /// </summary>
@@ -128,7 +130,7 @@ public sealed class EventTrigger : TriggerBase
     {
         Debug.Assert(triggersHost is not null);
 
-        if (triggersHost.GetValue(FrameworkElement.TriggersProperty) is TriggerCollection triggerCollection)
+        if (TriggerCollectionField.GetValue((DependencyObject)triggersHost) is TriggerCollection triggerCollection)
         {
             // Don't seal the collection, because we allow it to change.  We will,
             // however, seal each of the triggers.
@@ -180,7 +182,7 @@ public sealed class EventTrigger : TriggerBase
     // Call DisconnectOneTrigger for each trigger in the Triggers collection.
     internal static void DisconnectAllTriggers(IInternalFrameworkElement triggersHost)
     {
-        if (triggersHost.GetValue(FrameworkElement.TriggersProperty) is TriggerCollection triggerCollection)
+        if (TriggerCollectionField.GetValue((DependencyObject)triggersHost) is TriggerCollection triggerCollection)
         {
             List<TriggerBase> internalTriggerCollection = triggerCollection.InternalItems;
             for (int i = 0; i < internalTriggerCollection.Count; i++)

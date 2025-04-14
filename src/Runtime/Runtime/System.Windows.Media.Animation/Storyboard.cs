@@ -614,7 +614,7 @@ public sealed class Storyboard : Timeline
 
     private void RemoveImpl(DependencyObject containingObject, bool raiseCompletedEvent)
     {
-        var clocks = (Dictionary<Storyboard, WeakReference<TimelineClock>>)containingObject.GetValue(StoryboardClockTreesField);
+        var clocks = StoryboardClockTreesField.GetValue(containingObject);
 
         if (clocks is not null && clocks.TryGetValue(this, out WeakReference<TimelineClock> clockReference))
         {
@@ -636,12 +636,7 @@ public sealed class Storyboard : Timeline
 
     internal override TimelineClock CreateClock() => new StoryboardClock(this);
 
-    private static readonly DependencyProperty StoryboardClockTreesField =
-        DependencyProperty.RegisterAttached(
-            nameof(StoryboardClockTreesField),
-            typeof(Dictionary<Storyboard, WeakReference<TimelineClock>>),
-            typeof(Storyboard),
-            null);
+    private static readonly UncommonField<Dictionary<Storyboard, WeakReference<TimelineClock>>> StoryboardClockTreesField = new();
 
     private TimelineClock GetStoryboardClock(DependencyObject o, bool throwIfNull)
     {
@@ -649,7 +644,7 @@ public sealed class Storyboard : Timeline
 
         WeakReference<TimelineClock> weakClock = null;
 
-        var clocks = (Dictionary<Storyboard, WeakReference<TimelineClock>>)o.GetValue(StoryboardClockTreesField);
+        var clocks = StoryboardClockTreesField.GetValue(o);
 
         if (clocks is null || !clocks.TryGetValue(this, out weakClock))
         {
@@ -671,12 +666,12 @@ public sealed class Storyboard : Timeline
     {
         Debug.Assert(o is not null);
 
-        var clocks = (Dictionary<Storyboard, WeakReference<TimelineClock>>)o.GetValue(StoryboardClockTreesField);
+        var clocks = StoryboardClockTreesField.GetValue(o);
 
         if (clocks is null)
         {
-            clocks = new();
-            o.SetValueInternal(StoryboardClockTreesField, clocks);
+            clocks = [];
+            StoryboardClockTreesField.SetValue(o, clocks);
         }
 
         clocks[this] = clock.WeakReference;

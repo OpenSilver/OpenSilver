@@ -807,10 +807,10 @@ namespace System.Windows.Controls.Primitives
             // The array list for storing the registered popups on the placement target is lazily created.
             //
 
-            if (placementTarget.GetValue(RegisteredPopupsField) is not List<Popup> registeredPopups)
+            if (RegisteredPopupsField.GetValue(placementTarget) is not List<Popup> registeredPopups)
             {
                 registeredPopups = new(1);
-                placementTarget.SetValueInternal(RegisteredPopupsField, registeredPopups);
+                RegisteredPopupsField.SetValue(placementTarget, registeredPopups);
             }
 
             if (!registeredPopups.Contains(popup))
@@ -828,7 +828,7 @@ namespace System.Windows.Controls.Primitives
             Debug.Assert(popup is not null, "Popup must be non-null");
             Debug.Assert(placementTarget is not null, "Placement target must be non-null.");
 
-            if (placementTarget.GetValue(RegisteredPopupsField) is List<Popup> registeredPopups)
+            if (RegisteredPopupsField.GetValue(placementTarget) is List<Popup> registeredPopups)
             {
                 registeredPopups.Remove(popup);
 
@@ -836,17 +836,12 @@ namespace System.Windows.Controls.Primitives
                 // popups are left, we can also get rid of the array list.
                 if (registeredPopups.Count == 0)
                 {
-                    placementTarget.ClearValue(RegisteredPopupsField);
+                    RegisteredPopupsField.ClearValue(placementTarget);
                 }
             }
         }
 
-        internal static readonly DependencyProperty RegisteredPopupsField =
-            DependencyProperty.RegisterAttached(
-                "_RegisteredPopupsField",
-                typeof(List<Popup>),
-                typeof(Popup),
-                null);
+        internal static readonly UncommonField<List<Popup>> RegisteredPopupsField = new();
 
         public event EventHandler ClosedDueToOutsideClick;
 

@@ -856,25 +856,15 @@ namespace System.Windows
         {
             get
             {
-                if (GetValue(TriggersProperty) is not TriggerCollection triggers)
+                if (EventTrigger.TriggerCollectionField.GetValue(this) is not TriggerCollection triggers)
                 {
                     triggers = new TriggerCollection(this);
-                    SetValueInternal(TriggersProperty, triggers);
+                    EventTrigger.TriggerCollectionField.SetValue(this, triggers);
                 }
 
                 return triggers;
             }
         }
-
-        /// <summary>
-        /// Identifies the <see cref="Triggers"/> dependency property.
-        /// </summary>
-        internal static readonly DependencyProperty TriggersProperty =
-            DependencyProperty.Register(
-                nameof(Triggers),
-                typeof(TriggerCollection),
-                typeof(FrameworkElement),
-                null);
 
         #endregion Triggers
 

@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
 using System.Windows;
 using OpenSilver.Internal.Media.Animation;
 
@@ -18,7 +19,7 @@ namespace OpenSilver.Internal;
 
 internal sealed class Storage
 {
-    private Storage(DependencyProperty dp, bool inheritable, object value)
+    internal Storage(DependencyProperty dp, bool inheritable, object value)
     {
         LocalValue = DependencyProperty.UnsetValue;
         LocalStyleValue = DependencyProperty.UnsetValue;
@@ -29,7 +30,14 @@ internal sealed class Storage
         Entry = new EffectiveValueEntry(value);
     }
 
-    internal static Storage CreateDefaultValueEntry(DependencyProperty dp, bool inheritable, object value) => new(dp, inheritable, value);
+    internal Storage(int propertyIndex)
+    {
+        Debug.Assert(DependencyProperty.RegisteredPropertyList[propertyIndex] is null);
+
+        LocalValue = DependencyProperty.UnsetValue;
+        PropertyIndex = propertyIndex;
+        Inheritable = false;
+    }
 
     internal int PropertyIndex { get; }
 

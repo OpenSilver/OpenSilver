@@ -239,7 +239,7 @@ namespace System.Windows.Data
             add
             {
                 // Get existing event hanlders
-                FilterEventHandler handlers = _filterHandlers;
+                FilterEventHandler handlers = FilterHandlersField.GetValue(this);
                 if (handlers != null)
                 {
                     // combine to a multicast delegate
@@ -250,14 +250,14 @@ namespace System.Windows.Data
                     handlers = value;
                 }
                 // Set the delegate
-                _filterHandlers = handlers;
+                FilterHandlersField.SetValue(this, handlers);
 
                 OnForwardedPropertyChanged();
             }
             remove
             {
                 // Get existing event hanlders
-                FilterEventHandler handlers = _filterHandlers;
+                FilterEventHandler handlers = FilterHandlersField.GetValue(this);
                 if (handlers != null)
                 {
                     // Remove the given handler
@@ -265,12 +265,12 @@ namespace System.Windows.Data
                     if (handlers == null)
                     {
                         // Clear the value because there are no more handlers
-                        _filterHandlers = null;
+                        FilterHandlersField.ClearValue(this);
                     }
                     else
                     {
                         // Set the remaining handlers
-                        _filterHandlers = handlers;
+                        FilterHandlersField.SetValue(this, handlers);
                     }
                 }
 
@@ -536,7 +536,7 @@ namespace System.Windows.Data
 
                 // Filter
                 Predicate<object> filter;
-                if (_filterHandlers != null)
+                if (FilterHandlersField.GetValue(this) != null)
                 {
                     filter = FilterWrapper;
                 }
@@ -595,7 +595,7 @@ namespace System.Windows.Data
         private bool WrapFilter(object item)
         {
             FilterEventArgs args = new FilterEventArgs(item);
-            FilterEventHandler handlers = _filterHandlers;
+            FilterEventHandler handlers = FilterHandlersField.GetValue(this);
 
             if (handlers != null)
             {
@@ -705,10 +705,12 @@ namespace System.Windows.Data
         private int _deferLevel;    // counts nested calls to BeginDefer
         private DataSourceProvider _dataProvider;  // DataSourceProvider whose DataChanged event we want
         private FilterStub _filterStub;    // used to support the Filter event
-        private FilterEventHandler _filterHandlers; // Store the handlers for the Filter event
         private WeakEventListener<CollectionViewSource, DataSourceProvider, EventArgs> _dataChangedListener;
 
         // the placeholder source for all default views
         private static readonly CollectionViewSource DefaultSource = new CollectionViewSource();
+
+        // This uncommon field is used to store the handlers for the Filter event
+        private static readonly UncommonField<FilterEventHandler> FilterHandlersField = new();
     }
 }

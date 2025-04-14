@@ -15,258 +15,237 @@ using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using OpenSilver.Internal;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// This is a static helper class that has methods that use the DescendentsWalker to do tree walks.
+/// </summary>
+internal static class TreeWalkHelper
 {
     /// <summary>
-    /// This is a static helper class that has methods that use the DescendentsWalker to do tree walks.
+    ///     Invalidate inheritable properties and resource
+    ///     references during a tree change operation.
     /// </summary>
-    internal static class TreeWalkHelper
+    internal static void InvalidateOnTreeChange<TFrameworkElement>(TFrameworkElement fe, DependencyObject parent, bool isAddOperation)
+        where TFrameworkElement : DependencyObject, IInternalFrameworkElement
     {
-        /// <summary>
-        ///     Invalidate inheritable properties and resource
-        ///     references during a tree change operation.
-        /// </summary>
-        internal static void InvalidateOnTreeChange(
-            IInternalFrameworkElement fe,
-            DependencyObject parent,
-            bool isAddOperation)
+        DependencyObject.InvalidateInheritedProperties(fe, fe.Parent ?? fe.VisualParent);
+
+        if (HasChildren(fe))
         {
-            DependencyObject d = fe.AsDependencyObject();
+            // The TreeChangeInfo object is used here to track
+            // information that we have because we're doing a tree walk.
+            var parentInfo = new TreeChangeInfo(fe, parent, isAddOperation);
 
-            DependencyObject.InvalidateInheritedProperties(d, fe.Parent ?? fe.VisualParent);
+            var walker = new DescendentsWalker<TreeChangeInfo>(
+                TreeWalkPriority.LogicalTree, TreeChangeDelegate, parentInfo);
 
-            if (HasChildren(fe))
-            {
-                // The TreeChangeInfo object is used here to track
-                // information that we have because we're doing a tree walk.
-                var parentInfo = new TreeChangeInfo(d, parent, isAddOperation);
-
-                var walker = new DescendentsWalker<TreeChangeInfo>(
-                    TreeWalkPriority.LogicalTree, TreeChangeDelegate, parentInfo);
-
-                walker.StartWalk(d, false);
-            }
-            else
-            {
-                // Degenerate case when the current node is a leaf node and has no children.
-
-                var parentInfo = new TreeChangeInfo(fe.AsDependencyObject(), parent, isAddOperation);
-
-                // Degenerate case of OnAncestorChanged for a single node
-                OnAncestorChanged(fe, parentInfo);
-            }
+            walker.StartWalk(fe, false);
         }
-
-        /// <summary>
-        ///     Callback on visiting each node in the descendency during a tree change
-        ///     Note that this is only used in an entire sub-tree undergoes a change.
-        ///     If the tree change is happening on a single node with no children, this
-        ///     invalidation happens inside InvalidateOnTreeChange and this method doesn't
-        ///     get involved.
-        /// </summary>
-        private static bool OnAncestorChanged(
-            DependencyObject d,
-            TreeChangeInfo info,
-            bool visitedViaVisualTree)
+        else
         {
-            // Invalidate properties on current instance
+            // Degenerate case when the current node is a leaf node and has no children.
 
-            if (d is IInternalFrameworkElement fe)
-            {
-                OnAncestorChanged(fe, info);
-            }
+            var parentInfo = new TreeChangeInfo(fe, parent, isAddOperation);
 
-            // Continue walk down subtree
-            return true;
+            // Degenerate case of OnAncestorChanged for a single node
+            OnAncestorChanged(fe, parentInfo);
         }
-
-        /// <summary>
-        ///     OnAncestorChanged variant when we know what type FE the
-        ///     tree node is.
-        /// </summary>
-        private static void OnAncestorChanged(
-           IInternalFrameworkElement fe,
-           TreeChangeInfo info)
-        {
-            fe.OnAncestorChangedInternal(info);
-        }
-
-        /// <summary>
-        ///     Invalidates all the properties on the nodes in the given sub-tree
-        ///     that are referring to the resource[s] that are changing.
-        /// </summary>
-        internal static void InvalidateOnResourcesChange(
-            IInternalFrameworkElement fe,
-            ResourcesChangeInfo info)
-        {
-            Debug.Assert(fe is not null, "Node with the resources change notification must be a FrameworkElement.");
-
-            if (HasChildren(fe))
-            {
-                // Spin up a DescendentsWalker only when
-                // the current node has children to walk
-
-                var walker = new DescendentsWalker<ResourcesChangeInfo>(
-                    TreeWalkPriority.LogicalTree, ResourcesChangeDelegate, info);
-
-                walker.StartWalk(fe.AsDependencyObject(), false);
-            }
-            else
-            {
-                // Degenerate case when the current node is a leaf node and has no children.
-
-                OnResourcesChanged(fe.AsDependencyObject(), info);
-            }
-        }
-
-        /// <summary>
-        ///     Callback on visiting each node in the descendency
-        ///     during a resources change.
-        /// </summary>
-        private static bool OnResourcesChangedCallback(
-            DependencyObject d,
-            ResourcesChangeInfo info,
-            bool visitedViaVisualTree)
-        {
-            OnResourcesChanged(d, info);
-
-            // Continue walk down subtree
-            return true;
-        }
-
-        /// <summary>
-        ///     Process a resource change for the given DependencyObject.
-        ///     Return true if the DO has resource references.
-        /// </summary>
-        internal static void OnResourcesChanged(
-            DependencyObject d,
-            ResourcesChangeInfo info)
-        {
-            if (d is IInternalFrameworkElement fe)
-            {
-                fe.OnResourcesChanged(info);
-            }
-        }
-
-        internal static void InvalidateOnInheritablePropertyChange(
-            IInternalUIElement uie,
-            InheritablePropertyChangeInfo info,
-            bool skipStartNode)
-        {
-            if (HasChildren(uie))
-            {
-                var walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
-                    TreeWalkPriority.LogicalTree, InheritablePropertyChangeDelegate, info);
-
-                walker.StartWalk(uie.AsDependencyObject(), skipStartNode);
-            }
-            else if (!skipStartNode)
-            {
-                // Degenerate case when the current node is a leaf node and has no children.
-                // If the current node needs a notification, do so now.
-                bool visitedViaVisualTree = false;
-                OnInheritablePropertyChanged(uie.AsDependencyObject(), info, visitedViaVisualTree);
-            }
-        }
-
-        private static bool IsForceInheritedProperty(DependencyProperty dp) => dp == FrameworkElement.FlowDirectionProperty;
-
-        /// <summary>
-        /// Callback on visiting each node in the descendency
-        /// during an inheritable property change
-        /// </summary>
-        private static bool OnInheritablePropertyChanged(
-            DependencyObject d,
-            InheritablePropertyChangeInfo info,
-            bool visitedViaVisualTree)
-        {
-            Debug.Assert(d != null, "Must have non-null current node");
-
-            DependencyProperty dp = info.Property;
-            PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
-            bool inheritanceNode = IsInheritanceNode(metadata);
-            bool isForceInheritedProperty = IsForceInheritedProperty(dp);
-
-            if (inheritanceNode || isForceInheritedProperty)
-            {
-                Storage storage = d.GetStorage(dp);
-                BaseValueSourceInternal oldValueSource = storage is not null ?
-                    storage.Entry.BaseValueSourceInternal :
-                    BaseValueSourceInternal.Default;
-
-                // If the oldValueSource is of lower precedence than Inheritance
-                // only then do we need to Invalidate the property
-                if (BaseValueSourceInternal.Inherited >= oldValueSource)
-                {
-                    if (visitedViaVisualTree && d is IInternalFrameworkElement fe)
-                    {
-                        DependencyObject logicalParent = fe.Parent;
-                        if (logicalParent != null)
-                        {
-                            DependencyObject visualParent = fe.VisualParent;
-                            if (visualParent != null && visualParent != logicalParent)
-                            {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return d.SetInheritedValue(dp, metadata, info.NewValue, false);
-                }
-                else
-                {
-                    Debug.Assert(storage is not null);
-
-                    storage.InheritedValue = info.NewValue;
-
-                    if (isForceInheritedProperty)
-                    {
-                        return DependencyObjectStore.UpdateEffectiveValue(
-                            storage,
-                            d,
-                            dp,
-                            metadata,
-                            storage.Entry,
-                            storage.Entry,
-                            false,
-                            OperationType.Inherit);
-                    }
-
-                    return false;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Determine if the current DependencyObject is a candidate for
-        /// producing inheritable values
-        /// </summary>
-        internal static bool IsInheritanceNode(PropertyMetadata metadata)
-        {
-            return metadata is not null && metadata.Inherits;
-        }
-
-        /// <summary>
-        /// Says if the current FE has visual or logical children
-        /// </summary>
-        internal static bool HasChildren(IInternalUIElement uie)
-        {
-            // See if we have logical or visual children, in which case this is a real tree invalidation.
-            return uie is not null &&
-                (uie.HasVisualChildren ||
-                 uie.GetValue(Popup.RegisteredPopupsField) is not null ||
-                 (uie is IInternalFrameworkElement fe && fe.HasLogicalChildren));
-        }
-
-        private static readonly VisitedCallback<TreeChangeInfo> TreeChangeDelegate
-            = new VisitedCallback<TreeChangeInfo>(OnAncestorChanged);
-
-        private static readonly VisitedCallback<ResourcesChangeInfo> ResourcesChangeDelegate
-            = new VisitedCallback<ResourcesChangeInfo>(OnResourcesChangedCallback);
-
-        private static readonly VisitedCallback<InheritablePropertyChangeInfo> InheritablePropertyChangeDelegate
-            = new VisitedCallback<InheritablePropertyChangeInfo>(OnInheritablePropertyChanged);
     }
+
+    /// <summary>
+    ///     Callback on visiting each node in the descendency during a tree change
+    ///     Note that this is only used in an entire sub-tree undergoes a change.
+    ///     If the tree change is happening on a single node with no children, this
+    ///     invalidation happens inside InvalidateOnTreeChange and this method doesn't
+    ///     get involved.
+    /// </summary>
+    private static bool OnAncestorChanged(DependencyObject d, TreeChangeInfo info, bool visitedViaVisualTree)
+    {
+        // Invalidate properties on current instance
+
+        if (d is IInternalFrameworkElement fe)
+        {
+            OnAncestorChanged(fe, info);
+        }
+
+        // Continue walk down subtree
+        return true;
+    }
+
+    /// <summary>
+    ///     OnAncestorChanged variant when we know what type FE the
+    ///     tree node is.
+    /// </summary>
+    private static void OnAncestorChanged<TFrameworkElement>(TFrameworkElement fe, TreeChangeInfo info)
+        where TFrameworkElement : IInternalFrameworkElement
+    {
+        fe.OnAncestorChangedInternal(info);
+    }
+
+    /// <summary>
+    ///     Invalidates all the properties on the nodes in the given sub-tree
+    ///     that are referring to the resource[s] that are changing.
+    /// </summary>
+    internal static void InvalidateOnResourcesChange<TFrameworkElement>(TFrameworkElement fe, ResourcesChangeInfo info)
+        where TFrameworkElement : DependencyObject, IInternalFrameworkElement
+    {
+        Debug.Assert(fe is not null, "Node with the resources change notification must be a FrameworkElement.");
+
+        if (HasChildren(fe))
+        {
+            // Spin up a DescendentsWalker only when
+            // the current node has children to walk
+
+            var walker = new DescendentsWalker<ResourcesChangeInfo>(
+                TreeWalkPriority.LogicalTree, ResourcesChangeDelegate, info);
+
+            walker.StartWalk(fe, false);
+        }
+        else
+        {
+            // Degenerate case when the current node is a leaf node and has no children.
+
+            OnResourcesChanged(fe, info);
+        }
+    }
+
+    /// <summary>
+    ///     Callback on visiting each node in the descendency
+    ///     during a resources change.
+    /// </summary>
+    private static bool OnResourcesChangedCallback(DependencyObject d, ResourcesChangeInfo info, bool visitedViaVisualTree)
+    {
+        if (d is IInternalFrameworkElement fe)
+        {
+            OnResourcesChanged(fe, info);
+        }
+
+        // Continue walk down subtree
+        return true;
+    }
+
+    /// <summary>
+    ///     Process a resource change for the given DependencyObject.
+    ///     Return true if the DO has resource references.
+    /// </summary>
+    internal static void OnResourcesChanged<TFrameworkElement>(TFrameworkElement fe, ResourcesChangeInfo info)
+        where TFrameworkElement : IInternalFrameworkElement
+    {
+        fe.OnResourcesChanged(info);
+    }
+
+    internal static void InvalidateOnInheritablePropertyChange<TUIElement>(TUIElement uie, InheritablePropertyChangeInfo info, bool skipStartNode)
+        where TUIElement : DependencyObject, IInternalUIElement
+    {
+        if (HasChildren(uie))
+        {
+            var walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
+                TreeWalkPriority.LogicalTree, InheritablePropertyChangeDelegate, info);
+
+            walker.StartWalk(uie, skipStartNode);
+        }
+        else if (!skipStartNode)
+        {
+            // Degenerate case when the current node is a leaf node and has no children.
+            // If the current node needs a notification, do so now.
+            bool visitedViaVisualTree = false;
+            OnInheritablePropertyChanged(uie, info, visitedViaVisualTree);
+        }
+    }
+
+    private static bool IsForceInheritedProperty(DependencyProperty dp) => dp == FrameworkElement.FlowDirectionProperty;
+
+    /// <summary>
+    /// Callback on visiting each node in the descendency
+    /// during an inheritable property change
+    /// </summary>
+    private static bool OnInheritablePropertyChanged(DependencyObject d, InheritablePropertyChangeInfo info, bool visitedViaVisualTree)
+    {
+        Debug.Assert(d is not null, "Must have non-null current node");
+
+        DependencyProperty dp = info.Property;
+        PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
+        bool inheritanceNode = IsInheritanceNode(metadata);
+        bool isForceInheritedProperty = IsForceInheritedProperty(dp);
+
+        if (inheritanceNode || isForceInheritedProperty)
+        {
+            Storage storage = d.GetStorage(dp.GlobalIndex);
+            BaseValueSourceInternal oldValueSource = storage is not null ?
+                storage.Entry.BaseValueSourceInternal :
+                BaseValueSourceInternal.Default;
+
+            // If the oldValueSource is of lower precedence than Inheritance
+            // only then do we need to Invalidate the property
+            if (BaseValueSourceInternal.Inherited >= oldValueSource)
+            {
+                if (visitedViaVisualTree && d is IInternalFrameworkElement fe)
+                {
+                    if (fe.Parent is DependencyObject logicalParent &&
+                        fe.VisualParent is DependencyObject visualParent &&
+                        visualParent != logicalParent)
+                    {
+                        return false;
+                    }
+                }
+
+                return d.SetInheritedValue(dp, metadata, info.NewValue, false);
+            }
+            else
+            {
+                Debug.Assert(storage is not null);
+
+                storage.InheritedValue = info.NewValue;
+
+                if (isForceInheritedProperty)
+                {
+                    return DependencyObjectStore.UpdateEffectiveValue(
+                        storage,
+                        d,
+                        dp,
+                        metadata,
+                        storage.Entry,
+                        storage.Entry,
+                        false,
+                        OperationType.Inherit);
+                }
+
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Determine if the current DependencyObject is a candidate for
+    /// producing inheritable values
+    /// </summary>
+    internal static bool IsInheritanceNode(PropertyMetadata metadata)
+    {
+        return metadata is not null && metadata.Inherits;
+    }
+
+    /// <summary>
+    /// Says if the current FE has visual or logical children
+    /// </summary>
+    internal static bool HasChildren<TUIElement>(TUIElement uie)
+        where TUIElement : DependencyObject, IInternalUIElement
+    {
+        // See if we have logical or visual children, in which case this is a real tree invalidation.
+        return uie is not null &&
+            (uie.HasVisualChildren ||
+             Popup.RegisteredPopupsField.GetValue(uie) is not null ||
+             (uie is IInternalFrameworkElement fe && fe.HasLogicalChildren));
+    }
+
+    private static readonly VisitedCallback<TreeChangeInfo> TreeChangeDelegate
+        = new(OnAncestorChanged);
+
+    private static readonly VisitedCallback<ResourcesChangeInfo> ResourcesChangeDelegate
+        = new(OnResourcesChangedCallback);
+
+    private static readonly VisitedCallback<InheritablePropertyChangeInfo> InheritablePropertyChangeDelegate
+        = new(OnInheritablePropertyChanged);
 }
