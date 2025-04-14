@@ -17,6 +17,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Commands;
 using OpenSilver.Internal.Media;
 
 namespace System.Windows.Documents;
@@ -24,11 +26,13 @@ namespace System.Windows.Documents;
 /// <summary>
 /// Provides an inline-level content element that provides facilities for hosting hyperlinks.
 /// </summary>
-public sealed class Hyperlink : Span
+public sealed class Hyperlink : Span, ICommandSource
 {
     private static readonly SolidColorBrush _defaultMouseOverBrush;
 
+    private WeakEventListener<Hyperlink, ICommand, EventArgs> _canExecuteChangedListener;
     private JavaScriptCallback _clickCallback;
+    private bool _canExecute = true;
 
     static Hyperlink()
     {
@@ -60,6 +64,14 @@ public sealed class Hyperlink : Span
     }
 
     /// <summary>
+    /// Gets a value that indicates whether or not the <see cref="Hyperlink"/> is enabled.
+    /// </summary>
+    /// <returns>
+    /// true if the <see cref="Hyperlink"/> is enabled; otherwise, false.
+    /// </returns>
+    protected override bool IsEnabledCore => base.IsEnabledCore && CanExecute;
+
+    /// <summary>
     /// Identifies the <see cref="Command"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty CommandProperty =
@@ -67,19 +79,23 @@ public sealed class Hyperlink : Span
             nameof(Command),
             typeof(ICommand),
             typeof(Hyperlink),
-            new PropertyMetadata((object)null));
+            new PropertyMetadata(null, OnCommandChanged));
 
     /// <summary>
     /// Gets or sets a command to associate with the <see cref="Hyperlink"/>.
     /// </summary>
     /// <returns>
-    /// A command to associate with the <see cref="Hyperlink"/>. The default 
-    /// is null.
+    /// A command to associate with the <see cref="Hyperlink"/>. The default is null.
     /// </returns>
     public ICommand Command
     {
         get => (ICommand)GetValue(CommandProperty);
         set => SetValueInternal(CommandProperty, value);
+    }
+
+    private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Hyperlink)d).OnCommandChanged((ICommand)e.NewValue);
     }
 
     /// <summary>
@@ -90,20 +106,45 @@ public sealed class Hyperlink : Span
             nameof(CommandParameter),
             typeof(object),
             typeof(Hyperlink),
-            new PropertyMetadata((object)null));
+            new PropertyMetadata(null, OnCommandParameterChanged));
 
     /// <summary>
-    /// Gets or sets command parameters associated with the command specified by the
-    /// <see cref="Command"/> property.
+    /// Gets or sets command parameters associated with the command specified by the <see cref="Command"/> property.
     /// </summary>
     /// <returns>
-    /// An object specifying parameters for the command specified by the <see cref="Command"/>
-    /// property. The default is null.
+    /// An object specifying parameters for the command specified by the <see cref="Command"/> property. The default is null.
     /// </returns>
     public object CommandParameter
     {
         get => GetValue(CommandParameterProperty);
         set => SetValueInternal(CommandParameterProperty, value);
+    }
+
+    private static void OnCommandParameterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Hyperlink)d).UpdateCanExecute();
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="CommandTarget"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty CommandTargetProperty =
+        DependencyProperty.Register(
+            nameof(CommandTarget),
+            typeof(IInputElement),
+            typeof(Hyperlink),
+            new PropertyMetadata((object)null));
+
+    /// <summary>
+    /// Gets or sets a target element on which to execute the command specified by the <see cref="Command"/> property.
+    /// </summary>
+    /// <returns>
+    /// A target element on which to execute the command specified by the <see cref="Command"/> property. The default is null.
+    /// </returns>
+    public IInputElement CommandTarget
+    {
+        get => (IInputElement)GetValue(CommandTargetProperty);
+        set => SetValueInternal(CommandTargetProperty, value);
     }
 
     /// <summary>
@@ -255,23 +296,11 @@ public sealed class Hyperlink : Span
     {
         RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
-        ExecuteCommand();
+        CommandHelpers.ExecuteCommandSource(this);
 
         if (NavigateUri is Uri navigateUri)
         {
             Navigate(this, navigateUri, TargetName);
-        }
-    }
-
-    private void ExecuteCommand()
-    {
-        if (Command is ICommand command)
-        {
-            object parameter = CommandParameter;
-            if (command.CanExecute(parameter))
-            {
-                command.Execute(parameter);
-            }
         }
     }
 
@@ -343,9 +372,9 @@ public sealed class Hyperlink : Span
             return null;
         }
 
-        if (fe is INavigate && (fe.Name == target || string.IsNullOrEmpty(target)))
+        if (fe is INavigate navigate && (fe.Name == target || string.IsNullOrEmpty(target)))
         {
-            return (INavigate)fe;
+            return navigate;
         }
 
         bool isPopup = fe is Popup;
@@ -358,12 +387,62 @@ public sealed class Hyperlink : Span
                 continue;
             }
 
-            if (FindNavigator(child as FrameworkElement, subtree, target) is INavigate navigate)
+            navigate = FindNavigator(child as FrameworkElement, subtree, target);
+            if (navigate is not null)
             {
                 return navigate;
             }
         }
 
         return null;
+    }
+
+    private void OnCommandChanged(ICommand newCommand)
+    {
+        if (_canExecuteChangedListener is not null)
+        {
+            _canExecuteChangedListener.Detach();
+            _canExecuteChangedListener = null;
+        }
+
+        if (newCommand is not null)
+        {
+            _canExecuteChangedListener = new(this, newCommand)
+            {
+                OnEventAction = static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
+                OnDetachAction = static (listener, source) => source.CanExecuteChanged -= listener.OnEvent,
+            };
+
+            newCommand.CanExecuteChanged += _canExecuteChangedListener.OnEvent;
+        }
+
+        UpdateCanExecute();
+    }
+
+    private void OnCanExecuteChanged(object sender, EventArgs e) => UpdateCanExecute();
+
+    private void UpdateCanExecute()
+    {
+        if (Command is not null)
+        {
+            CanExecute = CommandHelpers.CanExecuteCommandSource(this);
+        }
+        else
+        {
+            CanExecute = true;
+        }
+    }
+
+    private bool CanExecute
+    {
+        get => _canExecute;
+        set
+        {
+            if (_canExecute != value)
+            {
+                _canExecute = value;
+                CoerceValue(IsEnabledProperty);
+            }
+        }
     }
 }
