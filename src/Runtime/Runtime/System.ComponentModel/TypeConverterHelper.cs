@@ -328,25 +328,35 @@ namespace System.ComponentModel
         /// </summary>
         private static Dictionary<Type, TypeConverter> GetCoreTypeConverters()
         {
-            return new Dictionary<Type, TypeConverter>(31)
+            var commandConverter = new CommandConverter();
+            var brushConverter = new BrushConverter();
+            var geometryConverter = new GeometryConverter();
+            var transformConverter = new TransformConverter();
+
+            return new Dictionary<Type, TypeConverter>(34)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(ModifierKeys)] = new ModifierKeysConverter(),
                 [typeof(Key)] = new KeyConverter(),
+                [typeof(MouseAction)] = new MouseActionConverter(),
+                [typeof(KeyGesture)] = new KeyGestureConverter(),
+                [typeof(MouseGesture)] = new MouseGestureConverter(),
+                [typeof(RoutedCommand)] = commandConverter,
+                [typeof(RoutedUICommand)] = commandConverter,
                 [typeof(KeyTime)] = new KeyTimeConverter(),
                 [typeof(RepeatBehavior)] = new RepeatBehaviorConverter(),
                 [typeof(KeySpline)] = new KeySplineConverter(),
-                [typeof(Brush)] = new BrushConverter(),
-                [typeof(SolidColorBrush)] = new BrushConverter(),
+                [typeof(Brush)] = brushConverter,
+                [typeof(SolidColorBrush)] = brushConverter,
                 [typeof(Color)] = new ColorConverter(),
                 [typeof(DoubleCollection)] = new DoubleCollectionConverter(),
                 [typeof(FontFamily)] = new FontFamilyConverter(),
-                [typeof(Geometry)] = new GeometryConverter(),
-                [typeof(PathGeometry)] = new GeometryConverter(),
+                [typeof(Geometry)] = geometryConverter,
+                [typeof(PathGeometry)] = geometryConverter,
                 [typeof(Matrix)] = new MatrixConverter(),
                 [typeof(PointCollection)] = new PointCollectionConverter(),
-                [typeof(Transform)] = new TransformConverter(),
-                [typeof(MatrixTransform)] = new TransformConverter(),
+                [typeof(Transform)] = transformConverter,
+                [typeof(MatrixTransform)] = transformConverter,
                 [typeof(CornerRadius)] = new CornerRadiusConverter(),
                 [typeof(Duration)] = new DurationConverter(),
                 [typeof(FontWeight)] = new FontWeightConverter(),
@@ -375,7 +385,7 @@ namespace System.ComponentModel
         {
             return new Dictionary<Type, TypeConverter>(1)
             {
-                [typeof(ICommand)] = NullConverter,
+                [typeof(ICommand)] = CoreTypeConverters[typeof(RoutedCommand)],
             };
         }
 

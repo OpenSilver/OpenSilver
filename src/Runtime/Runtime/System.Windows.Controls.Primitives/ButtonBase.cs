@@ -14,6 +14,7 @@
 using System.Windows.Input;
 using System.Windows.Automation.Provider;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Commands;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -21,7 +22,7 @@ namespace System.Windows.Controls.Primitives
     /// Represents the base class for all button controls, such as <see cref="Button"/>,
     /// <see cref="RepeatButton"/>, and <see cref="HyperlinkButton"/>.
     /// </summary>
-    public class ButtonBase : ContentControl
+    public class ButtonBase : ContentControl, ICommandSource
     {
         private WeakEventListener<ButtonBase, ICommand, EventArgs> _canExecuteChangedListener;
         private bool _commandDisabled;
@@ -194,6 +195,28 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
+        /// Identifies the <see cref="CommandTarget"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CommandTargetProperty =
+            DependencyProperty.Register(
+                nameof(CommandTarget),
+                typeof(IInputElement),
+                typeof(ButtonBase),
+                new PropertyMetadata((object)null));
+
+        /// <summary>
+        /// Gets or sets the element on which to raise the specified command.
+        /// </summary>
+        /// <returns>
+        /// Element on which to raise a command.
+        /// </returns>
+        public IInputElement CommandTarget
+        {
+            get => (IInputElement)GetValue(CommandTargetProperty);
+            set => SetValueInternal(CommandTargetProperty, value);
+        }
+
+        /// <summary>
         /// Identifier for the <see cref="Command"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CommandProperty =
@@ -217,8 +240,7 @@ namespace System.Windows.Controls.Primitives
 
         private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ButtonBase b = (ButtonBase)d;
-            b.OnCommandChanged((ICommand)e.NewValue);
+            ((ButtonBase)d).OnCommandChanged((ICommand)e.NewValue);
         }
 
         /// <summary>
@@ -228,7 +250,7 @@ namespace System.Windows.Controls.Primitives
         {
             RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
-            ExecuteCommand();
+            CommandHelpers.ExecuteCommandSource(this);
         }
 
         /// <summary>
@@ -700,13 +722,13 @@ namespace System.Windows.Controls.Primitives
 
         private void OnCommandChanged(ICommand newCommand)
         {
-            if (_canExecuteChangedListener != null)
+            if (_canExecuteChangedListener is not null)
             {
                 _canExecuteChangedListener.Detach();
                 _canExecuteChangedListener = null;
             }
 
-            if (newCommand != null)
+            if (newCommand is not null)
             {
                 _canExecuteChangedListener = new(this, newCommand)
                 {
@@ -724,24 +746,13 @@ namespace System.Windows.Controls.Primitives
 
         private void UpdateCanExecute()
         {
-            if (Command != null)
+            if (Command is not null)
             {
-                CanExecute = Command.CanExecute(CommandParameter);
+                CanExecute = CommandHelpers.CanExecuteCommandSource(this);
             }
             else
             {
                 CanExecute = true;
-            }
-        }
-
-        private void ExecuteCommand()
-        {
-            if (Command != null)
-            {
-                if (Command.CanExecute(CommandParameter))
-                {
-                    Command.Execute(CommandParameter);
-                }
             }
         }
     }

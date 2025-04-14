@@ -158,9 +158,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
             else if (namespaceName.StartsWith(ClrNamespace, StringComparison.CurrentCultureIgnoreCase))
             {
-                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(namespaceName, out string ns, out string assemblyNameIfAny);
+                // Override assemblyName
+                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(namespaceName, out string ns, out assemblyName);
                 namespaceName = ns;
-                GettingInformationAboutXamlTypes.FixNamespaceForCompatibility(ref assemblyNameIfAny, ref namespaceName);
+                GettingInformationAboutXamlTypes.FixNamespaceForCompatibility(ref assemblyName, ref namespaceName);
             }
 
             // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style
@@ -207,7 +208,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 }
                 else
                 {
-                    namespacesToLookInto = new string[1] { namespaceName };
+                    namespacesToLookInto = [namespaceName];
                 }
 
                 // Search for the type:
@@ -473,7 +474,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
         {
             // Distinguish between system types (String, Double...) and other types
-            if (_systemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
+            if (_systemTypesHelper.IsKnownType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
                 return _systemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
 
             // Find the type:

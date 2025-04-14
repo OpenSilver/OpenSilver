@@ -94,11 +94,13 @@ public class KeyConverter : TypeConverter
             throw GetConvertFromException(source);
         }
 
-        return GetKeyFromString(stringSource.Trim());
+        return GetKeyFromString(stringSource);
     }
 
-    private static Key GetKeyFromString(string keyToken)
+    internal static Key GetKeyFromString(string keyToken)
     {
+        keyToken = keyToken.Trim();
+
         if (keyToken.Length == 0)
         {
             return Key.None;
@@ -218,6 +220,11 @@ public class KeyConverter : TypeConverter
         }
 
         Key key = (Key)value;
+        return ToString(key) ?? throw GetConvertToException(value, destinationType);
+    }
+
+    internal static string ToString(Key key)
+    {
         return key switch
         {
             Key.None => string.Empty,
@@ -236,9 +243,9 @@ public class KeyConverter : TypeConverter
             // Last resort, use Enum<Key>.ToString() if the range is defined
             _ when IsDefinedKey(key) => key.ToString(),
             // Everything else failed, we throw an exception
-            _ => throw GetConvertToException(value, destinationType)
+            _ => null,
         };
     }
 
-    private static bool IsDefinedKey(Key key) => Enum.IsDefined(typeof(Key), key);
+    internal static bool IsDefinedKey(Key key) => Enum.IsDefined(typeof(Key), key);
 }

@@ -391,7 +391,7 @@ End Sub
                 bool isElementInRootNamescope = GetRootOfCurrentNamescopeForRuntime(element).Parent == null;
 
                 bool isRootElement = IsElementTheRootElement(element);
-                bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
+                bool isKnownSystemType = _settings.SystemTypes.IsKnownType(
                     elementType.Substring("Global.".Length), assemblyNameIfAny);
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
@@ -427,7 +427,7 @@ End Sub
                             directContent = _settings.SystemTypes.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
-                        string preparedValue = _settings.SystemTypes.ConvertFromInvariantString(directContent, elementType.Substring("Global.".Length));
+                        string preparedValue = _settings.SystemTypes.ConvertKnownType(directContent, elementType.Substring("Global.".Length));
                         parameters.StringBuilder.AppendLine(
                             $"Dim {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue})");
                     }
@@ -439,7 +439,7 @@ End Sub
 
                         string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
 
-                        bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
+                        bool isKnownCoreType = _settings.CoreTypes.IsKnownType(
                             elementType.Substring("Global.".Length), assemblyNameIfAny);
 
                         string preparedValue = ConvertFromInvariantString(
@@ -645,7 +645,7 @@ End Sub
                                             {
                                                 if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
                                                 {
-                                                    string xamlPath = _settings.SystemTypes.ConvertFromInvariantString(resolvedPath, "System.String");
+                                                    string xamlPath = _settings.SystemTypes.ConvertToString(resolvedPath);
                                                     parameters.StringBuilder.AppendLine($"{elementUid}.XamlPath = {xamlPath}");
                                                 }
 
@@ -664,7 +664,7 @@ End Sub
                                             {
                                                 ResolvePathForTemplateBinding(attributeValue, element, out string typeName, out string propertyName);
                                                 parameters.StringBuilder.AppendLine(
-                                                    $"{elementUid}.DependencyPropertyName = {_settings.SystemTypes.ConvertFromInvariantString(propertyName, "System.String")}");
+                                                    $"{elementUid}.DependencyPropertyName = {_settings.SystemTypes.ConvertToString(propertyName)}");
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
@@ -859,7 +859,7 @@ End Sub
 
                 if (handledEventsTooAttribute is not null)
                 {
-                    string value = _settings.SystemTypes.ConvertFromInvariantString(GetAttributeValue(handledEventsTooAttribute), "system.boolean");
+                    string value = _settings.SystemTypes.ConvertToBoolean(GetAttributeValue(handledEventsTooAttribute));
                     parameters.StringBuilder.AppendLine($"{eventSetterName}.HandledEventsToo = {value}");
                 }
 
@@ -1687,9 +1687,9 @@ End Sub
                 }
 
                 string valueTypeFullName = GetFullTypeName(valueNamespaceName, valueLocalTypeName);
-                bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
+                bool isKnownSystemType = _settings.SystemTypes.IsKnownType(
                         valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
-                bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
+                bool isKnownCoreType = _settings.CoreTypes.IsKnownType(
                     valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
 
                 // Generate the code or instantiating the attribute
@@ -1959,20 +1959,20 @@ End Sub
                     }
 
                     type = underlyingType;
-                    isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(type, null);
-                    isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(type, null);
+                    isKnownCoreType = _settings.CoreTypes.IsKnownType(type, null);
+                    isKnownSystemType = _settings.SystemTypes.IsKnownType(type, null);
                 }
 
                 if (isKnownCoreType)
                 {
-                    return _settings.CoreTypes.ConvertFromInvariantString(value, type, context);
+                    return _settings.CoreTypes.ConvertKnownType(value, type, context);
                 }
                 else if (isKnownSystemType)
                 {
-                    return _settings.SystemTypes.ConvertFromInvariantString(value, type);
+                    return _settings.SystemTypes.ConvertKnownType(value, type);
                 }
 
-                return CoreTypesConverterVB.ConvertFromInvariantStringHelper(value, type);
+                return _settings.CoreTypes.ConvertFromInvariantString(value, type);
             }
 
             private string XamlContextGetPropertyValue(

@@ -528,7 +528,7 @@ namespace System.ComponentModel.Tests
         [TestMethod]
         public void GetConverter_When_ICommand()
         {
-            Assert.IsNull(TypeConverterHelper.GetConverter(typeof(ICommand)));
+            Assert.IsInstanceOfType<CommandConverter>(TypeConverterHelper.GetConverter(typeof(ICommand)));
         }
 
         [TestMethod]

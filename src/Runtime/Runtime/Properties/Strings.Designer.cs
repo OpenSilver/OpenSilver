@@ -160,11 +160,92 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Alt+Left;Backspace.
+        /// </summary>
+        internal static string BrowseBackKeyDisplayString {
+            get {
+                return ResourceManager.GetString("BrowseBackKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        internal static string BrowseBackText {
+            get {
+                return ResourceManager.GetString("BrowseBackText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alt+Right;Shift+Backspace.
+        /// </summary>
+        internal static string BrowseForwardKeyDisplayString {
+            get {
+                return ResourceManager.GetString("BrowseForwardKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forward.
+        /// </summary>
+        internal static string BrowseForwardText {
+            get {
+                return ResourceManager.GetString("BrowseForwardText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alt+Home;BrowserHome.
+        /// </summary>
+        internal static string BrowseHomeKeyDisplayString {
+            get {
+                return ResourceManager.GetString("BrowseHomeKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Home.
+        /// </summary>
+        internal static string BrowseHomeText {
+            get {
+                return ResourceManager.GetString("BrowseHomeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alt+Esc;BrowserStop.
+        /// </summary>
+        internal static string BrowseStopKeyDisplayString {
+            get {
+                return ResourceManager.GetString("BrowseStopKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        internal static string BrowseStopText {
+            get {
+                return ResourceManager.GetString("BrowseStopText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CancelEdit is not supported for the current edit item..
         /// </summary>
         internal static string CancelEditNotSupported {
             get {
                 return ResourceManager.GetString("CancelEditNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel Print.
+        /// </summary>
+        internal static string CancelPrintText {
+            get {
+                return ResourceManager.GetString("CancelPrintText", resourceCulture);
             }
         }
         
@@ -394,6 +475,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        internal static string CloseText {
+            get {
+                return ResourceManager.GetString("CloseText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to After a CollectionChange.Add event, Items collection does not contain the added item &apos;{0}&apos;.\n This could happen if the event sender supplied incorrect information in CollectionChangedEventArgs..
         /// </summary>
         internal static string CollectionAddEventMissingItem {
@@ -408,6 +498,33 @@ namespace OpenSilver.Internal {
         internal static string CollectionChangeIndexOutOfRange {
             get {
                 return ResourceManager.GetString("CollectionChangeIndexOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collection accepts only objects of type CommandBinding..
+        /// </summary>
+        internal static string CollectionOnlyAcceptsCommandBindings {
+            get {
+                return ResourceManager.GetString("CollectionOnlyAcceptsCommandBindings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collection accepts only objects of type InputBinding..
+        /// </summary>
+        internal static string CollectionOnlyAcceptsInputBindings {
+            get {
+                return ResourceManager.GetString("CollectionOnlyAcceptsInputBindings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collection accepts only objects of type InputGesture..
+        /// </summary>
+        internal static string CollectionOnlyAcceptsInputGestures {
+            get {
+                return ResourceManager.GetString("CollectionOnlyAcceptsInputGestures", resourceCulture);
             }
         }
         
@@ -457,6 +574,42 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Shift+F10;Apps.
+        /// </summary>
+        internal static string ContextMenuKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ContextMenuKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Context Menu.
+        /// </summary>
+        internal static string ContextMenuText {
+            get {
+                return ResourceManager.GetString("ContextMenuText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+C;Ctrl+Insert.
+        /// </summary>
+        internal static string CopyKeyDisplayString {
+            get {
+                return ResourceManager.GetString("CopyKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        internal static string CopyText {
+            get {
+                return ResourceManager.GetString("CopyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number of elements in source Enumerable is greater than available space from index to the end of destination array..
         /// </summary>
         internal static string CopyToNotEnoughSpace {
@@ -466,11 +619,38 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Correction List.
+        /// </summary>
+        internal static string CorrectionListText {
+            get {
+                return ResourceManager.GetString("CorrectionListText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The CollectionView that originates this CurrentChanging event is in a state that does not allow the event to be canceled. Check CurrentChangingEventArgs.IsCancelable before assigning to this CurrentChangingEventArgs.Cancel property..
         /// </summary>
         internal static string CurrentChangingCannotBeCanceled {
             get {
                 return ResourceManager.GetString("CurrentChangingCannotBeCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+X;Shift+Delete.
+        /// </summary>
+        internal static string CutKeyDisplayString {
+            get {
+                return ResourceManager.GetString("CutKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cut.
+        /// </summary>
+        internal static string CutText {
+            get {
+                return ResourceManager.GetString("CutText", resourceCulture);
             }
         }
         
@@ -489,6 +669,15 @@ namespace OpenSilver.Internal {
         internal static string CyclicThemeStyleReferenceDetected {
             get {
                 return ResourceManager.GetString("CyclicThemeStyleReferenceDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decrease Zoom.
+        /// </summary>
+        internal static string DecreaseZoomText {
+            get {
+                return ResourceManager.GetString("DecreaseZoomText", resourceCulture);
             }
         }
         
@@ -565,6 +754,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Del.
+        /// </summary>
+        internal static string DeleteKeyDisplayString {
+            get {
+                return ResourceManager.GetString("DeleteKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        internal static string DeleteText {
+            get {
+                return ResourceManager.GetString("DeleteText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot set both DisplayMemberPath and ItemTemplate..
         /// </summary>
         internal static string DisplayMemberPathAndItemTemplateDefined {
@@ -637,6 +844,123 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Shift+Down.
+        /// </summary>
+        internal static string ExtendSelectionDownKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ExtendSelectionDownKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extend Selection Down.
+        /// </summary>
+        internal static string ExtendSelectionDownText {
+            get {
+                return ResourceManager.GetString("ExtendSelectionDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+Left.
+        /// </summary>
+        internal static string ExtendSelectionLeftKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ExtendSelectionLeftKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extend Selection Left.
+        /// </summary>
+        internal static string ExtendSelectionLeftText {
+            get {
+                return ResourceManager.GetString("ExtendSelectionLeftText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+Right.
+        /// </summary>
+        internal static string ExtendSelectionRightKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ExtendSelectionRightKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extend Selection Right.
+        /// </summary>
+        internal static string ExtendSelectionRightText {
+            get {
+                return ResourceManager.GetString("ExtendSelectionRightText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+Up.
+        /// </summary>
+        internal static string ExtendSelectionUpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ExtendSelectionUpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extend Selection Up.
+        /// </summary>
+        internal static string ExtendSelectionUpText {
+            get {
+                return ResourceManager.GetString("ExtendSelectionUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+I.
+        /// </summary>
+        internal static string FavoritesKeyDisplayString {
+            get {
+                return ResourceManager.GetString("FavoritesKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Favorites.
+        /// </summary>
+        internal static string FavoritesText {
+            get {
+                return ResourceManager.GetString("FavoritesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+F.
+        /// </summary>
+        internal static string FindKeyDisplayString {
+            get {
+                return ResourceManager.GetString("FindKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find.
+        /// </summary>
+        internal static string FindText {
+            get {
+                return ResourceManager.GetString("FindText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to First Page.
+        /// </summary>
+        internal static string FirstPageText {
+            get {
+                return ResourceManager.GetString("FirstPageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot promote from Hashtable..
         /// </summary>
         internal static string FrugalMap_CannotPromoteBeyondHashtable {
@@ -700,6 +1024,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Go To Page.
+        /// </summary>
+        internal static string GoToPageText {
+            get {
+                return ResourceManager.GetString("GoToPageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot modify &apos;{0}&apos; in read-only state..
         /// </summary>
         internal static string GridCollection_CannotModifyReadOnly {
@@ -727,6 +1060,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to F1.
+        /// </summary>
+        internal static string HelpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("HelpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        internal static string HelpText {
+            get {
+                return ResourceManager.GetString("HelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot animate the &apos;{0}&apos; property on &apos;{1}&apos; because the object is sealed or frozen..
         /// </summary>
         internal static string IAnimatable_CantAnimateSealedDO {
@@ -750,6 +1101,24 @@ namespace OpenSilver.Internal {
         internal static string InconsistentBindingList {
             get {
                 return ResourceManager.GetString("InconsistentBindingList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Increase Zoom.
+        /// </summary>
+        internal static string IncreaseZoomText {
+            get {
+                return ResourceManager.GetString("IncreaseZoomText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gesture accepts only objects of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string InputBinding_ExpectedInputGesture {
+            get {
+                return ResourceManager.GetString("InputBinding_ExpectedInputGesture", resourceCulture);
             }
         }
         
@@ -876,6 +1245,24 @@ namespace OpenSilver.Internal {
         internal static string ItemsSourceInUse {
             get {
                 return ResourceManager.GetString("ItemsSourceInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}+{1}&apos; key and modifier combination is not supported for KeyGesture..
+        /// </summary>
+        internal static string KeyGesture_Invalid {
+            get {
+                return ResourceManager.GetString("KeyGesture_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last Page.
+        /// </summary>
+        internal static string LastPageText {
+            get {
+                return ResourceManager.GetString("LastPageText", resourceCulture);
             }
         }
         
@@ -1033,6 +1420,222 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Boost Bass.
+        /// </summary>
+        internal static string MediaBoostBassText {
+            get {
+                return ResourceManager.GetString("MediaBoostBassText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel Down.
+        /// </summary>
+        internal static string MediaChannelDownText {
+            get {
+                return ResourceManager.GetString("MediaChannelDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel Up.
+        /// </summary>
+        internal static string MediaChannelUpText {
+            get {
+                return ResourceManager.GetString("MediaChannelUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decrease Bass.
+        /// </summary>
+        internal static string MediaDecreaseBassText {
+            get {
+                return ResourceManager.GetString("MediaDecreaseBassText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decrease Microphone Volume.
+        /// </summary>
+        internal static string MediaDecreaseMicrophoneVolumeText {
+            get {
+                return ResourceManager.GetString("MediaDecreaseMicrophoneVolumeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decrease Treble.
+        /// </summary>
+        internal static string MediaDecreaseTrebleText {
+            get {
+                return ResourceManager.GetString("MediaDecreaseTrebleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decrease Volume.
+        /// </summary>
+        internal static string MediaDecreaseVolumeText {
+            get {
+                return ResourceManager.GetString("MediaDecreaseVolumeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fast Forward.
+        /// </summary>
+        internal static string MediaFastForwardText {
+            get {
+                return ResourceManager.GetString("MediaFastForwardText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Increase Bass.
+        /// </summary>
+        internal static string MediaIncreaseBassText {
+            get {
+                return ResourceManager.GetString("MediaIncreaseBassText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Increase Microphone Volume.
+        /// </summary>
+        internal static string MediaIncreaseMicrophoneVolumeText {
+            get {
+                return ResourceManager.GetString("MediaIncreaseMicrophoneVolumeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Increase Treble.
+        /// </summary>
+        internal static string MediaIncreaseTrebleText {
+            get {
+                return ResourceManager.GetString("MediaIncreaseTrebleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Increase Volume.
+        /// </summary>
+        internal static string MediaIncreaseVolumeText {
+            get {
+                return ResourceManager.GetString("MediaIncreaseVolumeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mute Microphone Volume.
+        /// </summary>
+        internal static string MediaMuteMicrophoneVolumeText {
+            get {
+                return ResourceManager.GetString("MediaMuteMicrophoneVolumeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mute Volume.
+        /// </summary>
+        internal static string MediaMuteVolumeText {
+            get {
+                return ResourceManager.GetString("MediaMuteVolumeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Track.
+        /// </summary>
+        internal static string MediaNextTrackText {
+            get {
+                return ResourceManager.GetString("MediaNextTrackText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause.
+        /// </summary>
+        internal static string MediaPauseText {
+            get {
+                return ResourceManager.GetString("MediaPauseText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Play.
+        /// </summary>
+        internal static string MediaPlayText {
+            get {
+                return ResourceManager.GetString("MediaPlayText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous Track.
+        /// </summary>
+        internal static string MediaPreviousTrackText {
+            get {
+                return ResourceManager.GetString("MediaPreviousTrackText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Record.
+        /// </summary>
+        internal static string MediaRecordText {
+            get {
+                return ResourceManager.GetString("MediaRecordText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rewind.
+        /// </summary>
+        internal static string MediaRewindText {
+            get {
+                return ResourceManager.GetString("MediaRewindText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select.
+        /// </summary>
+        internal static string MediaSelectText {
+            get {
+                return ResourceManager.GetString("MediaSelectText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        internal static string MediaStopText {
+            get {
+                return ResourceManager.GetString("MediaStopText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Microphone OnOff.
+        /// </summary>
+        internal static string MediaToggleMicrophoneOnOffText {
+            get {
+                return ResourceManager.GetString("MediaToggleMicrophoneOnOffText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Play Pause.
+        /// </summary>
+        internal static string MediaTogglePlayPauseText {
+            get {
+                return ResourceManager.GetString("MediaTogglePlayPauseText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not allowed during an AddNew or EditItem transaction..
         /// </summary>
         internal static string MemberNotAllowedDuringAddOrEdit {
@@ -1069,11 +1672,263 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Down.
+        /// </summary>
+        internal static string MoveDownKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveDownKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Down.
+        /// </summary>
+        internal static string MoveDownText {
+            get {
+                return ResourceManager.GetString("MoveDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+Left.
+        /// </summary>
+        internal static string MoveFocusBackKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveFocusBackKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Focus Back.
+        /// </summary>
+        internal static string MoveFocusBackText {
+            get {
+                return ResourceManager.GetString("MoveFocusBackText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+Down.
+        /// </summary>
+        internal static string MoveFocusDownKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveFocusDownKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Focus Down.
+        /// </summary>
+        internal static string MoveFocusDownText {
+            get {
+                return ResourceManager.GetString("MoveFocusDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+Right.
+        /// </summary>
+        internal static string MoveFocusForwardKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveFocusForwardKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Focus Forward.
+        /// </summary>
+        internal static string MoveFocusForwardText {
+            get {
+                return ResourceManager.GetString("MoveFocusForwardText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+PageDown.
+        /// </summary>
+        internal static string MoveFocusPageDownKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveFocusPageDownKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Focus Page Down.
+        /// </summary>
+        internal static string MoveFocusPageDownText {
+            get {
+                return ResourceManager.GetString("MoveFocusPageDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+PageUp.
+        /// </summary>
+        internal static string MoveFocusPageUpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveFocusPageUpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Focus Page Up.
+        /// </summary>
+        internal static string MoveFocusPageUpText {
+            get {
+                return ResourceManager.GetString("MoveFocusPageUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+Up.
+        /// </summary>
+        internal static string MoveFocusUpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveFocusUpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Focus Up.
+        /// </summary>
+        internal static string MoveFocusUpText {
+            get {
+                return ResourceManager.GetString("MoveFocusUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot move an item in a selection when selection is in progress..
         /// </summary>
         internal static string MoveInDeferSelectionActive {
             get {
                 return ResourceManager.GetString("MoveInDeferSelectionActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Left.
+        /// </summary>
+        internal static string MoveLeftKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveLeftKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Left.
+        /// </summary>
+        internal static string MoveLeftText {
+            get {
+                return ResourceManager.GetString("MoveLeftText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Right.
+        /// </summary>
+        internal static string MoveRightKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveRightKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Right.
+        /// </summary>
+        internal static string MoveRightText {
+            get {
+                return ResourceManager.GetString("MoveRightText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End.
+        /// </summary>
+        internal static string MoveToEndKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveToEndKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move To End.
+        /// </summary>
+        internal static string MoveToEndText {
+            get {
+                return ResourceManager.GetString("MoveToEndText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Home.
+        /// </summary>
+        internal static string MoveToHomeKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveToHomeKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move To Home.
+        /// </summary>
+        internal static string MoveToHomeText {
+            get {
+                return ResourceManager.GetString("MoveToHomeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PageDown.
+        /// </summary>
+        internal static string MoveToPageDownKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveToPageDownKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move To Page Down.
+        /// </summary>
+        internal static string MoveToPageDownText {
+            get {
+                return ResourceManager.GetString("MoveToPageDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PageUp.
+        /// </summary>
+        internal static string MoveToPageUpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveToPageUpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move To Page Up.
+        /// </summary>
+        internal static string MoveToPageUpText {
+            get {
+                return ResourceManager.GetString("MoveToPageUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Up.
+        /// </summary>
+        internal static string MoveUpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("MoveUpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Up.
+        /// </summary>
+        internal static string MoveUpText {
+            get {
+                return ResourceManager.GetString("MoveUpText", resourceCulture);
             }
         }
         
@@ -1159,11 +2014,47 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Navigate Journal.
+        /// </summary>
+        internal static string NavigateJournalText {
+            get {
+                return ResourceManager.GetString("NavigateJournalText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot have nested BeginInit calls on the same instance..
         /// </summary>
         internal static string NestedBeginInitNotSupported {
             get {
                 return ResourceManager.GetString("NestedBeginInitNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+N.
+        /// </summary>
+        internal static string NewKeyDisplayString {
+            get {
+                return ResourceManager.GetString("NewKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        internal static string NewText {
+            get {
+                return ResourceManager.GetString("NewText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Page.
+        /// </summary>
+        internal static string NextPageText {
+            get {
+                return ResourceManager.GetString("NextPageText", resourceCulture);
             }
         }
         
@@ -1186,6 +2077,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not a Command.
+        /// </summary>
+        internal static string NotACommandText {
+            get {
+                return ResourceManager.GetString("NotACommandText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot set UpdateSourceTrigger on inner Binding of MultiBinding. Only the default Immediate UpdateSourceTrigger is valid..
         /// </summary>
         internal static string NoUpdateSourceTriggerForInnerBindingOfMultiBinding {
@@ -1200,6 +2100,24 @@ namespace OpenSilver.Internal {
         internal static string NullPropertyIllegal {
             get {
                 return ResourceManager.GetString("NullPropertyIllegal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+O.
+        /// </summary>
+        internal static string OpenKeyDisplayString {
+            get {
+                return ResourceManager.GetString("OpenKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        internal static string OpenText {
+            get {
+                return ResourceManager.GetString("OpenText", resourceCulture);
             }
         }
         
@@ -1294,11 +2212,92 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ctrl+V;Shift+Insert.
+        /// </summary>
+        internal static string PasteKeyDisplayString {
+            get {
+                return ResourceManager.GetString("PasteKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste.
+        /// </summary>
+        internal static string PasteText {
+            get {
+                return ResourceManager.GetString("PasteText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot change collection during a CollectionChanged event..
         /// </summary>
         internal static string PresentationFrameworkCollectionReentrancyNotAllowed {
             get {
                 return ResourceManager.GetString("PresentationFrameworkCollectionReentrancyNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous Page.
+        /// </summary>
+        internal static string PreviousPageText {
+            get {
+                return ResourceManager.GetString("PreviousPageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+P.
+        /// </summary>
+        internal static string PrintKeyDisplayString {
+            get {
+                return ResourceManager.GetString("PrintKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+F2.
+        /// </summary>
+        internal static string PrintPreviewKeyDisplayString {
+            get {
+                return ResourceManager.GetString("PrintPreviewKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Print Preview.
+        /// </summary>
+        internal static string PrintPreviewText {
+            get {
+                return ResourceManager.GetString("PrintPreviewText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Print.
+        /// </summary>
+        internal static string PrintText {
+            get {
+                return ResourceManager.GetString("PrintText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to F4.
+        /// </summary>
+        internal static string PropertiesKeyDisplayString {
+            get {
+                return ResourceManager.GetString("PropertiesKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Properties.
+        /// </summary>
+        internal static string PropertiesText {
+            get {
+                return ResourceManager.GetString("PropertiesText", resourceCulture);
             }
         }
         
@@ -1375,6 +2374,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Operation not supported on a read-only InputGestureCollection..
+        /// </summary>
+        internal static string ReadOnlyInputGesturesCollection {
+            get {
+                return ResourceManager.GetString("ReadOnlyInputGesturesCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property key is not authorized to modify property &apos;{0}&apos;..
         /// </summary>
         internal static string ReadOnlyKeyNotAuthorized {
@@ -1420,11 +2428,47 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ctrl+Y.
+        /// </summary>
+        internal static string RedoKeyDisplayString {
+            get {
+                return ResourceManager.GetString("RedoKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redo.
+        /// </summary>
+        internal static string RedoText {
+            get {
+                return ResourceManager.GetString("RedoText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value cannot be null. Object reference: &apos;{0}&apos;..
         /// </summary>
         internal static string ReferenceIsNull {
             get {
                 return ResourceManager.GetString("ReferenceIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to F5.
+        /// </summary>
+        internal static string RefreshKeyDisplayString {
+            get {
+                return ResourceManager.GetString("RefreshKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        internal static string RefreshText {
+            get {
+                return ResourceManager.GetString("RefreshText", resourceCulture);
             }
         }
         
@@ -1461,6 +2505,24 @@ namespace OpenSilver.Internal {
         internal static string RemovingPlaceholder {
             get {
                 return ResourceManager.GetString("RemovingPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+H.
+        /// </summary>
+        internal static string ReplaceKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ReplaceKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace.
+        /// </summary>
+        internal static string ReplaceText {
+            get {
+                return ResourceManager.GetString("ReplaceText", resourceCulture);
             }
         }
         
@@ -1537,6 +2599,96 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save As.
+        /// </summary>
+        internal static string SaveAsText {
+            get {
+                return ResourceManager.GetString("SaveAsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+S.
+        /// </summary>
+        internal static string SaveKeyDisplayString {
+            get {
+                return ResourceManager.GetString("SaveKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string SaveText {
+            get {
+                return ResourceManager.GetString("SaveText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll By Line.
+        /// </summary>
+        internal static string ScrollByLineText {
+            get {
+                return ResourceManager.GetString("ScrollByLineText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PageDown.
+        /// </summary>
+        internal static string ScrollPageDownKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ScrollPageDownKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Page Down.
+        /// </summary>
+        internal static string ScrollPageDownText {
+            get {
+                return ResourceManager.GetString("ScrollPageDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Page Left.
+        /// </summary>
+        internal static string ScrollPageLeftText {
+            get {
+                return ResourceManager.GetString("ScrollPageLeftText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Page Right.
+        /// </summary>
+        internal static string ScrollPageRightText {
+            get {
+                return ResourceManager.GetString("ScrollPageRightText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PageUp.
+        /// </summary>
+        internal static string ScrollPageUpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("ScrollPageUpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Page Up.
+        /// </summary>
+        internal static string ScrollPageUpText {
+            get {
+                return ResourceManager.GetString("ScrollPageUpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; parameter value cannot be NaN..
         /// </summary>
         internal static string ScrollViewer_CannotBeNaN {
@@ -1551,6 +2703,114 @@ namespace OpenSilver.Internal {
         internal static string ScrollViewer_OutOfRange {
             get {
                 return ResourceManager.GetString("ScrollViewer_OutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to F3.
+        /// </summary>
+        internal static string SearchKeyDisplayString {
+            get {
+                return ResourceManager.GetString("SearchKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        internal static string SearchText {
+            get {
+                return ResourceManager.GetString("SearchText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ctrl+A.
+        /// </summary>
+        internal static string SelectAllKeyDisplayString {
+            get {
+                return ResourceManager.GetString("SelectAllKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select All.
+        /// </summary>
+        internal static string SelectAllText {
+            get {
+                return ResourceManager.GetString("SelectAllText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+End.
+        /// </summary>
+        internal static string SelectToEndKeyDisplayString {
+            get {
+                return ResourceManager.GetString("SelectToEndKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select To End.
+        /// </summary>
+        internal static string SelectToEndText {
+            get {
+                return ResourceManager.GetString("SelectToEndText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+Home.
+        /// </summary>
+        internal static string SelectToHomeKeyDisplayString {
+            get {
+                return ResourceManager.GetString("SelectToHomeKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select To Home.
+        /// </summary>
+        internal static string SelectToHomeText {
+            get {
+                return ResourceManager.GetString("SelectToHomeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+PageDown.
+        /// </summary>
+        internal static string SelectToPageDownKeyDisplayString {
+            get {
+                return ResourceManager.GetString("SelectToPageDownKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select To PageDown.
+        /// </summary>
+        internal static string SelectToPageDownText {
+            get {
+                return ResourceManager.GetString("SelectToPageDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift+PageUp.
+        /// </summary>
+        internal static string SelectToPageUpKeyDisplayString {
+            get {
+                return ResourceManager.GetString("SelectToPageUpKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select To PageUp.
+        /// </summary>
+        internal static string SelectToPageUpText {
+            get {
+                return ResourceManager.GetString("SelectToPageUpText", resourceCulture);
             }
         }
         
@@ -1623,6 +2883,24 @@ namespace OpenSilver.Internal {
         internal static string SourceNotSet {
             get {
                 return ResourceManager.GetString("SourceNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Esc.
+        /// </summary>
+        internal static string StopKeyDisplayString {
+            get {
+                return ResourceManager.GetString("StopKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        internal static string StopText {
+            get {
+                return ResourceManager.GetString("StopText", resourceCulture);
             }
         }
         
@@ -2158,6 +3436,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ctrl+Z.
+        /// </summary>
+        internal static string UndoKeyDisplayString {
+            get {
+                return ResourceManager.GetString("UndoKeyDisplayString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Undo.
+        /// </summary>
+        internal static string UndoText {
+            get {
+                return ResourceManager.GetString("UndoText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected collection change action &apos;{0}&apos;..
         /// </summary>
         internal static string UnexpectedCollectionChangeAction {
@@ -2181,6 +3477,15 @@ namespace OpenSilver.Internal {
         internal static string Unsupported_Modifier {
             get {
                 return ResourceManager.GetString("Unsupported_Modifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported MouseAction &apos;{0}&apos;..
+        /// </summary>
+        internal static string Unsupported_MouseAction {
+            get {
+                return ResourceManager.GetString("Unsupported_MouseAction", resourceCulture);
             }
         }
         
@@ -2226,6 +3531,15 @@ namespace OpenSilver.Internal {
         internal static string XmlLangMalformed {
             get {
                 return ResourceManager.GetString("XmlLangMalformed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zoom.
+        /// </summary>
+        internal static string ZoomText {
+            get {
+                return ResourceManager.GetString("ZoomText", resourceCulture);
             }
         }
     }

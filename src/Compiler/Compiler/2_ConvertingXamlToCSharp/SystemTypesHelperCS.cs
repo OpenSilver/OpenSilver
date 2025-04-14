@@ -26,22 +26,22 @@ namespace OpenSilver.Compiler
         private static readonly Dictionary<(string Namespace, string Type), string> _supportIntrinsicTypesDefaultValues =
             new(16, StringTupleComparer.Instance)
             {
-                [("system", "double")] = "0D",
-                [("system", "single")] = "0F",
-                [("system", "timespan")] = "new global::System.TimeSpan()",
-                [("system", "string")] = "",
-                [("system", "boolean")] = "false",
-                [("system", "byte")] = "(global::System.Byte)0",
-                [("system", "int16")] = "(global::System.Int16)0",
-                [("system", "int32")] = "0",
-                [("system", "int64")] = "0L",
-                [("system", "uint16")] = "(global::System.UInt16)0",
-                [("system", "uint32")] = "0U",
-                [("system", "uint64")] = "0UL",
-                [("system", "sbyte")] = "(global::System.SByte)0",
-                [("system", "char")] = "(global::System.Char)0",
-                [("system", "decimal")] = "0M",
-                [("system", "object")] = "\"\"",
+                [("System", "Double")] = "0D",
+                [("System", "Single")] = "0F",
+                [("System", "TimeSpan")] = "new global::System.TimeSpan()",
+                [("System", "String")] = "",
+                [("System", "Boolean")] = "false",
+                [("System", "Byte")] = "(global::System.Byte)0",
+                [("System", "Int16")] = "(global::System.Int16)0",
+                [("System", "Int32")] = "0",
+                [("System", "Int64")] = "0L",
+                [("System", "UInt16")] = "(global::System.UInt16)0",
+                [("System", "UInt32")] = "0U",
+                [("System", "UInt64")] = "0UL",
+                [("System", "SByte")] = "(global::System.SByte)0",
+                [("System", "Char")] = "(global::System.Char)0",
+                [("System", "Decimal")] = "0M",
+                [("System", "Object")] = "\"\"",
             };
 
         public override bool IsNullableType(string fullTypeName, string assembly, out string underlyingType)
@@ -81,7 +81,7 @@ namespace OpenSilver.Compiler
             return $"global::{namespaceName}.{typeName}";
         }
 
-        protected override string ConvertToDouble(string source)
+        public override string ConvertToDouble(string source)
         {
             string value = source.Trim().ToLower();
 
@@ -117,7 +117,7 @@ namespace OpenSilver.Compiler
             return $"{value}D";
         }
 
-        protected override string ConvertToSingle(string source)
+        public override string ConvertToSingle(string source)
         {
             string value = source.Trim().ToLower();
 
@@ -153,7 +153,7 @@ namespace OpenSilver.Compiler
             return $"{value}F";
         }
 
-        protected override string ConvertToTimeSpan(string source)
+        public override string ConvertToTimeSpan(string source)
         {
             string value = source.Trim();
 
@@ -171,12 +171,12 @@ namespace OpenSilver.Compiler
             return $"global::System.TimeSpan.Parse({Escape(value)}, {InvariantCulture})";
         }
 
-        protected override string ConvertToString(string source)
+        public override string ConvertToString(string source)
         {
             return Escape(source);
         }
 
-        protected override string ConvertToBoolean(string source)
+        public override string ConvertToBoolean(string source)
         {
             string value = source.Trim();
             
@@ -188,7 +188,7 @@ namespace OpenSilver.Compiler
             return value.ToLower();
         }
 
-        protected override string ConvertToByte(string source)
+        public override string ConvertToByte(string source)
         {
             string value = source.Trim();
         
@@ -200,7 +200,7 @@ namespace OpenSilver.Compiler
             return $"(global::System.Byte){value}";
         }
 
-        protected override string ConvertToInt16(string source)
+        public override string ConvertToInt16(string source)
         {
             string value = source.Trim();
 
@@ -212,7 +212,7 @@ namespace OpenSilver.Compiler
             return $"(global::System.Int16){value}";
         }
 
-        protected override string ConvertToInt32(string source)
+        public override string ConvertToInt32(string source)
         {
             string value = source.Trim();
 
@@ -224,7 +224,7 @@ namespace OpenSilver.Compiler
             return value;
         }
 
-        protected override string ConvertToInt64(string source)
+        public override string ConvertToInt64(string source)
         {
             string value = source.Trim();
         
@@ -236,7 +236,7 @@ namespace OpenSilver.Compiler
             return $"{value}L";
         }
 
-        protected override string ConvertToUInt16(string source)
+        public override string ConvertToUInt16(string source)
         {
             string value = source.Trim();
 
@@ -248,7 +248,7 @@ namespace OpenSilver.Compiler
             return $"(global::System.UInt16){value}";
         }
 
-        protected override string ConvertToUInt32(string source)
+        public override string ConvertToUInt32(string source)
         {
             string value = source.Trim();
 
@@ -260,7 +260,7 @@ namespace OpenSilver.Compiler
             return $"{value}U";
         }
 
-        protected override string ConvertToUInt64(string source)
+        public override string ConvertToUInt64(string source)
         {
             string value = source.Trim();
 
@@ -272,7 +272,7 @@ namespace OpenSilver.Compiler
             return $"{value}UL";
         }
 
-        protected override string ConvertToSByte(string source)
+        public override string ConvertToSByte(string source)
         {
             string value = source.Trim();
 
@@ -284,7 +284,7 @@ namespace OpenSilver.Compiler
             return $"(global::System.SByte){value}";
         }
 
-        protected override string ConvertToChar(string source)
+        public override string ConvertToChar(string source)
         {
             if (source.Length == 1)
             {
@@ -294,7 +294,7 @@ namespace OpenSilver.Compiler
             return _supportIntrinsicTypesDefaultValues[("system", "char")];
         }
 
-        protected override string ConvertToDecimal(string source)
+        public override string ConvertToDecimal(string source)
         {
             string value = source.ToLower();
 
@@ -316,7 +316,7 @@ namespace OpenSilver.Compiler
             return $"{value}M";
         }
 
-        protected override string ConvertToObject(string source)
+        public override string ConvertToObject(string source)
         {
             if (string.IsNullOrEmpty(source))
             {

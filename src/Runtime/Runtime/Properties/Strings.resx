@@ -151,8 +151,35 @@
   <data name="BindingListCanOnlySortByOneProperty" xml:space="preserve">
     <value>IBindingList can sort by only one property.</value>
   </data>
+  <data name="BrowseBackKeyDisplayString" xml:space="preserve">
+    <value>Alt+Left;Backspace</value>
+  </data>
+  <data name="BrowseBackText" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="BrowseForwardKeyDisplayString" xml:space="preserve">
+    <value>Alt+Right;Shift+Backspace</value>
+  </data>
+  <data name="BrowseForwardText" xml:space="preserve">
+    <value>Forward</value>
+  </data>
+  <data name="BrowseHomeKeyDisplayString" xml:space="preserve">
+    <value>Alt+Home;BrowserHome</value>
+  </data>
+  <data name="BrowseHomeText" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="BrowseStopKeyDisplayString" xml:space="preserve">
+    <value>Alt+Esc;BrowserStop</value>
+  </data>
+  <data name="BrowseStopText" xml:space="preserve">
+    <value>Stop</value>
+  </data>
   <data name="CancelEditNotSupported" xml:space="preserve">
     <value>CancelEdit is not supported for the current edit item.</value>
+  </data>
+  <data name="CancelPrintText" xml:space="preserve">
+    <value>Cancel Print</value>
   </data>
   <data name="CannotBeBasedOnSelf" xml:space="preserve">
     <value>A {0} cannot be based on itself.</value>
@@ -230,11 +257,23 @@
   <data name="ClearOnReadOnlyObjectNotAllowed" xml:space="preserve">
     <value>Cannot clear properties on object '{0}' because it is in a read-only state.</value>
   </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>Close</value>
+  </data>
   <data name="CollectionAddEventMissingItem" xml:space="preserve">
     <value>After a CollectionChange.Add event, Items collection does not contain the added item '{0}'.\n This could happen if the event sender supplied incorrect information in CollectionChangedEventArgs.</value>
   </data>
   <data name="CollectionChangeIndexOutOfRange" xml:space="preserve">
     <value>'{0}' index in collection change event is not valid for collection of size '{1}'.</value>
+  </data>
+  <data name="CollectionOnlyAcceptsCommandBindings" xml:space="preserve">
+    <value>Collection accepts only objects of type CommandBinding.</value>
+  </data>
+  <data name="CollectionOnlyAcceptsInputBindings" xml:space="preserve">
+    <value>Collection accepts only objects of type InputBinding.</value>
+  </data>
+  <data name="CollectionOnlyAcceptsInputGestures" xml:space="preserve">
+    <value>Collection accepts only objects of type InputGesture.</value>
   </data>
   <data name="CollectionViewTypeIsInitOnly" xml:space="preserve">
     <value>CollectionViewType property can only be set during initialization.</value>
@@ -251,17 +290,41 @@
   <data name="CollectionView_WrongType" xml:space="preserve">
     <value>'{0}' type is not a CollectionView type.</value>
   </data>
+  <data name="ContextMenuKeyDisplayString" xml:space="preserve">
+    <value>Shift+F10;Apps</value>
+  </data>
+  <data name="ContextMenuText" xml:space="preserve">
+    <value>Context Menu</value>
+  </data>
+  <data name="CopyKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+C;Ctrl+Insert</value>
+  </data>
+  <data name="CopyText" xml:space="preserve">
+    <value>Copy</value>
+  </data>
   <data name="CopyToNotEnoughSpace" xml:space="preserve">
     <value>Number of elements in source Enumerable is greater than available space from index to the end of destination array.</value>
   </data>
+  <data name="CorrectionListText" xml:space="preserve">
+    <value>Correction List</value>
+  </data>
   <data name="CurrentChangingCannotBeCanceled" xml:space="preserve">
     <value>The CollectionView that originates this CurrentChanging event is in a state that does not allow the event to be canceled. Check CurrentChangingEventArgs.IsCancelable before assigning to this CurrentChangingEventArgs.Cancel property.</value>
+  </data>
+  <data name="CutKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+X;Shift+Delete</value>
+  </data>
+  <data name="CutText" xml:space="preserve">
+    <value>Cut</value>
   </data>
   <data name="CyclicStyleReferenceDetected" xml:space="preserve">
     <value>Cyclic reference found while evaluating the Style property on element '{0}'.</value>
   </data>
   <data name="CyclicThemeStyleReferenceDetected" xml:space="preserve">
     <value>Cyclic reference found while evaluating the ThemeStyle property on element '{0}'.</value>
+  </data>
+  <data name="DecreaseZoomText" xml:space="preserve">
+    <value>Decrease Zoom</value>
   </data>
   <data name="DefaultValueAutoAssignFailed" xml:space="preserve">
     <value>Cannot automatically generate a valid default value for property '{0}'. Specify a default value explicitly when owner type '{1}' is registering this DependencyProperty.</value>
@@ -287,6 +350,12 @@
   <data name="DeferSelectionNotActive" xml:space="preserve">
     <value>Cannot end a selection when no selection is in progress.</value>
   </data>
+  <data name="DeleteKeyDisplayString" xml:space="preserve">
+    <value>Del</value>
+  </data>
+  <data name="DeleteText" xml:space="preserve">
+    <value>Delete</value>
+  </data>
   <data name="DisplayMemberPathAndItemTemplateDefined" xml:space="preserve">
     <value>Cannot set both DisplayMemberPath and ItemTemplate.</value>
   </data>
@@ -311,6 +380,45 @@
   <data name="EventNotFound" xml:space="preserve">
     <value>'{1}' event not found on type '{0}'.</value>
   </data>
+  <data name="ExtendSelectionDownKeyDisplayString" xml:space="preserve">
+    <value>Shift+Down</value>
+  </data>
+  <data name="ExtendSelectionDownText" xml:space="preserve">
+    <value>Extend Selection Down</value>
+  </data>
+  <data name="ExtendSelectionLeftKeyDisplayString" xml:space="preserve">
+    <value>Shift+Left</value>
+  </data>
+  <data name="ExtendSelectionLeftText" xml:space="preserve">
+    <value>Extend Selection Left</value>
+  </data>
+  <data name="ExtendSelectionRightKeyDisplayString" xml:space="preserve">
+    <value>Shift+Right</value>
+  </data>
+  <data name="ExtendSelectionRightText" xml:space="preserve">
+    <value>Extend Selection Right</value>
+  </data>
+  <data name="ExtendSelectionUpKeyDisplayString" xml:space="preserve">
+    <value>Shift+Up</value>
+  </data>
+  <data name="ExtendSelectionUpText" xml:space="preserve">
+    <value>Extend Selection Up</value>
+  </data>
+  <data name="FavoritesKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+I</value>
+  </data>
+  <data name="FavoritesText" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="FindKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+F</value>
+  </data>
+  <data name="FindText" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="FirstPageText" xml:space="preserve">
+    <value>First Page</value>
+  </data>
   <data name="FrugalMap_CannotPromoteBeyondHashtable" xml:space="preserve">
     <value>Cannot promote from Hashtable.</value>
   </data>
@@ -332,6 +440,9 @@
   <data name="GenerationNotInProgress" xml:space="preserve">
     <value>Must call GenerateNext while content generation is in progress.</value>
   </data>
+  <data name="GoToPageText" xml:space="preserve">
+    <value>Go To Page</value>
+  </data>
   <data name="GridCollection_CannotModifyReadOnly" xml:space="preserve">
     <value>Cannot modify '{0}' in read-only state.</value>
   </data>
@@ -341,6 +452,12 @@
   <data name="HasLogicalParent" xml:space="preserve">
     <value>Specified element is already the logical child of another element. Disconnect it first.</value>
   </data>
+  <data name="HelpKeyDisplayString" xml:space="preserve">
+    <value>F1</value>
+  </data>
+  <data name="HelpText" xml:space="preserve">
+    <value>Help</value>
+  </data>
   <data name="IAnimatable_CantAnimateSealedDO" xml:space="preserve">
     <value>Cannot animate the '{0}' property on '{1}' because the object is sealed or frozen.</value>
   </data>
@@ -349,6 +466,12 @@
   </data>
   <data name="InconsistentBindingList" xml:space="preserve">
     <value>IBindingList '{0}' has unexpected length after a '{1}' event.\nThis can happen if the IBindingList has been changed without raising a corresponding ListChanged event.</value>
+  </data>
+  <data name="IncreaseZoomText" xml:space="preserve">
+    <value>Increase Zoom</value>
+  </data>
+  <data name="InputBinding_ExpectedInputGesture" xml:space="preserve">
+    <value>Gesture accepts only objects of type '{0}'.</value>
   </data>
   <data name="InsertInDeferSelectionActive" xml:space="preserve">
     <value>Cannot insert in a selection when selection is in progress. Use Add method.</value>
@@ -391,6 +514,12 @@
   </data>
   <data name="ItemsSourceInUse" xml:space="preserve">
     <value>Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.</value>
+  </data>
+  <data name="KeyGesture_Invalid" xml:space="preserve">
+    <value>'{0}+{1}' key and modifier combination is not supported for KeyGesture.</value>
+  </data>
+  <data name="LastPageText" xml:space="preserve">
+    <value>Last Page</value>
   </data>
   <data name="LayoutManager_DeepRecursion" xml:space="preserve">
     <value>Layout recursion reached allowed limit to avoid stack overflow: '{0}'. Either the tree contains a loop or is too deep.</value>
@@ -443,6 +572,78 @@
   <data name="MarkupExtensionTypeNameBad" xml:space="preserve">
     <value>'{0}' string is not valid for type.</value>
   </data>
+  <data name="MediaBoostBassText" xml:space="preserve">
+    <value>Boost Bass</value>
+  </data>
+  <data name="MediaChannelDownText" xml:space="preserve">
+    <value>Channel Down</value>
+  </data>
+  <data name="MediaChannelUpText" xml:space="preserve">
+    <value>Channel Up</value>
+  </data>
+  <data name="MediaDecreaseBassText" xml:space="preserve">
+    <value>Decrease Bass</value>
+  </data>
+  <data name="MediaDecreaseMicrophoneVolumeText" xml:space="preserve">
+    <value>Decrease Microphone Volume</value>
+  </data>
+  <data name="MediaDecreaseTrebleText" xml:space="preserve">
+    <value>Decrease Treble</value>
+  </data>
+  <data name="MediaDecreaseVolumeText" xml:space="preserve">
+    <value>Decrease Volume</value>
+  </data>
+  <data name="MediaFastForwardText" xml:space="preserve">
+    <value>Fast Forward</value>
+  </data>
+  <data name="MediaIncreaseBassText" xml:space="preserve">
+    <value>Increase Bass</value>
+  </data>
+  <data name="MediaIncreaseMicrophoneVolumeText" xml:space="preserve">
+    <value>Increase Microphone Volume</value>
+  </data>
+  <data name="MediaIncreaseTrebleText" xml:space="preserve">
+    <value>Increase Treble</value>
+  </data>
+  <data name="MediaIncreaseVolumeText" xml:space="preserve">
+    <value>Increase Volume</value>
+  </data>
+  <data name="MediaMuteMicrophoneVolumeText" xml:space="preserve">
+    <value>Mute Microphone Volume</value>
+  </data>
+  <data name="MediaMuteVolumeText" xml:space="preserve">
+    <value>Mute Volume</value>
+  </data>
+  <data name="MediaNextTrackText" xml:space="preserve">
+    <value>Next Track</value>
+  </data>
+  <data name="MediaPauseText" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="MediaPlayText" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="MediaPreviousTrackText" xml:space="preserve">
+    <value>Previous Track</value>
+  </data>
+  <data name="MediaRecordText" xml:space="preserve">
+    <value>Record</value>
+  </data>
+  <data name="MediaRewindText" xml:space="preserve">
+    <value>Rewind</value>
+  </data>
+  <data name="MediaSelectText" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="MediaStopText" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="MediaToggleMicrophoneOnOffText" xml:space="preserve">
+    <value>Toggle Microphone OnOff</value>
+  </data>
+  <data name="MediaTogglePlayPauseText" xml:space="preserve">
+    <value>Toggle Play Pause</value>
+  </data>
   <data name="MemberNotAllowedDuringAddOrEdit" xml:space="preserve">
     <value>'{0}' is not allowed during an AddNew or EditItem transaction.</value>
   </data>
@@ -455,8 +656,92 @@
   <data name="Mismatched_RoutedEvent" xml:space="preserve">
     <value>RoutedEvent in RoutedEventArgs and EventRoute are mismatched.</value>
   </data>
+  <data name="MoveDownKeyDisplayString" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="MoveDownText" xml:space="preserve">
+    <value>Move Down</value>
+  </data>
+  <data name="MoveFocusBackKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Left</value>
+  </data>
+  <data name="MoveFocusBackText" xml:space="preserve">
+    <value>Move Focus Back</value>
+  </data>
+  <data name="MoveFocusDownKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Down</value>
+  </data>
+  <data name="MoveFocusDownText" xml:space="preserve">
+    <value>Move Focus Down</value>
+  </data>
+  <data name="MoveFocusForwardKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Right</value>
+  </data>
+  <data name="MoveFocusForwardText" xml:space="preserve">
+    <value>Move Focus Forward</value>
+  </data>
+  <data name="MoveFocusPageDownKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+PageDown</value>
+  </data>
+  <data name="MoveFocusPageDownText" xml:space="preserve">
+    <value>Move Focus Page Down</value>
+  </data>
+  <data name="MoveFocusPageUpKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+PageUp</value>
+  </data>
+  <data name="MoveFocusPageUpText" xml:space="preserve">
+    <value>Move Focus Page Up</value>
+  </data>
+  <data name="MoveFocusUpKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Up</value>
+  </data>
+  <data name="MoveFocusUpText" xml:space="preserve">
+    <value>Move Focus Up</value>
+  </data>
   <data name="MoveInDeferSelectionActive" xml:space="preserve">
     <value>Cannot move an item in a selection when selection is in progress.</value>
+  </data>
+  <data name="MoveLeftKeyDisplayString" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="MoveLeftText" xml:space="preserve">
+    <value>Move Left</value>
+  </data>
+  <data name="MoveRightKeyDisplayString" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="MoveRightText" xml:space="preserve">
+    <value>Move Right</value>
+  </data>
+  <data name="MoveToEndKeyDisplayString" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="MoveToEndText" xml:space="preserve">
+    <value>Move To End</value>
+  </data>
+  <data name="MoveToHomeKeyDisplayString" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="MoveToHomeText" xml:space="preserve">
+    <value>Move To Home</value>
+  </data>
+  <data name="MoveToPageDownKeyDisplayString" xml:space="preserve">
+    <value>PageDown</value>
+  </data>
+  <data name="MoveToPageDownText" xml:space="preserve">
+    <value>Move To Page Down</value>
+  </data>
+  <data name="MoveToPageUpKeyDisplayString" xml:space="preserve">
+    <value>PageUp</value>
+  </data>
+  <data name="MoveToPageUpText" xml:space="preserve">
+    <value>Move To Page Up</value>
+  </data>
+  <data name="MoveUpKeyDisplayString" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="MoveUpText" xml:space="preserve">
+    <value>Move Up</value>
   </data>
   <data name="MultiBindingHasNoConverter" xml:space="preserve">
     <value>Cannot set MultiBinding because MultiValueConverter must be specified.</value>
@@ -485,8 +770,20 @@
   <data name="NamesNotSupportedInsideResourceDictionary" xml:space="preserve">
     <value>Names not supported under ResourceDictionary scope.</value>
   </data>
+  <data name="NavigateJournalText" xml:space="preserve">
+    <value>Navigate Journal</value>
+  </data>
   <data name="NestedBeginInitNotSupported" xml:space="preserve">
     <value>Cannot have nested BeginInit calls on the same instance.</value>
+  </data>
+  <data name="NewKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+N</value>
+  </data>
+  <data name="NewText" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="NextPageText" xml:space="preserve">
+    <value>Next Page</value>
   </data>
   <data name="NoCheckOrChangeWhenDeferred" xml:space="preserve">
     <value>Cannot change or check the contents or Current position of CollectionView while Refresh is being deferred.</value>
@@ -494,11 +791,20 @@
   <data name="NoDefaultUpdateSourceTrigger" xml:space="preserve">
     <value>FrameworkPropertyMetadata.DefaultUpdateSourceTrigger cannot be set to UpdateSourceTrigger.Default; this would create a circular definition.</value>
   </data>
+  <data name="NotACommandText" xml:space="preserve">
+    <value>Not a Command</value>
+  </data>
   <data name="NoUpdateSourceTriggerForInnerBindingOfMultiBinding" xml:space="preserve">
     <value>Cannot set UpdateSourceTrigger on inner Binding of MultiBinding. Only the default Immediate UpdateSourceTrigger is valid.</value>
   </data>
   <data name="NullPropertyIllegal" xml:space="preserve">
     <value>Must have non-null value for '{0}'.</value>
+  </data>
+  <data name="OpenKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+O</value>
+  </data>
+  <data name="OpenText" xml:space="preserve">
+    <value>Open</value>
   </data>
   <data name="OverridingMetadataDoesNotMatchBaseMetadataType" xml:space="preserve">
     <value>Metadata override and base metadata must be of the same type or derived type.</value>
@@ -530,8 +836,35 @@
   <data name="Parser_UnexpectedToken" xml:space="preserve">
     <value>Unexpected token '{0}' encountered at position '{1}'.</value>
   </data>
+  <data name="PasteKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+V;Shift+Insert</value>
+  </data>
+  <data name="PasteText" xml:space="preserve">
+    <value>Paste</value>
+  </data>
   <data name="PresentationFrameworkCollectionReentrancyNotAllowed" xml:space="preserve">
     <value>Cannot change collection during a CollectionChanged event.</value>
+  </data>
+  <data name="PreviousPageText" xml:space="preserve">
+    <value>Previous Page</value>
+  </data>
+  <data name="PrintKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+P</value>
+  </data>
+  <data name="PrintPreviewKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+F2</value>
+  </data>
+  <data name="PrintPreviewText" xml:space="preserve">
+    <value>Print Preview</value>
+  </data>
+  <data name="PrintText" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="PropertiesKeyDisplayString" xml:space="preserve">
+    <value>F4</value>
+  </data>
+  <data name="PropertiesText" xml:space="preserve">
+    <value>Properties</value>
   </data>
   <data name="PropertyAlreadyRegistered" xml:space="preserve">
     <value>'{0}' property was already registered by '{1}'.</value>
@@ -557,6 +890,9 @@
   <data name="ReadOnlyChangeNotAllowed" xml:space="preserve">
     <value>'{0}' property was registered as read-only and cannot be modified without an authorization key.</value>
   </data>
+  <data name="ReadOnlyInputGesturesCollection" xml:space="preserve">
+    <value>Operation not supported on a read-only InputGestureCollection.</value>
+  </data>
   <data name="ReadOnlyKeyNotAuthorized" xml:space="preserve">
     <value>Property key is not authorized to modify property '{0}'.</value>
   </data>
@@ -572,8 +908,20 @@
   <data name="Rect_Empty" xml:space="preserve">
     <value>Rectangle cannot be empty.</value>
   </data>
+  <data name="RedoKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Y</value>
+  </data>
+  <data name="RedoText" xml:space="preserve">
+    <value>Redo</value>
+  </data>
   <data name="ReferenceIsNull" xml:space="preserve">
     <value>Value cannot be null. Object reference: '{0}'.</value>
+  </data>
+  <data name="RefreshKeyDisplayString" xml:space="preserve">
+    <value>F5</value>
+  </data>
+  <data name="RefreshText" xml:space="preserve">
+    <value>Refresh</value>
   </data>
   <data name="RemovedItemNotFound" xml:space="preserve">
     <value>Collection Remove event must specify item position.</value>
@@ -586,6 +934,12 @@
   </data>
   <data name="RemovingPlaceholder" xml:space="preserve">
     <value>Removing the NewItem placeholder is not allowed.</value>
+  </data>
+  <data name="ReplaceKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+H</value>
+  </data>
+  <data name="ReplaceText" xml:space="preserve">
+    <value>Replace</value>
   </data>
   <data name="ResourceDictionaryInvalidMergedDictionary" xml:space="preserve">
     <value>The merged dictionary is invalid. Either a ResourceDictionary is being placed into its own MergedDictionaries collection or a it is being added to the same MergedDictionary collection twice.</value>
@@ -611,11 +965,77 @@
   <data name="RoutedEventCannotChangeWhileRouting" xml:space="preserve">
     <value>Cannot change the RoutedEvent property while the RoutedEvent is being routed.</value>
   </data>
+  <data name="SaveAsText" xml:space="preserve">
+    <value>Save As</value>
+  </data>
+  <data name="SaveKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+S</value>
+  </data>
+  <data name="SaveText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ScrollByLineText" xml:space="preserve">
+    <value>Scroll By Line</value>
+  </data>
+  <data name="ScrollPageDownKeyDisplayString" xml:space="preserve">
+    <value>PageDown</value>
+  </data>
+  <data name="ScrollPageDownText" xml:space="preserve">
+    <value>Scroll Page Down</value>
+  </data>
+  <data name="ScrollPageLeftText" xml:space="preserve">
+    <value>Scroll Page Left</value>
+  </data>
+  <data name="ScrollPageRightText" xml:space="preserve">
+    <value>Scroll Page Right</value>
+  </data>
+  <data name="ScrollPageUpKeyDisplayString" xml:space="preserve">
+    <value>PageUp</value>
+  </data>
+  <data name="ScrollPageUpText" xml:space="preserve">
+    <value>Scroll Page Up</value>
+  </data>
   <data name="ScrollViewer_CannotBeNaN" xml:space="preserve">
     <value>'{0}' parameter value cannot be NaN.</value>
   </data>
   <data name="ScrollViewer_OutOfRange" xml:space="preserve">
     <value>'{0}' parameter has value '{1}', which is not in the valid range of '{2}' to '{3}'.</value>
+  </data>
+  <data name="SearchKeyDisplayString" xml:space="preserve">
+    <value>F3</value>
+  </data>
+  <data name="SearchText" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SelectAllKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+A</value>
+  </data>
+  <data name="SelectAllText" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+  <data name="SelectToEndKeyDisplayString" xml:space="preserve">
+    <value>Shift+End</value>
+  </data>
+  <data name="SelectToEndText" xml:space="preserve">
+    <value>Select To End</value>
+  </data>
+  <data name="SelectToHomeKeyDisplayString" xml:space="preserve">
+    <value>Shift+Home</value>
+  </data>
+  <data name="SelectToHomeText" xml:space="preserve">
+    <value>Select To Home</value>
+  </data>
+  <data name="SelectToPageDownKeyDisplayString" xml:space="preserve">
+    <value>Shift+PageDown</value>
+  </data>
+  <data name="SelectToPageDownText" xml:space="preserve">
+    <value>Select To PageDown</value>
+  </data>
+  <data name="SelectToPageUpKeyDisplayString" xml:space="preserve">
+    <value>Shift+PageUp</value>
+  </data>
+  <data name="SelectToPageUpText" xml:space="preserve">
+    <value>Select To PageUp</value>
   </data>
   <data name="SetInDeferSelectionActive" xml:space="preserve">
     <value>Cannot set an item in a selection when selection is in progress. Use Add or Remove method.</value>
@@ -640,6 +1060,12 @@
   </data>
   <data name="SourceNotSet" xml:space="preserve">
     <value>Must set Source in RoutedEventArgs before building event route or invoking handlers.</value>
+  </data>
+  <data name="StopKeyDisplayString" xml:space="preserve">
+    <value>Esc</value>
+  </data>
+  <data name="StopText" xml:space="preserve">
+    <value>Stop</value>
   </data>
   <data name="Storyboard_BeginStoryboardNameNotFound" xml:space="preserve">
     <value>'{0}' object Name found but it is not a BeginStoryboard object.</value>
@@ -822,6 +1248,12 @@
   <data name="UIElement_NotChild" xml:space="preserve">
     <value>Specified UIElement is not a child of this UIElement.</value>
   </data>
+  <data name="UndoKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Z</value>
+  </data>
+  <data name="UndoText" xml:space="preserve">
+    <value>Undo</value>
+  </data>
   <data name="UnexpectedCollectionChangeAction" xml:space="preserve">
     <value>Unexpected collection change action '{0}'.</value>
   </data>
@@ -830,6 +1262,9 @@
   </data>
   <data name="Unsupported_Modifier" xml:space="preserve">
     <value>Unrecognized ModifierKeys '{0}'.</value>
+  </data>
+  <data name="Unsupported_MouseAction" xml:space="preserve">
+    <value>Unsupported MouseAction '{0}'.</value>
   </data>
   <data name="Validation_ConversionFailed" xml:space="preserve">
     <value>Value '{0}' could not be converted.</value>
@@ -845,5 +1280,8 @@
   </data>
   <data name="XmlLangMalformed" xml:space="preserve">
     <value>'{0}' language tag must be empty or must conform to grammar defined in IETF RFC 3066.</value>
+  </data>
+  <data name="ZoomText" xml:space="preserve">
+    <value>Zoom</value>
   </data>
 </root>

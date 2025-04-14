@@ -18,7 +18,7 @@ namespace System.Windows.Input;
 /// <summary>
 /// Provides event data for the <see cref="UIElement.KeyUp"/> and <see cref="UIElement.KeyDown"/> events.
 /// </summary>
-public sealed class KeyEventArgs : RoutedEventArgs
+public sealed class KeyEventArgs : KeyboardEventArgs
 {
     /// <inheritdoc />
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>

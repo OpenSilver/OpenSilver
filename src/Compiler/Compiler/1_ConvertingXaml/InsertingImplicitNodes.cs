@@ -145,14 +145,14 @@ namespace OpenSilver.Compiler
                                     
 
                     // Distinguish system types (string, double, etc.) to other types
-                    if (settings.SystemTypes.IsSupportedSystemType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
+                    if (settings.SystemTypes.IsKnownType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
                     {
                         // In this case we do nothing because system types are handled
                         // later in the process. Example: "<sys:Double>50</sys:Double>"
                         // becomes "Double x = 50;"
                     }
                     else if (settings.Inspector.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny) ||
-                             settings.CoreTypes.IsSupportedCoreType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
+                             settings.CoreTypes.IsKnownType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
                     {
                         // Add the attribute that will tell the compiler to later
                         // intialize the type by converting from the string using the

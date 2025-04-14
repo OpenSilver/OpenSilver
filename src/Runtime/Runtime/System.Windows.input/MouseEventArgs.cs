@@ -23,7 +23,7 @@ namespace System.Windows.Input;
 /// Provides event data for pointer message events related to specific user interface
 /// elements, such as PointerPressed.
 /// </summary>
-public class MouseEventArgs : RoutedEventArgs
+public class MouseEventArgs : InputEventArgs
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="MouseEventArgs"/> class.

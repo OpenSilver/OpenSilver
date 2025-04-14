@@ -167,7 +167,7 @@ public class RoutedEventArgs : EventArgs
     /// event sources, such as when class handling an event. Resetting apparent event sources from instance 
     /// handlers is not recommended, particularly when the handler does not mark the event as handled.
     /// If you do reset <see cref="Source"/> to report a different event source, <see cref="OriginalSource"/> 
-    /// will continue to report the source as first raised by the originating <see cref="UIElement.RaiseEvent"/> 
+    /// will continue to report the source as first raised by the originating <see cref="UIElement.RaiseEvent(RoutedEventArgs)"/>
     /// call.
     /// </remarks>
     public object Source
@@ -287,6 +287,8 @@ public class RoutedEventArgs : EventArgs
     internal void MarkAsUserInitiated() => _userInitiated = true;
 
     internal void ClearUserInitiated() => _userInitiated = false;
+
+    internal bool UserInitiated => _userInitiated;
 
     internal object UIEventArg { get; set; }
 

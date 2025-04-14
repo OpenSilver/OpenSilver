@@ -24,4 +24,6 @@ public static class Keyboard
     public static ModifierKeys Modifiers => InputManager.Current.GetKeyboardModifiers();
 
     internal static bool IsFocusable(UIElement uie) => KeyboardNavigation.Current.IsTabStop(uie);
+
+    internal static IInputElement FocusedElement => FocusManager.GetFocusedElement(Window.Current) as IInputElement;
 }

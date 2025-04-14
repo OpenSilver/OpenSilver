@@ -27,7 +27,7 @@ namespace System.Windows
     /// UIElement is a base class for most of the objects that have visual appearance
     /// and can process basic input in a user interface.
     /// </summary>
-    public abstract partial class UIElement : DependencyObject
+    public abstract partial class UIElement : DependencyObject, IInputElement
     {
         static UIElement()
         {

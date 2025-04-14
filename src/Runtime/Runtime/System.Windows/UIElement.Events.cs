@@ -49,11 +49,20 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk), false);
             EventManager.RegisterClassHandler<UIElement>(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(OnPreviewExecutedThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(CommandManager.ExecutedEvent, new ExecutedRoutedEventHandler(OnExecutedThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(CommandManager.PreviewCanExecuteEvent, new CanExecuteRoutedEventHandler(OnPreviewCanExecuteThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(CommandManager.CanExecuteEvent, new CanExecuteRoutedEventHandler(OnCanExecuteThunk), false);
         }
 
         private static void OnMouseDownThunk(object sender, MouseButtonEventArgs e)
         {
             UIElement uie = (UIElement)sender;
+
+            if (!e.Handled)
+            {
+                CommandManager.TranslateInput(uie, e);
+            }
 
             if (!e.Handled)
             {
@@ -83,7 +92,17 @@ namespace System.Windows
 
         private static void OnMouseRightButtonDownThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonDown(e);
 
-        private static void OnMouseWheelThunk(object sender, MouseWheelEventArgs e) => ((UIElement)sender).OnMouseWheel(e);
+        private static void OnMouseWheelThunk(object sender, MouseWheelEventArgs e)
+        {
+            UIElement uie = (UIElement)sender;
+
+            CommandManager.TranslateInput(uie, e);
+
+            if (!e.Handled)
+            {
+                uie.OnMouseWheel(e);
+            }
+        }
 
         private static void OnMouseLeftButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseLeftButtonUp(e);
 
@@ -99,7 +118,17 @@ namespace System.Windows
 
         private static void OnMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonUp(e);
 
-        private static void OnKeyDownThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnKeyDown(e);
+        private static void OnKeyDownThunk(object sender, KeyEventArgs e)
+        {
+            UIElement uie = (UIElement)sender;
+
+            CommandManager.TranslateInput(uie, e);
+
+            if (!e.Handled)
+            {
+                uie.OnKeyDown(e);
+            }
+        }
 
         private static void OnKeyUpThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnKeyUp(e);
 
@@ -110,6 +139,30 @@ namespace System.Windows
         private static void OnGotMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnGotMouseCapture(e);
 
         private static void OnLostMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnLostMouseCapture(e);
+
+        private static void OnPreviewExecutedThunk(object sender, ExecutedRoutedEventArgs e)
+        {
+            // Command Manager will determine if preview or regular event.
+            CommandManager.OnExecuted(sender, e);
+        }
+
+        private static void OnExecutedThunk(object sender, ExecutedRoutedEventArgs e)
+        {
+            // Command Manager will determine if preview or regular event.
+            CommandManager.OnExecuted(sender, e);
+        }
+
+        private static void OnPreviewCanExecuteThunk(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // Command Manager will determine if preview or regular event.
+            CommandManager.OnCanExecute(sender, e);
+        }
+
+        private static void OnCanExecuteThunk(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // Command Manager will determine if preview or regular event.
+            CommandManager.OnCanExecute(sender, e);
+        }
 
         /// <summary>
         /// Adds a routed event handler for a specified routed event, adding the handler to the 
@@ -233,6 +286,44 @@ namespace System.Windows
             e.ClearUserInitiated();
 
             RaiseEventImpl(this, e);
+        }
+
+        /// <summary>
+        ///     "Trusted" internal flavor of RaiseEvent.
+        ///     Used to set the User-initated RaiseEvent.
+        /// </summary>
+        internal void RaiseEvent(RoutedEventArgs args, bool trusted)
+        {
+            Debug.Assert(args is not null);
+
+            if (trusted)
+            {
+                RaiseTrustedEvent(args);
+            }
+            else
+            {
+                args.ClearUserInitiated();
+
+                RaiseEventImpl(this, args);
+            }
+        }
+
+        internal void RaiseTrustedEvent(RoutedEventArgs args)
+        {
+            Debug.Assert(args is not null);
+
+            // Try/finally to ensure that UserInitiated bit is cleared.
+            args.MarkAsUserInitiated();
+
+            try
+            {
+                RaiseEventImpl(this, args);
+            }
+            finally
+            {
+                // Clear the bit - just to guarantee it's not used again
+                args.ClearUserInitiated();
+            }
         }
 
         private static RoutedEvent CrackMouseButtonEvent(MouseButtonEventArgs e)

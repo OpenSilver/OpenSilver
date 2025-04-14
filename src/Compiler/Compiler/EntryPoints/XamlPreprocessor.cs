@@ -39,14 +39,14 @@ namespace OpenSilver.Compiler
 
         private readonly Stopwatch _watch;
         private AssembliesInspector _assembliesInspector;
-        private ICoreTypesConverter _coreTypesConverter;
+        private CoreTypesConverter _coreTypesConverter;
         private SupportedLanguage _supportedLanguage = SupportedLanguage.Unknown;
         private string _language;
         private XamlPreprocessorOptions _options;
 
         private AssembliesInspector AssembliesInspector => _assembliesInspector ??= LoadAssemblies();
 
-        private ICoreTypesConverter CoreTypesConverter
+        private CoreTypesConverter CoreTypesConverter
         {
             get
             {

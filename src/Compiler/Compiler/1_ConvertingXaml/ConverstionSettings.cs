@@ -19,7 +19,7 @@ internal sealed class ConversionSettings
     public ConversionSettings(
         string assemblyName,
         AssembliesInspector inspector,
-        ICoreTypesConverter coreTypes,
+        CoreTypesConverter coreTypes,
         SystemTypesHelper systemTypes,
         XamlPreprocessorOptions options)
     {
@@ -34,7 +34,7 @@ internal sealed class ConversionSettings
 
     public AssembliesInspector Inspector { get; }
 
-    public ICoreTypesConverter CoreTypes { get; }
+    public CoreTypesConverter CoreTypes { get; }
 
     public SystemTypesHelper SystemTypes { get; }
 

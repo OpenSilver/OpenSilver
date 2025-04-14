@@ -100,7 +100,7 @@ public class ModifierKeysConverter : TypeConverter
         return FromString(context, culture, stringSource);
     }
 
-    private static ModifierKeys FromString(ITypeDescriptorContext context, CultureInfo culture, string stringSource)
+    internal static ModifierKeys FromString(ITypeDescriptorContext context, CultureInfo culture, string stringSource)
     {
         string modifiersToken = stringSource.Trim();
 

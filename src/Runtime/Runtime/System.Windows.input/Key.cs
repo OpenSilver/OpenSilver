@@ -539,7 +539,11 @@ public enum Key
     /// <summary>
     /// The Num Lock key.
     /// </summary>
-    NumberKeyLock = 144,
+    NumLock = 114,
+    /// <summary>
+    /// The Num Lock key.
+    /// </summary>
+    NumberKeyLock = NumLock,
     /// <summary>
     /// The Scroll Lock (ScrLk) key.
     /// </summary>

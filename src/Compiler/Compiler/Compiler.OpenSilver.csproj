@@ -26,6 +26,7 @@
     <Compile Include="..\Shared\XamlResourcesHelper.cs">
       <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
     </Compile>
+    <Compile Include="1_ConvertingXaml\CommandConverter.cs" />
     <Compile Include="1_ConvertingXaml\ConvertingStringToValue.cs" />
     <Compile Include="1_ConvertingXaml\ConverstionSettings.cs" />
     <Compile Include="1_ConvertingXaml\CoreTypesHelper.cs" />
