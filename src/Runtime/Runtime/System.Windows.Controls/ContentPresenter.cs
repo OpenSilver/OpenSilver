@@ -594,12 +594,21 @@ namespace System.Windows.Controls
             return resource;
         }
 
-        internal void PrepareContentPresenter(object item, DataTemplate template)
+        internal void PrepareContentPresenter(object item, DataTemplate itemTemplate, DataTemplateSelector itemTemplateSelector)
         {
             if (item != this)
             {
                 Content = item;
-                ContentTemplate = template;
+
+                if (itemTemplate is not null)
+                {
+                    ContentTemplate = itemTemplate;
+                }
+
+                if (itemTemplateSelector is not null)
+                {
+                    ContentTemplateSelector = itemTemplateSelector;
+                }
             }
         }
 

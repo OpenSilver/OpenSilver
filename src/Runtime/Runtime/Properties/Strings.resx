@@ -359,6 +359,9 @@
   <data name="DisplayMemberPathAndItemTemplateDefined" xml:space="preserve">
     <value>Cannot set both DisplayMemberPath and ItemTemplate.</value>
   </data>
+  <data name="DisplayMemberPathAndItemTemplateSelectorDefined" xml:space="preserve">
+    <value>Cannot set both DisplayMemberPath and ItemTemplateSelector. When one is nonempty, it must be cleared before the other can be set.</value>
+  </data>
   <data name="DTypeNotSupportForSystemType" xml:space="preserve">
     <value>'{0}' type does not have a matching DependencyObjectType.</value>
   </data>
@@ -514,6 +517,9 @@
   </data>
   <data name="ItemsSourceInUse" xml:space="preserve">
     <value>Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.</value>
+  </data>
+  <data name="ItemTemplateSelectorBreaksDisplayMemberPath" xml:space="preserve">
+    <value>Cannot set ItemTemplateSelector while DisplayMemberPath is in use.</value>
   </data>
   <data name="KeyGesture_Invalid" xml:space="preserve">
     <value>'{0}+{1}' key and modifier combination is not supported for KeyGesture.</value>

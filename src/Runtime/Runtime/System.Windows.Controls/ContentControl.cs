@@ -222,15 +222,24 @@ namespace System.Windows.Controls
         /// <summary>
         /// Prepare to display the item.
         /// </summary>
-        internal void PrepareContentControl(object item, DataTemplate template)
+        internal void PrepareContentControl(object item, DataTemplate itemTemplate, DataTemplateSelector itemTemplateSelector)
         {
             if (item != this)
             {
                 // don't treat Content as a logical child
                 ContentIsNotLogical = true;
 
-                ContentTemplate = template;
                 Content = item;
+                
+                if (itemTemplate is not null)
+                {
+                    ContentTemplate = itemTemplate;
+                }
+
+                if (itemTemplateSelector is not null)
+                {
+                    ContentTemplateSelector = itemTemplateSelector;
+                }
             }
             else
             {

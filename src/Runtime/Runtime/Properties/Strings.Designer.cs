@@ -781,6 +781,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot set both DisplayMemberPath and ItemTemplateSelector. When one is nonempty, it must be cleared before the other can be set..
+        /// </summary>
+        internal static string DisplayMemberPathAndItemTemplateSelectorDefined {
+            get {
+                return ResourceManager.GetString("DisplayMemberPathAndItemTemplateSelectorDefined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; type does not have a matching DependencyObjectType..
         /// </summary>
         internal static string DTypeNotSupportForSystemType {
@@ -1245,6 +1254,15 @@ namespace OpenSilver.Internal {
         internal static string ItemsSourceInUse {
             get {
                 return ResourceManager.GetString("ItemsSourceInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot set ItemTemplateSelector while DisplayMemberPath is in use..
+        /// </summary>
+        internal static string ItemTemplateSelectorBreaksDisplayMemberPath {
+            get {
+                return ResourceManager.GetString("ItemTemplateSelectorBreaksDisplayMemberPath", resourceCulture);
             }
         }
         

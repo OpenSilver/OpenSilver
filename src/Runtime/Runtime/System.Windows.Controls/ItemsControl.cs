@@ -32,8 +32,6 @@ namespace System.Windows.Controls
     {
         #region Data
 
-        private static readonly DataTemplate _emptyPathTemplate;
-
         // Note: this maps an item (for example a string) to the element
         // that is added to the visual tree (such a datatemplate) or to 
         // the native DOM element in case of native combo box for example.
@@ -48,21 +46,6 @@ namespace System.Windows.Controls
         static ItemsControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ItemsControl), new PropertyMetadata(typeof(ItemsControl)));
-
-            _emptyPathTemplate = new DataTemplate
-            {
-                Template = new TemplateContent(
-                    new XamlContext(),
-                    static (owner, context) =>
-                    {
-                        var textBlock = new TextBlock();
-                        textBlock.SetTemplatedParent(context.TemplateOwnerReference);
-                        textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
-
-                        return textBlock;
-                    }),
-            };
-            _emptyPathTemplate.Seal();
         }
 
         /// <summary>
@@ -126,9 +109,12 @@ namespace System.Windows.Controls
         #region Dependency Properties
 
         /// <summary>
-        /// Gets or sets the template that defines the panel that controls the layout
-        /// of items.
+        /// Gets or sets the template that defines the panel that controls the layout of items.
         /// </summary>
+        /// <returns>
+        /// An <see cref="ItemsPanelTemplate"/> that defines the panel to use for the layout of the items. The default value 
+        /// for the <see cref="ItemsControl"/> is an <see cref="ItemsPanelTemplate"/> that specifies a <see cref="StackPanel"/>.
+        /// </returns>
         public ItemsPanelTemplate ItemsPanel
         {
             get { return (ItemsPanelTemplate)GetValue(ItemsPanelProperty); }
@@ -136,7 +122,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the ItemsPanel dependency property.
+        /// Identifies the <see cref="ItemsPanel"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ItemsPanelProperty =
             DependencyProperty.Register(
@@ -147,38 +133,48 @@ namespace System.Windows.Controls
 
         private static ItemsPanelTemplate GetDefaultItemsPanel()
         {
-            ItemsPanelTemplate template = new ItemsPanelTemplate
+            var template = new ItemsPanelTemplate
             {
                 Template = new TemplateContent(
                     new XamlContext(),
-                    (owner, context) =>
+                    static (owner, context) =>
                     {
                         var panel = new StackPanel();
                         panel.SetTemplatedParent(context.TemplateOwnerReference);
                         return panel;
-                    }                    
-                )
+                    }),
             };
 
             template.Seal();
 
-            // Note: We seal the template in order to avoid letting the user modify the 
-            // default template itself since it is the same instance that is used as 
-            // the default value for all ItemsControls.
-            // This would bring issues such as a user modifying the default template 
-            // for one element then modifying it again for another one and both would 
-            // have the last one's template.
             return template;
         }
 
         private static void OnItemsPanelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ItemsControl)d).UpdateItemsPanel((ItemsPanelTemplate)e.NewValue);
+            ((ItemsControl)d).OnItemsPanelChanged((ItemsPanelTemplate)e.OldValue, (ItemsPanelTemplate)e.NewValue);
         }
 
         /// <summary>
-        /// Gets or sets an object source used to generate the content of the ItemsControl.
+        /// Invoked when the <see cref="ItemsPanel"/> property changes.
         /// </summary>
+        /// <param name="oldItemsPanel">
+        /// Old value of the <see cref="ItemsPanel"/> property.
+        /// </param>
+        /// <param name="newItemsPanel">
+        /// New value of the <see cref="ItemsPanel"/> property.
+        /// </param>
+        protected virtual void OnItemsPanelChanged(ItemsPanelTemplate oldItemsPanel, ItemsPanelTemplate newItemsPanel)
+        {
+            ItemContainerGenerator.OnPanelChanged();
+        }
+
+        /// <summary>
+        /// Gets or sets a collection used to generate the content of the <see cref="ItemsControl"/>.
+        /// </summary>
+        /// <returns>
+        /// A collection that is used to generate the content of the <see cref="ItemsControl"/>. The default is null.
+        /// </returns>
         public IEnumerable ItemsSource
         {
             get { return (IEnumerable)GetValue(ItemsSourceProperty); }
@@ -216,8 +212,24 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets or sets the DataTemplate used to display each item.
+        /// Called when the <see cref="ItemsSource"/> property changes.
         /// </summary>
+        /// <param name="oldValue">
+        /// Old value of the <see cref="ItemsSource"/> property.
+        /// </param>
+        /// <param name="newValue">
+        /// New value of the <see cref="ItemsSource"/> property.
+        /// </param>
+        protected virtual void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> used to display each item.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="DataTemplate"/> that specifies the visualization of the data objects. The default is null.
+        /// </returns>
         public DataTemplate ItemTemplate
         {
             get { return (DataTemplate)GetValue(ItemTemplateProperty); }
@@ -225,7 +237,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the ItemTemplate dependency property.
+        /// Identifies the <see cref="ItemTemplate"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ItemTemplateProperty =
             DependencyProperty.Register(
@@ -234,22 +246,96 @@ namespace System.Windows.Controls
                 typeof(ItemsControl),
                 new PropertyMetadata(null, OnItemTemplateChanged));
 
-        /// <summary>
-        /// Invoked when the value of the ItemTemplate property changes.
-        /// </summary>
         private static void OnItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ItemsControl itemsControl = (ItemsControl)d;
-            if (itemsControl._itemContainerGenerator != null)
+            ((ItemsControl)d).OnItemTemplateChanged((DataTemplate)e.OldValue, (DataTemplate)e.NewValue);
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ItemTemplate"/> property changes.
+        /// </summary>
+        /// <param name="oldItemTemplate">
+        /// The old <see cref="ItemTemplate"/> property value.
+        /// </param>
+        /// <param name="newItemTemplate">
+        /// The new <see cref="ItemTemplate"/> property value.
+        /// </param>
+        protected virtual void OnItemTemplateChanged(DataTemplate oldItemTemplate, DataTemplate newItemTemplate)
+        {
+            CheckTemplateSource();
+
+            _itemContainerGenerator?.Refresh();
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ItemTemplateSelector"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ItemTemplateSelectorProperty =
+            DependencyProperty.Register(
+                nameof(ItemTemplateSelector),
+                typeof(DataTemplateSelector),
+                typeof(ItemsControl),
+                new PropertyMetadata(null, OnItemTemplateSelectorChanged));
+
+        /// <summary>
+        /// Gets or sets the custom logic for choosing a template used to display each item.
+        /// </summary>
+        /// <returns>
+        /// A custom <see cref="DataTemplateSelector"/> object that provides logic and returns a <see cref="DataTemplate"/>.
+        /// The default is null.
+        /// </returns>
+        public DataTemplateSelector ItemTemplateSelector
+        {
+            get { return (DataTemplateSelector)GetValue(ItemTemplateSelectorProperty); }
+            set { SetValueInternal(ItemTemplateSelectorProperty, value); }
+        }
+
+        private static void OnItemTemplateSelectorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ItemsControl)d).OnItemTemplateSelectorChanged((DataTemplateSelector)e.OldValue, (DataTemplateSelector)e.NewValue);
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ItemTemplateSelector"/> property changes.
+        /// </summary>
+        /// <param name="oldItemTemplateSelector">
+        /// Old value of the <see cref="ItemTemplateSelector"/> property.
+        /// </param>
+        /// <param name="newItemTemplateSelector">
+        /// New value of the <see cref="ItemTemplateSelector"/> property.
+        /// </param>
+        protected virtual void OnItemTemplateSelectorChanged(DataTemplateSelector oldItemTemplateSelector, DataTemplateSelector newItemTemplateSelector)
+        {
+            CheckTemplateSource();
+
+            if (_itemContainerGenerator is not null && ItemTemplate is null)
             {
-                itemsControl._itemContainerGenerator.Refresh();
+                _itemContainerGenerator.Refresh();
+            }
+        }
+
+        private void CheckTemplateSource()
+        {
+            if (!string.IsNullOrEmpty(DisplayMemberPath))
+            {
+                if (ItemTemplateSelector is not DisplayMemberTemplateSelector)
+                {
+                    throw new InvalidOperationException(Strings.ItemTemplateSelectorBreaksDisplayMemberPath);
+                }
+
+                if (ItemTemplate is not null)
+                {
+                    throw new InvalidOperationException(Strings.DisplayMemberPathAndItemTemplateDefined);
+                }
             }
         }
 
         /// <summary>
-        /// Gets or sets a path to a value on the source object to serve as the visual
-        /// representation of the object.
+        /// Gets or sets the name or path of the property that is displayed for each data item.
         /// </summary>
+        /// <returns>
+        /// The name or path of the property that is displayed for each the data item in the control. The default is an empty string ("").
+        /// </returns>
         public string DisplayMemberPath
         {
             get { return (string)GetValue(DisplayMemberPathProperty); }
@@ -257,7 +343,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the DisplayMemberPath dependency property.
+        /// Identifies the <see cref="DisplayMemberPath"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty DisplayMemberPathProperty =
             DependencyProperty.Register(
@@ -269,15 +355,65 @@ namespace System.Windows.Controls
         private static void OnDisplayMemberPathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
-            if (itemsControl._itemContainerGenerator != null)
+            itemsControl.OnDisplayMemberPathChanged((string)e.OldValue, (string)e.NewValue);
+            itemsControl.UpdateDisplayMemberTemplateSelector();
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="DisplayMemberPath"/> property changes.
+        /// </summary>
+        /// <param name="oldDisplayMemberPath">
+        /// The old value of the <see cref="DisplayMemberPath"/> property.
+        /// </param>
+        /// <param name="newDisplayMemberPath">
+        /// New value of the <see cref="DisplayMemberPath"/> property.
+        /// </param>
+        protected virtual void OnDisplayMemberPathChanged(string oldDisplayMemberPath, string newDisplayMemberPath)
+        {
+        }
+
+        private void UpdateDisplayMemberTemplateSelector()
+        {
+            string displayMemberPath = DisplayMemberPath;
+
+            if (!string.IsNullOrEmpty(displayMemberPath))
             {
-                itemsControl._itemContainerGenerator.Refresh();
+                // DisplayMemberPath is desired.
+                // Set ItemTemplateSelector to an appropriate object, provided that
+                // this doesn't conflict with the user's own setting.
+                DataTemplateSelector itemTemplateSelector = ItemTemplateSelector;
+
+                if (itemTemplateSelector is not null && itemTemplateSelector is not DisplayMemberTemplateSelector)
+                {
+                    // if ItemTemplateSelector was actually set to something besides a DisplayMember selector,
+                    // it's an error to overwrite it with a DisplayMember selector unless ItemTemplateSelector
+                    // came from a style and DisplayMemberPath is local
+                    if (ReadLocalValue(ItemTemplateSelectorProperty) != DependencyProperty.UnsetValue ||
+                        ReadLocalValue(DisplayMemberPathProperty) == DependencyProperty.UnsetValue)
+                    {
+                        throw new InvalidOperationException(Strings.DisplayMemberPathAndItemTemplateSelectorDefined);
+                    }
+                }
+
+                // now set the ItemTemplateSelector to use the new DisplayMemberPath
+                ItemTemplateSelector = new DisplayMemberTemplateSelector(displayMemberPath);
+            }
+            else
+            {
+                // Property is not desired. Clear the ItemTemplateSelector if we had set it earlier.
+                if (ItemTemplateSelector is DisplayMemberTemplateSelector)
+                {
+                    ClearValue(ItemTemplateSelectorProperty);
+                }
             }
         }
 
         /// <summary>
-        /// Gets or sets the style that is used when rendering the item containers.
+        /// Gets or sets the <see cref="Style"/> that is applied to the container element generated for each item.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Style"/> that is applied to the container element generated for each item. The default is null.
+        /// </returns>
         public Style ItemContainerStyle
         {
             get { return (Style)GetValue(ItemContainerStyleProperty); }
@@ -285,7 +421,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the ItemContainerStyle dependency property.
+        /// Identifies the <see cref="ItemContainerStyle"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ItemContainerStyleProperty =
             DependencyProperty.Register(
@@ -296,11 +432,21 @@ namespace System.Windows.Controls
 
         private static void OnItemContainerStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ItemsControl itemsControl = (ItemsControl)d;
-            if (itemsControl._itemContainerGenerator != null)
-            {
-                itemsControl._itemContainerGenerator.Refresh();
-            }
+            ((ItemsControl)d).OnItemContainerStyleChanged((Style)e.OldValue, (Style)e.NewValue);
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ItemContainerStyle"/> property changes.
+        /// </summary>
+        /// <param name="oldItemContainerStyle">
+        /// Old value of the <see cref="ItemContainerStyle"/> property.
+        /// </param>
+        /// <param name="newItemContainerStyle">
+        /// New value of the <see cref="ItemContainerStyle"/> property.
+        /// </param>
+        protected virtual void OnItemContainerStyleChanged(Style oldItemContainerStyle, Style newItemContainerStyle)
+        {
+            _itemContainerGenerator?.Refresh();
         }
 
         #endregion Dependency Properties
@@ -340,7 +486,7 @@ namespace System.Windows.Controls
             }
             else
             {
-                container = recycledContainer == null ? GetContainerForItemOverride() : recycledContainer;
+                container = recycledContainer ?? GetContainerForItemOverride();
             }
 
             return container;
@@ -401,13 +547,10 @@ namespace System.Windows.Controls
 
         #region Protected Methods
 
+        [Obsolete(Helper.ObsoleteMemberMessage + "Use ItemsControl.OnItemsPanelChanged instead.", true)]
         protected virtual void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
         {
-            this.ItemContainerGenerator.OnPanelChanged();
-        }
-
-        protected virtual void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
-        {
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -792,16 +935,15 @@ namespace System.Windows.Controls
         {
             // Note: This is the WPF implementation.
             // Silverlight does not clear containers on the ItemsControl level.
-            //ContentControl cc;
-            //ContentPresenter cp;
+            //switch (element)
+            //{
+            //    case ContentControl cc:
+            //        cc.ClearContentControl(item);
+            //        break;
 
-            //if ((cc = element as ContentControl) != null)
-            //{
-            //    cc.ClearContentControl(item);
-            //}
-            //else if ((cp = element as ContentPresenter) != null)
-            //{
-            //    cp.ClearContentPresenter(item);
+            //    case ContentPresenter cp:
+            //        cp.ClearContentPresenter(item);
+            //        break;
             //}
         }
 
@@ -829,7 +971,7 @@ namespace System.Windows.Controls
         /// </returns>
         protected virtual bool IsItemItsOwnContainerOverride(object item)
         {
-            return (item is UIElement);
+            return item is UIElement;
         }
 
         /// <summary>
@@ -843,63 +985,27 @@ namespace System.Windows.Controls
         /// </param>
         protected virtual void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
-            ContentControl cc;
-            ContentPresenter cp;
-
-            if (this.ItemTemplate != null && !string.IsNullOrWhiteSpace(this.DisplayMemberPath))
+            switch (element)
             {
-                throw new InvalidOperationException(Strings.DisplayMemberPathAndItemTemplateDefined);
-            }
+                case ContentControl cc:
+                    cc.PrepareContentControl(item, ItemTemplate, ItemTemplateSelector);
+                    break;
 
-            DataTemplate template = this.SelectTemplate(element, item);
-
-            if ((cc = element as ContentControl) != null)
-            {
-                cc.PrepareContentControl(item, template);
-            }
-            else if ((cp = element as ContentPresenter) != null)
-            {
-                cp.PrepareContentPresenter(item, template);
+                case ContentPresenter cp:
+                    cp.PrepareContentPresenter(item, ItemTemplate, ItemTemplateSelector);
+                    break;
             }
         }
 
-        private DataTemplate SelectTemplate(DependencyObject element, object item)
-        {
-            DataTemplate template = null;
-            if (item is not UIElement)
-            {
-                template = ItemTemplate ??
-                    (DataTemplate)ContentPresenter.FindTemplateResourceInternal(element, item) ??
-                    GetDataTemplateForDisplayMemberPath(DisplayMemberPath);
-            }
-
-            return template;
-        }
-
-        internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
-        {
-            if (string.IsNullOrEmpty(displayMemberPath))
-            {
-                return _emptyPathTemplate;
-            }
-
-            var binding = new Binding(displayMemberPath);
-
-            return new DataTemplate
-            {
-                Template = new TemplateContent(
-                    new XamlContext(),
-                    (control, context) =>
-                    {
-                        var textBlock = new TextBlock();
-                        textBlock.SetTemplatedParent(context.TemplateOwnerReference);
-                        textBlock.SetBinding(TextBlock.TextProperty, binding);
-
-                        return textBlock;
-                    })
-            };
-        }
-
+        /// <summary>
+        /// Returns the <see cref="ItemsControl"/> that the specified element hosts items for.
+        /// </summary>
+        /// <param name="element">
+        /// The host element.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ItemsControl"/> that the specified element hosts items for, or null.
+        /// </returns>
         public static ItemsControl GetItemsOwner(DependencyObject element)
         {
             ItemsControl container = null;
@@ -919,6 +1025,15 @@ namespace System.Windows.Controls
             return container;
         }
 
+        /// <summary>
+        /// Returns the <see cref="ItemsControl"/> that owns the specified container element.
+        /// </summary>
+        /// <param name="container">
+        /// The container element to return the <see cref="ItemsControl"/> for.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ItemsControl"/> that owns the specified container element.
+        /// </returns>
         public static ItemsControl ItemsControlFromItemContainer(DependencyObject container)
         {
             UIElement ui = container as UIElement;
@@ -940,9 +1055,10 @@ namespace System.Windows.Controls
 
             ui = VisualTreeHelper.GetParent(ui) as UIElement;
 
-            return ItemsControl.GetItemsOwner(ui);
+            return GetItemsOwner(ui);
         }
 
+        /// <inheritdoc />
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
             base.OnTextInput(e);
@@ -958,6 +1074,66 @@ namespace System.Windows.Controls
             }
 
             e.Handled = true;
+        }
+
+        internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
+        {
+            if (string.IsNullOrEmpty(displayMemberPath))
+            {
+                return DisplayMemberTemplateSelector.EmptyPathTemplate;
+            }
+
+            var binding = new Binding(displayMemberPath);
+
+            return new DataTemplate
+            {
+                Template = new TemplateContent(
+                    new XamlContext(),
+                    (control, context) =>
+                    {
+                        var textBlock = new TextBlock();
+                        textBlock.SetTemplatedParent(context.TemplateOwnerReference);
+                        textBlock.SetBinding(TextBlock.TextProperty, binding);
+
+                        return textBlock;
+                    })
+            };
+        }
+
+        private sealed class DisplayMemberTemplateSelector : DataTemplateSelector
+        {
+            static DisplayMemberTemplateSelector()
+            {
+                EmptyPathTemplate = new DataTemplate
+                {
+                    Template = new TemplateContent(
+                    new XamlContext(),
+                    static (owner, context) =>
+                    {
+                        var textBlock = new TextBlock();
+                        textBlock.SetTemplatedParent(context.TemplateOwnerReference);
+                        textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
+
+                        return textBlock;
+                    }),
+                };
+                EmptyPathTemplate.Seal();
+            }
+
+            private readonly string _displayMemberPath;
+            private DataTemplate _contentTemplate;
+
+            public DisplayMemberTemplateSelector(string displayMemberPath)
+            {
+                _displayMemberPath = displayMemberPath;
+            }
+
+            internal static DataTemplate EmptyPathTemplate { get; }
+
+            public override DataTemplate SelectTemplate(object item, DependencyObject container)
+            {
+                return _contentTemplate ??= GetDataTemplateForDisplayMemberPath(_displayMemberPath);
+            }
         }
     }
 }
