@@ -449,6 +449,51 @@ namespace System.Windows.Controls
             _itemContainerGenerator?.Refresh();
         }
 
+        /// <summary>
+        /// Identifies the <see cref="ItemContainerStyleSelector"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ItemContainerStyleSelectorProperty =
+            DependencyProperty.Register(
+                nameof(ItemContainerStyleSelector),
+                typeof(StyleSelector),
+                typeof(ItemsControl),
+                new PropertyMetadata(null, OnItemContainerStyleSelectorChanged));
+
+        /// <summary>
+        /// Gets or sets custom style-selection logic for a style that can be applied to each generated container element.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="StyleSelector"/> object that contains logic that chooses the style to use as the <see cref="ItemContainerStyle"/>.
+        /// The default is null.
+        /// </returns>
+        public StyleSelector ItemContainerStyleSelector
+        {
+            get { return (StyleSelector)GetValue(ItemContainerStyleSelectorProperty); }
+            set { SetValueInternal(ItemContainerStyleSelectorProperty, value); }
+        }
+
+        private static void OnItemContainerStyleSelectorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ItemsControl)d).OnItemContainerStyleSelectorChanged((StyleSelector)e.OldValue, (StyleSelector)e.NewValue);
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ItemContainerStyleSelector"/> property changes.
+        /// </summary>
+        /// <param name="oldItemContainerStyleSelector">
+        /// Old value of the <see cref="ItemContainerStyleSelector"/> property.
+        /// </param>
+        /// <param name="newItemContainerStyleSelector">
+        /// New value of the <see cref="ItemContainerStyleSelector"/> property.
+        /// </param>
+        protected virtual void OnItemContainerStyleSelectorChanged(StyleSelector oldItemContainerStyleSelector, StyleSelector newItemContainerStyleSelector)
+        {
+            if (_itemContainerGenerator is not null && ItemContainerStyle is null)
+            {
+                _itemContainerGenerator.Refresh();
+            }
+        }
+
         #endregion Dependency Properties
 
         #region IGeneratorHost
@@ -856,10 +901,19 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Determine whether the ItemContainerStyle/StyleSelector should apply to the container
+        /// Returns a value that indicates whether to apply the style from the <see cref="ItemContainerStyle"/> or
+        /// <see cref="ItemContainerStyleSelector"/> property to the container element of the specified item.
         /// </summary>
-        /// <returns>true if the ItemContainerStyle should apply to the item</returns>
-        internal virtual bool ShouldApplyItemContainerStyle(DependencyObject container, object item)
+        /// <param name="container">
+        /// The container element.
+        /// </param>
+        /// <param name="item">
+        /// The item of interest.
+        /// </param>
+        /// <returns>
+        /// Always true for the base implementation.
+        /// </returns>
+        protected virtual bool ShouldApplyItemContainerStyle(DependencyObject container, object item)
         {
             return true;
         }
@@ -881,8 +935,17 @@ namespace System.Windows.Controls
             // Control's ItemContainerStyle has first stab
             Style style = ItemContainerStyle;
 
+            // no ItemContainerStyle set, try ItemContainerStyleSelector
+            if (style is null)
+            {
+                if (ItemContainerStyleSelector is StyleSelector itemContainerStyleSelector)
+                {
+                    style = itemContainerStyleSelector.SelectStyle(item, container);
+                }
+            }
+
             // apply the style, if found
-            if (style != null)
+            if (style is not null)
             {
                 // verify style is appropriate before applying it
                 if (!style.TargetType.IsInstanceOfType(container))

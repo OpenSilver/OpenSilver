@@ -113,6 +113,7 @@
     <Compile Include="System.Windows.Controls\MenuItem.cs" />
     <Compile Include="System.Windows.Controls\ScrollChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\Separator.cs" />
+    <Compile Include="System.Windows.Controls\StyleSelector.cs" />
     <Compile Include="System.Windows.Controls\TreeView.cs" />
     <Compile Include="System.Windows.Controls\TreeViewItem.cs" />
     <Compile Include="System.Windows.Controls\VisualStates.cs" />
