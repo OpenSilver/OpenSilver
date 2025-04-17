@@ -1402,8 +1402,7 @@
                             </Grid.RowDefinitions>
                             <ScrollContentPresenter Cursor="{TemplateBinding Cursor}"
                                                     Margin="{TemplateBinding Padding}"
-                                                    x:Name="ScrollContentPresenter"
-                                                    ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                    x:Name="ScrollContentPresenter" />
                             <Rectangle Grid.Column="1"
                                        Grid.Row="1"
                                        Fill="#FFE9EEF4" />
@@ -1527,9 +1526,7 @@
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           Margin="{TemplateBinding Padding}"
                                           x:Name="contentPresenter"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Rectangle x:Name="DisabledVisualElement"
                                    IsHitTestVisible="false"
                                    Opacity="0"
@@ -1819,9 +1816,7 @@
                                    RadiusY="1" />
                         <ContentPresenter HorizontalAlignment="Left"
                                           Margin="{TemplateBinding Padding}"
-                                          x:Name="contentPresenter"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                          x:Name="contentPresenter" />
                         <Rectangle x:Name="FocusVisualElement"
                                    Visibility="Collapsed"
                                    Stroke="{StaticResource HighlightBrush}"
@@ -2001,9 +1996,7 @@
                                                 <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                   Margin="{TemplateBinding Padding}"
                                                                   x:Name="contentPresenter"
-                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                  Content="{TemplateBinding Content}"
-                                                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                                                 <Rectangle Margin="1"
                                                            x:Name="FocusVisualElement"
                                                            IsHitTestVisible="false"
@@ -2301,9 +2294,7 @@
                                    RadiusY="1" />
                         <ContentPresenter HorizontalAlignment="Left"
                                           Margin="{TemplateBinding Padding}"
-                                          x:Name="contentPresenter"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                          x:Name="contentPresenter" />
                         <Rectangle x:Name="FocusVisualElement"
                                    Visibility="Collapsed"
                                    Stroke="{StaticResource HighlightBrush}"
@@ -3201,9 +3192,7 @@
                                                               Margin="4,0,0,0"
                                                               x:Name="header"
                                                               VerticalAlignment="Center"
-                                                              Grid.Column="1"
-                                                              Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                              Grid.Column="1" />
                                         </Grid>
                                     </Border>
                                     <Border x:Name="FocusVisualElement"
@@ -3325,9 +3314,7 @@
                                                               Margin="4,0,0,0"
                                                               x:Name="header"
                                                               VerticalAlignment="Center"
-                                                              Grid.Column="1"
-                                                              Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                              Grid.Column="1" />
                                         </Grid>
                                     </Border>
                                     <Border x:Name="FocusVisualElement"
@@ -3449,9 +3436,7 @@
                                                               Margin="0,4,0,0"
                                                               x:Name="header"
                                                               VerticalAlignment="Top"
-                                                              Grid.Row="1"
-                                                              Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                              Grid.Row="1" />
                                         </Grid>
                                     </Border>
                                     <Border x:Name="FocusVisualElement"
@@ -3573,9 +3558,7 @@
                                                               Margin="0,4,0,0"
                                                               x:Name="header"
                                                               VerticalAlignment="Top"
-                                                              Grid.Row="1"
-                                                              Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                              Grid.Row="1" />
                                         </Grid>
                                     </Border>
                                     <Border x:Name="FocusVisualElement"
@@ -3814,7 +3797,8 @@
                                                 Grid.Column="0"
                                                 Grid.Row="1"
                                                 Content="{TemplateBinding Content}"
-                                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
                             </Grid>
                         </Border>
                         <Border x:Name="DisabledVisualElement"
@@ -4006,7 +3990,8 @@
                                         x:Name="NormalText"
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                         Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}">
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}">
                             <ContentControl.Foreground>
                                 <SolidColorBrush Color="#FF333333"
                                                  x:Name="selectedText" />
@@ -4203,7 +4188,8 @@
                                                                 x:Name="buttonContent"
                                                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                                 Content="{TemplateBinding Content}"
-                                                                ContentTemplate="{TemplateBinding ContentTemplate}">
+                                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}">
                                                     <ContentControl.Foreground>
                                                         <SolidColorBrush Color="#FF333333"
                                                                          x:Name="TextColor" />
@@ -4444,7 +4430,8 @@
                                         x:Name="NormalText"
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                         Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}">
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}">
                             <ContentControl.Foreground>
                                 <SolidColorBrush Color="#FF333333"
                                                  x:Name="selectedText" />
@@ -5571,9 +5558,7 @@
                                           Margin="{TemplateBinding Padding}"
                                           x:Name="contentPresenter"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          Grid.Column="1"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                          Grid.Column="1" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -5872,9 +5857,7 @@
                                           Margin="{TemplateBinding Padding}"
                                           x:Name="contentPresenter"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          Grid.Column="1"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                          Grid.Column="1" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -7048,9 +7031,7 @@
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           Margin="{TemplateBinding Padding}"
                                           x:Name="contentPresenter"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Rectangle x:Name="DisabledVisualElement"
                                    IsHitTestVisible="false"
                                    Opacity="0"
@@ -7291,8 +7272,6 @@
                                                    RadiusY="2" />
                                         <ContentPresenter x:Name="content"
                                                           Cursor="{TemplateBinding Cursor}"
-                                                          Content="{TemplateBinding Content}"
-                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
                                                           HorizontalAlignment="Left"
                                                           Margin="{TemplateBinding Padding}" />
                                     </Grid>
@@ -7530,9 +7509,7 @@
                         <ContentPresenter Cursor="{TemplateBinding Cursor}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Rectangle x:Name="RightGridLine"
                                    VerticalAlignment="Stretch"
                                    Width="1"
@@ -8123,9 +8100,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="visualizationToolkit:Title">
-                    <ContentPresenter Content="{TemplateBinding Content}"
-                                      ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      Cursor="{TemplateBinding Cursor}"
+                    <ContentPresenter Cursor="{TemplateBinding Cursor}"
                                       Margin="{TemplateBinding Padding}"
                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
@@ -8598,6 +8573,7 @@
                                                                      Foreground="{TemplateBinding Foreground}"
                                                                      Content="{TemplateBinding Content}"
                                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                     ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
                                                                      Grid.Column="1"
                                                                      Grid.Row="0"
                                                                      Grid.RowSpan="1" />
@@ -8933,6 +8909,7 @@
                                                                                   VerticalContentAlignment="Top"
                                                                                   Content="{TemplateBinding Content}"
                                                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                                  ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
                                                                                   Grid.Row="1"
                                                                                   Percentage="0"
                                                                                   RevealMode="{TemplateBinding ExpandDirection}"
@@ -9402,9 +9379,7 @@
                                                 Background="{TemplateBinding Background}">
                                             <ContentPresenter x:Name="ContentPresenter"
                                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                              Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                                         </Border>
                                     </Grid>
                                 </Border>
@@ -9539,9 +9514,7 @@
                                                                           Height="Auto"
                                                                           HorizontalAlignment="Center"
                                                                           VerticalAlignment="Center"
-                                                                          Width="Auto"
-                                                                          Content="{TemplateBinding Content}"
-                                                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                                          Width="Auto" />
                                                     </Border>
                                                 </Border>
                                                 <Border x:Name="FocusVisualElement"
@@ -9610,8 +9583,7 @@
                                                     </Grid.RowDefinitions>
                                                     <ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                                             Cursor="{TemplateBinding Cursor}"
-                                                                            Margin="{TemplateBinding Padding}"
-                                                                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                                            Margin="{TemplateBinding Padding}" />
                                                     <Rectangle Fill="#FFE9EEF4"
                                                                Grid.Column="1"
                                                                Grid.Row="1" />
@@ -10203,9 +10175,7 @@
                                                 CornerRadius="2">
                                             <ContentPresenter x:Name="contentPresenter"
                                                               HorizontalAlignment="Center"
-                                                              VerticalAlignment="Center"
-                                                              Content="{TemplateBinding Content}"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                              VerticalAlignment="Center" />
                                         </Border>
                                     </Border>
                                     <Border x:Name="FocusVisualElement"

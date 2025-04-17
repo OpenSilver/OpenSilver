@@ -44,17 +44,13 @@ namespace System.Windows.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentPresenter"/> class.
         /// </summary>
-        public ContentPresenter()
-        {
-        }
+        public ContentPresenter() { }
 
         /// <summary>
         /// Identifies the <see cref="Content"/> dependency property
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register(
-                nameof(Content),
-                typeof(object),
+            ContentControl.ContentProperty.AddOwner(
                 typeof(ContentPresenter),
                 new PropertyMetadata(null, OnContentChanged));
 
@@ -66,8 +62,8 @@ namespace System.Windows.Controls
         /// </returns>
         public object Content
         {
-            get { return GetValue(ContentProperty); }
-            set { SetValueInternal(ContentProperty, value); }
+            get => GetValue(ContentProperty);
+            set => SetValueInternal(ContentProperty, value);
         }
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -80,7 +76,7 @@ namespace System.Windows.Controls
 
             bool mismatch;
 
-            if (ctrl.ContentTemplate != null)
+            if (ctrl.ContentTemplate is not null)
             {
                 mismatch = false; // explicit template - do not re-apply
             }
@@ -99,7 +95,7 @@ namespace System.Windows.Controls
                 Type oldDataType = e.OldValue?.GetType();
                 Type newDataType = e.NewValue?.GetType();
 
-                mismatch = (oldDataType != newDataType);
+                mismatch = oldDataType != newDataType;
             }
 
             // if the content and (old) template don't match, reselect the template
@@ -118,13 +114,10 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="ContentTemplate"/> dependency
-        /// property.
+        /// Identifies the <see cref="ContentTemplate"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentTemplateProperty =
-            DependencyProperty.Register(
-                nameof(ContentTemplate),
-                typeof(DataTemplate),
+            ContentControl.ContentTemplateProperty.AddOwner(
                 typeof(ContentPresenter),
                 new PropertyMetadata(null, OnContentTemplateChanged));
 
@@ -137,8 +130,8 @@ namespace System.Windows.Controls
         /// </returns>
         public DataTemplate ContentTemplate
         {
-            get { return (DataTemplate)GetValue(ContentTemplateProperty); }
-            set { SetValueInternal(ContentTemplateProperty, value); }
+            get => (DataTemplate)GetValue(ContentTemplateProperty);
+            set => SetValueInternal(ContentTemplateProperty, value);
         }
 
         private static void OnContentTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -150,6 +143,53 @@ namespace System.Windows.Controls
             ctrl.Template = null;
 
             ctrl.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ContentTemplateSelector"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentTemplateSelectorProperty =
+            ContentControl.ContentTemplateSelectorProperty.AddOwner(
+                typeof(ContentPresenter),
+                new PropertyMetadata(null, OnContentTemplateSelectorChanged));
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplateSelector"/>, which allows the application 
+        /// writer to provide custom logic for choosing the template that is used to display 
+        /// the content of the control.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="DataTemplateSelector"/> object that supplies logic to return a 
+        /// <see cref="DataTemplate"/> to apply. The default is null.
+        /// </returns>
+        public DataTemplateSelector ContentTemplateSelector
+        {
+            get => (DataTemplateSelector)GetValue(ContentControl.ContentTemplateSelectorProperty);
+            set => SetValueInternal(ContentControl.ContentTemplateSelectorProperty, value);
+        }
+
+        private static void OnContentTemplateSelectorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ContentPresenter ctrl = (ContentPresenter)d;
+            ctrl._templateIsCurrent = false;
+            ctrl.OnContentTemplateSelectorChanged((DataTemplateSelector)e.OldValue, (DataTemplateSelector)e.NewValue);
+
+            ctrl.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ContentTemplateSelector"/> property changes.
+        /// </summary>
+        /// <param name="oldContentTemplateSelector">
+        /// The old value of the <see cref="ContentTemplateSelector"/> property.
+        /// </param>
+        /// <param name="newContentTemplateSelector">
+        /// The new value of the <see cref="ContentTemplateSelector"/> property.
+        /// </param>
+        protected virtual void OnContentTemplateSelectorChanged(DataTemplateSelector oldContentTemplateSelector, DataTemplateSelector newContentTemplateSelector)
+        {
+            // if ContentTemplateSelector is really changing (and in use), remove the old template
+            Template = null;
         }
 
         /// <summary>
@@ -167,8 +207,8 @@ namespace System.Windows.Controls
         /// </summary>
         private DataTemplate Template
         {
-            get { return _templateCache; }
-            set { SetValueInternal(TemplateProperty, value); }
+            get => _templateCache;
+            set => SetValueInternal(TemplateProperty, value);
         }
 
         // Property invalidation callback invoked when TemplateProperty is invalidated
@@ -181,16 +221,13 @@ namespace System.Windows.Controls
         }
 
         // Internal Helper so the FrameworkElement could see this property
-        internal override FrameworkTemplate TemplateInternal
-        {
-            get { return Template; }
-        }
+        internal override FrameworkTemplate TemplateInternal => Template;
 
         // Internal Helper so the FrameworkElement could see the template cache
         internal override FrameworkTemplate TemplateCache
         {
-            get { return _templateCache; }
-            set { _templateCache = (DataTemplate)value; }
+            get => _templateCache;
+            set => _templateCache = (DataTemplate)value;
         }
 
         internal static DataTemplate DefaultContentTemplate { get; }
@@ -278,23 +315,31 @@ namespace System.Windows.Controls
         /// </remarks>
         private DataTemplate ChooseTemplate()
         {
-            DataTemplate template = null;
             object content = Content;
 
             // ContentTemplate has first stab
-            template = ContentTemplate;
+            DataTemplate template = ContentTemplate;
+
+            // no ContentTemplate set, try ContentTemplateSelector
+            if (template is null)
+            {
+                if (ContentTemplateSelector is DataTemplateSelector contentTemplateSelector)
+                {
+                    template = contentTemplateSelector.SelectTemplate(content, this);
+                }
+            }
 
             // no ContentTemplate set, try the default templates
-            if (template == null)
+            if (template is null)
             {
                 // Lookup template for typeof(Content) in resource dictionaries.
-                if (content != null)
+                if (content is not null)
                 {
                     template = (DataTemplate)FindTemplateResourceInternal(this, content);
                 }
 
                 // default templates for well known types
-                if (template == null)
+                if (template is null)
                 {
                     if (content is UIElement)
                     {
@@ -586,8 +631,7 @@ namespace System.Windows.Controls
 
             if (count > 0)
             {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
+                if (GetVisualChild(0) is UIElement child)
                 {
                     child.Measure(availableSize);
                     return child.DesiredSize;
@@ -604,8 +648,7 @@ namespace System.Windows.Controls
 
             if (count > 0)
             {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
+                if (GetVisualChild(0) is UIElement child)
                 {
                     child.Arrange(new Rect(finalSize));
                 }
@@ -642,7 +685,7 @@ namespace System.Windows.Controls
 
                 cp.TemplateChild = result;
 
-                return result != null;
+                return result is not null;
             }
 
             private FrameworkElement DefaultExpansion(object content, ContentPresenter container)

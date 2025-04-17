@@ -124,8 +124,6 @@
                                                RadiusX="1"
                                                RadiusY="1" />
                                     <ContentPresenter x:Name="ContentPresenter"
-                                                      Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                                      ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                       HorizontalAlignment="Left"
                                                       Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}" />
                                     <Rectangle x:Name="FocusVisualElement"
@@ -275,6 +273,7 @@
                                             Foreground="{TemplateBinding Property={x:Static Control.ForegroundProperty}}"
                                             Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                             ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                            ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                             FontWeight="{TemplateBinding Property={x:Static Control.FontWeightProperty}}"
                                             Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                             HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"

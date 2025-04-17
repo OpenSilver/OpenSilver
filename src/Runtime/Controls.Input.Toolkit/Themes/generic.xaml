@@ -2115,8 +2115,6 @@
                                           Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           HorizontalAlignment="Left"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
-                                          Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                           Grid.RowSpan="2"
                                           Grid.Row="1" />
                     </Grid>

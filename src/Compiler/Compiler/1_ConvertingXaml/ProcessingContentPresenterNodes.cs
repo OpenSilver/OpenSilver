@@ -52,25 +52,38 @@ namespace OpenSilver.Compiler
             {
                 bool hasContentAttribute = HasAttribute(currentElement, "Content", settings.Inspector);
                 bool hasContentTemplateAttribute = HasAttribute(currentElement, "ContentTemplate", settings.Inspector);
+                bool hasContentTemplateSelectorAttribute = HasAttribute(currentElement, "ContentTemplateSelector", settings.Inspector);
 
-                if (!hasContentAttribute || !hasContentTemplateAttribute)
+                if (!hasContentAttribute || (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute))
                 {
-                    string prefix = GenerateXmlnsPrefix();
-                    while (currentElement.GetNamespaceOfPrefix(prefix) != null)
+                    string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
+
+                    // First look for the default namespace, it should cover 99% of cases.
+                    if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, currentElement.GetDefaultNamespace()) == -1)
                     {
-                        prefix = GenerateXmlnsPrefix();
+                        systemWindowsPrefix = GenerateXmlnsPrefix(currentElement);
+                        currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), "clr-namespace:System.Windows;assembly=OpenSilver");
+
+                        systemWindowsControlsPrefix = GenerateXmlnsPrefix(currentElement);
+                        currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), "clr-namespace:System.Windows.Controls;assembly=OpenSilver");
                     }
 
-                    currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(prefix), "clr-namespace:System.Windows;assembly=OpenSilver");
+                    string xPrefix = currentElement.GetPrefixOfNamespace(GeneratingCode.xNamespace);
+                    if (xPrefix is null)
+                    {
+                        xPrefix = GenerateXmlnsPrefix(currentElement);
+                        currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(xPrefix), GeneratingCode.xNamespace.NamespaceName);
+                    }
 
                     if (!hasContentAttribute)
                     {
-                        currentElement.SetAttributeValue("Content", $"{{{prefix}:TemplateBinding Content}}");
+                        SetTemplateBinding(currentElement, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
                     }
 
-                    if (!hasContentTemplateAttribute)
+                    if (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute)
                     {
-                        currentElement.SetAttributeValue("ContentTemplate", $"{{{prefix}:TemplateBinding ContentTemplate}}");
+                        SetTemplateBinding(currentElement, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                        SetTemplateBinding(currentElement, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
                     }
                 }
             }
@@ -115,6 +128,31 @@ namespace OpenSilver.Compiler
             }
 
             return found;
+        }
+
+        private static void SetTemplateBinding(XElement element, string propertyName, string systemWindowsPrefix, string systemWindowsControlsPrefix, string xPrefix)
+        {
+            element.SetAttributeValue(propertyName, (systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix) switch
+            {
+                (null or "", null or "", null or "") => $"{{TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
+                (null or "", null or "", _) => $"{{TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
+                (null or "", _, null or "") => $"{{TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+                (_, null or "", null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
+                (null or "", _, _) => $"{{TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+                (_, null or "", _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
+                (_, _, null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+                (_, _, _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+            });
+        }
+
+        private static string GenerateXmlnsPrefix(XElement element)
+        {
+            string prefix = GenerateXmlnsPrefix();
+            while (element.GetNamespaceOfPrefix(prefix) is not null)
+            {
+                prefix = GenerateXmlnsPrefix();
+            }
+            return prefix;
         }
 
         private static string GenerateXmlnsPrefix()

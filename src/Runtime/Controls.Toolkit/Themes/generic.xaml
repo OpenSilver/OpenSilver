@@ -132,12 +132,14 @@
                         <ContentControl x:Name="content"
                                         Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                         ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                         HorizontalContentAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                         VerticalContentAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                         <Rectangle x:Name="overlay"
                                    Style="{TemplateBinding Property={x:Static BusyIndicator.OverlayStyleProperty}}" />
                         <ContentPresenter x:Name="busycontent"
-                                          ContentTemplate="{x:Null}">
+                                          ContentTemplate="{x:Null}"
+                                          ContentTemplateSelector="{x:Null}">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
                                 <Border Background="{x:Static Brushes.White}"
@@ -265,9 +267,7 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          Margin="{TemplateBinding Property={x:Static FrameworkElement.MarginProperty}}"
+                        <ContentPresenter Margin="{TemplateBinding Property={x:Static FrameworkElement.MarginProperty}}"
                                           Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
@@ -587,9 +587,7 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                                              Grid.Column="1"
+                                            <ContentPresenter Grid.Column="1"
                                                               HorizontalAlignment="Stretch"
                                                               Margin="4,0,0,0"
                                                               x:Name="header"
@@ -718,9 +716,7 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                                              Grid.Column="1"
+                                            <ContentPresenter Grid.Column="1"
                                                               HorizontalAlignment="Stretch"
                                                               Margin="4,0,0,0"
                                                               x:Name="header"
@@ -849,9 +845,7 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                                              Grid.Row="1"
+                                            <ContentPresenter Grid.Row="1"
                                                               HorizontalAlignment="Center"
                                                               Margin="0,4,0,0"
                                                               x:Name="header"
@@ -980,9 +974,7 @@
                                                       StrokeThickness="2"
                                                       VerticalAlignment="Center" />
                                             </Grid>
-                                            <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                                              Grid.Row="1"
+                                            <ContentPresenter Grid.Row="1"
                                                               HorizontalAlignment="Center"
                                                               Margin="0,4,0,0"
                                                               x:Name="header"
@@ -1191,6 +1183,7 @@
                                               VerticalContentAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
                                 <ContentControl Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                                 ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                                ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                                 FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
                                                 FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
                                                 FontStretch="{TemplateBinding Property={x:Static Control.FontStretchProperty}}"
@@ -1256,9 +1249,7 @@
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
@@ -1277,9 +1268,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:ListBoxDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
@@ -1314,9 +1303,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:PanelDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
@@ -1351,9 +1338,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="controls:TreeViewDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
@@ -1545,6 +1530,7 @@
                         <ContentControl IsTabStop="False"
                                         Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                         ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                         HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                         VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
                                         FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
@@ -1735,6 +1721,7 @@
                                         IsTabStop="False"
                                         Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                         ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                        ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                         HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                         VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
                                         FontSize="{TemplateBinding Property={x:Static Control.FontSizeProperty}}"
@@ -1851,6 +1838,7 @@
                                                                 IsTabStop="False"
                                                                 Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                                                 ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                                                ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                                                 Margin="1,5,1,9"
                                                                 HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                                                 VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}">

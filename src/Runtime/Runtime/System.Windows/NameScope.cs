@@ -190,7 +190,7 @@ public class NameScope : INameScopeDictionary
             throw new ArgumentNullException(nameof(dependencyObject));
         }
 
-        dependencyObject.SetValue(NameScopeProperty, value);
+        dependencyObject.SetValueInternal(NameScopeProperty, value);
     }
 
     internal static INameScope GetNameScope(IDependencyObject dependencyObject)

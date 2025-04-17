@@ -438,7 +438,8 @@
                                                                      Grid.Row="0"
                                                                      Grid.RowSpan="1"
                                                                      Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                                                     ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}" />
+                                                                     ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                                                     ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}" />
                                 </Grid>
                             </Grid>
                         </Border>
@@ -480,8 +481,7 @@
                                       Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                       HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                       VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
-                                      Margin="0"
-                                      ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}" />
+                                      Margin="0" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -842,6 +842,7 @@
                                                                                   RevealMode="{TemplateBinding Property={x:Static AccordionItem.ExpandDirectionProperty}}"
                                                                                   Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
                                                                                   ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                                                                  ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                                                                   Margin="0,0,0,0"
                                                                                   Style="{TemplateBinding Property={x:Static AccordionItem.ExpandableContentControlStyleProperty}}"
                                                                                   FontFamily="{TemplateBinding Property={x:Static Control.FontFamilyProperty}}"
@@ -871,9 +872,7 @@
                 <ControlTemplate TargetType="layoutToolkit:LayoutTransformer">
                     <Grid x:Name="TransformRoot"
                           Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
-                        <ContentPresenter x:Name="Presenter"
-                                          Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}" />
+                        <ContentPresenter x:Name="Presenter" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -1021,6 +1020,7 @@
                             <ContentPresenter x:Name="PreviousContentPresentationSite"
                                               Content="{x:Null}"
                                               ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                              ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                               HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                               VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}">
                                 <ContentPresenter.RenderTransform>
@@ -1036,6 +1036,7 @@
                             <ContentPresenter x:Name="CurrentContentPresentationSite"
                                               Content="{x:Null}"
                                               ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
+                                              ContentTemplateSelector="{TemplateBinding Property={x:Static ContentControl.ContentTemplateSelectorProperty}}"
                                               HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                               VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}">
                                 <ContentPresenter.RenderTransform>

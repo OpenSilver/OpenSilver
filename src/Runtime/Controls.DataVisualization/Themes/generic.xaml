@@ -718,9 +718,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="charting:DataPointSeriesDragDropTarget">
                     <Grid>
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
@@ -1232,9 +1230,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="datavis:Title">
                     <Grid Background="{TemplateBinding Property={x:Static Control.BackgroundProperty}}">
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />

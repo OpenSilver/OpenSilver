@@ -24,8 +24,7 @@
                             BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                             HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                             VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}">
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
                                           HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"/>

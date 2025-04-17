@@ -124,9 +124,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:ContentControl">
-                    <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                               ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
-                                               Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                    <controls:ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
                                                Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}" />
@@ -262,8 +260,6 @@
                             </controls:Grid>
                         </controls:Border>
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                    VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                                    HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
@@ -416,8 +412,6 @@
                             </controls:Grid>
                         </controls:Border>
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                    VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                                    HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
@@ -727,8 +721,6 @@
                         </controls:Grid>
                         <controls:ContentPresenter controls:Grid.Column="1"
                                                    x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                    HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                    VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
@@ -1011,8 +1003,6 @@
                         </controls:Grid>
                         <controls:ContentPresenter controls:Grid.Column="1"
                                                    x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                    HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                    VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
@@ -1138,8 +1128,6 @@
                             </controls:Grid>
                         </controls:Border>
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                    VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                                    HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
@@ -1261,8 +1249,6 @@
                                             controls:Canvas.ZIndex="1"
                                             Visibility="Collapsed" />
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                    VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                                    HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
@@ -1323,9 +1309,7 @@
 
                             <controls:ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                              Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
-                                                             Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
-                                                             Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                             ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}" />
+                                                             Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
 
                             <controls:Border controls:Grid.Column="1"
                                              controls:Grid.Row="1"
@@ -1787,8 +1771,6 @@
                                          IsHitTestVisible="False"
                                          CornerRadius="1" />
                         <controls:ContentPresenter x:Name="contentPresenter"
-                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                    HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         <controls:Border x:Name="FocusVisualElement"
@@ -1843,8 +1825,6 @@
                                 <animation:Storyboard x:Key="Normal State" />
                             </controls:Border.Resources>
                             <controls:ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
-                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
-                                                       Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
                                                        Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                         </controls:Border>
                     </controls:Border>
@@ -1861,8 +1841,6 @@
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:Viewbox">
                     <controls:ContentPresenter x:Name="Child"
-                                               Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                               ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                HorizontalAlignment="{TemplateBinding Property={x:Static FrameworkElement.HorizontalAlignmentProperty}}"
                                                VerticalAlignment="{TemplateBinding Property={x:Static FrameworkElement.VerticalAlignmentProperty}}">
                     </controls:ContentPresenter>
@@ -2206,8 +2184,6 @@
                                                              BorderThickness="1"
                                                              Margin="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}" />
                                             <controls:ContentPresenter x:Name="contentPresenter"
-                                                                       Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                                        HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                                        VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
                                                                        Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
@@ -2322,6 +2298,7 @@
                                 <controls:ContentPresenter x:Name="ContentPresenter"
                                                            Content="{markup:Null}"
                                                            ContentTemplate="{markup:Null}"
+                                                           ContentTemplateSelector="{markup:Null}"
                                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                            HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                            VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}">
@@ -4214,6 +4191,7 @@
                             </controls:Grid.ColumnDefinitions>
                             <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
                                                        ContentTemplate="{markup:Null}"
+                                                       ContentTemplateSelector="{markup:Null}"
                                                        Margin="1"
                                                        VerticalAlignment="Center" />
                             <!--<controls:Border
@@ -4688,8 +4666,6 @@
                                                          Margin="7"
                                                          controls:Grid.Row="1">
                                             <controls:ContentPresenter x:Name="ContentPresenter"
-                                                                       Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                                        HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                                        VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}" />
                                         </controls:Border>
@@ -5112,8 +5088,6 @@
                                                           RadiusY="2" />
                                         <controls:ContentPresenter x:Name="Content"
                                                                    Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
-                                                                   Content="{TemplateBinding Property={x:Static controls:ContentControl.ContentProperty}}"
-                                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:ContentControl.ContentTemplateProperty}}"
                                                                    HorizontalAlignment="Left"
                                                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
                                     </controls:Grid>

@@ -27,8 +27,6 @@ namespace System.Windows.Controls
     [ContentProperty(nameof(Content))]
     public class ContentControl : Control
     {
-#region Constructor
-
         static ContentControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ContentControl), new PropertyMetadata(typeof(ContentControl)));
@@ -39,21 +37,20 @@ namespace System.Windows.Controls
         /// </summary>
         public ContentControl() { }
 
-#endregion Constructor
-
-#region Dependency Properties
-
         /// <summary>
-        /// Gets or sets the content of a ContentControl.
+        /// Gets or sets the content of a <see cref="ContentControl"/>.
         /// </summary>
+        /// <returns>
+        /// An object that contains the control's content. The default value is null.
+        /// </returns>
         public object Content
         {
-            get { return GetValue(ContentProperty); }
-            set { SetValueInternal(ContentProperty, value); }
+            get => GetValue(ContentProperty);
+            set => SetValueInternal(ContentProperty, value);
         }
 
         /// <summary>
-        /// Identifies the Content dependency property.
+        /// Identifies the <see cref="Content"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
             DependencyProperty.Register(
@@ -68,65 +65,122 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets or sets the data template that is used to display the content of the
-        /// ContentControl.
+        /// Gets or sets the data template used to display the content of the <see cref="ContentControl"/>.
         /// </summary>
+        /// <returns>
+        /// A data template. The default value is null.
+        /// </returns>
         public DataTemplate ContentTemplate
         {
-            get { return (DataTemplate)GetValue(ContentTemplateProperty); }
-            set { SetValueInternal(ContentTemplateProperty, value); }
+            get => (DataTemplate)GetValue(ContentTemplateProperty);
+            set => SetValueInternal(ContentTemplateProperty, value);
         }
 
         /// <summary>
-        /// Identifies the ContentTemplate dependency property.
+        /// Identifies the <see cref="ContentTemplate"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentTemplateProperty =
             DependencyProperty.Register(
                 nameof(ContentTemplate),
                 typeof(DataTemplate),
                 typeof(ContentControl),
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(null, OnContentTemplateChanged));
 
-#endregion Dependency Properties
+        private static void OnContentTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ContentControl ctrl = (ContentControl)d;
+            ctrl.OnContentTemplateChanged((DataTemplate)e.OldValue, (DataTemplate)e.NewValue);
+        }
 
-#region Protected Methods
+        /// <summary>
+        /// Called when the <see cref="ContentTemplate"/> property changes.
+        /// </summary>
+        /// <param name="oldContentTemplate">
+        /// The old value of the <see cref="ContentTemplate"/> property.
+        /// </param>
+        /// <param name="newContentTemplate">
+        /// The new value of the <see cref="ContentTemplate"/> property.
+        /// </param>
+        protected virtual void OnContentTemplateChanged(DataTemplate oldContentTemplate, DataTemplate newContentTemplate)
+        {
+        }
 
+        /// <summary>
+        /// Identifies the <see cref="ContentTemplateSelector"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentTemplateSelectorProperty =
+            DependencyProperty.Register(
+                nameof(ContentTemplateSelector),
+                typeof(DataTemplateSelector),
+                typeof(ContentControl),
+                new PropertyMetadata(null, OnContentTemplateSelectorChanged));
+
+        /// <summary>
+        /// Gets or sets a template selector that enables an application writer to provide custom template-selection logic.
+        /// </summary>
+        /// <returns>
+        /// A data template selector. The default value is null.
+        /// </returns>
+        public DataTemplateSelector ContentTemplateSelector
+        {
+            get => (DataTemplateSelector)GetValue(ContentTemplateSelectorProperty);
+            set => SetValueInternal(ContentTemplateSelectorProperty, value);
+        }
+
+        private static void OnContentTemplateSelectorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ContentControl ctrl = (ContentControl)d;
+            ctrl.OnContentTemplateSelectorChanged((DataTemplateSelector)e.NewValue, (DataTemplateSelector)e.NewValue);
+        }
+
+        /// <summary>
+        /// Called when the <see cref="ContentTemplateSelector"/> property changes.
+        /// </summary>
+        /// <param name="oldContentTemplateSelector">
+        /// The old value of the <see cref="ContentTemplateSelector"/> property.
+        /// </param>
+        /// <param name="newContentTemplateSelector">
+        /// The new value of the <see cref="ContentTemplateSelector"/> property.
+        /// </param>
+        protected virtual void OnContentTemplateSelectorChanged(DataTemplateSelector oldContentTemplateSelector, DataTemplateSelector newContentTemplateSelector)
+        {
+        }
+
+        /// <summary>
+        /// Called when the <see cref="Content"/> property changes.
+        /// </summary>
+        /// <param name="oldContent">
+        /// The old value of the <see cref="Content"/> property.
+        /// </param>
+        /// <param name="newContent">
+        /// The new value of the <see cref="Content"/> property.
+        /// </param>
         protected virtual void OnContentChanged(object oldContent, object newContent)
         {
             // Remove the old content child
-            this.RemoveLogicalChild(oldContent);
+            RemoveLogicalChild(oldContent);
 
-            if (this.ContentIsNotLogical)
+            if (ContentIsNotLogical)
             {
                 return;
             }
 
             // We want to update the logical parent only if we don't have one already.
-            FrameworkElement fe = newContent as FrameworkElement;
-            if (fe != null)
+            if (newContent is FrameworkElement fe)
             {
-                DependencyObject logicalParent = fe.Parent;
-                if (logicalParent != null)
+                if (fe.Parent is not null)
                 {
                     return;
                 }
             }
 
-            this.AddLogicalChild(newContent);
+            AddLogicalChild(newContent);
         }
-
-#endregion Protected Methods
-
-#region Internal Properties
 
         /// <summary>
         ///    Indicates whether Content should be a logical child or not.
         /// </summary>
-        internal bool ContentIsNotLogical
-        {
-            get;
-            set;
-        }
+        internal bool ContentIsNotLogical { get; set; }
 
         /// <summary>
         /// Gets an enumerator to the content control's logical child elements.
@@ -165,10 +219,6 @@ namespace System.Windows.Controls
 
         private static FrameworkTemplate DefaultTemplate { get; } = new UseContentTemplate();
 
-        #endregion Internal Properties
-
-        #region Internal Methods
-
         /// <summary>
         /// Prepare to display the item.
         /// </summary>
@@ -177,14 +227,14 @@ namespace System.Windows.Controls
             if (item != this)
             {
                 // don't treat Content as a logical child
-                this.ContentIsNotLogical = true;
+                ContentIsNotLogical = true;
 
-                this.ContentTemplate = template;
-                this.Content = item;
+                ContentTemplate = template;
+                Content = item;
             }
             else
             {
-                this.ContentIsNotLogical = false;
+                ContentIsNotLogical = false;
             }
         }
 
@@ -192,7 +242,7 @@ namespace System.Windows.Controls
         {
             if (this != item)
             {
-                this.ClearValue(ContentProperty);
+                ClearValue(ContentProperty);
             }
         }
 
@@ -200,7 +250,7 @@ namespace System.Windows.Controls
 
         internal static string ContentObjectToString(object content)
         {
-            if (content != null)
+            if (content is not null)
             {
                 if (content is FrameworkElement feContent)
                 {
@@ -212,8 +262,6 @@ namespace System.Windows.Controls
 
             return string.Empty;
         }
-
-        #endregion Internal Methods
 
         private sealed class UseContentTemplate : FrameworkTemplate
         {

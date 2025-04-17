@@ -271,9 +271,7 @@
                         <Border x:Name="FocusVisual" BorderBrush="#FF6DBDD1" BorderThickness="1" Background="#66FFFFFF" HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch" IsHitTestVisible="false" Opacity="0" />
 
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
-                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
                                           VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}"
                                           Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}" />
 
@@ -768,8 +766,6 @@
                                                 BorderThickness="{TemplateBinding Property={x:Static Control.BorderThicknessProperty}}"
                                                 CornerRadius="2">
                                             <ContentPresenter x:Name="contentPresenter"
-                                                              Content="{TemplateBinding Property={x:Static ContentControl.ContentProperty}}"
-                                                              ContentTemplate="{TemplateBinding Property={x:Static ContentControl.ContentTemplateProperty}}"
                                                               HorizontalAlignment="Center"
                                                               VerticalAlignment="Center" />
                                         </Border>
