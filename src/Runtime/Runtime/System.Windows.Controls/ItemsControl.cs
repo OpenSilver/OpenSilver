@@ -494,6 +494,50 @@ namespace System.Windows.Controls
             }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="IsTextSearchEnabled"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsTextSearchEnabledProperty =
+            DependencyProperty.Register(
+                nameof(IsTextSearchEnabled),
+                typeof(bool),
+                typeof(ItemsControl),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether <see cref="TextSearch"/> is enabled on the <see cref="ItemsControl"/> instance.
+        /// </summary>
+        /// <returns>
+        /// true if <see cref="TextSearch"/> is enabled; otherwise, true. The default is false.
+        /// </returns>
+        public bool IsTextSearchEnabled
+        {
+            get { return (bool)GetValue(IsTextSearchEnabledProperty); }
+            set { SetValueInternal(IsTextSearchEnabledProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="IsTextSearchCaseSensitive"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsTextSearchCaseSensitiveProperty =
+            DependencyProperty.Register(
+                nameof(IsTextSearchCaseSensitive),
+                typeof(bool),
+                typeof(ItemsControl),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether case is a condition when searching for items.
+        /// </summary>
+        /// <returns>
+        /// true if text searches are case-sensitive; otherwise, false.
+        /// </returns>
+        public bool IsTextSearchCaseSensitive
+        {
+            get { return (bool)GetValue(IsTextSearchCaseSensitiveProperty); }
+            set { SetValueInternal(IsTextSearchCaseSensitiveProperty, value); }
+        }
+
         #endregion Dependency Properties
 
         #region IGeneratorHost
@@ -693,7 +737,7 @@ namespace System.Windows.Controls
         {
             if (info != null)
             {
-                ItemInfo[] a = new ItemInfo[] { info };
+                ItemInfo[] a = [info];
                 AdjustItemInfosAfterGeneratorChange(a, claimUniqueContainer: false);
             }
         }
@@ -782,7 +826,7 @@ namespace System.Windows.Controls
         {
             if (info != null)
             {
-                ItemInfo[] a = new ItemInfo[] { info };
+                ItemInfo[] a = [info];
                 AdjustItemInfos(e, a);
             }
         }
@@ -886,7 +930,7 @@ namespace System.Windows.Controls
         {
             try
             {
-                return Object.Equals(o1, o2);
+                return Equals(o1, o2);
             }
             catch (InvalidCastException)
             {
@@ -1126,17 +1170,34 @@ namespace System.Windows.Controls
         {
             base.OnTextInput(e);
 
-            if (!string.IsNullOrEmpty(e.Text))
+            if (!string.IsNullOrEmpty(e.Text) && IsTextSearchEnabled)
             {
-                TextSearch instance = TextSearch.EnsureInstance(this);
-
-                if (instance != null)
+                if (TextSearch.EnsureInstance(this) is TextSearch instance)
                 {
                     instance.DoSearch(e.Text);                    
                 }
             }
 
             e.Handled = true;
+        }
+
+        /// <inheritdoc />
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (IsTextSearchEnabled)
+            {
+                // If the pressed the backspace key, delete the last character
+                // in the TextSearch current prefix.
+                if (e.Key == Key.Back)
+                {
+                    if (TextSearch.EnsureInstance(this) is TextSearch instance)
+                    {
+                        instance.DeleteLastCharacter();
+                    }
+                }
+            }
         }
 
         internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)

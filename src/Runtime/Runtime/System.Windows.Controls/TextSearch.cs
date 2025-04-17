@@ -196,6 +196,34 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        ///     Called when the user presses backspace.
+        /// </summary>
+        /// <returns></returns>
+        internal bool DeleteLastCharacter()
+        {
+            if (IsActive)
+            {
+                // Remove the last character from the prefix string.
+                // Get the last character entered and then remove a string of
+                // that length off the prefix string.
+                if (_charsEntered.Count > 0)
+                {
+                    string lastChar = _charsEntered[_charsEntered.Count - 1];
+                    string prefix = Prefix;
+
+                    _charsEntered.RemoveAt(_charsEntered.Count - 1);
+                    Prefix = prefix.Substring(0, prefix.Length - lastChar.Length);
+
+                    ResetTimeout();
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Searches through the given itemCollection for the first item matching the given prefix.
         /// </summary>
         /// <remarks>
@@ -265,10 +293,11 @@ namespace System.Windows.Controls
                 if (item != null)
                 {
                     string itemString = GetPrimaryText(item, primaryTextPath, itemsControl);
+                    bool isTextSearchCaseSensitive = itemsControl.IsTextSearchCaseSensitive;
 
                     // See if the current item matches the newPrefix, if so we can
                     // stop searching and accept this item as the match.
-                    if (itemString != null && itemString.StartsWith(newPrefix, StringComparison.OrdinalIgnoreCase))
+                    if (itemString != null && itemString.StartsWith(newPrefix, !isTextSearchCaseSensitive, null))
                     {
                         // Accept the new prefix as the current prefix.
                         wasNewCharUsed = true;
@@ -291,7 +320,7 @@ namespace System.Windows.Controls
                         {
                             if (itemString != null)
                             {
-                                if (fallbackMatchIndex == -1 && itemString.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                                if (fallbackMatchIndex == -1 && itemString.StartsWith(prefix, !isTextSearchCaseSensitive, null))
                                 {
                                     fallbackMatchIndex = currentIndex;
                                 }

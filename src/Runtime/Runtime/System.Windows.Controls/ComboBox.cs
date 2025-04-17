@@ -58,9 +58,8 @@ namespace System.Windows.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(typeof(ComboBox)));
             IsEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(OnVisualStatePropertyChanged));
-            IsSelectionActivePropertyKey.OverrideMetadata(
-                typeof(ComboBox),
-                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
+            IsSelectionActivePropertyKey.OverrideMetadata(typeof(ComboBox),new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
+            IsTextSearchEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
 
         /// <summary>

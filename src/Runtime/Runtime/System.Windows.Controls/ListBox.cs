@@ -38,9 +38,8 @@ namespace System.Windows.Controls
         static ListBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBox), new PropertyMetadata(typeof(ListBox)));
-            IsSelectionActivePropertyKey.OverrideMetadata(
-                typeof(ListBox),
-                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
+            IsSelectionActivePropertyKey.OverrideMetadata(typeof(ListBox), new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
+            IsTextSearchEnabledProperty.OverrideMetadata(typeof(ListBox), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
 
         /// <summary>
