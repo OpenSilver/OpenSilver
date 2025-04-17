@@ -90,18 +90,20 @@ namespace System.Windows.Controls
 
         private void CreateItemCollectionAndGenerator()
         {
-            this._items = new ItemCollection(this);
+            _items = new ItemCollection(this);
 
             // ItemInfos must get adjusted before the generator's change handler is called,
             // so that any new ItemInfos arising from the generator don't get adjusted by mistake
-            this._items.CollectionChanged += new NotifyCollectionChangedEventHandler(this.OnItemCollectionChanged1);
+            _items.CollectionChanged += new NotifyCollectionChangedEventHandler(OnItemCollectionChanged1);
 
             // the generator must attach its collection change handler before
             // the control itself, so that the generator is up-to-date by the
             // time the control tries to use it
-            this._itemContainerGenerator = new ItemContainerGenerator(this);
+            _itemContainerGenerator = new ItemContainerGenerator(this);
 
-            this._items.CollectionChanged += new NotifyCollectionChangedEventHandler(this.OnItemCollectionChanged2);
+            _itemContainerGenerator.ChangeAlternationCount();
+
+            _items.CollectionChanged += new NotifyCollectionChangedEventHandler(OnItemCollectionChanged2);
         }
 
         #endregion Public Properties
@@ -538,6 +540,93 @@ namespace System.Windows.Controls
             set { SetValueInternal(IsTextSearchCaseSensitiveProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="AlternationCount"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AlternationCountProperty =
+            DependencyProperty.Register(
+                nameof(AlternationCount),
+                typeof(int),
+                typeof(ItemsControl),
+                new PropertyMetadata(0, OnAlternationCountChanged));
+
+        /// <summary>
+        /// Gets or sets the number of alternating item containers in the <see cref="ItemsControl"/>, which enables 
+        /// alternating containers to have a unique appearance.
+        /// </summary>
+        /// <returns>
+        /// The number of alternating item containers in the <see cref="ItemsControl"/>.
+        /// </returns>
+        public int AlternationCount
+        {
+            get { return (int)GetValue(AlternationCountProperty); }
+            set { SetValueInternal(AlternationCountProperty, value); }
+        }
+
+        private static void OnAlternationCountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ItemsControl)d).OnAlternationCountChanged((int)e.OldValue, (int)e.NewValue);
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="AlternationCount"/> property changes.
+        /// </summary>
+        /// <param name="oldAlternationCount">
+        /// The old value of <see cref="AlternationCount"/>.
+        /// </param>
+        /// <param name="newAlternationCount">
+        /// The new value of <see cref="AlternationCount"/>.
+        /// </param>
+        protected virtual void OnAlternationCountChanged(int oldAlternationCount, int newAlternationCount)
+        {
+            ItemContainerGenerator.ChangeAlternationCount();
+        }
+
+        private static readonly DependencyPropertyKey AlternationIndexPropertyKey =
+            DependencyProperty.RegisterAttachedReadOnly(
+                "AlternationIndex",
+                typeof(int),
+                typeof(ItemsControl),
+                new PropertyMetadata(0));
+
+        /// <summary>
+        /// Identifies the AlternationIndex dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AlternationIndexProperty = AlternationIndexPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets the alternation index for the specified object.
+        /// </summary>
+        /// <param name="element">
+        /// The object from which to get the alternation index.
+        /// </param>
+        /// <returns>
+        /// The value of the alternation index.
+        /// </returns>
+        public static int GetAlternationIndex(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (int)element.GetValue(AlternationIndexProperty);
+        }
+
+        // internal setter for AlternationIndex.  This property is not settable by
+        // an app, only by internal code
+        internal static void SetAlternationIndex(DependencyObject d, int value)
+        {
+            d.SetValue(AlternationIndexPropertyKey, value);
+        }
+
+        // internal clearer for AlternationIndex.  This property is not settable by
+        // an app, only by internal code
+        internal static void ClearAlternationIndex(DependencyObject d)
+        {
+            d.ClearValue(AlternationIndexPropertyKey);
+        }
+
         #endregion Dependency Properties
 
         #region IGeneratorHost
@@ -548,6 +637,14 @@ namespace System.Windows.Controls
         IList IGeneratorHost.View
         {
             get { return Items; }
+        }
+
+        /// <summary>
+        /// The AlternationCount
+        /// <summary>
+        int IGeneratorHost.AlternationCount
+        {
+            get { return AlternationCount; }
         }
 
         void IGeneratorHost.ClearContainerForItem(DependencyObject container, object item)

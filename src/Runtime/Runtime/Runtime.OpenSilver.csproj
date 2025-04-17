@@ -102,6 +102,7 @@
     <Compile Include="System.Windows.Automation.Peers\TreeViewAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\TreeViewItemAutomationPeer.cs" />
     <Compile Include="System.Windows.Controls.Primitives\MenuBase.cs" />
+    <Compile Include="System.Windows.Controls\AlternationConverter.cs" />
     <Compile Include="System.Windows.Controls\ChildWindow.cs" />
     <Compile Include="System.Windows.Controls\ContextMenu.cs" />
     <Compile Include="System.Windows.Controls\ContextMenuService.cs" />

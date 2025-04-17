@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;   // IItemContainerGenerator
-using System.Windows.Data;
 using System.Windows.Media;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
@@ -368,6 +367,8 @@ namespace System.Windows.Controls
                 {
                     ResetRecyclableContainers();
                 }
+
+                SetAlternationCount();
 
                 // tell generators what happened
                 if (MapChanged != null)
@@ -812,6 +813,60 @@ namespace System.Windows.Controls
             ((IItemContainerGenerator)this).RemoveAll();
         }
 
+        // called when the host's AlternationCount changes
+        internal void ChangeAlternationCount()
+        {
+            if (_itemMap == null)
+            {
+                // handle reentrant call
+                return;
+            }
+
+            // update my AlternationCount and adjust my containers
+            SetAlternationCount();
+        }
+
+        // update AlternationIndex on each container to reflect the new AlternationCount
+        void ChangeAlternationCount(int newAlternationCount)
+        {
+            if (_alternationCount == newAlternationCount)
+                return;
+
+            // find the first realized container (need this regardless of what happens)
+            ItemBlock block = _itemMap.Next;
+            int offset = 0;
+            while (offset == block.ContainerCount)
+            {
+                block = block.Next;
+            }
+
+            // if there are no realized containers, there's nothing to do
+            if (block != _itemMap)
+            {
+                // if user is requesting alternation, reset each container's AlternationIndex
+                if (newAlternationCount > 0)
+                {
+                    _alternationCount = newAlternationCount;
+                    SetAlternationIndex((RealizedItemBlock)block, offset, GeneratorDirection.Forward);
+                }
+                // otherwise, clear each container's AlternationIndex
+                else if (_alternationCount > 0)
+                {
+                    while (block != _itemMap)
+                    {
+                        for (offset = 0; offset < block.ContainerCount; ++offset)
+                        {
+                            ItemsControl.ClearAlternationIndex(((RealizedItemBlock)block).ContainerAt(offset));
+                        }
+
+                        block = block.Next;
+                    }
+                }
+            }
+
+            _alternationCount = newAlternationCount;
+        }
+
         //------------------------------------------------------
         //
         //  Internal properties
@@ -947,9 +1002,11 @@ namespace System.Windows.Controls
                             container = _factory._recyclableContainers.Dequeue();
                             isNewlyRealized = false;
                         }
-
-                        // generate container for an item
-                        container = _factory.Host.GetContainerForItem(item, container);
+                        else
+                        {
+                            // generate container for an item
+                            container = _factory.Host.GetContainerForItem(item, container);
+                        }
 
                         // add the (item, container) to the current block
                         if (container != null)
@@ -957,6 +1014,9 @@ namespace System.Windows.Controls
                             ItemContainerGenerator.LinkContainerToItem(container, item);
 
                             _factory.Realize(uBlock, _cachedState.Offset, item, container);
+
+                            // set AlternationIndex on the container (and possibly others)
+                            _factory.SetAlternationIndex(_cachedState.Block, _cachedState.Offset, _direction);
                         }
                     }
                     else
@@ -1315,6 +1375,104 @@ namespace System.Windows.Controls
             // tell generators what happened
             if (MapChanged != null)
                 MapChanged(block, offset, count, newBlock, newOffset, deltaCount);
+        }
+
+        // Set the AlternationIndex on a newly-realized container.  Also, reset
+        // the AlternationIndex on other containers to maintain the adjacency
+        // criterion.
+        void SetAlternationIndex(ItemBlock block, int offset, GeneratorDirection direction)
+        {
+            // If user doesn't request alternation, don't do anything
+            if (_alternationCount <= 0)
+                return;
+
+            int index;
+            RealizedItemBlock rib;
+
+            // Proceed in the direction of generation.  This tends to reach the
+            // end sooner (often in one step).
+            if (direction != GeneratorDirection.Backward)
+            {
+                // Forward.  Back up one container to determine the starting index
+                --offset;
+                while (offset < 0 || block is UnrealizedItemBlock)
+                {
+                    block = block.Prev;
+                    offset = block.ContainerCount - 1;
+                }
+
+                rib = block as RealizedItemBlock;
+                index = (block == _itemMap) ? -1 : ItemsControl.GetAlternationIndex(rib.ContainerAt(offset));
+
+                // loop through the remaining containers, resetting each AlternationIndex
+                for (; ; )
+                {
+                    // advance to next realized container
+                    ++offset;
+                    while (offset == block.ContainerCount)
+                    {
+                        block = block.Next;
+                        offset = 0;
+                    }
+
+                    // exit if we've reached the end
+                    if (block == _itemMap)
+                        break;
+
+                    // advance the AlternationIndex
+                    index = (index + 1) % _alternationCount;
+
+                    // assign it to the container
+                    rib = block as RealizedItemBlock;
+                    ItemsControl.SetAlternationIndex(rib.ContainerAt(offset), index);
+                }
+            }
+            else
+            {
+                // Backward.  Advance one container to determine the starting index
+                ++offset;
+                while (offset >= block.ContainerCount || block is UnrealizedItemBlock)
+                {
+                    block = block.Next;
+                    offset = 0;
+                }
+
+                rib = block as RealizedItemBlock;
+
+                // Get the alternation index for the advanced container. Use value 1 if no container
+                // is found, so that 0 gets used for actual container in question.
+                index = (block == _itemMap) ? 1 : ItemsControl.GetAlternationIndex(rib.ContainerAt(offset));
+
+                // loop through the remaining containers, resetting each AlternationIndex
+                for (; ; )
+                {
+                    // retreat to next realized container
+                    --offset;
+                    while (offset < 0)
+                    {
+                        block = block.Prev;
+                        offset = block.ContainerCount - 1;
+                    }
+
+                    // exit if we've reached the end
+                    if (block == _itemMap)
+                        break;
+
+                    // retreat the AlternationIndex
+                    index = (_alternationCount + index - 1) % _alternationCount;
+
+                    // assign it to the container
+                    rib = block as RealizedItemBlock;
+                    ItemsControl.SetAlternationIndex(rib.ContainerAt(offset), index);
+                }
+            }
+        }
+
+        void SetAlternationCount()
+        {
+            int alternationCount = Host.AlternationCount;
+
+            ChangeAlternationCount(alternationCount);
         }
 
         void GetBlockAndPosition(object item, int itemIndex, bool deletedFromItems, out GeneratorPosition position, out ItemBlock block, out int offsetFromBlockStart, out int correctIndex)
@@ -1713,6 +1871,12 @@ namespace System.Windows.Controls
             // remove the item, and remove the block if it's now empty
             MoveItems(block, offsetFromBlockStart + 1, block.ItemCount - offsetFromBlockStart - 1, block, offsetFromBlockStart, 0);
             --block.ItemCount;
+            if (rib != null)
+            {
+                // fix up the alternation index before removing an empty block, while
+                // we still have a valid block and offset
+                SetAlternationIndex(block, offsetFromBlockStart, GeneratorDirection.Forward);
+            }
             RemoveAndCoalesceBlocksIfNeeded(block);
 
             // tell generators what happened
@@ -1897,6 +2061,17 @@ namespace System.Windows.Controls
                     Realize(uib, offsetFromBlockStart, item, container);
                 }
             }
+
+            // fix up the AlternationIndex on containers affected by the move
+            if (_alternationCount > 0)
+            {
+                // start with the smaller of the two positions, and proceed forward.
+                // This tends to preserve the AlternatonIndex on containers at the
+                // front of the list, as users expect
+                int index = Math.Min(oldIndex, newIndex);
+                GetBlockAndPosition(index, out position, out block, out offsetFromBlockStart);
+                SetAlternationIndex(block, offsetFromBlockStart, GeneratorDirection.Forward);
+            }
         }
 
         // Called when the items collection is refreshed
@@ -1925,6 +2100,7 @@ namespace System.Windows.Controls
         private int _startIndexForUIFromItem;
         private DependencyObject _peer;
         private IList _items;
+        private int _alternationCount;
 
         private Type _containerType;     // type of containers on the recycle queue
         private Queue<DependencyObject> _recyclableContainers = new Queue<DependencyObject>();

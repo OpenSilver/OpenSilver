@@ -28,6 +28,11 @@ internal interface IGeneratorHost
     IList View { get; }
 
     /// <summary>
+    /// The AlternationCount
+    /// </summary>
+    int AlternationCount { get; }
+
+    /// <summary>
     /// Return true if the item is (or should be) its own item container
     /// </summary>
     bool IsItemItsOwnContainer(object item);
