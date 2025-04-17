@@ -895,11 +895,8 @@ namespace System.Windows.Controls
                             // otherwise see if an unclaimed container matches the item
                             object item = info.Item;
                             ItemContainerGenerator.FindItem(
-                                delegate (object o, DependencyObject d)
-                                {
-                                    return ItemsControl.EqualsEx(o, item) &&
-                                      !claimedContainers.Contains(d);
-                                },
+                                static (state, o, d) => EqualsEx(o, state.item) && !state.claimedContainers.Contains(d),
+                                (item, claimedContainers),
                                 out container, out index);
                         }
 

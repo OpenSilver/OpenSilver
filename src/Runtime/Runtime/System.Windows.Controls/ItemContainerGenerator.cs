@@ -481,13 +481,9 @@ namespace System.Windows.Controls
         /// </summary>
         public DependencyObject ContainerFromItem(object item)
         {
-            object dummy;
-            DependencyObject container;
-            int index;
-
             DoLinearSearch(
-                delegate (object o, DependencyObject d) { return ItemsControl.EqualsEx(o, item); },
-                out dummy, out container, out index, false);
+                static (state, o, d) => ItemsControl.EqualsEx(o, state),
+                item, out _, out DependencyObject container, out _, false);
 
             return container;
         }
@@ -512,23 +508,18 @@ namespace System.Windows.Controls
                 throw new ArgumentNullException(nameof(container));
             }
 
-            int index;
-            object item;
-            DependencyObject dummy;
-
             DoLinearSearch(
-                delegate (object o, DependencyObject d) { return (d == container); },
-                out item, out dummy, out index, returnLocalIndex);
+                static (state, o, d) => d == state,
+                container, out _, out _, out int index, returnLocalIndex);
 
             return index;
         }
 
         // expose DoLinearSearch to internal code
-        internal bool FindItem(Func<object, DependencyObject, bool> match,
+        internal bool FindItem<TState>(Func<TState, object, DependencyObject, bool> match, TState matchState,
                 out DependencyObject container, out int itemIndex)
         {
-            object item;
-            return DoLinearSearch(match, out item, out container, out itemIndex, false);
+            return DoLinearSearch(match, matchState, out _, out container, out itemIndex, false);
         }
 
         /// <summary>
@@ -558,6 +549,9 @@ namespace System.Windows.Controls
         /// <param name="match">
         ///     The predicate with which to test each (item, container).
         /// </param>
+        /// <param name="matchState">
+        ///     An object containing information to be used by the callback method, or null.
+        /// </param>
         /// <param name="returnLocalIndex">
         ///     If true, only search at the current level and return an index
         ///         in local coordinates (w.r.t. the current level).
@@ -575,7 +569,7 @@ namespace System.Windows.Controls
         /// <returns>
         ///     true if found, false otherwise.
         /// </returns>
-        private bool DoLinearSearch(Func<object, DependencyObject, bool> match,
+        private bool DoLinearSearch<TState>(Func<TState, object, DependencyObject, bool> match, TState matchState,
                 out object item, out DependencyObject container, out int itemIndex,
                 bool returnLocalIndex)
         {
@@ -635,7 +629,7 @@ namespace System.Windows.Controls
                 {
                     for (; offset < endOffset; ++offset)
                     {
-                        bool found = match(rib.ItemAt(offset), rib.ContainerAt(offset));
+                        bool found = match(matchState, rib.ItemAt(offset), rib.ContainerAt(offset));
 
                         if (found)
                         {
