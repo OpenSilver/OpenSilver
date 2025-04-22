@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.Globalization;
+
 namespace System.Windows.Controls.Primitives
 {
     /// <summary>
@@ -33,6 +35,21 @@ namespace System.Windows.Controls.Primitives
         ItemContainerGenerator GetItemContainerGeneratorForPanel(Panel panel);
 
         /// <summary>
+        /// Prepares the generator to generate items, starting at the specified <see cref="GeneratorPosition"/>, and in 
+        /// the specified <see cref="GeneratorDirection"/>.
+        /// </summary>
+        /// <param name="position">
+        /// A <see cref="GeneratorPosition"/>, that specifies the position of the item to start generating items at.
+        /// </param>
+        /// <param name="direction">
+        /// A <see cref="GeneratorDirection"/> that specifies the direction which to generate items.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> object that tracks the lifetime of the generation process.
+        /// </returns>
+        IDisposable StartAt(GeneratorPosition position, GeneratorDirection direction);
+
+        /// <summary>
         /// Prepares the generator to generate items, starting at the specified <see cref="GeneratorPosition"/>,
         /// and in the specified <see cref="GeneratorDirection"/>, and
         /// controlling whether or not to start at a generated (realized) item.
@@ -51,6 +68,14 @@ namespace System.Windows.Controls.Primitives
         /// An <see cref="IDisposable"/> object that tracks the lifetime of the generation process.
         /// </returns>
         IDisposable StartAt(GeneratorPosition position, GeneratorDirection direction, bool allowStartAtRealizedItem);
+
+        /// <summary>
+        /// Returns the container element used to display the next item.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="DependencyObject"/> that is the container element which is used to display the next item.
+        /// </returns>
+        DependencyObject GenerateNext();
 
         /// <summary>
         /// Returns the container element used to display the next item, and whether the
@@ -119,113 +144,143 @@ namespace System.Windows.Controls.Primitives
 	}
 
     /// <summary>
-    /// A user of the ItemContainerGenerator describes positions using this struct.
-    /// Some examples:
-    /// To start generating forward from the beginning of the item list,
-    /// specify position (-1, 0) and direction Forward.
-    /// To start generating backward from the end of the list,
-    /// specify position (-1, 0) and direction Backward.
-    /// To generate the items after the element with index k, specify
-    /// position (k, 0) and direction Forward.
+    /// <see cref="GeneratorPosition"/> is used to describe the position of an item that is managed by 
+    /// <see cref="ItemContainerGenerator"/>.
     /// </summary>
     public struct GeneratorPosition
     {
         /// <summary>
-        /// Index, with respect to realized elements.  The special value -1
-        /// refers to a fictitious element at the beginning or end of the
-        /// the list.
+        /// Initializes a new instance of <see cref="GeneratorPosition"/> with the specified index and offset.
         /// </summary>
-        public int Index { get { return _index; } set { _index = value; } }
-
-        /// <summary>
-        /// Offset, with respect to unrealized items near the indexed element.
-        /// An offset of 0 refers to the indexed element itself, an offset
-        /// of 1 refers to the next (unrealized) item, and an offset of -1
-        /// refers to the previous item.
-        /// </summary>
-        public int Offset { get { return _offset; } set { _offset = value; } }
-
-        /// <summary> Constructor </summary>
+        /// <param name="index">
+        /// An <see cref="int"/> index that is relative to the generated (realized) items. -1 is a special value that 
+        /// refers to a fictitious item at the beginning or the end of the items list.
+        /// </param>
+        /// <param name="offset">
+        /// An <see cref="int"/> offset that is relative to the ungenerated (unrealized) items near the indexed item. 
+        /// An offset of 0 refers to the indexed element itself, an offset 1 refers to the next ungenerated (unrealized) 
+        /// item, and an offset of -1 refers to the previous item.
+        /// </param>
         public GeneratorPosition(int index, int offset)
         {
-            _index = index;
-            _offset = offset;
+            Index = index;
+            Offset = offset;
         }
 
-        /// <summary> Return a hash code </summary>
-        // This is required by FxCop.
-        public override int GetHashCode()
-        {
-            return _index.GetHashCode() + _offset.GetHashCode();
-        }
+        /// <summary>
+        /// Gets or sets the <see cref="int"/> index that is relative to the generated (realized) items.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="int"/> index that is relative to the generated (realized) items.
+        /// </returns>
+        public int Index { get; set; }
 
-        /// <summary>Returns a string representation of the GeneratorPosition</summary>
-        public override string ToString()
-        {
-            //return string.Concat("GeneratorPosition (", _index.ToString(TypeConverterHelper.InvariantEnglishUS), ",", _offset.ToString(TypeConverterHelper.InvariantEnglishUS), ")");
-            return string.Concat("GeneratorPosition (", _index.ToString(), ",", _offset.ToString());
-        }
+        /// <summary>
+        /// Gets or sets the <see cref="int"/> offset that is relative to the ungenerated (unrealized) items near the indexed item.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="int"/> offset that is relative to the ungenerated (unrealized) items near the indexed item.
+        /// </returns>
+        public int Offset { get; set; }
 
+        /// <summary>
+        /// Returns the hash code for this <see cref="GeneratorPosition"/>.
+        /// </summary>
+        /// <returns>
+        /// The hash code for this <see cref="GeneratorPosition"/>.
+        /// </returns>
+        public override int GetHashCode() => Index.GetHashCode() + Offset.GetHashCode();
 
-        // The remaining methods are present only because they are required by FxCop.
+        /// <summary>
+        /// Returns a string representation of this instance of <see cref="GeneratorPosition"/>.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this instance of <see cref="GeneratorPosition"/>.
+        /// </returns>
+        public override string ToString() =>
+            string.Concat("GeneratorPosition (", Index.ToString(CultureInfo.InvariantCulture), ",", Offset.ToString(CultureInfo.InvariantCulture));
 
-        /// <summary> Equality test </summary>
-        // This is required by FxCop.
-        public override bool Equals(object o)
-        {
-            if (o is GeneratorPosition)
-            {
-                GeneratorPosition that = (GeneratorPosition)o;
-                return this._index == that._index &&
-                        this._offset == that._offset;
-            }
-            return false;
-        }
+        /// <summary>
+        /// Compares the specified instance and the current instance of <see cref="GeneratorPosition"/> for value equality.
+        /// </summary>
+        /// <param name="o">
+        /// The <see cref="GeneratorPosition"/> instance to compare.
+        /// </param>
+        /// <returns>
+        /// true if o and this instance of <see cref="GeneratorPosition"/> have the same values.
+        /// </returns>
+        public override bool Equals(object o) => o is GeneratorPosition that && this == that;
 
-        /// <summary> Equality test </summary>
-        // This is required by FxCop.
-        public static bool operator ==(GeneratorPosition gp1, GeneratorPosition gp2)
-        {
-            return gp1._index == gp2._index &&
-                    gp1._offset == gp2._offset;
-        }
+        /// <summary>
+        /// Compares two <see cref="GeneratorPosition"/> objects for value equality.
+        /// </summary>
+        /// <param name="gp1">
+        /// The first instance to compare.
+        /// </param>
+        /// <param name="gp2">
+        /// The second instance to compare.
+        /// </param>
+        /// <returns>
+        /// true if the two objects are equal; otherwise, false.
+        /// </returns>
+        public static bool operator ==(GeneratorPosition gp1, GeneratorPosition gp2) => gp1.Index == gp2.Index && gp1.Offset == gp2.Offset;
 
-        /// <summary> Inequality test </summary>
-        // This is required by FxCop.
-        public static bool operator !=(GeneratorPosition gp1, GeneratorPosition gp2)
-        {
-            return !(gp1 == gp2);
-        }
-
-        private int _index;
-        private int _offset;
+        /// <summary>
+        /// Compares two <see cref="GeneratorPosition"/> objects for value inequality.
+        /// </summary>
+        /// <param name="gp1">
+        /// The first instance to compare.
+        /// </param>
+        /// <param name="gp2">
+        /// The second instance to compare.
+        /// </param>
+        /// <returns>
+        /// true if the values are not equal; otherwise, false.
+        /// </returns>
+        public static bool operator !=(GeneratorPosition gp1, GeneratorPosition gp2) => !(gp1 == gp2);
     }
 
     /// <summary>
-    /// This enum is used by the ItemContainerGenerator and its client to specify
-    /// the direction in which the generator produces UI.
+    /// Specifies the direction in which item generation will occur. <see cref="GeneratorDirection"/>
+    /// is used by <see cref="IItemContainerGenerator.StartAt(GeneratorPosition, GeneratorDirection)"/> and
+    /// <see cref="IItemContainerGenerator.StartAt(GeneratorPosition, GeneratorDirection, bool)"/>.
     /// </summary>
     public enum GeneratorDirection
     {
-        /// <summary> generate forward through the item collection </summary>
+        /// <summary>
+        /// Specifies to generate items in a forward direction.
+        /// </summary>
         Forward,
 
-        /// <summary> generate backward through the item collection </summary>
-        Backward
+        /// <summary>
+        /// Specifies to generate items in a backward direction.
+        /// </summary>
+        Backward,
     }
 
     /// <summary>
-    /// This enum is used by the ItemContainerGenerator to indicate its status.
+    /// Used by <see cref="ItemContainerGenerator"/> to indicate the status of its item generation.
     /// </summary>
-    internal enum GeneratorStatus
+    public enum GeneratorStatus
     {
-        ///<summary>The generator has not tried to generate content</summary>
+        /// <summary>
+        /// The generator has not tried to generate content.
+        /// </summary>
         NotStarted,
-        ///<summary>The generator is generating containers</summary>
+
+        /// <summary>
+        ///  The generator is generating containers.
+        /// </summary>
         GeneratingContainers,
-        ///<summary>The generator has finished generating containers</summary>
+
+        /// <summary>
+        /// The generator has finished generating containers.
+        /// </summary>
         ContainersGenerated,
-        ///<summary>The generator has finished generating containers, but encountered one or more errors</summary>
-        Error
+
+        /// <summary>
+        /// The generator has finished generating containers, but encountered one or more errors.
+        /// </summary>
+        Error,
     }
 }

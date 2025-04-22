@@ -13,6 +13,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;   // IItemContainerGenerator
@@ -66,8 +67,13 @@ namespace System.Windows.Controls
         //
         //------------------------------------------------------
 
-        /// <summary> The status of the generator </summary>
-        internal GeneratorStatus Status
+        /// <summary>
+        /// The generation status of the <see cref="ItemContainerGenerator"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="GeneratorStatus"/> value that represents the generation status of the <see cref="ItemContainerGenerator"/>.
+        /// </returns>
+        public GeneratorStatus Status
         {
             get { return _status; }
         }
@@ -80,6 +86,26 @@ namespace System.Windows.Controls
 
                 if (StatusChanged != null)
                     StatusChanged(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Gets the collection of items that belong to this <see cref="ItemContainerGenerator"/>.
+        /// </summary>
+        /// <returns>
+        /// The collection of items that belong to this <see cref="ItemContainerGenerator"/>.
+        /// </returns>
+        public ReadOnlyCollection<object> Items
+        {
+            get
+            {
+                // lazy creation
+                if (_itemsReadOnly == null && _items != null)
+                {
+                    _itemsReadOnly = new ReadOnlyCollection<object>(new ListOfObject(_items));
+                }
+
+                return _itemsReadOnly;
             }
         }
 
@@ -120,6 +146,19 @@ namespace System.Windows.Controls
         /// the IDisposable is disposed, the status changes to ContentReady or
         /// Error, as appropriate.
         /// </remarks>
+        IDisposable IItemContainerGenerator.StartAt(GeneratorPosition position, GeneratorDirection direction)
+        {
+            return ((IItemContainerGenerator)this).StartAt(position, direction, false);
+        }
+
+        /// <summary> Begin generating at the given position and direction </summary>
+        /// <remarks>
+        /// This method must be called before calling GenerateNext.  It returns an
+        /// IDisposable object that tracks the lifetime of the generation loop.
+        /// This method sets the generator's status to GeneratingContent;  when
+        /// the IDisposable is disposed, the status changes to ContentReady or
+        /// Error, as appropriate.
+        /// </remarks>
         IDisposable IItemContainerGenerator.StartAt(GeneratorPosition position, GeneratorDirection direction, bool allowStartAtRealizedItem)
         {
             if (_generator != null)
@@ -127,6 +166,28 @@ namespace System.Windows.Controls
 
             _generator = new Generator(this, position, direction, allowStartAtRealizedItem);
             return _generator;
+        }
+
+        /// <summary>
+        /// Returns an object that manages the <see cref="Status"/> property.
+        /// </summary>
+        /// <returns>
+        /// An object that manages the <see cref="Status"/> property.
+        /// </returns>
+        public IDisposable GenerateBatches()
+        {
+            if (_isGeneratingBatches)
+                throw new InvalidOperationException(Strings.GenerationInProgress);
+
+            return new BatchGenerator(this);
+        }
+
+        DependencyObject IItemContainerGenerator.GenerateNext()
+        {
+            if (_generator == null)
+                throw new InvalidOperationException(Strings.GenerationNotInProgress);
+
+            return _generator.GenerateNext(true, out _);
         }
 
         DependencyObject IItemContainerGenerator.GenerateNext(out bool isNewlyRealized)
@@ -489,19 +550,41 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Given a generated UI element, return the index of the corresponding item
-        /// within the ItemCollection.
+        /// Returns the index to an item that corresponds to the specified, generated <see cref="UIElement"/>.
         /// </summary>
+        /// <param name="container">
+        /// The <see cref="DependencyObject"/> that corresponds to the item to the index to be returned.
+        /// </param>
+        /// <returns>
+        /// An <see cref="int"/> index to an item that corresponds to the specified, generated <see cref="UIElement"/> 
+        /// or -1 if container is not found.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="container"/> is null.
+        /// </exception>
         public int IndexFromContainer(DependencyObject container)
         {
             return IndexFromContainer(container, false);
         }
 
         /// <summary>
-        /// Given a generated UI element, return the index of the corresponding item
-        /// within the ItemCollection.
+        /// Returns the index to an item that corresponds to the specified, generated <see cref="UIElement"/>,
+        /// optionally recursively searching hierarchical items.
         /// </summary>
-        internal int IndexFromContainer(DependencyObject container, bool returnLocalIndex)
+        /// <param name="container">
+        /// The <see cref="DependencyObject"/> that corresponds to the item to the index to be returned.
+        /// </param>
+        /// <param name="returnLocalIndex">
+        /// true to search the current level of hierarchical items; false to recursively search hierarchical items.
+        /// </param>
+        /// <returns>
+        /// An <see cref="int"/> index to an item that corresponds to the specified, generated <see cref="UIElement"/> 
+        /// or -1 if container is not found.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="container"/> is null.
+        /// </exception>
+        public int IndexFromContainer(DependencyObject container, bool returnLocalIndex)
         {
             if (container == null)
             {
@@ -768,16 +851,16 @@ namespace System.Windows.Controls
         //------------------------------------------------------
 
         /// <summary>
-        /// The ItemsChanged event is raised by a ItemContainerGenerator to inform
-        /// layouts that the items collection has changed.
+        /// The <see cref="ItemsChanged"/> event is raised by a <see cref="ItemContainerGenerator"/> to inform layouts that the
+        /// items collection has changed.
         /// </summary>
         public event ItemsChangedEventHandler ItemsChanged;
 
         /// <summary>
-        /// The StatusChanged event is raised by a ItemContainerGenerator to inform
-        /// controls that its status has changed.
+        /// The <see cref="StatusChanged"/> event is raised by a <see cref="ItemContainerGenerator"/> to inform controls that 
+        /// its status has changed.
         /// </summary>
-        internal event EventHandler StatusChanged;
+        public event EventHandler StatusChanged;
 
         //------------------------------------------------------
         //
@@ -907,7 +990,7 @@ namespace System.Windows.Controls
         ///     Generator is the object that generates UI on behalf of an ItemsControl,
         ///     working under the supervision of an ItemContainerGenerator.
         /// </summary>
-        private class Generator : IDisposable
+        private sealed class Generator : IDisposable
         {
             //------------------------------------------------------
             //
@@ -1049,7 +1132,10 @@ namespace System.Windows.Controls
                 {
                     _factory.MapChanged -= new MapChangedHandler(OnMapChanged);
                     _done = true;
-                    _factory.SetStatus(GeneratorStatus.ContainersGenerated);
+                    if (!_factory._isGeneratingBatches)
+                    {
+                        _factory.SetStatus(GeneratorStatus.ContainersGenerated);
+                    }
                     _factory._generator = null;
                     _factory = null;
                 }
@@ -1153,6 +1239,29 @@ namespace System.Windows.Controls
             GeneratorDirection _direction;
             bool _done;
             GeneratorState _cachedState;
+        }
+
+        private sealed class BatchGenerator : IDisposable
+        {
+            public BatchGenerator(ItemContainerGenerator factory)
+            {
+                _factory = factory;
+                _factory._isGeneratingBatches = true;
+                _factory.SetStatus(GeneratorStatus.GeneratingContainers);
+            }
+
+            void IDisposable.Dispose()
+            {
+                if (_factory != null)
+                {
+                    _factory._isGeneratingBatches = false;
+                    _factory.SetStatus(GeneratorStatus.ContainersGenerated);
+                    _factory = null;
+                }
+                GC.SuppressFinalize(this);
+            }
+
+            private ItemContainerGenerator _factory;
         }
 
         //------------------------------------------------------
@@ -2094,15 +2203,17 @@ namespace System.Windows.Controls
         private int _startIndexForUIFromItem;
         private DependencyObject _peer;
         private IList _items;
+        private ReadOnlyCollection<object> _itemsReadOnly;
         private int _alternationCount;
 
         private Type _containerType;     // type of containers on the recycle queue
         private Queue<DependencyObject> _recyclableContainers = new Queue<DependencyObject>();
 
-        event MapChangedHandler MapChanged;
+        private bool _isGeneratingBatches;
 
-        delegate void MapChangedHandler(ItemBlock block, int offset, int count,
-                    ItemBlock newBlock, int newOffset, int deltaCount);
+        private event MapChangedHandler MapChanged;
+
+        delegate void MapChangedHandler(ItemBlock block, int offset, int count, ItemBlock newBlock, int newOffset, int deltaCount);
 
         //------------------------------------------------------
         //
@@ -2255,7 +2366,7 @@ namespace System.Windows.Controls
         }
 
         // represents a block of unrealized (ungenerated) items
-        private class UnrealizedItemBlock : ItemBlock
+        private sealed class UnrealizedItemBlock : ItemBlock
         {
             public override int ContainerCount { get { return 0; } }
 
@@ -2266,7 +2377,7 @@ namespace System.Windows.Controls
         }
 
         // represents a block of realized (generated) items
-        private class RealizedItemBlock : ItemBlock
+        private sealed class RealizedItemBlock : ItemBlock
         {
             public override int ContainerCount { get { return ItemCount; } }
 
@@ -2355,26 +2466,81 @@ namespace System.Windows.Controls
         // an entry in the table maintained by RealizedItemBlock
         private struct BlockEntry
         {
-            public object Item { get { return _item; } set { _item = value; } }
-            public DependencyObject Container { get { return _container; } set { _container = value; } }
-
-            private object _item;
-            private DependencyObject _container;
+            public object Item { get; set; }
+            public DependencyObject Container { get; set; }
         }
 
         // cached state of the factory's item map (updated by factory)
         // used to speed up calls to Generate
         private struct GeneratorState
         {
-            public ItemBlock Block { get { return _block; } set { _block = value; } }
-            public int Offset { get { return _offset; } set { _offset = value; } }
-            public int Count { get { return _count; } set { _count = value; } }
-            public int ItemIndex { get { return _itemIndex; } set { _itemIndex = value; } }
+            public ItemBlock Block { get; set; } // some block in the map (most recently used)
+            public int Offset { get; set; } // offset with the block
+            public int Count { get; set; } // cumulative item count of blocks before the cached one
+            public int ItemIndex { get; set; } // index of current item
+        }
 
-            private ItemBlock _block;     // some block in the map (most recently used)
-            private int _offset;    // offset with the block
-            private int _count;     // cumulative item count of blocks before the cached one
-            private int _itemIndex; // index of current item
+        private sealed class ListOfObject : IList<object>
+        {
+            private readonly IList _list;
+
+            internal ListOfObject(IList list)
+            {
+                Debug.Assert(_list is not null);
+                _list = list;
+            }
+
+            int IList<object>.IndexOf(object item) => _list.IndexOf(item);
+
+            void IList<object>.Insert(int index, object item) => throw new NotImplementedException();
+
+            void IList<object>.RemoveAt(int index) => throw new NotImplementedException();
+
+            object IList<object>.this[int index]
+            {
+                get => _list[index];
+                set => throw new NotImplementedException();
+            }
+
+            void ICollection<object>.Add(object item) => throw new NotImplementedException();
+
+            void ICollection<object>.Clear() => throw new NotImplementedException();
+
+            bool ICollection<object>.Contains(object item) => _list.Contains(item);
+
+            void ICollection<object>.CopyTo(object[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
+
+            int ICollection<object>.Count => _list.Count;
+
+            bool ICollection<object>.IsReadOnly => true;
+
+            bool ICollection<object>.Remove(object item) => throw new NotImplementedException();
+
+            IEnumerator<object> IEnumerable<object>.GetEnumerator() => GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            private ObjectEnumerator GetEnumerator() => new(_list);
+
+            private sealed class ObjectEnumerator : IEnumerator<object>
+            {
+                private IEnumerator _ie;
+
+                public ObjectEnumerator(IList list)
+                {
+                    _ie = list.GetEnumerator();
+                }
+
+                object IEnumerator<object>.Current => _ie.Current;
+
+                void IDisposable.Dispose() => _ie = null;
+
+                object IEnumerator.Current => _ie.Current;
+
+                bool IEnumerator.MoveNext() => _ie.MoveNext();
+
+                void IEnumerator.Reset() => _ie.Reset();
+            }
         }
     }
 }
