@@ -1277,12 +1277,9 @@ namespace System.Windows.Controls
         {
             if (TextBox != null)
             {
-#if SILVERLIGHT
                 TextBox.RemoveHandler(TextBox.TextInputStartEvent, new TextCompositionEventHandler(OnTextBoxTextInputStart));
                 TextBox.RemoveHandler(TextBox.TextInputEvent, new TextCompositionEventHandler(OnTextBoxTextInput));
-#else
                 TextBox.PreviewKeyDown -= OnTextBoxPreviewKeyDown;
-#endif
             }
 
             if (DropDownPopup != null)
@@ -1312,12 +1309,9 @@ namespace System.Windows.Controls
             TextBox = GetTemplateChild(AutoCompleteBox.ElementTextBox) as TextBox;
             if (TextBox != null)
             {
-#if SILVERLIGHT
                 TextBox.AddHandler(TextBox.TextInputStartEvent, new TextCompositionEventHandler(OnTextBoxTextInputStart), true);
                 TextBox.AddHandler(TextBox.TextInputEvent, new TextCompositionEventHandler(OnTextBoxTextInput), true);
-#else
                 TextBox.PreviewKeyDown += OnTextBoxPreviewKeyDown;
-#endif
             }
 
             Interaction.OnApplyTemplateBase();
@@ -1434,7 +1428,6 @@ namespace System.Windows.Controls
 #endif
         }
 
-#if !SILVERLIGHT
         /// <summary>
         /// Handles the PreviewKeyDown event on the TextBox for WPF. This method
         /// is not implemented for Silverlight.
@@ -1445,7 +1438,6 @@ namespace System.Windows.Controls
         {
             OnKeyDown(e);
         }
-#endif
 
         /// <summary>
         /// Connects to the DropDownPopup Closed event.
@@ -1531,7 +1523,7 @@ namespace System.Windows.Controls
         {
             DependencyObject focused =
 #if SILVERLIGHT
- FocusManager.GetFocusedElement() as DependencyObject;
+                FocusManager.GetFocusedElement() as DependencyObject;
 #else
                 FocusManager.GetFocusedElement(this) as DependencyObject;
 #endif
