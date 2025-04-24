@@ -55,6 +55,11 @@ public interface IInputElement
     bool IsMouseCaptured { get; }
 
     /// <summary>
+    /// Occurs when the right mouse button is released while the mouse pointer is over this element.
+    /// </summary>
+    event MouseButtonEventHandler PreviewMouseRightButtonUp;
+
+    /// <summary>
     /// Occurs when the right mouse button is released while the mouse pointer is over the element.
     /// </summary>
     event MouseButtonEventHandler MouseRightButtonUp;
@@ -102,7 +107,17 @@ public interface IInputElement
     /// <summary>
     /// Occurs when the left mouse button is pressed while the mouse pointer is over the element.
     /// </summary>
+    event MouseButtonEventHandler PreviewMouseLeftButtonDown;
+
+    /// <summary>
+    /// Occurs when the left mouse button is pressed while the mouse pointer is over the element.
+    /// </summary>
     event MouseButtonEventHandler MouseLeftButtonDown;
+
+    /// <summary>
+    /// Occurs when the left mouse button is released while the mouse pointer is over the element.
+    /// </summary>
+    event MouseButtonEventHandler PreviewMouseLeftButtonUp;
 
     /// <summary>
     /// Occurs when the left mouse button is released while the mouse pointer is over the element.
@@ -112,12 +127,27 @@ public interface IInputElement
     /// <summary>
     /// Occurs when the mouse pointer moves while the mouse pointer is over the element.
     /// </summary>
+    event MouseEventHandler PreviewMouseMove;
+
+    /// <summary>
+    /// Occurs when the mouse pointer moves while the mouse pointer is over the element.
+    /// </summary>
     event MouseEventHandler MouseMove;
+
+    /// <summary>
+    /// Occurs when the right mouse button is pressed while the mouse pointer is over this element.
+    /// </summary>
+    event MouseButtonEventHandler PreviewMouseRightButtonDown;
 
     /// <summary>
     /// Occurs when the right mouse button is pressed while the mouse pointer is over the element.
     /// </summary>
     event MouseButtonEventHandler MouseRightButtonDown;
+
+    /// <summary>
+    /// Occurs when the mouse wheel moves while the mouse pointer is over this element.
+    /// </summary>
+    event MouseWheelEventHandler PreviewMouseWheel;
 
     /// <summary>
     /// Occurs when the mouse wheel moves while the mouse pointer is over this element.
@@ -194,17 +224,12 @@ public interface IInputElement
     // event StylusDownEventHandler PreviewStylusDown;
     // event StylusButtonEventHandler PreviewStylusButtonUp;
     // event StylusButtonEventHandler PreviewStylusButtonDown;
-    // event MouseWheelEventHandler PreviewMouseWheel;
-    // event MouseButtonEventHandler PreviewMouseRightButtonUp;
-    // event MouseButtonEventHandler PreviewMouseRightButtonDown;
-    // event MouseEventHandler PreviewMouseMove;
     // event StylusEventHandler PreviewStylusOutOfRange;
     // event StylusSystemGestureEventHandler PreviewStylusSystemGesture;
     // event StylusDownEventHandler StylusDown;
     // event TextCompositionEventHandler PreviewTextInput;
     // event StylusButtonEventHandler StylusButtonDown;
     // event StylusButtonEventHandler StylusButtonUp;
-    // event MouseButtonEventHandler PreviewMouseLeftButtonUp;
     // event StylusEventHandler StylusEnter;
     // event StylusEventHandler StylusInAirMove;
     // event StylusEventHandler StylusInRange;
@@ -213,7 +238,6 @@ public interface IInputElement
     // event StylusEventHandler StylusOutOfRange;
     // event StylusSystemGestureEventHandler StylusSystemGesture;
     // event StylusEventHandler PreviewStylusUp;
-    // event MouseButtonEventHandler PreviewMouseLeftButtonDown;
     // event KeyboardFocusChangedEventHandler GotKeyboardFocus;
     // event StylusEventHandler GotStylusCapture;
     // event KeyboardFocusChangedEventHandler PreviewLostKeyboardFocus;

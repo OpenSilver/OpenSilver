@@ -511,19 +511,41 @@ internal sealed class InputManager
 
     private void ProcessOnMouseMove(UIElement uie, PointerCallbackParameters parameters)
     {
-        if (uie.MouseTarget is UIElement mouseTarget)
+        if (uie.MouseTarget is not UIElement mouseTarget)
         {
-            ProcessPointerEvent(mouseTarget, Mouse.MouseMoveEvent, parameters);
+            return;
         }
+
+        var previewMove = new MouseEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.PreviewMouseMoveEvent,
+            Source = mouseTarget,
+            UIEventArg = parameters.UIEventArg,
+        };
+
+        mouseTarget.RaiseTrustedEvent(previewMove);
+
+        if (previewMove.Handled)
+        {
+            return;
+        }
+
+        var move = new MouseEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.MouseMoveEvent,
+            Source = mouseTarget,
+            UIEventArg = parameters.UIEventArg,
+        };
+
+        mouseTarget.RaiseTrustedEvent(move);
     }
 
     private void ProcessOnMouseLeftButtonDown(UIElement uie, PointerCallbackParameters parameters)
     {
         if (uie.MouseTarget is UIElement mouseTarget)
         {
-            ProcessMouseButtonEvent(
+            ProcessMouseDownEvent(
                 mouseTarget,
-                Mouse.MouseDownEvent,
                 parameters,
                 MouseButton.Left,
                 refreshClickCount: true,
@@ -547,9 +569,8 @@ internal sealed class InputManager
     {
         if (uie.MouseTarget is UIElement mouseTarget)
         {
-            bool handled = ProcessMouseButtonEvent(
+            bool handled = ProcessMouseDownEvent(
                 mouseTarget,
-                Mouse.MouseDownEvent,
                 parameters,
                 MouseButton.Right,
                 refreshClickCount: true,
@@ -576,9 +597,8 @@ internal sealed class InputManager
     {
         if (uie.MouseTarget is UIElement mouseTarget)
         {
-            ProcessMouseButtonEvent(
+            ProcessMouseDownEvent(
                 mouseTarget,
-                Mouse.MouseDownEvent,
                 parameters,
                 MouseButton.Middle,
                 refreshClickCount: true,
@@ -601,40 +621,73 @@ internal sealed class InputManager
             int delta = OpenSilver.Interop.ExecuteJavaScriptDouble(
                 $"{OpenSilver.Interop.GetVariableStringForJS(parameters.UIEventArg)}.deltaY", false) > 0 ? -120 : 120;
 
-            var e = new MouseWheelEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY, delta)
+            var previewWheel = new MouseWheelEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY, delta)
+            {
+                RoutedEvent = Mouse.PreviewMouseWheelEvent,
+                Source = mouseTarget,
+                UIEventArg = parameters.UIEventArg,
+            };
+
+            mouseTarget.RaiseTrustedEvent(previewWheel);
+
+            if (previewWheel.Handled)
+            {
+                previewWheel.PreventDefault();
+                return;
+            }
+
+            var wheel = new MouseWheelEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY, delta)
             {
                 RoutedEvent = Mouse.MouseWheelEvent,
                 Source = mouseTarget,
                 UIEventArg = parameters.UIEventArg,
             };
 
-            mouseTarget.RaiseTrustedEvent(e);
+            mouseTarget.RaiseTrustedEvent(wheel);
 
-            if (e.Handled)
+            if (wheel.Handled)
             {
-                e.PreventDefault();
+                wheel.PreventDefault();
             }
         }
     }
 
     private void ProcessOnMouseEnter(UIElement uie, PointerCallbackParameters parameters)
     {
-        if (uie.MouseTarget is UIElement mouseTarget)
+        if (uie.MouseTarget is not UIElement mouseTarget)
         {
-            mouseTarget.SetValueInternal(UIElement.IsMouseOverPropertyKey, true);
-
-            ProcessPointerEvent(mouseTarget, Mouse.MouseEnterEvent, parameters);
+            return;
         }
+
+        mouseTarget.SetValueInternal(UIElement.IsMouseOverPropertyKey, true);
+
+        var mouseEnter = new MouseEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.MouseEnterEvent,
+            Source = mouseTarget,
+            UIEventArg = parameters.UIEventArg,
+        };
+
+        mouseTarget.RaiseTrustedEvent(mouseEnter);
     }
 
     private void ProcessOnMouseLeave(UIElement uie, PointerCallbackParameters parameters)
     {
-        if (uie.MouseTarget is UIElement mouseTarget)
+        if (uie.MouseTarget is not UIElement mouseTarget)
         {
-            mouseTarget.ClearValue(UIElement.IsMouseOverPropertyKey);
-
-            ProcessPointerEvent(mouseTarget, Mouse.MouseLeaveEvent, parameters);
+            return;
         }
+
+        mouseTarget.ClearValue(UIElement.IsMouseOverPropertyKey);
+
+        var mouseLeave = new MouseEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.MouseLeaveEvent,
+            Source = mouseTarget,
+            UIEventArg = parameters.UIEventArg,
+        };
+
+        mouseTarget.RaiseTrustedEvent(mouseLeave);
     }
 
     private void ProcessOnKeyDown(UIElement uie, object jsEventArg)
@@ -833,62 +886,78 @@ internal sealed class InputManager
         }
     }
 
-    private void ProcessPointerEvent(UIElement uie, RoutedEvent routedEvent, PointerCallbackParameters parameters)
-    {
-        var e = new MouseEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
-        {
-            RoutedEvent = routedEvent,
-            Source = uie,
-            UIEventArg = parameters.UIEventArg,
-        };
-
-        uie.RaiseTrustedEvent(e);
-    }
-
-    private bool ProcessMouseUpEvent(UIElement uie, PointerCallbackParameters parameters, MouseButton button)
-    {
-        var e = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
-        {
-            RoutedEvent = Mouse.MouseUpEvent,
-            Source = uie,
-            UIEventArg = parameters.UIEventArg,
-        };
-
-        uie.RaiseTrustedEvent(e);
-
-        CommandManager.InvalidateRequerySuggested();
-
-        return e.Handled;
-    }
-
-    private bool ProcessMouseButtonEvent(
+    private bool ProcessMouseDownEvent(
         UIElement uie,
-        RoutedEvent routedEvent,
         PointerCallbackParameters parameters,
         MouseButton button,
         bool refreshClickCount,
         bool closeToolTips)
     {
-        var e = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        if (closeToolTips)
         {
-            RoutedEvent = routedEvent,
+            ToolTipService.OnMouseButtonDown();
+        }
+
+        var previewMouseDown = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.PreviewMouseDownEvent,
             Source = uie,
             UIEventArg = parameters.UIEventArg,
         };
 
         if (refreshClickCount)
         {
-            e.ClickCount = RefreshClickCount(button, Environment.TickCount, e.GetPosition(null));
+            previewMouseDown.ClickCount = RefreshClickCount(button, Environment.TickCount, previewMouseDown.GetPosition(null));
         }
 
-        if (closeToolTips)
+        uie.RaiseTrustedEvent(previewMouseDown);
+
+        if (previewMouseDown.Handled)
         {
-            ToolTipService.OnMouseButtonDown(e);
+            return true;
         }
 
-        uie.RaiseTrustedEvent(e);
+        var mouseDown = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.MouseDownEvent,
+            Source = uie,
+            UIEventArg = parameters.UIEventArg,
+            ClickCount = previewMouseDown.ClickCount,
+        };
 
-        return e.Handled;
+        uie.RaiseTrustedEvent(mouseDown);
+
+        return mouseDown.Handled;
+    }
+
+    private bool ProcessMouseUpEvent(UIElement uie, PointerCallbackParameters parameters, MouseButton button)
+    {
+        var previewMouseUp = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.PreviewMouseUpEvent,
+            Source = uie,
+            UIEventArg = parameters.UIEventArg,
+        };
+
+        uie.RaiseTrustedEvent(previewMouseUp);
+
+        if (previewMouseUp.Handled)
+        {
+            return true;
+        }
+
+        var mouseUp = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        {
+            RoutedEvent = Mouse.MouseUpEvent,
+            Source = uie,
+            UIEventArg = parameters.UIEventArg,
+        };
+
+        uie.RaiseTrustedEvent(mouseUp);
+
+        CommandManager.InvalidateRequerySuggested();
+
+        return mouseUp.Handled;
     }
 
     private void ProcessOnTapped(UIElement uie, PointerCallbackParameters parameters)

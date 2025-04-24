@@ -30,13 +30,21 @@ namespace System.Windows
 
         private static void RegisterEvents()
         {
+            EventManager.RegisterClassHandler<UIElement>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDownThunk), true);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseDownEvent, new MouseButtonEventHandler(OnMouseDownThunk), true);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.PreviewMouseUpEvent, new MouseButtonEventHandler(OnPreviewMouseUpThunk), true);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseUpEvent, new MouseButtonEventHandler(OnMouseUpThunk), true);
+            EventManager.RegisterClassHandler<UIElement>(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPreviewMouseLeftButtonDownThunk), false);
             EventManager.RegisterClassHandler<UIElement>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseLeftButtonDownThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler(OnPreviewMouseLeftButtonUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnMouseLeftButtonUpThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(PreviewMouseRightButtonDownEvent, new MouseButtonEventHandler(OnPreviewMouseRightButtonDownThunk), false);
             EventManager.RegisterClassHandler<UIElement>(MouseRightButtonDownEvent, new MouseButtonEventHandler(OnMouseRightButtonDownThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(PreviewMouseRightButtonUpEvent, new MouseButtonEventHandler(OnPreviewMouseRightButtonUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(MouseRightButtonUpEvent, new MouseButtonEventHandler(OnMouseRightButtonUpThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.PreviewMouseMoveEvent, new MouseEventHandler(OnPreviewMouseMoveThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseMoveEvent, new MouseEventHandler(OnMouseMoveThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.PreviewMouseWheelEvent, new MouseWheelEventHandler(OnPreviewMouseWheelThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseWheelEvent, new MouseWheelEventHandler(OnMouseWheelThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnterThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk), false);
@@ -57,6 +65,19 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(CommandManager.CanExecuteEvent, new CanExecuteRoutedEventHandler(OnCanExecuteThunk), false);
         }
 
+        private static void OnPreviewMouseDownThunk(object sender, MouseButtonEventArgs e)
+        {
+            UIElement uie = (UIElement)sender;
+
+            if (!e.Handled)
+            {
+                uie.OnPreviewMouseDown(e);
+            }
+
+            // Always raise this "sub-event", but we pass along the handledness.
+            CrackMouseButtonEventAndReRaiseEvent(uie, e);
+        }
+
         private static void OnMouseDownThunk(object sender, MouseButtonEventArgs e)
         {
             UIElement uie = (UIElement)sender;
@@ -69,6 +90,19 @@ namespace System.Windows
             if (!e.Handled)
             {
                 uie.OnMouseDown(e);
+            }
+
+            // Always raise this "sub-event", but we pass along the handledness.
+            CrackMouseButtonEventAndReRaiseEvent(uie, e);
+        }
+
+        private static void OnPreviewMouseUpThunk(object sender, MouseButtonEventArgs e)
+        {
+            UIElement uie = (UIElement)sender;
+
+            if (!e.Handled)
+            {
+                uie.OnPreviewMouseUp(e);
             }
 
             // Always raise this "sub-event", but we pass along the handledness.
@@ -88,11 +122,19 @@ namespace System.Windows
             CrackMouseButtonEventAndReRaiseEvent(uie, e);
         }
 
+        private static void OnPreviewMouseMoveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnPreviewMouseMove(e);
+
         private static void OnMouseMoveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseMove(e);
+
+        private static void OnPreviewMouseLeftButtonDownThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnPreviewMouseLeftButtonDown(e);
 
         private static void OnMouseLeftButtonDownThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseLeftButtonDown(e);
 
+        private static void OnPreviewMouseRightButtonDownThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnPreviewMouseRightButtonDown(e);
+
         private static void OnMouseRightButtonDownThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonDown(e);
+
+        private static void OnPreviewMouseWheelThunk(object sender, MouseWheelEventArgs e) => ((UIElement)sender).OnPreviewMouseWheel(e);
 
         private static void OnMouseWheelThunk(object sender, MouseWheelEventArgs e)
         {
@@ -106,7 +148,13 @@ namespace System.Windows
             }
         }
 
+        private static void OnPreviewMouseLeftButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnPreviewMouseLeftButtonUp(e);
+
         private static void OnMouseLeftButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseLeftButtonUp(e);
+
+        private static void OnPreviewMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnPreviewMouseRightButtonDown(e);
+
+        private static void OnMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonUp(e);
 
         private static void OnMouseEnterThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseEnter(e);
 
@@ -117,8 +165,6 @@ namespace System.Windows
         private static void OnTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInput(e);
 
         private static void OnTappedThunk(object sender, TappedRoutedEventArgs e) => ((UIElement)sender).OnTapped(e);
-
-        private static void OnMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonUp(e);
 
         private static void OnPreviewKeyDownThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnPreviewKeyDown(e);
 
@@ -373,9 +419,17 @@ namespace System.Windows
             switch (e.ChangedButton)
             {
                 case MouseButton.Left:
-                    if (e.RoutedEvent == Mouse.MouseDownEvent)
+                    if (e.RoutedEvent == Mouse.PreviewMouseDownEvent)
+                    {
+                        newEvent = PreviewMouseLeftButtonDownEvent;
+                    }
+                    else if (e.RoutedEvent == Mouse.MouseDownEvent)
                     {
                         newEvent = MouseLeftButtonDownEvent;
+                    }
+                    else if (e.RoutedEvent == Mouse.PreviewMouseUpEvent)
+                    {
+                        newEvent = PreviewMouseLeftButtonUpEvent;
                     }
                     else
                     {
@@ -383,9 +437,17 @@ namespace System.Windows
                     }
                     break;
                 case MouseButton.Right:
-                    if (e.RoutedEvent == Mouse.MouseDownEvent)
+                    if (e.RoutedEvent == Mouse.PreviewMouseDownEvent)
+                    {
+                        newEvent = PreviewMouseRightButtonDownEvent;
+                    }
+                    else if (e.RoutedEvent == Mouse.MouseDownEvent)
                     {
                         newEvent = MouseRightButtonDownEvent;
+                    }
+                    else if (e.RoutedEvent == Mouse.PreviewMouseUpEvent)
+                    {
+                        newEvent = PreviewMouseRightButtonUpEvent;
                     }
                     else
                     {
@@ -571,6 +633,31 @@ namespace System.Windows
         #region MouseDown
 
         /// <summary>
+        /// Identifies the <see cref="PreviewMouseDown"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseDownEvent = Mouse.PreviewMouseDownEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when any mouse button is pressed while the pointer is over this element.
+        /// </summary>
+        public event MouseButtonEventHandler PreviewMouseDown
+        {
+            add => AddHandler(Mouse.PreviewMouseDownEvent, value, false);
+            remove => RemoveHandler(Mouse.PreviewMouseDownEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseDown"/> routed event reaches an element in 
+        /// its route that is derived from this class. Implement this method to add class handling for 
+        /// this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports 
+        /// that one or more mouse buttons were pressed.
+        /// </param>
+        protected virtual void OnPreviewMouseDown(MouseButtonEventArgs e) { }
+
+        /// <summary>
         /// Identifies the <see cref="MouseDown"/> routed event.
         /// </summary>
         public static readonly RoutedEvent MouseDownEvent = Mouse.MouseDownEvent.AddOwner(typeof(UIElement));
@@ -585,18 +672,42 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Invoked when an unhandled Mouse.MouseDown attached event reaches an element in its route that is 
-        /// derived from this class. Implement this method to add class handling for this event.
+        /// Invoked when an unhandled <see cref="MouseDown"/> routed event reaches an element in its route 
+        /// that is derived from this class. Implement this method to add class handling for this event.
         /// </summary>
         /// <param name="e">
-        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. This event data reports details 
-        /// about the mouse button that was pressed and the handled state.
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. This event data reports 
+        /// details about the mouse button that was pressed and the handled state.
         /// </param>
         protected virtual void OnMouseDown(MouseButtonEventArgs e) { }
 
         #endregion
 
         #region MouseUp
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewMouseUp"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseUpEvent = Mouse.PreviewMouseUpEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when any mouse button is released while the mouse pointer is over this element.
+        /// </summary>
+        public event MouseButtonEventHandler PreviewMouseUp
+        {
+            add => AddHandler(Mouse.PreviewMouseUpEvent, value, false);
+            remove => RemoveHandler(Mouse.PreviewMouseUpEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseUp"/> routed event reaches an element in its route 
+        /// that is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports that one 
+        /// or more mouse buttons were released.
+        /// </param>
+        protected virtual void OnPreviewMouseUp(MouseButtonEventArgs e) { }
 
         /// <summary>
         /// Identifies the <see cref="MouseUp"/> routed event.
@@ -613,18 +724,41 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Invoked when an unhandled Mouse.MouseUp routed event reaches an element in its route that is derived 
-        /// from this class. Implement this method to add class handling for this event.
+        /// Invoked when an unhandled <see cref="MouseUp"/> routed event reaches an element in its route that 
+        /// is derived from this class. Implement this method to add class handling for this event.
         /// </summary>
         /// <param name="e">
-        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports that the 
-        /// mouse button was released.
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports that 
+        /// the mouse button was released.
         /// </param>
         protected virtual void OnMouseUp(MouseButtonEventArgs e) { }
 
         #endregion
 
         #region MouseMove
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewMouseMove"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseMoveEvent = Mouse.PreviewMouseMoveEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the mouse pointer moves while the mouse pointer is over this element.
+        /// </summary>
+        public event MouseEventHandler PreviewMouseMove
+        {
+            add => AddHandler(Mouse.PreviewMouseMoveEvent, value, false);
+            remove => RemoveHandler(Mouse.PreviewMouseMoveEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseMove"/> routed event reaches an element in its 
+        /// route that is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnPreviewMouseMove(MouseEventArgs e) { }
 
         /// <summary>
         /// Identifies the <see cref="MouseMove"/> routed event.
@@ -652,6 +786,36 @@ namespace System.Windows
         #region MouseLeftButtonDown
 
         /// <summary>
+        /// Identifies the <see cref="PreviewMouseLeftButtonDown"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseLeftButtonDownEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(PreviewMouseLeftButtonDown),
+                RoutingStrategy.Direct,
+                typeof(MouseButtonEventHandler),
+                typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the left mouse button is pressed while the mouse pointer is over this element.
+        /// </summary>
+        public event MouseButtonEventHandler PreviewMouseLeftButtonDown
+        {
+            add => AddHandler(PreviewMouseLeftButtonDownEvent, value, false);
+            remove => RemoveHandler(PreviewMouseLeftButtonDownEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseLeftButtonDown"/> routed event reaches an 
+        /// element in its route that is derived from this class. Implement this method to add class 
+        /// handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports 
+        /// that the left mouse button was pressed.
+        /// </param>
+        protected virtual void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e) { }
+
+        /// <summary>
         /// Identifies the <see cref="MouseLeftButtonDown"/> routed event.
         /// </summary>
         public static readonly RoutedEvent MouseLeftButtonDownEvent =
@@ -662,8 +826,8 @@ namespace System.Windows
                 typeof(UIElement));
 
         /// <summary>
-        /// Occurs when the pointer device that previously initiated a Press action is
-        /// pressed, while within this element.
+        /// Occurs when the pointer device that previously initiated a Press action is pressed, while 
+        /// within this element.
         /// </summary>
         public event MouseButtonEventHandler MouseLeftButtonDown
         {
@@ -672,14 +836,48 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Raises the PointerPressed event
+        /// Invoked when an unhandled <see cref="MouseLeftButtonDown"/> routed event is raised on this 
+        /// element. Implement this method to add class handling for this event.
         /// </summary>
-        /// <param name="e">The arguments for the event.</param>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports 
+        /// that the left mouse button was pressed.
+        /// </param>
         protected virtual void OnMouseLeftButtonDown(MouseButtonEventArgs e) { }
 
         #endregion
 
         #region MouseRightButtonDown
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewMouseRightButtonDown"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseRightButtonDownEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(PreviewMouseRightButtonDown),
+                RoutingStrategy.Direct,
+                typeof(MouseButtonEventHandler),
+                typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the right mouse button is pressed while the mouse pointer is over this element.
+        /// </summary>
+        public event MouseButtonEventHandler PreviewMouseRightButtonDown
+        {
+            add => AddHandler(PreviewMouseRightButtonDownEvent, value, false);
+            remove => RemoveHandler(PreviewMouseRightButtonDownEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseRightButtonDown"/> routed event reaches an 
+        /// element in its route that is derived from this class. Implement this method to add class 
+        /// handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports 
+        /// that the right mouse button was pressed.
+        /// </param>
+        protected virtual void OnPreviewMouseRightButtonDown(MouseButtonEventArgs e) { }
 
         /// <summary>
         /// Identifies the <see cref="MouseRightButtonDown"/> routed event.
@@ -691,6 +889,9 @@ namespace System.Windows
                 typeof(MouseButtonEventHandler),
                 typeof(UIElement));
 
+        /// <summary>
+        /// Occurs when the right mouse button is pressed while the mouse pointer is over this element.
+        /// </summary>
         public event MouseButtonEventHandler MouseRightButtonDown
         {
             add => AddHandler(MouseRightButtonDownEvent, value, false);
@@ -698,14 +899,43 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Raises the MouseRightButtonDown event
+        /// Invoked when an unhandled <see cref="MouseRightButtonDown"/> routed event reaches an element 
+        /// in its route that is derived from this class. Implement this method to add class handling for 
+        /// this event.
         /// </summary>
-        /// <param name="e">The arguments for the event.</param>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports 
+        /// that the right mouse button was pressed.
+        /// </param>
         protected virtual void OnMouseRightButtonDown(MouseButtonEventArgs e) { }
 
         #endregion
 
         #region MouseWheel
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewMouseWheel"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseWheelEvent = Mouse.MouseWheelEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over this element.
+        /// </summary>
+        public event MouseWheelEventHandler PreviewMouseWheel
+        {
+            add => AddHandler(Mouse.PreviewMouseWheelEvent, value, false);
+            remove => RemoveHandler(Mouse.PreviewMouseWheelEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseWheel"/> routed event reaches an element in
+        /// its route that is derived from this class. Implement this method to add class handling for 
+        /// this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseWheelEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnPreviewMouseWheel(MouseWheelEventArgs e) { }
 
         /// <summary>
         /// Identifies the <see cref="MouseWheel"/> routed event.
@@ -733,6 +963,36 @@ namespace System.Windows
         #region MouseLeftButtonUp
 
         /// <summary>
+        /// Identifies the <see cref="PreviewMouseLeftButtonUp"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseLeftButtonUpEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(PreviewMouseLeftButtonUp),
+                RoutingStrategy.Direct,
+                typeof(MouseButtonEventHandler),
+                typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the left mouse button is released while the mouse pointer is over this element.
+        /// </summary>
+        public event MouseButtonEventHandler PreviewMouseLeftButtonUp
+        {
+            add => AddHandler(PreviewMouseLeftButtonUpEvent, value, false);
+            remove => RemoveHandler(PreviewMouseLeftButtonUpEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseLeftButtonUp"/> routed event reaches an 
+        /// element in its route that is derived from this class. Implement this method to add class 
+        /// handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports
+        /// that the left mouse button was released.
+        /// </param>
+        protected virtual void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e) { }
+
+        /// <summary>
         /// Identifies the <see cref="MouseLeftButtonUp"/> routed event.
         /// </summary>
         public static readonly RoutedEvent MouseLeftButtonUpEvent =
@@ -743,8 +1003,8 @@ namespace System.Windows
                 typeof(UIElement));
 
         /// <summary>
-        /// Occurs when the pointer device that previously initiated a Press action is
-        /// released, while within this element.
+        /// Occurs when the pointer device that previously initiated a Press action is released, 
+        /// while within this element.
         /// </summary>
         public event MouseButtonEventHandler MouseLeftButtonUp
         {
@@ -753,9 +1013,14 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Raises the PointerReleased event
+        /// Invoked when an unhandled <see cref="MouseLeftButtonUp"/> routed event reaches an 
+        /// element in its route that is derived from this class. Implement this method to add 
+        /// class handling for this event.
         /// </summary>
-        /// <param name="e">The arguments for the event.</param>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data 
+        /// reports that the left mouse button was released.
+        /// </param>
         protected virtual void OnMouseLeftButtonUp(MouseButtonEventArgs e) { }
 
         #endregion
@@ -923,6 +1188,37 @@ namespace System.Windows
         #region MouseRightButtonUp
 
         /// <summary>
+        /// Identifies the <see cref="PreviewMouseRightButtonUp"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseRightButtonUpEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(PreviewMouseRightButtonUp),
+                RoutingStrategy.Direct,
+                typeof(MouseButtonEventHandler),
+                typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the right mouse button is released while the mouse pointer is over 
+        /// this element.
+        /// </summary>
+        public event MouseButtonEventHandler PreviewMouseRightButtonUp
+        {
+            add => AddHandler(PreviewMouseRightButtonUpEvent, value, false);
+            remove => RemoveHandler(PreviewMouseRightButtonUpEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="PreviewMouseRightButtonUp"/> routed event 
+        /// reaches an element in its route that is derived from this class. Implement this 
+        /// method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event 
+        /// data reports that the right mouse button was released.
+        /// </param>
+        protected virtual void OnPreviewMouseRightButtonUp(MouseButtonEventArgs e) { }
+
+        /// <summary>
         /// Identifies the <see cref="MouseRightButtonUp"/> routed event.
         /// </summary>
         public static readonly RoutedEvent MouseRightButtonUpEvent =
@@ -933,8 +1229,7 @@ namespace System.Windows
                 typeof(UIElement));
 
         /// <summary>
-        /// Occurs when a right-tap input stimulus happens while the pointer is over
-        /// the element.
+        /// Occurs when a right-tap input stimulus happens while the pointer is over the element.
         /// </summary>
         public event MouseButtonEventHandler MouseRightButtonUp
         {
@@ -943,9 +1238,14 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Raises the RightTapped event
+        /// Invoked when an unhandled <see cref="MouseRightButtonUp"/> routed event reaches an element 
+        /// in its route that is derived from this class. Implement this method to add class handling 
+        /// for this event.
         /// </summary>
-        /// <param name="e">The arguments for the event.</param>
+        /// <param name="e">
+        /// The <see cref="MouseButtonEventArgs"/> that contains the event data. The event data reports 
+        /// that the right mouse button was released.
+        /// </param>
         protected virtual void OnMouseRightButtonUp(MouseButtonEventArgs e) { }
 
         #endregion
@@ -967,8 +1267,9 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Invoked when an unhandled Keyboard.PreviewKeyDown attached event reaches an element in its route 
-        /// that is derived from this class. Implement this method to add class handling for this event.
+        /// Invoked when an unhandled <see cref="PreviewKeyDown"/> attached event reaches an element 
+        /// in its route that is derived from this class. Implement this method to add class handling 
+        /// for this event.
         /// </summary>
         /// <param name="e">
         /// The <see cref="KeyEventArgs"/> that contains the event data.

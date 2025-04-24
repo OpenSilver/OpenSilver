@@ -342,7 +342,7 @@ namespace System.Windows.Controls
             CloseAutomaticToolTip(null, EventArgs.Empty);
         }
 
-        internal static void OnMouseButtonDown(MouseButtonEventArgs e)
+        internal static void OnMouseButtonDown()
         {
             // close the opened ToolTip or cancel mouse hover
             if (_currentToolTip == null)

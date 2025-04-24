@@ -19,6 +19,40 @@ namespace System.Windows.Input;
 public static class Mouse
 {
     /// <summary>
+    /// Identifies the Mouse.PreviewMouseDown attached event.
+    /// </summary>
+    public static readonly RoutedEvent PreviewMouseDownEvent =
+        EventManager.RegisterRoutedEvent(
+            "PreviewMouseDown",
+            RoutingStrategy.Tunnel,
+            typeof(MouseButtonEventHandler),
+            typeof(Mouse));
+
+    /// <summary>
+    /// Adds a handler for the Mouse.PreviewMouseDown attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void AddPreviewMouseDownHandler(DependencyObject element, MouseButtonEventHandler handler)
+        => UIElement.AddHandler(element, PreviewMouseDownEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Mouse.PreviewMouseDown attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void RemovePreviewMouseDownHandler(DependencyObject element, MouseButtonEventHandler handler)
+        => UIElement.RemoveHandler(element, PreviewMouseDownEvent, handler);
+
+    /// <summary>
     /// Identifies the Mouse.MouseDown attached event.
     /// </summary>
     public static readonly RoutedEvent MouseDownEvent =
@@ -53,6 +87,40 @@ public static class Mouse
         => UIElement.RemoveHandler(element, MouseDownEvent, handler);
 
     /// <summary>
+    /// Identifies the Mouse.PreviewMouseUp attached event.
+    /// </summary>
+    public static readonly RoutedEvent PreviewMouseUpEvent =
+        EventManager.RegisterRoutedEvent(
+            "PreviewMouseUp",
+            RoutingStrategy.Tunnel,
+            typeof(MouseButtonEventHandler),
+            typeof(Mouse));
+
+    /// <summary>
+    /// Adds a handler for the Mouse.PreviewMouseUp attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void AddPreviewMouseUpHandler(DependencyObject element, MouseButtonEventHandler handler)
+        => UIElement.AddHandler(element, PreviewMouseUpEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Mouse.PreviewMouseUp attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void RemovePreviewMouseUpHandler(DependencyObject element, MouseButtonEventHandler handler)
+        => UIElement.RemoveHandler(element, PreviewMouseUpEvent, handler);
+
+    /// <summary>
     /// Identifies the Mouse.MouseUp attached event.
     /// </summary>
     public static readonly RoutedEvent MouseUpEvent =
@@ -85,6 +153,40 @@ public static class Mouse
     /// </param>
     public static void RemoveMouseUpHandler(DependencyObject element, MouseButtonEventHandler handler)
         => UIElement.RemoveHandler(element, MouseUpEvent, handler);
+
+    /// <summary>
+    /// Identifies the Mouse.PreviewMouseMove attached event.
+    /// </summary>
+    public static readonly RoutedEvent PreviewMouseMoveEvent =
+        EventManager.RegisterRoutedEvent(
+            "PreviewMouseMove",
+            RoutingStrategy.Tunnel,
+            typeof(MouseEventHandler),
+            typeof(Mouse));
+
+    /// <summary>
+    /// Adds a handler for the Mouse.PreviewMouseMove attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void AddPreviewMouseMoveHandler(DependencyObject element, MouseEventHandler handler)
+        => UIElement.AddHandler(element, PreviewMouseMoveEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Mouse.PreviewMouseMove attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void RemovePreviewMouseMoveHandler(DependencyObject element, MouseEventHandler handler)
+        => UIElement.RemoveHandler(element, PreviewMouseMoveEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.MouseMove attached event.
@@ -255,6 +357,40 @@ public static class Mouse
     /// </param>
     public static void RemoveLostMouseCaptureHandler(DependencyObject element, MouseEventHandler handler)
         => UIElement.RemoveHandler(element, LostMouseCaptureEvent, handler);
+
+    /// <summary>
+    /// Identifies the Mouse.PreviewMouseWheel attached event.
+    /// </summary>
+    public static readonly RoutedEvent PreviewMouseWheelEvent =
+        EventManager.RegisterRoutedEvent(
+            "PreviewMouseWheel",
+            RoutingStrategy.Tunnel,
+            typeof(MouseWheelEventHandler),
+            typeof(Mouse));
+
+    /// <summary>
+    /// Adds a handler for the Mouse.PreviewMouseWheel attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void AddPreviewMouseWheelHandler(DependencyObject element, MouseWheelEventHandler handler)
+        => UIElement.AddHandler(element, PreviewMouseWheelEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Mouse.PreviewMouseWheel attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void RemovePreviewMouseWheelHandler(DependencyObject element, MouseWheelEventHandler handler)
+        => UIElement.RemoveHandler(element, PreviewMouseWheelEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.MouseWheel attached event.
