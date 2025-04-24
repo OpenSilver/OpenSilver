@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
-
 namespace System.Windows.Input;
 
 /// <summary>
@@ -40,19 +38,19 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddMouseDownHandler(DependencyObject element, MouseButtonEventHandler handler)
-        => AddHandler(element, MouseDownEvent, handler);
+        => UIElement.AddHandler(element, MouseDownEvent, handler);
 
     /// <summary>
-    /// Removes a handler for the System.Windows.Input.Mouse.MouseDown attached event.
+    /// Removes a handler for the Mouse.MouseDown attached event.
     /// </summary>
     /// <param name="element">
-    /// The System.Windows.UIElement or System.Windows.ContentElement that listens to this event.
+    /// The <see cref="UIElement"/> that listens to this event.
     /// </param>
     /// <param name="handler">
     /// The event handler.
     /// </param>
     public static void RemoveMouseDownHandler(DependencyObject element, MouseButtonEventHandler handler)
-        => RemoveHandler(element, MouseDownEvent, handler);
+        => UIElement.RemoveHandler(element, MouseDownEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.MouseUp attached event.
@@ -74,7 +72,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddMouseUpHandler(DependencyObject element, MouseButtonEventHandler handler)
-        => AddHandler(element, MouseUpEvent, handler);
+        => UIElement.AddHandler(element, MouseUpEvent, handler);
 
     /// <summary>
     /// Removes a handler for the Mouse.MouseUp attached event.
@@ -86,7 +84,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void RemoveMouseUpHandler(DependencyObject element, MouseButtonEventHandler handler)
-        => RemoveHandler(element, MouseUpEvent, handler);
+        => UIElement.RemoveHandler(element, MouseUpEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.MouseMove attached event.
@@ -108,7 +106,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddMouseMoveHandler(DependencyObject element, MouseEventHandler handler)
-        => AddHandler(element, MouseMoveEvent, handler);
+        => UIElement.AddHandler(element, MouseMoveEvent, handler);
 
     /// <summary>
     /// Removes a handler for the Mouse.MouseMove attached event.
@@ -120,7 +118,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void RemoveMouseMoveHandler(DependencyObject element, MouseEventHandler handler)
-        => RemoveHandler(element, MouseMoveEvent, handler);
+        => UIElement.RemoveHandler(element, MouseMoveEvent, handler);
 
     /// <summary>
     /// dentifies the Mouse.MouseEnter attached event.
@@ -142,7 +140,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddMouseEnterHandler(DependencyObject element, MouseEventHandler handler)
-        => AddHandler(element, MouseEnterEvent, handler);
+        => UIElement.AddHandler(element, MouseEnterEvent, handler);
 
     /// <summary>
     /// Removes a handler for the Mouse.MouseEnter attached event.
@@ -154,7 +152,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void RemoveMouseEnterHandler(DependencyObject element, MouseEventHandler handler)
-        => RemoveHandler(element, MouseEnterEvent, handler);
+        => UIElement.RemoveHandler(element, MouseEnterEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.MouseLeave attached event.
@@ -176,7 +174,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddMouseLeaveHandler(DependencyObject element, MouseEventHandler handler)
-        => AddHandler(element, MouseLeaveEvent, handler);
+        => UIElement.AddHandler(element, MouseLeaveEvent, handler);
 
     /// <summary>
     /// Removes a handler for the Mouse.MouseLeave attached event.
@@ -188,7 +186,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void RemoveMouseLeaveHandler(DependencyObject element, MouseEventHandler handler)
-        => RemoveHandler(element, MouseLeaveEvent, handler);
+        => UIElement.RemoveHandler(element, MouseLeaveEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.GotMouseCapture attached event.
@@ -210,7 +208,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddGotMouseCaptureHandler(DependencyObject element, MouseEventHandler handler)
-        => AddHandler(element, GotMouseCaptureEvent, handler);
+        => UIElement.AddHandler(element, GotMouseCaptureEvent, handler);
 
     /// <summary>
     /// Removes a handler for the Mouse.GotMouseCapture attached event.
@@ -222,7 +220,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void RemoveGotMouseCaptureHandler(DependencyObject element, MouseEventHandler handler)
-        => RemoveHandler(element, GotMouseCaptureEvent, handler);
+        => UIElement.RemoveHandler(element, GotMouseCaptureEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.LostMouseCapture attached event.
@@ -244,7 +242,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddLostMouseCaptureHandler(DependencyObject element, MouseEventHandler handler)
-        => AddHandler(element, LostMouseCaptureEvent, handler);
+        => UIElement.AddHandler(element, LostMouseCaptureEvent, handler);
 
     /// <summary>
     /// Removes a handler for the Mouse.LostMouseCapture attached event.
@@ -256,7 +254,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void RemoveLostMouseCaptureHandler(DependencyObject element, MouseEventHandler handler)
-        => RemoveHandler(element, LostMouseCaptureEvent, handler);
+        => UIElement.RemoveHandler(element, LostMouseCaptureEvent, handler);
 
     /// <summary>
     /// Identifies the Mouse.MouseWheel attached event.
@@ -278,7 +276,7 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void AddMouseWheelHandler(DependencyObject element, MouseWheelEventHandler handler)
-        => AddHandler(element, MouseWheelEvent, handler);
+        => UIElement.AddHandler(element, MouseWheelEvent, handler);
 
     /// <summary>
     /// Removes a handler for the Mouse.MouseWheel attached event.
@@ -290,39 +288,5 @@ public static class Mouse
     /// The event handler.
     /// </param>
     public static void RemoveMouseWheelHandler(DependencyObject element, MouseWheelEventHandler handler)
-        => RemoveHandler(element, MouseWheelEvent, handler);
-
-    private static void AddHandler(DependencyObject d, RoutedEvent routedEvent, Delegate handler)
-    {
-        switch (d)
-        {
-            case UIElement uiElement:
-                uiElement.AddHandler(routedEvent, handler);
-                break;
-
-            case IUIElement iuiElement:
-                iuiElement.AddHandler(routedEvent, handler, false);
-                break;
-
-            default:
-                throw new ArgumentException(string.Format(Strings.Invalid_IInputElement, d.GetType()));
-        }
-    }
-
-    private static void RemoveHandler(DependencyObject d, RoutedEvent routedEvent, Delegate handler)
-    {
-        switch (d)
-        {
-            case UIElement uiElement:
-                uiElement.RemoveHandler(routedEvent, handler);
-                break;
-
-            case IUIElement iuiElement:
-                iuiElement.RemoveHandler(routedEvent, handler);
-                break;
-
-            default:
-                throw new ArgumentException(string.Format(Strings.Invalid_IInputElement, d.GetType()));
-        }
-    }
+        => UIElement.RemoveHandler(element, MouseWheelEvent, handler);
 }

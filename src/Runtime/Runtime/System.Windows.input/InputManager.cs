@@ -653,26 +653,46 @@ internal sealed class InputManager
         }
 
         int keyCode = VirtualKeysHelpers.FixKeyCodeForSilverlight((int)nativeKeyCode);
+        Key key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode);
+        ModifierKeys modifiers = Keyboard.Modifiers;
 
-        var e = new KeyEventArgs()
+        ToolTipService.OnKeyDown(key);
+
+        var previewKeyDown = new KeyEventArgs
         {
-            RoutedEvent = UIElement.KeyDownEvent,
+            RoutedEvent = Keyboard.PreviewKeyDownEvent,
             Source = keyboardTarget,
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
-            Key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-            KeyModifiers = Keyboard.Modifiers,
+            Key = key,
+            KeyModifiers = modifiers,
         };
 
-        ToolTipService.OnKeyDown(e);
+        keyboardTarget.RaiseTrustedEvent(previewKeyDown);
 
-        keyboardTarget.RaiseTrustedEvent(e);
-
-        KeyboardNavigation.Current.ProcessInput(e);
-
-        if (e.Handled)
+        if (previewKeyDown.Handled)
         {
-            e.PreventDefault();
+            previewKeyDown.PreventDefault();
+            return;
+        }
+
+        var keyDown = new KeyEventArgs
+        {
+            RoutedEvent = Keyboard.KeyDownEvent,
+            Source = keyboardTarget,
+            UIEventArg = jsEventArg,
+            PlatformKeyCode = keyCode,
+            Key = key,
+            KeyModifiers = modifiers,
+        };
+
+        keyboardTarget.RaiseTrustedEvent(keyDown);
+
+        KeyboardNavigation.Current.ProcessInput(keyDown);
+
+        if (keyDown.Handled)
+        {
+            keyDown.PreventDefault();
         }
     }
 
@@ -692,18 +712,37 @@ internal sealed class InputManager
         }
 
         int keyCode = VirtualKeysHelpers.FixKeyCodeForSilverlight((int)nativeKeyCode);
+        Key key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode);
+        ModifierKeys modifiers = Keyboard.Modifiers;
 
-        var e = new KeyEventArgs()
+        var previewKeyUp = new KeyEventArgs
         {
-            RoutedEvent = UIElement.KeyUpEvent,
+            RoutedEvent = Keyboard.PreviewKeyUpEvent,
             Source = keyboardTarget,
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
-            Key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-            KeyModifiers = Keyboard.Modifiers,
+            Key = key,
+            KeyModifiers = modifiers,
         };
 
-        keyboardTarget.RaiseTrustedEvent(e);
+        keyboardTarget.RaiseTrustedEvent(previewKeyUp);
+
+        if (previewKeyUp.Handled)
+        {
+            return;
+        }
+
+        var keyUp = new KeyEventArgs
+        {
+            RoutedEvent = Keyboard.KeyUpEvent,
+            Source = keyboardTarget,
+            UIEventArg = jsEventArg,
+            PlatformKeyCode = keyCode,
+            Key = key,
+            KeyModifiers = modifiers,
+        };
+
+        keyboardTarget.RaiseTrustedEvent(keyUp);
 
         CommandManager.InvalidateRequerySuggested();
     }

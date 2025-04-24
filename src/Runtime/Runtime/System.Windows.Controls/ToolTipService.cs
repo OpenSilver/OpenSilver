@@ -323,7 +323,7 @@ namespace System.Windows.Controls
             }
         }
 
-        internal static void OnKeyDown(KeyEventArgs e)
+        internal static void OnKeyDown(Key key)
         {
             // close the opened ToolTip or cancel mouse hover 
             if (_currentToolTip == null)
@@ -334,7 +334,7 @@ namespace System.Windows.Controls
                 return;
             }
 
-            if (IsSpecialKey(e.Key))
+            if (IsSpecialKey(key))
             {
                 return;
             }

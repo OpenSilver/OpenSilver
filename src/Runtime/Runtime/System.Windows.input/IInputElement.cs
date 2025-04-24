@@ -72,7 +72,17 @@ public interface IInputElement
     /// <summary>
     /// Occurs when a key is pressed while the keyboard is focused on this element.
     /// </summary>
+    event KeyEventHandler PreviewKeyDown;
+
+    /// <summary>
+    /// Occurs when a key is pressed while the keyboard is focused on this element.
+    /// </summary>
     event KeyEventHandler KeyDown;
+
+    /// <summary>
+    /// Occurs when a key is released while the keyboard is focused on this element.
+    /// </summary>
+    event KeyEventHandler PreviewKeyUp;
 
     /// <summary>
     /// Occurs when a key is released while the keyboard is focused on this element.
@@ -204,7 +214,6 @@ public interface IInputElement
     // event StylusSystemGestureEventHandler StylusSystemGesture;
     // event StylusEventHandler PreviewStylusUp;
     // event MouseButtonEventHandler PreviewMouseLeftButtonDown;
-    // event KeyEventHandler PreviewKeyUp;
     // event KeyboardFocusChangedEventHandler GotKeyboardFocus;
     // event StylusEventHandler GotStylusCapture;
     // event KeyboardFocusChangedEventHandler PreviewLostKeyboardFocus;
@@ -212,7 +221,6 @@ public interface IInputElement
     // event KeyboardFocusChangedEventHandler LostKeyboardFocus;
     // event StylusEventHandler StylusUp;
     // event KeyboardFocusChangedEventHandler PreviewGotKeyboardFocus;
-    // event KeyEventHandler PreviewKeyDown;
 
     // bool CaptureStylus();
     // void ReleaseStylusCapture();

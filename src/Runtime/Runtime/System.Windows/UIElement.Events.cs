@@ -45,8 +45,10 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TappedEvent, new TappedEventHandler(OnTappedThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(KeyDownEvent, new KeyEventHandler(OnKeyDownThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.PreviewKeyDownEvent, new KeyEventHandler(OnPreviewKeyDownThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.KeyDownEvent, new KeyEventHandler(OnKeyDownThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.PreviewKeyUpEvent, new KeyEventHandler(OnPreviewKeyUpThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.KeyUpEvent, new KeyEventHandler(OnKeyUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk), false);
             EventManager.RegisterClassHandler<UIElement>(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk), false);
             EventManager.RegisterClassHandler<UIElement>(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(OnPreviewExecutedThunk), false);
@@ -118,6 +120,8 @@ namespace System.Windows
 
         private static void OnMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonUp(e);
 
+        private static void OnPreviewKeyDownThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnPreviewKeyDown(e);
+
         private static void OnKeyDownThunk(object sender, KeyEventArgs e)
         {
             UIElement uie = (UIElement)sender;
@@ -129,6 +133,8 @@ namespace System.Windows
                 uie.OnKeyDown(e);
             }
         }
+
+        private static void OnPreviewKeyUpThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnPreviewKeyUp(e);
 
         private static void OnKeyUpThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnKeyUp(e);
 
@@ -265,6 +271,40 @@ namespace System.Windows
             }
 
             EventHandlersStore?.RemoveRoutedEventHandler(routedEvent, handler);
+        }
+
+        internal static void AddHandler(DependencyObject d, RoutedEvent routedEvent, Delegate handler)
+        {
+            switch (d)
+            {
+                case UIElement uiElement:
+                    uiElement.AddHandler(routedEvent, handler);
+                    break;
+
+                case IUIElement iuiElement:
+                    iuiElement.AddHandler(routedEvent, handler, false);
+                    break;
+
+                default:
+                    throw new ArgumentException(string.Format(Strings.Invalid_IInputElement, d.GetType()));
+            }
+        }
+
+        internal static void RemoveHandler(DependencyObject d, RoutedEvent routedEvent, Delegate handler)
+        {
+            switch (d)
+            {
+                case UIElement uiElement:
+                    uiElement.RemoveHandler(routedEvent, handler);
+                    break;
+
+                case IUIElement iuiElement:
+                    iuiElement.RemoveHandler(routedEvent, handler);
+                    break;
+
+                default:
+                    throw new ArgumentException(string.Format(Strings.Invalid_IInputElement, d.GetType()));
+            }
         }
 
         /// <summary>
@@ -913,28 +953,49 @@ namespace System.Windows
         #region KeyDown event
 
         /// <summary>
-        /// Identifies the <see cref="KeyDown"/> routed event.
+        /// Identifies the <see cref="PreviewKeyDown"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent KeyDownEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(KeyDown),
-                RoutingStrategy.Bubble,
-                typeof(KeyEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent PreviewKeyDownEvent = Keyboard.PreviewKeyDownEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
-        /// Occurs when a keyboard key is pressed while the UIElement has focus.
+        /// Occurs when a key is pressed while focus is on this element.
         /// </summary>
-        public event KeyEventHandler KeyDown
+        public event KeyEventHandler PreviewKeyDown
         {
-            add => AddHandler(KeyDownEvent, value, false);
-            remove => RemoveHandler(KeyDownEvent, value);
+            add => AddHandler(Keyboard.PreviewKeyDownEvent, value, false);
+            remove => RemoveHandler(Keyboard.PreviewKeyDownEvent, value);
         }
 
         /// <summary>
-        /// Raises the KeyDown event
+        /// Invoked when an unhandled Keyboard.PreviewKeyDown attached event reaches an element in its route 
+        /// that is derived from this class. Implement this method to add class handling for this event.
         /// </summary>
-        /// <param name="e">The arguments for the event.</param>
+        /// <param name="e">
+        /// The <see cref="KeyEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnPreviewKeyDown(KeyEventArgs e) { }
+
+        /// <summary>
+        /// Identifies the <see cref="KeyDown"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent KeyDownEvent = Keyboard.KeyDownEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when a key is pressed while focus is on this element.
+        /// </summary>
+        public event KeyEventHandler KeyDown
+        {
+            add => AddHandler(Keyboard.KeyDownEvent, value, false);
+            remove => RemoveHandler(Keyboard.KeyDownEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Keyboard.KeyDown attached event reaches an element in its route that 
+        /// is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="KeyEventArgs"/> that contains the event data.
+        /// </param>
         protected virtual void OnKeyDown(KeyEventArgs e) { }
 
         #endregion
@@ -942,28 +1003,49 @@ namespace System.Windows
         #region KeyUp event
 
         /// <summary>
-        /// Identifies the <see cref="KeyUp"/> routed event.
+        /// Identifies the <see cref="PreviewKeyUp"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent KeyUpEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(KeyUp),
-                RoutingStrategy.Bubble,
-                typeof(KeyEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent PreviewKeyUpEvent = Keyboard.PreviewKeyUpEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
-        /// Occurs when a keyboard key is released while the UIElement has focus.
+        /// Occurs when a key is released while focus is on this element.
         /// </summary>
-        public event KeyEventHandler KeyUp
+        public event KeyEventHandler PreviewKeyUp
         {
-            add => AddHandler(KeyUpEvent, value, false);
-            remove => RemoveHandler(KeyUpEvent, value);
+            add => AddHandler(Keyboard.PreviewKeyUpEvent, value, false);
+            remove => RemoveHandler(Keyboard.PreviewKeyUpEvent, value);
         }
 
         /// <summary>
-        /// Raises the KeyUp event
+        /// Invoked when an unhandled Keyboard.PreviewKeyUp attached event reaches an element in its route 
+        /// that is derived from this class. Implement this method to add class handling for this event.
         /// </summary>
-        /// <param name="e">The arguments for the event.</param>
+        /// <param name="e">
+        /// The <see cref="KeyEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnPreviewKeyUp(KeyEventArgs e) { }
+
+        /// <summary>
+        /// Identifies the <see cref="KeyUp"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent KeyUpEvent = Keyboard.KeyUpEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when a key is released while focus is on this element.
+        /// </summary>
+        public event KeyEventHandler KeyUp
+        {
+            add => AddHandler(Keyboard.KeyUpEvent, value, false);
+            remove => RemoveHandler(Keyboard.KeyUpEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Keyboard.KeyUp attached event reaches an element in its route that 
+        /// is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="KeyEventArgs"/> that contains the event data.
+        /// </param>
         protected virtual void OnKeyUp(KeyEventArgs e) { }
 
         #endregion
