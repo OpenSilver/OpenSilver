@@ -61,7 +61,7 @@ namespace System.Windows.Controls
                 "TextPath",
                 typeof(string),
                 typeof(TextSearch),
-                null);
+                new FrameworkPropertyMetadata(string.Empty));
 
         /// <summary>
         /// Returns the name of the property that identifies an item in the specified element's
@@ -100,6 +100,60 @@ namespace System.Windows.Controls
             }
 
             element.SetValueInternal(TextPathProperty, path);
+        }
+
+        /// <summary>
+        /// Identifies the TextSearch.Text attached property.
+        /// </summary>
+        public static readonly DependencyProperty TextProperty =
+            DependencyProperty.RegisterAttached(
+                "Text",
+                typeof(string),
+                typeof(TextSearch),
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        /// <summary>
+        /// Returns the string to that identifies the specified item.
+        /// </summary>
+        /// <param name="element">
+        /// The element from which the property value is read.
+        /// </param>
+        /// <returns>
+        /// The string that identifies the specified item.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
+        public static string GetText(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (string)element.GetValue(TextProperty);
+        }
+
+        /// <summary>
+        /// Writes the TextSearch.Text attached property value to the specified element.
+        /// </summary>
+        /// <param name="element">
+        /// The element to which the property value is written.
+        /// </param>
+        /// <param name="text">
+        /// The string that identifies the item.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
+        public static void SetText(DependencyObject element, string text)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(TextProperty, text);
         }
 
         /// <summary>
@@ -400,10 +454,20 @@ namespace System.Windows.Controls
         {
             // Order of precedence for getting Primary Text is as follows:
             //
-            // 1) PrimaryText (WPF only)
+            // 1) PrimaryText
             // 2) PrimaryTextPath (TextSearch.TextPath or ItemsControl.DisplayMemberPath)
             // 3) GetPlainText()
             // 4) ToString()
+
+            if (item is DependencyObject itemDO)
+            {
+                string primaryText = (string)itemDO.GetValue(TextProperty);
+
+                if (!string.IsNullOrEmpty(primaryText))
+                {
+                    return primaryText;
+                }
+            }
 
             // Here hopefully they've supplied a path into their object which we can use.
             if (!string.IsNullOrEmpty(primaryTextPath) && primaryTextBindingHome != null)
