@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
-using OpenSilver.Theming;
 
 namespace System.Windows;
 

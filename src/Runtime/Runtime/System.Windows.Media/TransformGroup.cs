@@ -40,6 +40,7 @@ namespace System.Windows.Media
                         {
                             TransformGroup tg = (TransformGroup)d;
                             var collection = new TransformCollection();
+                            tg.ProvideSelfAsInheritanceContext(collection, null);
                             tg.OnChildrenChanged(null, collection);
                             return collection;
                         }),

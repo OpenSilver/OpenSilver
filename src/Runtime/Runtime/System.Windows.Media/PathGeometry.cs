@@ -96,6 +96,7 @@ namespace System.Windows.Media
                         {
                             PathGeometry pathGeometry = (PathGeometry)d;
                             var figures = new PathFigureCollection();
+                            pathGeometry.ProvideSelfAsInheritanceContext(figures, null);
                             figures.SetParentGeometry(pathGeometry);
                             return figures;
                         }),

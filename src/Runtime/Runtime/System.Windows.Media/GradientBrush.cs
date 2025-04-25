@@ -61,6 +61,7 @@ namespace System.Windows.Media
                         {
                             GradientBrush gb = (GradientBrush)d;
                             var collection = new GradientStopCollection();
+                            gb.ProvideSelfAsInheritanceContext(collection, null);
                             gb.OnGradientStopsChanged(null, collection);
                             return collection;
                         }),

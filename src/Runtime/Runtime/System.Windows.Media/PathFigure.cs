@@ -127,6 +127,7 @@ namespace System.Windows.Media
                         {
                             PathFigure figure = (PathFigure)d;
                             var segments = new PathSegmentCollection();
+                            figure.ProvideSelfAsInheritanceContext(segments, null);
                             segments.SetParentGeometry(figure._parentGeometry);
                             return segments;
                         }),

@@ -46,6 +46,7 @@ namespace System.Windows.Media
                         {
                             GeometryGroup geometry = (GeometryGroup)d;
                             var collection = new GeometryCollection();
+                            geometry.ProvideSelfAsInheritanceContext(collection, null);
                             geometry.OnChildrenChanged(null, collection);
                             return collection;
                         }),
