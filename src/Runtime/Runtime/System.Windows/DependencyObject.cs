@@ -885,6 +885,33 @@ namespace System.Windows
             return metadata.GetDefaultValue(this, dp);
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether serialization processes should serialize the value for 
+        /// the provided dependency property.
+        /// </summary>
+        /// <param name="dp">
+        /// The identifier for the dependency property that should be serialized.
+        /// </param>
+        /// <returns>
+        /// true if the dependency property that is supplied should be value-serialized; otherwise, false.
+        /// </returns>
+        protected internal virtual bool ShouldSerializeProperty(DependencyProperty dp) => ContainsValue(dp);
+
+        /// <summary>
+        /// This method is called by DependencyObjectPropertyDescriptor to determine if a value is set for a given DP.
+        /// </summary>
+        internal bool ContainsValue(DependencyProperty dp)
+        {
+            if (GetStorage(dp.GlobalIndex) is not Storage storage)
+            {
+                return false;
+            }
+
+            EffectiveValueEntry entry = storage.Entry;
+            object value = entry.IsCoercedWithCurrentValue ? entry.ModifiedValue.CoercedValue : entry.LocalValue;
+            return !ReferenceEquals(value, DependencyProperty.UnsetValue);
+        }
+
         internal void InvalidateDependents(DependencyPropertyChangedEventArgs args)
         {
             if (_dependentListMap is null)
