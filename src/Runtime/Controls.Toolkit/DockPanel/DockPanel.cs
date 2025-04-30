@@ -71,6 +71,7 @@ namespace System.Windows.Controls
         /// <returns>
         /// The <see cref="Dock" /> property value for the element.
         /// </returns>
+        [AttachedPropertyBrowsableForChildren]
         public static Dock GetDock(UIElement element)
         {
             if (element == null)

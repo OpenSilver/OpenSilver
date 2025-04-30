@@ -73,6 +73,7 @@ namespace System.Windows.Controls
         /// <returns>
         /// The name of the property that identifies the item to the user.
         /// </returns>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static string GetTextPath(DependencyObject element)
         {
             if (element is null)
@@ -124,6 +125,7 @@ namespace System.Windows.Controls
         /// <exception cref="ArgumentNullException">
         /// <paramref name="element"/> is null.
         /// </exception>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static string GetText(DependencyObject element)
         {
             if (element is null)

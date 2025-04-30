@@ -18,6 +18,7 @@ public static class ContextMenuService
     /// </summary>
     /// <param name="obj">Object to query concerning the ContextMenu property.</param>
     /// <returns>Value of the ContextMenu property.</returns>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static ContextMenu GetContextMenu(DependencyObject obj)
     {
         if (obj is null)
@@ -93,6 +94,7 @@ public static class ContextMenuService
     /// <returns>
     /// Value of the ContextMenuService.PlacementTarget property.
     /// </returns>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static UIElement GetPlacementTarget(DependencyObject element)
     {
         if (element is null)
@@ -141,6 +143,7 @@ public static class ContextMenuService
     /// <returns>
     /// Value of the ContextMenuService.Placement property.
     /// </returns>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static PlacementMode GetPlacement(DependencyObject element)
     {
         if (element is null)

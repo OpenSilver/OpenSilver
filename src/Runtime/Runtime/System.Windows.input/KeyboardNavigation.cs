@@ -46,6 +46,7 @@ public sealed class KeyboardNavigation
     /// <exception cref="ArgumentNullException">
     /// element is null.
     /// </exception>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static int GetTabIndex(DependencyObject element)
     {
         if (element is null)
@@ -98,6 +99,7 @@ public sealed class KeyboardNavigation
     /// <exception cref="ArgumentNullException">
     /// element is null.
     /// </exception>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetIsTabStop(DependencyObject element)
     {
         if (element is null)
@@ -150,6 +152,7 @@ public sealed class KeyboardNavigation
     /// <exception cref="ArgumentNullException">
     /// element is null.
     /// </exception>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static KeyboardNavigationMode GetTabNavigation(DependencyObject element)
     {
         if (element is null)
@@ -202,6 +205,7 @@ public sealed class KeyboardNavigation
     /// <exception cref="ArgumentNullException">
     /// element is null.
     /// </exception>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetAcceptsReturn(DependencyObject element)
     {
         if (element is null)

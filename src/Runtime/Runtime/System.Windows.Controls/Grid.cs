@@ -79,6 +79,7 @@ public class Grid : Panel
     /// <returns>
     /// The value of the Grid.Column attached property.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static int GetColumn(UIElement element)
     {
         if (element is null)
@@ -128,6 +129,7 @@ public class Grid : Panel
     /// <returns>
     /// The value of the Grid.Row attached property.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static int GetRow(UIElement element)
     {
         if (element is null)
@@ -177,6 +179,7 @@ public class Grid : Panel
     /// <returns>
     /// The value of the Grid.ColumnSpan attached property.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static int GetColumnSpan(UIElement element)
     {
         if (element is null)
@@ -226,6 +229,7 @@ public class Grid : Panel
     /// <returns>
     /// The value of the Grid.RowSpan attached property.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static int GetRowSpan(UIElement element)
     {
         if (element is null)

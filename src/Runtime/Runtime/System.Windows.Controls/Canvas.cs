@@ -47,6 +47,7 @@ public class Canvas : Panel
     /// <returns>
     /// The Canvas.Left coordinate of the specified element.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static double GetLeft(UIElement element)
     {
         if (element is null)
@@ -94,6 +95,7 @@ public class Canvas : Panel
     /// <returns>
     /// The Canvas.Top coordinate of the specified element.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static double GetTop(UIElement element)
     {
         if (element is null)
@@ -141,6 +143,7 @@ public class Canvas : Panel
     /// <returns>
     /// The Canvas.Right coordinate of the specified element.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static double GetRight(UIElement element)
     {
         if (element is null)
@@ -188,6 +191,7 @@ public class Canvas : Panel
     /// <returns>
     /// The Canvas.Bottom coordinate of the specified element.
     /// </returns>
+    [AttachedPropertyBrowsableForChildren]
     public static double GetBottom(UIElement element)
     {
         if (element is null)

@@ -76,6 +76,7 @@ namespace System.Windows.Controls
         /// <returns>
         /// The relative position of the specified tooltip.
         /// </returns>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static PlacementMode GetPlacement(DependencyObject element)
         {
             if (element == null)
@@ -125,8 +126,14 @@ namespace System.Windows.Controls
         /// <returns>
         /// The visual element that the tooltip is positioned relative to.
         /// </returns>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static UIElement GetPlacementTarget(DependencyObject element)
         {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             return (UIElement)element.GetValue(PlacementTargetProperty);
         }
 
@@ -142,6 +149,11 @@ namespace System.Windows.Controls
         /// </param>
         public static void SetPlacementTarget(DependencyObject element, UIElement value)
         {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             element.SetValueInternal(PlacementTargetProperty, value);
         }
 
@@ -160,6 +172,7 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="element">The object from which the property value is read.</param>
         /// <returns>The object's tooltip content.</returns>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static object GetToolTip(DependencyObject element)
         {
             if (element == null)
