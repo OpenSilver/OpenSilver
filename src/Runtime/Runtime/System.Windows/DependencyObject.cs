@@ -12,11 +12,13 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using OpenSilver.Internal;
+using OpenSilver.Internal.ComponentModel;
 using OpenSilver.Internal.Data;
 using OpenSilver.Internal.Media.Animation;
 
@@ -28,6 +30,7 @@ namespace System.Windows
     /// other important Silverlight classes, such as <see cref="UIElement"/>, <see cref="Geometry"/>,
     /// <see cref="FrameworkTemplate"/>, <see cref="Style"/>, and <see cref="ResourceDictionary"/>.
     /// </summary>
+    [TypeDescriptionProvider(typeof(DependencyObjectProvider))]
     public class DependencyObject : DispatcherObject, IDependencyObject
     {
         private Dictionary<int, DependentList> _dependentListMap;

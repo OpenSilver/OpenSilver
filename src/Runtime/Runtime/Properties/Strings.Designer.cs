@@ -2905,6 +2905,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ShouldSerializeProperty and ResetProperty methods must be public (&apos;{0}&apos;)..
+        /// </summary>
+        internal static string SpecialMethodMustBePublic {
+            get {
+                return ResourceManager.GetString("SpecialMethodMustBePublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Esc.
         /// </summary>
         internal static string StopKeyDisplayString {

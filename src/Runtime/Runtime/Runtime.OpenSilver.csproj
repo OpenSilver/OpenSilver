@@ -96,6 +96,23 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
+    <Compile Include="OpenSilver\Internal\ComponentModel\APCustomTypeDescriptor.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\AttachedPropertyMethodSelector.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\AttachInfo.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\DependencyObjectPropertyDescriptor.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\DependencyObjectProvider.cs" />
+    <Compile Include="System.ComponentModel\DependencyPropertyDescriptor.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\DependencyPropertyAttribute.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\DependencyPropertyKind.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\DPCustomTypeDescriptor.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\PropertyChangeTracker.cs" />
+    <Compile Include="OpenSilver\Internal\ComponentModel\PropertyKey.cs" />
+    <Compile Include="System.ComponentModel\PropertyFilterAttribute.cs" />
+    <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
+    <Compile Include="System.Windows\AttachedPropertyBrowsableAttribute.cs" />
+    <Compile Include="System.Windows\AttachedPropertyBrowsableForChildrenAttribute.cs" />
+    <Compile Include="System.Windows\AttachedPropertyBrowsableForTypeAttribute.cs" />
+    <Compile Include="System.Windows\AttachedPropertyBrowsableWhenAttributePresentAttribute.cs" />
     <Compile Include="System.ComponentModel\IEditableCollectionViewAddNewItem.cs" />
     <Compile Include="System.Web\MimeMapping.cs" />
     <Compile Include="System.Windows.Automation.Peers\ChildWindowAutomationPeer.cs" />
