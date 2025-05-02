@@ -21,34 +21,66 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup;
+
+/// <summary>
+/// Reports the type that a markup extension can return.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+public sealed class MarkupExtensionReturnTypeAttribute : Attribute
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    internal sealed class MarkupExtensionReturnTypeAttribute : Attribute
-	{
-		public MarkupExtensionReturnTypeAttribute()
-		{
-		}
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MarkupExtensionReturnTypeAttribute"/> class.
+    /// </summary>
+    public MarkupExtensionReturnTypeAttribute()
+    {
+    }
 
-		public MarkupExtensionReturnTypeAttribute(Type returnType)
-		{
-			ReturnType = returnType;
-		}
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MarkupExtensionReturnTypeAttribute"/> class using the 
+    /// provided <see cref="Type"/>.
+    /// </summary>
+    /// <param name="returnType">
+    /// The return type that this attribute reports.
+    /// </param>
+    public MarkupExtensionReturnTypeAttribute(Type returnType)
+    {
+        ReturnType = returnType;
+    }
 
-		[Obsolete("Unused. Use MarkupExtensionReturnTypeAttribute(Type) or XamlSetMarkupExtensionAttribute.")]
-		public MarkupExtensionReturnTypeAttribute(Type returnType, Type expressionType)
-			: this(returnType)
-		{
-			ExpressionType = expressionType;
-		}
+    /// <summary>
+    /// Deprecated; do not use.
+    /// </summary>
+    /// <param name="returnType">
+    /// The return type that this .NET attribute reports.
+    /// </param>
+    /// <param name="expressionType">
+    /// Deprecated; do not use.
+    /// </param>
+    [Obsolete("Unused. Use MarkupExtensionReturnTypeAttribute(Type) or XamlSetMarkupExtensionAttribute.")]
+    public MarkupExtensionReturnTypeAttribute(Type returnType, Type expressionType)
+            : this(returnType)
+    {
+        ExpressionType = expressionType;
+    }
 
-		public Type ReturnType { get; private set; }
+    /// <summary>
+    /// Gets the <see cref="MarkupExtension"/> return type that this .NET attribute reports.
+    /// </summary>
+    /// <returns>
+    /// The type-safe return type of the specific <see cref="MarkupExtension.ProvideValue(IServiceProvider)"/>
+    /// implementation of the markup extension where the <see cref="MarkupExtensionReturnTypeAttribute"/> .NET 
+    /// attribute is applied.
+    /// </returns>
+    public Type ReturnType { get; private set; }
 
-		[ObsoleteAttribute("Unused. Use XamlSetMarkupExtensionAttribute functionality instead.")]
-		public Type ExpressionType { get; private set; }
-	}
+    /// <summary>
+    /// Deprecated; do not use.
+    /// </summary>
+    /// <returns>
+    /// Deprecated; do not use.
+    /// </returns>
+    [ObsoleteAttribute("Unused. Use XamlSetMarkupExtensionAttribute functionality instead.")]
+    public Type ExpressionType { get; private set; }
 }
