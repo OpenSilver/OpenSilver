@@ -74,13 +74,15 @@ namespace System.Windows
 
         internal VisualState GetState(string stateName)
         {
-            Collection<VisualState> states = _states;
-            for (int stateIndex = 0; stateIndex < states.Count; ++stateIndex)
+            if (_states is Collection<VisualState> states)
             {
-                VisualState state = states[stateIndex];
-                if (state.Name == stateName)
+                for (int stateIndex = 0; stateIndex < states.Count; ++stateIndex)
                 {
-                    return state;
+                    VisualState state = states[stateIndex];
+                    if (state.Name == stateName)
+                    {
+                        return state;
+                    }
                 }
             }
 
