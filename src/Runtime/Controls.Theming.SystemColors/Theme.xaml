@@ -1474,7 +1474,8 @@
                             </Grid.RowDefinitions>
                             <ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                     Cursor="{TemplateBinding Cursor}"
-                                                    Margin="{TemplateBinding Padding}"/>
+                                                    Margin="{TemplateBinding Padding}"
+                                                    CanContentScroll="{TemplateBinding CanContentScroll}"/>
                             <Rectangle Fill="{Binding ControlBrush, Source={StaticResource SystemBrushes}}"
                                        Grid.Column="1"
                                        Grid.Row="1" />
@@ -11228,7 +11229,8 @@
                                                     </Grid.RowDefinitions>
                                                     <ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                                             Cursor="{TemplateBinding Cursor}"
-                                                                            Margin="{TemplateBinding Padding}" />
+                                                                            Margin="{TemplateBinding Padding}"
+                                                                            CanContentScroll="{TemplateBinding CanContentScroll}" />
                                                     <Rectangle Fill="Transparent"
                                                                Grid.Column="1"
                                                                Grid.Row="1" />

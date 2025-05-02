@@ -3224,6 +3224,7 @@
                             </Grid.ColumnDefinitions>
                             <ScrollContentPresenter Cursor="{TemplateBinding Cursor}"
                                                     Margin="{TemplateBinding Padding}"
+                                                    CanContentScroll="{TemplateBinding CanContentScroll}"
                                                     x:Name="ScrollContentPresenter" />
                             <Rectangle Grid.Column="1"
                                        Grid.Row="1" />
@@ -14329,7 +14330,8 @@
                                                     </Grid.RowDefinitions>
                                                     <ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                                             Cursor="{TemplateBinding Cursor}"
-                                                                            Margin="{TemplateBinding Padding}" />
+                                                                            Margin="{TemplateBinding Padding}"
+                                                                            CanContentScroll="{TemplateBinding CanContentScroll}" />
                                                     <Rectangle Fill="#FFE9EEF4"
                                                                Grid.Column="1"
                                                                Grid.Row="1" />

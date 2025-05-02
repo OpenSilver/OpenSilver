@@ -1309,7 +1309,8 @@
 
                             <controls:ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                              Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
-                                                             Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
+                                                             Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                                             CanContentScroll="{TemplateBinding Property={x:Static controls:ScrollViewer.CanContentScrollProperty}}" />
 
                             <controls:Border controls:Grid.Column="1"
                                              controls:Grid.Row="1"

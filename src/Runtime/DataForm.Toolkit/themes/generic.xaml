@@ -202,7 +202,7 @@
                                                         <RowDefinition Height="*" />
                                                         <RowDefinition Height="Auto" />
                                                     </Grid.RowDefinitions>
-													<ScrollContentPresenter x:Name="ScrollContentPresenter" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
+													<ScrollContentPresenter x:Name="ScrollContentPresenter" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" CanContentScroll="{TemplateBinding CanContentScroll}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
                                                     <Rectangle Fill="#FFE9EEF4"
                                                                Grid.Column="1"
                                                                Grid.Row="1" />

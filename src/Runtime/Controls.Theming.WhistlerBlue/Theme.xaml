@@ -1720,7 +1720,8 @@
 
                             <ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                     Cursor="{TemplateBinding Cursor}"
-                                                    Margin="{TemplateBinding Padding}" />
+                                                    Margin="{TemplateBinding Padding}"
+                                                    CanContentScroll="{TemplateBinding CanContentScroll}" />
 
                             <ScrollBar x:Name="VerticalScrollBar"
                                        Width="16"
@@ -10877,7 +10878,8 @@
                                                     </Grid.RowDefinitions>
                                                     <ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                                             Cursor="{TemplateBinding Cursor}"
-                                                                            Margin="{TemplateBinding Padding}" />
+                                                                            Margin="{TemplateBinding Padding}"
+                                                                            CanContentScroll="{TemplateBinding CanContentScroll}" />
                                                     <Rectangle Fill="#FFE9EEF4"
                                                                Grid.Column="1"
                                                                Grid.Row="1" />

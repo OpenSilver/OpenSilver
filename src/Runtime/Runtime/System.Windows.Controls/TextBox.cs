@@ -921,6 +921,11 @@ namespace System.Windows.Controls
                 TextBoxView view = CreateView();
 
                 _textViewHost.AttachView(view);
+
+                if (_scrollViewer is not null)
+                {
+                    _scrollViewer.CanContentScroll = true;
+                }
             }
         }
 

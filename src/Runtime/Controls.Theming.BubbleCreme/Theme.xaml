@@ -1580,7 +1580,7 @@
                                     </Border.OpacityMask>
                                 </Border>
                             </Grid>
-                            <ScrollContentPresenter Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" x:Name="ScrollContentPresenter" />
+                            <ScrollContentPresenter Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" CanContentScroll="{TemplateBinding CanContentScroll}" x:Name="ScrollContentPresenter" />
                             <Rectangle Grid.Column="1" Grid.Row="1" Fill="{x:Null}" />
                             <ScrollBar x:Name="VerticalScrollBar" Margin="0,0,2,2" Width="16" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" IsTabStop="False" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Value="{TemplateBinding VerticalOffset}" Orientation="Vertical" ViewportSize="{TemplateBinding ViewportHeight}" BorderThickness=".75,.75,1.5,1.5">
                                 <ScrollBar.Background>
@@ -1635,7 +1635,7 @@
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <ScrollContentPresenter Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" x:Name="ScrollContentPresenter" />
+                            <ScrollContentPresenter Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" CanContentScroll="{TemplateBinding CanContentScroll}" x:Name="ScrollContentPresenter" />
                             <Rectangle Grid.Column="1" Grid.Row="1" Fill="#FFE9EEF4" Opacity="0" />
                             <ScrollBar x:Name="VerticalScrollBar" Width="18" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" IsTabStop="False" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Value="{TemplateBinding VerticalOffset}" Orientation="Vertical" ViewportSize="{TemplateBinding ViewportHeight}" />
                             <ScrollBar Height="18" x:Name="HorizontalScrollBar" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" IsTabStop="False" Grid.Row="1" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Value="{TemplateBinding HorizontalOffset}" Orientation="Horizontal" ViewportSize="{TemplateBinding ViewportWidth}" />
@@ -6724,7 +6724,7 @@
                                                         <RowDefinition Height="*"/>
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
-                                                    <ScrollContentPresenter x:Name="ScrollContentPresenter" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" />
+                                                    <ScrollContentPresenter x:Name="ScrollContentPresenter" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" CanContentScroll="{TemplateBinding CanContentScroll}" />
                                                     <Rectangle Fill="#FFE9EEF4" Grid.Column="1" Grid.Row="1"/>
                                                     <ScrollBar x:Name="VerticalScrollBar" Margin="0,-1" Width="18" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" IsTabStop="False" Grid.Column="1" Grid.Row="0" Orientation="Vertical" ViewportSize="{TemplateBinding ViewportHeight}" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Value="{TemplateBinding VerticalOffset}"/>
                                                     <ScrollBar x:Name="HorizontalScrollBar" Height="18" Margin="-1,0,-1,-1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" IsTabStop="False" Grid.Column="0" Grid.Row="1" Orientation="Horizontal" ViewportSize="{TemplateBinding ViewportWidth}" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Value="{TemplateBinding HorizontalOffset}"/>

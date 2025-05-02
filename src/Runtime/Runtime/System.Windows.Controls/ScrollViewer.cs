@@ -90,7 +90,15 @@ namespace System.Windows.Controls
         /// </summary>
         internal ScrollBar ElementVerticalScrollBar { get; private set; }
 
-        internal IScrollInfo ScrollInfo
+        /// <summary>
+        /// Gets or sets the element that implements the <see cref="IScrollInfo"/> interface and provides 
+        /// values for scrolling properties of this <see cref="ScrollViewer"/>.
+        /// </summary>
+        /// <returns>
+        /// The element that controls scrolling properties, such as extent, offset, or viewport size.
+        /// This property has no default value.
+        /// </returns>
+        protected internal IScrollInfo ScrollInfo
         {
             get { return _scrollInfo; }
             set
@@ -102,6 +110,77 @@ namespace System.Windows.Controls
                     _scrollInfo.CanVerticallyScroll = VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
                 }
             }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="CanContentScroll"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CanContentScrollProperty =
+            DependencyProperty.RegisterAttached(
+                nameof(CanContentScroll),
+                typeof(bool),
+                typeof(ScrollViewer),
+                new PropertyMetadata(BooleanBoxes.TrueBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether elements that support the 
+        /// <see cref="IScrollInfo"/> interface are allowed to scroll.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="ScrollViewer"/> scrolls in terms of logical units; 
+        /// false if the <see cref="ScrollViewer"/> scrolls in terms of physical units.
+        /// The default is true.
+        /// </returns>
+        public bool CanContentScroll
+        {
+            get => (bool)GetValue(CanContentScrollProperty);
+            set => SetValueInternal(CanContentScrollProperty, value);
+        }
+
+        /// <summary>
+        /// Gets the value of the <see cref="CanContentScroll"/> dependency property 
+        /// from a given element.
+        /// </summary>
+        /// <param name="element">
+        /// The element from which the property value is read.
+        /// </param>
+        /// <returns>
+        /// true if this element can scroll; otherwise, false.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
+        public static bool GetCanContentScroll(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (bool)element.GetValue(CanContentScrollProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="CanContentScroll"/> dependency property 
+        /// to a given element.
+        /// </summary>
+        /// <param name="element">
+        /// The element on which to set the property value.
+        /// </param>
+        /// <param name="canContentScroll">
+        /// The property value to set.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
+        public static void SetCanContentScroll(DependencyObject element, bool canContentScroll)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(CanContentScrollProperty, canContentScroll);
         }
 
         /// <summary>

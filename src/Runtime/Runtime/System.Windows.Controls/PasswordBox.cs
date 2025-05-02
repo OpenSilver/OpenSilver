@@ -362,6 +362,11 @@ namespace System.Windows.Controls
             {
                 PasswordBoxView view = CreateView();
                 _textViewHost.AttachView(view);
+
+                if (_contentElement is ScrollViewer scrollViewer)
+                {
+                    scrollViewer.CanContentScroll = true;
+                }
             }
         }
 

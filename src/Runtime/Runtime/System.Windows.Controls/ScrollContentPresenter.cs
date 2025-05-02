@@ -13,6 +13,7 @@
 
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -168,47 +169,111 @@ namespace System.Windows.Controls
         public double ViewportHeight => IsScrollClient ? _scrollData._viewport.Height : 0.0;
 
         /// <summary>
-        /// Builds the visual tree for the <see cref="ScrollContentPresenter"/>
-        /// when a new template is applied.
+        /// Identifies the <see cref="CanContentScroll"/> dependency property.
         /// </summary>
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
+        public static readonly DependencyProperty CanContentScrollProperty =
+            ScrollViewer.CanContentScrollProperty.AddOwner(
+                typeof(ScrollContentPresenter),
+                new PropertyMetadata(OnCanContentScrollChanged));
 
-            if (TemplatedParent is ScrollViewer sv)
+        /// <summary>
+        /// Indicates whether the content, if it supports <see cref="IScrollInfo"/>, 
+        /// should be allowed to control scrolling.
+        /// </summary>
+        /// <returns>
+        /// true if the content is allowed to scroll; otherwise, false. A false value 
+        /// indicates that the <see cref="ScrollContentPresenter"/> acts as the scrolling 
+        /// client. This property has no default value.
+        /// </returns>
+        public bool CanContentScroll
+        {
+            get => (bool)GetValue(CanContentScrollProperty);
+            set => SetValueInternal(CanContentScrollProperty, value);
+        }
+
+        private static void OnCanContentScrollChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ScrollContentPresenter scp = (ScrollContentPresenter)d;
+            if (scp._scrollInfo is null)
             {
-                IScrollInfo info = Content as IScrollInfo;
-                if (info is null)
+                return;
+            }
+
+            scp.HookupScrollingComponents();
+            scp.InvalidateMeasure();
+        }
+
+        // Helper method to get our ScrollViewer owner and its scrolling content talking.
+        // Method introduces the current owner/content, and clears a from any previous content.
+        internal void HookupScrollingComponents()
+        {
+            // We need to introduce our IScrollInfo to our ScrollViewer (and break any previous links).
+
+            // If our content is not an IScrollInfo, we should have selected a style that contains one.
+            if (TemplatedParent is ScrollViewer scrollContainer)
+            {
+                IScrollInfo si = null;
+
+                if (CanContentScroll)
                 {
-                    if (Content is ItemsPresenter presenter)
+                    // We need to get an IScrollInfo to introduce to the ScrollViewer.
+                    // 1. Try our content...
+                    si = Content as IScrollInfo;
+
+                    if (si is null)
                     {
-                        presenter.ApplyTemplate();
-                        if (presenter.TemplateChild != null)
+                        if (Content is UIElement child)
                         {
-                            info = presenter.TemplateChild as IScrollInfo;
+                            // 2. Our child might be an ItemsPresenter.  In this case check its child for being an IScrollInfo
+                            ItemsPresenter itemsPresenter = child as ItemsPresenter;
+                            if (itemsPresenter is null)
+                            {
+                                // 3. With the change in templates for ClearTypeHint the ItemsPresenter is not guranteed to be the 
+                                // immediate child. We now look for a named element instead of naively walking the descendents.
+                                if (scrollContainer.TemplatedParent is FrameworkElement templatedParent)
+                                {
+                                    itemsPresenter = templatedParent.GetTemplateChild("ItemsPresenter") as ItemsPresenter;
+                                }
+                            }
+
+                            if (itemsPresenter is not null)
+                            {
+                                itemsPresenter.ApplyTemplate();
+
+                                int count = VisualTreeHelper.GetChildrenCount(itemsPresenter);
+                                if (count > 0)
+                                {
+                                    si = VisualTreeHelper.GetChild(itemsPresenter, 0) as IScrollInfo;
+                                }
+                            }
                         }
                     }
                 }
 
-                if (info is null)
+                // 4. As a final fallback, we use ourself.
+                if (si is null)
                 {
-                    info = this;
+                    si = this;
                     EnsureScrollData();
                 }
 
                 // Detach any differing previous IScrollInfo from ScrollViewer
-                if (info != _scrollInfo && _scrollInfo is not null)
+                if (si != _scrollInfo && _scrollInfo is not null)
                 {
                     if (IsScrollClient) _scrollData = null;
                     else _scrollInfo.ScrollOwner = null;
                 }
 
-                _scrollInfo = info;
-                info.ScrollOwner = sv;
-                sv.ScrollInfo = info;
+                // Introduce our ScrollViewer and IScrollInfo to each other.
+                _scrollInfo = si;                   // At this point, we pass IsScrollClient if si == this.
+                si.ScrollOwner = scrollContainer;
+                scrollContainer.ScrollInfo = si;
             }
             else if (_scrollInfo is not null)
             {
+                // We're not really in a valid scrolling scenario.  Break any previous references, and get us
+                // back into a totally unlinked state.
+
                 if (_scrollInfo.ScrollOwner is not null)
                 {
                     _scrollInfo.ScrollOwner.ScrollInfo = null;
@@ -218,6 +283,18 @@ namespace System.Windows.Controls
                 _scrollInfo = null;
                 _scrollData = null;
             }
+        }
+
+        /// <summary>
+        /// Builds the visual tree for the <see cref="ScrollContentPresenter"/>
+        /// when a new template is applied.
+        /// </summary>
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            // Get our scrolling owner and content talking.
+            HookupScrollingComponents();
         }
 
         private bool IsScrollClient => _scrollInfo == this;

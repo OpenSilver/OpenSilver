@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using System.Windows.Media;
 
 namespace System.Windows.Controls;
 
@@ -132,6 +133,17 @@ public class ItemsPresenter : FrameworkElement
         // something has changed that affects the ItemsPresenter.
         // Re-measure.  This will recalculate everything from scratch.
         InvalidateMeasure();
+
+        // If we're under a ScrollViewer then its ScrollContentPresenter needs to
+        // be updated to work with the new panel.
+        if (Parent is ScrollViewer)
+        {
+            // If our logical parent is a ScrollViewer then the visual parent is a ScrollContentPresenter.
+            if (VisualTreeHelper.GetParent(this) is ScrollContentPresenter scp)
+            {
+                scp.HookupScrollingComponents();
+            }
+        }
     }
 
     internal static ItemsPresenter FromPanel(Panel panel)
