@@ -282,12 +282,18 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         }
 
         private static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName, out TypeReference ownerElementType)
+            => FindPropertyDeep(elementType, propertyName, out ownerElementType, false, false, false);
+
+        private static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName,
+            out TypeReference ownerElementType, bool ignoreCase = false, bool staticOnly = false, bool publicOnly = false)
         {
             ownerElementType = elementType;
             while (ownerElementType != null)
             {
                 var resolved = ownerElementType.ResolveOrThrow();
-                var propertyDefinition = resolved.Properties.FirstOrDefault(p => p.Name == propertyName);
+                var propertyDefinition = resolved.Properties.FirstOrDefault(p =>
+                    string.Compare(p.Name, propertyName, ignoreCase) == 0 && (!staticOnly || p.GetMethod.IsStatic) &&
+                    (!publicOnly || p.GetMethod.IsPublic));
                 if (propertyDefinition != null) return propertyDefinition;
 
                 ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
@@ -802,9 +808,21 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var type = FindType(namespaceName, typeName, null, true);
 
             var field = FindFieldDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
-            if (field != null &&
-                (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
+            if (field != null && (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
                 return $"{type.GetTypeNameIncludingGenericArguments(true, _compilerType)}.{field.Name}";
+
+            return null;
+        }
+
+        public string GetProperty(string fieldName, string namespaceName, string typeName, string assemblyName)
+        {
+            var type = FindType(namespaceName, typeName, null, true);
+
+            var property = FindPropertyDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
+            if (property != null && (property.GetMethod.IsPublic || property.GetMethod.IsAssembly || property.GetMethod.IsFamilyOrAssembly))
+            {
+                return $"{type.GetTypeNameIncludingGenericArguments(true, _compilerType)}.{property.Name}";
+            }
 
             return null;
         }

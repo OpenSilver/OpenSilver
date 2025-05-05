@@ -1130,6 +1130,11 @@ namespace GlobalResource
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                        _settings.AssemblyName) != null ||
+                                    _settings.Inspector.GetProperty(
+                                        propertyName + "Property",
+                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
                                         _settings.AssemblyName) != null;
 
                                 string propertyDeclaringTypeName;
@@ -1183,6 +1188,11 @@ namespace GlobalResource
 
                                 string dependencyPropertyName =
                                     _settings.Inspector.GetField(
+                                        propertyName + "Property",
+                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                        _settings.AssemblyName) ??
+                                    _settings.Inspector.GetProperty(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
@@ -1259,6 +1269,11 @@ namespace GlobalResource
                             {
                                 var dpName =
                                     _settings.Inspector.GetField(
+                                        propertyName + "Property",
+                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                        _settings.AssemblyName) ??
+                                    _settings.Inspector.GetProperty(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
@@ -1397,11 +1412,17 @@ namespace GlobalResource
                                     assemblyNameIfAny,
                                     isAttachedProperty);
 
-                                string dpName = _settings.Inspector.GetField(
-                                    propertyName + "Property",
-                                    propertyOwnerTypeNS,
-                                    propertyOwnerTypeName,
-                                    _settings.AssemblyName);
+                                string dpName =
+                                    _settings.Inspector.GetField(
+                                        propertyName + "Property",
+                                        propertyOwnerTypeNS,
+                                        propertyOwnerTypeName,
+                                        _settings.AssemblyName) ??
+                                    _settings.Inspector.GetProperty(
+                                        propertyName + "Property",
+                                        propertyOwnerTypeNS,
+                                        propertyOwnerTypeName,
+                                        _settings.AssemblyName);
 
                                 if (dpName != null)
                                 {

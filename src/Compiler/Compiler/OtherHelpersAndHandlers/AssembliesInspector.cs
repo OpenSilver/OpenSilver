@@ -109,6 +109,9 @@ namespace OpenSilver.Compiler
         public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
             => _monoCecilVersion.GetField(fieldName, namespaceName, typeName, assemblyName);
 
+        public string GetProperty(string fieldName, string namespaceName, string typeName, string assemblyName)
+            => _monoCecilVersion.GetProperty(fieldName, namespaceName, typeName, assemblyName);
+
         public TypeDefinition GetTypeDefinition(string namespaceName, string typeName, string assemblyName, bool throwIfNull = true)
             => _monoCecilVersion.FindType(namespaceName, typeName, assemblyName, !throwIfNull);
 
