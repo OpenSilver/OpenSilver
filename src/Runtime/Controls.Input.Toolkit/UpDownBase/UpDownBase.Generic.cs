@@ -319,6 +319,25 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Provides handling for the PreviewKeyDown event.
+        /// </summary>
+        /// <remarks>
+        /// Only support up and down arrow keys.
+        /// </remarks>
+        /// <param name="e">Key event args.</param>
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            if (e.Handled)
+            {
+                return;
+            }
+
+            OnKeyDown(e);
+        }
+
+        /// <summary>
         /// Provides handling for the MouseWheel event.
         /// </summary>
         /// <param name="e">Mouse wheel event args.</param>
