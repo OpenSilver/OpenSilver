@@ -14,6 +14,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Windows.Markup;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -31,6 +32,8 @@ namespace System.Windows.Controls
     public partial class ItemsControl : Control, IGeneratorHost
     {
         #region Data
+
+        private static readonly UncommonField<DisplayMemberPathTemplate> DisplayMemberPathTemplateField = new();
 
         // Note: this maps an item (for example a string) to the element
         // that is added to the visual tree (such a datatemplate) or to 
@@ -320,7 +323,7 @@ namespace System.Windows.Controls
         {
             if (!string.IsNullOrEmpty(DisplayMemberPath))
             {
-                if (ItemTemplateSelector is not DisplayMemberTemplateSelector)
+                if (ItemTemplateSelector is not null)
                 {
                     throw new InvalidOperationException(Strings.ItemTemplateSelectorBreaksDisplayMemberPath);
                 }
@@ -358,7 +361,7 @@ namespace System.Windows.Controls
         {
             ItemsControl itemsControl = (ItemsControl)d;
             itemsControl.OnDisplayMemberPathChanged((string)e.OldValue, (string)e.NewValue);
-            itemsControl.UpdateDisplayMemberTemplateSelector();
+            itemsControl.UpdateDisplayMemberTemplate();
         }
 
         /// <summary>
@@ -374,40 +377,22 @@ namespace System.Windows.Controls
         {
         }
 
-        private void UpdateDisplayMemberTemplateSelector()
+        private void UpdateDisplayMemberTemplate()
         {
             string displayMemberPath = DisplayMemberPath;
 
             if (!string.IsNullOrEmpty(displayMemberPath))
             {
-                // DisplayMemberPath is desired.
-                // Set ItemTemplateSelector to an appropriate object, provided that
-                // this doesn't conflict with the user's own setting.
-                DataTemplateSelector itemTemplateSelector = ItemTemplateSelector;
+                CheckTemplateSource();
 
-                if (itemTemplateSelector is not null && itemTemplateSelector is not DisplayMemberTemplateSelector)
-                {
-                    // if ItemTemplateSelector was actually set to something besides a DisplayMember selector,
-                    // it's an error to overwrite it with a DisplayMember selector unless ItemTemplateSelector
-                    // came from a style and DisplayMemberPath is local
-                    if (ReadLocalValue(ItemTemplateSelectorProperty) != DependencyProperty.UnsetValue ||
-                        ReadLocalValue(DisplayMemberPathProperty) == DependencyProperty.UnsetValue)
-                    {
-                        throw new InvalidOperationException(Strings.DisplayMemberPathAndItemTemplateSelectorDefined);
-                    }
-                }
-
-                // now set the ItemTemplateSelector to use the new DisplayMemberPath
-                ItemTemplateSelector = new DisplayMemberTemplateSelector(displayMemberPath);
+                DisplayMemberPathTemplateField.SetValue(this, new DisplayMemberPathTemplate(displayMemberPath));
             }
             else
             {
-                // Property is not desired. Clear the ItemTemplateSelector if we had set it earlier.
-                if (ItemTemplateSelector is DisplayMemberTemplateSelector)
-                {
-                    ClearValue(ItemTemplateSelectorProperty);
-                }
+                DisplayMemberPathTemplateField.ClearValue(this);
             }
+
+            _itemContainerGenerator?.Refresh();
         }
 
         /// <summary>
@@ -1186,14 +1171,22 @@ namespace System.Windows.Controls
         /// </param>
         protected virtual void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
+            DataTemplate itemTemplate = ItemTemplate;
+            DataTemplateSelector itemTemplateSelector = ItemTemplateSelector;
+
+            if (itemTemplate is null && itemTemplateSelector is null)
+            {
+                itemTemplate = DisplayMemberPathTemplateField.GetValue(this);
+            }
+
             switch (element)
             {
                 case ContentControl cc:
-                    cc.PrepareContentControl(item, ItemTemplate, ItemTemplateSelector);
+                    cc.PrepareContentControl(item, itemTemplate, itemTemplateSelector);
                     break;
 
                 case ContentPresenter cp:
-                    cp.PrepareContentPresenter(item, ItemTemplate, ItemTemplateSelector);
+                    cp.PrepareContentPresenter(item, itemTemplate, itemTemplateSelector);
                     break;
             }
         }
@@ -1294,63 +1287,30 @@ namespace System.Windows.Controls
             }
         }
 
-        internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
+        internal static DataTemplate GetDisplayMemberPathTemplate(ItemsControl itemsControl) => DisplayMemberPathTemplateField.GetValue(itemsControl);
+
+        private sealed class DisplayMemberPathTemplate : DataTemplate
         {
-            if (string.IsNullOrEmpty(displayMemberPath))
+            private readonly Binding _binding;
+
+            public DisplayMemberPathTemplate(string displayMemberPath)
             {
-                return DisplayMemberTemplateSelector.EmptyPathTemplate;
+                _binding = new Binding(displayMemberPath);
             }
 
-            var binding = new Binding(displayMemberPath);
-
-            return new DataTemplate
+            internal override bool BuildVisualTree(IFrameworkElement container)
             {
-                Template = new TemplateContent(
-                    new XamlContext(),
-                    (control, context) =>
-                    {
-                        var textBlock = new TextBlock();
-                        textBlock.SetTemplatedParent(context.TemplateOwnerReference);
-                        textBlock.SetBinding(TextBlock.TextProperty, binding);
+                Debug.Assert(container is ContentControl || container is ContentPresenter);
 
-                        return textBlock;
-                    })
-            };
-        }
+                var feContainer = (FrameworkElement)container;
 
-        private sealed class DisplayMemberTemplateSelector : DataTemplateSelector
-        {
-            static DisplayMemberTemplateSelector()
-            {
-                EmptyPathTemplate = new DataTemplate
-                {
-                    Template = new TemplateContent(
-                    new XamlContext(),
-                    static (owner, context) =>
-                    {
-                        var textBlock = new TextBlock();
-                        textBlock.SetTemplatedParent(context.TemplateOwnerReference);
-                        textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
+                var textBlock = new TextBlock();
+                textBlock.SetTemplatedParent(new(feContainer));
+                textBlock.SetBinding(TextBlock.TextProperty, _binding);
 
-                        return textBlock;
-                    }),
-                };
-                EmptyPathTemplate.Seal();
-            }
+                feContainer.TemplateChild = textBlock;
 
-            private readonly string _displayMemberPath;
-            private DataTemplate _contentTemplate;
-
-            public DisplayMemberTemplateSelector(string displayMemberPath)
-            {
-                _displayMemberPath = displayMemberPath;
-            }
-
-            internal static DataTemplate EmptyPathTemplate { get; }
-
-            public override DataTemplate SelectTemplate(object item, DependencyObject container)
-            {
-                return _contentTemplate ??= GetDataTemplateForDisplayMemberPath(_displayMemberPath);
+                return true;
             }
         }
     }

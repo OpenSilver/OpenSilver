@@ -359,9 +359,6 @@
   <data name="DisplayMemberPathAndItemTemplateDefined" xml:space="preserve">
     <value>Cannot set both DisplayMemberPath and ItemTemplate.</value>
   </data>
-  <data name="DisplayMemberPathAndItemTemplateSelectorDefined" xml:space="preserve">
-    <value>Cannot set both DisplayMemberPath and ItemTemplateSelector. When one is nonempty, it must be cleared before the other can be set.</value>
-  </data>
   <data name="DTypeNotSupportForSystemType" xml:space="preserve">
     <value>'{0}' type does not have a matching DependencyObjectType.</value>
   </data>

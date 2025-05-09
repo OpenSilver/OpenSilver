@@ -114,7 +114,7 @@ namespace System.Windows.Controls
                     }
                     else
                     {
-                        template = selectionBoxItemTemplate = ItemTemplate ?? GetDataTemplateForDisplayMemberPath(DisplayMemberPath);
+                        template = selectionBoxItemTemplate = ItemTemplate ?? GetDisplayMemberPathTemplate(this);
                     }
                 }
             }
