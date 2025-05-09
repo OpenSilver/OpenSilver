@@ -1742,17 +1742,21 @@ namespace OpenSilver.Compiler
                 string propertyName,
                 XName parentXName)
             {
-                // In the case of the "Frame" control, a relative URI to a ".xaml" file (used for navigation) should not be changed into an absolute URI, because it is relative to the Startup assembly, not to the current assembly where the value is defined:
-                bool IsFrameOrUriMappingSpecialCase =
-                    parentXName.LocalName == "UriMapping"
-                    || parentXName.LocalName == "Frame"
-                    || parentXName.LocalName == "HyperlinkButton";
+                // In the case of the "Frame" control, a relative URI to a ".xaml" file (used for navigation) should not be changed
+                // into an absolute URI, because it is relative to the Startup assembly, not to the current assembly where the value
+                // is defined:
+                if (parentXName.LocalName == "UriMapping" ||
+                    parentXName.LocalName == "Frame" ||
+                    parentXName.LocalName == "HyperlinkButton" ||
+                    parentXName.LocalName == "Hyperlink")
+                {
+                    return;
+                }
 
                 // We change relative paths into absolute paths in case of <Image> controls and other controls that have the "Source" property:
                 if ((valueTypeFullName == $"global::{KnownNamespaces.SystemWindowsMedia}.ImageSource"
                     || valueTypeFullName == "global::System.Uri"
                     || (propertyName == "FontFamily" && path.Contains('.')))
-                    && !IsFrameOrUriMappingSpecialCase
                     && !path.ToLower().EndsWith(".xaml")) // Note: this is to avoid messing with Frame controls, which paths are always relative to the startup assembly (in SL).
                 {
                     if (!IsUriAbsolute(path) // This lines checks if the URI is in the form "ms-appx://" or "http://" or "https://" or "mailto:..." etc.
