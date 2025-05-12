@@ -132,6 +132,7 @@ namespace System.Windows.Controls.Primitives
             return value == PlacementMode.Absolute
                 || value == PlacementMode.Relative
                 || value == PlacementMode.Bottom
+                || value == PlacementMode.Center
                 || value == PlacementMode.Right
                 || value == PlacementMode.Mouse
                 || value == PlacementMode.MousePoint
@@ -503,6 +504,7 @@ namespace System.Windows.Controls.Primitives
         {
             return placement == PlacementMode.Relative
                 || placement == PlacementMode.Bottom
+                || placement == PlacementMode.Center
                 || placement == PlacementMode.Right
                 || placement == PlacementMode.Left
                 || placement == PlacementMode.Top;
@@ -651,6 +653,9 @@ namespace System.Windows.Controls.Primitives
                     case PlacementMode.Right:
                         offset = targetInterestPoints.TopRight;
                         break;
+                    case PlacementMode.Center:
+                        offset = targetInterestPoints.Center - new Vector(childInterestPoints.Width / 2, childInterestPoints.Height / 2);
+                        break;
                     default:
                         Debug.Assert(false, $"Unexpected relative placement mode: '{placement}'.");
                         offset = new Point(0, 0);
@@ -693,6 +698,10 @@ namespace System.Windows.Controls.Primitives
             public Point TopRight;
             public Point BottomLeft;
             public Point BottomRight;
+
+            public Point Center => new(TopLeft.X + (Width / 2), TopLeft.Y + (Height / 2));
+            public double Width => TopRight.X - TopLeft.X;
+            public double Height => BottomLeft.Y - TopLeft.Y;
         }
 
         private static InterestPoints InterestPointsFromRect(Rect rect, Matrix transform)

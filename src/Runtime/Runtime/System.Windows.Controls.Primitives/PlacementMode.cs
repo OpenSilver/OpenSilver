@@ -46,6 +46,13 @@ public enum PlacementMode
     Bottom = 2,
 
     /// <summary>
+    /// A position of the <see cref="Popup"/> control where it is centered over the <see cref="Popup.PlacementTarget"/>.
+    /// If a screen edge obscures the <see cref="Popup"/>, the control repositions itself to align with
+    /// the screen edge.
+    /// </summary>
+    Center = 3,
+
+    /// <summary>
     /// A position of the <see cref="Popup"/> control that aligns its left edge with the right edge 
     /// of the <see cref="Popup.PlacementTarget"/> and aligns its upper edge with the upper edge of 
     /// the <see cref="Popup.PlacementTarget"/>. If the right screen-edge obscures the <see cref="Popup"/>,
