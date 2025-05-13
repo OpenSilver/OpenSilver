@@ -6,6 +6,7 @@ using Microsoft.Web.WebView2.Core.DevToolsProtocolExtension;
 using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Win32;
 using OpenSilver.Simulator;
+using OpenSilver.Simulator.BlazorSupport;
 using OpenSilver.Simulator.XamlInspection;
 using System.Diagnostics;
 using System.Globalization;
@@ -40,6 +41,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         readonly Thread _openSilverRuntimeThread;
         Dispatcher _openSilverRuntimeDispatcher;
         string _lastExecutedJavaScript = "";
+        BlazorWebViewManager _blazorWebViewManager;
 
         const string NAME_OF_TEMP_CACHE_FOLDER = "simulator-temp-cache";
 
@@ -186,6 +188,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 MainWebBrowser.CoreWebView2.GetDevToolsProtocolEventReceiver("Log.entryAdded").DevToolsProtocolEventReceived += OnConsoleMessageEvent;
             }
 
+            _blazorWebViewManager = OpenSilverBlazorInitializer.TryInitialize(Dispatcher, MainWebBrowser, _simulatorUrl);
             LoadIndexFile();
         }
 
@@ -368,6 +371,15 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                     e.Response = response;
                     return;
                 }
+            }
+
+            if (_blazorWebViewManager?.TryGetResponse(uriString, out var statusCode, out var statusMessage, out var content, out var headers) == true)
+            {
+                var response = environment.CreateWebResourceResponse(
+                    content,
+                    statusCode, statusMessage, GetHeaders(uriString));
+                e.Response = response;
+                return;
             }
 
             var notFound = environment.CreateWebResourceResponse(
