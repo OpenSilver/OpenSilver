@@ -1091,14 +1091,20 @@ document.createTextviewManager = function (inputCallback, scrollCallback) {
 
             view.addEventListener('paste', function (e) {
                 if (this.getAttribute('data-acceptsreturn') === 'false') {
-                    e.preventDefault();
-                    let content = (e.originalEvent || e).clipboardData.getData('text/plain');
-                    if (content !== undefined) {
-                        content = content.replace(/\n/g, '').replace(/\r/g, '');
+                    const text = e.clipboardData.getData('text/plain');
+
+                    if (text.indexOf('\n') !== -1 || text.indexOf('\r') !== -1) {
+                        e.preventDefault();
+
+                        const newText = text.replace(/[\r\n]+/g, '');
+                        document.execCommand('insertText', false, newText);
+
+                        // Scroll to the cursor position
+                        this.blur();
+                        this.focus();
                     }
-                    document.execCommand('insertText', false, content);
                 }
-            }, false);
+            });
 
             parent.appendChild(view);
         },
