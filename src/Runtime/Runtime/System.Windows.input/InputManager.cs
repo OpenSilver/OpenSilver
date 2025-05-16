@@ -11,12 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
-using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using System.Collections.Concurrent;
 
 namespace System.Windows.Input;
 
@@ -40,10 +39,9 @@ internal sealed class InputManager
         TOUCH_START = 11,
         TOUCH_END = 12,
         TOUCH_MOVE = 13,
-        FOCUS_MANAGED = 14,
-        FOCUS_UNMANAGED = 15,
-        WINDOW_FOCUS = 16,
-        WINDOW_BLUR = 17,
+        FOCUS_UNMANAGED = 14,
+        WINDOW_FOCUS = 15,
+        WINDOW_BLUR = 16,
     }
 
     private enum MouseButton
@@ -64,77 +62,62 @@ internal sealed class InputManager
         Right,
     }
 
-    private sealed class FocusQueue
+    private sealed class EventQueue
     {
-        private List<FocusRequest> _queue = new();
+        private readonly ConcurrentQueue<RoutedEventArgs> _queue = [];
+        private readonly EventQueueProcessingDisabled _processingDisabled;
+        private int _disableProcessingRequests;
 
-        public bool IsEmpty => _queue.Count == 0;
-
-        public void AddRequest(FocusRequest request) => _queue.Add(request);
-
-        public FocusRequest PeekLast()
+        public EventQueue()
         {
-            if (!TryPeekLast(out FocusRequest request))
-            {
-                throw new InvalidOperationException("Queue is empty.");
-            }
-
-            return request;
+            _processingDisabled = new(this);
         }
 
-        public bool TryPeekLast(out FocusRequest request)
-        {
-            if (IsEmpty)
-            {
-                request = default;
-                return false;
-            }
+        public void AddEvent(RoutedEventArgs args) => _queue.Enqueue(args);
 
-            request = _queue[_queue.Count - 1];
-            return true;
+        public IDisposable DisableProcessing()
+        {
+            Interlocked.Increment(ref _disableProcessingRequests);
+            return _processingDisabled;
         }
 
-        public void ProcessQueue()
+        private void EnableProcessing()
         {
-            foreach (FocusRequest r in Interlocked.Exchange(ref _queue, new()))
+            if (Interlocked.Decrement(ref _disableProcessingRequests) == 0)
             {
-                RoutedEvent routedEvent = r.Type switch
-                {
-                    FocusRequestType.LostFocus => UIElement.LostFocusEvent,
-                    FocusRequestType.GotFocus => UIElement.GotFocusEvent,
-                    _ => null,
-                };
-
-                if (routedEvent is null) continue;
-
-                UIElement target = r.Target;
-                target.RaiseEvent(new RoutedEventArgs
-                {
-                    RoutedEvent = routedEvent,
-                    OriginalSource = target,
-                });
+                ProcessQueue();
             }
+        }
+
+        private void ProcessQueue()
+        {
+            if (_queue.IsEmpty)
+            {
+                return;
+            }
+
+            while (_queue.TryDequeue(out RoutedEventArgs args))
+            {
+                UIElement target = (UIElement)args.OriginalSource;
+                target.RaiseEvent(args);
+            }
+        }
+
+        private sealed class EventQueueProcessingDisabled : IDisposable
+        {
+            private readonly EventQueue _eventQueue;
+
+            public EventQueueProcessingDisabled(EventQueue eventQueue)
+            {
+                _eventQueue = eventQueue;
+            }
+
+            public void Dispose() => _eventQueue.EnableProcessing();
         }
     }
 
-    private readonly struct FocusRequest
-    {
-        public FocusRequest(UIElement target, FocusRequestType type)
-        {
-            Debug.Assert(target is not null);
-            Target = target;
-            Type = type;
-        }
-
-        public UIElement Target { get; }
-
-        public FocusRequestType Type { get; }
-    }
-
-    private enum FocusRequestType { GotFocus, LostFocus }
-
+    private readonly EventQueue _eventQueue = new();
     private readonly JavaScriptCallback _handler;
-    private readonly FocusQueue _focusQueue = new();
 
     private const int _doubleClickDeltaTime = 400;
     private const int _doubleClickDeltaX = 5;
@@ -195,11 +178,14 @@ internal sealed class InputManager
             Pointer.Captured = null;
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.releaseMouseCapture();");
 
-            uie.RaiseEvent(new MouseEventArgs
+            using (_eventQueue.DisableProcessing())
             {
-                RoutedEvent = UIElement.LostMouseCaptureEvent,
-                OriginalSource = uie,
-            });
+                _eventQueue.AddEvent(new MouseEventArgs
+                {
+                    RoutedEvent = UIElement.LostMouseCaptureEvent,
+                    OriginalSource = uie,
+                });
+            }
         }
     }
 
@@ -218,13 +204,25 @@ internal sealed class InputManager
             {
                 KeyboardNavigation.UpdateFocusedElement(uie, focusScope);
 
-                if (focused is not null)
+                using (_eventQueue.DisableProcessing())
                 {
-                    _focusQueue.AddRequest(new FocusRequest(focused, FocusRequestType.LostFocus));
-                }
-                _focusQueue.AddRequest(new FocusRequest(uie, FocusRequestType.GotFocus));
-                return true;
+                    if (focused is not null)
+                    {
+                        _eventQueue.AddEvent(new RoutedEventArgs
+                        {
+                            RoutedEvent = UIElement.LostFocusEvent,
+                            OriginalSource = focused,
+                        });
+                    }
 
+                    _eventQueue.AddEvent(new RoutedEventArgs
+                    {
+                        RoutedEvent = UIElement.GotFocusEvent,
+                        OriginalSource = uie,
+                    });
+                }
+
+                return true;
             }
             ClearTabIndex(uie);
         }
@@ -257,17 +255,20 @@ internal sealed class InputManager
 
     internal void OnElementRemoved(UIElement uie)
     {
-        RaiseMouseLeave(uie);
-        ResetFocus(uie);
-        ReleaseMouseCapture(uie);
+        using (_eventQueue.DisableProcessing())
+        {
+            RaiseMouseLeave(uie);
+            ResetFocus(uie);
+            ReleaseMouseCapture(uie);
+        }
 
-        static void RaiseMouseLeave(UIElement uie)
+        void RaiseMouseLeave(UIElement uie)
         {
             if (uie.IsPointerOver)
             {
                 uie.IsPointerOver = false;
 
-                uie.RaiseEvent(new MouseEventArgs
+                _eventQueue.AddEvent(new MouseEventArgs
                 {
                     RoutedEvent = UIElement.MouseLeaveEvent,
                     OriginalSource = uie,
@@ -283,13 +284,11 @@ internal sealed class InputManager
             {
                 KeyboardNavigation.UpdateFocusedElement(null, focusScope);
 
-                bool processQueue = _focusQueue.IsEmpty;
-                _focusQueue.AddRequest(new FocusRequest(focused, FocusRequestType.LostFocus));
-
-                if (processQueue)
+                _eventQueue.AddEvent(new RoutedEventArgs
                 {
-                    _focusQueue.ProcessQueue();
-                }
+                    RoutedEvent = UIElement.LostFocusEvent,
+                    OriginalSource = focused,
+                });
             }
         }
 
@@ -312,14 +311,16 @@ internal sealed class InputManager
 
     private void ProcessInput(string id, int eventId, object jsEventArg)
     {
-        UIElement uie = INTERNAL_HtmlDomManager.GetElementById(id);
-        if (uie is null)
+        using (_eventQueue.DisableProcessing())
         {
-            ProcessEvent((EVENTS)eventId, jsEventArg);
-        }
-        else
-        {
-            DispatchEvent(uie, (EVENTS)eventId, jsEventArg);
+            if (INTERNAL_HtmlDomManager.GetElementById(id) is not UIElement uie)
+            {
+                ProcessEvent((EVENTS)eventId, jsEventArg);
+            }
+            else
+            {
+                DispatchEvent(uie, (EVENTS)eventId, jsEventArg);
+            }
         }
     }
 
@@ -339,10 +340,6 @@ internal sealed class InputManager
             case EVENTS.MOUSE_LEFT_UP:
                 _mouseLeftDown = false;
                 ReleaseMouseCapture();
-                break;
-
-            case EVENTS.FOCUS_MANAGED:
-                OnFocusManaged();
                 break;
 
             case EVENTS.FOCUS_UNMANAGED:
@@ -365,11 +362,6 @@ internal sealed class InputManager
         {
             ReleaseMouseCapture(uie);
         }
-    }
-
-    private void OnFocusManaged()
-    {
-        _focusQueue.ProcessQueue();
     }
 
     private void OnFocusUnmanaged()
@@ -400,7 +392,7 @@ internal sealed class InputManager
         // The window received focus, re-focus element with logical focus if any.
         if (FocusManager.GetFocusedElement() is UIElement focusedElement)
         {
-            focusedElement.RaiseEvent(new RoutedEventArgs
+            _eventQueue.AddEvent(new RoutedEventArgs
             {
                 RoutedEvent = UIElement.GotFocusEvent,
                 OriginalSource = focusedElement,
@@ -413,7 +405,7 @@ internal sealed class InputManager
     {
         if (FocusManager.GetFocusedElement() is UIElement focusedElement)
         {
-            focusedElement.RaiseEvent(new RoutedEventArgs
+            _eventQueue.AddEvent(new RoutedEventArgs
             {
                 RoutedEvent = UIElement.LostFocusEvent,
                 OriginalSource = focusedElement,
@@ -686,21 +678,25 @@ internal sealed class InputManager
 
         KeyboardNavigation.UpdateFocusedElement(newFocus, focusScope);
 
-        bool processQueue = _focusQueue.IsEmpty;
-
-        if (oldFocus is not null)
+        using (_eventQueue.DisableProcessing())
         {
-            _focusQueue.AddRequest(new FocusRequest(oldFocus, FocusRequestType.LostFocus));
-        }
+            if (oldFocus is not null)
+            {
+                _eventQueue.AddEvent(new RoutedEventArgs
+                {
+                    RoutedEvent = UIElement.LostFocusEvent,
+                    OriginalSource = oldFocus,
+                });
+            }
 
-        if (newFocus is not null)
-        {
-            _focusQueue.AddRequest(new FocusRequest(newFocus, FocusRequestType.GotFocus));
-        }
-
-        if (processQueue)
-        {
-            _focusQueue.ProcessQueue();
+            if (newFocus is not null)
+            {
+                _eventQueue.AddEvent(new RoutedEventArgs
+                {
+                    RoutedEvent = UIElement.GotFocusEvent,
+                    OriginalSource = newFocus,
+                });
+            }
         }
 
         static UIElement FindLogicalFocus(UIElement uie)
