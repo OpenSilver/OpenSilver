@@ -411,10 +411,9 @@ document.createInputManager = function (callback) {
         TOUCH_START: 11,
         TOUCH_END: 12,
         TOUCH_MOVE: 13,
-        FOCUS_MANAGED: 14,
-        FOCUS_UNMANAGED: 15,
-        WINDOW_FOCUS: 16,
-        WINDOW_BLUR: 17,
+        FOCUS_UNMANAGED: 14,
+        WINDOW_FOCUS: 15,
+        WINDOW_BLUR: 16,
     };
 
     const MODIFIERKEYS = {
@@ -426,17 +425,7 @@ document.createInputManager = function (callback) {
     };
 
     const FocusManager = (function () {
-        let _timeoutID = null;
         let _isManagedFocusUpdate = false;
-
-        function startTimer() {
-            if (_timeoutID === null) {
-                _timeoutID = setTimeout(function () {
-                    _timeoutID = null;
-                    callback('', EVENTS.FOCUS_MANAGED, null);
-                });
-            }
-        };
 
         return {
             get isManagingFocus() {
@@ -451,12 +440,7 @@ document.createInputManager = function (callback) {
                 element.focus({ preventScroll: true });
                 _isManagedFocusUpdate = false;
 
-                if (document.activeElement === element) {
-                    startTimer();
-                    return true;
-                }
-
-                return false;
+                return document.activeElement === element;
             },
         };
     })();
