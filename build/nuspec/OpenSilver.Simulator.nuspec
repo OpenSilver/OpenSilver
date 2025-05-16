@@ -14,9 +14,28 @@
     <icon>images\OpenSilver_icon.png</icon>
 
     <dependencies>
-      <group targetFramework="netcoreapp3.1">
+      <group targetFramework="net7.0-windows7.0">
         <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
         <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
+        <dependency id="Microsoft.AspNetCore.Components.WebView" version="7.0.20" />
+        <dependency id="MahApps.Metro" version="2.4.10" />
+        <dependency id="System.Text.Json" version="9.0.0" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
+
+      <group targetFramework="net8.0-windows7.0">
+        <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
+        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
+        <dependency id="Microsoft.AspNetCore.Components.WebView" version="8.0.15" />
+        <dependency id="MahApps.Metro" version="2.4.10" />
+        <dependency id="System.Text.Json" version="9.0.0" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
+
+      <group targetFramework="net9.0-windows7.0">
+        <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
+        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
+        <dependency id="Microsoft.AspNetCore.Components.WebView" version="9.0.4" />
         <dependency id="MahApps.Metro" version="2.4.10" />
         <dependency id="System.Text.Json" version="9.0.0" />
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
@@ -24,7 +43,13 @@
     </dependencies>
 
     <frameworkReferences>
-      <group targetFramework="netcoreapp3.1">
+      <group targetFramework="net7.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+      </group>
+      <group targetFramework="net8.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+      </group>
+      <group targetFramework="net9.0-windows7.0">
         <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
       </group>
     </frameworkReferences>
@@ -38,8 +63,14 @@
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.dll" target="lib/netcoreapp3.1" />
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.xml" target="lib/netcoreapp3.1" />
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net7.0-windows/OpenSilver.Simulator.dll" target="lib/net7.0-windows7.0" />
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net7.0-windows/OpenSilver.Simulator.xml" target="lib/net7.0-windows7.0" />
+
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net8.0-windows/OpenSilver.Simulator.dll" target="lib/net8.0-windows7.0" />
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net8.0-windows/OpenSilver.Simulator.xml" target="lib/net8.0-windows7.0" />
+
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net9.0-windows/OpenSilver.Simulator.dll" target="lib/net9.0-windows7.0" />
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net9.0-windows/OpenSilver.Simulator.xml" target="lib/net9.0-windows7.0" />
 
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
