@@ -11,8 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -39,10 +39,9 @@ internal sealed class InputManager
         KEYDOWN = 10,
         KEYUP = 11,
         KEYPRESS = 12,
-        FOCUS_MANAGED = 13,
-        FOCUS_UNMANAGED = 14,
-        WINDOW_FOCUS = 15,
-        WINDOW_BLUR = 16,
+        FOCUS_UNMANAGED = 13,
+        WINDOW_FOCUS = 14,
+        WINDOW_BLUR = 15,
     }
 
     private readonly struct PointerCallbackParameters(bool isTouchEvent, double pageX, double pageY, ModifierKeys modifiers, object uiEventArg)
@@ -54,83 +53,69 @@ internal sealed class InputManager
         public readonly object UIEventArg = uiEventArg;
     }
 
-    private sealed class FocusQueue
+    private sealed class EventQueue
     {
-        private List<FocusRequest> _queue = [];
+        private readonly ConcurrentQueue<RoutedEventArgs> _queue = [];
+        private readonly EventQueueProcessingDisabled _processingDisabled;
+        private int _disableProcessingRequests;
 
-        public bool IsEmpty => _queue.Count == 0;
-
-        public void AddRequest(FocusRequest request) => _queue.Add(request);
-
-        public FocusRequest PeekLast()
+        public EventQueue()
         {
-            if (!TryPeekLast(out FocusRequest request))
-            {
-                throw new InvalidOperationException("Queue is empty.");
-            }
-
-            return request;
+            _processingDisabled = new(this);
         }
 
-        public bool TryPeekLast(out FocusRequest request)
-        {
-            if (IsEmpty)
-            {
-                request = default;
-                return false;
-            }
+        public void AddEvent(RoutedEventArgs args) => _queue.Enqueue(args);
 
-            request = _queue[_queue.Count - 1];
-            return true;
+        public IDisposable DisableProcessing()
+        {
+            Interlocked.Increment(ref _disableProcessingRequests);
+            return _processingDisabled;
         }
 
-        public void ProcessQueue()
+        private void EnableProcessing()
         {
-            List<FocusRequest> queue = Interlocked.Exchange(ref _queue, []);
+            if (Interlocked.Decrement(ref _disableProcessingRequests) == 0)
+            {
+                ProcessQueue();
+            }
+        }
 
-            if (queue.Count == 0)
+        private void ProcessQueue()
+        {
+            if (_queue.IsEmpty)
             {
                 return;
             }
 
-            foreach (FocusRequest r in queue)
+            while (_queue.TryDequeue(out RoutedEventArgs args))
             {
-                RoutedEvent routedEvent = r.Type switch
+                UIElement target = (UIElement)args.Source;
+                target.RaiseTrustedEvent(args);
+
+                if (args.RoutedEvent == UIElement.LostFocusEvent ||
+                    args.RoutedEvent == UIElement.GotFocusEvent)
                 {
-                    FocusRequestType.LostFocus => UIElement.LostFocusEvent,
-                    FocusRequestType.GotFocus => UIElement.GotFocusEvent,
-                    _ => null,
-                };
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
+        }
 
-                if (routedEvent is null) continue;
+        private sealed class EventQueueProcessingDisabled : IDisposable
+        {
+            private readonly EventQueue _eventQueue;
 
-                UIElement target = r.Target;
-                target.RaiseTrustedEvent(new RoutedEventArgs(routedEvent, target));
+            public EventQueueProcessingDisabled(EventQueue eventQueue)
+            {
+                _eventQueue = eventQueue;
             }
 
-            CommandManager.InvalidateRequerySuggested();
+            public void Dispose() => _eventQueue.EnableProcessing();
         }
     }
 
-    private readonly struct FocusRequest
-    {
-        public FocusRequest(UIElement target, FocusRequestType type)
-        {
-            Debug.Assert(target is not null);
-            Target = target;
-            Type = type;
-        }
-
-        public UIElement Target { get; }
-
-        public FocusRequestType Type { get; }
-    }
-
-    private enum FocusRequestType { GotFocus, LostFocus }
-
+    private readonly EventQueue _eventQueue = new();
     private readonly JavaScriptCallback _handler;
     private readonly JavaScriptCallback _pointerHandler;
-    private readonly FocusQueue _focusQueue = new();
 
     private const int _doubleClickDeltaTime = 400;
     private const int _doubleClickDeltaX = 5;
@@ -180,11 +165,14 @@ internal sealed class InputManager
             string sDiv = OpenSilver.Interop.GetVariableStringForJS(uie.OuterDiv);
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.capturePointer({sDiv})");
 
-            uie.RaiseTrustedEvent(new MouseEventArgs
+            using (_eventQueue.DisableProcessing())
             {
-                RoutedEvent = Mouse.GotMouseCaptureEvent,
-                Source = uie,
-            });
+                _eventQueue.AddEvent(new MouseEventArgs
+                {
+                    RoutedEvent = Mouse.GotMouseCaptureEvent,
+                    Source = uie,
+                });
+            }
 
             return true;
         }
@@ -199,11 +187,14 @@ internal sealed class InputManager
             Pointer.Captured = null;
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.releasePointerCapture()");
 
-            uie.RaiseTrustedEvent(new MouseEventArgs
+            using (_eventQueue.DisableProcessing())
             {
-                RoutedEvent = Mouse.LostMouseCaptureEvent,
-                Source = uie,
-            });
+                _eventQueue.AddEvent(new MouseEventArgs
+                {
+                    RoutedEvent = Mouse.LostMouseCaptureEvent,
+                    Source = uie,
+                });
+            }
         }
     }
 
@@ -222,11 +213,16 @@ internal sealed class InputManager
             {
                 KeyboardNavigation.UpdateFocusedElement(uie, focusScope);
 
-                if (focused is not null)
+                using (_eventQueue.DisableProcessing())
                 {
-                    _focusQueue.AddRequest(new FocusRequest(focused, FocusRequestType.LostFocus));
+                    if (focused is not null)
+                    {
+                        _eventQueue.AddEvent(new RoutedEventArgs(UIElement.LostFocusEvent, focused));
+                    }
+
+                    _eventQueue.AddEvent(new RoutedEventArgs(UIElement.GotFocusEvent, uie));
                 }
-                _focusQueue.AddRequest(new FocusRequest(uie, FocusRequestType.GotFocus));
+
                 return true;
 
             }
@@ -261,17 +257,20 @@ internal sealed class InputManager
 
     internal void OnElementRemoved(UIElement uie)
     {
-        RaiseMouseLeave(uie);
-        ResetFocus(uie);
-        ReleaseMouseCapture(uie);
+        using (_eventQueue.DisableProcessing())
+        {
+            RaiseMouseLeave(uie);
+            ResetFocus(uie);
+            ReleaseMouseCapture(uie);
+        }
 
-        static void RaiseMouseLeave(UIElement uie)
+        void RaiseMouseLeave(UIElement uie)
         {
             if (uie.IsMouseOver)
             {
                 uie.ClearValue(UIElement.IsMouseOverPropertyKey);
 
-                uie.RaiseTrustedEvent(new MouseEventArgs
+                _eventQueue.AddEvent(new MouseEventArgs
                 {
                     RoutedEvent = Mouse.MouseLeaveEvent,
                     Source = uie,
@@ -287,13 +286,7 @@ internal sealed class InputManager
             {
                 KeyboardNavigation.UpdateFocusedElement(null, focusScope);
 
-                bool processQueue = _focusQueue.IsEmpty;
-                _focusQueue.AddRequest(new FocusRequest(focused, FocusRequestType.LostFocus));
-
-                if (processQueue)
-                {
-                    _focusQueue.ProcessQueue();
-                }
+                _eventQueue.AddEvent(new RoutedEventArgs(UIElement.LostFocusEvent, focused));
             }
         }
 
@@ -316,28 +309,34 @@ internal sealed class InputManager
 
     private void ProcessInput(string id, int eventId, object jsEventArg)
     {
-        if (INTERNAL_HtmlDomManager.GetElementById(id) is not UIElement uie)
+        using (_eventQueue.DisableProcessing())
         {
-            ProcessUnmappedEvent((EVENTS)eventId, jsEventArg);
-        }
-        else
-        {
-            DispatchEvent(uie, (EVENTS)eventId, jsEventArg);
+            if (INTERNAL_HtmlDomManager.GetElementById(id) is not UIElement uie)
+            {
+                ProcessUnmappedEvent((EVENTS)eventId, jsEventArg);
+            }
+            else
+            {
+                DispatchEvent(uie, (EVENTS)eventId, jsEventArg);
+            }
         }
     }
 
     private void ProcessPointerInput(string id, int eventId, object jsEventArg, bool isTouchEvent, double pageX, double pageY, int keyModifiers)
     {
-        if (INTERNAL_HtmlDomManager.GetElementById(id) is not UIElement uie)
+        using (_eventQueue.DisableProcessing())
         {
-            ProcessUnmappedEvent((EVENTS)eventId, jsEventArg);
-        }
-        else
-        {
-            DispatchEventPointerEvent(
-                uie,
-                (EVENTS)eventId,
-                new PointerCallbackParameters(isTouchEvent, pageX, pageY, (ModifierKeys)keyModifiers, jsEventArg));
+            if (INTERNAL_HtmlDomManager.GetElementById(id) is not UIElement uie)
+            {
+                ProcessUnmappedEvent((EVENTS)eventId, jsEventArg);
+            }
+            else
+            {
+                DispatchEventPointerEvent(
+                    uie,
+                    (EVENTS)eventId,
+                    new PointerCallbackParameters(isTouchEvent, pageX, pageY, (ModifierKeys)keyModifiers, jsEventArg));
+            }
         }
     }
 
@@ -433,10 +432,6 @@ internal sealed class InputManager
                 ReleaseMouseCapture();
                 break;
 
-            case EVENTS.FOCUS_MANAGED:
-                OnFocusManaged();
-                break;
-
             case EVENTS.FOCUS_UNMANAGED:
                 OnFocusUnmanaged();
                 break;
@@ -457,11 +452,6 @@ internal sealed class InputManager
         {
             ReleaseMouseCapture(uie);
         }
-    }
-
-    private void OnFocusManaged()
-    {
-        _focusQueue.ProcessQueue();
     }
 
     private void OnFocusUnmanaged()
@@ -502,7 +492,7 @@ internal sealed class InputManager
     {
         if (FocusManager.GetFocusedElement() is UIElement focusedElement)
         {
-            focusedElement.RaiseTrustedEvent(new RoutedEventArgs(UIElement.LostFocusEvent, focusedElement)
+            _eventQueue.AddEvent(new RoutedEventArgs(UIElement.LostFocusEvent, focusedElement)
             {
                 UIEventArg = jsEventArg,
             });
@@ -813,21 +803,17 @@ internal sealed class InputManager
 
         KeyboardNavigation.UpdateFocusedElement(newFocus, focusScope);
 
-        bool processQueue = _focusQueue.IsEmpty;
-
-        if (oldFocus is not null)
+        using (_eventQueue.DisableProcessing())
         {
-            _focusQueue.AddRequest(new FocusRequest(oldFocus, FocusRequestType.LostFocus));
-        }
+            if (oldFocus is not null)
+            {
+                _eventQueue.AddEvent(new RoutedEventArgs(UIElement.LostFocusEvent, oldFocus));
+            }
 
-        if (newFocus is not null)
-        {
-            _focusQueue.AddRequest(new FocusRequest(newFocus, FocusRequestType.GotFocus));
-        }
-
-        if (processQueue)
-        {
-            _focusQueue.ProcessQueue();
+            if (newFocus is not null)
+            {
+                _eventQueue.AddEvent(new RoutedEventArgs(UIElement.GotFocusEvent, newFocus));
+            }
         }
 
         static UIElement FindLogicalFocus(UIElement uie)
@@ -930,7 +916,7 @@ internal sealed class InputManager
         return mouseDown.Handled;
     }
 
-    private bool ProcessMouseUpEvent(UIElement uie, PointerCallbackParameters parameters, MouseButton button)
+    private void ProcessMouseUpEvent(UIElement uie, PointerCallbackParameters parameters, MouseButton button)
     {
         var previewMouseUp = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
         {
@@ -943,7 +929,7 @@ internal sealed class InputManager
 
         if (previewMouseUp.Handled)
         {
-            return true;
+            return;
         }
 
         var mouseUp = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
@@ -956,8 +942,6 @@ internal sealed class InputManager
         uie.RaiseTrustedEvent(mouseUp);
 
         CommandManager.InvalidateRequerySuggested();
-
-        return mouseUp.Handled;
     }
 
     private void ProcessOnTapped(UIElement uie, PointerCallbackParameters parameters)
