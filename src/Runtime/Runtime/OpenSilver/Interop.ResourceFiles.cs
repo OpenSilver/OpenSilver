@@ -210,23 +210,21 @@ public static partial class Interop
                 string sSuccessAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileSuccess);
                 string sFailureAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileFailure);
                 ExecuteJavaScriptVoid(
-    $@"// Add the script tag to the head
-var filePath = {GetVariableStringForJS(html5Path)};
-var head = document.getElementsByTagName('head')[0];
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = filePath;
-// Then bind the event to the callback function
-// There are several events for cross browser compatibility.
-if(script.onreadystatechange != undefined) {{
-script.onreadystatechange = {sSuccessAction};
-}} else {{
-script.onload = function () {{ {sSuccessAction}(filePath) }};
-script.onerror = function () {{ {sFailureAction}(filePath) }};
-}}
-
-// Fire the loading
-head.appendChild(script);");
+                    $$"""
+                    (function() {
+                        var filePath = {{GetVariableStringForJS(html5Path)}};
+                        var script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = filePath;
+                        if (script.onreadystatechange != undefined) {
+                            script.onreadystatechange = {sSuccessAction};
+                        } else {
+                            script.onload = function () { {{sSuccessAction}}(filePath) };
+                            script.onerror = function () { {{sFailureAction}}(filePath) };
+                        }
+                        document.head.appendChild(script);
+                    })()
+                    """);
             }
         }
 
