@@ -1,0 +1,1287 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccessCollectionAfterShutDown" xml:space="preserve">
+    <value>AccessCollection de la collection '{0}' ne peut pas être appelé après l'arrêt.</value>
+  </data>
+  <data name="AddedItemNotAtIndex" xml:space="preserve">
+    <value>L'élément ajouté ne doit pas apparaître à l'index donné '{0}'.</value>
+  </data>
+  <data name="AddedItemNotInCollection" xml:space="preserve">
+    <value>L'événement Add d'une collection fait référence à un élément qui n'appartient pas à la collection.</value>
+  </data>
+  <data name="Animation_AnimationTimelineTypeMismatch" xml:space="preserve">
+    <value>Impossible d'utiliser l'AnimationTimeline de type '{0}' pour animer la propriété '{1}' de type '{2}'.</value>
+  </data>
+  <data name="Animation_DependencyPropertyIsNotAnimatable" xml:space="preserve">
+    <value>La propriété '{0}' ne peut pas être animée sur la classe '{1}', car l'indicateur IsAnimationProhibited a été défini en fonction du UIPropertyMetadata utilisé pour associer la propriété à la classe.</value>
+  </data>
+  <data name="Application_ServiceMustImplementInterface" xml:space="preserve">
+    <value>L’élément déclaré comme service d’application n’implémente pas l’interface IApplicationService.</value>
+  </data>
+  <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
+    <value>Impossible d'effectuer l'opération.</value>
+  </data>
+  <data name="BasedOnHasLoop" xml:space="preserve">
+    <value>Cette hiérarchie de {0} de références BasedOn contient une boucle.</value>
+  </data>
+  <data name="BindingCollectionContainsNonBinding" xml:space="preserve">
+    <value>BindingCollection ne prend pas en charge les éléments de type {0}. Seul Binding est autorisé.</value>
+  </data>
+  <data name="BindingListCannotCustomFilter" xml:space="preserve">
+    <value>La liste sous-jacente de cet objet CollectionView ne prend pas en charge le filtrage.</value>
+  </data>
+  <data name="BindingListCanOnlySortByOneProperty" xml:space="preserve">
+    <value>Le tri de IBindingList ne peut être effectué que sur une seule propriété.</value>
+  </data>
+  <data name="BrowseBackKeyDisplayString" xml:space="preserve">
+    <value>Alt+Left;Backspace</value>
+  </data>
+  <data name="BrowseBackText" xml:space="preserve">
+    <value>Précédent</value>
+  </data>
+  <data name="BrowseForwardKeyDisplayString" xml:space="preserve">
+    <value>Alt+Right;Shift+Backspace</value>
+  </data>
+  <data name="BrowseForwardText" xml:space="preserve">
+    <value>Transférer</value>
+  </data>
+  <data name="BrowseHomeKeyDisplayString" xml:space="preserve">
+    <value>Alt+Home;BrowserHome</value>
+  </data>
+  <data name="BrowseHomeText" xml:space="preserve">
+    <value>Accueil</value>
+  </data>
+  <data name="BrowseStopKeyDisplayString" xml:space="preserve">
+    <value>Alt+Esc;BrowserStop</value>
+  </data>
+  <data name="BrowseStopText" xml:space="preserve">
+    <value>Arrêter</value>
+  </data>
+  <data name="CancelEditNotSupported" xml:space="preserve">
+    <value>CancelEdit n'est pas pris en charge pour l'élément actuellement modifié.</value>
+  </data>
+  <data name="CancelPrintText" xml:space="preserve">
+    <value>Annuler l'impression</value>
+  </data>
+  <data name="CannotBeBasedOnSelf" xml:space="preserve">
+    <value>Un {0} ne peut pas être basé sur lui-même.</value>
+  </data>
+  <data name="CannotBeSelfParent" xml:space="preserve">
+    <value>Un élément ne peut pas être son propre parent.</value>
+  </data>
+  <data name="CannotChangeAfterSealed" xml:space="preserve">
+    <value>Après qu'un '{0}' est en cours d'utilisation (sealed), il ne peut pas être modifié.</value>
+  </data>
+  <data name="CannotConvertStringToType" xml:space="preserve">
+    <value>Impossible de convertir la valeur de chaîne '{0}' en type '{1}'.</value>
+  </data>
+  <data name="CannotDetermineSortByPropertiesForCollection" xml:space="preserve">
+    <value>Impossible de trouver des informations de type sur la collection ; les noms de propriétés sur SortBy ne peuvent pas être résolus.</value>
+  </data>
+  <data name="CannotEditPlaceholder" xml:space="preserve">
+    <value>La modification de l'espace réservé NewItem n'est pas autorisée.</value>
+  </data>
+  <data name="CannotFilterView" xml:space="preserve">
+    <value>L'affichage '{0}' ne prend pas en charge le filtrage.</value>
+  </data>
+  <data name="CannotFindRemovedItem" xml:space="preserve">
+    <value>Impossible de trouver l'élément supprimé.</value>
+  </data>
+  <data name="CannotGroupView" xml:space="preserve">
+    <value>L'affichage '{0}' ne prend pas en charge le regroupement.</value>
+  </data>
+  <data name="CannotHaveEventHandlersInThemeStyle" xml:space="preserve">
+    <value>Impossible de définir des gestionnaires d'événement au sein d'un Style de thème.</value>
+  </data>
+  <data name="CannotHaveOverridesDefaultStyleInThemeStyle" xml:space="preserve">
+    <value>Impossible de définir la propriété OverridesDefaultStyle dans le Style par défaut.</value>
+  </data>
+  <data name="CannotHavePropertyInStyle" xml:space="preserve">
+    <value>Impossible de définir la propriété '{0}' dans le Style de l'élément en cours.</value>
+  </data>
+  <data name="CannotModifyLogicalChildrenDuringTreeWalk" xml:space="preserve">
+    <value>Impossible de modifier les enfants logiques de ce nœud pour l'instant car un parcours de l'arborescence est en cours.</value>
+  </data>
+  <data name="CannotMoveToUnknownPosition" xml:space="preserve">
+    <value>Impossible de déplacer les éléments vers une position inconnue (-1).</value>
+  </data>
+  <data name="CannotRecyleHeterogeneousTypes" xml:space="preserve">
+    <value>Le panneau ItemsHost ne peut pas utiliser VirtualizationMode == Recycling, car la méthode IGeneratorHost.GetContainerForItemOverride retourne des conteneurs qui ont des types différents.</value>
+  </data>
+  <data name="CannotRemoveUnrealizedItems" xml:space="preserve">
+    <value>La plage de Remove({0},{1}) ne peut pas inclure des éléments sans élément d'interface utilisateur correspondant.</value>
+  </data>
+  <data name="CannotSelectNotSelectableItem" xml:space="preserve">
+    <value>L'élément ne peut pas être sélectionné.</value>
+  </data>
+  <data name="CannotSortView" xml:space="preserve">
+    <value>L'affichage '{0}' ne prend pas en charge le tri.</value>
+  </data>
+  <data name="CannotUseItemsSource" xml:space="preserve">
+    <value>La collection Items doit être vide pour pouvoir utiliser ItemsSource.</value>
+  </data>
+  <data name="ChangeSealedBinding" xml:space="preserve">
+    <value>Impossible de modifier la liaison après qu'elle a été utilisée.</value>
+  </data>
+  <data name="ChangingCollectionNotSupported" xml:space="preserve">
+    <value>La collection SelectedItems ne peut être changée que dans les modes à sélection multiple. Utilisez SelectedItem dans les modes à sélection unique.</value>
+  </data>
+  <data name="ChildWindow_CannotChangeModalState" xml:space="preserve">
+    <value>Impossible de changer l’état modal pendant que la ChildWindow est ouverte.</value>
+  </data>
+  <data name="ChildWindow_InvalidOperation" xml:space="preserve">
+    <value>Impossible d'appeler Show() sur une ChildWindow qui se trouve déjà dans l'arbre visuel. ChildWindow doit être l’élément le plus haut dans le fichier .xaml.</value>
+  </data>
+  <data name="ClassTypeIllegal" xml:space="preserve">
+    <value>Les gestionnaires de classe ne peuvent être inscrits que pour UIElement et leurs sous-types.</value>
+  </data>
+  <data name="ClearOnReadOnlyObjectNotAllowed" xml:space="preserve">
+    <value>Impossible d'effacer les propriétés de l'objet '{0}', car il est en lecture seule.</value>
+  </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="CollectionAddEventMissingItem" xml:space="preserve">
+    <value>Après un événement CollectionChange.Add, la collection Items ne contient pas l'élément ajouté '{0}'.\n Cela peut se produire si l'expéditeur de l'événement a fourni des informations incorrectes dans CollectionChangedEventArgs.</value>
+  </data>
+  <data name="CollectionChangeIndexOutOfRange" xml:space="preserve">
+    <value>L'index '{0}' de l'événement relatif au changement de la collection est non valide pour la collection dont la taille est '{1}'.</value>
+  </data>
+  <data name="CollectionOnlyAcceptsCommandBindings" xml:space="preserve">
+    <value>La collection n'accepte que les objets de type CommandBinding.</value>
+  </data>
+  <data name="CollectionOnlyAcceptsInputBindings" xml:space="preserve">
+    <value>La collection n'accepte que les objets de type InputBinding.</value>
+  </data>
+  <data name="CollectionOnlyAcceptsInputGestures" xml:space="preserve">
+    <value>La collection n'accepte que les objets de type InputGesture.</value>
+  </data>
+  <data name="CollectionViewTypeIsInitOnly" xml:space="preserve">
+    <value>La propriété CollectionViewType ne peut être définie que pendant l'initialisation.</value>
+  </data>
+  <data name="CollectionView_MissingSynchronizationCallback" xml:space="preserve">
+    <value>Le rappel de synchronisation pour la collection '{0}' n'est plus disponible.\n Cela peut arriver si le rappel est une méthode anonyme.</value>
+  </data>
+  <data name="CollectionView_NameTypeDuplicity" xml:space="preserve">
+    <value>Impossible d'obtenir un CollectionView de type '{0}' pour un CollectionViewSource qui utilise déjà le type '{1}'.</value>
+  </data>
+  <data name="CollectionView_ViewTypeInsufficient" xml:space="preserve">
+    <value>'{0}' n'a pas de constructeur qui accepte le type de collection '{1}'.</value>
+  </data>
+  <data name="CollectionView_WrongType" xml:space="preserve">
+    <value>Le type '{0}' n'est pas un type CollectionView.</value>
+  </data>
+  <data name="ContextMenuKeyDisplayString" xml:space="preserve">
+    <value>Maj+F10 ; Apps</value>
+  </data>
+  <data name="ContextMenuText" xml:space="preserve">
+    <value>Menu contextuel</value>
+  </data>
+  <data name="CopyKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+C ; Ctrl+Insert</value>
+  </data>
+  <data name="CopyText" xml:space="preserve">
+    <value>Copier</value>
+  </data>
+  <data name="CopyToNotEnoughSpace" xml:space="preserve">
+    <value>Le nombre d'éléments de l'objet Enumerable source est supérieur à l'espace disponible entre l'index et la fin du tableau de destination.</value>
+  </data>
+  <data name="CorrectionListText" xml:space="preserve">
+    <value>Liste des corrections</value>
+  </data>
+  <data name="CurrentChangingCannotBeCanceled" xml:space="preserve">
+    <value>Le CollectionView à l'origine de cet événement CurrentChanging est dans un état qui ne permet pas l'annulation de l'événement. Vérifiez CurrentChangingEventArgs.IsCancelable avant d'affecter une valeur à cette propriété CurrentChangingEventArgs.Cancel.</value>
+  </data>
+  <data name="CutKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+X ; Shift+Delete</value>
+  </data>
+  <data name="CutText" xml:space="preserve">
+    <value>Couper</value>
+  </data>
+  <data name="CyclicStyleReferenceDetected" xml:space="preserve">
+    <value>Référence cyclique détectée lors de l'évaluation de la propriété Style de l'élément '{0}'.</value>
+  </data>
+  <data name="CyclicThemeStyleReferenceDetected" xml:space="preserve">
+    <value>Référence cyclique détectée lors de l'évaluation de la propriété ThemeStyle de l'élément '{0}'.</value>
+  </data>
+  <data name="DecreaseZoomText" xml:space="preserve">
+    <value>Réduire le zoom</value>
+  </data>
+  <data name="DefaultValueAutoAssignFailed" xml:space="preserve">
+    <value>Impossible de générer automatiquement une valeur par défaut valide pour la propriété '{0}'. Spécifiez explicitement une valeur par défaut quand le type de propriétaire '{1}' inscrit cette DependencyProperty.</value>
+  </data>
+  <data name="DefaultValueInvalid" xml:space="preserve">
+    <value>La valeur par défaut de la propriété '{0}' est non valide en raison de l'échec de ValidateValueCallback.</value>
+  </data>
+  <data name="DefaultValueMayNotBeExpression" xml:space="preserve">
+    <value>Un objet Expression n'est pas une valeur par défaut valide pour DependencyProperty.</value>
+  </data>
+  <data name="DefaultValuePropertyTypeMismatch" xml:space="preserve">
+    <value>Le type valeur par défaut ne correspond pas au type de la propriété '{0}'.</value>
+  </data>
+  <data name="DeferringLoaderNoContext" xml:space="preserve">
+    <value>Le report du chargeur '{0}' nécessite l'implémentation de '{1}' dans IServiceProvider.</value>
+  </data>
+  <data name="DeferringLoaderNoSave" xml:space="preserve">
+    <value>Le report du chargeur '{0}' ne prend pas en charge l'opération Enregistrer.</value>
+  </data>
+  <data name="DeferSelectionActive" xml:space="preserve">
+    <value>Impossible de commencer une nouvelle sélection pendant qu'une sélection est en cours.</value>
+  </data>
+  <data name="DeferSelectionNotActive" xml:space="preserve">
+    <value>Impossible de terminer une sélection lorsqu'il n'existe aucune sélection en cours.</value>
+  </data>
+  <data name="DeleteKeyDisplayString" xml:space="preserve">
+    <value>Del</value>
+  </data>
+  <data name="DeleteText" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="DisplayMemberPathAndItemTemplateDefined" xml:space="preserve">
+    <value>Impossible de définir à la fois DisplayMemberPath et ItemTemplate.</value>
+  </data>
+  <data name="DTypeNotSupportForSystemType" xml:space="preserve">
+    <value>Le type '{0}' n'a pas de DependencyObjectType correspondant.</value>
+  </data>
+  <data name="DuplicateEventName" xml:space="preserve">
+    <value>RoutedEvent Name '{0}' pour OwnerType '{1}' déjà utilisé.</value>
+  </data>
+  <data name="EndInitWithoutBeginInitNotSupported" xml:space="preserve">
+    <value>Appel obligatoire de BeginInit avant EndInit.</value>
+  </data>
+  <data name="EnumeratorInvalidOperation" xml:space="preserve">
+    <value>L'énumérateur est situé avant le premier élément de la collection ou après le dernier élément.</value>
+  </data>
+  <data name="EnumeratorVersionChanged" xml:space="preserve">
+    <value>La collection a été modifiée ; l'opération d'énumération peut ne pas s'exécuter.</value>
+  </data>
+  <data name="Enumerator_VerifyContext" xml:space="preserve">
+    <value>Aucun objet actif à retourner.</value>
+  </data>
+  <data name="EventNotFound" xml:space="preserve">
+    <value>Événement '{1}' introuvable pour le type '{0}'.</value>
+  </data>
+  <data name="ExtendSelectionDownKeyDisplayString" xml:space="preserve">
+    <value>Maj+Bas</value>
+  </data>
+  <data name="ExtendSelectionDownText" xml:space="preserve">
+    <value>Étendre la sélection vers le bas</value>
+  </data>
+  <data name="ExtendSelectionLeftKeyDisplayString" xml:space="preserve">
+    <value>Maj+Gauche</value>
+  </data>
+  <data name="ExtendSelectionLeftText" xml:space="preserve">
+    <value>Étendre la sélection vers la gauche</value>
+  </data>
+  <data name="ExtendSelectionRightKeyDisplayString" xml:space="preserve">
+    <value>Maj+Droite</value>
+  </data>
+  <data name="ExtendSelectionRightText" xml:space="preserve">
+    <value>Étendre la sélection vers la droite</value>
+  </data>
+  <data name="ExtendSelectionUpKeyDisplayString" xml:space="preserve">
+    <value>Maj+Haut</value>
+  </data>
+  <data name="ExtendSelectionUpText" xml:space="preserve">
+    <value>Étendre la sélection vers le haut</value>
+  </data>
+  <data name="FavoritesKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+I</value>
+  </data>
+  <data name="FavoritesText" xml:space="preserve">
+    <value>Favoris</value>
+  </data>
+  <data name="FindKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+F</value>
+  </data>
+  <data name="FindText" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="FirstPageText" xml:space="preserve">
+    <value>Première page</value>
+  </data>
+  <data name="FrugalMap_CannotPromoteBeyondHashtable" xml:space="preserve">
+    <value>Impossible d'effectuer une promotion à partir de Hashtable.</value>
+  </data>
+  <data name="FrugalMap_TargetMapCannotHoldAllData" xml:space="preserve">
+    <value>Impossible de promouvoir '{0}' en '{1}', car le mappage cible est trop petit.</value>
+  </data>
+  <data name="GeneralTransform_TransformFailed" xml:space="preserve">
+    <value>Transformation non définie pour le point.</value>
+  </data>
+  <data name="General_BadType" xml:space="preserve">
+    <value>Type de l'objet transmis à '{0}' non valide.</value>
+  </data>
+  <data name="General_Expected_Type" xml:space="preserve">
+    <value>Objet de type '{0}' attendu.</value>
+  </data>
+  <data name="GenerationInProgress" xml:space="preserve">
+    <value>Impossible d'appeler StartAt quand la génération du contenu est en cours.</value>
+  </data>
+  <data name="GenerationNotInProgress" xml:space="preserve">
+    <value>Appel obligatoire de GenerateNext pendant que la génération du contenu est en cours.</value>
+  </data>
+  <data name="GoToPageText" xml:space="preserve">
+    <value>Atteindre la page</value>
+  </data>
+  <data name="GridCollection_CannotModifyReadOnly" xml:space="preserve">
+    <value>Impossible de modifier '{0}' en état lecture seule.</value>
+  </data>
+  <data name="HandlerTypeIllegal" xml:space="preserve">
+    <value>Type de gestionnaire non compatible.</value>
+  </data>
+  <data name="HasLogicalParent" xml:space="preserve">
+    <value>L'élément spécifié est déjà l'enfant logique d'un autre élément. Déconnectez-le d'abord.</value>
+  </data>
+  <data name="HelpKeyDisplayString" xml:space="preserve">
+    <value>F1</value>
+  </data>
+  <data name="HelpText" xml:space="preserve">
+    <value>Aide</value>
+  </data>
+  <data name="IAnimatable_CantAnimateSealedDO" xml:space="preserve">
+    <value>Impossible d'animer la propriété '{0}' sur '{1}', car l'objet est sealed ou gelé.</value>
+  </data>
+  <data name="ImplementOtherMembersWithSort" xml:space="preserve">
+    <value>Si SortDescriptions est substitué dans les classes dérivées, alors '{0}' doit l'être également.</value>
+  </data>
+  <data name="InconsistentBindingList" xml:space="preserve">
+    <value>IBindingList '{0}' a une longueur inattendue après un événement '{1}'.\nCela peut se produire si IBindingList a été changé sans lever l'événement ListChanged correspondant.</value>
+  </data>
+  <data name="IncreaseZoomText" xml:space="preserve">
+    <value>Augmenter le zoom</value>
+  </data>
+  <data name="InputBinding_ExpectedInputGesture" xml:space="preserve">
+    <value>Gesture n'accepte que les objets de type '{0}'.</value>
+  </data>
+  <data name="InsertInDeferSelectionActive" xml:space="preserve">
+    <value>Impossible d'effectuer une insertion dans une sélection lorsque la sélection est en cours. Utilisez la méthode Add.</value>
+  </data>
+  <data name="InvalidCtorParameterNoInfinity" xml:space="preserve">
+    <value>Le paramètre '{0}' ne peut pas être Infinity.</value>
+  </data>
+  <data name="InvalidCtorParameterNoNaN" xml:space="preserve">
+    <value>Le paramètre '{0}' ne peut pas être NaN.</value>
+  </data>
+  <data name="InvalidCtorParameterUnknownGridUnitType" xml:space="preserve">
+    <value>Paramètre '{0}' non valide. Les valeurs valides sont GridUnitType.Auto, GridUnitType.Pixel ou GridUnitType.Star.</value>
+  </data>
+  <data name="InvalidCursorType" xml:space="preserve">
+    <value>Type de curseur '{0}' non valide.</value>
+  </data>
+  <data name="InvalidPropertyValue" xml:space="preserve">
+    <value>'{0}' n'est pas une valeur valide pour la propriété '{1}'.</value>
+  </data>
+  <data name="InvalidSetterValue" xml:space="preserve">
+    <value>'{0}' est une valeur non valide pour la propriété '{1}.{2}' d'une méthode Setter.</value>
+  </data>
+  <data name="InvalidStringCornerRadius" xml:space="preserve">
+    <value>Valeur '{0}' non valide. Elle doit comporter une ou quatre Length délimitées.</value>
+  </data>
+  <data name="InvalidStringThickness" xml:space="preserve">
+    <value>Valeur '{0}' non valide. Elle doit comporter une, deux ou quatre Length délimitées.</value>
+  </data>
+  <data name="InvalidTextDecorationCollectionString" xml:space="preserve">
+    <value>La chaîne TextDecorationCollection demandée n'est pas valide : '{0}'.</value>
+  </data>
+  <data name="Invalid_IInputElement" xml:space="preserve">
+    <value>'{0}' n’est pas un type valide pour IInputElement. UIElement attendu.</value>
+  </data>
+  <data name="ItemsPanelNotAPanel" xml:space="preserve">
+    <value>VisualTree de ItemsPanelTemplate doit contenir un Panel. '{0}' n'est pas un Panel.</value>
+  </data>
+  <data name="ItemsPanelNotSingleNode" xml:space="preserve">
+    <value>VisualTree de ItemsPanelTemplate doit être un seul élément.</value>
+  </data>
+  <data name="ItemsSourceInUse" xml:space="preserve">
+    <value>Opération non valide quand ItemsSource est en cours d'utilisation. Accédez aux éléments et modifiez-les avec ItemsControl.ItemsSource.</value>
+  </data>
+  <data name="ItemTemplateSelectorBreaksDisplayMemberPath" xml:space="preserve">
+    <value>Impossible de définir ItemTemplateSelector tandis que DisplayMemberPath est en cours d'utilisation.</value>
+  </data>
+  <data name="KeyGesture_Invalid" xml:space="preserve">
+    <value>La combinaison clé et modificateur '{0}+{1}' n'est pas prise en charge pour KeyGesture.</value>
+  </data>
+  <data name="LastPageText" xml:space="preserve">
+    <value>Dernière page</value>
+  </data>
+  <data name="LayoutManager_DeepRecursion" xml:space="preserve">
+    <value>La récursivité de la disposition a atteint la limite autorisée pour éviter le dépassement de capacité de la pile : '{0}'. L'arborescence contient une boucle ou est trop profonde.</value>
+  </data>
+  <data name="LengthFormatError" xml:space="preserve">
+    <value>La chaîne '{0}' ne peut pas être convertie en Length.</value>
+  </data>
+  <data name="ListBoxSelectAllSelectionMode" xml:space="preserve">
+    <value>SelectAll ne peut être appelé que lorsque SelectionMode a la valeur Multiple ou Extended.</value>
+  </data>
+  <data name="ListenerDidNotHandleEvent" xml:space="preserve">
+    <value>L'écouteur n'a pas pris en charge l'événement demandé.</value>
+  </data>
+  <data name="ListenerDidNotHandleEventDetail" xml:space="preserve">
+    <value>L'écouteur de type '{0}' est inscrit auprès du gestionnaire d'événements de type '{1}', mais n'a pas pris en charge l'événement. L'écouteur n'est pas codé correctement.</value>
+  </data>
+  <data name="LocalValueEnumerationOutOfBounds" xml:space="preserve">
+    <value>La position de l'énumération des valeurs locales est hors limites.</value>
+  </data>
+  <data name="LocalValueEnumerationReset" xml:space="preserve">
+    <value>La position de l'énumération des valeurs locales se trouve avant le début : appel préalable de MoveNext obligatoire.</value>
+  </data>
+  <data name="LogicalTreeLoop" xml:space="preserve">
+    <value>Profondeur de l'arborescence logique dépassée lors du parcours de l'arborescence. Peut-être est-ce le signe d'un cycle dans l'arborescence.</value>
+  </data>
+  <data name="MarkupExtensionBadStatic" xml:space="preserve">
+    <value>La valeur StaticExtension '{0}' ne peut pas être résolue en énumération, champ statique ou propriété statique.</value>
+  </data>
+  <data name="MarkupExtensionDynamicOrBindingOnClrProp" xml:space="preserve">
+    <value>Impossible de définir '{0}' pour la propriété '{1}' de type '{2}'. '{0}' peut uniquement être défini pour le DependencyProperty d'un DependencyObject.</value>
+  </data>
+  <data name="MarkupExtensionNoContext1" xml:space="preserve">
+    <value>L'extension de balisage '{0}' nécessite l'implémentation de '{1}' dans le IServiceProvider de ProvideValue.</value>
+  </data>
+  <data name="MarkupExtensionNoContext2" xml:space="preserve">
+    <value>L'extension de balisage '{0}' nécessite l'implémentation de '{1}' ou '{2}' dans le IServiceProvider de ProvideValue.</value>
+  </data>
+  <data name="MarkupExtensionResourceKey" xml:space="preserve">
+    <value>L'extension de balisage Resource doit avoir sa propriété ResourceKey définie avant que ProvideValue puisse être appelé.</value>
+  </data>
+  <data name="MarkupExtensionResourceNotFound" xml:space="preserve">
+    <value>Ressource '{0}' introuvable.</value>
+  </data>
+  <data name="MarkupExtensionStaticMember" xml:space="preserve">
+    <value>La propriété Member doit être définie pour StaticExtension avant que ProvideValue puisse être appelé.</value>
+  </data>
+  <data name="MarkupExtensionTypeName" xml:space="preserve">
+    <value>La propriété TypeName de TypeExtension doit être définie avant que ProvideValue puisse être appelé.</value>
+  </data>
+  <data name="MarkupExtensionTypeNameBad" xml:space="preserve">
+    <value>Chaîne '{0}' non valide pour le type.</value>
+  </data>
+  <data name="MediaBoostBassText" xml:space="preserve">
+    <value>Accentuer les basses</value>
+  </data>
+  <data name="MediaChannelDownText" xml:space="preserve">
+    <value>Chaîne précédente</value>
+  </data>
+  <data name="MediaChannelUpText" xml:space="preserve">
+    <value>Chaîne suivante</value>
+  </data>
+  <data name="MediaDecreaseBassText" xml:space="preserve">
+    <value>Réduire les basses</value>
+  </data>
+  <data name="MediaDecreaseMicrophoneVolumeText" xml:space="preserve">
+    <value>Réduire le volume du microphone</value>
+  </data>
+  <data name="MediaDecreaseTrebleText" xml:space="preserve">
+    <value>Réduire les aigus</value>
+  </data>
+  <data name="MediaDecreaseVolumeText" xml:space="preserve">
+    <value>Réduire le volume</value>
+  </data>
+  <data name="MediaFastForwardText" xml:space="preserve">
+    <value>Avance rapide</value>
+  </data>
+  <data name="MediaIncreaseBassText" xml:space="preserve">
+    <value>Augmenter les basses</value>
+  </data>
+  <data name="MediaIncreaseMicrophoneVolumeText" xml:space="preserve">
+    <value>Augmenter le volume du micro</value>
+  </data>
+  <data name="MediaIncreaseTrebleText" xml:space="preserve">
+    <value>Augmenter les aigus</value>
+  </data>
+  <data name="MediaIncreaseVolumeText" xml:space="preserve">
+    <value>Augmenter le volume</value>
+  </data>
+  <data name="MediaMuteMicrophoneVolumeText" xml:space="preserve">
+    <value>Volume du micro muet</value>
+  </data>
+  <data name="MediaMuteVolumeText" xml:space="preserve">
+    <value>Volume muet</value>
+  </data>
+  <data name="MediaNextTrackText" xml:space="preserve">
+    <value>Piste suivante</value>
+  </data>
+  <data name="MediaPauseText" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="MediaPlayText" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="MediaPreviousTrackText" xml:space="preserve">
+    <value>Piste précédente</value>
+  </data>
+  <data name="MediaRecordText" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="MediaRewindText" xml:space="preserve">
+    <value>Rembobiner</value>
+  </data>
+  <data name="MediaSelectText" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="MediaStopText" xml:space="preserve">
+    <value>Arrêter</value>
+  </data>
+  <data name="MediaToggleMicrophoneOnOffText" xml:space="preserve">
+    <value>Basculer le micro entre actif et inactif</value>
+  </data>
+  <data name="MediaTogglePlayPauseText" xml:space="preserve">
+    <value>Basculer entre lecture et pause</value>
+  </data>
+  <data name="MemberNotAllowedDuringAddOrEdit" xml:space="preserve">
+    <value>'{0}' n'est pas autorisé durant une transaction AddNew ou EditItem.</value>
+  </data>
+  <data name="MemberNotAllowedDuringTransaction" xml:space="preserve">
+    <value>'{0}' n'est pas autorisé durant une transaction commencée par '{1}'.</value>
+  </data>
+  <data name="MemberNotAllowedForView" xml:space="preserve">
+    <value>'{0}' n'est pas autorisé pour cette vue.</value>
+  </data>
+  <data name="Mismatched_RoutedEvent" xml:space="preserve">
+    <value>RoutedEvent in RoutedEventArgs et EventRoute incompatibles.</value>
+  </data>
+  <data name="MoveDownKeyDisplayString" xml:space="preserve">
+    <value>Descendre</value>
+  </data>
+  <data name="MoveDownText" xml:space="preserve">
+    <value>Descendre</value>
+  </data>
+  <data name="MoveFocusBackKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Gauche</value>
+  </data>
+  <data name="MoveFocusBackText" xml:space="preserve">
+    <value>Déplacer le focus vers l'arrière</value>
+  </data>
+  <data name="MoveFocusDownKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Bas</value>
+  </data>
+  <data name="MoveFocusDownText" xml:space="preserve">
+    <value>Déplacer le focus vers le bas</value>
+  </data>
+  <data name="MoveFocusForwardKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Droite</value>
+  </data>
+  <data name="MoveFocusForwardText" xml:space="preserve">
+    <value>Déplacer le focus vers l'avant</value>
+  </data>
+  <data name="MoveFocusPageDownKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Pg.suiv</value>
+  </data>
+  <data name="MoveFocusPageDownText" xml:space="preserve">
+    <value>Avancer le focus d'une page</value>
+  </data>
+  <data name="MoveFocusPageUpKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Pg. préc</value>
+  </data>
+  <data name="MoveFocusPageUpText" xml:space="preserve">
+    <value>Reculer le focus d'une page</value>
+  </data>
+  <data name="MoveFocusUpKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Haut</value>
+  </data>
+  <data name="MoveFocusUpText" xml:space="preserve">
+    <value>Monter le focus</value>
+  </data>
+  <data name="MoveInDeferSelectionActive" xml:space="preserve">
+    <value>Impossible de déplacer un élément dans une sélection lorsque la sélection est en cours.</value>
+  </data>
+  <data name="MoveLeftKeyDisplayString" xml:space="preserve">
+    <value>Gauche</value>
+  </data>
+  <data name="MoveLeftText" xml:space="preserve">
+    <value>Déplacer vers la gauche</value>
+  </data>
+  <data name="MoveRightKeyDisplayString" xml:space="preserve">
+    <value>Droit</value>
+  </data>
+  <data name="MoveRightText" xml:space="preserve">
+    <value>Déplacer vers la droite</value>
+  </data>
+  <data name="MoveToEndKeyDisplayString" xml:space="preserve">
+    <value>Fin</value>
+  </data>
+  <data name="MoveToEndText" xml:space="preserve">
+    <value>Déplacer à la fin</value>
+  </data>
+  <data name="MoveToHomeKeyDisplayString" xml:space="preserve">
+    <value>Accueil</value>
+  </data>
+  <data name="MoveToHomeText" xml:space="preserve">
+    <value>Déplacer au début</value>
+  </data>
+  <data name="MoveToPageDownKeyDisplayString" xml:space="preserve">
+    <value>Pg. suiv</value>
+  </data>
+  <data name="MoveToPageDownText" xml:space="preserve">
+    <value>Déplacer vers la page suivante</value>
+  </data>
+  <data name="MoveToPageUpKeyDisplayString" xml:space="preserve">
+    <value>Pg. préc</value>
+  </data>
+  <data name="MoveToPageUpText" xml:space="preserve">
+    <value>Déplacer vers la page précédente</value>
+  </data>
+  <data name="MoveUpKeyDisplayString" xml:space="preserve">
+    <value>Monter</value>
+  </data>
+  <data name="MoveUpText" xml:space="preserve">
+    <value>Monter</value>
+  </data>
+  <data name="MultiBindingHasNoConverter" xml:space="preserve">
+    <value>Impossible de définir MultiBinding parce que MultiValueConverter doit être spécifié.</value>
+  </data>
+  <data name="MultiThreadedCollectionChangeNotSupported" xml:space="preserve">
+    <value>Ce type de CollectionView ne prend pas en charge les modifications de son SourceCollection à partir d'un thread différent du thread du Dispatcher.</value>
+  </data>
+  <data name="MustBaseOnStyleOfABaseType" xml:space="preserve">
+    <value>Ne peut s'appuyer que sur un Style avec un type cible dont le type de base est '{0}'.</value>
+  </data>
+  <data name="NamedObjectMustBeFrameworkElement" xml:space="preserve">
+    <value>'{0}' n'est pas un type dérivé de FrameworkElement.</value>
+  </data>
+  <data name="NameScopeDuplicateNamesNotAllowed" xml:space="preserve">
+    <value>Impossible d'inscrire un Name dupliqué '{0}' dans cette portée.</value>
+  </data>
+  <data name="NameScopeNameNotEmptyString" xml:space="preserve">
+    <value>Name ne peut pas être une chaîne vide.</value>
+  </data>
+  <data name="NameScopeNameNotFound" xml:space="preserve">
+    <value>Name '{0}' introuvable.</value>
+  </data>
+  <data name="NameScopeNotFound" xml:space="preserve">
+    <value>NameScope introuvable pour {1} le nom '{0}'.</value>
+  </data>
+  <data name="NamesNotSupportedInsideResourceDictionary" xml:space="preserve">
+    <value>Names non pris en charge sous la portée ResourceDictionary.</value>
+  </data>
+  <data name="NavigateJournalText" xml:space="preserve">
+    <value>Journal de navigation</value>
+  </data>
+  <data name="NestedBeginInitNotSupported" xml:space="preserve">
+    <value>Impossible d'avoir des appels BeginInit imbriqués sur la même instance.</value>
+  </data>
+  <data name="NewKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+N</value>
+  </data>
+  <data name="NewText" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="NextPageText" xml:space="preserve">
+    <value>Page suivante</value>
+  </data>
+  <data name="NoCheckOrChangeWhenDeferred" xml:space="preserve">
+    <value>Impossible de modifier ou de vérifier le contenu ou la position Current de CollectionView quand Refresh est différé.</value>
+  </data>
+  <data name="NoDefaultUpdateSourceTrigger" xml:space="preserve">
+    <value>Impossible de définir FrameworkPropertyMetadata.DefaultUpdateSourceTrigger avec UpdateSourceTrigger.Default ; il en résulterait une création circulaire.</value>
+  </data>
+  <data name="NotACommandText" xml:space="preserve">
+    <value>Commande non reconnue</value>
+  </data>
+  <data name="NoUpdateSourceTriggerForInnerBindingOfMultiBinding" xml:space="preserve">
+    <value>Impossible de définir UpdateSourceTrigger sur un Binding interne de MultiBinding. Seul l'Immediate UpdateSourceTrigger par défaut est valide.</value>
+  </data>
+  <data name="NullPropertyIllegal" xml:space="preserve">
+    <value>Valeur non égale à null obligatoire pour '{0}'.</value>
+  </data>
+  <data name="OpenKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+O</value>
+  </data>
+  <data name="OpenText" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="OverridingMetadataDoesNotMatchBaseMetadataType" xml:space="preserve">
+    <value>La substitution de métadonnées et les métadonnées de base doivent être du même type ou du même type dérivé.</value>
+  </data>
+  <data name="PanelIsNotItemsHost" xml:space="preserve">
+    <value>Panel doit avoir IsItemsHost défini avec la valeur true.</value>
+  </data>
+  <data name="Panel_ItemsControlNotFound" xml:space="preserve">
+    <value>Un Panel avec IsItemsHost="true" n'est pas imbriqué dans un ItemsControl. Panel doit être imbriqué dans ItemsControl pour obtenir et afficher des éléments.</value>
+  </data>
+  <data name="Panel_NoNullVisualParent" xml:space="preserve">
+    <value>'{0}' doit être fourni durant l'instanciation de '{1}'.</value>
+  </data>
+  <data name="ParameterCannotBeNegative" xml:space="preserve">
+    <value>Le paramètre doit être supérieur ou égal à zéro.</value>
+  </data>
+  <data name="ParameterMustBeBetween" xml:space="preserve">
+    <value>La valeur du paramètre doit être comprise entre '{0}' et '{1}'.</value>
+  </data>
+  <data name="ParserCannotConvertPropertyValue" xml:space="preserve">
+    <value>Impossible de convertir la valeur de l'attribut '{0}' en objet de type '{1}'.</value>
+  </data>
+  <data name="ParserNoResource" xml:space="preserve">
+    <value>Impossible de trouver la ressource nommée'{0}'. Les noms de ressources respectent la casse.</value>
+  </data>
+  <data name="Parsers_IllegalToken" xml:space="preserve">
+    <value>Jeton non valide.</value>
+  </data>
+  <data name="Parser_UnexpectedToken" xml:space="preserve">
+    <value>Jeton '{0}' inattendu rencontré à la position '{1}'.</value>
+  </data>
+  <data name="PasteKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+V ; Shift+Insert</value>
+  </data>
+  <data name="PasteText" xml:space="preserve">
+    <value>Coller</value>
+  </data>
+  <data name="PresentationFrameworkCollectionReentrancyNotAllowed" xml:space="preserve">
+    <value>Impossible de modifier la collection pendant un événement CollectionChanged.</value>
+  </data>
+  <data name="PreviousPageText" xml:space="preserve">
+    <value>Page précédente</value>
+  </data>
+  <data name="PrintKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+P</value>
+  </data>
+  <data name="PrintPreviewKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+F2</value>
+  </data>
+  <data name="PrintPreviewText" xml:space="preserve">
+    <value>Aperçu avant impression</value>
+  </data>
+  <data name="PrintText" xml:space="preserve">
+    <value>Impression</value>
+  </data>
+  <data name="PropertiesKeyDisplayString" xml:space="preserve">
+    <value>F4</value>
+  </data>
+  <data name="PropertiesText" xml:space="preserve">
+    <value>Propriétés</value>
+  </data>
+  <data name="PropertyAlreadyRegistered" xml:space="preserve">
+    <value>La propriété '{0}' a déjà été inscrite par '{1}'.</value>
+  </data>
+  <data name="PropertyNotBindable" xml:space="preserve">
+    <value>La propriété '{0}' ne peut pas être liée aux données.</value>
+  </data>
+  <data name="PropertyNotReadable" xml:space="preserve">
+    <value>La propriété nommée '{0}' sur le type '{1}' ne peut pas être lue.</value>
+  </data>
+  <data name="PropertyNotReadOnly" xml:space="preserve">
+    <value>Cette méthode remplace les métadonnées uniquement pour les propriétés en lecture seule. Cette propriété n'est pas en lecture seule.</value>
+  </data>
+  <data name="PropertyPathIndexWrongType" xml:space="preserve">
+    <value>Le paramètre d'indexeur du chemin d'accès possède une valeur qui ne peut pas être résolue: '{0}'</value>
+  </data>
+  <data name="PropertyToSortByNotFoundOnType" xml:space="preserve">
+    <value>Le type '{0}' n'a pas de propriété nommée '{1}'. Impossible de trier la collecte de données.</value>
+  </data>
+  <data name="RangeActionsNotSupported" xml:space="preserve">
+    <value>Actions de plage non prises en charge.</value>
+  </data>
+  <data name="ReadOnlyChangeNotAllowed" xml:space="preserve">
+    <value>La propriété '{0}' a été inscrite en tant que propriété en lecture seule et ne peut pas être modifiée sans une clé d'autorisation.</value>
+  </data>
+  <data name="ReadOnlyInputGesturesCollection" xml:space="preserve">
+    <value>Opération non prise en charge sur une classe InputGestureCollection en lecture seule.</value>
+  </data>
+  <data name="ReadOnlyKeyNotAuthorized" xml:space="preserve">
+    <value>La clé de propriété n'est pas autorisée à modifier la propriété '{0}'.</value>
+  </data>
+  <data name="ReadOnlyOverrideKeyNotAuthorized" xml:space="preserve">
+    <value>La clé de propriété n'est pas autorisée à remplacer les métadonnées de la propriété '{0}'.</value>
+  </data>
+  <data name="ReadOnlyOverrideNotAllowed" xml:space="preserve">
+    <value>La propriété '{0}' a été inscrite en tant que propriété en lecture seule et ses métadonnées ne peuvent pas être remplacées sans une clé d'autorisation.</value>
+  </data>
+  <data name="Rect_CannotCallMethod" xml:space="preserve">
+    <value>Impossible d'appeler cette méthode sur le Rect Empty.</value>
+  </data>
+  <data name="Rect_Empty" xml:space="preserve">
+    <value>L'objet Rectangle ne peut pas être vide.</value>
+  </data>
+  <data name="RedoKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Y</value>
+  </data>
+  <data name="RedoText" xml:space="preserve">
+    <value>Rétablir</value>
+  </data>
+  <data name="ReferenceIsNull" xml:space="preserve">
+    <value>La valeur ne peut pas être null. Référence d'objet : '{0}'.</value>
+  </data>
+  <data name="RefreshKeyDisplayString" xml:space="preserve">
+    <value>F5</value>
+  </data>
+  <data name="RefreshText" xml:space="preserve">
+    <value>Actualiser</value>
+  </data>
+  <data name="RemovedItemNotFound" xml:space="preserve">
+    <value>L'événement CollectionRemove doit spécifier la position de l'élément.</value>
+  </data>
+  <data name="RemoveRequiresOffsetZero" xml:space="preserve">
+    <value>Le GeneratorPosition '{0},{1}' passé à Remove n'a pas un Offset égal à 0.</value>
+  </data>
+  <data name="RemoveRequiresPositiveCount" xml:space="preserve">
+    <value>Count '{0}' passé à Remove doit être positif.</value>
+  </data>
+  <data name="RemovingPlaceholder" xml:space="preserve">
+    <value>La suppression de l'espace réservé NewItem n'est pas autorisée.</value>
+  </data>
+  <data name="ReplaceKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+H</value>
+  </data>
+  <data name="ReplaceText" xml:space="preserve">
+    <value>Remplacement</value>
+  </data>
+  <data name="ResourceDictionaryInvalidMergedDictionary" xml:space="preserve">
+    <value>Le dictionnaire fusionné n'est pas valide. Un ResourceDictionary est en cours de placement dans sa propre collection MergedDictionaries ou est ajouté deux fois à la même collection MergedDictionary.</value>
+  </data>
+  <data name="ResourceDictionaryIsReadOnly" xml:space="preserve">
+    <value>ResourceDictionary est en lecture seule et ne peut pas être modifié.</value>
+  </data>
+  <data name="ResourceDictionaryKeyMustBeTypeOrString" xml:space="preserve">
+    <value>Key doit être un Type, un DataTemplateKey ou une String.</value>
+  </data>
+  <data name="ResourceDictionaryNullValueNotSupported" xml:space="preserve">
+    <value>La valeur null n’est pas prise en charge dans un ResourceDictionary.</value>
+  </data>
+  <data name="ResourceDictionaryValueMustBeDataTemplate" xml:space="preserve">
+    <value>Pour une clé de type DataTemplateKey, la valeur doit être un DataTemplate.</value>
+  </data>
+  <data name="ResourceDictionaryValueMustBeStyle" xml:space="preserve">
+    <value>Pour une clé de type Type, la valeur doit être un Style.</value>
+  </data>
+  <data name="ResourceDictionaryValueMustBeStyleWithCorrectTargetType" xml:space="preserve">
+    <value>Pour une clé de type Type, la valeur Style doit avoir un TargetType égal à la clé.</value>
+  </data>
+  <data name="RoutedEventCannotChangeWhileRouting" xml:space="preserve">
+    <value>Impossible de modifier la propriété RoutedEvent pendant son routage.</value>
+  </data>
+  <data name="SaveAsText" xml:space="preserve">
+    <value>Enregistrer sous</value>
+  </data>
+  <data name="SaveKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+S</value>
+  </data>
+  <data name="SaveText" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="ScrollByLineText" xml:space="preserve">
+    <value>Défilement par ligne</value>
+  </data>
+  <data name="ScrollPageDownKeyDisplayString" xml:space="preserve">
+    <value>Pg. suiv</value>
+  </data>
+  <data name="ScrollPageDownText" xml:space="preserve">
+    <value>Défilement de la page vers le bas</value>
+  </data>
+  <data name="ScrollPageLeftText" xml:space="preserve">
+    <value>Défilement de la page vers la gauche</value>
+  </data>
+  <data name="ScrollPageRightText" xml:space="preserve">
+    <value>Défilement de la page vers la droite</value>
+  </data>
+  <data name="ScrollPageUpKeyDisplayString" xml:space="preserve">
+    <value>Pg. préc</value>
+  </data>
+  <data name="ScrollPageUpText" xml:space="preserve">
+    <value>Défilement de la page vers le haut</value>
+  </data>
+  <data name="ScrollViewer_CannotBeNaN" xml:space="preserve">
+    <value>La valeur du paramètre '{0}' ne peut pas être NaN.</value>
+  </data>
+  <data name="ScrollViewer_OutOfRange" xml:space="preserve">
+    <value>Le paramètre '{0}' a la valeur '{1}', laquelle se trouve en dehors de la plage valide comprise entre '{2}' et '{3}'.</value>
+  </data>
+  <data name="SearchKeyDisplayString" xml:space="preserve">
+    <value>F3</value>
+  </data>
+  <data name="SearchText" xml:space="preserve">
+    <value>Recherche</value>
+  </data>
+  <data name="SelectAllKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+A</value>
+  </data>
+  <data name="SelectAllText" xml:space="preserve">
+    <value>Sélectionner tout</value>
+  </data>
+  <data name="SelectToEndKeyDisplayString" xml:space="preserve">
+    <value>Maj+Fin</value>
+  </data>
+  <data name="SelectToEndText" xml:space="preserve">
+    <value>Sélectionner jusqu'à la fin</value>
+  </data>
+  <data name="SelectToHomeKeyDisplayString" xml:space="preserve">
+    <value>Maj+Début</value>
+  </data>
+  <data name="SelectToHomeText" xml:space="preserve">
+    <value>Sélectionner jusqu'au début</value>
+  </data>
+  <data name="SelectToPageDownKeyDisplayString" xml:space="preserve">
+    <value>Maj+Pg. suiv</value>
+  </data>
+  <data name="SelectToPageDownText" xml:space="preserve">
+    <value>Sélectionner jusqu'à la page suivante</value>
+  </data>
+  <data name="SelectToPageUpKeyDisplayString" xml:space="preserve">
+    <value>Maj+Pg. préc</value>
+  </data>
+  <data name="SelectToPageUpText" xml:space="preserve">
+    <value>Sélectionner jusqu'à la page précédente</value>
+  </data>
+  <data name="SetInDeferSelectionActive" xml:space="preserve">
+    <value>Impossible de définir un élément dans une sélection lorsque la sélection est en cours. Utilisez la méthode Add ou Remove.</value>
+  </data>
+  <data name="SetOnReadOnlyObjectNotAllowed" xml:space="preserve">
+    <value>Impossible de définir une propriété pour l'objet '{0}', car il est en lecture seule.</value>
+  </data>
+  <data name="SetterValueOfMarkupExtensionNotSupported" xml:space="preserve">
+    <value>'{0}' non valide pour Setter.Value. Les seuls types MarkupExtension pris en charge sont DynamicResourceExtension et BindingBase ou les types dérivés.</value>
+  </data>
+  <data name="SharingNonSharableExpression" xml:space="preserve">
+    <value>Impossible de définir l'expression. Elle est marquée comme étant 'NonShareable' et a déjà été utilisée.</value>
+  </data>
+  <data name="Size_HeightCannotBeNegative" xml:space="preserve">
+    <value>Height ne doit pas avoir une valeur négative.</value>
+  </data>
+  <data name="Size_WidthAndHeightCannotBeNegative" xml:space="preserve">
+    <value>Width et Height ne doivent pas avoir une valeur négative.</value>
+  </data>
+  <data name="Size_WidthCannotBeNegative" xml:space="preserve">
+    <value>Width ne doit pas avoir une valeur négative.</value>
+  </data>
+  <data name="SourceNotSet" xml:space="preserve">
+    <value>Définition obligatoire de Source dans RoutedEventArgs avant de créer un itinéraire des événements ou d'appeler des gestionnaires.</value>
+  </data>
+  <data name="SpecialMethodMustBePublic" xml:space="preserve">
+    <value>Les méthodes ShouldSerializeProperty et ResetProperty doivent être publiques ('{0}').</value>
+  </data>
+  <data name="StopKeyDisplayString" xml:space="preserve">
+    <value>Esc</value>
+  </data>
+  <data name="StopText" xml:space="preserve">
+    <value>Arrêter</value>
+  </data>
+  <data name="Storyboard_BeginStoryboardNameNotFound" xml:space="preserve">
+    <value>object Name '{0}' trouvé mais il ne s'agit pas d'un objet BeginStoryboard.</value>
+  </data>
+  <data name="Storyboard_BeginStoryboardNameRequired" xml:space="preserve">
+    <value>BeginStoryboardName obligatoire pour trouver la cible de cette action.</value>
+  </data>
+  <data name="Storyboard_BeginStoryboardNoStoryboard" xml:space="preserve">
+    <value>BeginStoryboard '{0}' ne possède pas d'objet Storyboard associé.</value>
+  </data>
+  <data name="Storyboard_NameNotFound" xml:space="preserve">
+    <value>Le nom '{0}' est introuvable dans l'étendue de nom de '{1}'.</value>
+  </data>
+  <data name="Storyboard_NeverApplied" xml:space="preserve">
+    <value>Impossible d'effectuer l'action car le Storyboard spécifié n'a pas été appliqué à cet objet pour un contrôle interactif.</value>
+  </data>
+  <data name="Storyboard_NoNameScope" xml:space="preserve">
+    <value>Aucune portée de nom applicable n'existe pour résoudre le nom '{0}'.</value>
+  </data>
+  <data name="Storyboard_NoTarget" xml:space="preserve">
+    <value>Aucune cible n'a été spécifiée pour '{0}'.</value>
+  </data>
+  <data name="Storyboard_PropertyPathDependencyObjectNotFound" xml:space="preserve">
+    <value>La valeur de la propriété '{0}' n’est pas un DependencyObject dans le chemin de propriété '{1}'.</value>
+  </data>
+  <data name="Storyboard_PropertyPathIncludesNonAnimatableProperty" xml:space="preserve">
+    <value>Le chemin Storyboard.TargetProperty '{0}' contient la propriété non animable '{1}'.</value>
+  </data>
+  <data name="Storyboard_PropertyPathMustPointToDependencyProperty" xml:space="preserve">
+    <value>Le chemin Storyboard.TargetProperty '{0}' ne pointe pas vers un DependencyProperty.</value>
+  </data>
+  <data name="Storyboard_PropertyPathPropertyNotFound" xml:space="preserve">
+    <value>Impossible de résoudre toutes les références de propriété dans le chemin de la propriété '{0}'. Vérifiez que les objets applicables prennent en charge les propriétés.</value>
+  </data>
+  <data name="Storyboard_PropertyPathSealedCheckFailed" xml:space="preserve">
+    <value>La valeur de propriété '{0}' du chemin '{1}' se trouve sur une instance non modifiable de '{2}'.</value>
+  </data>
+  <data name="Storyboard_TargetNameNotDependencyObject" xml:space="preserve">
+    <value>La propriété Name de l'objet cible '{0}' a été trouvée, mais l'objet n'est pas un type de cible valide.</value>
+  </data>
+  <data name="Storyboard_TargetPropertyRequired" xml:space="preserve">
+    <value>Doit spécifier TargetProperty pour '{0}'.</value>
+  </data>
+  <data name="Storyboard_UnrecognizedTimeSeekOrigin" xml:space="preserve">
+    <value>Valeur TimeSeekOrigin non valide.</value>
+  </data>
+  <data name="StringEmpty" xml:space="preserve">
+    <value>Le paramètre ne peut pas être une chaîne nulle.</value>
+  </data>
+  <data name="StyleForWrongType" xml:space="preserve">
+    <value>Un style destiné au type '{0}' ne peut pas être appliqué au type '{1}'.</value>
+  </data>
+  <data name="StyleTargetTypeMismatchWithElement" xml:space="preserve">
+    <value>Le TargetType '{0}' ne correspond pas au type de l'élément '{1}'.</value>
+  </data>
+  <data name="StyleValueOfExpressionNotSupported" xml:space="preserve">
+    <value>Le type d'expression n'est pas une valeur Style valide.</value>
+  </data>
+  <data name="TargetNameNotFound" xml:space="preserve">
+    <value>Impossible de trouver un FrameworkElement avec le Name '{0}'.</value>
+  </data>
+  <data name="TemplateFindNameInInvalidElement" xml:space="preserve">
+    <value>Cette opération n'est valide que sur les éléments auxquels ce modèle est appliqué.</value>
+  </data>
+  <data name="Timing_InvalidArgFinitePositive" xml:space="preserve">
+    <value>La valeur de la propriété doit être finie et supérieure à zéro.</value>
+  </data>
+  <data name="Timing_InvalidArgNonNegative" xml:space="preserve">
+    <value>La valeur de la propriété doit être supérieure ou égale à zéro ou indéfinie.</value>
+  </data>
+  <data name="Timing_MustBeRoot" xml:space="preserve">
+    <value>L'opération n'est pas autorisée sur un Storyboard non racine.</value>
+  </data>
+  <data name="Timing_NotTimeSpan" xml:space="preserve">
+    <value>Impossible de renvoyer une valeur de propriété TimeSpan pour une valeur de Duration égale à '{0}'. Vérifiez la propriété HasTimeSpan avant de demander la valeur de la propriété TimeSpan d'un Duration.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorInvalidIterationCount" xml:space="preserve">
+    <value>'{0}' n'est pas une valeur IterationCount valide pour une structure RepeatBehavior. Une valeur IterationCount doit représenter un nombre supérieur ou égal à zéro, mais pas infini.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorInvalidRepeatDuration" xml:space="preserve">
+    <value>'{0}' n'est pas une valeur RepeatDuration valide pour une structure RepeatBehavior. Une valeur RepeatDuration doit être une valeur TimeSpan supérieure ou égale à zéro battement d'horloge.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorNotIterationCount" xml:space="preserve">
+    <value>RepeatBehavior '{0}' ne représente pas un nombre d'itérations et ne possède pas une valeur IterationCount.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorNotRepeatDuration" xml:space="preserve">
+    <value>RepeatBehavior '{0}' ne représente pas une durée de répétition et ne possède pas une valeur RepeatDuration.</value>
+  </data>
+  <data name="Timing_SeekDestinationIndefinite" xml:space="preserve">
+    <value>La méthode ClockController.Seek a été appelée avec TimeSeekOrigin.Duration comme paramètre seekOrigin d'un objet Clock dont la durée est égale à Forever. Les objets Clock ayant une durée égale à Forever doivent utiliser TimeSeekOrigin.BeginTime.</value>
+  </data>
+  <data name="Timing_SeekDestinationNegative" xml:space="preserve">
+    <value>La méthode ClockController.Seek a été appelée avec des arguments qui décrivent une destination de recherche ayant une valeur négative. La destination de recherche doit être supérieure ou égale à zéro.</value>
+  </data>
+  <data name="Timing_SkipToFillDestinationIndefinite" xml:space="preserve">
+    <value>Impossible d'appeler la méthode ClockController.SkipToFill pour un objet Clock ayant une propriété Duration ou RepeatDuration égale à Forever, parce que cet objet Clock n'atteindra jamais sa période de remplissage.</value>
+  </data>
+  <data name="TokenizerHelperEmptyToken" xml:space="preserve">
+    <value>Jeton vide rencontré à la position {0} durant l'analyse de '{1}'.</value>
+  </data>
+  <data name="TokenizerHelperExtraDataEncountered" xml:space="preserve">
+    <value>Données supplémentaires rencontrées à la position {0} durant l'analyse de '{1}'.</value>
+  </data>
+  <data name="TokenizerHelperMissingEndQuote" xml:space="preserve">
+    <value>Absence de guillemet fermant rencontrée lors de l'analyse de '{0}'.</value>
+  </data>
+  <data name="TokenizerHelperPrematureStringTermination" xml:space="preserve">
+    <value>Fin de chaîne prématurée rencontrée lors de l'analyse de '{0}'.</value>
+  </data>
+  <data name="TooManyRoutedEvents" xml:space="preserve">
+    <value>Limite de RoutedEvent/EventPrivateKey dépassée. Les événements routés ou les événements EventPrivateKey du CLR sont généralement des membres de classes statiques inscrits avec des initialiseurs de champs ou des constructeurs statiques. Dans ce cas, les événements routés ou les clés EventPrivateKeys peuvent avoir été initialisés dans les constructeurs d'instance, entraînant un dépassement de la limite.</value>
+  </data>
+  <data name="Transform_NotInvertible" xml:space="preserve">
+    <value>La transformation n'est pas réversible.</value>
+  </data>
+  <data name="TreeLoop" xml:space="preserve">
+    <value>Cycle potentiel détecté dans l'arborescence pendant la construction de l'itinéraire des événements.</value>
+  </data>
+  <data name="TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite" xml:space="preserve">
+    <value>Impossible de modifier la propriété en lecture seule HasItems.</value>
+  </data>
+  <data name="TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite" xml:space="preserve">
+    <value>Impossible de modifier la propriété en lecture seule IsSelectionActive.</value>
+  </data>
+  <data name="TreeView_OnSelectedItemPropertyChanged_InvalidWrite" xml:space="preserve">
+    <value>Impossible de modifier la propriété en lecture seule SelectedItem.</value>
+  </data>
+  <data name="TreeView_OnSelectedValuePropertyChanged_InvalidWrite" xml:space="preserve">
+    <value>Impossible de modifier la propriété en lecture seule SelectedValue.</value>
+  </data>
+  <data name="TriggersSupportsEventTriggersOnly" xml:space="preserve">
+    <value>Les membres de la collection Triggers doivent être de type EventTrigger.</value>
+  </data>
+  <data name="TwoWayBindingNeedsPath" xml:space="preserve">
+    <value>La liaison bidirectionnelle nécessite Path.</value>
+  </data>
+  <data name="TypeMetadataAlreadyInUse" xml:space="preserve">
+    <value>Les métadonnées sont déjà associées à un type et à une propriété. Vous devez en créer d'autres.</value>
+  </data>
+  <data name="TypeMetadataAlreadyRegistered" xml:space="preserve">
+    <value>PropertyMetadata est déjà inscrit pour le type '{0}'.</value>
+  </data>
+  <data name="TypeMetadataCannotChangeAfterUse" xml:space="preserve">
+    <value>Impossible de modifier les métadonnées de propriété une fois celles-ci associées à une propriété.</value>
+  </data>
+  <data name="TypeMustBeDependencyObjectDerived" xml:space="preserve">
+    <value>Le type '{0}' doit dériver de DependencyObject.</value>
+  </data>
+  <data name="UIA_OperationCannotBePerformed" xml:space="preserve">
+    <value>Impossible d'effectuer l'opération.</value>
+  </data>
+  <data name="UIElement_HasParent" xml:space="preserve">
+    <value>Déconnexion obligatoire de l'enfant spécifié du UIElement parent actuel avant de procéder à l'attachement d'un nouveau UIElement parent.</value>
+  </data>
+  <data name="UIElement_Layout_InfinityArrange" xml:space="preserve">
+    <value>Impossible d'appeler Arrange sur un UIElement avec une taille infinie ou une valeur NAN. Le parent de type '{0}' appelle UIElement. Arrange appelé sur un élément de type '{1}'.</value>
+  </data>
+  <data name="UIElement_Layout_NaNMeasure" xml:space="preserve">
+    <value>Impossible d'appeler UIElement.Measure(availableSize) avec une taille NaN.</value>
+  </data>
+  <data name="UIElement_Layout_NaNReturned" xml:space="preserve">
+    <value>Lorsque les mesures de disposition de l'élément '{0}' sont remplacées, les valeurs NaN ne doivent pas être retournées pour DesiredSize.</value>
+  </data>
+  <data name="UIElement_Layout_PositiveInfinityReturned" xml:space="preserve">
+    <value>La substitution des mesures de présentation de l'élément '{0}' ne doit pas renvoyer PositiveInfinity comme DesiredSize, même si Infinity est transmis sous forme de taille disponible.</value>
+  </data>
+  <data name="UIElement_NotADescendant" xml:space="preserve">
+    <value>L'objet UIElement spécifié n'est pas un descendant de cet objet UIElement.</value>
+  </data>
+  <data name="UIElement_NotAnAncestor" xml:space="preserve">
+    <value>L'objet UIElement spécifié n'est pas un ancêtre de cet objet UIElement.</value>
+  </data>
+  <data name="UIElement_NotAnUIElement" xml:space="preserve">
+    <value>'{0}' n'est pas un objet UIElement.</value>
+  </data>
+  <data name="UIElement_NotChild" xml:space="preserve">
+    <value>L'objet UIElement spécifié n'est pas un enfant de cet objet UIElement.</value>
+  </data>
+  <data name="UndoKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Z</value>
+  </data>
+  <data name="UndoText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="UnexpectedCollectionChangeAction" xml:space="preserve">
+    <value>Action de modification de la collection inattendue '{0}'.</value>
+  </data>
+  <data name="UnexpectedParameterType" xml:space="preserve">
+    <value>Le paramètre a un type inattendu : '{0}'. Le type attendu est '{1}'.</value>
+  </data>
+  <data name="Unsupported_Modifier" xml:space="preserve">
+    <value>ModifierKeys non reconnu : '{0}'.</value>
+  </data>
+  <data name="Unsupported_MouseAction" xml:space="preserve">
+    <value>Énumération MouseAction '{0}' non prise en charge.</value>
+  </data>
+  <data name="Validation_ConversionFailed" xml:space="preserve">
+    <value>La valeur '{0}' n'a pas pu être convertie.</value>
+  </data>
+  <data name="VerifyAccess" xml:space="preserve">
+    <value>Le thread appelant ne peut pas accéder à cet objet parce qu'un autre thread en est propriétaire.</value>
+  </data>
+  <data name="XmlLangGetCultureFailure" xml:space="preserve">
+    <value>Pas de classe CultureInfo enregistrée avec la propriété IetfLanguageTag '{0}'.</value>
+  </data>
+  <data name="XmlLangGetSpecificCulture" xml:space="preserve">
+    <value>Impossible de trouver une culture non neutre liée à '{0}'.</value>
+  </data>
+  <data name="XmlLangMalformed" xml:space="preserve">
+    <value>La balise de langue '{0}' doit être vide ou conforme à la grammaire définie dans la norme RFC 3066 de l'IETF.</value>
+  </data>
+  <data name="ZoomText" xml:space="preserve">
+    <value>Zoom</value>
+  </data>
+</root>
