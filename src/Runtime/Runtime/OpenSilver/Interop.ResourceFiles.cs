@@ -216,12 +216,8 @@ public static partial class Interop
                         var script = document.createElement('script');
                         script.type = 'text/javascript';
                         script.src = filePath;
-                        if (script.onreadystatechange != undefined) {
-                            script.onreadystatechange = {sSuccessAction};
-                        } else {
-                            script.onload = function () { {{sSuccessAction}}(filePath) };
-                            script.onerror = function () { {{sFailureAction}}(filePath) };
-                        }
+                        script.onload = function () { {{sSuccessAction}}(filePath) };
+                        script.onerror = function () { {{sFailureAction}}(filePath) };
                         document.head.appendChild(script);
                     })()
                     """);
