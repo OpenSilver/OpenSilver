@@ -30,7 +30,10 @@ namespace System.Windows.Controls.Primitives
         /// <summary> 
         /// Initializes a new instance of the <see cref="Thumb"/> class.
         /// </summary> 
-        public Thumb() { }
+        public Thumb()
+        {
+            AllowScrollOnTouchMove = false;
+        }
 
         /// <summary>
         /// Occurs when a <see cref="Thumb"/> control receives logical focus and 
