@@ -310,7 +310,16 @@ public sealed class Storyboard : Timeline
     /// The current state of the clock created for this storyboard: <see cref="ClockState.Active"/>,
     /// <see cref="ClockState.Filling"/>, or <see cref="ClockState.Stopped"/>.
     /// </returns>
-    public ClockState GetCurrentState() => GetCurrentStateImpl(this);
+    public ClockState GetCurrentState()
+    {
+        // Silverlight allows calling this method even when the Storyboard was not started yet.
+        // That's why we do not throw if the clock is not found.
+        if (GetStoryboardClock(this, false) is TimelineClock clock)
+        {
+            return clock.CurrentState;
+        }
+        return ClockState.Stopped;
+    }
 
     /// <summary>
     /// Retrieves the current state of the clock that was created for this <see cref="Storyboard"/>.
@@ -341,7 +350,16 @@ public sealed class Storyboard : Timeline
     /// <see cref="TimeSpan.Zero"/> if this storyboard's clock is <see cref="ClockState.Stopped"/>; otherwise, the 
     /// current time of the storyboard's clock.
     /// </returns>
-    public TimeSpan GetCurrentTime() => GetCurrentTimeImpl(this) ?? TimeSpan.Zero;
+    public TimeSpan GetCurrentTime()
+    {
+        // Silverlight allows calling this method even when the Storyboard was not started yet.
+        // That's why we do not throw if the clock is not found.
+        if (GetStoryboardClock(this, false) is TimelineClock clock)
+        {
+            return clock.CurrentTime ?? TimeSpan.Zero;
+        }
+        return TimeSpan.Zero;
+    }
 
     /// <summary>
     /// Retrieves the current time of the clock that was created for this <see cref="Storyboard"/>.
