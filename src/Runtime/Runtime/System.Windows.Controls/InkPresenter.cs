@@ -29,6 +29,11 @@ namespace System.Windows.Controls
         private StylusPoint _lastPos;
         private StylusPoint _mousePos;
 
+        static InkPresenter()
+        {
+            AllowScrollOnTouchMoveProperty.OverrideMetadata(typeof(InkPresenter), new PropertyMetadata(BooleanBoxes.FalseBox));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InkPresenter"/> class.
         /// </summary>

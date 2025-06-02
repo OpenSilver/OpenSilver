@@ -1498,6 +1498,7 @@ namespace System.Windows.Controls
                     return;
                 }
 
+                _originalSource.AllowScrollOnTouchMove = false;
                 UnSubscribeFromEvents();
 
                 _owner.OnItemDragStarting(new ItemDragEventArgs

@@ -435,6 +435,7 @@ namespace Microsoft.Expression.Interactivity.Layout
             this.relativePosition = positionInElementCoordinates;
 
             this.AssociatedObject.CaptureMouse();
+            AssociatedObject.AllowScrollOnTouchMove = false;
 
             this.AssociatedObject.MouseMove += this.OnMouseMove;
             this.AssociatedObject.LostMouseCapture += this.OnLostMouseCapture;

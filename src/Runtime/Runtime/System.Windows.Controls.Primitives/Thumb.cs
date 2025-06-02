@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved. 
 
+using OpenSilver.Internal;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
@@ -25,15 +26,13 @@ namespace System.Windows.Controls.Primitives
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Thumb), new PropertyMetadata(typeof(Thumb)));
             IsEnabledProperty.OverrideMetadata(typeof(Thumb), new PropertyMetadata(OnIsEnabledChanged));
+            AllowScrollOnTouchMoveProperty.OverrideMetadata(typeof(Thumb), new PropertyMetadata(BooleanBoxes.FalseBox));
         }
 
         /// <summary> 
         /// Initializes a new instance of the <see cref="Thumb"/> class.
         /// </summary> 
-        public Thumb()
-        {
-            AllowScrollOnTouchMove = false;
-        }
+        public Thumb() { }
 
         /// <summary>
         /// Occurs when a <see cref="Thumb"/> control receives logical focus and 
