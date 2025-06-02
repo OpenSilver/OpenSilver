@@ -63,7 +63,7 @@ namespace System.Windows.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollViewer), new PropertyMetadata(typeof(ScrollViewer)));
             EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnTouchStartThunk), true);
-            EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnTouchEndThunk), true);
+            EventManager.RegisterClassHandler<ScrollViewer>(PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler(OnTouchEndThunk), true);
             EventManager.RegisterClassHandler<ScrollViewer>(Mouse.MouseMoveEvent, new MouseEventHandler(OnTouchMoveThunk), true);
         }
 
@@ -1527,7 +1527,7 @@ namespace System.Windows.Controls
                 Cancel();
 
                 if (e.IsTouchEvent &&
-                    Pointer.Captured is null &&
+                    e.OriginalSource is UIElement el && el.AllowScrollOnTouchMove &&
                     (IsVerticalScrollBarVisible || IsHorizontalScrollBarVisible) &&
                     _scrollViewer.ScrollInfo is IScrollInfo isi &&
                     _current is null) // prevents scrolling multiple nested ScrollViewers
@@ -1545,7 +1545,7 @@ namespace System.Windows.Controls
 
             public void HandleMouseMove(MouseEventArgs e)
             {
-                if (Pointer.Captured is not null)
+                if (e.OriginalSource is UIElement el && !el.AllowScrollOnTouchMove)
                 {
                     Cancel();
                 }
@@ -1578,6 +1578,7 @@ namespace System.Windows.Controls
                     return;
                 }
 
+                e.Handled = _isPanning;
                 Cancel();
 
                 if ((GetTime() - _lastMoveTime).TotalMilliseconds < MaxWaitForInertiaMS && CanScroll(_velocityX, _velocityY))

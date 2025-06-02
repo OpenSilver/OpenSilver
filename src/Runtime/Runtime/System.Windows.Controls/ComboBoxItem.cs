@@ -33,10 +33,7 @@ namespace System.Windows.Controls
 
             ComboBox parent = ParentComboBox;
 
-            if (parent != null && !ScrollViewer.IsPanning)
-            {
-                parent.NotifyComboBoxItemMouseUp(this);
-            }
+            parent?.NotifyComboBoxItemMouseUp(this);
 
             base.OnMouseLeftButtonUp(e);
         }

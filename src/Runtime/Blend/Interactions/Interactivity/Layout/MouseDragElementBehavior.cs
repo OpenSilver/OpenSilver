@@ -435,6 +435,7 @@ namespace Microsoft.Expression.Interactivity.Layout
             this.relativePosition = positionInElementCoordinates;
 
             this.AssociatedObject.CaptureMouse();
+            AssociatedObject.AllowScrollOnTouchMove = false;
 
             this.AssociatedObject.MouseMove += this.OnMouseMove;
             this.AssociatedObject.LostMouseCapture += this.OnLostMouseCapture;
@@ -460,6 +461,7 @@ namespace Microsoft.Expression.Interactivity.Layout
             this.AssociatedObject.MouseMove -= this.OnMouseMove;
             this.AssociatedObject.LostMouseCapture -= this.OnLostMouseCapture;
             this.AssociatedObject.RemoveHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonUp));
+            AssociatedObject.ClearValue(UIElement.AllowScrollOnTouchMoveProperty);
         }
 
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

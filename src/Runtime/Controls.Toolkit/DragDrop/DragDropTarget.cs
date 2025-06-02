@@ -177,6 +177,7 @@ namespace System.Windows.Controls
 
             if (!eventArgs.Cancel && !SW.DragDrop.IsDragInProgress)
             {
+                eventArgs.OriginalSource.AllowScrollOnTouchMove = false;
                 OnItemDragStarted(eventArgs);
 
                 SW.GiveFeedbackEventHandler giveFeedbackHandler =
@@ -196,6 +197,7 @@ namespace System.Windows.Controls
                                 giveFeedbackHandler);
                         }
                         SW.DragDrop.DragDropCompleted -= handler;
+                        eventArgs.OriginalSource.ClearValue(AllowScrollOnTouchMoveProperty);
 
                         InternalOnItemDragCompleted(
                             new ItemDragEventArgs(eventArgs)
@@ -1505,6 +1507,7 @@ namespace System.Windows.Controls
                     DragDecoratorContentMouseOffset = _offset,
                     Data = new SelectionCollection() { new Selection(itemIndex, data) },
                     DragSource = itemsControl,
+                    OriginalSource = _originalSource,
                     AllowedEffects = _owner.ReadLocalValue(AllowedSourceEffectsProperty) == DependencyProperty.UnsetValue
                                             ? _owner.GetAllowedEffects(itemsControl)
                                             : (SW.DragDropEffects)_owner.GetValue(AllowedSourceEffectsProperty),

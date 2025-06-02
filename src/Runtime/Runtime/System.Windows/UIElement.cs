@@ -1342,10 +1342,7 @@ namespace System.Windows
                 nameof(AllowScrollOnTouchMove),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(BooleanBoxes.TrueBox)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetTouchAction((bool)newValue ? "auto" : "none"),
-                });
+                new PropertyMetadata(BooleanBoxes.TrueBox));
 
 #endregion
 
