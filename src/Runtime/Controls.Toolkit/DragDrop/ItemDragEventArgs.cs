@@ -72,6 +72,11 @@ namespace System.Windows.Controls
         public DependencyObject DragSource { get; set; }
 
         /// <summary>
+        /// Original source of the event, which is the UIElement that initiated the drag operation.
+        /// </summary>
+        internal UIElement OriginalSource { get; set; }
+
+        /// <summary>
         /// Gets or sets the data associated with the item container being dragged.
         /// </summary>
         public object Data { get; set; }
@@ -116,6 +121,7 @@ namespace System.Windows.Controls
             this.DragDecoratorContentMouseOffset = args.DragDecoratorContentMouseOffset;
             this.RemoveDataFromDragSourceAction = args.RemoveDataFromDragSourceAction;
             this.DataRemovedFromDragSource = args.DataRemovedFromDragSource;
+            OriginalSource = args.OriginalSource;
         }
     }
 }
