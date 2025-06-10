@@ -18,7 +18,7 @@ namespace CSHTML5.Internal
 {
     public static class KnownTypesHelper
     {
-        private static readonly HashSet<Type> _additionalKnownTypes = new();
+        private static readonly HashSet<Type> _additionalKnownTypes = [];
 
         public static void AddKnownType(Type knownType) => _additionalKnownTypes.Add(knownType);
 

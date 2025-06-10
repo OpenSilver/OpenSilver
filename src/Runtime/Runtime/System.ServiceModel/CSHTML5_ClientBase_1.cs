@@ -29,6 +29,8 @@ using System.Windows;
 using CSHTML5.Internal;
 using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer_CSHTML5Ver;
 using System.Globalization;
+using System.ServiceModel.Description;
+using System.Collections.Concurrent;
 
 namespace System.ServiceModel
 {
@@ -75,8 +77,8 @@ namespace System.ServiceModel
     public abstract partial class CSHTML5_ClientBase<TChannel> /*: ICommunicationObject, IDisposable*/ where TChannel : class
     {
         //Note: Adding this because they are in the file generated when adding a Service Reference through the "Add Connected Service" for OpenSilver.
-        public Description.ServiceEndpoint Endpoint { get; } = new Description.ServiceEndpoint(new Description.ContractDescription("none"));
-        public Description.ClientCredentials ClientCredentials { get; } = new Description.ClientCredentials();
+        public ServiceEndpoint Endpoint { get; } = new ServiceEndpoint(new ContractDescription("none"));
+        public ClientCredentials ClientCredentials { get; } = new ClientCredentials();
 
         public TChannel Channel { get; }
 
@@ -94,16 +96,43 @@ namespace System.ServiceModel
         protected void InvokeAsync(BeginOperationDelegate beginOperationDelegate, object[] inValues,
           EndOperationDelegate endOperationDelegate, SendOrPostCallback operationCompletedCallback, object userState)
         {
-            AsyncOperation asyncOperation = AsyncOperationManager.CreateOperation(userState);
-            AsyncOperationContext context = new AsyncOperationContext(asyncOperation, endOperationDelegate, operationCompletedCallback);
-            IAsyncResult result = beginOperationDelegate(inValues, OnAsyncCallCompleted, context);
+            var asyncOperation = AsyncOperationManager.CreateOperation(userState);
+            var context = new AsyncOperationContext(asyncOperation, endOperationDelegate, operationCompletedCallback);
+
+            Exception error = null;
+            object[] results = null;
+            IAsyncResult result = null;
+
+            try
+            {
+                result = beginOperationDelegate(inValues, OnAsyncCallCompleted, context);
+                if (result.CompletedSynchronously)
+                {
+                    results = endOperationDelegate(result);
+                }
+            }
+            catch (Exception e)
+            {
+                error = e;
+            }
+
+            if (error != null || result.CompletedSynchronously) /* result cannot be null if error == null */
+            {
+                CompleteAsyncCall(context, results, error);
+            }
         }
 
-        static void OnAsyncCallCompleted(IAsyncResult result)
+        private static void OnAsyncCallCompleted(IAsyncResult result)
         {
-            AsyncOperationContext context = (AsyncOperationContext)result.AsyncState;
+            if (result.CompletedSynchronously)
+            {
+                return;
+            }
+
+            var context = (AsyncOperationContext)result.AsyncState;
             Exception error = null;
-            object[] results = null; //todo: fix type?
+            object[] results = null;
+
             try
             {
                 results = context.EndDelegate(result);
@@ -112,14 +141,15 @@ namespace System.ServiceModel
             {
                 error = e;
             }
+
             CompleteAsyncCall(context, results, error);
         }
 
-        static void CompleteAsyncCall(AsyncOperationContext context, object[] results, Exception error)
+        private static void CompleteAsyncCall(AsyncOperationContext context, object[] results, Exception error)
         {
             if (context.CompletionCallback != null)
             {
-                InvokeAsyncCompletedEventArgs e = new InvokeAsyncCompletedEventArgs(results, error, false, context.AsyncOperation.UserSuppliedState);
+                var e = new InvokeAsyncCompletedEventArgs(results, error, false, context.AsyncOperation.UserSuppliedState);
                 context.AsyncOperation.PostOperationCompleted(context.CompletionCallback, e);
             }
             else
@@ -128,43 +158,20 @@ namespace System.ServiceModel
             }
         }
 
-        class AsyncOperationContext
+        private sealed class AsyncOperationContext
         {
-            AsyncOperation asyncOperation;
-            EndOperationDelegate endDelegate;
-            SendOrPostCallback completionCallback;
-
             internal AsyncOperationContext(AsyncOperation asyncOperation, EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             {
-                this.asyncOperation = asyncOperation;
-                this.endDelegate = endDelegate;
-                this.completionCallback = completionCallback;
+                AsyncOperation = asyncOperation;
+                EndDelegate = endDelegate;
+                CompletionCallback = completionCallback;
             }
 
-            internal AsyncOperation AsyncOperation
-            {
-                get
-                {
-                    return this.asyncOperation;
-                }
-            }
+            internal AsyncOperation AsyncOperation { get; }
 
-            internal EndOperationDelegate EndDelegate
-            {
-                get
-                {
-                    return this.endDelegate;
-                }
-            }
+            internal EndOperationDelegate EndDelegate { get; }
 
-            internal SendOrPostCallback CompletionCallback
-            {
-                get
-                {
-                    return this.completionCallback;
-                }
-            }
-
+            internal SendOrPostCallback CompletionCallback { get; }
         }
 
         /// <summary>
@@ -191,21 +198,13 @@ namespace System.ServiceModel
         /// </summary>
         protected class InvokeAsyncCompletedEventArgs : AsyncCompletedEventArgs
         {
-            object[] results;
-
             internal InvokeAsyncCompletedEventArgs(object[] results, Exception error, bool cancelled, object userState)
                 : base(error, cancelled, userState)
             {
-                this.results = results;
+                Results = results;
             }
 
-            public object[] Results
-            {
-                get
-                {
-                    return this.results;
-                }
-            }
+            public object[] Results { get; }
         }
 
         public string INTERNAL_RemoteAddressAsString { get; }
@@ -380,23 +379,22 @@ namespace System.ServiceModel
                 Action<string> callback,
                 string soapVersion)
             {
-                MethodInfo method = ResolveMethod(interfaceType, webMethodName, "Begin" + webMethodName);
+                ContractDescription contract = ContractDescriptionProvider.GetContract(interfaceType);
+                OperationDescription operation = contract.Operations.Find(webMethodName);
+
+                MethodInfo method = operation.BeginMethod;
                 bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
 
-                Dictionary<string, string> headers;
-                string request;
                 PrepareRequest(
-                    webMethodName,
+                    operation,
                     method,
-                    interfaceType,
-                    methodReturnType,
                     knownTypes,
                     messageHeaders,
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
-                    out headers,
-                    out request);
+                    out Dictionary<string, string> headers,
+                    out string request);
 
                 Uri address = INTERNAL_UriHelper.EnsureAbsoluteUri(_addressOfService);
 
@@ -439,14 +437,17 @@ namespace System.ServiceModel
                      string xmlReturnedFromTheServer,
                      string soapVersion)
             {
-                MethodInfo beginMethod = ResolveMethod(interfaceType, webMethodName, "Begin" + webMethodName);
+                ContractDescription contract = ContractDescriptionProvider.GetContract(interfaceType);
+                OperationDescription operation = contract.Operations.Find(webMethodName);
+
+                MethodInfo beginMethod = operation.BeginMethod;
                 bool isXmlSerializer = IsXmlSerializer(webMethodName,
                                                        methodReturnType,
                                                        beginMethod);
 
                 object requestResponse = ReadAndPrepareResponse(
+                    operation,
                     xmlReturnedFromTheServer,
-                    interfaceType,
                     methodReturnType,
                     knownTypes,
                     static faultException => throw faultException,
@@ -588,26 +589,25 @@ namespace System.ServiceModel
                 IDictionary<string, object> originalRequestObject,
                 string soapVersion) // Note: we don't arrive here using c#
             {
+                ContractDescription contract = ContractDescriptionProvider.GetContract(interfaceType);
+                OperationDescription operation = contract.Operations.Find(webMethodName);
+
                 // todo: find out what happens with methods that take multiple arguments 
                 // (if possible) and change the parameterName to a string[].
-                MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName + "Async");
+                MethodInfo method = operation.TaskMethod;
                 bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
                 string outgoingMessageHeadersString = GetEnvelopeHeaders(outgoingMessageHeaders?.ToList(), soapVersion);
 
-                Dictionary<string, string> headers;
-                string request;
                 PrepareRequest(
-                    webMethodName,
+                    operation,
                     method,
-                    interfaceType,
-                    methodReturnType,
                     null,
                     outgoingMessageHeadersString,
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
-                    out headers,
-                    out request);
+                    out Dictionary<string, string> headers,
+                    out string request);
 
                 var tcs = new TaskCompletionSource<(T, MessageHeaders)>(); //todo: here we need to change object to the return type
 
@@ -622,7 +622,7 @@ namespace System.ServiceModel
                         ReadAndPrepareResponseGeneric_JSVersion(
                             tcs,
                             args2,
-                            interfaceType,
+                            operation,
                             methodReturnType,
                             null,
                             isXmlSerializer,
@@ -651,25 +651,24 @@ namespace System.ServiceModel
                 IDictionary<string, object> originalRequestObject,
                 string soapVersion) // Note: we don't arrive here using c#
             {
+                ContractDescription contract = ContractDescriptionProvider.GetContract(interfaceType);
+                OperationDescription operation = contract.Operations.Find(webMethodName);
+
                 // todo: find out what happens with methods that take multiple arguments 
                 // (if possible) and change the parameterName to a string[].
-                MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName + "Async");
+                MethodInfo method = operation.TaskMethod;
                 bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
 
-                Dictionary<string, string> headers;
-                string request;
                 PrepareRequest(
-                    webMethodName,
+                    operation,
                     method,
-                    interfaceType,
-                    methodReturnType,
                     null,
                     "",
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
-                    out headers,
-                    out request);
+                    out Dictionary<string, string> headers,
+                    out string request);
 
                 var tcs = new TaskCompletionSource<T>(); //todo: here we need to change object to the return type
 
@@ -684,7 +683,7 @@ namespace System.ServiceModel
                         ReadAndPrepareResponseGeneric_JSVersion(
                             tcs,
                             args2,
-                            interfaceType,
+                            operation,
                             methodReturnType,
                             null,
                             isXmlSerializer,
@@ -747,23 +746,22 @@ namespace System.ServiceModel
                 //</s:Envelope>
                 //**************************************
 
+                ContractDescription contract = ContractDescriptionProvider.GetContract(interfaceType);
+                OperationDescription operation = contract.Operations.Find(webMethodName);
+
                 MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName, "Begin" + webMethodName);
                 bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
 
-                Dictionary<string, string> headers;
-                string request;
                 PrepareRequest(
-                    webMethodName,
+                    operation,
                     method,
-                    interfaceType,
-                    methodReturnType,
                     null,
                     "",
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
-                    out headers,
-                    out request);
+                    out Dictionary<string, string> headers,
+                    out string request);
 
                 string response = _webRequestHelper_JSVersion.MakeRequest(
                         new Uri(_addressOfService),
@@ -776,8 +774,8 @@ namespace System.ServiceModel
                         Application.Current.Host.Settings.DefaultSoapCredentialsMode);
 
                 return ReadAndPrepareResponse(
+                    operation,
                     response,
-                    interfaceType,
                     methodReturnType,
                     null,
                     faultException => throw faultException,
@@ -838,24 +836,23 @@ namespace System.ServiceModel
                 //</s:Envelope>
                 //**************************************
 
+                ContractDescription contract = ContractDescriptionProvider.GetContract(interfaceType);
+                OperationDescription operation = contract.Operations.Find(webMethodName);
+
                 MethodInfo method = ResolveMethod(interfaceType, webMethodName, webMethodName, "Begin" + webMethodName);
                 bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
                 var outgoingMessageHeadersString = GetEnvelopeHeaders(outgoingMessageHeaders?.ToList(), soapVersion);
 
-                Dictionary<string, string> headers;
-                string request;
                 PrepareRequest(
-                    webMethodName,
+                    operation,
                     method,
-                    interfaceType,
-                    methodReturnType,
                     null,
                     outgoingMessageHeadersString,
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
-                    out headers,
-                    out request);
+                    out Dictionary<string, string> headers,
+                    out string request);
 
                 string response = _webRequestHelper_JSVersion.MakeRequest(
                         new Uri(_addressOfService),
@@ -868,8 +865,8 @@ namespace System.ServiceModel
                         Application.Current.Host.Settings.DefaultSoapCredentialsMode);
 
                 var typedResponseBody = ReadAndPrepareResponse(
+                    operation,
                     response,
-                    interfaceType,
                     methodReturnType,
                     null,
                     faultException => throw faultException,
@@ -965,10 +962,8 @@ namespace System.ServiceModel
             }
 
             private void PrepareRequest(
-                string webMethodName, // webMethod
+                OperationDescription operation,
                 MethodInfo method, // method to look for in 'interfaceType'
-                Type interfaceType,
-                Type methodReturnType,
                 IReadOnlyList<Type> knownTypes,
                 string envelopeHeaders,
                 IDictionary<string, object> requestParameters,
@@ -977,25 +972,10 @@ namespace System.ServiceModel
                 out Dictionary<string, string> headers,
                 out string request)
             {
-                headers = new Dictionary<string, string>();
-
-                string interfaceTypeName = interfaceType.Name; // default value
-                string interfaceTypeNamespace = "http://tempuri.org/"; // default value
-
-                if (interfaceType.GetCustomAttributes<ServiceContractAttribute>(false).FirstOrDefault() is ServiceContractAttribute serviceContractAttr)
-                {
-                    if (serviceContractAttr.Namespace is not null)
-                    {
-                        interfaceTypeNamespace = serviceContractAttr.Namespace;
-                    }
-                    if (!string.IsNullOrEmpty(serviceContractAttr.Name))
-                    {
-                        interfaceTypeName = serviceContractAttr.Name;
-                    }
-                }
+                headers = [];
 
                 // in every case, we want the name of the method as a XElement
-                var methodNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(webMethodName));
+                var methodNameElement = new XElement(XNamespace.Get(operation.DeclaringContract.Namespace).GetName(operation.Name));
 
                 // Note: now we want to add the parameters of the method
                 // to do that, we basically get the serialized version of the objects, 
@@ -1013,10 +993,10 @@ namespace System.ServiceModel
                         if (requestBody != null)
                         {
                             var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
-                            types.AddRange(interfaceType.GetCustomAttributes<ServiceKnownTypeAttribute>(true).Select(o => o.Type));
+                            types.AddRange(operation.KnownTypes);
 
                             var dataContractSerializer = new DataContractSerializerCustom(
-                                parameterInfos[i].ParameterType.IsByRef ? parameterInfos[i].ParameterType.GetElementType(): parameterInfos[i].ParameterType,
+                                parameterInfos[i].ParameterType.IsByRef ? parameterInfos[i].ParameterType.GetElementType() : parameterInfos[i].ParameterType,
                                 types,
                                 isXmlSerializer);
 
@@ -1024,7 +1004,7 @@ namespace System.ServiceModel
 
                             if (!isXmlSerializer)
                             {
-                                var paramNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(parameterInfos[i].Name));
+                                var paramNameElement = new XElement(XNamespace.Get(operation.DeclaringContract.Namespace).GetName(parameterInfos[i].Name));
 
                                 // we don't want to add this in the case of an XmlSerializer 
                                 // because it would be <request> which is not what we want. 
@@ -1057,9 +1037,9 @@ namespace System.ServiceModel
                                     foreach (XElement node in xElement.Elements())
                                     {
                                         ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ?
-                                                                                       interfaceTypeNamespace :
-                                                                                       x.Name.NamespaceName)
-                                                                                  .GetName(x.Name.LocalName));
+                                            operation.DeclaringContract.Namespace :
+                                            x.Name.NamespaceName)
+                                            .GetName(x.Name.LocalName));
                                         methodNameElement.Add(node);
                                     }
                                 }
@@ -1068,7 +1048,7 @@ namespace System.ServiceModel
                         else
                         {
                             // the value is null so we simply need to put the parameter name with i:nil="true" and we're good
-                            var paramNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(parameterInfos[i].Name));
+                            var paramNameElement = new XElement(XNamespace.Get(operation.DeclaringContract.Namespace).GetName(parameterInfos[i].Name));
                             var attribute = new XAttribute(XNamespace.Get(XMLSCHEMA_NAMESPACE).GetName("nil"), "true");
                             paramNameElement.Add(attribute);
                             methodNameElement.Add(paramNameElement);
@@ -1079,17 +1059,7 @@ namespace System.ServiceModel
                 string elementAsString = DataContractSerializerCustom.XElementToString(methodNameElement);
 
                 // Look for the soapAction.
-                string soapAction = string.Empty;
-
-                if (method.GetCustomAttributes<OperationContractAttribute>(false).FirstOrDefault() is OperationContractAttribute operationContractAttr)
-                {
-                    soapAction = operationContractAttr.Action;
-                }
-
-                if (string.IsNullOrEmpty(soapAction))
-                {
-                    soapAction = $"{interfaceTypeNamespace.Trim('/')}/{interfaceTypeName.Trim('/')}/{webMethodName}";
-                }
+                string soapAction = operation.Messages[0].Action;
 
                 switch (soapVersion)
                 {
@@ -1119,7 +1089,7 @@ namespace System.ServiceModel
             private void ReadAndPrepareResponseGeneric_JSVersion<T>(
                 TaskCompletionSource<T> taskCompletionSource,
                 INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e,
-                Type interfaceType,
+                OperationDescription operation,
                 Type requestResponseType,
                 IReadOnlyList<Type> knownTypes,
                 bool isXmlSerializer,
@@ -1132,8 +1102,8 @@ namespace System.ServiceModel
                 else
                 {
                     T requestResponse = (T)ReadAndPrepareResponse(
+                        operation,
                         e.Result,
-                        interfaceType,
                         requestResponseType,
                         knownTypes,
                         faultException => taskCompletionSource.TrySetException(faultException),
@@ -1152,7 +1122,7 @@ namespace System.ServiceModel
             private void ReadAndPrepareResponseGeneric_JSVersion<T>(
                 TaskCompletionSource<(T, MessageHeaders)> taskCompletionSource,
                 INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e,
-                Type interfaceType,
+                OperationDescription operation,
                 Type requestResponseType,
                 IReadOnlyList<Type> knownTypes,
                 bool isXmlSerializer,
@@ -1161,8 +1131,8 @@ namespace System.ServiceModel
                 if (e.Error == null)
                 {
                     T requestResponse = (T)ReadAndPrepareResponse(
+                        operation,
                         e.Result,
-                        interfaceType,
                         requestResponseType,
                         knownTypes,
                         faultException => taskCompletionSource.TrySetException(faultException),
@@ -1262,8 +1232,8 @@ namespace System.ServiceModel
             }
 
             private static object ReadAndPrepareResponse(
+                OperationDescription operation,
                 string responseAsString,
-                Type interfaceType,
                 Type requestResponseType,
                 IReadOnlyList<Type> knownTypes,
                 Action<FaultException> raiseFaultException,
@@ -1392,13 +1362,10 @@ namespace System.ServiceModel
                     }
 
                     return ReadResponseReferenceType(
-                        envelopeElement,
                         bodyElement,
-                        interfaceType,
+                        operation,
                         requestResponseType,
-                        knownTypes,
-                        isXmlSerializer,
-                        soapVersion);
+                        knownTypes);
                 }
 
                 static object ParseException(XElement exceptionElement, string exceptionTypeName)
@@ -1549,24 +1516,13 @@ namespace System.ServiceModel
                 return requestResponse;
             }
 
-            private static object ReadResponseReferenceType(XElement envelopeElement,
+            private static object ReadResponseReferenceType(
                 XElement bodyElement,
-                Type interfaceType,
+                OperationDescription operation,
                 Type requestResponseType,
-                IReadOnlyList<Type> knownTypes,
-                bool isXmlSerializer,
-                string soapVersion)
+                IReadOnlyList<Type> knownTypes)
             {
                 Debug.Assert(!requestResponseType.IsValueType);
-
-                object requestResponse = null;
-
-                // we deserialize the response
-                // in the case of an XmlSerializer:
-                // - change the xsi:nil="true" or add the xsi namespace (probably better to add the namespace)
-                // - directly use xDoc.Root instead of its Nodes (I think)
-                // - change the type to deserialize to the type with the name : requestResponseType.Name + "Body"
-                FieldInfo bodyFieldInfo = null;
 
                 // we make sure this is not a method with no return type
                 // Note: we test for the "Object" type since it is what we put instead of "void"
@@ -1584,74 +1540,90 @@ namespace System.ServiceModel
                     }
                 }
 
-                Type typeToDeserialize = requestResponseType;
-                if (isXmlSerializer)
-                {
-                    bodyFieldInfo = requestResponseType.GetField("Body");
-                    typeToDeserialize = bodyFieldInfo.FieldType;
-                }
-
                 // get the known types from the interface type
                 var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
-                types.AddRange(interfaceType.GetCustomAttributes<ServiceKnownTypeAttribute>(true).Select(o => o.Type));
-
-                var deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
-                XElement xElement = envelopeElement;
+                types.AddRange(operation.KnownTypes);
+                types.AddRange(KnownTypesHelper.KnownTypes);
 
                 //exclude the parts that are <Enveloppe><Body>... since they are useless 
                 // and would keep the deserialization from working properly
                 // they should always be the two outermost elements
-                if (soapVersion == "1.1")
+                XElement xElement = bodyElement;
+
+                object requestResponse;
+
+                var responseDescription = operation.Messages[1]; // out message are always at index 1
+                var bodyDescription = responseDescription.Body;
+
+                if (bodyDescription.WrapperName is not null)
                 {
-                    xElement = bodyElement ?? xElement;
+                    xElement = xElement.Elements().First();
+                    Debug.Assert(xElement.Name.LocalName == bodyDescription.WrapperName &&
+                        xElement.Name.NamespaceName == bodyDescription.WrapperNamespace);
+                }
+
+                if (bodyDescription.Parts.Count > 0)
+                {
+                    requestResponse = Activator.CreateInstance(requestResponseType);
+
+                    foreach (var bodyMemberElement in xElement.Elements())
+                    {
+                        var key = new XmlQualifiedName(bodyMemberElement.Name.LocalName, bodyMemberElement.Name.NamespaceName);
+                        if (!bodyDescription.Parts.Contains(key))
+                        {
+                            continue;
+                        }
+
+                        var part = bodyDescription.Parts[key];
+                        var serializer = new DataContractSerializer(part.Type,
+                            part.Name,
+                            part.Namespace,
+                            types);
+
+                        object o = DeserializeXElement(serializer, bodyMemberElement);
+
+                        switch (part.MemberInfo)
+                        {
+                            case FieldInfo field:
+                                field.SetValue(requestResponse, o);
+                                break;
+
+                            case PropertyInfo property:
+                                property.SetValue(requestResponse, o);
+                                break;
+                        }
+                    }
                 }
                 else
                 {
-                    xElement = bodyElement;
-                }
-
-                // we check if the type is defined in the next XElement because 
-                // it changes the XElement we want to use in that case.
-                // The reason is that the response uses one less XElement in the 
-                // case where we use XmlSerializer and the method has the return 
-                // Type object.
-                bool isTypeSpecified =
-                    xElement.Attributes(XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance").GetName("type"))
-                            .Any();
-                if (!isXmlSerializer || !isTypeSpecified)
-                {
-                    // we are either not in the XmlSerializer version or we have 
-                    // the "extra" XElement so we move in once.
-                    xElement = xElement.Elements().FirstOrDefault() ?? xElement; //move inside of the <Body> tag
-                }
-
-                if (!isXmlSerializer)
-                {
-                    if (typeToDeserialize.GetCustomAttribute<MessageContractAttribute>() != null)
+                    xElement = xElement.Elements().FirstOrDefault();
+                    if (xElement is null)
                     {
-                        // DataContractSerializer needs correct namespace instead of http://tempuri.org/
-                        XNamespace ns = GetDefaultNamespace(typeToDeserialize.Namespace, false);
-                        xElement.Name = ns + xElement.Name.LocalName;
-                        xElement.Attributes("xmlns").Remove();
-                        foreach (var childElement in xElement.Elements())
-                        {
-                            childElement.Name = ns + childElement.Name.LocalName;
-                        }
+                        requestResponse = null;
                     }
                     else
                     {
-                        xElement = xElement.Elements().FirstOrDefault() ?? xElement;
+                        var serializer = new DataContractSerializer(requestResponseType, types);
+                        requestResponse = DeserializeXElement(serializer, xElement);
                     }
-                    requestResponse = deSerializer.DeserializeFromXElement(xElement);
-                }
-                else
-                {
-                    requestResponse = Activator.CreateInstance(requestResponseType);
-                    object requestResponseBody = deSerializer.DeserializeFromXElement(xElement);
-                    bodyFieldInfo.SetValue(requestResponse, requestResponseBody);
                 }
 
                 return requestResponse;
+            }
+
+            private static object DeserializeXElement(DataContractSerializer serializer, XElement xElement)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var xw = XmlWriter.Create(ms, DataContractSerializerCustom.DefaultXmlWriterSettings))
+                    {
+                        xElement.Save(xw);
+                    }
+
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    return serializer.ReadObject(ms);
+                }
             }
 
             static void VerifyThatResponseIsNotNullOrEmpty(string responseAsString)
@@ -1772,5 +1744,12 @@ namespace System.ServiceModel
         #endregion
 
         #endregion work in progress
+    }
+
+    internal static class ContractDescriptionProvider
+    {
+        private static readonly ConcurrentDictionary<Type, ContractDescription> _cache = [];
+
+        public static ContractDescription GetContract(Type type) => _cache.GetOrAdd(type, ContractDescription.GetContract);
     }
 }
