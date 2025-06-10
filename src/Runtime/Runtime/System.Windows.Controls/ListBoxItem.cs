@@ -81,18 +81,26 @@ namespace System.Windows.Controls
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            if (!e.Handled)
+            if (!e.Handled && !e.IsTouchEvent)
             {
                 e.Handled = true;
                 Focus();
-                ListBox parent = ParentListBox;
-                if (parent != null)
-                {
-                    parent.NotifyListItemClicked(this);
-                }
+                ParentListBox?.NotifyListItemClicked(this);
             }
 
             base.OnMouseLeftButtonDown(e);
+        }
+
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        {
+            if (!e.Handled && e.IsTouchEvent)
+            {
+                e.Handled = true;
+                Focus();
+                ParentListBox?.NotifyListItemClicked(this);
+            }
+
+            base.OnMouseLeftButtonUp(e);
         }
 
         protected override void OnMouseEnter(MouseEventArgs e)
@@ -120,7 +128,7 @@ namespace System.Windows.Controls
 
             this.IsFocused = true;
             this.UpdateVisualStates();
-            
+
             ParentSelector?.NotifyListItemGotFocus(this);
         }
 

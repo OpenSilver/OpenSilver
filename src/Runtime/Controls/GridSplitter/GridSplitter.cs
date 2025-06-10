@@ -132,6 +132,7 @@ namespace System.Windows.Controls
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(GridSplitter), new PropertyMetadata(typeof(GridSplitter)));
             IsEnabledProperty.OverrideMetadata(typeof(GridSplitter), new PropertyMetadata(OnIsEnabledChanged));
+            AllowScrollOnTouchMoveProperty.OverrideMetadata(typeof(GridSplitter), new PropertyMetadata(false));
         }
 
         /// <summary>
