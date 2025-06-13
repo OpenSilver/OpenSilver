@@ -28,9 +28,9 @@ using System.Xml;
 using System.Windows;
 using CSHTML5.Internal;
 using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer_CSHTML5Ver;
-using System.Globalization;
 using System.ServiceModel.Description;
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace System.ServiceModel
 {
@@ -314,7 +314,6 @@ namespace System.ServiceModel
         /// </summary>
         public partial class WebMethodsCaller
         {
-            private const string XMLSCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"; // Usually associated to the "xsi:" prefix.
             private const string DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE = "http://schemas.datacontract.org/2004/07/";
 
             string _addressOfService;
@@ -382,17 +381,12 @@ namespace System.ServiceModel
                 ContractDescription contract = ContractDescriptionProvider.GetContract(interfaceType);
                 OperationDescription operation = contract.Operations.Find(webMethodName);
 
-                MethodInfo method = operation.BeginMethod;
-                bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
-
                 PrepareRequest(
                     operation,
-                    method,
                     knownTypes,
                     messageHeaders,
                     originalRequestObject,
                     soapVersion,
-                    isXmlSerializer,
                     out Dictionary<string, string> headers,
                     out string request);
 
@@ -600,12 +594,10 @@ namespace System.ServiceModel
 
                 PrepareRequest(
                     operation,
-                    method,
                     null,
                     outgoingMessageHeadersString,
                     originalRequestObject,
                     soapVersion,
-                    isXmlSerializer,
                     out Dictionary<string, string> headers,
                     out string request);
 
@@ -661,12 +653,10 @@ namespace System.ServiceModel
 
                 PrepareRequest(
                     operation,
-                    method,
                     null,
                     "",
                     originalRequestObject,
                     soapVersion,
-                    isXmlSerializer,
                     out Dictionary<string, string> headers,
                     out string request);
 
@@ -754,12 +744,10 @@ namespace System.ServiceModel
 
                 PrepareRequest(
                     operation,
-                    method,
                     null,
                     "",
                     originalRequestObject,
                     soapVersion,
-                    isXmlSerializer,
                     out Dictionary<string, string> headers,
                     out string request);
 
@@ -845,12 +833,10 @@ namespace System.ServiceModel
 
                 PrepareRequest(
                     operation,
-                    method,
                     null,
                     outgoingMessageHeadersString,
                     originalRequestObject,
                     soapVersion,
-                    isXmlSerializer,
                     out Dictionary<string, string> headers,
                     out string request);
 
@@ -963,100 +949,63 @@ namespace System.ServiceModel
 
             private void PrepareRequest(
                 OperationDescription operation,
-                MethodInfo method, // method to look for in 'interfaceType'
                 IReadOnlyList<Type> knownTypes,
                 string envelopeHeaders,
                 IDictionary<string, object> requestParameters,
                 string soapVersion,
-                bool isXmlSerializer,
                 out Dictionary<string, string> headers,
                 out string request)
             {
                 headers = [];
 
-                // in every case, we want the name of the method as a XElement
-                var methodNameElement = new XElement(XNamespace.Get(operation.DeclaringContract.Namespace).GetName(operation.Name));
-
-                // Note: now we want to add the parameters of the method
-                // to do that, we basically get the serialized version of the objects, 
-                // and replace their tag that should have the type with the parameter name.
-                if (requestParameters != null)
+                var bodyBuilder = new StringBuilder();
+                using (var xmlWriter = XmlDictionaryWriter.CreateDictionaryWriter(XmlWriter.Create(bodyBuilder, new XmlWriterSettings { OmitXmlDeclaration = true })))
                 {
-                    ParameterInfo[] parameterInfos = method.GetParameters();
-                    int parametersCount = requestParameters != null ?
-                                          requestParameters.Count :
-                                          0;
+                    MessageDescription messageDescription = operation.Messages[0];
 
-                    for (int i = 0; i < parametersCount; ++i)
+                    if (messageDescription.Body.WrapperName is not null)
                     {
-                        object requestBody = requestParameters[parameterInfos[i].Name];
-                        if (requestBody != null)
+                        xmlWriter.WriteStartElement(messageDescription.Body.WrapperName, messageDescription.Body.WrapperNamespace);
+                    }
+
+                    if (requestParameters is not null)
+                    {
+                        var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
+                        types.AddRange(operation.KnownTypes);
+                        types.AddRange(KnownTypesHelper.KnownTypes);
+
+                        if (messageDescription.MessageType is null)
                         {
-                            var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
-                            types.AddRange(operation.KnownTypes);
-
-                            var dataContractSerializer = new DataContractSerializerCustom(
-                                parameterInfos[i].ParameterType.IsByRef ? parameterInfos[i].ParameterType.GetElementType() : parameterInfos[i].ParameterType,
-                                types,
-                                isXmlSerializer);
-
-                            XDocument xdoc = dataContractSerializer.SerializeToXDocument(requestBody);
-
-                            if (!isXmlSerializer)
+                            foreach (MessagePartDescription part in messageDescription.Body.Parts)
                             {
-                                var paramNameElement = new XElement(XNamespace.Get(operation.DeclaringContract.Namespace).GetName(parameterInfos[i].Name));
-
-                                // we don't want to add this in the case of an XmlSerializer 
-                                // because it would be <request> which is not what we want. 
-                                // The correct parameter name is alread in the Request body.
-                                methodNameElement.Add(paramNameElement);
-                                foreach (XNode currentNode in xdoc.Root.Nodes())
-                                {
-                                    paramNameElement.Add(currentNode);
-                                }
-                                foreach (XAttribute currentAttribute in xdoc.Root.Attributes())
-                                {
-                                    // we don't want to keep the "xmlns="http://schemas.microsoft.com/2003/10/Serialization/" 
-                                    // because it breaks the request.
-                                    if (currentAttribute.Name.LocalName != "xmlns")
-                                    {
-                                        paramNameElement.Add(currentAttribute);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                //we assume that it always has the same structure 
-                                // <root>
-                                //   <AddOrUpdateToDoRequest xmlns="http://schemas.datacontract.org/2004/07/">
-                                //      <Body>
-                                //         <toDoItem
-                                // so we want to go to xdoc.Root.Nodes()[0].Nodes()
-                                foreach (XElement xElement in xdoc.Root.Nodes().OfType<XElement>())
-                                {
-                                    foreach (XElement node in xElement.Elements())
-                                    {
-                                        ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ?
-                                            operation.DeclaringContract.Namespace :
-                                            x.Name.NamespaceName)
-                                            .GetName(x.Name.LocalName));
-                                        methodNameElement.Add(node);
-                                    }
-                                }
+                                var requestBody = requestParameters[part.Name];
+                                var serializer = new DataContractSerializer(part.Type, part.Name, part.Namespace, types);
+                                serializer.WriteObject(xmlWriter, requestBody);
                             }
                         }
                         else
                         {
-                            // the value is null so we simply need to put the parameter name with i:nil="true" and we're good
-                            var paramNameElement = new XElement(XNamespace.Get(operation.DeclaringContract.Namespace).GetName(parameterInfos[i].Name));
-                            var attribute = new XAttribute(XNamespace.Get(XMLSCHEMA_NAMESPACE).GetName("nil"), "true");
-                            paramNameElement.Add(attribute);
-                            methodNameElement.Add(paramNameElement);
+                            var body = requestParameters.Values.First();
+                            foreach (MessagePartDescription part in messageDescription.Body.Parts)
+                            {
+                                var serializer = new DataContractSerializer(part.Type, part.Name, part.Namespace, types);
+                                var bodyMember = part.MemberInfo.MemberType switch
+                                {
+                                    MemberTypes.Property => ((PropertyInfo)part.MemberInfo).GetValue(body),
+                                    _ => ((FieldInfo)part.MemberInfo).GetValue(body),
+                                };
+                                serializer.WriteObject(xmlWriter, bodyMember);
+                            }
                         }
+                    }
+
+                    if (messageDescription.Body.WrapperName is not null)
+                    {
+                        xmlWriter.WriteEndElement();
                     }
                 }
 
-                string elementAsString = DataContractSerializerCustom.XElementToString(methodNameElement);
+                string elementAsString = bodyBuilder.ToString();
 
                 // Look for the soapAction.
                 string soapAction = operation.Messages[0].Action;
@@ -1348,25 +1297,18 @@ namespace System.ServiceModel
                     }
                 }
 
-                if (requestResponseType.IsValueType)
+                if (envelopeElement is null)
                 {
-                    return ReadResponseValueType(responseAsString, requestResponseType);
+                    envelopeElement = DataContractSerializerCustom.ParseToXDocument(responseAsString).Root;
+                    headerElement = envelopeElement.Element(XName.Get("Header", NS));
+                    bodyElement = envelopeElement.Element(XName.Get("Body", NS));
                 }
-                else
-                {
-                    if (envelopeElement is null)
-                    {
-                        envelopeElement = DataContractSerializerCustom.ParseToXDocument(responseAsString).Root;
-                        headerElement = envelopeElement.Element(XName.Get("Header", NS));
-                        bodyElement = envelopeElement.Element(XName.Get("Body", NS));
-                    }
 
-                    return ReadResponseReferenceType(
-                        bodyElement,
-                        operation,
-                        requestResponseType,
-                        knownTypes);
-                }
+                return ReadResponseReferenceType(
+                    bodyElement,
+                    operation,
+                    requestResponseType,
+                    knownTypes);
 
                 static object ParseException(XElement exceptionElement, string exceptionTypeName)
                 {
@@ -1414,116 +1356,12 @@ namespace System.ServiceModel
                 }
             }
 
-            private static object ReadResponseValueType(string responseAsString, Type requestResponseType)
-            {
-                Debug.Assert(requestResponseType.IsValueType);
-
-                object requestResponse = null;
-
-                // we remove the parts of the response string that are not the 
-                // response itself. That is, we remove the "<s:Body>" so as to 
-                // keep only its content
-                ReadOnlySpan<char> response = responseAsString.AsSpan();
-                ReadOnlySpan<char> keyWord = ":Body".AsSpan();
-                int i = response.IndexOf(keyWord);
-                int k = i + response.Slice(i).IndexOf('>');
-                response = response.Slice(k + 1);
-                i = response.LastIndexOf(keyWord);
-                k = response.Slice(0, i).LastIndexOf('<');
-                response = response.Slice(0, k);
-
-                // Here we are dealing with a value type.
-                // Example:
-                //     <METHODNAMEResponse xmlns="http://tempuri.org/">
-                //         <METHODNAMEResult>10</METHODNAMEResult>
-                //     </METHODNAMEResponse>
-
-
-                // we look for :nil="true". Since we have a value type, it will
-                // mean that the value type is nullable and the value is null
-                if (response.IndexOf(":nil=\"true\"".AsSpan()) == -1)
-                {
-                    // we remove the <MethodNameResponse> tag
-                    int ii = response.IndexOf('>');
-                    int jj = ii + 1 + response.Slice(ii + 1).IndexOf('>');
-                    int kk = jj + 1 + response.Slice(jj + 1).IndexOf('<');
-                    response = response.Slice(jj + 1, kk - jj - 1);
-
-                    //todo: support more value types?
-                    //todo: handle nullables that are null
-                    if (requestResponseType == typeof(int) || requestResponseType == typeof(int?))
-                    {
-                        requestResponse = int.Parse(response.ToString());
-                    }
-                    else if (requestResponseType == typeof(long) || requestResponseType == typeof(long?))
-                    {
-                        requestResponse = long.Parse(response.ToString());
-                    }
-                    else if (requestResponseType == typeof(bool) || requestResponseType == typeof(bool?))
-                    {
-                        requestResponse = bool.Parse(response.ToString());
-                    }
-                    else if (requestResponseType == typeof(float) || requestResponseType == typeof(float?))
-                    {
-                        requestResponse = float.Parse(response.ToString()); //todo: ensure this is the culture-invariant parsing!
-                    }
-                    else if (requestResponseType == typeof(double) || requestResponseType == typeof(double?))
-                    {
-                        requestResponse = double.Parse(response.ToString()); //todo: ensure this is the culture-invariant parsing!
-                    }
-                    else if (requestResponseType == typeof(decimal) || requestResponseType == typeof(decimal?))
-                    {
-                        requestResponse = decimal.Parse(response.ToString()); //todo: ensure this is the culture-invariant parsing!
-                    }
-                    else if (requestResponseType == typeof(char) || requestResponseType == typeof(char?))
-                    {
-                        requestResponse = (char)int.Parse(response.ToString()); //todo: support encodings
-                    }
-                    else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
-                    {
-                        requestResponse = DateTime.Parse(response.ToString(), CultureInfo.InvariantCulture);
-                    }
-                    else if (requestResponseType == typeof(TimeSpan) || requestResponseType == typeof(TimeSpan?))
-                    {
-                        requestResponse = XmlConvert.ToTimeSpan(response.ToString());
-                    }
-                    else if (requestResponseType.IsEnum)
-                    {
-                        requestResponse = Enum.Parse(requestResponseType, response.ToString());
-                    }
-                    else if (requestResponseType == typeof(void))
-                    {
-                        // Do nothing so null object will be returned
-                    }
-                    else
-                    {
-                        throw new NotSupportedException(
-                            $"The type '{requestResponseType}' is not supported in the current WCF implementation, string value is {response.ToString()}.");
-                    }
-                }
-                else
-                {
-                    if (requestResponseType.FullName.StartsWith("System.Nullable`1"))
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        return Activator.CreateInstance(requestResponseType);
-                    }
-                }
-
-                return requestResponse;
-            }
-
             private static object ReadResponseReferenceType(
                 XElement bodyElement,
                 OperationDescription operation,
                 Type requestResponseType,
                 IReadOnlyList<Type> knownTypes)
             {
-                Debug.Assert(!requestResponseType.IsValueType);
-
                 // we make sure this is not a method with no return type
                 // Note: we test for the "Object" type since it is what we put instead of "void"
                 // to allow passing it as Generic type argument when calling CallWebMethod.
@@ -1552,60 +1390,80 @@ namespace System.ServiceModel
 
                 object requestResponse;
 
-                var responseDescription = operation.Messages[1]; // out message are always at index 1
-                var bodyDescription = responseDescription.Body;
+                var replyDescription = operation.Messages[1]; // out message are always at index 1
 
-                if (bodyDescription.WrapperName is not null)
+                if (replyDescription.MessageType is not null)
                 {
-                    xElement = xElement.Elements().First();
-                    Debug.Assert(xElement.Name.LocalName == bodyDescription.WrapperName &&
-                        xElement.Name.NamespaceName == bodyDescription.WrapperNamespace);
-                }
+                    requestResponse = Activator.CreateInstance(
+                        replyDescription.MessageType,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance | BindingFlags.NonPublic,
+                        null,
+                        [],
+                        null);
 
-                if (bodyDescription.Parts.Count > 0)
-                {
-                    requestResponse = Activator.CreateInstance(requestResponseType);
-
-                    foreach (var bodyMemberElement in xElement.Elements())
+                    if (replyDescription.Body.WrapperName is not null)
                     {
-                        var key = new XmlQualifiedName(bodyMemberElement.Name.LocalName, bodyMemberElement.Name.NamespaceName);
-                        if (!bodyDescription.Parts.Contains(key))
+                        xElement = xElement.Elements().First();
+                        Debug.Assert(xElement.Name.LocalName == replyDescription.Body.WrapperName &&
+                            xElement.Name.NamespaceName == replyDescription.Body.WrapperNamespace);
+                    }
+
+                    foreach (var part in replyDescription.Body.Parts)
+                    {
+                        XElement element = xElement.Element(XName.Get(part.Name, part.Namespace));
+                        if (element is null)
                         {
                             continue;
                         }
 
-                        var part = bodyDescription.Parts[key];
                         var serializer = new DataContractSerializer(part.Type,
                             part.Name,
                             part.Namespace,
                             types);
 
-                        object o = DeserializeXElement(serializer, bodyMemberElement);
+                        object o = DeserializeXElement(serializer, element);
 
-                        switch (part.MemberInfo)
+                        if (part.MemberInfo.MemberType == MemberTypes.Property)
                         {
-                            case FieldInfo field:
-                                field.SetValue(requestResponse, o);
-                                break;
-
-                            case PropertyInfo property:
-                                property.SetValue(requestResponse, o);
-                                break;
+                            ((PropertyInfo)part.MemberInfo).SetValue(requestResponse, o);
+                        }
+                        else
+                        {
+                            ((FieldInfo)part.MemberInfo).SetValue(requestResponse, o);
                         }
                     }
                 }
                 else
                 {
-                    xElement = xElement.Elements().FirstOrDefault();
-                    if (xElement is null)
+                    if (replyDescription.Body.WrapperName is not null)
                     {
-                        requestResponse = null;
+                        xElement = xElement.Elements().First();
+                        Debug.Assert(xElement.Name.LocalName == replyDescription.Body.WrapperName &&
+                            xElement.Name.NamespaceName == replyDescription.Body.WrapperNamespace);
                     }
-                    else
+
+                    requestResponse = null;
+
+                    var returnPart = replyDescription.Body.ReturnValue;
+
+                    if (returnPart is not null && returnPart.Type != typeof(void))
                     {
-                        var serializer = new DataContractSerializer(requestResponseType, types);
-                        requestResponse = DeserializeXElement(serializer, xElement);
+                        xElement = xElement.Element(XName.Get(returnPart.Name, returnPart.Namespace));
+
+                        if (xElement is not null)
+                        {
+                            var serializer = new DataContractSerializer(
+                                returnPart.Type,
+                                returnPart.Name,
+                                returnPart.Namespace,
+                                types);
+
+                            requestResponse = DeserializeXElement(serializer, xElement);
+                        }
                     }
+
+                    // Note: we do not deserialize bodyDescription.Parts because it is used for out/ref parameters,
+                    // which we do not support.
                 }
 
                 return requestResponse;
@@ -1613,16 +1471,9 @@ namespace System.ServiceModel
 
             private static object DeserializeXElement(DataContractSerializer serializer, XElement xElement)
             {
-                using (var ms = new MemoryStream())
+                using (var reader = xElement.CreateReader())
                 {
-                    using (var xw = XmlWriter.Create(ms, DataContractSerializerCustom.DefaultXmlWriterSettings))
-                    {
-                        xElement.Save(xw);
-                    }
-
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    return serializer.ReadObject(ms);
+                    return serializer.ReadObject(reader);
                 }
             }
 
@@ -1680,12 +1531,15 @@ namespace System.ServiceModel
             return null;
         }
 
-        //    /// <summary>
-        //    /// Replicates the behavior of the default keyword in C#.
-        //    /// </summary>
-        //    /// <typeparam name="T">The type that is identified as reference or numeric by the keyword.</typeparam>
-        //    /// <returns>Returns null if T is a reference type and zero if T is a numeric value type.</returns>
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Replicates the behavior of the default keyword in C#.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type that is identified as reference or numeric by the keyword.
+        /// </typeparam>
+        /// <returns>
+        /// Returns null if <typeparamref name="T"/> is a reference type and zero if <typeparamref name="T"/> is a numeric value type.
+        /// </returns>
         protected T GetDefaultValueForInitialization<T>()
         {
             return default(T);
