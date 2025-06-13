@@ -27,13 +27,13 @@ namespace System.Runtime.Serialization
     /// </summary>
     public class DataContractSerializer_CSHTML5Ver
     {
-        internal static readonly XmlReaderSettings DefaultXmlReaderSettings = new()
+        private static readonly XmlReaderSettings DefaultXmlReaderSettings = new()
         {
             CheckCharacters = false,
             IgnoreWhitespace = true,
         };
 
-        internal static readonly XmlWriterSettings DefaultXmlWriterSettings = new()
+        private static readonly XmlWriterSettings DefaultXmlWriterSettings = new()
         {
             CheckCharacters = false,
             OmitXmlDeclaration = true,
