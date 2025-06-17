@@ -100,6 +100,7 @@ namespace System.Windows.Controls
                 if (_headerElement != null)
                 {
                     _headerElement.MouseLeftButtonDown -= OnHeaderMouseLeftButtonDown;
+                    _headerElement.MouseLeftButtonUp -= OnHeaderElementMouseLeftButtonUp;
                 }
 
                 // Attach to the new Header element
@@ -107,6 +108,7 @@ namespace System.Windows.Controls
                 if (_headerElement != null)
                 {
                     _headerElement.MouseLeftButtonDown += OnHeaderMouseLeftButtonDown;
+                    _headerElement.MouseLeftButtonUp += OnHeaderElementMouseLeftButtonUp;
                 }
             }
         }
@@ -1146,31 +1148,48 @@ namespace System.Windows.Controls
         /// <param name="e">Event arguments.</param>
         private void OnHeaderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (Interaction.AllowMouseLeftButtonDown(e))
+            if (Interaction.AllowMouseLeftButtonDown(e) && !e.IsTouchEvent)
             {
-                // If the event hasn't already been handled and this item is
-                // focusable, then focus (and possibly expand if it was double
-                // clicked)
-                if (!e.Handled && IsEnabled)
+                ProcessPointerClick(e);
+            }
+        }
+
+        private void ProcessPointerClick(MouseButtonEventArgs e)
+        {
+            // If the event hasn't already been handled and this item is
+            // focusable, then focus (and possibly expand if it was double clicked)
+            if (!e.Handled && IsEnabled)
+            {
+                if (Focus())
                 {
-                    if (Focus())
-                    {
-                        e.Handled = true;
-                    }
-
-                    // Expand the item when double clicked
-                    if (Interaction.ClickCount % 2 == 0)
-                    {
-                        bool opened = !IsExpanded;
-                        UserInitiatedExpansion |= opened;
-                        IsExpanded = opened;
-
-                        e.Handled = true;
-                    }
+                    e.Handled = true;
                 }
 
-                Interaction.OnMouseLeftButtonDownBase();
-                OnMouseLeftButtonDown(e);
+                // Expand the item when double clicked
+                if (Interaction.ClickCount % 2 == 0)
+                {
+                    bool opened = !IsExpanded;
+                    UserInitiatedExpansion |= opened;
+                    IsExpanded = opened;
+
+                    e.Handled = true;
+                }
+            }
+
+            Interaction.OnMouseLeftButtonDownBase();
+            OnMouseLeftButtonDown(e);
+        }
+
+        /// <summary>
+        /// Provides handling for the Header's MouseLeftButtonUp event.
+        /// </summary>
+        /// <param name="sender">The Header template part.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnHeaderElementMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (Interaction.AllowMouseLeftButtonUp(e) && e.IsTouchEvent)
+            {
+                ProcessPointerClick(e);
             }
         }
 
