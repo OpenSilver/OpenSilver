@@ -152,6 +152,7 @@ namespace CSHTML5.Internal
             element.OuterDiv = null;
             element.VisualChildrenInformation = null;
             element.IsRenderingSuspended = false;
+            element.ParentWindow = null;
         }
 
         public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent, int index = -1)

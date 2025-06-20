@@ -11,19 +11,19 @@
 *  
 \*====================================================================================*/
 
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Windows.Input;
-using System.Windows.Markup;
-using System.ComponentModel;
-using System.Xaml.Markup;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Markup;
+using System.Windows.Media;
+using System.Xaml.Markup;
 
 namespace System.Windows
 {
@@ -468,28 +468,75 @@ namespace System.Windows
         {
             // Notify the ContentPresenter/ItemsPresenter that we are about to generate the
             // template tree and allow them to choose the right template to be applied.
-            this.OnPreApplyTemplate();
+            OnPreApplyTemplate();
 
             bool visualsCreated = false;
-            if (this.TemplateInternal != null)
-            {
-                FrameworkTemplate template = this.TemplateInternal;
 
+            if (TemplateInternal is FrameworkTemplate template)
+            {
                 // we only apply the template if no template has been
                 // rendered already for this control.
-                if (this.TemplateChild == null)
+                if (TemplateChild is null)
                 {
                     visualsCreated = template.ApplyTemplateContent(this);
+
+                    if (ParentWindow is not null)
+                    {
+                        InvalidateStateTriggers(true);
+                    }
+
+                    if (visualsCreated)
+                    {
+                        // Call the OnApplyTemplate method
+                        OnApplyTemplate();
+                    }
                 }
             }
 
-            if (visualsCreated)
+            return visualsCreated;
+        }
+
+        internal sealed override void OnParentWindowChanged(Window window) => InvalidateStateTriggers(window is not null);
+
+        private void InvalidateStateTriggers(bool attach)
+        {
+            if (StateGroupsRoot is not FrameworkElement stateGroupsRoot)
             {
-                // Call the OnApplyTemplate method
-                this.OnApplyTemplate();
+                return;
             }
 
-            return visualsCreated;
+            if (VisualStateManager.GetVisualStateGroupsInternal(stateGroupsRoot) is not VisualStateGroupCollection groups)
+            {
+                return;
+            }
+
+            foreach (VisualStateGroup group in groups)
+            {
+                if (group.InternalStates is null)
+                {
+                    continue;
+                }
+
+                foreach (VisualState state in group.InternalStates)
+                {
+                    if (state.InternalStateTriggers is null)
+                    {
+                        continue;
+                    }
+
+                    foreach (StateTriggerBase trigger in state.InternalStateTriggers)
+                    {
+                        if (attach)
+                        {
+                            trigger.SendAttached();
+                        }
+                        else
+                        {
+                            trigger.SendDetached();
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -521,10 +568,7 @@ namespace System.Windows
             FrameworkTemplate newTemplate,
             DependencyProperty templateProperty)
         {
-            if (newTemplate != null)
-            {
-                newTemplate.Seal();
-            }
+            newTemplate?.Seal();
 
             // Update the template cache
             fe.TemplateCache = newTemplate;

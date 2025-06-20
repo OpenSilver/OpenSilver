@@ -110,6 +110,7 @@
     <Compile Include="System.ComponentModel\PropertyFilterAttribute.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
     <Compile Include="System.Windows.Media.Animation\ElasticEase.cs" />
+    <Compile Include="System.Windows\AdaptiveTrigger.cs" />
     <Compile Include="System.Windows\AttachedPropertyBrowsableAttribute.cs" />
     <Compile Include="System.Windows\AttachedPropertyBrowsableForChildrenAttribute.cs" />
     <Compile Include="System.Windows\AttachedPropertyBrowsableForTypeAttribute.cs" />
@@ -245,6 +246,9 @@
     <Compile Include="System.Windows\RoutedEventConverter.cs" />
     <Compile Include="System.Windows\RoutingStrategy.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
+    <Compile Include="System.Windows\StateTrigger.cs" />
+    <Compile Include="System.Windows\StateTriggerBase.cs" />
+    <Compile Include="OpenSilver\Internal\StateTriggerCollection.cs" />
     <Compile Include="System.Windows\TreeChangeInfo.cs" />
     <Compile Include="System.Windows\UIElement.Animations.cs" />
     <Compile Include="System.Windows\UIElement.Commands.cs" />
@@ -267,7 +271,6 @@
     <Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
     <Compile Include="OpenSilver\Internal\StringBuilderFactory.cs" />
     <Compile Include="OpenSilver\Internal\VisualStateGroupCollection.cs" />
-    <Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />
     <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\Data\IPropertyPathNode.cs" />
@@ -288,7 +291,6 @@
       <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
     </Compile>
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
-    <Compile Include="OpenSilver\Internal\VisualTransitionCollection.cs" />
     <Compile Include="OpenSilver\Internal\WeakEventListener.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContext.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContextStack.cs" />
@@ -517,6 +519,8 @@
     <Compile Include="System.Windows\UIElement.Layout.cs" />
     <Compile Include="System.Windows\Vector.cs" />
     <Compile Include="System.Windows\VectorConverter.cs" />
+    <Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />
+    <Compile Include="OpenSilver\Internal\VisualTransitionsCollection.cs" />
     <Compile Include="System.Windows\WeakEventManager.cs" />
     <Compile Include="System.Windows\WeakEventManagerOfT.cs" />
     <Compile Include="System.Windows\WindowStartupLocation.cs" />

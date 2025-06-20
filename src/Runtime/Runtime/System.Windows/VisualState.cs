@@ -11,57 +11,74 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using System.Collections;
 using System.ComponentModel;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
 using System.Xaml.Markup;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Represents the visual appearance of the control when it is in a specific state.
+/// </summary>
+[ContentProperty(nameof(Storyboard))]
+[RuntimeNameProperty(nameof(Name))]
+public sealed class VisualState : DependencyObject
 {
+    private StateTriggerCollection _stateTriggers;
+
     /// <summary>
-    /// Represents the visual appearance of the control when it is in a specific state.
+    /// Initializes a new instance of the <see cref="VisualState"/> class.
     /// </summary>
-    [ContentProperty(nameof(Storyboard))]
-    [RuntimeNameProperty(nameof(Name))]
-    public sealed class VisualState : DependencyObject
+    public VisualState() { }
+
+    /// <summary>
+    /// Gets the name of the <see cref="VisualState"/>.
+    /// </summary>
+    /// <returns>
+    /// The name of the <see cref="VisualState"/>.
+    /// </returns>
+    public string Name
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VisualState"/> class.
-        /// </summary>
-        public VisualState() { }
-
-        /// <summary>
-        /// Gets the name of the <see cref="VisualState"/>.
-        /// </summary>
-        /// <returns>
-        /// The name of the <see cref="VisualState"/>.
-        /// </returns>
-        public string Name
-        {
-            get => (string)GetValue(FrameworkElement.NameProperty);
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            set => SetValueInternal(FrameworkElement.NameProperty, value);
-        }
-
-        private static readonly DependencyProperty StoryboardProperty =
-            DependencyProperty.Register(
-                nameof(Storyboard),
-                typeof(Storyboard),
-                typeof(VisualState),
-                null);
-
-        /// <summary>
-        /// Gets or sets a <see cref="Storyboard"/> that defines the appearance of the control 
-        /// when it is the state that is represented by the <see cref="VisualState"/>.
-        /// </summary>
-        /// <returns>
-        /// A Storyboard that defines the appearance of the control when it is the state that 
-        /// is represented by the <see cref="VisualState"/>.
-        /// </returns>
-        public Storyboard Storyboard
-        {
-            get => (Storyboard)GetValue(StoryboardProperty);
-            set => SetValueInternal(StoryboardProperty, value);
-        }
+        get => (string)GetValue(FrameworkElement.NameProperty);
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        set => SetValueInternal(FrameworkElement.NameProperty, value);
     }
+
+    private static readonly DependencyProperty StoryboardProperty =
+        DependencyProperty.Register(
+            nameof(Storyboard),
+            typeof(Storyboard),
+            typeof(VisualState),
+            null);
+
+    /// <summary>
+    /// Gets or sets a <see cref="Storyboard"/> that defines the appearance of the control 
+    /// when it is the state that is represented by the <see cref="VisualState"/>.
+    /// </summary>
+    /// <returns>
+    /// A Storyboard that defines the appearance of the control when it is the state that 
+    /// is represented by the <see cref="VisualState"/>.
+    /// </returns>
+    public Storyboard Storyboard
+    {
+        get => (Storyboard)GetValue(StoryboardProperty);
+        set => SetValueInternal(StoryboardProperty, value);
+    }
+
+    /// <summary>
+    /// Gets a collection of <see cref="StateTriggerBase"/> objects that indicate when this 
+    /// <see cref="VisualState"/> should be applied. If any (not all) of the triggers are active, 
+    /// the VisualState will be applied.
+    /// </summary>
+    /// <returns>
+    /// A collection of <see cref="StateTriggerBase"/> objects. The default is an empty collection.
+    /// </returns>
+    public IList StateTriggers => _stateTriggers ??= new StateTriggerCollection(this);
+
+    internal StateTriggerCollection InternalStateTriggers => _stateTriggers;
+
+    internal VisualStateGroup VisualStateGroup { get; set; }
 }

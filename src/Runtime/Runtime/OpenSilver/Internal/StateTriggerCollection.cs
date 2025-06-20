@@ -18,18 +18,18 @@ using System.Windows;
 
 namespace OpenSilver.Internal;
 
-internal sealed class VisualStatesCollection : Collection<VisualState>
+internal sealed class StateTriggerCollection : Collection<StateTriggerBase>
 {
-    private readonly VisualStateGroup _owner;
+    private readonly VisualState _owner;
 
-    public VisualStatesCollection(VisualStateGroup owner)
+    public StateTriggerCollection(VisualState owner)
     {
         Debug.Assert(owner is not null);
         _owner = owner;
     }
 
     /// <inheritdoc />
-    protected override void InsertItem(int index, VisualState item)
+    protected override void InsertItem(int index, StateTriggerBase item)
     {
         if (item is null)
         {
@@ -46,13 +46,13 @@ internal sealed class VisualStatesCollection : Collection<VisualState>
     {
         if (Count > 0)
         {
-            VisualState[] states = [.. this];
+            StateTriggerBase[] stateTriggers = [.. this];
 
             base.ClearItems();
 
-            foreach (VisualState state in states)
+            foreach (StateTriggerBase stateTrigger in stateTriggers)
             {
-                ClearParent(state);
+                ClearParent(stateTrigger);
             }
         }
     }
@@ -60,38 +60,38 @@ internal sealed class VisualStatesCollection : Collection<VisualState>
     /// <inheritdoc />
     protected override void RemoveItem(int index)
     {
-        VisualState oldState = this[index];
+        StateTriggerBase oldStateTrigger = this[index];
 
         base.RemoveItem(index);
 
-        ClearParent(oldState);
+        ClearParent(oldStateTrigger);
     }
 
     /// <inheritdoc />
-    protected override void SetItem(int index, VisualState item)
+    protected override void SetItem(int index, StateTriggerBase item)
     {
         if (item is null)
         {
             throw new ArgumentNullException(nameof(item));
         }
 
-        VisualState oldState = this[index];
+        StateTriggerBase oldStateTrigger = this[index];
 
         base.SetItem(index, item);
 
-        ClearParent(oldState);
+        ClearParent(oldStateTrigger);
         SetParent(item);
     }
 
-    private void SetParent(VisualState state)
+    private void SetParent(StateTriggerBase stateTrigger)
     {
-        state.VisualStateGroup = _owner;
-        _owner.ProvideSelfAsInheritanceContext(state, null);
+        stateTrigger.VisualState = _owner;
+        _owner.ProvideSelfAsInheritanceContext(stateTrigger, null);
     }
 
-    private void ClearParent(VisualState state)
+    private void ClearParent(StateTriggerBase stateTrigger)
     {
-        state.VisualStateGroup = null;
-        _owner.RemoveSelfAsInheritanceContext(state, null);
+        stateTrigger.VisualState = null;
+        _owner.RemoveSelfAsInheritanceContext(stateTrigger, null);
     }
 }

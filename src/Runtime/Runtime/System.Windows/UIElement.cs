@@ -275,7 +275,24 @@ namespace System.Windows
 
 #endregion Visual Children
 
-        internal Window ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
+        private Window _window;
+
+        internal Window ParentWindow
+        {
+            get => _window;
+            set
+            {
+                if (_window == value)
+                {
+                    return;
+                }
+
+                _window = value;
+                OnParentWindowChanged(value);
+            }
+        }
+
+        internal virtual void OnParentWindowChanged(Window window) { }
 
         // This is the main DIV of the HTML representation of the control
         internal INTERNAL_HtmlDomElementReference OuterDiv { get; set; }

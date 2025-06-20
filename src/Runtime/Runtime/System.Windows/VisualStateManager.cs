@@ -11,11 +11,11 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
-using OpenSilver.Internal;
 
 namespace System.Windows;
 
@@ -107,6 +107,22 @@ public class VisualStateManager : DependencyObject
         return GoToState((FrameworkElement)control, stateName, useTransitions);
     }
 
+    internal static bool GoToElementState(FrameworkElement stateGroupsRoot, VisualStateGroup group, VisualState state)
+    {
+        Debug.Assert(stateGroupsRoot is not null);
+        Debug.Assert(group is not null);
+
+        // Look for a custom VSM, and call it if it was found, regardless of whether the state was found or not.
+        // This is because we don't know what the custom VSM will want to do. But for our default implementation,
+        // we know that if we haven't found the state, we don't actually want to do anything.
+        if (GetCustomVisualStateManager(stateGroupsRoot) is VisualStateManager customVsm)
+        {
+            return customVsm.GoToStateCore(null, stateGroupsRoot, state?.Name, group, state, false);
+        }
+
+        return GoToStateInternal(null, stateGroupsRoot, group, state, false);
+    }
+
     /// <summary>
     /// Transitions the element between two states. Use this method to transition states that are defined by an 
     /// application, rather than defined by a control.
@@ -168,6 +184,11 @@ public class VisualStateManager : DependencyObject
         VisualState state,
         bool useTransitions)
     {
+        if (state is null)
+        {
+            throw new ArgumentNullException(nameof(state));
+        }
+
         return GoToStateInternal(control, templateRoot, group, state, useTransitions);
     }
 
@@ -311,11 +332,6 @@ public class VisualStateManager : DependencyObject
             throw new ArgumentNullException(nameof(stateGroupsRoot));
         }
 
-        if (state is null)
-        {
-            throw new ArgumentNullException(nameof(state));
-        }
-
         if (group is null)
         {
             throw new InvalidOperationException();
@@ -329,7 +345,7 @@ public class VisualStateManager : DependencyObject
                 return true;
             }
 
-            state.Storyboard?.BeginVSM(stateGroupsRoot);
+            state?.Storyboard?.BeginVSM(stateGroupsRoot);
             lastState?.Storyboard?.RemoveVSM(stateGroupsRoot);
 
             // remember the current state

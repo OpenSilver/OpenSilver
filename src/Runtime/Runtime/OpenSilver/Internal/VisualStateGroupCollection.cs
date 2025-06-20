@@ -47,7 +47,7 @@ internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
 
         base.InsertItem(index, item);
 
-        Owner?.ProvideSelfAsInheritanceContext(item, null);
+        SetParent(item, Owner);
     }
 
     /// <inheritdoc />
@@ -63,7 +63,7 @@ internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
 
             foreach (VisualStateGroup group in groups)
             {
-                owner.RemoveSelfAsInheritanceContext(group, null);
+                ClearParent(group, owner);
             }
         }
     }
@@ -75,7 +75,7 @@ internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
 
         base.RemoveItem(index);
 
-        Owner?.RemoveSelfAsInheritanceContext(oldGroup, null);
+        ClearParent(oldGroup, Owner);
     }
 
     /// <inheritdoc />
@@ -92,8 +92,20 @@ internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
 
         if (Owner is DependencyObject owner)
         {
-            owner.RemoveSelfAsInheritanceContext(oldGroup, null);
-            owner.ProvideSelfAsInheritanceContext(item, null);
+            ClearParent(oldGroup, owner);
+            SetParent(item, owner);
         }
+    }
+
+    private void SetParent(VisualStateGroup group, DependencyObject owner)
+    {
+        group.SetVisualElement(_owner);
+        owner?.ProvideSelfAsInheritanceContext(group, null);
+    }
+
+    private void ClearParent(VisualStateGroup group, DependencyObject owner)
+    {
+        group.SetVisualElement(null);
+        owner?.RemoveSelfAsInheritanceContext(group, null);
     }
 }
