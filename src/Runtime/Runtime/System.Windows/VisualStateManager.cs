@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
@@ -33,7 +32,7 @@ public class VisualStateManager : DependencyObject
     /// <param name="stateName">The new state that the control is in.</param>
     /// <param name="useTransitions">Whether to use transition animations.</param>
     /// <returns>true if the state changed successfully, false otherwise.</returns>
-    private static bool GoToStateCommon(Control control, FrameworkElement stateGroupsRoot, string stateName, bool useTransitions)
+    private static bool GoToStateCommon(FrameworkElement control, FrameworkElement stateGroupsRoot, string stateName, bool useTransitions)
     {
         if (stateName is null)
         {
@@ -89,7 +88,7 @@ public class VisualStateManager : DependencyObject
     /// <exception cref="ArgumentNullException">
     /// stateName is null.
     /// </exception>
-    public static bool GoToState(Control control, string stateName, bool useTransitions)
+    public static bool GoToState(FrameworkElement control, string stateName, bool useTransitions)
     {
         if (control is null)
         {
@@ -101,13 +100,32 @@ public class VisualStateManager : DependencyObject
         return GoToStateCommon(control, stateGroupsRoot, stateName, useTransitions);
     }
 
+    /// <inheritdoc cref="GoToState(FrameworkElement, string, bool)" />
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static bool GoToState(Control control, string stateName, bool useTransitions)
+    {
+        return GoToState((FrameworkElement)control, stateName, useTransitions);
+    }
+
     /// <summary>
-    /// Transitions a control's state.
+    /// Transitions the element between two states. Use this method to transition states that are defined by an 
+    /// application, rather than defined by a control.
     /// </summary>
-    /// <param name="stateGroupsRoot">The root element that contains the VisualStateManager.</param>
-    /// <param name="stateName">The new state that the control is in.</param>
-    /// <param name="useTransitions">Whether to use transition animations.</param>
-    /// <returns>true if the state changed successfully, false otherwise.</returns>
+    /// <param name="stateGroupsRoot">
+    /// The root element that contains the <see cref="VisualStateManager"/>.
+    /// </param>
+    /// <param name="stateName">
+    /// The state to transition to.
+    /// </param>
+    /// <param name="useTransitions">
+    /// true to use a <see cref="VisualTransition"/> object to transition between states; otherwise, false.
+    /// </param>
+    /// <returns>
+    /// true if the control successfully transitioned to the new state; otherwise, false.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stateGroupsRoot"/> is null or <paramref name="stateName"/> is null.
+    /// </exception>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static bool GoToElementState(FrameworkElement stateGroupsRoot, string stateName, bool useTransitions)
     {
@@ -143,7 +161,7 @@ public class VisualStateManager : DependencyObject
     /// <returns>
     /// true if the control successfully transitioned to the new state; otherwise, false.
     /// </returns>
-    protected virtual bool GoToStateCore(Control control,
+    protected virtual bool GoToStateCore(FrameworkElement control,
         FrameworkElement templateRoot,
         string stateName,
         VisualStateGroup group,
@@ -215,10 +233,10 @@ public class VisualStateManager : DependencyObject
 
     private static readonly DependencyPropertyKey VisualStateGroupsPropertyKey =
         DependencyProperty.RegisterAttachedReadOnly(
-        "VisualStateGroups",
-        typeof(IList),
-        typeof(VisualStateManager),
-        new PropertyMetadata((object)null));
+            "VisualStateGroups",
+            typeof(IList),
+            typeof(VisualStateManager),
+            new PropertyMetadata((object)null));
 
     /// <summary>
     /// Identifies the VisualStateManager.VisualStateGroup attached property.
@@ -282,7 +300,7 @@ public class VisualStateManager : DependencyObject
         return false;
     }
 
-    private static bool GoToStateInternal(Control control,
+    private static bool GoToStateInternal(FrameworkElement control,
         FrameworkElement stateGroupsRoot,
         VisualStateGroup group,
         VisualState state,
@@ -345,10 +363,18 @@ public class VisualStateManager : DependencyObject
     /// <param name="control">
     /// The control that is transitioning states.
     /// </param>
+    /// <param name="stateGroupsRoot">
+    /// The root element that contains the <see cref="VisualStateManager"/>.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// stateGroup is null or newState is null or control is null.
+    /// <paramref name="stateGroup"/> is null or <paramref name="newState"/> is null.
     /// </exception>
-    protected void RaiseCurrentStateChanging(VisualStateGroup stateGroup, VisualState oldState, VisualState newState, Control control)
+    protected void RaiseCurrentStateChanging(
+        VisualStateGroup stateGroup,
+        VisualState oldState,
+        VisualState newState,
+        FrameworkElement control,
+        FrameworkElement stateGroupsRoot)
     {
         if (stateGroup is null)
         {
@@ -360,18 +386,89 @@ public class VisualStateManager : DependencyObject
             throw new ArgumentNullException(nameof(newState));
         }
 
-        if (control is null)
-        {
-            throw new ArgumentNullException(nameof(control));
-        }
-
-        FrameworkElement stateGroupsRoot = control.StateGroupsRoot;
         if (stateGroupsRoot is null)
         {
             return; // Ignore if a ControlTemplate hasn't been applied
         }
 
         stateGroup.RaiseCurrentStateChanging(stateGroupsRoot, oldState, newState, control);
+    }
+
+    /// <summary>
+    /// Raises the <see cref="VisualStateGroup.CurrentStateChanging"/> event on the specified 
+    /// <see cref="VisualStateGroup"/>.
+    /// </summary>
+    /// <param name="stateGroup">
+    /// The object on which the <see cref="VisualStateGroup.CurrentStateChanging"/> event.
+    /// </param>
+    /// <param name="oldState">
+    /// The state that the control is transitioning from.
+    /// </param>
+    /// <param name="newState">
+    /// The state that the control is transitioning to.
+    /// </param>
+    /// <param name="control">
+    /// The control that is transitioning states.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stateGroup"/> is null or <paramref name="newState"/> is null or <paramref name="control"/> is null.
+    /// </exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected void RaiseCurrentStateChanging(VisualStateGroup stateGroup, VisualState oldState, VisualState newState, Control control)
+    {
+        if (control is null)
+        {
+            throw new ArgumentNullException(nameof(control));
+        }
+
+        RaiseCurrentStateChanging(stateGroup, oldState, newState, control, control.StateGroupsRoot);
+    }
+
+    /// <summary>
+    /// Raises the <see cref="VisualStateGroup.CurrentStateChanged"/> event on the specified
+    /// <see cref="VisualStateGroup"/>.
+    /// </summary>
+    /// <param name="stateGroup">
+    /// The object on which the <see cref="VisualStateGroup.CurrentStateChanging"/> event.
+    /// </param>
+    /// <param name="oldState">
+    /// The state that the control transitioned from.
+    /// </param>
+    /// <param name="newState">
+    /// The state that the control transitioned to.
+    /// </param>
+    /// <param name="control">
+    /// The control that transitioned states.
+    /// </param>
+    /// <param name="stateGroupsRoot">
+    /// The root element that contains the <see cref="VisualStateManager"/>.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stateGroup"/> is null or <paramref name="newState"/> is null.
+    /// </exception>
+    protected void RaiseCurrentStateChanged(
+        VisualStateGroup stateGroup,
+        VisualState oldState,
+        VisualState newState,
+        FrameworkElement control,
+        FrameworkElement stateGroupsRoot)
+    {
+        if (stateGroup is null)
+        {
+            throw new ArgumentNullException(nameof(stateGroup));
+        }
+
+        if (newState is null)
+        {
+            throw new ArgumentNullException(nameof(newState));
+        }
+
+        if (stateGroupsRoot is null)
+        {
+            return; // Ignore if a ControlTemplate hasn't been applied
+        }
+
+        stateGroup.RaiseCurrentStateChanged(stateGroupsRoot, oldState, newState, control);
     }
 
     /// <summary>
@@ -391,32 +488,17 @@ public class VisualStateManager : DependencyObject
     /// The control that transitioned states.
     /// </param>
     /// <exception cref="ArgumentNullException">
-    /// stateGroup is null or newState is null or control is null.
+    /// <paramref name="stateGroup"/> is null or <paramref name="newState"/> is null or <paramref name="control"/> is null.
     /// </exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     protected void RaiseCurrentStateChanged(VisualStateGroup stateGroup, VisualState oldState, VisualState newState, Control control)
     {
-        if (stateGroup is null)
-        {
-            throw new ArgumentNullException(nameof(stateGroup));
-        }
-
-        if (newState is null)
-        {
-            throw new ArgumentNullException(nameof(newState));
-        }
-
         if (control is null)
         {
             throw new ArgumentNullException(nameof(control));
         }
 
-        FrameworkElement stateGroupsRoot = control.StateGroupsRoot;
-        if (stateGroupsRoot is null)
-        {
-            return; // Ignore if a ControlTemplate hasn't been applied
-        }
-
-        stateGroup.RaiseCurrentStateChanged(stateGroupsRoot, oldState, newState, control);
+        RaiseCurrentStateChanged(stateGroup, oldState, newState, control, control.StateGroupsRoot);
     }
 
     #endregion State Change

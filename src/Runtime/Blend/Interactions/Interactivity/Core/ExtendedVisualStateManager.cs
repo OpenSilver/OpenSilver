@@ -336,11 +336,7 @@ namespace Microsoft.Expression.Interactivity.Core
 #region VisualStateManager overrides
 
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "1#", Justification = "Better to share the implementation here than to match the parameter name.")]
-#if __WPF__
         protected override bool GoToStateCore(FrameworkElement control, FrameworkElement stateGroupsRoot, string stateName, VisualStateGroup group, VisualState state, bool useTransitions)
-#else
-        protected override bool GoToStateCore(Control control, FrameworkElement stateGroupsRoot, string stateName, VisualStateGroup group, VisualState state, bool useTransitions)
-#endif
         {
             //
             // Reminder that a layout transition may already be running; several of these functions keep track of the current value of MovingElements
@@ -658,11 +654,7 @@ namespace Microsoft.Expression.Interactivity.Core
             return animateWithTransitionEffect;
         }
 
-#if __WPF__
         private bool TransitionEffectAwareGoToStateCore(FrameworkElement control, FrameworkElement stateGroupsRoot, string stateName, VisualStateGroup group, VisualState state, bool useTransitions, VisualTransition transition, bool animateWithTransitionEffect, VisualState previousState)
-#else
-        private bool TransitionEffectAwareGoToStateCore(Control control, FrameworkElement stateGroupsRoot, string stateName, VisualStateGroup group, VisualState state, bool useTransitions, VisualTransition transition, bool animateWithTransitionEffect, VisualState previousState)
-#endif
         {
             IEasingFunction oldGeneratedEasingFunction = null;
 
@@ -1267,7 +1259,6 @@ namespace Microsoft.Expression.Interactivity.Core
                         gotValue = true;
                         return doubleAnimation.To;
                     }
-#if __WPF__
                     else
                     {
                         ThicknessAnimationUsingKeyFrames thicknessAnimationUsingKeyFrames = timeline as ThicknessAnimationUsingKeyFrames;
@@ -1304,7 +1295,6 @@ namespace Microsoft.Expression.Interactivity.Core
                             }
                         }
                     }
-#endif
                 }
             }
 

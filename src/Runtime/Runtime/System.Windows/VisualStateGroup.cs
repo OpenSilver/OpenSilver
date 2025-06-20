@@ -14,7 +14,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using OpenSilver.Internal;
@@ -34,11 +33,11 @@ namespace System.Windows
 
         /// <summary>
         /// Gets the most recently set <see cref="VisualState"/> from a successful call to the 
-        /// <see cref="VisualStateManager.GoToState(Control, string, bool)"/> method.
+        /// <see cref="VisualStateManager.GoToState(FrameworkElement, string, bool)"/> method.
         /// </summary>
         /// <returns>
         /// The most recently set <see cref="VisualState"/> from a successful call to the
-        /// <see cref="VisualStateManager.GoToState(Control, string, bool)"/> method.
+        /// <see cref="VisualStateManager.GoToState(FrameworkElement, string, bool)"/> method.
         /// </returns>
         public VisualState CurrentState { get; internal set; }
 
@@ -89,14 +88,14 @@ namespace System.Windows
             return null;
         }
 
-        internal void RaiseCurrentStateChanging(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
+        internal void RaiseCurrentStateChanging(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, FrameworkElement control)
         {
-            CurrentStateChanging?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
+            CurrentStateChanging?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control, stateGroupsRoot));
         }
 
-        internal void RaiseCurrentStateChanged(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
+        internal void RaiseCurrentStateChanged(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, FrameworkElement control)
         {
-            CurrentStateChanged?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
+            CurrentStateChanged?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control, stateGroupsRoot));
         }
 
         /// <summary>
