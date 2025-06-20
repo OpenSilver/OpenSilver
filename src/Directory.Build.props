@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">3.2.2</AssemblyVersion>
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">3.2.3</AssemblyVersion>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 </Project>
