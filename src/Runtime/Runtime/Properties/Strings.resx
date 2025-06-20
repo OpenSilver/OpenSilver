@@ -135,6 +135,9 @@
   <data name="Application_ServiceMustImplementInterface" xml:space="preserve">
     <value>Element declared as Application Service does not implement IApplicationService interface.</value>
   </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeNonNegative" xml:space="preserve">
+    <value>{0} ('{1}') must be a non-negative value.</value>
+  </data>
   <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
     <value>Cannot perform operation.</value>
     <comment>Exception thrown by automation peers.</comment>
@@ -964,6 +967,9 @@
   </data>
   <data name="ResourceDictionaryValueMustBeStyleWithCorrectTargetType" xml:space="preserve">
     <value>For a Type key the Style value must have TargetType which is equals to key.</value>
+  </data>
+  <data name="ResponsiveThreshold_Invalid" xml:space="preserve">
+    <value>'{0}' must be greater than '{1}'.</value>
   </data>
   <data name="RoutedEventCannotChangeWhileRouting" xml:space="preserve">
     <value>Cannot change the RoutedEvent property while the RoutedEvent is being routed.</value>

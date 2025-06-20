@@ -1092,11 +1092,11 @@ namespace OpenSilver.Compiler
                                         $"global::{KnownNamespaces.SystemWindowsData}.BindingOperations.SetBinding({parentUid}, {dpFullName}, {childUid});");
                                 }
                             }
-                            else if (GeneratingCode.IsDynamicResourceExtension(child))
+                            else if (GeneratingCode.IsDynamicResourceExtension(child) || GeneratingCode.IsResponsiveExtension(child))
                             {
-                                //------------------------------
-                                // {DynamicResource}
-                                //------------------------------
+                                //-----------------------------------
+                                // {DynamicResource} or {Responsive}
+                                //-----------------------------------
 
                                 string dependencyPropertyName =
                                     _settings.Inspector.GetField(
@@ -1145,7 +1145,7 @@ namespace OpenSilver.Compiler
                                     else
                                     {
                                         throw new XamlParseException(
-                                            $"A 'DynamicResourceExtension' cannot be set on the '{propertyName}' property of type '{elementType.Substring("global::".Length)}'. A 'DynamicResourceExtension' can only be set on a DependencyProperty of a DependencyObject, or the Setter.Value property.",
+                                            $"A '{element.Name.LocalName}' cannot be set on the '{propertyName}' property of type '{elementType.Substring("global::".Length)}'. A '{element.Name.LocalName}' can only be set on a DependencyProperty of a DependencyObject, or the Setter.Value property.",
                                             element);
                                     }
                                 }
@@ -1356,7 +1356,7 @@ namespace OpenSilver.Compiler
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
 
-                                        string markupExtension = 
+                                        string markupExtension =
                                             $"(({IMarkupExtensionClass}){childUid}).ProvideValue(new global::System.ServiceProvider({parentUid}, null))";
 
                                         parameters.StringBuilder.AppendLine(

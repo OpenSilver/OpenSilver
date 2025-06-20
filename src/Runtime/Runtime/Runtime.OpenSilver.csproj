@@ -243,6 +243,10 @@
     <Compile Include="System.Windows\ResourceReferenceKeyNotFoundException.cs" />
     <Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />
     <Compile Include="System.Windows\LogicalTreeHelper.cs" />
+    <Compile Include="System.Windows\ResponsiveExpression.cs" />
+    <Compile Include="System.Windows\ResponsiveExtension.cs" />
+    <Compile Include="System.Windows\ResponsiveThreshold.cs" />
+    <Compile Include="System.Windows\ResponsiveThresholdConverter.cs" />
     <Compile Include="System.Windows\RoutedEventConverter.cs" />
     <Compile Include="System.Windows\RoutingStrategy.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />

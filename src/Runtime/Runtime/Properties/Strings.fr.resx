@@ -135,6 +135,9 @@
   <data name="Application_ServiceMustImplementInterface" xml:space="preserve">
     <value>L’élément déclaré comme service d’application n’implémente pas l’interface IApplicationService.</value>
   </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeNonNegative" xml:space="preserve">
+    <value>{0} ('{1}') doit être une valeur positive ou nulle.</value>
+  </data>
   <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
     <value>Impossible d'effectuer l'opération.</value>
   </data>
@@ -962,6 +965,9 @@
   </data>
   <data name="ResourceDictionaryValueMustBeStyleWithCorrectTargetType" xml:space="preserve">
     <value>Pour une clé de type Type, la valeur Style doit avoir un TargetType égal à la clé.</value>
+  </data>
+  <data name="ResponsiveThreshold_Invalid" xml:space="preserve">
+    <value>La valeur de '{0}' doit être supérieure à celle de '{1}'.</value>
   </data>
   <data name="RoutedEventCannotChangeWhileRouting" xml:space="preserve">
     <value>Impossible de modifier la propriété RoutedEvent pendant son routage.</value>

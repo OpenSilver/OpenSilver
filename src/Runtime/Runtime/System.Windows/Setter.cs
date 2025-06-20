@@ -137,11 +137,24 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
                 case MarkupExtension:
                     // Bindings and dynamic resources are allowed on setters, they will later be transformed into an expression
-                    if (value is not BindingBase && value is not DynamicResourceExtension)
+                    if (value is BindingBase || value is DynamicResourceExtension)
                     {
-                        throw new ArgumentException(string.Format(Strings.SetterValueOfMarkupExtensionNotSupported, value.GetType().Name));
+                        break;
                     }
-                    break;
+
+                    if (value is ResponsiveExtension responsiveExtension)
+                    {
+                        _value = new ResponsiveExtension
+                        {
+                            Mobile = responsiveExtension.ConvertHelper(responsiveExtension.Mobile, _property),
+                            Tablet = responsiveExtension.ConvertHelper(responsiveExtension.Tablet, _property),
+                            Desktop = responsiveExtension.ConvertHelper(responsiveExtension.Desktop, _property),
+                            Threshold = responsiveExtension.Threshold,
+                        };
+                        break;
+                    }
+
+                    throw new ArgumentException(string.Format(Strings.SetterValueOfMarkupExtensionNotSupported, value.GetType().Name));
 
                 default:
                     if (!dp.IsObjectType)
@@ -196,7 +209,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
         MarkupExtension me = eventArgs.MarkupExtension;
 
-        if (me is DynamicResourceExtension || me is BindingBase)
+        if (me is DynamicResourceExtension || me is BindingBase || me is ResponsiveExtension)
         {
             setter.Value = me;
             eventArgs.Handled = true;

@@ -115,6 +115,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} (&apos;{1}&apos;) must be a non-negative value..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Generic_MustBeNonNegative {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Generic_MustBeNonNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot perform operation..
         /// </summary>
         internal static string Automation_OperationCannotBePerformed {
@@ -2595,6 +2604,15 @@ namespace OpenSilver.Internal {
         internal static string ResourceDictionaryValueMustBeStyleWithCorrectTargetType {
             get {
                 return ResourceManager.GetString("ResourceDictionaryValueMustBeStyleWithCorrectTargetType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be greater than &apos;{1}&apos;..
+        /// </summary>
+        internal static string ResponsiveThreshold_Invalid {
+            get {
+                return ResourceManager.GetString("ResponsiveThreshold_Invalid", resourceCulture);
             }
         }
         

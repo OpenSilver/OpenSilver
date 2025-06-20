@@ -1002,6 +1002,18 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return $"{RuntimeHelperClass}.RoutedEventFromName(\"{eventName}\", typeof<global.{ownerTypeString}>)";
     }
 
+    public override string ConvertToResponsiveThreshold(XElement context, string source)
+    {
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        return split.Length switch
+        {
+            1 => $"new global.System.Windows.ResponsiveThreshold({split[0]})",
+            2 => $"new global.System.Windows.ResponsiveThreshold({split[0]}, {split[1]})",
+            _ => throw GetConvertException(source, "System.Windows.ResponsiveThreshold"),
+        };
+    }
+
     private static string Escape(string s)
     {
         return string.Concat("@\"", s.Replace("\"", "\"\""), "\"");

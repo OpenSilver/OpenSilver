@@ -333,7 +333,7 @@ namespace System.ComponentModel
             var geometryConverter = new GeometryConverter();
             var transformConverter = new TransformConverter();
 
-            return new Dictionary<Type, TypeConverter>(34)
+            return new Dictionary<Type, TypeConverter>(35)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(ModifierKeys)] = new ModifierKeysConverter(),
@@ -371,6 +371,7 @@ namespace System.ComponentModel
                 [typeof(CacheMode)] = new CacheModeConverter(),
                 [typeof(FontStretch)] = new FontStretchConverter(),
                 [typeof(Vector)] = new VectorConverter(),
+                [typeof(ResponsiveThreshold)] = new ResponsiveThresholdConverter(),
             };
         }
 

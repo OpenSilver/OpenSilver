@@ -1103,11 +1103,11 @@ End Sub
                                         $"Global.{KnownNamespaces.SystemWindowsData}.BindingOperations.SetBinding({parentUid}, {dpFullName}, {childUid})");
                                 }
                             }
-                            else if (GeneratingCode.IsDynamicResourceExtension(child))
+                            else if (GeneratingCode.IsDynamicResourceExtension(child) || GeneratingCode.IsResponsiveExtension(child))
                             {
-                                //------------------------------
-                                // {DynamicResource}
-                                //------------------------------
+                                //-----------------------------------
+                                // {DynamicResource} or {Responsive}
+                                //-----------------------------------
 
                                 string dependencyPropertyName =
                                     _settings.Inspector.GetField(

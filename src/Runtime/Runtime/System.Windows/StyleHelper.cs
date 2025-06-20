@@ -134,6 +134,7 @@ namespace System.Windows
                         BindingBase bindingBase => bindingBase.CreateBindingExpression(fe, dp, null),
                         DynamicResourceExtension dynamicResource => new ResourceReferenceExpression(dynamicResource.ResourceKey ??
                             throw new InvalidOperationException(Strings.MarkupExtensionResourceKey)),
+                        ResponsiveExtension responsive => responsive.CreateResponsiveExpression(fe, dp),
                         _ => pValue.Value,
                     };
 
