@@ -50,14 +50,6 @@ namespace Compiler.Tests
         }
 
         [TestMethod]
-        public void IsAssignableFrom_Custom_ResponsiveExtension_Should_Return_True()
-        {
-            bool res = MonoCecilVersion.IsAssignableFrom("System.Windows", "ResponsiveExtension`1", "Experimental", "DerivedResponsiveExtension");
-
-            Assert.IsTrue(res);
-        }
-
-        [TestMethod]
         public void GetAssemblyQualifiedNameOfXamlType_Should_Return_Name()
         {
             var res = MonoCecilVersion.GetAssemblyQualifiedNameOfXamlType("http://schemas.microsoft.com/winfx/2006/xaml/presentation", nameof(Validation), null);
