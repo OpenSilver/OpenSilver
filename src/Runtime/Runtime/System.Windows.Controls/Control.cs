@@ -29,7 +29,9 @@ namespace System.Windows.Controls
         {
             FocusableProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata(BooleanBoxes.TrueBox));
 
+            EventManager.RegisterClassHandler<Control>(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(HandleDoubleClick), true);
             EventManager.RegisterClassHandler<Control>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(HandleDoubleClick), true);
+            EventManager.RegisterClassHandler<Control>(PreviewMouseRightButtonDownEvent, new MouseButtonEventHandler(HandleDoubleClick), true);
             EventManager.RegisterClassHandler<Control>(MouseRightButtonDownEvent, new MouseButtonEventHandler(HandleDoubleClick), true);
         }
 
@@ -48,6 +50,33 @@ namespace System.Windows.Controls
                 OnTemplateChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, TemplateProperty, metadata));
             }
         }
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewMouseDoubleClick"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewMouseDoubleClickEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(PreviewMouseDoubleClick),
+                RoutingStrategy.Direct,
+                typeof(MouseButtonEventHandler),
+                typeof(Control));
+
+        /// <summary>
+        /// Occurs when a user clicks the mouse button two or more times.
+        /// </summary>
+        public event MouseButtonEventHandler PreviewMouseDoubleClick
+        {
+            add => AddHandler(PreviewMouseDoubleClickEvent, value);
+            remove => RemoveHandler(PreviewMouseDoubleClickEvent, value);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="PreviewMouseDoubleClick"/> routed event.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+        protected virtual void OnPreviewMouseDoubleClick(MouseButtonEventArgs e) => RaiseEvent(e);
 
         /// <summary>
         /// Identifies the <see cref="MouseDoubleClick"/> routed event.
@@ -81,14 +110,22 @@ namespace System.Windows.Controls
             if (e.ClickCount == 2)
             {
                 var ctrl = (Control)sender;
-                var doubleClick = new MouseButtonEventArgs(e.ChangedButton, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
-                {
-                    RoutedEvent = MouseDoubleClickEvent,
-                    Source = e.OriginalSource, // Set OriginalSource because initially is null
-                };
-                doubleClick.OverrideSource(e.Source);
+                var doubleClick = new MouseButtonEventArgs(e.ChangedButton, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY);
 
-                ctrl.OnMouseDoubleClick(doubleClick);
+                if (e.RoutedEvent == PreviewMouseLeftButtonDownEvent || e.RoutedEvent == PreviewMouseRightButtonDownEvent)
+                {
+                    doubleClick.RoutedEvent = PreviewMouseDoubleClickEvent;
+                    doubleClick.Source = e.OriginalSource; // Set OriginalSource because initially is null
+                    doubleClick.OverrideSource(e.Source);
+                    ctrl.OnPreviewMouseDoubleClick(doubleClick);
+                }
+                else
+                {
+                    doubleClick.RoutedEvent = MouseDoubleClickEvent;
+                    doubleClick.Source = e.OriginalSource; // Set OriginalSource because initially is null
+                    doubleClick.OverrideSource(e.Source);
+                    ctrl.OnMouseDoubleClick(doubleClick);
+                }
 
                 // If MouseDoubleClick event is handled - we delegate the state to original MouseButtonEventArgs
                 if (doubleClick.Handled)
