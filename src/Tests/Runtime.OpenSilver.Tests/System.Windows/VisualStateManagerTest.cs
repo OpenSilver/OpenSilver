@@ -436,7 +436,7 @@ namespace System.Windows.Tests
 
         private class Test_CustomVisualStateManager : VisualStateManager
         {
-            protected override bool GoToStateCore(Control control, FrameworkElement templateRoot, string stateName, VisualStateGroup group, VisualState state, bool useTransitions)
+            protected override bool GoToStateCore(FrameworkElement control, FrameworkElement templateRoot, string stateName, VisualStateGroup group, VisualState state, bool useTransitions)
             {
                 var innerControl = (control as MyControl2).InnerControl;
                 if (innerControl == null)
