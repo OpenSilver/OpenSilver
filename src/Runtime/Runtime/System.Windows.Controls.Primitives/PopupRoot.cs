@@ -13,6 +13,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -22,7 +23,7 @@ namespace System.Windows.Controls.Primitives;
 
 internal sealed class PopupRoot : FrameworkElement
 {
-    private static readonly HashSet<PopupRoot> _popupRoots = new();
+    private static readonly HashSet<PopupRoot> _popupRoots = [];
 
     private readonly Popup _popup;
     private readonly TransformLayer _transformLayer;
@@ -34,9 +35,10 @@ internal sealed class PopupRoot : FrameworkElement
 
     internal PopupRoot(Popup popup)
     {
+        Debug.Assert(popup is not null);
+
         BypassLayoutPolicies = true;
 
-        ParentWindow = GetParentWindowOfPopup(popup);
         _popup = popup;
 
         _transformLayer = new TransformLayer();
@@ -66,6 +68,7 @@ internal sealed class PopupRoot : FrameworkElement
 
         IsOpen = true;
 
+        ParentWindow = GetParentWindow();
         OuterDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(this);
         IsLoadedCache = true;
         IsConnectedToLiveTree = true;
@@ -222,8 +225,8 @@ internal sealed class PopupRoot : FrameworkElement
     // we get the window from there. Otherwise, if the popup itself is inthe visual
     // tree, "Popup.ParentWindow" should be populated. Otherwise, we use the default
     // window (MainWindow) to display the popup.
-    private static Window GetParentWindowOfPopup(Popup popup)
-        => popup.PlacementTarget?.ParentWindow ?? popup.ParentWindow ?? Application.Current.MainWindow;
+    private Window GetParentWindow()
+        => _popup.PlacementTarget?.ParentWindow ?? _popup.ParentWindow ?? Application.Current.MainWindow;
 }
 
 internal sealed class TransformLayer : FrameworkElement
