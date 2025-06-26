@@ -135,73 +135,82 @@ namespace System.Windows.Controls
             }
         }
 
-        //-----------------------
-        // BACKGROUND
-        //-----------------------
-
         /// <summary>
         /// Gets or sets a brush that provides the background of the control.
         /// </summary>
         public Brush Background
         {
-            get { return (Brush)GetValue(BackgroundProperty); }
-            set { SetValueInternal(BackgroundProperty, value); }
+            get => (Brush)GetValue(BackgroundProperty);
+            set => SetValueInternal(BackgroundProperty, value);
         }
 
         /// <summary>
         /// Identifies the <see cref="Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register(
-                nameof(Background),
-                typeof(Brush), 
-                typeof(Control), 
-                new PropertyMetadata((object)null));
-
-        //-----------------------
-        // BORDERBRUSH
-        //-----------------------
+            Panel.BackgroundProperty.AddOwner(
+                typeof(Control),
+                new FrameworkPropertyMetadata(
+                    Panel.BackgroundProperty.DefaultMetadata.DefaultValue,
+                    FrameworkPropertyMetadataOptions.None));
 
         /// <summary>
         /// Gets or sets a brush that describes the border background of a control.
         /// </summary>
         public Brush BorderBrush
         {
-            get { return (Brush)GetValue(BorderBrushProperty); }
-            set { SetValueInternal(BorderBrushProperty, value); }
+            get => (Brush)GetValue(BorderBrushProperty);
+            set => SetValueInternal(BorderBrushProperty, value);
         }
 
         /// <summary>
         /// Identifies the <see cref="BorderBrush"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderBrushProperty =
-            DependencyProperty.Register(
-                nameof(BorderBrush), 
-                typeof(Brush), 
-                typeof(Control), 
-                new PropertyMetadata((object)null));
+            Border.BorderBrushProperty.AddOwner(
+                typeof(Control),
+                new FrameworkPropertyMetadata(
+                    Border.BorderBrushProperty.DefaultMetadata.DefaultValue,
+                    FrameworkPropertyMetadataOptions.None));
 
-        //-----------------------
-        // BORDERTHICKNESS
-        //-----------------------
         /// <summary>
         /// Gets or sets the thickness of the border.
         /// </summary>
         public Thickness BorderThickness
         {
-            get { return (Thickness)GetValue(BorderThicknessProperty); }
-            set { SetValueInternal(BorderThicknessProperty, value); }
+            get => (Thickness)GetValue(BorderThicknessProperty);
+            set => SetValueInternal(BorderThicknessProperty, value);
         }
 
         /// <summary>
         /// Identifies the <see cref="BorderThickness"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register(
-                nameof(BorderThickness), 
-                typeof(Thickness), 
-                typeof(Control), 
-                new PropertyMetadata(new Thickness()));
+            Border.BorderThicknessProperty.AddOwner(
+                typeof(Control),
+                new FrameworkPropertyMetadata(
+                    Border.BorderThicknessProperty.DefaultMetadata.DefaultValue,
+                    FrameworkPropertyMetadataOptions.None));
+
+        /// <summary>
+        /// Gets or sets the radius for the corners of the control's border.
+        /// </summary>
+        public CornerRadius CornerRadius
+        {
+            get => (CornerRadius)GetValue(CornerRadiusProperty);
+            set => SetValueInternal(CornerRadiusProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="CornerRadius"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CornerRadiusProperty =
+            Border.CornerRadiusProperty.AddOwner(
+                typeof(Control),
+                new FrameworkPropertyMetadata(
+                    Border.CornerRadiusProperty.DefaultMetadata.DefaultValue,
+                    FrameworkPropertyMetadataOptions.None));
+
 
         //-----------------------
         // FONTWEIGHT
