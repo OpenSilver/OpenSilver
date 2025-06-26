@@ -544,9 +544,11 @@ namespace System.Windows.Controls.Primitives
             if (StaysWithinScreenBounds)
             {
                 var root = Application.Current.Host.Content;
-                offset = PutInScreenBounds(offset,
-                    new Size(root.ActualWidth, root.ActualHeight),
-                    InterestPointsFromRect(new Rect(child.RenderSize), _popupRoot.Transform));
+                var interestPoints = InterestPointsFromRect(new Rect(child.RenderSize), _popupRoot.Transform);
+                var childBounds = GetBounds(interestPoints);
+                childBounds.Offset(interestPoints.TopLeft.X + offset.X, interestPoints.TopLeft.Y + offset.Y);
+
+                offset = PutInScreenBounds(offset, new Size(root.ActualWidth, root.ActualHeight), childBounds);
             }
 
             return offset;
@@ -570,60 +572,47 @@ namespace System.Windows.Controls.Primitives
 
             Point offset = GetCandidateOffset(placement, targetInterestPoints, childInterestPoints);
             Rect childBounds = GetBounds(childInterestPoints);
-            childBounds.Offset(childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
 
-            if (childBounds.Y + childBounds.Height > windowBounds.Height)
+            Rect candidateBounds = Rect.Offset(childBounds, childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
+
+            if (candidateBounds.Y + candidateBounds.Height > windowBounds.Height)
             {
                 if (placement == PlacementMode.Bottom)
                 {
                     offset = GetCandidateOffset(PlacementMode.Top, targetInterestPoints, childInterestPoints);
                 }
-                else
-                {
-                    offset.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
-                }
             }
-            else if (childBounds.Y < 0)
+            else if (candidateBounds.Y < 0)
             {
                 if (placement == PlacementMode.Top)
                 {
                     offset = GetCandidateOffset(PlacementMode.Bottom, targetInterestPoints, childInterestPoints);
                 }
-                else
-                {
-                    offset.Y -= childBounds.Y;
-                }
             }
 
-            childBounds = GetBounds(childInterestPoints);
-            childBounds.Offset(childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
+            candidateBounds = Rect.Offset(childBounds, childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
 
-            if (childBounds.X + childBounds.Width > windowBounds.Width)
+            if (candidateBounds.X + candidateBounds.Width > windowBounds.Width)
             {
                 if (placement == PlacementMode.Right)
                 {
                     offset = GetCandidateOffset(PlacementMode.Left, targetInterestPoints, childInterestPoints);
                 }
-                else
-                {
-                    offset.X -= childBounds.X + childBounds.Width - windowBounds.Width;
-                }
             }
-            else if (childBounds.X < 0)
+            else if (candidateBounds.X < 0)
             {
                 if (placement == PlacementMode.Left)
                 {
                     offset = GetCandidateOffset(PlacementMode.Right, targetInterestPoints, childInterestPoints);
                 }
-                else
-                {
-                    offset.X -= childBounds.X;
-                }
             }
 
             if (StaysWithinScreenBounds)
             {
-                offset = PutInScreenBounds(offset, windowBounds, childInterestPoints);
+                offset = PutInScreenBounds(
+                    offset,
+                    windowBounds,
+                    Rect.Offset(childBounds, childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y));
             }
 
             return offset;
@@ -666,11 +655,8 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        private static Point PutInScreenBounds(Point offset, Size windowBounds, InterestPoints childInterestPoints)
+        private static Point PutInScreenBounds(Point offset, Size windowBounds, Rect childBounds)
         {
-            Rect childBounds = GetBounds(childInterestPoints);
-            childBounds.Offset(childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
-
             if (childBounds.Y + childBounds.Height > windowBounds.Height)
             {
                 offset.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
