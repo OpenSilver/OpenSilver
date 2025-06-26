@@ -178,7 +178,7 @@ public sealed class Storyboard : Timeline
 
     // This method should only be used by VisualStateManager for Silverlight compatibility. In WPF, Begin is asynchronous. In 
     // Silverlight the VSM fires a frame immediately, but other storyboards don't.
-    internal void BeginVSM(FrameworkElement containingObject) => BeginCommon(containingObject, true, true);
+    internal void BeginVSM(DependencyObject containingObject) => BeginCommon(containingObject, true, true);
 
     private void BeginCommon(DependencyObject containingObject, bool isControllable, bool alignedToLastTick)
     {
@@ -628,7 +628,7 @@ public sealed class Storyboard : Timeline
 
     // This method should only be used by VisualStateManager for Silverlight compatibility. In WPF, Remove fires the Completed
     // event if it was not already fired, but the event is not fired in Silverlight when the storyboard is removed by the VSM.
-    internal void RemoveVSM(FrameworkElement containingObject) => RemoveImpl(containingObject, false);
+    internal void RemoveVSM(DependencyObject containingObject) => RemoveImpl(containingObject, false);
 
     private void RemoveImpl(DependencyObject containingObject, bool raiseCompletedEvent)
     {
