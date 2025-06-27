@@ -603,7 +603,7 @@
     <Compile Include="System.Windows\ApplicationServiceContext.cs" />
     <Compile Include="System.Windows\DataFormats.cs" />
     <Compile Include="System.Windows\DependencyObjectCollection_1.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\IApplicationLifetimeAware.cs" />
+    <Compile Include="System.Windows\IApplicationLifetimeAware.cs" />
     <Compile Include="System.Windows\IApplicationService.cs" />
     <Compile Include="System.Windows\NullableBoolConverter.cs" />
     <Compile Include="System.Windows\StyleTypedPropertyAttribute.cs" />

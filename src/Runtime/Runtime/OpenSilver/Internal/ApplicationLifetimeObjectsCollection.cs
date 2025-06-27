@@ -31,110 +31,62 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
 
-namespace OpenSilver.Internal
+namespace OpenSilver.Internal;
+
+internal sealed class ApplicationLifetimeObjectsCollection : IList
 {
-	internal sealed class ApplicationLifetimeObjectsCollection : IList
-	{
-		private readonly List<object> list = new List<object>();
-		private bool read_only;
+    private readonly List<IApplicationService> _list = [];
 
-		public object this[int index]
-		{
-			get
-			{
-				return list[index];
-			}
-			set
-			{
-				throw new NotSupportedException();
-			}
-		}
+    public object this[int index]
+    {
+        get => _list[index];
+        set => throw new NotSupportedException();
+    }
 
-		public int Count
-		{
-			get { return list.Count; }
-		}
+    public int Count => _list.Count;
 
-		public bool IsSynchronized
-		{
-			get { return false; }
-		}
+    public bool IsSynchronized => false;
 
-		public object SyncRoot
-		{
-			get { throw new NotImplementedException(); }
-		}
+    public object SyncRoot => throw new NotImplementedException();
 
-		public bool IsFixedSize
-		{
-			get { return false; }
-		}
+    public bool IsFixedSize => false;
 
-		public bool IsReadOnly
-		{
-			get { return read_only; }
-		}
+    public bool IsReadOnly { get; private set; }
 
-		public int Add(object value)
-		{
-			if (value is not IApplicationService)
-            {
-				throw new NotSupportedException(Strings.Application_ServiceMustImplementInterface);
-            }
+    public int Add(object value)
+    {
+        if (value is not IApplicationService service)
+        {
+            throw new NotSupportedException(Strings.Application_ServiceMustImplementInterface);
+        }
 
-			if (IsReadOnly)
-            {
-				throw new NotSupportedException();
-			}
+        if (IsReadOnly)
+        {
+            throw new NotSupportedException();
+        }
 
-			// we can add only before application startup (i.e. parsing time)
-			list.Add(value);
-			return Count - 1;
-		}
+        // we can add only before application startup (i.e. parsing time)
+        _list.Add(service);
+        return Count - 1;
+    }
 
-		public void Clear()
-		{
-			throw new NotImplementedException();
-		}
+    public void Clear() => throw new NotImplementedException();
 
-		public bool Contains(object value)
-		{
-			throw new NotImplementedException();
-		}
+    public bool Contains(object value) => throw new NotImplementedException();
 
-		public int IndexOf(object value)
-		{
-			throw new NotImplementedException();
-		}
+    public int IndexOf(object value) => throw new NotImplementedException();
 
-		public void Insert(int index, object value)
-		{
-			throw new NotImplementedException();
-		}
+    public void Insert(int index, object value) => throw new NotImplementedException();
 
-		public void Remove(object value)
-		{
-			throw new NotImplementedException();
-		}
+    public void Remove(object value) => throw new NotImplementedException();
 
-		public void RemoveAt(int index)
-		{
-			throw new NotImplementedException();
-		}
+    public void RemoveAt(int index) => throw new NotImplementedException();
 
-		public void CopyTo(Array array, int index)
-		{
-			throw new NotImplementedException();
-		}
+    public void CopyTo(Array array, int index) => throw new NotImplementedException();
 
-		public IEnumerator GetEnumerator()
-		{
-			return list.GetEnumerator();
-		}
+    public IEnumerator GetEnumerator() => _list.GetEnumerator();
 
-		internal void Close()
-		{
-			read_only = true;
-		}
-	}
+    internal void RemoveServiceAt(int index) => _list.RemoveAt(index);
+
+    internal void Close() => IsReadOnly = true;
 }

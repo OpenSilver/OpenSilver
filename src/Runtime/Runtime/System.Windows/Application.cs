@@ -93,14 +93,7 @@ namespace System.Windows
             _mainWindow.AttachToDomElement(_rootDiv);
 
             // We call the "Startup" event and the "OnLaunched" method using the Dispatcher, because usually the user registers the "Startup" event in the constructor of the "App.cs" class, which is derived from "Application.cs", and therefore when we arrive here the event is not yet registered. Executing the code in the Dispatcher ensures that the constructor of the "App.cs" class has finished before running the code.
-            Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-            {
-                StartAppServices();
-
-                OnStartup(new StartupEventArgs());
-
-                OnLaunched(new LaunchActivatedEventArgs());
-            });
+            Dispatcher.CurrentDispatcher.InvokeAsync(DoStartup);
         }
 
         /// <summary>
@@ -131,19 +124,65 @@ namespace System.Windows
         /// <returns>
         /// A collection of the windows used by the application.
         /// </returns>
-        public WindowCollection Windows { get; } = new();
+        public WindowCollection Windows { get; } = [];
 
-        public IList ApplicationLifetimeObjects => _lifetimeObjects ??= new ApplicationLifetimeObjectsCollection();
+        /// <summary>
+        /// Gets the application extension services that have been registered for this application.
+        /// </summary>
+        /// <returns>
+        /// The registered services.
+        /// </returns>
+        public IList ApplicationLifetimeObjects => PrivateApplicationLifetimeObjects;
 
-        private void StartAppServices()
+        private ApplicationLifetimeObjectsCollection PrivateApplicationLifetimeObjects => _lifetimeObjects ??= [];
+
+        private void DoStartup()
         {
-            foreach (IApplicationService appService in ApplicationLifetimeObjects)
+            ApplicationLifetimeObjectsCollection services = PrivateApplicationLifetimeObjects;
+            services.Close();
+
+            for (int i = 0; i < services.Count;)
             {
-                if (appService != null)
+                IApplicationService service = (IApplicationService)services[i];
+
+                try
+                {
+                    service.StartService(new ApplicationServiceContext());
+                    i++;
+                }
+                catch (Exception ex)
+                {
+                    services.RemoveServiceAt(i);
+                    OnUnhandledException(ex, false);
+                }
+            }
+
+            foreach (IApplicationService service in services)
+            {
+                if (service is IApplicationLifetimeAware lifetimeAwareService)
                 {
                     try
                     {
-                        appService.StartService(new ApplicationServiceContext());
+                        lifetimeAwareService.Starting();
+                    }
+                    catch (Exception ex)
+                    {
+                        OnUnhandledException(ex, false);
+                    }
+                }
+            }
+
+            OnStartup(new StartupEventArgs());
+
+            OnLaunched(new LaunchActivatedEventArgs());
+
+            foreach (IApplicationService service in services)
+            {
+                if (service is IApplicationLifetimeAware lifetimeAwareService)
+                {
+                    try
+                    {
+                        lifetimeAwareService.Started();
                     }
                     catch (Exception ex)
                     {
@@ -627,6 +666,63 @@ namespace System.Windows
                 {
                     OpenSilver.Interop.ExecuteJavaScriptVoid(
                         $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.preventDefault()");
+                }
+                else
+                {
+                    StopApplicationServices();
+                }
+            }
+        }
+
+        private void StopApplicationServices()
+        {
+            ApplicationLifetimeObjectsCollection services = PrivateApplicationLifetimeObjects;
+
+            // Note: Silverlight invokes the Exiting method before firing the Exit event. However, since
+            // we allow cancellation of the Exit event, we need to call this method after the Exit event,
+            // because we only want to stop the services if the event was not cancelled.
+            foreach (IApplicationService service in services)
+            {
+                if (service is IApplicationLifetimeAware lifetimeAwareService)
+                {
+                    try
+                    {
+                        lifetimeAwareService.Exiting();
+                    }
+                    catch (Exception ex)
+                    {
+                        OnUnhandledException(ex, false);
+                    }
+                }
+            }
+
+            foreach (IApplicationService service in services)
+            {
+                if (service is IApplicationLifetimeAware lifetimeAwareService)
+                {
+                    try
+                    {
+                        lifetimeAwareService.Exited();
+                    }
+                    catch (Exception ex)
+                    {
+                        OnUnhandledException(ex, false);
+                    }
+                }
+            }
+
+            // Note: Silverlight stops the services in reverse order of their registration.
+            for (int i = services.Count - 1; i >= 0; i--)
+            {
+                IApplicationService service = (IApplicationService)services[i];
+
+                try
+                {
+                    service.StopService();
+                }
+                catch (Exception ex)
+                {
+                    OnUnhandledException(ex, false);
                 }
             }
         }
