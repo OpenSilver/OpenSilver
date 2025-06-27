@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
-using System;
-using System.Collections;
 using System.Windows.Resources;
 
 namespace System.Windows
@@ -38,10 +35,12 @@ namespace System.Windows
 
         internal void OnUnhandledException(Exception exception, bool handled)
         {
-            if (UnhandledException != null)
-            {
-                UnhandledException(this, new ApplicationUnhandledExceptionEventArgs(exception, handled));
-            }
+            OnUnhandledException(new ApplicationUnhandledExceptionEventArgs(exception, handled));
+        }
+
+        internal void OnUnhandledException(ApplicationUnhandledExceptionEventArgs args)
+        {
+            UnhandledException?.Invoke(this, args);
         }
 
         [OpenSilver.NotImplemented]

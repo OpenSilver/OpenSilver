@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Windows;
 using Microsoft.JSInterop;
 
 namespace CSHTML5.Internal
@@ -49,7 +50,7 @@ namespace CSHTML5.Internal
             object[] callbackArgsObject,
             bool returnValue)
         {
-            object result;
+            object result = null;
 
             try
             {
@@ -60,8 +61,14 @@ namespace CSHTML5.Internal
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                throw;
+                var args = new ApplicationUnhandledExceptionEventArgs(ex, false);
+                Application.Current.OnUnhandledException(args);
+
+                if (!args.Handled)
+                {
+                    Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                    throw;
+                }
             }
 
             return returnValue ? result : null;
