@@ -884,7 +884,12 @@ internal sealed class InputManager
             ToolTipService.OnMouseButtonDown();
         }
 
-        var previewMouseDown = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        var previewMouseDown = new MouseButtonEventArgs(button,
+            MouseButtonState.Pressed,
+            parameters.IsTouchEvent,
+            parameters.KeyModifiers,
+            parameters.PageX,
+            parameters.PageY)
         {
             RoutedEvent = Mouse.PreviewMouseDownEvent,
             Source = uie,
@@ -903,7 +908,12 @@ internal sealed class InputManager
             return true;
         }
 
-        var mouseDown = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        var mouseDown = new MouseButtonEventArgs(button,
+            MouseButtonState.Pressed,
+            parameters.IsTouchEvent,
+            parameters.KeyModifiers,
+            parameters.PageX,
+            parameters.PageY)
         {
             RoutedEvent = Mouse.MouseDownEvent,
             Source = uie,
@@ -918,7 +928,12 @@ internal sealed class InputManager
 
     private void ProcessMouseUpEvent(UIElement uie, PointerCallbackParameters parameters, MouseButton button)
     {
-        var previewMouseUp = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        var previewMouseUp = new MouseButtonEventArgs(button,
+            MouseButtonState.Released,
+            parameters.IsTouchEvent,
+            parameters.KeyModifiers,
+            parameters.PageX,
+            parameters.PageY)
         {
             RoutedEvent = Mouse.PreviewMouseUpEvent,
             Source = uie,
@@ -932,7 +947,12 @@ internal sealed class InputManager
             return;
         }
 
-        var mouseUp = new MouseButtonEventArgs(button, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
+        var mouseUp = new MouseButtonEventArgs(button,
+            MouseButtonState.Released,
+            parameters.IsTouchEvent,
+            parameters.KeyModifiers,
+            parameters.PageX,
+            parameters.PageY)
         {
             RoutedEvent = Mouse.MouseUpEvent,
             Source = uie,
