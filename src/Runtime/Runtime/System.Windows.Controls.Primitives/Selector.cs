@@ -73,9 +73,23 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
+        /// Identifies the <see cref="SelectionChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent SelectionChangedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(SelectionChanged),
+                RoutingStrategy.Bubble,
+                typeof(SelectionChangedEventHandler),
+                typeof(Selector));
+
+        /// <summary>
         /// Occurs when the selection is changed.
         /// </summary>
-        public event SelectionChangedEventHandler SelectionChanged;
+        public event SelectionChangedEventHandler SelectionChanged
+        {
+            add => AddHandler(SelectionChangedEvent, value);
+            remove => RemoveHandler(SelectionChangedEvent, value);
+        }
 
         /// <summary>
         /// Gets or sets the index of the selected item.
@@ -115,7 +129,7 @@ namespace System.Windows.Controls.Primitives
         private static object CoerceSelectedIndex(DependencyObject d, object value)
         {
             Selector s = (Selector)d;
-            if ((value is int) && (int)value >= s.Items.Count)
+            if (value is int index && index >= s.Items.Count)
             {
                 return DependencyProperty.UnsetValue;
             }
@@ -725,10 +739,7 @@ namespace System.Windows.Controls.Primitives
         /// Raises the SelectionChanged event
         /// </summary>
         /// <param name="e">The arguments for the event.</param>
-        protected virtual void OnSelectionChanged(SelectionChangedEventArgs e)
-        {
-            SelectionChanged?.Invoke(this, e);
-        }
+        protected virtual void OnSelectionChanged(SelectionChangedEventArgs e) => RaiseEvent(e);
 
         internal virtual ScrollViewer ScrollHost { get; }
 

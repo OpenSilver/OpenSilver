@@ -13,11 +13,12 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Windows.Controls.Primitives;
 
 namespace System.Windows.Controls;
 
 /// <summary>
-/// Provides data for the <see cref="Primitives.Selector.SelectionChanged"/> event.
+/// Provides data for the <see cref="Selector.SelectionChanged"/> event.
 /// </summary>
 public class SelectionChangedEventArgs : RoutedEventArgs
 {
@@ -27,6 +28,9 @@ public class SelectionChangedEventArgs : RoutedEventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="SelectionChangedEventArgs"/> class.
     /// </summary>
+    /// <param name="id">
+    /// The event identifier (ID).
+    /// </param>
     /// <param name="removedItems">
     /// The items that were unselected.
     /// </param>
@@ -34,10 +38,15 @@ public class SelectionChangedEventArgs : RoutedEventArgs
     /// The items that were selected.
     /// </param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="removedItems"/> or <paramref name="addedItems"/> is null.
+    /// <paramref name="id"/> or <paramref name="removedItems"/> or <paramref name="addedItems"/> is null.
     /// </exception>
-    public SelectionChangedEventArgs(IList removedItems, IList addedItems)
+    public SelectionChangedEventArgs(RoutedEvent id, IList removedItems, IList addedItems)
     {
+        if (id is null)
+        {
+            throw new ArgumentNullException(nameof(id));
+        }
+
         if (removedItems is null)
         {
             throw new ArgumentNullException(nameof(removedItems));
@@ -47,6 +56,8 @@ public class SelectionChangedEventArgs : RoutedEventArgs
         {
             throw new ArgumentNullException(nameof(addedItems));
         }
+
+        RoutedEvent = id;
 
         if (removedItems.Count == 0)
         {
@@ -72,6 +83,45 @@ public class SelectionChangedEventArgs : RoutedEventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="SelectionChangedEventArgs"/> class.
     /// </summary>
+    /// <param name="removedItems">
+    /// The items that were unselected.
+    /// </param>
+    /// <param name="addedItems">
+    /// The items that were selected.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="removedItems"/> or <paramref name="addedItems"/> is null.
+    /// </exception>
+    public SelectionChangedEventArgs(IList removedItems, IList addedItems)
+        : this(Selector.SelectionChangedEvent, removedItems, addedItems)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SelectionChangedEventArgs"/> class.
+    /// </summary>
+    /// <param name="id">
+    /// The event identifier (ID).
+    /// </param>
+    /// <param name="removedItem">
+    /// The item that was unselected.
+    /// </param>
+    /// <param name="addedItem">
+    /// The item that was selected.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="id"/> is null.
+    /// </exception>
+    public SelectionChangedEventArgs(RoutedEvent id, object removedItem, object addedItem)
+    {
+        RoutedEvent = id ?? throw new ArgumentNullException(nameof(id));
+        _removedItems = removedItem is null ? [] : [removedItem];
+        _addedItems = addedItem is null ? [] : [addedItem];
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SelectionChangedEventArgs"/> class.
+    /// </summary>
     /// <param name="removedItem">
     /// The item that was unselected.
     /// </param>
@@ -79,13 +129,14 @@ public class SelectionChangedEventArgs : RoutedEventArgs
     /// The item that was selected.
     /// </param>
     public SelectionChangedEventArgs(object removedItem, object addedItem)
+        : this(Selector.SelectionChangedEvent, removedItem, addedItem)
     {
-        _removedItems = removedItem is null ? [] : [removedItem];
-        _addedItems = addedItem is null ? [] : [addedItem];
     }
 
     internal SelectionChangedEventArgs(List<ItemsControl.ItemInfo> unselectedInfos, List<ItemsControl.ItemInfo> selectedInfos)
     {
+        RoutedEvent = Selector.SelectionChangedEvent;
+
         if (unselectedInfos.Count == 0)
         {
             _removedItems = [];
@@ -128,4 +179,17 @@ public class SelectionChangedEventArgs : RoutedEventArgs
     /// The items that were unselected in this event.
     /// </returns>
     public IList AddedItems => _addedItems;
+
+    /// <summary>
+    /// Performs the proper type casting to call the type-safe <see cref="SelectionChangedEventHandler"/> 
+    /// delegate for the <see cref="Selector.SelectionChanged"/> event.
+    /// </summary>
+    /// <param name="genericHandler">
+    /// The handler to invoke.
+    /// </param>
+    /// <param name="genericTarget">
+    /// The current object along the event's route.
+    /// </param>
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget)
+        => ((SelectionChangedEventHandler)genericHandler)(genericTarget, this);
 }
