@@ -42,6 +42,7 @@
     <Compile Include="OpenSilver\Internal\Documents\TextContainerInlineImageContainer.cs" />
     <Compile Include="OpenSilver\Internal\DOMEvents.cs" />
     <Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
+    <Compile Include="OpenSilver\Internal\InternalAPIAttribute.cs" />
     <Compile Include="OpenSilver\Internal\IResourceDictionaryOwner.cs" />
     <Compile Include="OpenSilver\Internal\ISealable.cs" />
     <Compile Include="OpenSilver\Internal\ITemplateContent.cs" />

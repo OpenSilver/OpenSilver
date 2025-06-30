@@ -709,7 +709,8 @@ public sealed class Storyboard : Timeline
     /// never been specified.  If we reach a leaf node timeline and a needed attribute
     /// is still null, it is an error condition.  Otherwise we keep hoping they'll be found.
     /// </remarks>
-    private static void ClockTreeWalkRecursive(
+    [InternalAPI(ExternalProject.XRSharp)]
+    internal static void ClockTreeWalkRecursive(
         TimelineClock currentClock,
         bool hasControllableRoot,
         DependencyObject containingObject,
