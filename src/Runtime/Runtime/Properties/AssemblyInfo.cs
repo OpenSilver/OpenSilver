@@ -16,7 +16,6 @@ using System.Windows.Markup;
 
 [assembly: InternalsVisibleTo("OpenSilver.Browser")]
 [assembly: InternalsVisibleTo("OpenSilver.Simulator")]
-[assembly: InternalsVisibleTo("OpenSilver.MauiHybrid")]
 [assembly: InternalsVisibleTo("Runtime.OpenSilver.Tests")]
 [assembly: InternalsVisibleTo("OpenSilver.ControlsKit.FastControls")]
 [assembly: InternalsVisibleTo("XRSharp")]

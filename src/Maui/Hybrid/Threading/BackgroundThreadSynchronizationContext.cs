@@ -13,7 +13,6 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Windows;
 
 namespace OpenSilver.MauiHybrid.Threading
 {
@@ -99,14 +98,7 @@ namespace OpenSilver.MauiHybrid.Threading
                 }
                 catch (Exception ex)
                 {
-                    var args = new ApplicationUnhandledExceptionEventArgs(ex, false);
-                    System.Windows.Application.Current.OnUnhandledException(args);
-
-                    if (!args.Handled)
-                    {
-                        Debug.WriteLine($"Exception in the background synchronization context: {ex}");
-                        throw;
-                    }
+                    Debug.WriteLine("Exception in the background synchronization context: " + ex);
                 }
 
                 // If this was a Send(...) call, release the waiting thread
