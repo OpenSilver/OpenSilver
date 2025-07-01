@@ -57,7 +57,7 @@ namespace CSHTML5.Internal
                     var args = new ApplicationUnhandledExceptionEventArgs(ex, false);
                     Application.Current.OnUnhandledException(args);
 
-                    if (returnValue || !args.Handled)
+                    if (!args.Handled)
                     {
                         Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
                         throw;
