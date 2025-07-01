@@ -13,7 +13,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Windows;
 using DotNetForHtml5.Core;
 
 namespace CSHTML5.Internal
@@ -54,14 +53,8 @@ namespace CSHTML5.Internal
                 }
                 catch (Exception ex)
                 {
-                    var args = new ApplicationUnhandledExceptionEventArgs(ex, false);
-                    Application.Current.OnUnhandledException(args);
-
-                    if (returnValue || !args.Handled)
-                    {
-                        Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                        throw;
-                    }
+                    Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                    throw;
                 }
             }
 
