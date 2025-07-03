@@ -150,7 +150,7 @@ namespace System.Windows
                 catch (Exception ex)
                 {
                     services.RemoveServiceAt(i);
-                    OnUnhandledException(ex, false);
+                    HandleException(ex);
                 }
             }
 
@@ -164,7 +164,7 @@ namespace System.Windows
                     }
                     catch (Exception ex)
                     {
-                        OnUnhandledException(ex, false);
+                        HandleException(ex);
                     }
                 }
             }
@@ -183,7 +183,7 @@ namespace System.Windows
                     }
                     catch (Exception ex)
                     {
-                        OnUnhandledException(ex, false);
+                        HandleException(ex);
                     }
                 }
             }
@@ -389,6 +389,24 @@ namespace System.Windows
         /// must call <see cref="OnStartup"/> in the base class if the <see cref="Startup"/> event needs to be raised.
         /// </remarks>
         protected virtual void OnStartup(StartupEventArgs e) => Startup?.Invoke(this, e);
+
+        /// <summary>
+        /// Occurs when an exception that is raised is not handled.
+        /// </summary>
+        public event EventHandler<ApplicationUnhandledExceptionEventArgs> UnhandledException;
+
+        internal static bool CallHandleException(Exception exception) => Current is Application app && app.HandleException(exception);
+
+        internal bool HandleException(Exception exception)
+        {
+            if (UnhandledException is EventHandler<ApplicationUnhandledExceptionEventArgs> handler)
+            {
+                var args = new ApplicationUnhandledExceptionEventArgs(exception, false);
+                handler(this, args);
+                return args.Handled;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Gets or sets the main application UI. This is an alias for the 
@@ -688,7 +706,7 @@ namespace System.Windows
                     }
                     catch (Exception ex)
                     {
-                        OnUnhandledException(ex, false);
+                        HandleException(ex);
                     }
                 }
             }
@@ -703,7 +721,7 @@ namespace System.Windows
                     }
                     catch (Exception ex)
                     {
-                        OnUnhandledException(ex, false);
+                        HandleException(ex);
                     }
                 }
             }
@@ -719,7 +737,7 @@ namespace System.Windows
                 }
                 catch (Exception ex)
                 {
-                    OnUnhandledException(ex, false);
+                    HandleException(ex);
                 }
             }
         }

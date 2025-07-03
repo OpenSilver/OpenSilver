@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CSHTML5.Types;
 using DotNetForHtml5.Core;
@@ -76,12 +77,12 @@ namespace CSHTML5.Internal
         // ExecuteJavaScript_Implementation method, in the first "if".
         //---------------------------------------------------------------------------------------
 
-        public object OnCallbackFromJavaScript<T>(
-            int callbackId,
+        public object OnCallbackFromJavaScript(
+            Delegate callback,
             string idWhereCallbackArgsAreStored,
-            T callbackArgsObject)
+            object callbackArgsObject)
         {
-            return CallMethod(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
+            return CallMethod(callback, idWhereCallbackArgsAreStored, callbackArgsObject);
         }
 
         private static object DelegateDynamicInvoke(Delegate d, params object[] args)
@@ -108,18 +109,9 @@ namespace CSHTML5.Internal
             }
         }
 
-        private object CallMethod<T>(int callbackId, string idWhereCallbackArgsAreStored, T callbackArgs)
+        private object CallMethod(Delegate callback, string idWhereCallbackArgsAreStored, object callbackArgs)
         {
-            //----------------------------------
-            // Get the C# callback from its ID:
-            //----------------------------------
-            JavaScriptCallback jsCallback = JavaScriptCallback.Get(callbackId);
-            if (jsCallback == null)
-            {
-                return null;
-            }
-
-            Delegate callback = jsCallback.GetCallback();
+            Debug.Assert(callback is not null);
 
             if (TryOptimizationForCommonTypes(callback, out object simpleResult))
             {

@@ -13,7 +13,9 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
@@ -395,13 +397,33 @@ public sealed class Dispatcher
 
     private void OnDispatcherTickNative()
     {
-        Tick?.Invoke(this, EventArgs.Empty);
+        List<Exception> unhandledExceptions = null;
 
-        ProcessQueue();
+        try
+        {
+            Tick?.Invoke(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
+        {
+            bool handled = Application.CallHandleException(ex);
+
+            if (!handled)
+            {
+                unhandledExceptions = [];
+                unhandledExceptions.Add(ex);
+            }
+        }
+
+        ProcessQueue(ref unhandledExceptions);
         ProcessPendingOperations();
+
+        if (unhandledExceptions is not null)
+        {
+            ExceptionDispatchInfo.Capture(GetDispatcherException(unhandledExceptions)).Throw();
+        }
     }
 
-    private void ProcessQueue()
+    private void ProcessQueue(ref List<Exception> unhandledExceptions)
     {
         _isProcessingQueue = true;
 
@@ -415,7 +437,13 @@ public sealed class Dispatcher
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine("Dispatcher: Method execution failed: " + ex);
+                    bool handled = Application.CallHandleException(ex);
+
+                    if (!handled)
+                    {
+                        unhandledExceptions ??= [];
+                        unhandledExceptions.Add(ex);
+                    }
                 }
             }
         }
@@ -438,6 +466,17 @@ public sealed class Dispatcher
                 EnqueueOperation(operation);
             }
         }
+    }
+
+    private static Exception GetDispatcherException(List<Exception> unhandledExceptions)
+    {
+        Debug.Assert(unhandledExceptions is not null && unhandledExceptions.Count > 0);
+
+        return unhandledExceptions.Count switch
+        {
+            1 => unhandledExceptions[0],
+            _ => new AggregateException(unhandledExceptions),
+        };
     }
 
     private void EnqueueOperation(DispatcherOperation operation) => _queue.Enqueue((int)operation.Priority, operation);
@@ -478,7 +517,7 @@ public sealed class Dispatcher
         public WasmDispatcher(Dispatcher dispatcher)
         {
             _dispatcher = dispatcher;
-            var jsCallback = JavaScriptCallback.Create(OnDispatcherTickNative);
+            var jsCallback = JavaScriptCallback.Create(OnDispatcherTickNative, false);
             string sHandler = OpenSilver.Interop.GetVariableStringForJS(jsCallback);
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createUIDispatcher({sHandler})", false);
         }
@@ -513,17 +552,7 @@ public sealed class Dispatcher
             };
 
         private void OnTimerTick(object state) =>
-            INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(() =>
-            {
-                try
-                {
-                    _dispatcher.OnDispatcherTickNative();
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine("Dispatcher: Native Tick failed: " + ex);
-                }
-            });
+            INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(_dispatcher.OnDispatcherTickNative);
 
         public void SetTickRate(int tickRate)
         {

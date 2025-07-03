@@ -38,31 +38,18 @@ namespace CSHTML5.Internal
             object callbackArgsObject,
             bool returnValue)
         {
+            if (JavaScriptCallback.Get(callbackId) is not JavaScriptCallback jsCallback)
+            {
+                return null;
+            }
+
             object result = null;
             var actionExecuted = false;
 
             void InvokeCallback()
             {
-                try
-                {
-                    result = OnCallBackImpl.Instance.OnCallbackFromJavaScript(
-                        callbackId,
-                        idWhereCallbackArgsAreStored,
-                        callbackArgsObject);
-
-                    actionExecuted = true;
-                }
-                catch (Exception ex)
-                {
-                    var args = new ApplicationUnhandledExceptionEventArgs(ex, false);
-                    Application.Current.OnUnhandledException(args);
-
-                    if (!args.Handled)
-                    {
-                        Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                        throw;
-                    }
-                }
+                result = jsCallback.Invoke(idWhereCallbackArgsAreStored, callbackArgsObject);
+                actionExecuted = true;
             }
 
             // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:

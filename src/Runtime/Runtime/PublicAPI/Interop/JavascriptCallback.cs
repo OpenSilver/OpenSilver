@@ -13,6 +13,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Windows;
 using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
@@ -23,27 +24,59 @@ namespace CSHTML5.Internal
 
         private readonly int _id;
         private readonly Delegate _callback;
+        private readonly bool _handleExceptions;
 
-        private JavaScriptCallback(Delegate callback)
+        private JavaScriptCallback(Delegate callback, bool handleExceptions)
         {
             Debug.Assert(callback != null);
             _callback = callback;
+            _handleExceptions = handleExceptions;
             _id = _store.Add(this);
         }
 
-        public static JavaScriptCallback Create(Delegate callback)
+        public static JavaScriptCallback Create(Delegate callback, bool handleExceptions = true)
         {
             if (callback is null)
             {
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            return new JavaScriptCallback(callback);
+            return new JavaScriptCallback(callback, handleExceptions);
         }
 
         public static JavaScriptCallback Get(int index) => _store.Get(index);
 
-        public Delegate GetCallback() => _callback;
+        internal object Invoke(string idWhereCallbackArgsAreStored, object callbackArgs)
+        {
+            if (_handleExceptions)
+            {
+                return InvokeWithExceptionHandling(idWhereCallbackArgsAreStored, callbackArgs);
+            }
+
+            return InvokeImpl(idWhereCallbackArgsAreStored, callbackArgs);
+        }
+
+        private object InvokeWithExceptionHandling(string idWhereCallbackArgsAreStored, object callbackArgs)
+        {
+            try
+            {
+                return InvokeImpl(idWhereCallbackArgsAreStored, callbackArgs);
+            }
+            catch (Exception ex)
+            {
+                bool handled = Application.CallHandleException(ex);
+
+                if (!handled)
+                {
+                    throw;
+                }
+            }
+
+            return null;
+        }
+
+        private object InvokeImpl(string idWhereCallbackArgsAreStored, object callbackArgs)
+            => OnCallBackImpl.Instance.OnCallbackFromJavaScript(_callback, idWhereCallbackArgsAreStored, callbackArgs);
 
         public void Dispose() => _store.Clean(_id);
 

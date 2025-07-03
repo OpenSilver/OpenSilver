@@ -132,13 +132,30 @@ namespace System.Windows.Threading
                 {
                     if (internalTimer == timer._timer)
                     {
-                        timer.OnTick();
+                        timer.FireTick();
                     }
                 });
             }
             else
             {
-                timer.OnTick();
+                timer.FireTick();
+            }
+        }
+
+        private void FireTick()
+        {
+            try
+            {
+                OnTick();
+            }
+            catch (Exception ex)
+            {
+                bool handled = Application.CallHandleException(ex);
+
+                if (!handled)
+                {
+                    throw;
+                }
             }
         }
     }
