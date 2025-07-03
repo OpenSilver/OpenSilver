@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
-using System;
-using System.Collections;
 using System.Windows.Resources;
 
 namespace System.Windows
@@ -27,22 +24,9 @@ namespace System.Windows
     /// </summary>
     public partial class Application
     {
-        /// <summary>
-        /// Occurs when an exception that is raised is not handled.
-        /// </summary>
-        public event EventHandler<ApplicationUnhandledExceptionEventArgs> UnhandledException;
-
         /// <summary>Occurs when the <see cref="P:System.Windows.Application.InstallState" /> property value changes. </summary>
         [OpenSilver.NotImplemented]
         public event EventHandler InstallStateChanged;
-
-        internal void OnUnhandledException(Exception exception, bool handled)
-        {
-            if (UnhandledException != null)
-            {
-                UnhandledException(this, new ApplicationUnhandledExceptionEventArgs(exception, handled));
-            }
-        }
 
         [OpenSilver.NotImplemented]
         public bool IsRunningOutOfBrowser
