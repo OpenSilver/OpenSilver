@@ -5132,9 +5132,9 @@
     </Style>
     <Style TargetType="controls:TabItem">
         <Setter Property="HorizontalContentAlignment"
-                Value="Center" />
+                Value="Stretch" />
         <Setter Property="VerticalContentAlignment"
-                Value="Center" />
+                Value="Stretch" />
         <Setter Property="Padding"
                 Value="10,6,10,6" />
         <Setter Property="MinWidth"

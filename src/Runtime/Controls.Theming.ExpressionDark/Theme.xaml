@@ -6190,9 +6190,9 @@
         <Setter Property="Padding"
                 Value="6,0,6,0" />
         <Setter Property="HorizontalContentAlignment"
-                Value="Center" />
+                Value="Stretch" />
         <Setter Property="VerticalContentAlignment"
-                Value="Center" />
+                Value="Stretch" />
         <Setter Property="MinWidth"
                 Value="5" />
         <Setter Property="MinHeight"
