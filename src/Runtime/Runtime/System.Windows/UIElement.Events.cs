@@ -152,7 +152,7 @@ namespace System.Windows
 
         private static void OnMouseLeftButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseLeftButtonUp(e);
 
-        private static void OnPreviewMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnPreviewMouseRightButtonDown(e);
+        private static void OnPreviewMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnPreviewMouseRightButtonUp(e);
 
         private static void OnMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonUp(e);
 
