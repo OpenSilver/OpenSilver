@@ -270,9 +270,9 @@ namespace CSHTML5.Internal
             // RENDER THE ELEMENTS BY APPLYING THE CSS PROPERTIES:
             //--------------------------------------------------------
 
-            if (EnableOptimizationWhereCollapsedControlsAreNotRendered && child.IsInCollapsedTree)
+            if (EnableOptimizationWhereCollapsedControlsAreNotRendered && !child.IsRenderable)
             {
-                child.IsRenderingSuspended = true;
+                child.SuspendRendering();
                 if (child.Visibility == Visibility.Collapsed)
                 {
                     INTERNAL_HtmlDomManager.SetVisibility(child.OuterDiv, Visibility.Collapsed);

@@ -145,6 +145,7 @@ namespace System.Windows
             // Set the window as "loaded":
             IsLoadedCache = true;
             IsConnectedToLiveTree = true;
+            UpdateIsRenderableCache();
             UpdateIsVisibleCache();
 
             TextMeasurementService = new TextMeasurementService(this);

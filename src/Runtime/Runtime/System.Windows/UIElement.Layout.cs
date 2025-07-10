@@ -40,7 +40,7 @@ namespace System.Windows
         /// The size that this <see cref="UIElement"/> computed during the measure pass
         /// of the layout process.
         /// </returns>
-        public Size DesiredSize => Visibility == Visibility.Collapsed ? new Size() : _desiredSize;
+        public Size DesiredSize => !IsRenderable ? new Size() : _desiredSize;
 
         /// <summary>
         /// Gets a value indicating whether the current size returned by layout measure is valid.
@@ -164,7 +164,7 @@ namespace System.Windows
 
                 bool isCloseToPreviousMeasure = DoubleUtil.AreClose(availableSize, PreviousAvailableSize);
 
-                if (Visibility == Visibility.Collapsed || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (!IsRenderable || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset measure request.
                     if (MeasureRequest != null)
@@ -191,9 +191,6 @@ namespace System.Windows
                 {
                     return;
                 }
-
-                //ensure that all properties that may affect layout are properly rendered
-                ResumeRendering(this);
 
                 NeverMeasured = false;
                 Size prevSize = _desiredSize;
@@ -338,7 +335,7 @@ namespace System.Windows
                             GetType().FullName));
                 }
 
-                if (Visibility == Visibility.Collapsed || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (!IsRenderable || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset arrange request.
                     if (ArrangeRequest != null)

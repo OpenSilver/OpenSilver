@@ -851,7 +851,7 @@ namespace System.Windows
             uie.VisibilityCache = newVisibility;
             uie.SwitchVisibilityIfNeeded(newVisibility);
 
-            uie.UpdateIsInCollapsedTreeCache();
+            uie.UpdateIsRenderableCache();
 
             // The IsVisible property depends on this property.
             uie.UpdateIsVisibleCache();
@@ -914,34 +914,50 @@ namespace System.Windows
             }
         }
 
-        internal bool IsInCollapsedTree
+        internal bool IsRenderable
         {
-            get => ReadVisualFlag(VisualFlags.IsInCollapsedTree);
-            private set => WriteVisualFlag(VisualFlags.IsInCollapsedTree, value);
+            get => ReadVisualFlag(VisualFlags.IsRenderable);
+            private set => WriteVisualFlag(VisualFlags.IsRenderable, value);
         }
 
-        private void UpdateIsInCollapsedTreeCache()
+        internal void UpdateIsRenderableCache()
         {
-            bool isInCollapsedTree = InternalVisualParent is UIElement parent && parent.IsInCollapsedTree;
-            Rec(this, isInCollapsedTree);
-
-            static void Rec(UIElement uie, bool isInCollapsedTree)
+            bool isRenderable;
+            
+            if (InternalVisualParent is UIElement parent)
             {
-                if (!isInCollapsedTree)
+                isRenderable = parent.IsRenderable;
+            }
+            else
+            {
+                isRenderable = INTERNAL_VisualTreeManager.IsElementInVisualTree(this);
+            }
+
+            Rec(this, isRenderable);
+
+            static void Rec(UIElement uie, bool isRenderable)
+            {
+                if (isRenderable)
                 {
-                    isInCollapsedTree = uie.ReadFlag(CoreFlags.IsCollapsed);
+                    isRenderable = !uie.ReadFlag(CoreFlags.IsCollapsed);
                 }
 
-                if (uie.IsInCollapsedTree != isInCollapsedTree)
+                if (uie.IsRenderable != isRenderable)
                 {
-                    uie.IsInCollapsedTree = isInCollapsedTree;
+                    uie.IsRenderable = isRenderable;
+
+                    if (isRenderable)
+                    {
+                        uie.ResumeRendering();
+                        uie.InvalidateMeasureInternal();
+                    }
 
                     int count = uie.VisualChildrenCount;
                     for (int i = 0; i < count; i++)
                     {
                         if (uie.GetVisualChild(i) is UIElement child)
                         {
-                            Rec(child, isInCollapsedTree);
+                            Rec(child, isRenderable);
                         }
                     }
                 }
@@ -1391,6 +1407,11 @@ namespace System.Windows
 
         internal static void SynchronizeForceInheritProperties(UIElement uie, DependencyObject parent)
         {
+            if (parent is UIElement parentUIE && parentUIE.IsRenderable)
+            {
+                uie.UpdateIsRenderableCache();
+            }
+
             if (!(bool)parent.GetValue(IsEnabledProperty))
             {
                 uie.CoerceValue(IsEnabledProperty);
@@ -1404,11 +1425,6 @@ namespace System.Windows
             if ((bool)parent.GetValue(IsVisibleProperty))
             {
                 uie.UpdateIsVisibleCache();
-            }
-
-            if (parent is UIElement parentUIE && parentUIE.IsInCollapsedTree)
-            {
-                uie.UpdateIsInCollapsedTreeCache();
             }
         }
 
@@ -1568,26 +1584,14 @@ namespace System.Windows
             }
         }
 
-        private static void ResumeRendering(UIElement uie)
+        internal void SuspendRendering() => IsRenderingSuspended = true;
+
+        private void ResumeRendering()
         {
-            if (uie.ReadFlag(CoreFlags.IsCollapsed))
+            if (IsRenderingSuspended)
             {
-                return;
-            }
-
-            if (uie.IsRenderingSuspended)
-            {
-                uie.IsRenderingSuspended = false;
-                uie.RenderVisual();
-
-                int count = uie.VisualChildrenCount;
-                for (int i = 0; i < count; i++)
-                {
-                    if (uie.GetVisualChild(i) is UIElement child)
-                    {
-                        ResumeRendering(child);
-                    }
-                }
+                IsRenderingSuspended = false;
+                RenderVisual();
             }
         }
 
@@ -1723,8 +1727,9 @@ namespace System.Windows
         // visual tree.
         IsRenderingSuspended = 0x00080000,
 
-        // Indicates if this Visual is in a collapsed visual tree.
-        IsInCollapsedTree = 0x00100000,
+        // Indicates if this Visual can be rendered. An element can be rendered if it has been attached to the render tree and
+        // is not inside a collapsed tree.
+        IsRenderable = 0x00100000,
 
         // Indicates if this Visual is connected to the render tree.
         IsConnectedToLiveTree = 0x00200000,
