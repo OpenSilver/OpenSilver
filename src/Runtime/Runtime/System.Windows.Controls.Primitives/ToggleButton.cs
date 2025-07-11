@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
 
 namespace System.Windows.Controls.Primitives
@@ -52,10 +53,10 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty IsCheckedProperty =
             DependencyProperty.Register(
-                "IsChecked",
+                nameof(IsChecked),
                 typeof(bool?),
                 typeof(ToggleButton),
-                new PropertyMetadata(false, OnIsCheckedChanged));
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsCheckedChanged));
 
         /// <summary>
         /// Gets or sets whether the <see cref="ToggleButton"/> is checked.
@@ -68,7 +69,7 @@ namespace System.Windows.Controls.Primitives
         public bool? IsChecked
         {
             get { return (bool?)GetValue(IsCheckedProperty); }
-            set { SetValueInternal(IsCheckedProperty, value); }
+            set { SetValueInternal(IsCheckedProperty, value.HasValue ? BooleanBoxes.Box(value) : null); }
         }
 
         private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -98,10 +99,10 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty IsThreeStateProperty =
             DependencyProperty.Register(
-                "IsThreeState",
+                nameof(IsThreeState),
                 typeof(bool),
                 typeof(ToggleButton),
-                new PropertyMetadata(false));
+                new PropertyMetadata(BooleanBoxes.FalseBox));
 
         /// <summary>
         /// Gets or sets whether the control supports two or three states.
@@ -200,46 +201,32 @@ namespace System.Windows.Controls.Primitives
             // If IsChecked == true && IsThreeState == false  --->  IsChecked = false
             // If IsChecked == false                          --->  IsChecked = true
             // If IsChecked == null                           --->  IsChecked = false
-            bool? isChecked;
+            object isChecked;
             if (IsChecked == true)
-                isChecked = IsThreeState ? (bool?)null : (bool?)false;
+            {
+                isChecked = IsThreeState ? null : BooleanBoxes.FalseBox;
+            }
             else // false or null
-                isChecked = IsChecked.HasValue; // HasValue returns true if IsChecked==false
-            SetCurrentValue(IsCheckedProperty, isChecked);
+            {
+                isChecked = BooleanBoxes.Box(IsChecked.HasValue); // HasValue returns true if IsChecked==false
+            }
+            SetCurrentValueInternal(IsCheckedProperty, isChecked);
         }
 
         /// <summary>
         /// Raises the Checked event.
         /// </summary>
-        protected virtual void OnChecked(RoutedEventArgs e)
-        {
-            if (Checked != null)
-            {
-                Checked(this, e);
-            }
-        }
+        protected virtual void OnChecked(RoutedEventArgs e) => Checked?.Invoke(this, e);
 
         /// <summary>
         /// Raises the Indeterminate event.
         /// </summary>
-        protected virtual void OnIndeterminate(RoutedEventArgs e)
-        {
-            if (Indeterminate != null)
-            {
-                Indeterminate(this, e);
-            }
-        }
+        protected virtual void OnIndeterminate(RoutedEventArgs e) => Indeterminate?.Invoke(this, e);
 
         /// <summary>
         /// Raises the Unchecked event.
         /// </summary>
-        protected virtual void OnUnchecked(RoutedEventArgs e)
-        {
-            if (Unchecked != null)
-            {
-                Unchecked(this, e);
-            }
-        }
+        protected virtual void OnUnchecked(RoutedEventArgs e) => Unchecked?.Invoke(this, e);
 
         #endregion Protected Methods
 

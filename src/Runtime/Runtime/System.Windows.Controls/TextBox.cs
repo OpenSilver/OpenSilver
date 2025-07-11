@@ -694,7 +694,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Clears all the content from the text box.
         /// </summary>
-        public void Clear() => SetCurrentValue(TextProperty, string.Empty);
+        public void Clear() => SetCurrentValueInternal(TextProperty, string.Empty);
 
         /// <summary>
         /// Builds the visual tree for the
@@ -814,7 +814,7 @@ namespace System.Windows.Controls
             _isProcessingInput = true;
             try
             {
-                SetCurrentValue(TextProperty, text);
+                SetCurrentValueInternal(TextProperty, text);
             }
             finally
             {

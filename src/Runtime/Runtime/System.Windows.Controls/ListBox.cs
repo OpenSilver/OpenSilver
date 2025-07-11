@@ -409,11 +409,11 @@ namespace System.Windows.Controls
                     
                     if (!item.IsSelected)
                     {
-                        item.SetCurrentValue(ListBoxItem.IsSelectedProperty, true);
+                        item.SetCurrentValueInternal(ListBoxItem.IsSelectedProperty, BooleanBoxes.TrueBox);
                     }
                     else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
                     {
-                        item.SetCurrentValue(ListBoxItem.IsSelectedProperty, false);
+                        item.SetCurrentValueInternal(ListBoxItem.IsSelectedProperty, BooleanBoxes.FalseBox);
                     }
 
                     UpdateAnchorItem(ItemInfoFromContainer(item));
@@ -475,7 +475,7 @@ namespace System.Windows.Controls
 
         private void MakeToggleSelection(ListBoxItem item)
         {
-            item.SetCurrentValue(SelectorItem.IsSelectedProperty, !item.IsSelected);
+            item.SetCurrentValueInternal(SelectorItem.IsSelectedProperty, BooleanBoxes.Box(!item.IsSelected));
 
             UpdateAnchorItem(ItemInfoFromContainer(item));
         }

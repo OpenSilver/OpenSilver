@@ -903,7 +903,7 @@ namespace System.Windows.Controls
                 _textContentChanging = true;
                 try
                 {
-                    SetCurrentValue(TextProperty, Inlines.TextContainer.Text);
+                    SetCurrentValueInternal(TextProperty, Inlines.TextContainer.Text);
                 }
                 finally
                 {

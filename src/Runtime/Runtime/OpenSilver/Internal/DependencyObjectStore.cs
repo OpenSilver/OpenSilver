@@ -455,7 +455,8 @@ internal static class DependencyObjectStore
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
-        object newValue)
+        object newValue,
+        bool isInternal)
     {
         if (newValue == DependencyProperty.UnsetValue)
         {
@@ -464,21 +465,40 @@ internal static class DependencyObjectStore
             return;
         }
 
-        ValidateValue(dp, newValue, false, true);
+        ValidateValue(dp, newValue, false, isInternal);
+
+        bool handled = false;
 
         var oldEntry = storage.Entry;
         var newEntry = new EffectiveValueEntry(oldEntry);
 
-        // Coerce to current value
-        object baseValue = GetEffectiveValue(newEntry, RequestFlags.CoercionBaseValue);
-        ProcessCoerceValue(d,
-            dp,
-            metadata,
-            newEntry,
-            newValue, // controlValue
-            null, // old value is unused when coerceWithCurrentValue is true
-            baseValue,
-            true); // coerceWithCurrentValue
+        if (oldEntry.IsExpression)
+        {
+            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+
+            // if the base value is a reflective expression, we want to set the expression value
+            // instead of the coerced value.
+            handled = currentExpr.CanSetValue(d, dp);
+
+            if (handled)
+            {
+                newEntry.SetExpressionValue(newValue);
+            }
+        }
+
+        if (!handled)
+        {
+            // Coerce to current value
+            object baseValue = GetEffectiveValue(newEntry, RequestFlags.CoercionBaseValue);
+            ProcessCoerceValue(d,
+                dp,
+                metadata,
+                newEntry,
+                newValue, // controlValue
+                null, // old value is unused when coerceWithCurrentValue is true
+                baseValue,
+                true);
+        }
 
         UpdateEffectiveValue(storage,
             d,
@@ -504,7 +524,8 @@ internal static class DependencyObjectStore
                 d,
                 dp,
                 metadata,
-                oldEntry.ModifiedValue.CoercedValue);
+                oldEntry.ModifiedValue.CoercedValue,
+                true);
             return;
         }
 

@@ -84,7 +84,7 @@ namespace System.Windows.Automation.Peers
                 throw new ElementNotEnabledException();
             }
 
-            ((RadioButton)Owner).SetCurrentValue(ToggleButton.IsCheckedProperty, true);
+            ((RadioButton)Owner).SetCurrentValueInternal(ToggleButton.IsCheckedProperty, BooleanBoxes.TrueBox);
         }
 
         /// <summary>

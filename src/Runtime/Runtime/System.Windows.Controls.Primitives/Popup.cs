@@ -290,7 +290,7 @@ namespace System.Windows.Controls.Primitives
         }
 
         private static void CloseOnUnloaded(object sender, RoutedEventArgs e)
-            => ((Popup)sender).SetCurrentValue(IsOpenProperty, BooleanBoxes.FalseBox);
+            => ((Popup)sender).SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.FalseBox);
 
         private static void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -846,7 +846,7 @@ namespace System.Windows.Controls.Primitives
 
             if (IsOpen)
             {
-                SetCurrentValue(IsOpenProperty, BooleanBoxes.FalseBox);
+                SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.FalseBox);
             }
         }
 
@@ -955,7 +955,7 @@ namespace System.Windows.Controls.Primitives
 
             if (target is null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(target))
             {
-                SetCurrentValue(IsOpenProperty, BooleanBoxes.FalseBox);
+                SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.FalseBox);
                 return;
             }
 

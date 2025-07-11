@@ -256,7 +256,7 @@ namespace System.Windows.Controls
             _isProcessingInput = true;
             try
             {
-                SetCurrentValue(PasswordProperty, text);
+                SetCurrentValueInternal(PasswordProperty, text);
             }
             finally
             {

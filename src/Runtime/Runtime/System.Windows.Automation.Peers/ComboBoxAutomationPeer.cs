@@ -133,7 +133,7 @@ namespace System.Windows.Automation.Peers
                 throw new ElementNotEnabledException();
             }
 
-            ((ComboBox)Owner).SetCurrentValue(ComboBox.IsDropDownOpenProperty, true);
+            ((ComboBox)Owner).SetCurrentValueInternal(ComboBox.IsDropDownOpenProperty, BooleanBoxes.TrueBox);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace System.Windows.Automation.Peers
                 throw new ElementNotEnabledException();
             }
 
-            ((ComboBox)Owner).SetCurrentValue(ComboBox.IsDropDownOpenProperty, false);
+            ((ComboBox)Owner).SetCurrentValueInternal(ComboBox.IsDropDownOpenProperty, BooleanBoxes.FalseBox);
         }
 
         ///<summary>indicates an element's current Collapsed or Expanded state</summary>

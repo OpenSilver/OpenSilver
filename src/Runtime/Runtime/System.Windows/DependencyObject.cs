@@ -274,7 +274,7 @@ namespace System.Windows
         /// </exception>
         public void SetCurrentValue(DependencyProperty dp, object value)
         {
-            if (dp == null)
+            if (dp is null)
             {
                 throw new ArgumentNullException(nameof(dp));
             }
@@ -287,7 +287,27 @@ namespace System.Windows
                 this,
                 dp,
                 metadata,
-                value);
+                value,
+                false);
+        }
+
+        internal void SetCurrentValueInternal(DependencyProperty dp, object value)
+        {
+            if (dp is null)
+            {
+                throw new ArgumentNullException(nameof(dp));
+            }
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            Storage storage = GetOrCreateStorage(dp, metadata);
+
+            DependencyObjectStore.SetCurrentValueCommon(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                true);
         }
 
         /// <summary>

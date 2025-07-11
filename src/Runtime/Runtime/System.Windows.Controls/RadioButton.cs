@@ -178,7 +178,7 @@ namespace System.Windows.Controls
 
         private void UncheckRadioButton()
         {
-            SetCurrentValue(IsCheckedProperty, false);
+            SetCurrentValueInternal(IsCheckedProperty, BooleanBoxes.FalseBox);
         }
 
         #region Properties and Events
@@ -238,7 +238,7 @@ namespace System.Windows.Controls
         /// </summary>
         protected internal override void OnToggle()
         {
-            this.SetCurrentValue(IsCheckedProperty, true);
+            SetCurrentValueInternal(IsCheckedProperty, BooleanBoxes.TrueBox);
         }
 
         #endregion Override methods

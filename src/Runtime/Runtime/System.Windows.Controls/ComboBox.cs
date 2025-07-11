@@ -470,7 +470,7 @@ namespace System.Windows.Controls
                     index = Items.IndexOf(info.Item);
                 }
 
-                SetCurrentValue(SelectedIndexProperty, index);
+                SetCurrentValueInternal(SelectedIndexProperty, index);
 
                 returnValue = true;
             }

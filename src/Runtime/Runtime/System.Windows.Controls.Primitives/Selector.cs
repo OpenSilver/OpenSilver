@@ -920,7 +920,7 @@ namespace System.Windows.Controls.Primitives
                 || (selectedIndex > -1
                     && (_selectedItems.Count == 0 || selectedIndex != _selectedItems[0].Index)))
             {
-                SetCurrentValue(SelectedIndexProperty, InternalSelectedIndex);
+                SetCurrentValueInternal(SelectedIndexProperty, InternalSelectedIndex);
             }
 
             if (SelectedItem != InternalSelectedItem)
@@ -930,7 +930,7 @@ namespace System.Windows.Controls.Primitives
                     // We know that InternalSelectedItem is a correct value for SelectedItemProperty and
                     // should skip the coerce callback because it is expensive to call IndexOf and Contains
                     SkipCoerceSelectedItemCheck = true;
-                    SetCurrentValue(SelectedItemProperty, InternalSelectedItem);
+                    SetCurrentValueInternal(SelectedItemProperty, InternalSelectedItem);
                 }
                 finally
                 {
@@ -955,7 +955,7 @@ namespace System.Windows.Controls.Primitives
 
                 if (!Equals(SelectedValue, desiredSelectedValue))
                 {
-                    SetCurrentValue(SelectedValueProperty, desiredSelectedValue);
+                    SetCurrentValueInternal(SelectedValueProperty, desiredSelectedValue);
                 }
             }
 
@@ -1102,7 +1102,7 @@ namespace System.Windows.Controls.Primitives
                 {
                     if (selectorContainer.IsSelected != value)
                     {
-                        container.SetCurrentValue(SelectorItem.IsSelectedProperty, value);
+                        container.SetCurrentValueInternal(SelectorItem.IsSelectedProperty, BooleanBoxes.Box(value));
                     }
                 }
             }
@@ -1121,7 +1121,7 @@ namespace System.Windows.Controls.Primitives
                         {
                             if (selectorContainer.IsSelected != value)
                             {
-                                element.SetCurrentValue(SelectorItem.IsSelectedProperty, value);
+                                element.SetCurrentValueInternal(SelectorItem.IsSelectedProperty, BooleanBoxes.Box(value));
                             }
                         }
                     }
