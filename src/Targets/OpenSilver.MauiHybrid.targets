@@ -35,22 +35,27 @@
 
   </Target>
 
-  <Target Name="_CopyWasmResources"
+  <Target Name="_CopyOpenSilverResourcesAndroid"
+          BeforeTargets="ProcessMauiAssets"
+          DependsOnTargets="ResolveAssemblyReferences"
+          Condition="'$(TargetPlatformIdentifier)' == 'android'">
+    <CallTarget Condition="'$(DesignTimeBuild)' != 'true'" Targets="_CopyOpenSilverResourcesMain" />
+  </Target>
+
+  <Target Name="_CopyOpenSilverResourcesDefault"
           BeforeTargets="ResolveProjectStaticWebAssets"
-          DependsOnTargets="ResolveAssemblyReferences">
+          DependsOnTargets="ResolveAssemblyReferences"
+          Condition="'$(TargetPlatformIdentifier)' != 'android'">
 
     <PropertyGroup>
       <_IsMainBuild>true</_IsMainBuild>
-      <_IsMainBuild Condition="'$(DesignTimeBuild)' == 'true'">false</_IsMainBuild>
-      <_IsMainBuild Condition="'$(BuildingProject)' != 'true' AND '$(TargetPlatformIdentifier)' != 'android'">false</_IsMainBuild>
+      <_IsMainBuild Condition="'$(DesignTimeBuild)' == 'true' OR '$(BuildingProject)' != 'true'">false</_IsMainBuild>
     </PropertyGroup>
 
-
-    <CallTarget Condition="'$(_IsMainBuild)' == 'true'" Targets="_CopyWasmResourcesMain" />
-
+    <CallTarget Condition="'$(_IsMainBuild)' == 'true'" Targets="_CopyOpenSilverResourcesMain" />
   </Target>
 
-  <Target Name="_CopyWasmResourcesMain">
+  <Target Name="_CopyOpenSilverResourcesMain">
 
     <PropertyGroup>
       <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)' == ''">resources/</Cshtml5OutputResourcesPath>
