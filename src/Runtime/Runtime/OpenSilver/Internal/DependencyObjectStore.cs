@@ -112,7 +112,7 @@ internal static class DependencyObjectStore
             else
             {
                 Debug.Assert(
-                    oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle ||
+                    oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.Style ||
                     oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle);
 
                 RefreshExpressionCommon(storage, d, dp, metadata, (Expression)oldEntry.ModifiedValue.BaseValue);
@@ -215,7 +215,7 @@ internal static class DependencyObjectStore
         EffectiveValueEntry oldEntry = storage.Entry;
 
         // Check for early exit if effective value is not impacted
-        if (BaseValueSourceInternal.LocalStyle < oldEntry.BaseValueSourceInternal)
+        if (BaseValueSourceInternal.Style < oldEntry.BaseValueSourceInternal)
         {
             // value source remains the same.
             // Exit if the newly set value is of lower precedence than the effective value.
@@ -229,7 +229,7 @@ internal static class DependencyObjectStore
             currentExpr.OnDetach(d, dp);
         }
 
-        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, newValue, BaseValueSourceInternal.LocalStyle);
+        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, newValue, BaseValueSourceInternal.Style);
 
         if (oldEntry.IsAnimated)
         {
@@ -257,7 +257,7 @@ internal static class DependencyObjectStore
 
         storage.LocalStyleValue = DependencyProperty.UnsetValue;
 
-        if (oldEntry.BaseValueSourceInternal > BaseValueSourceInternal.LocalStyle)
+        if (oldEntry.BaseValueSourceInternal > BaseValueSourceInternal.Style)
         {
             return;
         }
@@ -667,7 +667,7 @@ internal static class DependencyObjectStore
         }
         else if (storage.LocalStyleValue != DependencyProperty.UnsetValue)
         {
-            return (storage.LocalStyleValue, BaseValueSourceInternal.LocalStyle);
+            return (storage.LocalStyleValue, BaseValueSourceInternal.Style);
         }
         else if (storage.ThemeStyleValue != DependencyProperty.UnsetValue)
         {

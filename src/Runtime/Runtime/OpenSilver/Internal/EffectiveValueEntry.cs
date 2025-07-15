@@ -208,9 +208,9 @@ internal enum FullValueSource : short
 // precedence and Default value has the least.
 internal enum BaseValueSourceInternal : short
 {
-    Default = 0,
-    Inherited = 1,
-    ThemeStyle = 2,
-    LocalStyle = 3,
-    Local = 4,
+    Default = 1,
+    Inherited = 2,
+    ThemeStyle = 3,
+    Style = 5,
+    Local = 11,
 }

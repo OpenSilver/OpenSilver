@@ -230,6 +230,7 @@
     <Compile Include="System.Windows.Media.Animation\VectorKeyFrame.cs" />
     <Compile Include="System.Windows.Media\Brushes.cs" />
     <Compile Include="System.Windows.Threading\DispatcherObject.cs" />
+    <Compile Include="System.Windows\DependencyPropertyHelper.cs" />
     <Compile Include="System.Windows\DynamicResourceExtension.cs" />
     <Compile Include="System.Windows\EventManager.cs" />
     <Compile Include="System.Windows\EventSetter.cs" />

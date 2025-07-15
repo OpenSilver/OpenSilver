@@ -30,15 +30,5 @@ internal sealed class ReadOnlyPropertyMetadata : PropertyMetadata
         GetReadOnlyValueCallback = getValueCallback;
     }
 
-    public ReadOnlyPropertyMetadata(
-        object defaultValue,
-        GetReadOnlyValueCallback getValueCallback,
-        PropertyChangedCallback propertyChangedCallback,
-        CoerceValueCallback coerceValueCallback)
-        : base(defaultValue, propertyChangedCallback, coerceValueCallback)
-    {
-        GetReadOnlyValueCallback = getValueCallback;
-    }
-
     internal override GetReadOnlyValueCallback GetReadOnlyValueCallback { get; }
 }
