@@ -382,13 +382,23 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 return;
             }
 
-            var notFound = environment.CreateWebResourceResponse(
-                new MemoryStream(Encoding.UTF8.GetBytes("" +
-                "<html>" +
-                    "<head><title>404 Not Found</title></head>" +
-                    "<body><center><h1>404 Not Found</h1></center></body>" +
-                "</html>")), 404, "Not Found", GetHeaders("index.html"));
-            e.Response = notFound;
+            if (_simulatorUrl == DefaultSimulatorUrl)
+            {
+                // The default simulator URL always points to an address that will not serve valid content.
+                // In this case, we know for sure that a 404 response is appropriate and should be handled explicitly.
+                //
+                // If the user has overridden _simulatorUrl, we cannot determine in advance whether the address is valid or serves content.
+                // In that scenario, it's best to let the browser handle the request, as the server may exist and respond.
+                //
+                // Here, we generate and return a custom 404 Not Found HTML response for the default simulator URL case.
+                var notFound = environment.CreateWebResourceResponse(
+                    new MemoryStream(Encoding.UTF8.GetBytes("" +
+                    "<html>" +
+                        "<head><title>404 Not Found</title></head>" +
+                        "<body><center><h1>404 Not Found</h1></center></body>" +
+                    "</html>")), 404, "Not Found", GetHeaders("index.html"));
+                e.Response = notFound;
+            }
         }
 
         private async Task OnLoadedAsync()
