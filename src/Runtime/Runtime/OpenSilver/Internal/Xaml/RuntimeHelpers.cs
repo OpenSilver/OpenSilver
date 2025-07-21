@@ -141,6 +141,18 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Type GetXamlComponentLoaderType(string componentUri)
+        {
+            Debug.Assert(componentUri is not null);
+
+            if (AppResourcesManager.IsComponentUri(componentUri))
+            {
+                return Application.GetXamlComponentLoaderType(componentUri);
+            }
+            return null;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
             Debug.Assert(dependencyObject is IFrameworkElement);

@@ -575,13 +575,17 @@ namespace System.Windows
             loader.LoadComponent(component);
         }
 
-        private static IXamlComponentLoader GetXamlComponentLoader(string componentUri)
+        internal static Type GetXamlComponentLoaderType(string componentUri)
         {
             string className = XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri);
             string assemblyName = AppResourcesManager.ExtractAssemblyNameFromComponentUri(componentUri);
 
-            Type loaderType = Type.GetType($"{className}, {assemblyName}");
-            if (loaderType != null)
+            return Type.GetType($"{className}, {assemblyName}");
+        }
+
+        private static IXamlComponentLoader GetXamlComponentLoader(string componentUri)
+        {
+            if (GetXamlComponentLoaderType(componentUri) is Type loaderType)
             {
                 return Activator.CreateInstance(loaderType) as IXamlComponentLoader;
             }
