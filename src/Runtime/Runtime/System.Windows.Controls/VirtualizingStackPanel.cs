@@ -624,22 +624,27 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
     private (int Index, double Offset) ComputeFirstItemInViewportIndex(bool isHorizontal, int itemCount)
     {
-        double rawOffset = isHorizontal ? _scrollData._offset.X : _scrollData._offset.Y;
+        if (IsScrolling)
+        {
+            double rawOffset = isHorizontal ? _scrollData._offset.X : _scrollData._offset.Y;
 
-        if (rawOffset < 0)
-        {
-            return (0, 0);
+            if (rawOffset < 0)
+            {
+                return (0, 0);
+            }
+            else if (rawOffset >= itemCount)
+            {
+                return (itemCount - 1, 1);
+            }
+            else
+            {
+                int index = (int)rawOffset;
+                double offset = rawOffset - index;
+                return (index, offset);
+            }
         }
-        else if (rawOffset >= itemCount)
-        {
-            return (itemCount - 1, 1);
-        }
-        else
-        {
-            int index = (int)rawOffset;
-            double offset = rawOffset - index;
-            return (index, offset);
-        }
+
+        return (0, 0);
     }
 
     private Size MeasureNonItemsHost(Size constraint)
@@ -867,15 +872,18 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         double previousChildSize = 0.0;
         List<UIElement> children = InternalChildren;
 
-        if (isHorizontal)
+        if (IsScrolling)
         {
-            rcChild.X = -ComputeFirstItemInViewportOffset(true);
-            rcChild.Y = -_scrollData._computedOffset.Y;
-        }
-        else
-        {
-            rcChild.X = -_scrollData._computedOffset.X;
-            rcChild.Y = -ComputeFirstItemInViewportOffset(false);
+            if (isHorizontal)
+            {
+                rcChild.X = -ComputeFirstItemInViewportOffset(true);
+                rcChild.Y = -_scrollData._computedOffset.Y;
+            }
+            else
+            {
+                rcChild.X = -_scrollData._computedOffset.X;
+                rcChild.Y = -ComputeFirstItemInViewportOffset(false);
+            }
         }
 
         for (int i = 0; i < children.Count; i++)
