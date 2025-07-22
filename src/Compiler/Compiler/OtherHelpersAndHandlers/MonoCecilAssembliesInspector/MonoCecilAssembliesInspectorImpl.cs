@@ -15,6 +15,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -102,8 +103,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private const string ResourceDictionaryName = "ResourceDictionary";
 
         private readonly MonoCecilAssemblyStorage _storage;
-        private readonly List<AssemblyData> _assemblies = new();
+        private readonly Dictionary<AssemblyDefinition, AssemblyData> _assemblies = new();
         private readonly Dictionary<string, TypeDefinition> _typeNameToType = new();
+        private readonly Dictionary<AssemblyDefinition, HashSet<string>> _typesPerAssembly = new();
 
         private readonly SupportedLanguage _compilerType;
         private readonly string _globalPrefix;
@@ -135,11 +137,32 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             _storage = new MonoCecilAssemblyStorage();
         }
 
+        private AssemblyDefinition StoreAssembly(AssemblyDefinition assembly)
+        {
+            _assemblies.Add(assembly, new AssemblyData(assembly));
+            _typesPerAssembly.Add(assembly, new HashSet<string>());
+            return assembly;
+        }
+
         public AssemblyDefinition LoadAssembly(string assemblyPath)
         {
-            var assembly = _storage.LoadAssembly(assemblyPath);
-            _assemblies.Add(new AssemblyData(assembly));
-            return assembly;
+            return StoreAssembly(_storage.LoadAssembly(assemblyPath));
+        }
+
+        public AssemblyDefinition LoadAssembly(Stream stream)
+        {
+            return StoreAssembly(_storage.LoadAssembly(stream));
+        }
+
+        public void UnloadAssembly(AssemblyDefinition assemblyDefinition)
+        {
+            _storage.UnloadAssembly(assemblyDefinition);
+            _assemblies.Remove(assemblyDefinition);
+            foreach(var t in _typesPerAssembly[assemblyDefinition])
+            {
+                _typeNameToType.Remove(t);
+            }
+            _typesPerAssembly.Remove(assemblyDefinition);
         }
 
         public void Dispose()
@@ -189,7 +212,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
             // Look for the type in all loaded assemblies:
-            foreach (AssemblyData asmData in _assemblies)
+            foreach (AssemblyData asmData in _assemblies.Values)
             {
                 AssemblyDefinition assembly = asmData.Assembly;
 
@@ -235,6 +258,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     if (type != null)
                     {
                         _typeNameToType[fullTypeNameWithNamespaceInsideBraces] = type;
+                        _typesPerAssembly[assembly].Add(fullTypeNameWithNamespaceInsideBraces);
                         return type;
                     }
                 }

@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using Mono.Cecil;
 
 namespace OpenSilver.Compiler
@@ -41,6 +42,24 @@ namespace OpenSilver.Compiler
             _assemblies.Add(assembly);
 
             return assembly;
+        }
+
+        public AssemblyDefinition LoadAssembly(Stream stream)
+        {
+            var assembly = AssemblyDefinition.ReadAssembly(stream, new ReaderParameters
+            {
+                AssemblyResolver = _resolver,
+            });
+
+            _assemblies.Add(assembly);
+
+            return assembly;
+        }
+
+        public void UnloadAssembly(AssemblyDefinition assemblyDefinition)
+        {
+            _assemblies.Remove(assemblyDefinition);
+            assemblyDefinition.Dispose();
         }
 
         public void Dispose()
