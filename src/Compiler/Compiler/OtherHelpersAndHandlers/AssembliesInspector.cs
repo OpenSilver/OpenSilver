@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
 using Mono.Cecil;
@@ -31,7 +32,11 @@ namespace OpenSilver.Compiler
 
         public void Dispose() => _monoCecilVersion.Dispose();
 
-        public void LoadAssembly(string assemblyPath) => _monoCecilVersion.LoadAssembly(assemblyPath);
+        public AssemblyDefinition LoadAssembly(string assemblyPath) => _monoCecilVersion.LoadAssembly(assemblyPath);
+
+        public AssemblyDefinition LoadAssembly(Stream stream) => _monoCecilVersion.LoadAssembly(stream);
+
+        public void UnloadAssembly(AssemblyDefinition assembly) => _monoCecilVersion.UnloadAssembly(assembly);
 
         public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
             => _monoCecilVersion.GetContentPropertyName(namespaceName, localTypeName, assemblyNameIfAny);

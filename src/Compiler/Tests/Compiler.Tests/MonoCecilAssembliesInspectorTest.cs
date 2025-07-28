@@ -260,6 +260,19 @@ namespace Compiler.Tests
             Assert.IsFalse(res);
         }
 
+        [TestMethod]
+        public void UnloadAssembly_Should_Unload_And_Remove_Associated_Types()
+        {
+            var compilerTests = "Compiler.Tests";
+            var assembly = MonoCecilVersion.LoadAssembly(compilerTests + ".dll");
+            var typeBefore = MonoCecilVersion.FindType(compilerTests, nameof(MonoCecilAssembliesInspectorTest));
+            MonoCecilVersion.UnloadAssembly(assembly);
+            var typeAfter = MonoCecilVersion.FindType(compilerTests, nameof(MonoCecilAssembliesInspectorTest), doNotRaiseExceptionIfNotFound: true);
+
+            Assert.AreEqual(nameof(MonoCecilAssembliesInspectorTest), typeBefore.Name);
+            Assert.IsNull(typeAfter);
+        }
+
         private static void LoadAssemblyAndDependencies(string assemblyPath)
         {
             var loadedAssemblyNames = new HashSet<string>();
