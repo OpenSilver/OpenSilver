@@ -230,7 +230,8 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
-      Language="$(Language)">
+      Language="$(Language)"
+      IsDesignTime="false">
       <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />
       <Output ItemName="_XamlPreprocessorProcessedPageFiles" TaskParameter="ProcessedPageFiles" />
       <Output ItemName="_XamlPreprocessorProcessedApplicationDefinitionFiles" TaskParameter="ProcessedApplicationDefinitionFiles" />
@@ -320,7 +321,8 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
-      Language="$(Language)">
+      Language="$(Language)"
+      IsDesignTime="true">
       <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />
       <Output ItemName="_XamlPreprocessorProcessedPageFiles" TaskParameter="ProcessedPageFiles" />
       <Output ItemName="_XamlPreprocessorProcessedApplicationDefinitionFiles" TaskParameter="ProcessedApplicationDefinitionFiles" />
