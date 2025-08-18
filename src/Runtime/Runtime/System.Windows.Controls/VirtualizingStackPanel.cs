@@ -405,15 +405,16 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
             // Next, prepare and measure the extents of our viewable items...
             int nvisible = 0;
+            int beyond = 0;
+            double viewportSize = 0;
+            double constraintSize = isHorizontal ? constraint.Width : constraint.Height;
             (int firstItemInViewportIndex, double firstItemInViewportLogicalOffset) = ComputeFirstItemInViewportIndex(isHorizontal, itemCount);
             GeneratorPosition start = generator.GeneratorPositionFromIndex(firstItemInViewportIndex);
+            List<UIElement> children = InternalChildren;
 
             using (generator.StartAt(start, GeneratorDirection.Forward, true))
             {
-                double viewportSize = 0;
                 int insertAt = start.Offset == 0 ? start.Index : start.Index + 1;
-                int beyond = 0;
-                List<UIElement> children = InternalChildren;
 
                 for (int i = firstItemInViewportIndex; i < itemCount && beyond < 2; i++, insertAt++)
                 {
@@ -519,6 +520,102 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
                 }
             }
 
+            if (beyond == 0 && viewportSize < constraintSize)
+            {
+                using (generator.StartAt(start, GeneratorDirection.Backward, true))
+                {
+                    UIElement firstChild = (UIElement)generator.GenerateNext(out _);
+                    Size firstChildSize = firstChild.DesiredSize;
+
+                    numberOfItemsInViewport += firstItemInViewportLogicalOffset;
+                    viewportSize += _firstItemInViewportPixelOffset;
+                    _firstItemInViewportPixelOffset = 0.0;
+
+                    if (viewportSize > constraintSize)
+                    {
+                        _firstItemInViewportPixelOffset = viewportSize - constraintSize;
+                        viewportSize = constraintSize;
+                        if (isHorizontal)
+                        {
+                            numberOfItemsInViewport -= 1 - (firstChildSize.Width - _firstItemInViewportPixelOffset) / firstChildSize.Width;
+                        }
+                        else
+                        {
+                            numberOfItemsInViewport -= 1 - (firstChildSize.Height - _firstItemInViewportPixelOffset) / firstChildSize.Height;
+                        }
+                    }
+                    else
+                    {
+                        int insertAt = start.Offset == 0 ? start.Index : start.Index + 1;
+
+                        for (int i = firstItemInViewportIndex - 1; i >= 0; i--)
+                        {
+                            UIElement child = (UIElement)generator.GenerateNext(out bool isNewlyRealized);
+                            if (isNewlyRealized || !IsChildRealized(child, insertAt, children))
+                            {
+                                // Add newly created children to the panel
+                                if (insertAt < 0)
+                                {
+                                    InsertInternalChild(0, child);
+                                }
+                                else
+                                {
+                                    InsertInternalChild(insertAt, child);
+                                }
+
+                                generator.PrepareItemContainer(child);
+                            }
+                            else
+                            {
+                                insertAt--;
+                            }
+
+                            child.Measure(childConstraint);
+
+                            Size size = child.DesiredSize;
+                            nvisible++;
+
+                            firstItemInViewportIndex = i;
+
+                            if (isHorizontal)
+                            {
+                                stackDesiredSize.Width += size.Width;
+                                stackDesiredSize.Height = Math.Max(stackDesiredSize.Height, size.Height);
+                                viewportSize += size.Width;
+
+                                if (viewportSize >= constraint.Width)
+                                {
+                                    _firstItemInViewportPixelOffset = viewportSize - constraint.Width;
+                                    numberOfItemsInViewport += 1 - (_firstItemInViewportPixelOffset / size.Width);
+                                    break;
+                                }
+                                else
+                                {
+                                    numberOfItemsInViewport += 1.0;
+                                }
+                            }
+                            else
+                            {
+                                stackDesiredSize.Width = Math.Max(stackDesiredSize.Width, size.Width);
+                                stackDesiredSize.Height += size.Height;
+                                viewportSize += size.Height;
+
+                                if (viewportSize >= constraint.Height)
+                                {
+                                    _firstItemInViewportPixelOffset = viewportSize - constraint.Height;
+                                    numberOfItemsInViewport += 1 - (_firstItemInViewportPixelOffset / size.Height);
+                                    break;
+                                }
+                                else
+                                {
+                                    numberOfItemsInViewport += 1.0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (nvisible > 0)
             {
                 CleanupContainers(owner, firstItemInViewportIndex, nvisible);
@@ -569,6 +666,16 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         }
 
         InRecyclingMode = GetVirtualizationMode(itemsControl) == VirtualizationMode.Recycling;
+    }
+
+    private static bool IsChildRealized(UIElement child, int index, List<UIElement> children)
+    {
+        return index switch
+        {
+            < 0 => false,
+            0 => children[0] == child,
+            _ => children[index - 1] == child || children[index] == child,
+        };
     }
 
     private void CleanupContainers(ItemsControl owner, int firstItemInViewportIndex, int count)
