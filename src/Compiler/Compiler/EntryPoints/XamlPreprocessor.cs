@@ -108,6 +108,9 @@ namespace OpenSilver.Compiler
         [Required]
         public bool VerifyHash { get; set; }
 
+        [Required]
+        public bool IsDesignTime { get; set; }
+
         [Output]
         public ITaskItem[] GeneratedFiles { get; set; }
 
@@ -172,7 +175,7 @@ namespace OpenSilver.Compiler
                 Log.LogMessage($"{operationName} finished after {_watch.ElapsedMilliseconds} ms.");
             }
 
-            return !Log.HasLoggedErrors;
+            return IsDesignTime || !Log.HasLoggedErrors;
         }
 
         private (List<ITaskItem> GeneratedFiles, List<ITaskItem> ProcessedFiles) ProcessFiles(ITaskItem[] sourceFiles)
