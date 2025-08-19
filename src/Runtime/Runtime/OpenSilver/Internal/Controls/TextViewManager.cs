@@ -22,14 +22,17 @@ internal sealed class TextViewManager
 {
     private readonly JavaScriptCallback _inputHandler;
     private readonly JavaScriptCallback _scrollHandler;
+    private readonly JavaScriptCallback _selectionChangeHandler;
 
     private TextViewManager()
     {
         _inputHandler = JavaScriptCallback.Create(OnInputNative);
         _scrollHandler = JavaScriptCallback.Create(OnScrollNative);
+        _selectionChangeHandler = JavaScriptCallback.Create(OnSelectionChangeNative);
         string sInputHandler = Interop.GetVariableStringForJS(_inputHandler);
         string sScrollHandler = Interop.GetVariableStringForJS(_scrollHandler);
-        Interop.ExecuteJavaScriptVoidAsync($"document.createTextviewManager({sInputHandler},{sScrollHandler})");
+        string sSelectionChangeHandler = Interop.GetVariableStringForJS(_selectionChangeHandler);
+        Interop.ExecuteJavaScriptVoidAsync($"document.createTextviewManager({sInputHandler},{sScrollHandler},{sSelectionChangeHandler})");
     }
 
     public static TextViewManager Instance { get; } = new();
@@ -118,6 +121,14 @@ internal sealed class TextViewManager
             double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop");
 
             textview.UpdateOffsets(new Vector(scrollLeft, scrollTop));
+        }
+    }
+
+    private static void OnSelectionChangeNative(string id)
+    {
+        if (INTERNAL_HtmlDomManager.GetElementById(id) is TextBoxView textview)
+        {
+            textview.OnSelectionChange();
         }
     }
 }

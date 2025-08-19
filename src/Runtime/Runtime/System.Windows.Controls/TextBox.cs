@@ -939,10 +939,23 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="SelectionChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent SelectionChangedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(SelectionChanged),
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(TextBox));
+
+        /// <summary>
         /// Occurs when the text selection has changed.
         /// </summary>
-        [OpenSilver.NotImplemented]
-        public event RoutedEventHandler SelectionChanged;
+        public event RoutedEventHandler SelectionChanged
+        {
+            add => AddHandler(SelectionChangedEvent, value);
+            remove => RemoveHandler(SelectionChangedEvent, value);
+        }
 
         /// <summary>
         /// Returns a rectangle for the leading edge of the character at the specified index.

@@ -70,6 +70,8 @@ internal sealed class TextBoxView : TextViewBase
         InvalidateMeasure();
     }
 
+    internal void OnSelectionChange() => Host.RaiseEvent(new RoutedEventArgs(TextBox.SelectionChangedEvent));
+
     internal void SetTextNative(string text)
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)

@@ -1056,7 +1056,7 @@ document.getSystemColor = function (color) {
     return '';
 };
 
-document.createTextviewManager = function (inputCallback, scrollCallback) {
+document.createTextviewManager = function (inputCallback, scrollCallback, selectionChangeCallback) {
     if (document.textviewManager) return;
 
     function getSelectionLength(view) {
@@ -1168,6 +1168,10 @@ document.createTextviewManager = function (inputCallback, scrollCallback) {
 
             view.addEventListener('scroll', function (e) {
                 scrollCallback(id);
+            });
+
+            view.addEventListener('selectionchange', function (e) {
+                selectionChangeCallback(id);
             });
 
             view.addEventListener('paste', function (e) {
