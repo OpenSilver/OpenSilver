@@ -72,7 +72,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             }
 
             TypeDefinition modifierKeysType = _inspector.GetTypeDefinition("System.Windows.Input", "ModifierKeys", "OpenSilver");
-            return string.Join(" | ", _inspector.GetEnumValues(modifierKeysType, modifiersToken, true, true));
+            return string.Join(" ||| ", _inspector.GetEnumValues(modifierKeysType, modifiersToken, true, true));
         }
 
         var sb = new StringBuilder();

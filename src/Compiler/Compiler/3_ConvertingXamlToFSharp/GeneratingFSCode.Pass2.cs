@@ -1796,7 +1796,7 @@ namespace GlobalResource
                         valueLocalTypeName,
                         valueAssemblyName);
 
-                    return string.Join(" | ", _settings.Inspector.GetEnumValues(
+                    return string.Join(" ||| ", _settings.Inspector.GetEnumValues(
                         enumType,
                         value.Trim(),
                         true,
