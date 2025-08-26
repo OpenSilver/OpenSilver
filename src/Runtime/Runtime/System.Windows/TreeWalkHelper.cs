@@ -29,7 +29,7 @@ internal static class TreeWalkHelper
     internal static void InvalidateOnTreeChange<TFrameworkElement>(TFrameworkElement fe, DependencyObject parent, bool isAddOperation)
         where TFrameworkElement : DependencyObject, IInternalFrameworkElement
     {
-        DependencyObject.InvalidateInheritedProperties(fe, fe.Parent ?? fe.VisualParent);
+        InvalidateInheritedProperties(fe);
 
         if (HasChildren(fe))
         {
@@ -51,6 +51,16 @@ internal static class TreeWalkHelper
             // Degenerate case of OnAncestorChanged for a single node
             OnAncestorChanged(fe, parentInfo);
         }
+    }
+
+    private static void InvalidateInheritedProperties<TFrameworkElement>(TFrameworkElement fe)
+        where TFrameworkElement : DependencyObject, IInternalFrameworkElement
+    {
+        DependencyObject parent = fe.Parent ??
+            fe.VisualParent ??
+            FrameworkElement.FindMentor(fe.InheritanceContext)?.AsDependencyObject();
+
+        DependencyObject.InvalidateInheritedProperties(fe, parent);
     }
 
     /// <summary>
