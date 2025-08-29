@@ -152,6 +152,7 @@ namespace OpenSilver.Internal.Xaml
             return null;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
@@ -160,6 +161,7 @@ namespace OpenSilver.Internal.Xaml
             NameScope.SetNameScope(dependencyObject, new NameScope());
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterName(DependencyObject dependencyObject, string name, object scopedElement)
         {
@@ -227,14 +229,30 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void XamlContext_InitializeNameScope(XamlContext context, DependencyObject rootElement)
+        {
+            Debug.Assert(context is not null && rootElement is IFrameworkElement);
+
+            if (rootElement is not INameScope nameScope)
+            {
+                nameScope = NameScope.GetNameScope(rootElement);
+
+                if (nameScope is null)
+                {
+                    nameScope = new NameScope();
+                    NameScope.SetNameScope(rootElement, nameScope);
+                }
+            }
+
+            context.ExternalNameScope = nameScope;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void XamlContext_RegisterName(XamlContext context, string name, object scopedElement)
         {
-            Debug.Assert(context != null && context.ExternalNameScope != null);
+            Debug.Assert(context is not null);
 
-            if (scopedElement is DependencyObject)
-            {
-                context.ExternalNameScope.RegisterName(name, scopedElement);
-            }
+            context.ExternalNameScope?.RegisterName(name, scopedElement);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

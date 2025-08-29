@@ -134,14 +134,7 @@ namespace OpenSilver.Compiler
                 return false;
             }
 
-            if (!XamlPreprocessorOptionsHelpers.TryParse(Options, out _options))
-            {
-                _options = XamlPreprocessorOptions.Auto;
-                if (!string.IsNullOrEmpty(Options))
-                {
-                    Log.LogWarning($"'{Options}' is not a supported xaml preprocessor option (Auto or Optimize).");
-                }
-            }
+            _options = ParseOptions(Options, XamlPreprocessorOptions.Auto);
 
             _watch.Start();
 
@@ -334,6 +327,16 @@ namespace OpenSilver.Compiler
             return new TaskItem(outputFilePath);
         }
 
+        private XamlPreprocessorOptions ParseOptions(string value, XamlPreprocessorOptions fallback)
+        {
+            if (!XamlPreprocessorOptionsHelpers.TryParse(value, out XamlPreprocessorOptions options))
+            {
+                Log.LogWarning($"'{value}' is not a supported xaml preprocessor option (Auto, Optimize or a XPath that evaluates to a node-set).");
+                return fallback;
+            }
+            return options;
+        }
+
         private static bool IsFileOutdated(string xaml, string outputFile)
         {
             // Check if the output file exists:
@@ -393,7 +396,11 @@ namespace OpenSilver.Compiler
         private XamlPreprocessorOptions GetXamlProcessorOptions(ITaskItem item)
         {
             string options = item.GetMetadata("OpenSilverXamlPreprocessorOptions");
-            return XamlPreprocessorOptionsHelpers.TryParse(options, out XamlPreprocessorOptions opts) ? opts : _options;
+            if (string.IsNullOrEmpty(options))
+            {
+                return _options;
+            }
+            return ParseOptions(options, _options);
         }
 
         private static string ReadFileContent(string filePath)

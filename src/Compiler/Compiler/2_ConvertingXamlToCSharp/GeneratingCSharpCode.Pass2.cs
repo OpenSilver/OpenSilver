@@ -12,6 +12,9 @@
 *  
 \*====================================================================================*/
 
+using Mono.Cecil;
+using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,9 +24,6 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using Mono.Cecil;
-using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
-using OpenSilver.Internal;
 
 namespace OpenSilver.Compiler
 {
@@ -54,47 +54,29 @@ namespace OpenSilver.Compiler
 
             private sealed class RootScope : GeneratorScope
             {
-                private readonly Dictionary<string, string> _namescope;
+                private readonly bool _buildNamescope;
 
                 public RootScope(string rootElementName, bool createNameScope)
                     : base(rootElementName)
                 {
+                    _buildNamescope = createNameScope;
+
                     StringBuilder.AppendLine($"var {XamlContext} = {RuntimeHelperClass}.Create_XamlContext();");
                     if (createNameScope)
                     {
-                        _namescope = new Dictionary<string, string>();
+                        StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_InitializeNameScope({XamlContext}, {rootElementName});");
                     }
                 }
 
                 public override void RegisterName(string name, string scopedElement)
                 {
-                    if (_namescope != null)
+                    if (_buildNamescope)
                     {
-                        _namescope.Add(name, scopedElement);
+                        StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement});");
                     }
                 }
 
-                protected override string ToStringCore()
-                {
-                    StringBuilder builder = new StringBuilder();
-
-                    builder.Append(StringBuilder.ToString());
-                    AppendNamescope(builder);
-
-                    return builder.ToString();
-                }
-
-                private void AppendNamescope(StringBuilder builder)
-                {
-                    if (_namescope == null) return;
-
-                    builder.AppendLine($"{RuntimeHelperClass}.InitializeNameScope({Root});");
-
-                    foreach (var kp in _namescope)
-                    {
-                        builder.AppendLine($"{RuntimeHelperClass}.RegisterName({Root}, {EscapeString(kp.Key)}, {kp.Value});");
-                    }
-                }
+                protected override string ToStringCore() => StringBuilder.ToString();
             }
 
             private sealed class NewObjectScope : GeneratorScope
@@ -112,7 +94,7 @@ namespace OpenSilver.Compiler
 
                 public override void RegisterName(string name, string scopedElement)
                 {
-                    throw new NotSupportedException();
+                    StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement});");
                 }
 
                 protected override string ToStringCore()
@@ -172,15 +154,21 @@ namespace OpenSilver.Compiler
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
                 public readonly ComponentConnectorBuilderCS ComponentConnector = new ComponentConnectorBuilderCS();
+                private int _frameworkTemplateCount = 0;
 
                 public bool GenerateFieldsForNamedElements { get; set; }
-
+                public bool IsInsideTemplate => _frameworkTemplateCount > 0;
                 public GeneratorScope CurrentScope => _scopes.Peek();
                 public StringBuilder StringBuilder => CurrentScope.StringBuilder;
 
                 public void PushScope(GeneratorScope scope)
                 {
                     _scopes.Push(scope);
+
+                    if (scope is FrameworkTemplateScope)
+                    {
+                        _frameworkTemplateCount++;
+                    }
                 }
 
                 public void PopScope()
@@ -190,7 +178,14 @@ namespace OpenSilver.Compiler
                         throw new InvalidOperationException();
                     }
 
-                    ResultingMethods.Add(_scopes.Pop().ToString());
+                    GeneratorScope scope = _scopes.Pop();
+
+                    if (scope is FrameworkTemplateScope)
+                    {
+                        _frameworkTemplateCount--;
+                    }
+
+                    ResultingMethods.Add(scope.ToString());
                 }
 
                 public string CurrentXamlContext => CurrentScope.XamlContext;
@@ -198,6 +193,7 @@ namespace OpenSilver.Compiler
 
             private readonly XamlReader _reader;
             private readonly ConversionSettings _settings;
+            private readonly XNodeSelector _nodeSelector;
 
             private readonly string _sourceFile;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
@@ -209,6 +205,7 @@ namespace OpenSilver.Compiler
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
+                _nodeSelector = XNodeSelector.Create(doc, settings.Options);
                 _sourceFile = sourceFile;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
             }
@@ -363,6 +360,21 @@ namespace OpenSilver.Compiler
                     out string localTypeName,
                     out string assemblyNameIfAny);
 
+                // Add the constructor (in case of object) or a direct initialization (in case
+                // of system type or "isInitializeFromString" or referenced ResourceDictionary)
+                // (unless this is the root element)
+                string elementUid = GeneratingCode.GetUniqueName(element);
+
+                if (_nodeSelector.IsMatch(element))
+                {
+                    var objectScope = new NewObjectScope(elementUid, elementType);
+
+                    parameters.StringBuilder.AppendLine(
+                        $"var {elementUid} = {objectScope.MethodName}({parameters.CurrentXamlContext});");
+
+                    parameters.PushScope(objectScope);
+                }
+
                 // Some special cases
                 if (elementType == $"global::{KnownNamespaces.SystemWindows}.EventSetter")
                 {
@@ -374,6 +386,7 @@ namespace OpenSilver.Compiler
                     {
                         if (_reader.NodeType == XamlNodeType.EndObject && _reader.ObjectData.Element == element)
                         {
+                            OnWriteEndObject(parameters);
                             break;
                         }
                     }
@@ -381,30 +394,13 @@ namespace OpenSilver.Compiler
                     return;
                 }
 
-                // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                bool isElementInRootNamescope = GetRootOfCurrentNamescopeForRuntime(element).Parent == null;
-
-                bool isRootElement = IsElementTheRootElement(element);
-                bool isKnownSystemType = _settings.SystemTypes.IsKnownType(
-                    elementType.Substring("global::".Length), assemblyNameIfAny);
-                bool isInitializeTypeFromString =
-                    element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
-
-                // Add the constructor (in case of object) or a direct initialization (in case
-                // of system type or "isInitializeFromString" or referenced ResourceDictionary)
-                // (unless this is the root element)
-                string elementUid = GeneratingCode.GetUniqueName(element);
-
-                bool isInNewScope = false;
-                GeneratorScope rootScope = parameters.CurrentScope;
-
-                if (isRootElement)
+                if (IsElementTheRootElement(element))
                 {
                     parameters.StringBuilder.AppendLine($"_ = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUid});");
                 }
                 else
                 {
-                    if (isKnownSystemType)
+                    if (_settings.SystemTypes.IsKnownType(elementType.Substring("global::".Length), assemblyNameIfAny))
                     {
                         //------------------------------------------------
                         // Add the type initialization from literal value:
@@ -425,7 +421,7 @@ namespace OpenSilver.Compiler
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue});");
                     }
-                    else if (isInitializeTypeFromString)
+                    else if (element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null)
                     {
                         //------------------------------------------------
                         // Add the type initialization from string:
@@ -437,25 +433,13 @@ namespace OpenSilver.Compiler
                             elementType.Substring("global::".Length), assemblyNameIfAny);
 
                         string preparedValue = ConvertFromInvariantString(
-                            stringValue, element, elementType, isKnownCoreType, isKnownSystemType);
+                            stringValue, element, elementType, isKnownCoreType, false);
 
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue});");
                     }
                     else
                     {
-                        if (_settings.Options == XamlPreprocessorOptions.Auto)
-                        {
-                            isInNewScope = true;
-
-                            var objectScope = new NewObjectScope(elementUid, elementType);
-
-                            parameters.StringBuilder.AppendLine(
-                                $"var {elementUid} = {objectScope.MethodName}({parameters.CurrentXamlContext});");
-
-                            parameters.PushScope(objectScope);
-                        }
-
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new {elementType}());");
 
@@ -477,7 +461,7 @@ namespace OpenSilver.Compiler
                 }
 
                 // Set templated parent if any
-                if (rootScope is FrameworkTemplateScope &&
+                if (parameters.IsInsideTemplate &&
                     _settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                 {
                     parameters.StringBuilder.AppendLine(
@@ -525,7 +509,7 @@ namespace OpenSilver.Compiler
                                 string name = attributeValue;
 
                                 // Add the code to register the name, etc.
-                                if (isElementInRootNamescope && parameters.GenerateFieldsForNamedElements)
+                                if (!parameters.IsInsideTemplate && parameters.GenerateFieldsForNamedElements)
                                 {
                                     string fieldModifier = "internal";
                                     XAttribute attr = element.Attribute(GeneratingCode.xNamespace + "FieldModifier");
@@ -558,7 +542,7 @@ namespace OpenSilver.Compiler
                                     }
                                 }
 
-                                rootScope.RegisterName(name, elementUid);
+                                 parameters.CurrentScope.RegisterName(name, elementUid);
                             }
                             else if (string.IsNullOrEmpty(attribute.Name.NamespaceName) || attribute.Name.NamespaceName == element.Name.NamespaceName)
                             {
@@ -752,11 +736,6 @@ namespace OpenSilver.Compiler
                         }
                     }
                 }
-
-                if (isInNewScope)
-                {
-                    parameters.PopScope();
-                }
             }
 
             private void WriteEventSetter(GeneratorContext parameters)
@@ -853,13 +832,16 @@ namespace OpenSilver.Compiler
                     string value = _settings.SystemTypes.ConvertToBoolean(GetAttributeValue(handledEventsTooAttribute));
                     parameters.StringBuilder.AppendLine($"{eventSetterName}.HandledEventsToo = {value};");
                 }
-
-                parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteEndObject({parameters.CurrentXamlContext});");
             }
 
             private void OnWriteEndObject(GeneratorContext parameters)
             {
                 parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteEndObject({parameters.CurrentXamlContext});");
+
+                if (_nodeSelector.IsMatch(_reader.ObjectData.Element))
+                {
+                    parameters.PopScope();
+                }
             }
 
             private void OnWriteStartMember(GeneratorContext parameters)
@@ -1425,30 +1407,6 @@ namespace OpenSilver.Compiler
                         info,
                         ex);
                 }
-            }
-
-            private XElement GetRootOfCurrentNamescopeForRuntime(XElement element)
-            {
-                XElement currentElement = element;
-                while (currentElement.Parent != null)
-                {
-                    int index = currentElement.Parent.Name.LocalName.IndexOf(".");
-                    if (index > -1)
-                    {
-                        string namespaceName = currentElement.Parent.Name.NamespaceName;
-                        string typeName = currentElement.Parent.Name.LocalName.Substring(0, index);
-                        string propertyName = currentElement.Parent.Name.LocalName.Substring(index + 1);
-
-                        if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName))
-                        {
-                            return currentElement;
-                        }
-                    }
-
-                    currentElement = currentElement.Parent;
-                }
-
-                return currentElement;
             }
 
             private bool IsElementTheRootElement(XElement element)

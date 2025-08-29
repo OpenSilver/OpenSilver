@@ -11,12 +11,13 @@
 \*====================================================================================*/
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenSilver.Internal.Xaml.Context;
-using OpenSilver.Internal.Xaml;
-using System.Windows.Markup;
-using System.Windows.Controls;
-using System.Windows.Media;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml;
+using OpenSilver.Internal.Xaml.Context;
+using System.Windows.Controls;
+using System.Windows.Markup;
+using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace System.Windows.Tests
 {
@@ -386,14 +387,15 @@ namespace System.Windows.Tests
 
                 name2.Children.Add(presenter);
 
-                Content = name2;                
+                Content = name2;
 
-                RuntimeHelpers.InitializeNameScope(this);
-                RuntimeHelpers.RegisterName(this, "name1", this);
-                RuntimeHelpers.RegisterName(this, "name2", name2);
-                RuntimeHelpers.RegisterName(this, "name3", name3);
-                RuntimeHelpers.RegisterName(this, "name6", name6);
-                RuntimeHelpers.RegisterName(this, "name7", name7);
+                NameScope nameScope = new NameScope();
+                nameScope.RegisterName("name1", this);
+                nameScope.RegisterName("name2", name2);
+                nameScope.RegisterName("name3", name3);
+                nameScope.RegisterName("name6", name6);
+                nameScope.RegisterName("name7", name7);
+                NameScope.SetNameScope(this, nameScope);
 
                 name3.ApplyTemplate();
                 itemsControl.ApplyTemplate();
@@ -451,8 +453,9 @@ namespace System.Windows.Tests
 
                 Content = grid;
 
-                RuntimeHelpers.InitializeNameScope(this);
-                RuntimeHelpers.RegisterName(this, "uc_name1", grid);
+                NameScope nameScope = new NameScope();
+                nameScope.RegisterName("uc_name1", grid);
+                NameScope.SetNameScope(this, nameScope);
 
                 uc_name1 = grid;
             }
