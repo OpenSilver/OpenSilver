@@ -112,6 +112,7 @@
     <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
     <Compile Include="System.Windows.Input\MouseButtonState.cs" />
     <Compile Include="System.Windows.Media.Animation\ElasticEase.cs" />
+    <Compile Include="System.Windows.Printing\PrintDocument.Async.cs" />
     <Compile Include="System.Windows\AdaptiveTrigger.cs" />
     <Compile Include="System.Windows\AttachedPropertyBrowsableAttribute.cs" />
     <Compile Include="System.Windows\AttachedPropertyBrowsableForChildrenAttribute.cs" />

@@ -13,9 +13,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
-using CSHTML5;
 using CSHTML5.Internal;
 
 namespace System.Windows.Printing
@@ -71,7 +71,66 @@ namespace System.Windows.Printing
                 }
                 else
                 {
-                    LoadNotLoadedElements(() => PrintNative(documentName));
+
+                    LoadNotLoadedElements(() =>
+                    {
+                        _endPrintJSCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(
+                            () =>
+                            {
+                                _endPrintJSCallback = null;
+                                OnEndPrint(new EndPrintEventArgs());
+                                _printDocument.EndPendingOperation();
+                            });
+
+                        PrintNative(documentName);
+                    });
+                }
+            }
+
+            public async Task PrintAsync(string documentName)
+            {
+                await OnBeginPrintAsync(new BeginPrintEventArgs());
+
+                if (_printDocument._printPageAsync != null)
+                {
+                    // In Silverlight PrintPage event is used to get all elements
+                    // that need to be printed.
+                    // In Silverlight it will stop calling PrintPage after Print
+                    // if HasMorePages is false AND PageVisual is null.
+                    // We set a limit to 1000 iterations to avoid infinite loops.
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        var e = new PrintPageEventArgs();
+                        await OnPrintPageAsync(e);
+                        if (e.PageVisual != null)
+                        {
+                            _elements.Add(e.PageVisual);
+                            _printDocument.PrintedPageCount = _elements.Count;
+                            if (!e.HasMorePages)
+                                break;
+                        }
+                    }
+                }
+
+                if (_elements.Count == 0)
+                {
+                    await OnEndPrintAsync(new EndPrintEventArgs());
+                    _printDocument.EndPendingOperation();
+                }
+                else
+                {
+                    LoadNotLoadedElements(() =>
+                    {
+                        _endPrintJSCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(
+                            async () =>
+                            {
+                                _endPrintJSCallback = null;
+                                await OnEndPrintAsync(new EndPrintEventArgs());
+                                _printDocument.EndPendingOperation();
+                            });
+
+                        PrintNative(documentName);
+                    });
                 }
             }
 
@@ -100,17 +159,52 @@ namespace System.Windows.Printing
             private void OnEndPrint(EndPrintEventArgs e)
                 => _printDocument.EndPrint?.Invoke(_printDocument, e);
 
+            private async Task OnBeginPrintAsync(BeginPrintEventArgs e)
+            {
+                var beginPrint = _printDocument._beginPrintAsync;
+                if (beginPrint is null)
+                {
+                    return;
+                }
+
+                foreach (Delegate handler in beginPrint.GetInvocationList())
+                {
+                    await ((Func<object, BeginPrintEventArgs, Task>)handler)(_printDocument, e);
+                }
+            }
+
+            private async Task OnPrintPageAsync(PrintPageEventArgs e)
+            {
+                var printPage = _printDocument._printPageAsync;
+                if (printPage is null)
+                {
+                    return;
+                }
+
+                foreach (Delegate handler in printPage.GetInvocationList())
+                {
+                    await ((Func<object, PrintPageEventArgs, Task>)handler)(_printDocument, e);
+                }
+            }
+
+            private async Task OnEndPrintAsync(EndPrintEventArgs e)
+            {
+                var endPrint = _printDocument._endPrintAsync;
+                if (endPrint is null)
+                {
+                    return;
+                }
+
+                foreach (Delegate handler in endPrint.GetInvocationList())
+                {
+                    await ((Func<object, EndPrintEventArgs, Task>)handler)(_printDocument, e);
+                }
+            }
+
             private void PrintNative(string documentName)
             {
                 AddPrintSection();
 
-                _endPrintJSCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(
-                    () =>
-                    {
-                        _endPrintJSCallback = null;
-                        OnEndPrint(new EndPrintEventArgs());
-                        _printDocument.EndPendingOperation();
-                    });
                 string sPrint = OpenSilver.Interop.GetVariableStringForJS(_printDocumentNative);
                 string sTitle = OpenSilver.Interop.GetVariableStringForJS(documentName);
                 string sCallback = OpenSilver.Interop.GetVariableStringForJS(_endPrintJSCallback);
