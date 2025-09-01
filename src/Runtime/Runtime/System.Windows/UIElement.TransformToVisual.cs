@@ -11,12 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
+using System.Diagnostics;
+using System.Windows.Media;
 
 namespace System.Windows;
 
@@ -171,10 +170,10 @@ public partial class UIElement
 
     private bool TryGetBorderOffsets(UIElement uie, out Point offsets)
     {
-        if (uie is Border border)
+        if (uie is IBorderElement border)
         {
-            Thickness borders = border.BorderThickness;
-            offsets = new Point(borders.Left, borders.Top);
+            Thickness thickness = border.BorderThickness;
+            offsets = new Point(thickness.Left, thickness.Top);
             return true;
         }
 

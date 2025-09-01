@@ -386,9 +386,9 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uniqueIdentifier);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateBorderDomElementAndAppendIt(object parentRef, Border border)
+        internal static INTERNAL_HtmlDomElementReference CreateBorderDomElementAndAppendIt(object parentRef, UIElement border)
         {
-            Debug.Assert(border is not null);
+            Debug.Assert(border is IBorderElement);
 
             string uniqueIdentifier = NewId();
 

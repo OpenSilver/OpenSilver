@@ -26,6 +26,7 @@
     <Compile Include="OpenSilver\Features.cs" />
     <Compile Include="OpenSilver\Internal\Commands\CommandHelpers.cs" />
     <Compile Include="OpenSilver\Internal\CommandLibraryHelper.cs" />
+    <Compile Include="OpenSilver\Internal\Controls\IBorderElement.cs" />
     <Compile Include="OpenSilver\Internal\Controls\IGeneratorHost.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ImageManager.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ScrollExtensions.cs" />

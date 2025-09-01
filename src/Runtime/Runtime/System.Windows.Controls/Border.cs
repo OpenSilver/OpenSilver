@@ -49,7 +49,7 @@ namespace System.Windows.Controls
     /// </code>
     /// </example>
     [ContentProperty(nameof(Child))]
-    public class Border : FrameworkElement
+    public class Border : FrameworkElement, IBorderElement
     {
         private UIElement _child;
         private WeakEventListener<Border, Brush, EventArgs> _backgroundChangedListener;
@@ -356,13 +356,13 @@ namespace System.Windows.Controls
             Size border = HelperCollapseThickness(BorderThickness);
             Size padding = HelperCollapseThickness(Padding);
 
+            // Combine into total decorating size
+            Size combined = new(border.Width + padding.Width, border.Height + padding.Height);
+
             if (Child is UIElement child)
             {
-                // Combine into total decorating size
-                Size combined = new Size(border.Width + padding.Width, border.Height + padding.Height);
-
                 // Remove size of border only from child's reference size.
-                Size childConstraint = new Size(
+                Size childConstraint = new(
                     Math.Max(0.0, availableSize.Width - combined.Width),
                     Math.Max(0.0, availableSize.Height - combined.Height));
 
@@ -371,7 +371,7 @@ namespace System.Windows.Controls
                 return new Size(child.DesiredSize.Width + combined.Width, child.DesiredSize.Height + combined.Height);
             }
 
-            return new Size(border.Width + padding.Width, border.Height + padding.Height);
+            return combined;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -380,7 +380,7 @@ namespace System.Windows.Controls
             if (Child is UIElement child)
             {
                 Thickness borders = BorderThickness;
-                Rect innerRect = new Rect(0, 0,
+                Rect innerRect = new(0, 0,
                     Math.Max(0.0, finalSize.Width - borders.Left - borders.Right),
                     Math.Max(0.0, finalSize.Height - borders.Top - borders.Bottom));
                 Rect childRect = HelperDeflateRect(innerRect, Padding);
@@ -391,10 +391,10 @@ namespace System.Windows.Controls
             return finalSize;
         }
 
-        private static Size HelperCollapseThickness(Thickness th) => new Size(th.Left + th.Right, th.Top + th.Bottom);
+        internal static Size HelperCollapseThickness(Thickness th) => new Size(th.Left + th.Right, th.Top + th.Bottom);
 
         /// Helper to deflate rectangle by thickness
-        private static Rect HelperDeflateRect(Rect rt, Thickness thick) =>
+        internal static Rect HelperDeflateRect(Rect rt, Thickness thick) =>
             new Rect(rt.Left + thick.Left,
                      rt.Top + thick.Top,
                      Math.Max(0.0, rt.Width - thick.Left - thick.Right),
