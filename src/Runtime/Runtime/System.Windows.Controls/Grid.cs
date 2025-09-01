@@ -11,19 +11,23 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Media;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls;
 
 /// <summary>
 /// Defines a flexible grid area that consists of columns and rows.
 /// </summary>
-public class Grid : Panel
+public class Grid : Panel, IBorderElement
 {
+    private WeakEventListener<Grid, Brush, EventArgs> _borderBrushChangedListener;
+
     static Grid()
     {
         DefinitionBase.PrivateSharedSizeScopeProperty.OverrideMetadata(
@@ -332,6 +336,170 @@ public class Grid : Panel
     }
 
     /// <summary>
+    /// Identifies the <see cref="ColumnSpacing"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ColumnSpacingProperty =
+        DependencyProperty.Register(
+            nameof(ColumnSpacing),
+            typeof(double),
+            typeof(Grid),
+            new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+    /// <summary>
+    /// Gets or sets the uniform distance (in pixels) between grid columns.
+    /// </summary>
+    /// <returns>
+    /// The uniform distance (in pixels) between grid columns.
+    /// </returns>
+    public double ColumnSpacing
+    {
+        get => (double)GetValue(ColumnSpacingProperty);
+        set => SetValueInternal(ColumnSpacingProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="RowSpacing"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty RowSpacingProperty =
+        DependencyProperty.Register(
+            nameof(RowSpacing),
+            typeof(double),
+            typeof(Grid),
+            new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+    /// <summary>
+    /// Gets or sets the uniform distance (in pixels) between grid rows.
+    /// </summary>
+    /// <returns>
+    /// The uniform distance (in pixels) between grid rows.
+    /// </returns>
+    public double RowSpacing
+    {
+        get => (double)GetValue(RowSpacingProperty);
+        set => SetValueInternal(RowSpacingProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="Padding"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty PaddingProperty =
+        Border.PaddingProperty.AddOwner(
+            typeof(Grid),
+            new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+    /// <summary>
+    /// Gets or sets the distance between the border and its child object.
+    /// </summary>
+    /// <returns>
+    /// The dimensions of the space between the border and its child as a <see cref="Thickness"/> value.
+    /// </returns>
+    public Thickness Padding
+    {
+        get => (Thickness)GetValue(PaddingProperty);
+        set => SetValueInternal(PaddingProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="BorderBrush"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BorderBrushProperty =
+        Border.BorderBrushProperty.AddOwner(
+            typeof(Grid),
+            new FrameworkPropertyMetadata(null, OnBorderBrushChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Grid)d).SetBorderColor(oldValue as Brush, (Brush)newValue),
+            });
+
+    /// <summary>
+    /// Gets or sets a brush that describes the border fill of the panel.
+    /// </summary>
+    /// <returns>
+    /// The brush that is used to fill the panel's border. The default is null, which is evaluated as
+    /// <see cref="Colors.Transparent"/> for rendering.
+    /// </returns>
+    public Brush BorderBrush
+    {
+        get => (Brush)GetValue(BorderBrushProperty);
+        set => SetValueInternal(BorderBrushProperty, value);
+    }
+
+    private static void OnBorderBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var panel = (Grid)d;
+
+        if (panel._borderBrushChangedListener != null)
+        {
+            panel._borderBrushChangedListener.Detach();
+            panel._borderBrushChangedListener = null;
+        }
+
+        if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
+        {
+            panel._borderBrushChangedListener = new(panel, newBrush)
+            {
+                OnEventAction = static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
+                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+            };
+            newBrush.Changed += panel._borderBrushChangedListener.OnEvent;
+        }
+    }
+
+    private void OnBorderBrushChanged(object sender, EventArgs e)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            var brush = (Brush)sender;
+            this.SetBorderColor(brush, brush);
+        }
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="BorderThickness"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BorderThicknessProperty =
+        Border.BorderThicknessProperty.AddOwner(
+            typeof(Grid),
+            new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Grid)d).SetBorderWidth((Thickness)newValue),
+            });
+
+    /// <summary>
+    /// Gets or sets the border thickness of the panel.
+    /// </summary>
+    /// <returns>
+    /// The border thickness of the panel, as a <see cref="Thickness"/> value.
+    /// </returns>
+    public Thickness BorderThickness
+    {
+        get => (Thickness)GetValue(BorderThicknessProperty);
+        set => SetValueInternal(BorderThicknessProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="CornerRadius"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty CornerRadiusProperty =
+        Border.CornerRadiusProperty.AddOwner(
+            typeof(Grid),
+            new FrameworkPropertyMetadata(new CornerRadius())
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Grid)d).SetBorderRadius((CornerRadius)newValue),
+            });
+
+    /// <summary>
+    /// Gets or sets the radius for the corners of the panel's border.
+    /// </summary>
+    /// <returns>
+    /// The degree to which the corners are rounded, expressed as values of the <see cref="Windows.CornerRadius"/> structure.
+    /// </returns>
+    public CornerRadius CornerRadius
+    {
+        get => (CornerRadius)GetValue(CornerRadiusProperty);
+        set => SetValueInternal(CornerRadiusProperty, value);
+    }
+
+    /// <summary>
     /// Gets a <see cref="ColumnDefinitionCollection"/> defined on this instance of <see cref="Grid"/>.
     /// </summary>
     /// <returns>
@@ -365,6 +533,12 @@ public class Grid : Panel
         }
     }
 
+    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    {
+        domElementWhereToPlaceChildren = null;
+        return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parentRef, this);
+    }
+
     /// <summary>
     /// Measures the children of a <see cref="Grid"/> in anticipation of arranging them during the <see cref="ArrangeOverride(Size)"/> pass.
     /// </summary>
@@ -377,6 +551,15 @@ public class Grid : Panel
     protected override Size MeasureOverride(Size constraint)
     {
         Size gridDesiredSize;
+
+        Size border = Border.HelperCollapseThickness(BorderThickness);
+        Size padding = Border.HelperCollapseThickness(Padding);
+        Size combined = new(border.Width + padding.Width, border.Height + padding.Height);
+
+        Size innerAvailableSize = new(
+            Math.Max(0.0, constraint.Width - combined.Width),
+            Math.Max(0.0, constraint.Height - combined.Height));
+
         ExtendedData extData = ExtData;
 
         try
@@ -392,15 +575,15 @@ public class Grid : Panel
                 for (int i = 0, count = children.Count; i < count; ++i)
                 {
                     UIElement child = children[i];
-                    child.Measure(constraint);
+                    child.Measure(innerAvailableSize);
                     gridDesiredSize.Width = Math.Max(gridDesiredSize.Width, child.DesiredSize.Width);
                     gridDesiredSize.Height = Math.Max(gridDesiredSize.Height, child.DesiredSize.Height);
                 }
             }
             else
             {
-                bool sizeToContentU = double.IsPositiveInfinity(constraint.Width);
-                bool sizeToContentV = double.IsPositiveInfinity(constraint.Height);
+                bool sizeToContentU = double.IsPositiveInfinity(innerAvailableSize.Width);
+                bool sizeToContentV = double.IsPositiveInfinity(innerAvailableSize.Height);
 
                 // Clear index information and rounding errors
                 if (RowDefinitionCollectionDirty || ColumnDefinitionCollectionDirty)
@@ -433,6 +616,13 @@ public class Grid : Panel
 
                 SizeToContentU = sizeToContentU;
                 SizeToContentV = sizeToContentV;
+
+                double rowSpacing = RowSpacing;
+                double columnSpacing = ColumnSpacing;
+                double combinedRowSpacing = rowSpacing * (DefinitionsV.Count - 1);
+                double combinedColumnSpacing = columnSpacing * (DefinitionsU.Count - 1);
+                innerAvailableSize.Width -= combinedColumnSpacing;
+                innerAvailableSize.Height -= combinedRowSpacing;
 
                 ValidateCells();
 
@@ -588,7 +778,7 @@ public class Grid : Panel
                 //      appears in Auto column.
                 //
 
-                MeasureCellsGroup(extData.CellGroup1, constraint, false, false);
+                MeasureCellsGroup(extData.CellGroup1, innerAvailableSize, rowSpacing, columnSpacing, false, false);
 
                 //  after Group1 is measured,  only Group3 may have cells belonging to Auto rows.
                 bool canResolveStarsV = !HasGroup3CellsInAutoRows;
@@ -597,14 +787,14 @@ public class Grid : Panel
                 {
                     if (HasStarCellsV)
                     {
-                        ResolveStar(DefinitionsV, constraint.Height);
+                        ResolveStar(DefinitionsV, innerAvailableSize.Height);
                     }
-                    MeasureCellsGroup(extData.CellGroup2, constraint, false, false);
+                    MeasureCellsGroup(extData.CellGroup2, innerAvailableSize, rowSpacing, columnSpacing, false, false);
                     if (HasStarCellsU)
                     {
-                        ResolveStar(DefinitionsU, constraint.Width);
+                        ResolveStar(DefinitionsU, innerAvailableSize.Width);
                     }
-                    MeasureCellsGroup(extData.CellGroup3, constraint, false, false);
+                    MeasureCellsGroup(extData.CellGroup3, innerAvailableSize, rowSpacing, columnSpacing, false, false);
                 }
                 else
                 {
@@ -615,12 +805,12 @@ public class Grid : Panel
                     {
                         if (HasStarCellsU)
                         {
-                            ResolveStar(DefinitionsU, constraint.Width);
+                            ResolveStar(DefinitionsU, innerAvailableSize.Width);
                         }
-                        MeasureCellsGroup(extData.CellGroup3, constraint, false, false);
+                        MeasureCellsGroup(extData.CellGroup3, innerAvailableSize, rowSpacing, columnSpacing, false, false);
                         if (HasStarCellsV)
                         {
-                            ResolveStar(DefinitionsV, constraint.Height);
+                            ResolveStar(DefinitionsV, innerAvailableSize.Height);
                         }
                     }
                     else
@@ -637,7 +827,7 @@ public class Grid : Panel
                         double[] group2MinSizes = CacheMinSizes(extData.CellGroup2, false);
                         double[] group3MinSizes = CacheMinSizes(extData.CellGroup3, true);
 
-                        MeasureCellsGroup(extData.CellGroup2, constraint, false, true);
+                        MeasureCellsGroup(extData.CellGroup2, innerAvailableSize, rowSpacing, columnSpacing, false, true);
 
                         do
                         {
@@ -649,32 +839,37 @@ public class Grid : Panel
 
                             if (HasStarCellsU)
                             {
-                                ResolveStar(DefinitionsU, constraint.Width);
+                                ResolveStar(DefinitionsU, innerAvailableSize.Width);
                             }
-                            MeasureCellsGroup(extData.CellGroup3, constraint, false, false);
+                            MeasureCellsGroup(extData.CellGroup3, innerAvailableSize, rowSpacing, columnSpacing, false, false);
 
                             // Reset cached Group2Widths
                             ApplyCachedMinSizes(group2MinSizes, false);
 
                             if (HasStarCellsV)
                             {
-                                ResolveStar(DefinitionsV, constraint.Height);
+                                ResolveStar(DefinitionsV, innerAvailableSize.Height);
                             }
-                            MeasureCellsGroup(extData.CellGroup2, constraint, cnt == c_layoutLoopMaxCount, false, out hasDesiredSizeUChanged);
+                            MeasureCellsGroup(extData.CellGroup2, innerAvailableSize, rowSpacing, columnSpacing, cnt == c_layoutLoopMaxCount, false, out hasDesiredSizeUChanged);
                         }
                         while (hasDesiredSizeUChanged && ++cnt <= c_layoutLoopMaxCount);
                     }
                 }
 
-                MeasureCellsGroup(extData.CellGroup4, constraint, false, false);
+                MeasureCellsGroup(extData.CellGroup4, innerAvailableSize, rowSpacing, columnSpacing, false, false);
 
-                gridDesiredSize = new Size(CalculateDesiredSize(DefinitionsU), CalculateDesiredSize(DefinitionsV));
+                gridDesiredSize = new Size(
+                    CalculateDesiredSize(DefinitionsU) + combinedColumnSpacing,
+                    CalculateDesiredSize(DefinitionsV) + combinedRowSpacing);
             }
         }
         finally
         {
             MeasureOverrideInProgress = false;
         }
+
+        gridDesiredSize.Width += combined.Width;
+        gridDesiredSize.Height += combined.Height;
 
         return gridDesiredSize;
     }
@@ -690,6 +885,12 @@ public class Grid : Panel
     /// </returns>
     protected override Size ArrangeOverride(Size arrangeSize)
     {
+        Thickness borders = BorderThickness;
+        Rect paddingBox = new(0, 0,
+            Math.Max(0.0, arrangeSize.Width - borders.Left - borders.Right),
+            Math.Max(0.0, arrangeSize.Height - borders.Top - borders.Bottom));
+        Rect innerRect = Border.HelperDeflateRect(paddingBox, Padding);
+
         try
         {
             ArrangeOverrideInProgress = true;
@@ -701,15 +902,20 @@ public class Grid : Panel
                 for (int i = 0, count = children.Count; i < count; ++i)
                 {
                     UIElement child = children[i];
-                    child.Arrange(new Rect(arrangeSize));
+                    child.Arrange(innerRect);
                 }
             }
             else
             {
                 Debug.Assert(DefinitionsU.Count > 0 && DefinitionsV.Count > 0);
 
-                SetFinalSize(DefinitionsU, arrangeSize.Width, true);
-                SetFinalSize(DefinitionsV, arrangeSize.Height, false);
+                double rowSpacing = RowSpacing;
+                double columnSpacing = ColumnSpacing;
+                double combinedRowSpacing = rowSpacing * (DefinitionsV.Count - 1);
+                double combinedColumnSpacing = columnSpacing * (DefinitionsU.Count - 1);
+
+                SetFinalSize(DefinitionsU, innerRect.Width - combinedColumnSpacing, true);
+                SetFinalSize(DefinitionsV, innerRect.Height - combinedRowSpacing, false);
 
                 List<UIElement> children = InternalChildren;
 
@@ -722,11 +928,14 @@ public class Grid : Panel
                     int columnSpan = PrivateCells[currentCell].ColumnSpan;
                     int rowSpan = PrivateCells[currentCell].RowSpan;
 
+                    double offsetU = columnIndex == 0 ? 0.0 : DefinitionsU[columnIndex].FinalOffset;
+                    double offsetV = rowIndex == 0 ? 0.0 : DefinitionsV[rowIndex].FinalOffset;
+
                     var cellRect = new Rect(
-                        columnIndex == 0 ? 0.0 : DefinitionsU[columnIndex].FinalOffset,
-                        rowIndex == 0 ? 0.0 : DefinitionsV[rowIndex].FinalOffset,
-                        GetFinalSizeForRange(DefinitionsU, columnIndex, columnSpan),
-                        GetFinalSizeForRange(DefinitionsV, rowIndex, rowSpan));
+                        offsetU + innerRect.X + (columnSpacing * columnIndex),
+                        offsetV + innerRect.Y + (rowSpacing * rowIndex),
+                        GetFinalSizeForRange(DefinitionsU, columnIndex, columnSpan, columnSpacing),
+                        GetFinalSizeForRange(DefinitionsV, rowIndex, rowSpan, rowSpacing));
 
                     cell.Arrange(cellRect);
                 }
@@ -1145,10 +1354,12 @@ public class Grid : Panel
     private void MeasureCellsGroup(
         int cellsHead,
         Size referenceSize,
+        double rowSpacing,
+        double columnSpacing,
         bool ignoreDesiredSizeU,
         bool forceInfinityV)
     {
-        MeasureCellsGroup(cellsHead, referenceSize, ignoreDesiredSizeU, forceInfinityV, out _);
+        MeasureCellsGroup(cellsHead, referenceSize, rowSpacing, columnSpacing, ignoreDesiredSizeU, forceInfinityV, out _);
     }
 
     /// <summary>
@@ -1157,6 +1368,8 @@ public class Grid : Panel
     /// <param name="cellsHead">Head index of the cells chain.</param>
     /// <param name="referenceSize">Reference size for spanned cells
     /// calculations.</param>
+    /// <param name="rowSpacing">Space in pixels between rows.</param>
+    /// <param name="columnSpacing">Space in pixels between columns.</param>
     /// <param name="ignoreDesiredSizeU">When "true" cells' desired
     /// width is not registered in columns.</param>
     /// <param name="forceInfinityV">Passed through to MeasureCell.
@@ -1165,6 +1378,8 @@ public class Grid : Panel
     private void MeasureCellsGroup(
         int cellsHead,
         Size referenceSize,
+        double rowSpacing,
+        double columnSpacing,
         bool ignoreDesiredSizeU,
         bool forceInfinityV,
         out bool hasDesiredSizeUChanged)
@@ -1185,7 +1400,7 @@ public class Grid : Panel
         {
             double oldWidth = children[i].DesiredSize.Width;
 
-            MeasureCell(i, forceInfinityV);
+            MeasureCell(i, forceInfinityV, rowSpacing, columnSpacing);
 
             hasDesiredSizeUChanged |= !DoubleUtil.AreClose(oldWidth, children[i].DesiredSize.Width);
 
@@ -1239,6 +1454,7 @@ public class Grid : Panel
                         DefinitionsU,
                         key.Start,
                         key.Count,
+                        columnSpacing,
                         requestedSize,
                         referenceSize.Width);
                 }
@@ -1248,6 +1464,7 @@ public class Grid : Panel
                         DefinitionsV,
                         key.Start,
                         key.Count,
+                        rowSpacing,
                         requestedSize,
                         referenceSize.Height);
                 }
@@ -1286,9 +1503,13 @@ public class Grid : Panel
     /// <param name="cell">Index of the cell to measure.</param>
     /// <param name="forceInfinityV">If "true" then cell is always
     /// calculated to infinite height.</param>
+    /// <param name="rowSpacing">Space in pixels between rows.</param>
+    /// <param name="columnSpacing">Space in pixels between columns.</param>
     private void MeasureCell(
         int cell,
-        bool forceInfinityV)
+        bool forceInfinityV,
+        double rowSpacing,
+        double columnSpacing)
     {
         double cellMeasureWidth;
         double cellMeasureHeight;
@@ -1306,7 +1527,8 @@ public class Grid : Panel
             cellMeasureWidth = GetMeasureSizeForRange(
                                     DefinitionsU,
                                     PrivateCells[cell].ColumnIndex,
-                                    PrivateCells[cell].ColumnSpan);
+                                    PrivateCells[cell].ColumnSpan,
+                                    columnSpacing);
         }
 
         if (forceInfinityV)
@@ -1325,7 +1547,8 @@ public class Grid : Panel
             cellMeasureHeight = GetMeasureSizeForRange(
                                     DefinitionsV,
                                     PrivateCells[cell].RowIndex,
-                                    PrivateCells[cell].RowSpan);
+                                    PrivateCells[cell].RowSpan,
+                                    rowSpacing);
         }
 
         UIElement child = InternalChildren[cell];
@@ -1339,6 +1562,7 @@ public class Grid : Panel
     /// <param name="definitions">Source array of definitions to read values from.</param>
     /// <param name="start">Starting index of the range.</param>
     /// <param name="count">Number of definitions included in the range.</param>
+    /// <param name="spacing">Space in pixels between each definitions</param>
     /// <returns>Calculated measure size.</returns>
     /// <remarks>
     /// For "Auto" definitions MinWidth is used in place of PreferredSize.
@@ -1346,7 +1570,8 @@ public class Grid : Panel
     private double GetMeasureSizeForRange<T>(
         List<T> definitions,
         int start,
-        int count)
+        int count,
+        double spacing)
         where T : DefinitionBase
     {
         Debug.Assert(0 < count && 0 <= start && (start + count) <= definitions.Count);
@@ -1360,6 +1585,8 @@ public class Grid : Panel
                 ? definitions[i].MinSize
                 : definitions[i].MeasureSize;
         } while (--i >= start);
+
+        measureSize += spacing * (count - 1);
 
         return measureSize;
     }
@@ -1393,20 +1620,26 @@ public class Grid : Panel
     /// <summary>
     /// Distributes min size back to definition array's range.
     /// </summary>
+    /// <param name="definitions">Definition array receiving distribution.</param>
     /// <param name="start">Start of the range.</param>
     /// <param name="count">Number of items in the range.</param>
-    /// <param name="requestedSize">Minimum size that should "fit" into the definitions range.</param>
-    /// <param name="definitions">Definition array receiving distribution.</param>
+    /// <param name="spacing">Space in pixels between definitions.</param>
+    /// <param name="childDesiredSize">Minimum size that should "fit" into the definitions range.</param>
     /// <param name="percentReferenceSize">Size used to resolve percentages.</param>
     private void EnsureMinSizeInDefinitionRange<T>(
         List<T> definitions,
         int start,
         int count,
-        double requestedSize,
+        double spacing,
+        double childDesiredSize,
         double percentReferenceSize)
         where T : DefinitionBase
     {
         Debug.Assert(1 < count && 0 <= start && (start + count) <= definitions.Count);
+
+        // The spacing between definitions that this element spans through must not
+        // be distributed.
+        double requestedSize = Math.Max(childDesiredSize - spacing * (count - 1), 0.0f);
 
         //  avoid processing when asked to distribute "0"
         if (!IsZero(requestedSize))
@@ -2459,11 +2692,13 @@ public class Grid : Panel
     /// <param name="definitions">Array of definitions to process.</param>
     /// <param name="start">Start of the range.</param>
     /// <param name="count">Number of items in the range.</param>
+    /// <param name="spacing">Space in pixels between definitions.</param>
     /// <returns>Final size.</returns>
     private double GetFinalSizeForRange<T>(
         List<T> definitions,
         int start,
-        int count)
+        int count,
+        double spacing)
         where T : DefinitionBase
     {
         double size = 0;
@@ -2473,6 +2708,8 @@ public class Grid : Panel
         {
             size += definitions[i].SizeCache;
         } while (--i >= start);
+
+        size += spacing * (count - 1);
 
         return size;
     }
