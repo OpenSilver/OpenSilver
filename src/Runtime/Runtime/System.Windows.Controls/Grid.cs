@@ -824,8 +824,15 @@ public class Grid : Panel, IBorderElement
                         int cnt = 0;
 
                         // Cache Group2MinWidths & Group3MinHeights
-                        double[] group2MinSizes = CacheMinSizes(extData.CellGroup2, false);
-                        double[] group3MinSizes = CacheMinSizes(extData.CellGroup3, true);
+                        Span<double> group2MinSizes = DefinitionsU.Count <= 128 ?
+                            stackalloc double[DefinitionsU.Count] :
+                            new double[DefinitionsU.Count];
+                        Span<double> group3MinSizes = DefinitionsV.Count <= 128 ?
+                            stackalloc double[DefinitionsV.Count] :
+                            new double[DefinitionsV.Count];
+
+                        CacheMinSizes(group2MinSizes, extData.CellGroup2, false);
+                        CacheMinSizes(group3MinSizes, extData.CellGroup3, true);
 
                         MeasureCellsGroup(extData.CellGroup2, innerAvailableSize, rowSpacing, columnSpacing, false, true);
 
@@ -1306,10 +1313,8 @@ public class Grid : Panel, IBorderElement
         }
     }
 
-    private double[] CacheMinSizes(int cellsHead, bool isRows)
+    private void CacheMinSizes(Span<double> minSizes, int cellsHead, bool isRows)
     {
-        double[] minSizes = isRows ? new double[DefinitionsV.Count] : new double[DefinitionsU.Count];
-
         for (int j = 0; j < minSizes.Length; j++)
         {
             minSizes[j] = -1;
@@ -1329,11 +1334,9 @@ public class Grid : Panel, IBorderElement
 
             i = PrivateCells[i].Next;
         } while (i < PrivateCells.Length);
-
-        return minSizes;
     }
 
-    private void ApplyCachedMinSizes(double[] minSizes, bool isRows)
+    private void ApplyCachedMinSizes(Span<double> minSizes, bool isRows)
     {
         for (int i = 0; i < minSizes.Length; i++)
         {
