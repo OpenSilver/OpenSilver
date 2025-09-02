@@ -1051,6 +1051,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; already belongs to another &apos;{1}&apos;..
+        /// </summary>
+        internal static string GridCollection_InOtherCollection {
+            get {
+                return ResourceManager.GetString("GridCollection_InOtherCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Handler type is mismatched..
         /// </summary>
         internal static string HandlerTypeIllegal {

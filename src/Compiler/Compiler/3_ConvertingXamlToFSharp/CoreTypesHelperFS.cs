@@ -1014,6 +1014,54 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         };
     }
 
+    public override string ConvertToRowDefinitionCollection(XElement context, string source)
+    {
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        var sb = new StringBuilder();
+
+        sb.AppendLine();
+        sb.AppendLine("                let collection = global.System.Windows.Controls.RowDefinitionCollection()");
+        if (split != null && split.Length > 0)
+        {
+            for (int i = 0; i < split.Length; i++)
+            {
+                string value = split[i];
+                sb.AppendLine($"                let row{i} = global.System.Windows.Controls.RowDefinition()");
+                sb.AppendLine($"                row{i}.Height <- {ConvertToGridLength(context, value)}");
+                sb.AppendLine($"                collection.Add(row{i})");
+            }
+        }
+
+        sb.Append("                collection");
+
+        return sb.ToString();
+    }
+
+    public override string ConvertToColumnDefinitionCollection(XElement context, string source)
+    {
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        var sb = new StringBuilder();
+
+        sb.AppendLine();
+        sb.AppendLine("                let collection = global.System.Windows.Controls.ColumnDefinitionCollection()");
+        if (split != null && split.Length > 0)
+        {
+            for (int i = 0; i < split.Length; i++)
+            {
+                string value = split[i];
+                sb.AppendLine($"                let column{i} = global.System.Windows.Controls.ColumnDefinition()");
+                sb.AppendLine($"                column{i}.Width <- {ConvertToGridLength(context, value)}");
+                sb.AppendLine($"                collection.Add(column{i})");
+            }
+        }
+
+        sb.Append("                collection");
+
+        return sb.ToString();
+    }
+
     private static string Escape(string s)
     {
         return string.Concat("@\"", s.Replace("\"", "\"\""), "\"");

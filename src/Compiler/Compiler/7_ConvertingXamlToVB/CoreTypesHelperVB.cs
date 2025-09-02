@@ -1003,6 +1003,58 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
         };
     }
 
+    public override string ConvertToRowDefinitionCollection(XElement context, string source)
+    {
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        if (split.Length == 0)
+        {
+            return "New Global.System.Windows.Controls.RowDefinitionCollection()";
+        }
+
+        var sb = new StringBuilder();
+
+        sb.Append("New Global.System.Windows.Controls.RowDefinitionCollection() From ");
+        sb.Append("{");
+
+        sb.Append($"New Global.System.Windows.Controls.RowDefinition() With {{ .Height = {ConvertToGridLength(context, split[0])} }}");
+        for (int i = 1; i < split.Length; i++)
+        {
+            sb.Append(", ")
+              .Append($"New Global.System.Windows.Controls.RowDefinition() With {{ .Height = {ConvertToGridLength(context, split[i])} }}");
+        }
+
+        sb.Append("}");
+
+        return sb.ToString();
+    }
+
+    public override string ConvertToColumnDefinitionCollection(XElement context, string source)
+    {
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        if (split.Length == 0)
+        {
+            return "New Global.System.Windows.Controls.ColumnDefinitionCollection()";
+        }
+
+        var sb = new StringBuilder();
+
+        sb.Append("New Global.System.Windows.Controls.ColumnDefinitionCollection() From ");
+        sb.Append("{");
+
+        sb.Append($"New Global.System.Windows.Controls.ColumnDefinition() With {{ .Width = {ConvertToGridLength(context, split[0])} }}");
+        for (int i = 1; i < split.Length; i++)
+        {
+            sb.Append(", ")
+              .Append($"New Global.System.Windows.Controls.ColumnDefinition() With {{ .Width = {ConvertToGridLength(context, split[i])} }}");
+        }
+
+        sb.Append("}");
+
+        return sb.ToString();
+    }
+
     private static string Escape(string s)
     {
         return string.Concat("\"", s.Replace("\"", "\"\""), "\"");

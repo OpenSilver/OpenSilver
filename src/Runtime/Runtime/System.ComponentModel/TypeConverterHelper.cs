@@ -17,8 +17,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -333,7 +334,7 @@ namespace System.ComponentModel
             var geometryConverter = new GeometryConverter();
             var transformConverter = new TransformConverter();
 
-            return new Dictionary<Type, TypeConverter>(35)
+            return new Dictionary<Type, TypeConverter>(37)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(ModifierKeys)] = new ModifierKeysConverter(),
@@ -372,6 +373,8 @@ namespace System.ComponentModel
                 [typeof(FontStretch)] = new FontStretchConverter(),
                 [typeof(Vector)] = new VectorConverter(),
                 [typeof(ResponsiveThreshold)] = new ResponsiveThresholdConverter(),
+                [typeof(RowDefinitionCollection)] = new RowDefinitionCollectionConverter(),
+                [typeof(ColumnDefinitionCollection)] = new ColumnDefinitionCollectionConverter(),
             };
         }
 

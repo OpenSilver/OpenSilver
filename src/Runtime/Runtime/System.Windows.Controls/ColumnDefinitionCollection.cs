@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 using System.Diagnostics;
 using OpenSilver.Internal;
 
@@ -19,15 +20,67 @@ namespace System.Windows.Controls;
 /// <summary>
 /// Provides access to an ordered, strongly typed collection of <see cref="ColumnDefinition"/> objects.
 /// </summary>
+[TypeConverter(typeof(ColumnDefinitionCollectionConverter))]
 public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection<ColumnDefinition>
 {
-    private readonly Grid _owner;
+    private Grid _owner;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ColumnDefinitionCollection"/> class.
+    /// </summary>
+    public ColumnDefinitionCollection() { }
 
     internal ColumnDefinitionCollection(Grid owner)
     {
         Debug.Assert(owner is not null);
         _owner = owner;
         PrivateOnModified();
+    }
+
+    internal Grid Owner
+    {
+        get => _owner;
+        set
+        {
+            if (_owner == value)
+            {
+                return;
+            }
+
+            if (_owner is null)
+            {
+                if (value.RowDefinitions.Count > 0)
+                {
+                    throw new ArgumentException(
+                        string.Format(Strings.GridCollection_InOtherCollection, nameof(Grid), nameof(ColumnDefinitionCollection)));
+                }
+
+                _owner = value;
+                PrivateOnModified();
+                for (int i = 0; i < InternalItems.Count; i++)
+                {
+                    DefinitionBase item = InternalItems[i];
+                    SetParent(item);
+                    item.OnEnterParentTree();
+                }
+            }
+            else if (value is null)
+            {
+                PrivateOnModified();
+                for (int i = 0; i < InternalItems.Count; i++)
+                {
+                    DefinitionBase item = InternalItems[i];
+                    item.OnExitParentTree();
+                    ClearParent(item);
+                }
+                _owner = null;
+            }
+            else
+            {
+                throw new ArgumentException(
+                    string.Format(Strings.GridCollection_InOtherCollection, nameof(ColumnDefinitionCollection), nameof(Grid)));
+            }
+        }
     }
 
     internal override bool IsReadOnlyImpl => AreDefinitionsLocked();
@@ -141,20 +194,23 @@ public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection
     /// </summary>
     private void PrivateOnModified()
     {
-        _owner.ColumnDefinitionCollectionDirty = true;
-        _owner.Invalidate();
+        if (_owner is Grid owner)
+        {
+            owner.ColumnDefinitionCollectionDirty = true;
+            owner.Invalidate();
+        }
     }
 
     private void SetParent(DefinitionBase value)
     {
         value.Parent = _owner;
-        _owner.ProvideSelfAsInheritanceContext(value, null);
+        _owner?.ProvideSelfAsInheritanceContext(value, null);
     }
 
     private void ClearParent(DefinitionBase value)
     {
         value.Parent = null;
-        _owner.RemoveSelfAsInheritanceContext(value, null);
+        _owner?.RemoveSelfAsInheritanceContext(value, null);
     }
 
     private void VerifyWriteAccess()
@@ -165,5 +221,5 @@ public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection
         }
     }
 
-    private bool AreDefinitionsLocked() => _owner.MeasureOverrideInProgress || _owner.ArrangeOverrideInProgress;
+    private bool AreDefinitionsLocked() => _owner is Grid owner && (owner.MeasureOverrideInProgress || owner.ArrangeOverrideInProgress);
 }

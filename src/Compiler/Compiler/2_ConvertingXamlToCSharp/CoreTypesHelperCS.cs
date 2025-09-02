@@ -1001,6 +1001,52 @@ internal sealed class CoreTypesConverterCS : CoreTypesConverter
         };
     }
 
+    public override string ConvertToRowDefinitionCollection(XElement context, string source)
+    {
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        var sb = new StringBuilder();
+
+        sb.Append("new global::System.Windows.Controls.RowDefinitionCollection()");
+
+        if (split.Length > 0)
+        {
+            sb.Append("{");
+
+            for (int i = 0; i < split.Length; i++)
+            {
+                sb.Append($"new global::System.Windows.Controls.RowDefinition() {{ Height = {ConvertToGridLength(context, split[i])} }}, ");
+            }
+
+            sb.Append("}");
+        }
+
+        return sb.ToString();
+    }
+
+    public override string ConvertToColumnDefinitionCollection(XElement context, string source)
+    {
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        var sb = new StringBuilder();
+
+        sb.Append("new global::System.Windows.Controls.ColumnDefinitionCollection()");
+
+        if (split.Length > 0)
+        {
+            sb.Append("{");
+
+            for (int i = 0; i < split.Length; i++)
+            {
+                sb.Append($"new global::System.Windows.Controls.ColumnDefinition() {{ Width = {ConvertToGridLength(context, split[i])} }}, ");
+            }
+
+            sb.Append("}");
+        }
+
+        return sb.ToString();
+    }
+
     private static string Escape(string s)
     {
         return string.Concat("@\"", s.Replace("\"", "\"\""), "\"");

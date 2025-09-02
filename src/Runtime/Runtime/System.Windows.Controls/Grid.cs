@@ -514,6 +514,34 @@ public class Grid : Panel, IBorderElement
 
             return _data.ColumnDefinitions;
         }
+        set
+        {
+            if (value?.Owner is not null)
+            {
+                if (value.Owner == this)
+                {
+                    return;
+                }
+
+                throw new ArgumentException(
+                    string.Format(Strings.GridCollection_InOtherCollection, nameof(value), nameof(ColumnDefinitionCollection)));
+            }
+
+            _data ??= new ExtendedData();
+
+            if (_data.ColumnDefinitions is ColumnDefinitionCollection columnDefinitions)
+            {
+                columnDefinitions.Owner = null;
+            }
+
+            _data.ColumnDefinitions = null;
+
+            if (value is not null)
+            {
+                value.Owner = this;
+                _data.ColumnDefinitions = value;
+            }
+        }
     }
 
     /// <summary>
@@ -530,6 +558,34 @@ public class Grid : Panel, IBorderElement
             _data.RowDefinitions ??= new(this);
 
             return _data.RowDefinitions;
+        }
+        set
+        {
+            if (value?.Owner is not null)
+            {
+                if (value.Owner == this)
+                {
+                    return;
+                }
+
+                throw new ArgumentException(
+                    string.Format(Strings.GridCollection_InOtherCollection, nameof(value), nameof(RowDefinitionCollection)));
+            }
+
+            _data ??= new ExtendedData();
+
+            if (_data.RowDefinitions is RowDefinitionCollection rowDefinitions)
+            {
+                rowDefinitions.Owner = null;
+            }
+
+            _data.RowDefinitions = null;
+
+            if (value is not null)
+            {
+                value.Owner = this;
+                _data.RowDefinitions = value;
+            }
         }
     }
 

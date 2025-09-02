@@ -111,6 +111,8 @@
     <Compile Include="OpenSilver\Internal\ComponentModel\PropertyKey.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterAttribute.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
+    <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
+    <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Input\MouseButtonState.cs" />
     <Compile Include="System.Windows.Media.Animation\ElasticEase.cs" />
     <Compile Include="System.Windows.Printing\PrintDocument.Async.cs" />

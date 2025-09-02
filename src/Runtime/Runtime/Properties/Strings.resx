@@ -449,6 +449,9 @@
   <data name="GridCollection_CannotModifyReadOnly" xml:space="preserve">
     <value>Cannot modify '{0}' in read-only state.</value>
   </data>
+  <data name="GridCollection_InOtherCollection" xml:space="preserve">
+    <value>'{0}' already belongs to another '{1}'.</value>
+  </data>
   <data name="HandlerTypeIllegal" xml:space="preserve">
     <value>Handler type is mismatched.</value>
   </data>

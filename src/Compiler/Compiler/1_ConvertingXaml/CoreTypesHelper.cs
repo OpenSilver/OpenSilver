@@ -41,7 +41,7 @@ internal abstract class CoreTypesConverter
         // from finding the converter.
         //
 
-        _knownCoreTypes = new Dictionary<string, Func<XElement, string, string>>(40, StringComparer.OrdinalIgnoreCase)
+        _knownCoreTypes = new Dictionary<string, Func<XElement, string, string>>(42, StringComparer.OrdinalIgnoreCase)
         {
             ["System.Windows.Input.Cursor"] = ConvertToCursor,
             ["System.Windows.Input.ModifierKeys"] = ConvertToModifierKeys,
@@ -83,6 +83,8 @@ internal abstract class CoreTypesConverter
             ["System.Windows.Vector"] = ConvertToVector,
             ["System.Windows.RoutedEvent"] = ConvertToRoutedEvent,
             ["System.Windows.ResponsiveThreshold"] = ConvertToResponsiveThreshold,
+            ["System.Windows.Controls.RowDefinitionCollection"] = ConvertToRowDefinitionCollection,
+            ["System.Windows.Controls.ColumnDefinitionCollection"] = ConvertToColumnDefinitionCollection,
         };
     }
 
@@ -159,6 +161,10 @@ internal abstract class CoreTypesConverter
     public abstract string ConvertToRoutedEvent(XElement context, string source);
 
     public abstract string ConvertToResponsiveThreshold(XElement context, string source);
+
+    public abstract string ConvertToRowDefinitionCollection(XElement context, string source);
+
+    public abstract string ConvertToColumnDefinitionCollection(XElement context, string source);
 
     public bool IsKnownType(string typeFullName, string assemblyName)
     {

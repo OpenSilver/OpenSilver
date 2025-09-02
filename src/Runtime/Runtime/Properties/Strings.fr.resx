@@ -447,6 +447,9 @@
   <data name="GridCollection_CannotModifyReadOnly" xml:space="preserve">
     <value>Impossible de modifier '{0}' en état lecture seule.</value>
   </data>
+  <data name="GridCollection_InOtherCollection" xml:space="preserve">
+    <value>‘{0}’ appartient déjà à un autre ‘{1}’.</value>
+  </data>
   <data name="HandlerTypeIllegal" xml:space="preserve">
     <value>Type de gestionnaire non compatible.</value>
   </data>
