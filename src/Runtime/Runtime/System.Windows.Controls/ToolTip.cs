@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows.Controls.Primitives;
 
 namespace System.Windows.Controls
@@ -36,21 +37,28 @@ namespace System.Windows.Controls
         public ToolTip() { }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the ToolTip is visible. True if the ToolTip is visible; otherwise, false. The default is false.
+        /// Gets or sets a value that indicates whether the <see cref="ToolTip"/> is visible.
         /// </summary>
+        /// <returns>
+        /// true if the <see cref="ToolTip"/> is visible; otherwise, false. The default is false.
+        /// </returns>
         public bool IsOpen
         {
-            get { return (bool)GetValue(IsOpenProperty); }
-            set { SetValueInternal(IsOpenProperty, value); }
+            get => (bool)GetValue(IsOpenProperty);
+            set => SetValueInternal(IsOpenProperty, value);
         }
 
         /// <summary>
-        /// Identifies the IsOpen dependency property.
+        /// Identifies the <see cref="IsOpen"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsOpenProperty =
-            DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(ToolTip), new PropertyMetadata(false, IsOpen_Changed));
+            DependencyProperty.Register(
+                nameof(IsOpen),
+                typeof(bool),
+                typeof(ToolTip),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsOpenChanged));
 
-        private static void IsOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((ToolTip)d).UpdatePopup((bool)e.NewValue);
         }
@@ -141,12 +149,12 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Occurs when a ToolTip is closed and is no longer visible.
+        /// Occurs when a <see cref="ToolTip"/> is closed and is no longer visible.
         /// </summary>
         public event RoutedEventHandler Closed;
 
         /// <summary>
-        /// Occurs when a ToolTip becomes visible.
+        /// Occurs when a <see cref="ToolTip"/> becomes visible.
         /// </summary>
         public event RoutedEventHandler Opened;
 
@@ -157,18 +165,17 @@ namespace System.Windows.Controls
             ToolTipService.PlacementTargetProperty.AddOwner(typeof(ToolTip));
 
         /// <summary>
-        /// Gets or sets the visual element or control that the tool tip should be 
-        /// positioned in relation to when opened by the <see cref="ToolTipService" />.
+        /// Gets or sets the visual element or control that the tool tip should be positioned in relation to 
+        /// when opened by the <see cref="ToolTipService" />.
         /// </summary>
         /// <returns>
-        /// The visual element or control that the tool tip should be positioned in 
-        /// relation to when opened by the <see cref="ToolTipService" />.
-        /// The default is null.
+        /// The visual element or control that the tool tip should be positioned in relation to when opened 
+        /// by the <see cref="ToolTipService" />. The default is null.
         /// </returns>
         public UIElement PlacementTarget
         {
-            get { return (UIElement)GetValue(PlacementTargetProperty); }
-            set { SetValueInternal(PlacementTargetProperty, value); }
+            get => (UIElement)GetValue(PlacementTargetProperty);
+            set => SetValueInternal(PlacementTargetProperty, value);
         }
 
         private UIElement EffectivePlacementTarget
@@ -191,17 +198,15 @@ namespace System.Windows.Controls
             ToolTipService.PlacementProperty.AddOwner(typeof(ToolTip));
 
         /// <summary>
-        /// Gets or sets how the <see cref="ToolTip" /> should be positioned
-        /// in relation to the <see cref="PlacementTarget" />.
+        /// Gets or sets how the <see cref="ToolTip" /> should be positioned in relation to the <see cref="PlacementTarget" />.
         /// </summary>
         /// <returns>
-        /// One of the <see cref="PlacementMode" /> values.
-        /// The default is <see cref="PlacementMode.Mouse" />.
+        /// One of the <see cref="PlacementMode" /> values. The default is <see cref="PlacementMode.Mouse" />.
         /// </returns>
         public PlacementMode Placement
         {
-            get { return (PlacementMode)GetValue(PlacementProperty); }
-            set { SetValueInternal(PlacementProperty, value); }
+            get => (PlacementMode)GetValue(PlacementProperty);
+            set => SetValueInternal(PlacementProperty, value);
         }
 
         private PlacementMode EffectivePlacement
@@ -217,41 +222,66 @@ namespace System.Windows.Controls
             }
         }
 
-        //-----------------------
-        // HORIZONTALOFFSET
-        //-----------------------
-
         /// <summary>
-        /// Gets or sets the horizontal distance between the target origin and the pop-up alignment point. The default is 0.
+        /// Gets or sets the horizontal distance between the target origin and the pop-up alignment point.
         /// </summary>
+        /// <returns>
+        /// The horizontal distance between the target origin and the pop-up alignment point. The default is 0.
+        /// </returns>
         public double HorizontalOffset
         {
-            get { return (double)GetValue(HorizontalOffsetProperty); }
-            set { SetValueInternal(HorizontalOffsetProperty, value); }
+            get => (double)GetValue(HorizontalOffsetProperty);
+            set => SetValueInternal(HorizontalOffsetProperty, value);
         }
+
         /// <summary>
-        /// Identifies the HorizontalOffset dependency property.
+        /// Identifies the <see cref="HorizontalOffset"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register(nameof(HorizontalOffset), typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
+            DependencyProperty.Register(
+                nameof(HorizontalOffset),
+                typeof(double),
+                typeof(ToolTip),
+                new PropertyMetadata(0d, OnHorizontalOffsetChanged));
 
-
-        //-----------------------
-        // VERTICALOFFSET
-        //-----------------------
+        private static void OnHorizontalOffsetChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            var tooltip = (ToolTip)o;
+            if (tooltip._parentPopup is not null)
+            {
+                tooltip._parentPopup.HorizontalOffset = (double)e.NewValue;
+            }
+        }
 
         /// <summary>
-        /// Gets or sets the vertical distance between the target origin and the pop-up alignment point. The default is 0.
+        /// Gets or sets the vertical distance between the target origin and the pop-up alignment point.
         /// </summary>
+        /// <returns>
+        /// The vertical distance between the target origin and the pop-up alignment point. The default is 0.
+        /// </returns>
         public double VerticalOffset
         {
-            get { return (double)GetValue(VerticalOffsetProperty); }
-            set { SetValueInternal(VerticalOffsetProperty, value); }
+            get => (double)GetValue(VerticalOffsetProperty);
+            set => SetValueInternal(VerticalOffsetProperty, value);
         }
+
         /// <summary>
-        /// Identifies the VerticalOffset dependency property.
+        /// Identifies the <see cref="VerticalOffset"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register(nameof(VerticalOffset), typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
+            DependencyProperty.Register(
+                nameof(VerticalOffset),
+                typeof(double),
+                typeof(ToolTip),
+                new PropertyMetadata(0d, OnVerticalOffsetChanged));
+
+        private static void OnVerticalOffsetChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            var tooltip = (ToolTip)o;
+            if (tooltip._parentPopup is not null)
+            {
+                tooltip._parentPopup.VerticalOffset = (double)e.NewValue;
+            }
+        }
     }
 }
