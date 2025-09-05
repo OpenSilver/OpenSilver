@@ -632,29 +632,7 @@ public partial class FrameworkElement
             {
                 Vector offset = ComputeAlignmentOffset(clippingSize, inkSize);
 
-                double left, top, width, height;
-                if (offset.X < 0)
-                {
-                    left = -offset.X;
-                    width = clippingSize.Width - offset.X;
-                }
-                else
-                {
-                    left = 0;
-                    width = clippingSize.Width;
-                }
-                if (offset.Y < 0)
-                {
-                    top = -offset.Y;
-                    height = clippingSize.Height - offset.Y;
-                }
-                else
-                {
-                    top = 0;
-                    height = clippingSize.Height;
-                }
-
-                var slotRect = new Rect(left, top, width, height);
+                var slotRect = new Rect(Math.Max(-offset.X, 0), Math.Max(-offset.Y, 0), clippingSize.Width, clippingSize.Height);
 
                 if (needToClipLocally) //intersect 2 rects
                 {
