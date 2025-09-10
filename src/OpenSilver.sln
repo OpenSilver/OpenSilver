@@ -31,8 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CBAC
 		Runtime\Scripts\cshtml5.css = Runtime\Scripts\cshtml5.css
 		Runtime\Scripts\cshtml5.js = Runtime\Scripts\cshtml5.js
 		Runtime\Scripts\FileSaver.min.js = Runtime\Scripts\FileSaver.min.js
-		Runtime\Scripts\html2canvas.js = Runtime\Scripts\html2canvas.js
 		Runtime\Scripts\OpenSilver.js = Runtime\Scripts\OpenSilver.js
+		Runtime\Scripts\htmlToImage.js = Runtime\Scripts\htmlToImage.js
 		Runtime\Scripts\quill.core.css = Runtime\Scripts\quill.core.css
 		Runtime\Scripts\quill.min.js = Runtime\Scripts\quill.min.js
 	EndProjectSection

@@ -42,7 +42,7 @@
     <file src="../../src/Runtime/Scripts/opensilver.js" target="content/js" />
     <file src="../../src/Runtime/Scripts/cshtml5.js" target="content/js" />
     <file src="../../src/Runtime/Scripts/cshtml5.css" target="content/css" />
-    <file src="../../src/Runtime/Scripts/html2canvas.js" target="content/js" />
+    <file src="../../src/Runtime/Scripts/htmlToImage.js" target="content/js" />
     <file src="../../src/Runtime/Scripts/quill.min.js" target="content/js" />
     <file src="../../src/Runtime/Scripts/quill.core.css" target="content/css" />
     <file src="../../src/Runtime/Scripts/FileSaver.min.js" target="content/js" />

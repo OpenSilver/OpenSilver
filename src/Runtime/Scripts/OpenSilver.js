@@ -75,7 +75,7 @@ window._openSilverRuntime = (function () {
 
     (function () {
         const styleheets = ['libs/cshtml5.css', 'libs/quill.core.css'];
-        const scripts = ['libs/cshtml5.js', 'libs/quill.min.js', 'libs/html2canvas.js', 'libs/FileSaver.min.js'];
+        const scripts = ['libs/cshtml5.js', 'libs/quill.min.js', 'libs/htmlToImage.js', 'libs/FileSaver.min.js'];
         const timestamp = '?date=' + new Date().toISOString();
 
         styleheets.forEach((name) => {
@@ -169,25 +169,24 @@ window._openSilverRuntime = (function () {
                         }
                     }
                 },
-                renderUIElement: function (id, width, height, transform, callback) {
+                renderUIElement: function (id, width, height, userTransform, callback) {
                     const element = document.getElementById(id);
-                    const currentTransform = element.style.transform;
-                    element.style.transform = transform;
-                    html2canvas(element, { scale: 1 }).then(function (canvas) {
-                        try {
-                            const ctx = canvas.getContext('2d');
-                            smoothCanvasContext(ctx);
-                            const w = width > -1 ? width : canvas.width;
-                            const h = height > -1 ? height : canvas.height;
-                            const imgData = ctx.getImageData(0, 0, w, h);
-                            _tempPixelsData = new Int32Array(imgData.data.buffer);
-                            callback(imgData.data.length, imgData.width, imgData.height);
-                        } catch (err) {
-                            console.error(err);
-                            callback(err.message);
-                        }
+                    const transform = new DOMMatrix([1 / window.devicePixelRatio, 0, 0, 1 / window.devicePixelRatio, 0, 0])
+                        .multiplySelf(new DOMMatrix(userTransform));
+                    htmlToImage.toPixelData(element, {
+                        width: width,
+                        height: height,
+                        style: {
+                            position: 'static',
+                            transform: transform,
+                            transformOrigin: '0% 0%',
+                            backgroundColor: 'transparent',
+                            pixelRatio: 1,
+                        },
+                    }).then(function (pixels) {
+                        _tempPixelsData = new Int32Array(pixels.buffer);
+                        callback(pixels.length, width, height);
                     });
-                    element.style.transform = currentTransform;
                 },
                 fillInt32Buffer: function (buffer) {
                     buffer.set(new Int32Array(_tempPixelsData), 0);

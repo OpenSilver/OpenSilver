@@ -44,7 +44,25 @@ namespace System.Windows.Media.Imaging
             }
 
             public Task CreateFromUIElementAsync(UIElement element, Transform transform)
-                => RenderUIElementAsync(element, transform, -1, -1, OnImageDataLoadSuccess, OnImageDataLoadError);
+            {
+                double width = element.RenderSize.Width;
+                double height = element.RenderSize.Height;
+
+                if (transform is not null)
+                {
+                    Rect transformedBounds = transform.TransformBounds(new Rect(0, 0, width, height));
+                    width = transformedBounds.Width;
+                    height = transformedBounds.Height;
+                }
+
+                return RenderUIElementAsync(
+                    element,
+                    transform,
+                    (int)Math.Round(width),
+                    (int)Math.Round(height),
+                    OnImageDataLoadSuccess,
+                    OnImageDataLoadError);
+            }
 
             public Task RenderUIElementAsync(UIElement element, Transform transform, int width, int height)
                 => RenderUIElementAsync(element, transform, width, height, OnRenderDataSuccess, OnRenderDataError);
