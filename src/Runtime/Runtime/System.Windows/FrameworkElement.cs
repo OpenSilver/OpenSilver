@@ -1086,7 +1086,7 @@ namespace System.Windows
         /// Identifies the <see cref="Loaded"/> routed event.
         /// </summary>
         public static readonly RoutedEvent LoadedEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(Loaded),
                 RoutingStrategy.Direct,
                 typeof(RoutedEventHandler),
@@ -1115,7 +1115,7 @@ namespace System.Windows
         /// Identifies the <see cref="Unloaded"/> routed event.
         /// </summary>
         public static readonly RoutedEvent UnloadedEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(Unloaded),
                 RoutingStrategy.Direct,
                 typeof(RoutedEventHandler),

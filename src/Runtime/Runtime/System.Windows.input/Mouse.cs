@@ -22,7 +22,7 @@ public static class Mouse
     /// Identifies the Mouse.PreviewMouseDown attached event.
     /// </summary>
     public static readonly RoutedEvent PreviewMouseDownEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "PreviewMouseDown",
             RoutingStrategy.Tunnel,
             typeof(MouseButtonEventHandler),
@@ -56,7 +56,7 @@ public static class Mouse
     /// Identifies the Mouse.MouseDown attached event.
     /// </summary>
     public static readonly RoutedEvent MouseDownEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "MouseDown",
             RoutingStrategy.Bubble,
             typeof(MouseButtonEventHandler),
@@ -90,7 +90,7 @@ public static class Mouse
     /// Identifies the Mouse.PreviewMouseUp attached event.
     /// </summary>
     public static readonly RoutedEvent PreviewMouseUpEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "PreviewMouseUp",
             RoutingStrategy.Tunnel,
             typeof(MouseButtonEventHandler),
@@ -124,7 +124,7 @@ public static class Mouse
     /// Identifies the Mouse.MouseUp attached event.
     /// </summary>
     public static readonly RoutedEvent MouseUpEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "MouseUp",
             RoutingStrategy.Bubble,
             typeof(MouseButtonEventHandler),
@@ -158,7 +158,7 @@ public static class Mouse
     /// Identifies the Mouse.PreviewMouseMove attached event.
     /// </summary>
     public static readonly RoutedEvent PreviewMouseMoveEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "PreviewMouseMove",
             RoutingStrategy.Tunnel,
             typeof(MouseEventHandler),
@@ -192,7 +192,7 @@ public static class Mouse
     /// Identifies the Mouse.MouseMove attached event.
     /// </summary>
     public static readonly RoutedEvent MouseMoveEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "MouseMove",
             RoutingStrategy.Bubble,
             typeof(MouseEventHandler),
@@ -226,7 +226,7 @@ public static class Mouse
     /// dentifies the Mouse.MouseEnter attached event.
     /// </summary>
     public static readonly RoutedEvent MouseEnterEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "MouseEnter",
             RoutingStrategy.Direct,
             typeof(MouseEventHandler),
@@ -260,7 +260,7 @@ public static class Mouse
     /// Identifies the Mouse.MouseLeave attached event.
     /// </summary>
     public static readonly RoutedEvent MouseLeaveEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "MouseLeave",
             RoutingStrategy.Direct,
             typeof(MouseEventHandler),
@@ -294,7 +294,7 @@ public static class Mouse
     /// Identifies the Mouse.GotMouseCapture attached event.
     /// </summary>
     public static readonly RoutedEvent GotMouseCaptureEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "GotMouseCapture",
             RoutingStrategy.Bubble,
             typeof(MouseEventHandler),
@@ -328,7 +328,7 @@ public static class Mouse
     /// Identifies the Mouse.LostMouseCapture attached event.
     /// </summary>
     public static readonly RoutedEvent LostMouseCaptureEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "LostMouseCapture",
             RoutingStrategy.Bubble,
             typeof(MouseEventHandler),
@@ -362,7 +362,7 @@ public static class Mouse
     /// Identifies the Mouse.PreviewMouseWheel attached event.
     /// </summary>
     public static readonly RoutedEvent PreviewMouseWheelEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "PreviewMouseWheel",
             RoutingStrategy.Tunnel,
             typeof(MouseWheelEventHandler),
@@ -396,7 +396,7 @@ public static class Mouse
     /// Identifies the Mouse.MouseWheel attached event.
     /// </summary>
     public static readonly RoutedEvent MouseWheelEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "MouseWheel",
             RoutingStrategy.Bubble,
             typeof(MouseWheelEventHandler),

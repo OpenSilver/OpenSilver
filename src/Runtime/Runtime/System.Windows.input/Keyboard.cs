@@ -22,7 +22,7 @@ public static class Keyboard
     /// Identifies the Keyboard.PreviewKeyDown attached event.
     /// </summary>
     public static readonly RoutedEvent PreviewKeyDownEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "PreviewKeyDown",
             RoutingStrategy.Tunnel,
             typeof(KeyEventHandler),
@@ -56,7 +56,7 @@ public static class Keyboard
     /// Identifies the Keyboard.KeyDown attached event.
     /// </summary>
     public static readonly RoutedEvent KeyDownEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "KeyDown",
             RoutingStrategy.Bubble,
             typeof(KeyEventHandler),
@@ -90,7 +90,7 @@ public static class Keyboard
     /// Identifies the Keyboard.PreviewKeyUp attached event.
     /// </summary>
     public static readonly RoutedEvent PreviewKeyUpEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "PreviewKeyUp",
             RoutingStrategy.Tunnel,
             typeof(KeyEventHandler),
@@ -124,7 +124,7 @@ public static class Keyboard
     /// Identifies the Keyboard.KeyUp attached event.
     /// </summary>
     public static readonly RoutedEvent KeyUpEvent =
-        EventManager.RegisterRoutedEvent(
+        EventManager.RegisterCoreEvent(
             "KeyUp",
             RoutingStrategy.Bubble,
             typeof(KeyEventHandler),

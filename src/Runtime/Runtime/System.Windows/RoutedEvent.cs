@@ -23,12 +23,13 @@ namespace System.Windows;
 public sealed class RoutedEvent
 {
     // Constructor for a RoutedEvent (is internal to the EventManager and is onvoked when a new RoutedEvent is registered)
-    internal RoutedEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType)
+    internal RoutedEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType, bool isCoreEvent)
     {
         Name = name;
         RoutingStrategy = routingStrategy;
         HandlerType = handlerType;
         OwnerType = ownerType;
+        IsCoreEvent = isCoreEvent;
 
         GlobalIndex = GlobalEventManager.GetNextAvailableGlobalIndex(this);
     }
@@ -69,6 +70,8 @@ public sealed class RoutedEvent
     /// The owner type of the routed event.
     /// </returns>
     public Type OwnerType { get; }
+
+    internal bool IsCoreEvent { get; }
 
     /// <summary>
     /// Associates another owner type with the routed event represented by a <see cref="RoutedEvent"/> 

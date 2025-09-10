@@ -561,12 +561,17 @@ namespace System.Windows
                         throw new InvalidOperationException(Strings.TreeLoop);
                     }
 
-                    // Invoke BuildRouteCore
                     // Add this element to route
                     e.AddToEventRoute(route, args);
 
                     // Get element's visual parent
-                    e = VisualTreeHelper.GetParent(e) as UIElement;
+                    DependencyObject parent = VisualTreeHelper.GetParent(e);
+                    if (parent is null && !args.RoutedEvent.IsCoreEvent)
+                    {
+                        parent = LogicalTreeHelper.GetParent(e);
+                    }
+
+                    e = parent as UIElement;
                 }
             }
         }
@@ -1079,7 +1084,7 @@ namespace System.Windows
         /// Identifies the <see cref="TextInputStart"/> routed event.
         /// </summary>
         public static readonly RoutedEvent TextInputStartEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(TextInputStart),
                 RoutingStrategy.Bubble,
                 typeof(TextCompositionEventHandler),
@@ -1106,7 +1111,7 @@ namespace System.Windows
         /// Identifies the <see cref="TextInput"/> routed event.
         /// </summary>
         public static readonly RoutedEvent TextInputEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(TextInput),
                 RoutingStrategy.Bubble,
                 typeof(TextCompositionEventHandler),
@@ -1137,7 +1142,7 @@ namespace System.Windows
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputUpdateEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(TextInputUpdate),
                 RoutingStrategy.Bubble,
                 typeof(TextCompositionEventHandler),
@@ -1161,7 +1166,7 @@ namespace System.Windows
         /// Identifies the <see cref="Tapped"/> routed event.
         /// </summary>
         public static readonly RoutedEvent TappedEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(Tapped),
                 RoutingStrategy.Bubble,
                 typeof(TappedEventHandler),
@@ -1357,7 +1362,7 @@ namespace System.Windows
         /// Identifies the <see cref="GotFocus"/> routed event.
         /// </summary>
         public static readonly RoutedEvent GotFocusEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(GotFocus),
                 RoutingStrategy.Bubble,
                 typeof(RoutedEventHandler),
@@ -1388,7 +1393,7 @@ namespace System.Windows
         /// Identifies the <see cref="LostFocus"/> routed event.
         /// </summary>
         public static readonly RoutedEvent LostFocusEvent =
-            EventManager.RegisterRoutedEvent(
+            EventManager.RegisterCoreEvent(
                 nameof(LostFocus),
                 RoutingStrategy.Bubble,
                 typeof(RoutedEventHandler),

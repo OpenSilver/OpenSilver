@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Diagnostics;
 using OpenSilver.Internal;
 
 namespace System.Windows;
@@ -70,7 +71,39 @@ public static class EventManager
             throw new ArgumentException(string.Format(Strings.DuplicateEventName, name, ownerType));
         }
 
-        return GlobalEventManager.RegisterRoutedEvent(name, routingStrategy, handlerType, ownerType);
+        return GlobalEventManager.RegisterRoutedEvent(name, routingStrategy, handlerType, ownerType, false);
+    }
+
+    internal static RoutedEvent RegisterCoreEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType)
+    {
+        if (name is null)
+        {
+            throw new ArgumentNullException(nameof(name));
+        }
+
+        if (routingStrategy != RoutingStrategy.Tunnel &&
+            routingStrategy != RoutingStrategy.Bubble &&
+            routingStrategy != RoutingStrategy.Direct)
+        {
+            throw new InvalidEnumArgumentException(nameof(routingStrategy), (int)routingStrategy, typeof(RoutingStrategy));
+        }
+
+        if (handlerType is null)
+        {
+            throw new ArgumentNullException(nameof(handlerType));
+        }
+
+        if (ownerType is null)
+        {
+            throw new ArgumentNullException(nameof(ownerType));
+        }
+
+        if (GlobalEventManager.GetRoutedEventFromName(name, ownerType, false) != null)
+        {
+            throw new ArgumentException(string.Format(Strings.DuplicateEventName, name, ownerType));
+        }
+
+        return GlobalEventManager.RegisterRoutedEvent(name, routingStrategy, handlerType, ownerType, true);
     }
 
     /// <summary>

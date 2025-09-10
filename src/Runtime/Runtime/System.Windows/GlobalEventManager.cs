@@ -22,7 +22,7 @@ internal static class GlobalEventManager
 {
     // Registers a RoutedEvent with the given details
     // NOTE: The Name must be unique within the given OwnerType
-    internal static RoutedEvent RegisterRoutedEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType)
+    internal static RoutedEvent RegisterRoutedEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType, bool isCoreEvent)
     {
         Debug.Assert(GetRoutedEventFromName(name, ownerType, false) is null, "RoutedEvent name must be unique within a given OwnerType");
 
@@ -34,7 +34,8 @@ internal static class GlobalEventManager
                 name,
                 routingStrategy,
                 handlerType,
-                ownerType);
+                ownerType,
+                isCoreEvent);
 
             AddOwner(routedEvent, ownerType);
 
