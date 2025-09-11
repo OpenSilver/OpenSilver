@@ -25,6 +25,7 @@ namespace System.Windows.Controls.Primitives
     public class ButtonBase : ContentControl, ICommandSource
     {
         private WeakEventListener<ButtonBase, ICommand, EventArgs> _canExecuteChangedListener;
+        private EventHandler _canExecuteChangedHandler;
         private bool _commandDisabled;
         private bool _isMouseCaptured;
         private bool _isSpaceKeyDown;
@@ -726,6 +727,7 @@ namespace System.Windows.Controls.Primitives
             {
                 _canExecuteChangedListener.Detach();
                 _canExecuteChangedListener = null;
+                _canExecuteChangedHandler = null;
             }
 
             if (newCommand is not null)
@@ -736,7 +738,8 @@ namespace System.Windows.Controls.Primitives
                     OnDetachAction = static (listener, source) => source.CanExecuteChanged -= listener.OnEvent,
                 };
 
-                newCommand.CanExecuteChanged += _canExecuteChangedListener.OnEvent;
+                _canExecuteChangedHandler = _canExecuteChangedListener.OnEvent;
+                newCommand.CanExecuteChanged += _canExecuteChangedHandler;
             }
 
             UpdateCanExecute();
