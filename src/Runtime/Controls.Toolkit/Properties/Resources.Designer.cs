@@ -232,15 +232,6 @@ namespace OpenSilver.Controls.Toolkit {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid Dock value &apos;{0}&apos;..
-        /// </summary>
-        internal static string DockPanel_OnDockPropertyChanged_InvalidValue {
-            get {
-                return ResourceManager.GetString("DockPanel_OnDockPropertyChanged_InvalidValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Removal by index is not supported..
         /// </summary>
         internal static string DragDropTarget_RemoveItemAtIndex_RemovalByIndexNotSupported {
@@ -357,24 +348,6 @@ namespace OpenSilver.Controls.Toolkit {
             get {
                 return ResourceManager.GetString("UIElementExtendedRoutedEventExtensions_TypeOfHandlerMustBeQueryContinueDragEventH" +
                         "andler", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid length value &apos;{0}&apos;..
-        /// </summary>
-        internal static string WrapPanel_OnItemHeightOrWidthPropertyChanged_InvalidValue {
-            get {
-                return ResourceManager.GetString("WrapPanel_OnItemHeightOrWidthPropertyChanged_InvalidValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid Orientation value &apos;{0}&apos;..
-        /// </summary>
-        internal static string WrapPanel_OnOrientationPropertyChanged_InvalidValue {
-            get {
-                return ResourceManager.GetString("WrapPanel_OnOrientationPropertyChanged_InvalidValue", resourceCulture);
             }
         }
     }

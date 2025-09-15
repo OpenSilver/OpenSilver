@@ -147,13 +147,6 @@ namespace System.Windows.Controls
         #endregion
 
         /// <summary>
-        /// A value indicating whether a read-only dependency property change
-        /// handler should allow the value to be set.  This is used to ensure
-        /// that read-only properties cannot be changed via SetValue, etc.
-        /// </summary>
-        private bool _allowWrite;
-
-        /// <summary>
         /// Gets or sets a value indicating whether a dependency property change
         /// handler should ignore the next change notification.  This is used to
         /// reset the value of properties without performing any of the actions
@@ -174,19 +167,15 @@ namespace System.Windows.Controls
         public new bool HasItems
         {
             get { return (bool)GetValue(HasItemsProperty); }
-            private set
-            {
-                try
-                {
-                    _allowWrite = true;
-                    SetValue(HasItemsProperty, value);
-                }
-                finally
-                {
-                    _allowWrite = false;
-                }
-            }
+            private set { SetValue(HasItemsPropertyKey, value); }
         }
+
+        private static readonly DependencyPropertyKey HasItemsPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(HasItems),
+                typeof(bool),
+                typeof(TreeViewItem),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnHasItemsPropertyChanged));
 
         /// <summary>
         /// Identifies the
@@ -198,12 +187,7 @@ namespace System.Windows.Controls
         /// <see cref="TreeViewItem.HasItems" />
         /// dependency property.
         /// </value>
-        public static readonly DependencyProperty HasItemsProperty =
-            DependencyProperty.Register(
-                "HasItems",
-                typeof(bool),
-                typeof(TreeViewItem),
-                new PropertyMetadata(false, OnHasItemsPropertyChanged));
+        public static readonly DependencyProperty HasItemsProperty = HasItemsPropertyKey.DependencyProperty;
 
         /// <summary>
         /// HasItemsProperty property changed handler.
@@ -212,27 +196,7 @@ namespace System.Windows.Controls
         /// <param name="e">Event arguments.</param>
         private static void OnHasItemsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TreeViewItem source = d as TreeViewItem;
-
-            // Ignore the change if requested
-            if (source.IgnorePropertyChange)
-            {
-                source.IgnorePropertyChange = false;
-                return;
-            }
-
-            // Ensure the property is only written when expected
-            if (!source._allowWrite)
-            {
-                // Reset the old value before it was incorrectly written
-                source.IgnorePropertyChange = true;
-                source.SetValue(HasItemsProperty, e.OldValue);
-
-                throw new InvalidOperationException(
-                    SR.TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite);
-            }
-
-            source.UpdateVisualState(true);
+            ((TreeViewItem)d).UpdateVisualState(true);
         }
         #endregion public bool HasItems
 
@@ -410,19 +374,15 @@ namespace System.Windows.Controls
         public bool IsSelectionActive
         {
             get { return (bool)GetValue(IsSelectionActiveProperty); }
-            private set
-            {
-                try
-                {
-                    _allowWrite = true;
-                    SetValue(IsSelectionActiveProperty, value);
-                }
-                finally
-                {
-                    _allowWrite = false;
-                }
-            }
+            private set { SetValue(IsSelectionActivePropertyKey, value); }
         }
+
+        private static readonly DependencyPropertyKey IsSelectionActivePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsSelectionActive),
+                typeof(bool),
+                typeof(TreeViewItem),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActivePropertyChanged));
 
         /// <summary>
         /// Identifies the
@@ -434,12 +394,7 @@ namespace System.Windows.Controls
         /// <see cref="TreeViewItem.IsSelectionActive" />
         /// dependency property.
         /// </value>
-        public static readonly DependencyProperty IsSelectionActiveProperty =
-            DependencyProperty.Register(
-                "IsSelectionActive",
-                typeof(bool),
-                typeof(TreeViewItem),
-                new PropertyMetadata(false, OnIsSelectionActivePropertyChanged));
+        public static readonly DependencyProperty IsSelectionActiveProperty = IsSelectionActivePropertyKey.DependencyProperty;
 
         /// <summary>
         /// IsSelectionActiveProperty property changed handler.
@@ -448,27 +403,7 @@ namespace System.Windows.Controls
         /// <param name="e">Event arguments.</param>
         private static void OnIsSelectionActivePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TreeViewItem source = d as TreeViewItem;
-
-            // Ignore the change if requested
-            if (source.IgnorePropertyChange)
-            {
-                source.IgnorePropertyChange = false;
-                return;
-            }
-
-            // Ensure the property is only written when expected
-            if (!source._allowWrite)
-            {
-                // Reset the old value before it was incorrectly written
-                source.IgnorePropertyChange = true;
-                source.SetValue(IsSelectionActiveProperty, e.OldValue);
-
-                throw new InvalidOperationException(
-                    SR.TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite);
-            }
-
-            source.UpdateVisualState(true);
+            ((TreeViewItem)d).UpdateVisualState(true);
         }
         #endregion public bool IsSelectionActive
 

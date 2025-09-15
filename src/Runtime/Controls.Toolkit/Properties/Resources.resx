@@ -176,10 +176,6 @@
   <data name="DateTimeTypeConverter_FormatException" xml:space="preserve">
     <value>DateTime value is in the wrong format.</value>
   </data>
-  <data name="DockPanel_OnDockPropertyChanged_InvalidValue" xml:space="preserve">
-    <value>Invalid Dock value '{0}'.</value>
-    <comment>Exception thrown when the Dock attached property is provided an invalid value.</comment>
-  </data>
   <data name="DragDropTarget_RemoveItemAtIndex_RemovalByIndexNotSupported" xml:space="preserve">
     <value>Removal by index is not supported.</value>
     <comment>Exception thrown when an attempt is made to remove an item by index and the item parent does not support removal by index.</comment>
@@ -231,13 +227,5 @@
   <data name="UIElementExtendedRoutedEventExtensions_TypeOfHandlerMustBeQueryContinueDragEventHandler" xml:space="preserve">
     <value>Type of the event handler must be QueryContinueDragEventHandler.</value>
     <comment>Exception thrown when handler for a target event is passed to AddHandler and the handler is not of type QueryContinueDragEventHandler.</comment>
-  </data>
-  <data name="WrapPanel_OnItemHeightOrWidthPropertyChanged_InvalidValue" xml:space="preserve">
-    <value>Invalid length value '{0}'.</value>
-    <comment>Exception thrown when the ItemWith or ItemHeight properties are provided an invalid value.</comment>
-  </data>
-  <data name="WrapPanel_OnOrientationPropertyChanged_InvalidValue" xml:space="preserve">
-    <value>Invalid Orientation value '{0}'.</value>
-    <comment>Exception thrown when the Orientation property is provided an invalid value.</comment>
   </data>
 </root>

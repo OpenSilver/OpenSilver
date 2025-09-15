@@ -10,7 +10,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using Resource = OpenSilver.Controls.Input.Toolkit.Resources;
 
 namespace System.Windows.Controls
 {
@@ -131,13 +130,6 @@ namespace System.Windows.Controls
         private static void OnIsDropDownOpenPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Picker source = (Picker)d;
-
-            // Ignore the change if requested
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
 
             bool oldValue = (bool)e.OldValue;
             bool newValue = (bool)e.NewValue;
@@ -264,7 +256,8 @@ namespace System.Windows.Controls
                 "MaxDropDownHeight",
                 typeof(double),
                 typeof(Picker),
-                new PropertyMetadata(double.PositiveInfinity, OnMaxDropDownHeightPropertyChanged));
+                new PropertyMetadata(double.PositiveInfinity, OnMaxDropDownHeightPropertyChanged),
+                IsMaxDropDownHeightValid);
 
         /// <summary>
         /// MaxDropDownHeightProperty property changed handler.
@@ -275,28 +268,14 @@ namespace System.Windows.Controls
         private static void OnMaxDropDownHeightPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Picker source = (Picker)d;
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
             double newValue = (double)e.NewValue;
-
-            // Revert to the old value if invalid (negative)
-            if (newValue < 0)
-            {
-                source._ignorePropertyChange = true;
-                source.SetValue(e.Property, e.OldValue);
-
-                throw new ArgumentException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        Resource.Picker_OnMaxDropDownHeightPropertyChanged_InvalidValue, e.NewValue),
-                    "value");
-            }
-
             source.OnMaxDropDownHeightChanged(newValue);
+        }
+
+        private static bool IsMaxDropDownHeightValid(object o)
+        {
+            double v = (double)o;
+            return v >= 0 || double.IsNaN(v);
         }
 #endregion public double MaxDropDownHeight
 
@@ -356,12 +335,6 @@ namespace System.Windows.Controls
         /// Gets or sets the canvas for the popup child.
         /// </summary>
         private Canvas _popupChildCanvas;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to ignore calling a pending 
-        /// change handlers. 
-        /// </summary>
-        private bool _ignorePropertyChange;
 
         /// <summary>
         /// Gets or sets a value indicating whether a visual popup state is 

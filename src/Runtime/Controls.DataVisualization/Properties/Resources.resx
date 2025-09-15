@@ -193,10 +193,6 @@
     <value>A series cannot be added to more than one series host.</value>
     <comment>Exception message.</comment>
   </data>
-  <data name="EdgePanel_OnEdgePropertyChanged" xml:space="preserve">
-    <value>Attempt to set Edge property to an invalid value.</value>
-    <comment>Exception message.</comment>
-  </data>
   <data name="Chart_AxisLocationChanged_CantBeChangedToAutoWhenHostedInsideOfASeriesHost" xml:space="preserve">
     <value>Axis location cannot be changed to auto when hosted inside of a series host.</value>
     <comment>Exception message.</comment>

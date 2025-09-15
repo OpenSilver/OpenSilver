@@ -3301,42 +3301,6 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property SelectedItem..
-        /// </summary>
-        internal static string TreeView_OnSelectedItemPropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeView_OnSelectedItemPropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property SelectedValue..
-        /// </summary>
-        internal static string TreeView_OnSelectedValuePropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeView_OnSelectedValuePropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property HasItems..
-        /// </summary>
-        internal static string TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property IsSelectionActive..
-        /// </summary>
-        internal static string TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Triggers collection members must be of type EventTrigger..
         /// </summary>
         internal static string TriggersSupportsEventTriggersOnly {

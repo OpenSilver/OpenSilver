@@ -3,9 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Globalization;
 using System.Windows.Media;
-using Resource = OpenSilver.Controls.Toolkit.Resources;
 
 namespace System.Windows.Controls
 {
@@ -16,14 +14,6 @@ namespace System.Windows.Controls
     /// <QualityBand>Stable</QualityBand>
     public class DockPanel : Panel
     {
-        /// <summary>
-        /// A value indicating whether a dependency property change handler
-        /// should ignore the next change notification.  This is used to reset
-        /// the value of properties without performing any of the actions in
-        /// their change handlers.
-        /// </summary>
-        private static bool _ignorePropertyChange;
-
         /// <summary>
         /// Gets or sets a value indicating whether the last child element
         /// added to a <see cref="DockPanel" /> resizes to fill the remaining 
@@ -48,18 +38,7 @@ namespace System.Windows.Controls
                 nameof(LastChildFill),
                 typeof(bool),
                 typeof(DockPanel),
-                new PropertyMetadata(true, OnLastChildFillPropertyChanged));
-
-        /// <summary>
-        /// LastChildFillProperty property changed handler.
-        /// </summary>
-        /// <param name="d">DockPanel that changed its LastChildFill.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnLastChildFillPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            DockPanel source = d as DockPanel;
-            source.InvalidateArrange();
-        }
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsArrange));
 
         /// <summary>
         /// Gets the value of the <see cref="Dock" /> attached property for 
@@ -74,9 +53,9 @@ namespace System.Windows.Controls
         [AttachedPropertyBrowsableForChildren]
         public static Dock GetDock(UIElement element)
         {
-            if (element == null)
+            if (element is null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
             return (Dock)element.GetValue(DockProperty);
         }
@@ -93,9 +72,9 @@ namespace System.Windows.Controls
         /// </param>
         public static void SetDock(UIElement element, Dock dock)
         {
-            if (element == null)
+            if (element is null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
             element.SetValue(DockProperty, dock);
         }
@@ -108,7 +87,8 @@ namespace System.Windows.Controls
                 "Dock",
                 typeof(Dock),
                 typeof(DockPanel),
-                new PropertyMetadata(Dock.Left, OnDockPropertyChanged));
+                new FrameworkPropertyMetadata(Dock.Left, OnDockPropertyChanged),
+                IsValidDock);
 
         /// <summary>
         /// DockProperty property changed handler.
@@ -117,32 +97,7 @@ namespace System.Windows.Controls
         /// <param name="e">Event arguments.</param>
         private static void OnDockPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // Ignore the change if requested
-            if (_ignorePropertyChange)
-            {
-                _ignorePropertyChange = false;
-                return;
-            }
-
             UIElement element = (UIElement)d;
-            Dock value = (Dock)e.NewValue;
-
-            // Validate the Dock property
-            if ((value != Dock.Left) &&
-                (value != Dock.Top) &&
-                (value != Dock.Right) &&
-                (value != Dock.Bottom))
-            {
-                // Reset the property to its original state before throwing
-                _ignorePropertyChange = true;
-                element.SetValue(DockProperty, (Dock)e.OldValue);
-
-                string message = string.Format(
-                    CultureInfo.InvariantCulture,
-                    Resource.DockPanel_OnDockPropertyChanged_InvalidValue,
-                    value);
-                throw new ArgumentException(message, "value");
-            }
 
             // Cause the DockPanel to update its layout when a child changes
             DockPanel panel = VisualTreeHelper.GetParent(element) as DockPanel;
@@ -150,6 +105,12 @@ namespace System.Windows.Controls
             {
                 panel.InvalidateMeasure();
             }
+        }
+
+        private static bool IsValidDock(object o)
+        {
+            Dock dock = (Dock)o;
+            return dock == Dock.Left || dock == Dock.Top || dock == Dock.Right || dock == Dock.Bottom;
         }
 
         /// <summary>

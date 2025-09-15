@@ -151,15 +151,6 @@ namespace OpenSilver.Controls.Input.Toolkit {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid maximum drop down height value &apos;{0}&apos;. The value must be greater than or equal to zero..
-        /// </summary>
-        internal static string Picker_OnMaxDropDownHeightPropertyChanged_InvalidValue {
-            get {
-                return ResourceManager.GetString("Picker_OnMaxDropDownHeightPropertyChanged_InvalidValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid PopupButtonMode value &apos;{0}&apos;..
         /// </summary>
         internal static string Picker_PopupButtonModeNotValid {

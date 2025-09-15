@@ -33,21 +33,6 @@ namespace System.Windows.Controls
     [StyleTypedProperty(Property = "ItemContainerStyle", StyleTargetType = typeof(TreeViewItem))]
     public class TreeView : ItemsControl, IUpdateVisualState
     {
-        /// <summary>
-        /// A value indicating whether a read-only dependency property change
-        /// handler should allow the value to be set.  This is used to ensure
-        /// that read-only properties cannot be changed via SetValue, etc.
-        /// </summary>
-        private bool _allowWrite;
-
-        /// <summary>
-        /// A value indicating whether a dependency property change handler
-        /// should ignore the next change notification.  This is used to reset
-        /// the value of properties without performing any of the actions in
-        /// their change handlers.
-        /// </summary>
-        private bool _ignorePropertyChange;
-
         #region public object SelectedItem
         /// <summary>
         /// Gets the selected item in a
@@ -60,19 +45,15 @@ namespace System.Windows.Controls
         public object SelectedItem
         {
             get { return GetValue(SelectedItemProperty); }
-            private set
-            {
-                try
-                {
-                    _allowWrite = true;
-                    SetValue(SelectedItemProperty, value);
-                }
-                finally
-                {
-                    _allowWrite = false;
-                }
-            }
+            private set { SetValue(SelectedItemPropertyKey, value); }
         }
+
+        private static readonly DependencyPropertyKey SelectedItemPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(SelectedItem),
+                typeof(object),
+                typeof(TreeView),
+                new PropertyMetadata(null, OnSelectedItemPropertyChanged));
 
         /// <summary>
         /// Identifies the
@@ -84,12 +65,7 @@ namespace System.Windows.Controls
         /// <see cref="TreeView.SelectedItem" />
         /// property.
         /// </value>
-        public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register(
-                "SelectedItem",
-                typeof(object),
-                typeof(TreeView),
-                new PropertyMetadata(null, OnSelectedItemPropertyChanged));
+        public static readonly DependencyProperty SelectedItemProperty = SelectedItemPropertyKey.DependencyProperty;
 
         /// <summary>
         /// SelectedItemProperty property changed handler.
@@ -98,27 +74,7 @@ namespace System.Windows.Controls
         /// <param name="e">Event arguments.</param>
         private static void OnSelectedItemPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TreeView source = d as TreeView;
-
-            // Ignore the change if requested
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
-            // Ensure the property is only written when expected
-            if (!source._allowWrite)
-            {
-                // Reset the old value before it was incorrectly written
-                source._ignorePropertyChange = true;
-                source.SetValue(SelectedItemProperty, e.OldValue);
-
-                throw new InvalidOperationException(
-                    SR.TreeView_OnSelectedItemPropertyChanged_InvalidWrite);
-            }
-
-            source.UpdateSelectedValue(e.NewValue);
+            ((TreeView)d).UpdateSelectedValue(e.NewValue);
         }
         #endregion public object SelectedItem
 
@@ -140,19 +96,15 @@ namespace System.Windows.Controls
         public object SelectedValue
         {
             get { return GetValue(SelectedValueProperty); }
-            private set
-            {
-                try
-                {
-                    _allowWrite = true;
-                    SetValue(SelectedValueProperty, value);
-                }
-                finally
-                {
-                    _allowWrite = false;
-                }
-            }
+            private set { SetValue(SelectedValuePropertyKey, value); }
         }
+
+        private static readonly DependencyPropertyKey SelectedValuePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(SelectedValue),
+                typeof(object),
+                typeof(TreeView),
+                new PropertyMetadata((object)null));
 
         /// <summary>
         /// Identifies the
@@ -164,40 +116,7 @@ namespace System.Windows.Controls
         /// <see cref="TreeView.SelectedValue" />
         /// dependency property.
         /// </value>
-        public static readonly DependencyProperty SelectedValueProperty =
-            DependencyProperty.Register(
-                "SelectedValue",
-                typeof(object),
-                typeof(TreeView),
-                new PropertyMetadata(null, OnSelectedValuePropertyChanged));
-
-        /// <summary>
-        /// SelectedValueProperty property changed handler.
-        /// </summary>
-        /// <param name="d">TreeView that changed its SelectedValue.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnSelectedValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            TreeView source = d as TreeView;
-
-            // Ignore the change if requested
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
-            // Ensure the property is only written when expected
-            if (!source._allowWrite)
-            {
-                // Reset the old value before it was incorrectly written
-                source._ignorePropertyChange = true;
-                source.SetValue(SelectedValueProperty, e.OldValue);
-
-                throw new InvalidOperationException(
-                    SR.TreeView_OnSelectedValuePropertyChanged_InvalidWrite);
-            }
-        }
+        public static readonly DependencyProperty SelectedValueProperty = SelectedValuePropertyKey.DependencyProperty;
         #endregion public object SelectedValue
 
         #region public string SelectedValuePath
@@ -1164,7 +1083,7 @@ namespace System.Windows.Controls
             }
             else
             {
-                ClearValue(SelectedValueProperty);
+                ClearValue(SelectedValuePropertyKey);
             }
         }
 

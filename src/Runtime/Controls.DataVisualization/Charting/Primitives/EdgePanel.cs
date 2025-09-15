@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Media;
 
@@ -22,11 +21,6 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
         /// The maximum number of iterations.
         /// </summary>
         private const int MaximumIterations = 10;
-
-        /// <summary>
-        /// A flag that ignores a property change when set.
-        /// </summary>
-        private static bool _ignorePropertyChange;
 
         #region public attached Edge Edge
         /// <summary>
@@ -72,7 +66,8 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
                 "Edge",
                 typeof(Edge),
                 typeof(EdgePanel),
-                new PropertyMetadata(Edge.Center, OnEdgePropertyChanged));
+                new PropertyMetadata(Edge.Center, OnEdgePropertyChanged),
+                IsValidEdge);
 
         /// <summary>
         /// EdgeProperty property changed handler.
@@ -82,41 +77,24 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Almost always set from the attached property CLR setter.")]
         private static void OnEdgePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // Ignore the change if requested
-            if (_ignorePropertyChange)
-            {
-                _ignorePropertyChange = false;
-                return;
-            }
-
             UIElement element = (UIElement)d;
-            Edge value = (Edge)e.NewValue;
 
-            // Validate the Edge property
-            if ((value != Edge.Left) &&
-                (value != Edge.Top) &&
-                (value != Edge.Right) &&
-                (value != Edge.Center) &&
-                (value != Edge.Bottom))
-            {
-                // Reset the property to its original state before throwing
-                _ignorePropertyChange = true;
-                element.SetValue(EdgeProperty, (Edge)e.OldValue);
-
-                string message = string.Format(
-                    CultureInfo.InvariantCulture,
-                    Properties.Resources.EdgePanel_OnEdgePropertyChanged,
-                    value);
-                 
-                throw new ArgumentException(message, "value");
-            }
-                 
             // Cause the EdgePanel to update its layout when a child changes
             EdgePanel panel = VisualTreeHelper.GetParent(element) as EdgePanel;
             if (panel != null)
             {
                 panel.InvalidateMeasure();
             }
+        }
+
+        private static bool IsValidEdge(object o)
+        {
+            Edge edge = (Edge)o;
+            return edge == Edge.Left ||
+                   edge == Edge.Top ||
+                   edge == Edge.Right ||
+                   edge == Edge.Center ||
+                   edge == Edge.Bottom;
         }
         #endregion public attached Edge Edge
 

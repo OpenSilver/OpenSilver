@@ -1199,22 +1199,6 @@
   <data name="TreeLoop" xml:space="preserve">
     <value>Potential cycle in tree found while building the event route.</value>
   </data>
-  <data name="TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property HasItems.</value>
-    <comment>Exception thrown when the HasItems property is improperly set.</comment>
-  </data>
-  <data name="TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property IsSelectionActive.</value>
-    <comment>Exception thrown when the IsSelectionActive property is improperly set.</comment>
-  </data>
-  <data name="TreeView_OnSelectedItemPropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property SelectedItem.</value>
-    <comment>Exception thrown when the SelectedItem property is improperly set.</comment>
-  </data>
-  <data name="TreeView_OnSelectedValuePropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property SelectedValue.</value>
-    <comment>Exception thrown when the SelectedValue property is improperly set.</comment>
-  </data>
   <data name="TriggersSupportsEventTriggersOnly" xml:space="preserve">
     <value>Triggers collection members must be of type EventTrigger.</value>
   </data>

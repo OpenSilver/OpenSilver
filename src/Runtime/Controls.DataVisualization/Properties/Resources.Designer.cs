@@ -169,15 +169,6 @@ namespace System.Windows.Controls.DataVisualization.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempt to set Edge property to an invalid value..
-        /// </summary>
-        internal static string EdgePanel_OnEdgePropertyChanged {
-            get {
-                return ResourceManager.GetString("EdgePanel_OnEdgePropertyChanged", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The DataRangeBinding property of the Interpolator must be bound to an IConvertible object..
         /// </summary>
         internal static string Interpolator_IncludeInRange_DataRangeBindingNotIConvertible {

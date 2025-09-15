@@ -17,14 +17,6 @@ namespace System.Windows.Controls
     public class WrapPanel : Panel
     {
         /// <summary>
-        /// A value indicating whether a dependency property change handler
-        /// should ignore the next change notification.  This is used to reset
-        /// the value of properties without performing any of the actions in
-        /// their change handlers.
-        /// </summary>
-        private bool _ignorePropertyChange;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="WrapPanel"/> class.
         /// </summary>
         public WrapPanel()
@@ -51,47 +43,9 @@ namespace System.Windows.Controls
         /// The identifier for the <see cref="Orientation" /> dependency property.
         /// </value>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register(
-                nameof(Orientation),
-                typeof(Orientation),
+            StackPanel.OrientationProperty.AddOwner(
                 typeof(WrapPanel),
-                new PropertyMetadata(Orientation.Horizontal, OnOrientationPropertyChanged));
-
-        /// <summary>
-        /// OrientationProperty property changed handler.
-        /// </summary>
-        /// <param name="d">WrapPanel that changed its Orientation.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnOrientationPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            WrapPanel source = (WrapPanel)d;
-            Orientation value = (Orientation)e.NewValue;
-
-            // Ignore the change if requested
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
-            // Validate the Orientation
-            if ((value != Orientation.Horizontal) &&
-                (value != Orientation.Vertical))
-            {
-                // Reset the property to its original state before throwing
-                source._ignorePropertyChange = true;
-                source.SetValue(OrientationProperty, (Orientation)e.OldValue);
-
-                string message = string.Format(
-                    CultureInfo.InvariantCulture,
-                    Resource.WrapPanel_OnOrientationPropertyChanged_InvalidValue,
-                    value);
-                throw new ArgumentException(message, "value");
-            }
-
-            // Orientation affects measuring.
-            source.InvalidateMeasure();
-        }
+                new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         /// Gets or sets the height of the layout area for each item that is contained 
@@ -119,7 +73,8 @@ namespace System.Windows.Controls
                 nameof(ItemHeight),
                 typeof(double),
                 typeof(WrapPanel),
-                new PropertyMetadata(double.NaN, OnItemHeightOrWidthPropertyChanged));
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure),
+                IsWidthHeightValid);
 
         /// <summary>
         /// Gets or sets the width of the layout area for each item that is contained 
@@ -147,44 +102,13 @@ namespace System.Windows.Controls
                 nameof(ItemWidth),
                 typeof(double),
                 typeof(WrapPanel),
-                new PropertyMetadata(double.NaN, OnItemHeightOrWidthPropertyChanged));
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure),
+                IsWidthHeightValid);
 
-        /// <summary>
-        /// Property changed handler for ItemHeight and ItemWidth.
-        /// </summary>
-        /// <param name="d">
-        /// WrapPanel that changed its ItemHeight or ItemWidth.
-        /// </param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnItemHeightOrWidthPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static bool IsWidthHeightValid(object value)
         {
-            WrapPanel source = (WrapPanel)d;
-            double value = (double)e.NewValue;
-
-            // Ignore the change if requested
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
-            // Validate the length (which must either be NaN or a positive,
-            // finite number)
-            if (!double.IsNaN(value) && ((value <= 0.0) || double.IsPositiveInfinity(value)))
-            {
-                // Reset the property to its original state before throwing
-                source._ignorePropertyChange = true;
-                source.SetValue(e.Property, (double)e.OldValue);
-
-                string message = string.Format(
-                    CultureInfo.InvariantCulture,
-                    Resource.WrapPanel_OnItemHeightOrWidthPropertyChanged_InvalidValue,
-                    value);
-                throw new ArgumentException(message, "value");
-            }
-
-            // The length properties affect measuring.
-            source.InvalidateMeasure();
+            double v = (double)value;
+            return double.IsNaN(v) || (v >= 0.0d && !double.IsPositiveInfinity(v));
         }
 
         /// <summary>

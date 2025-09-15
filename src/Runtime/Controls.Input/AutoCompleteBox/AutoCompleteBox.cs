@@ -17,7 +17,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using Properties = OpenSilver.Controls.Input.Properties;
 
 namespace System.Windows.Controls
 {
@@ -153,14 +152,6 @@ namespace System.Windows.Controls
         private DispatcherTimer _delayTimer;
 
         /// <summary>
-        /// Gets or sets a value indicating whether a read-only dependency 
-        /// property change handler should allow the value to be set.  This is 
-        /// used to ensure that read-only properties cannot be changed via 
-        /// SetValue, etc.
-        /// </summary>
-        private bool _allowWrite;
-
-        /// <summary>
         /// Gets or sets the helper that provides all of the standard
         /// interaction functionality. Making it internal for subclass access.
         /// </summary>
@@ -265,7 +256,8 @@ namespace System.Windows.Controls
                 "MinimumPopulateDelay",
                 typeof(int),
                 typeof(AutoCompleteBox),
-                new PropertyMetadata(OnMinimumPopulateDelayPropertyChanged));
+                new PropertyMetadata(OnMinimumPopulateDelayPropertyChanged),
+                IsMinimumPopulateDelayValid);
 
         /// <summary>
         /// MinimumPopulateDelayProperty property changed handler. Any current 
@@ -280,20 +272,7 @@ namespace System.Windows.Controls
         {
             AutoCompleteBox source = d as AutoCompleteBox;
 
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
             int newValue = (int)e.NewValue;
-            if (newValue < 0)
-            {
-                source._ignorePropertyChange = true;
-                d.SetValue(e.Property, e.OldValue);
-
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.AutoComplete_OnMinimumPopulateDelayPropertyChanged_InvalidValue, newValue), "value");
-            }
 
             // Stop any existing timer
             if (source._delayTimer != null)
@@ -319,9 +298,14 @@ namespace System.Windows.Controls
                 source._delayTimer.Interval = TimeSpan.FromMilliseconds(newValue);
             }
         }
+
+        private static bool IsMinimumPopulateDelayValid(object value)
+        {
+            return (int)value >= 0;
+        }
 #endregion public int MinimumPopulateDelay
-        
-#region public bool IsTextCompletionEnabled
+
+        #region public bool IsTextCompletionEnabled
         /// <summary>
         /// Gets or sets a value indicating whether the first possible match
         /// found during the filtering process will be displayed automatically
@@ -492,7 +476,8 @@ namespace System.Windows.Controls
                 "MaxDropDownHeight",
                 typeof(double),
                 typeof(AutoCompleteBox),
-                new PropertyMetadata(double.PositiveInfinity, OnMaxDropDownHeightPropertyChanged));
+                new PropertyMetadata(double.PositiveInfinity, OnMaxDropDownHeightPropertyChanged),
+                IsMaxDropDownHeightValid);
 
         /// <summary>
         /// MaxDropDownHeightProperty property changed handler.
@@ -503,28 +488,18 @@ namespace System.Windows.Controls
         private static void OnMaxDropDownHeightPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             AutoCompleteBox source = d as AutoCompleteBox;
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
             double newValue = (double)e.NewValue;
-            
-            // Revert to the old value if invalid (negative)
-            if (newValue < 0)
-            {
-                source._ignorePropertyChange = true;
-                source.SetValue(e.Property, e.OldValue);
-
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.AutoComplete_OnMaxDropDownHeightPropertyChanged_InvalidValue, e.NewValue), "value");
-            }
-
             source.OnMaxDropDownHeightChanged(newValue);
+        }
+
+        private static bool IsMaxDropDownHeightValid(object o)
+        {
+            double v = (double)o;
+            return v >= 0 || double.IsNaN(v);
         }
 #endregion public double MaxDropDownHeight
 
-#region public bool IsDropDownOpen
+        #region public bool IsDropDownOpen
         /// <summary>
         /// Gets or sets a value indicating whether the drop-down portion of
         /// the control is open.
@@ -672,12 +647,6 @@ namespace System.Windows.Controls
         {
             AutoCompleteBox source = d as AutoCompleteBox;
 
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
             // Update the text display
             if (source._skipSelectedItemTextUpdate)
             {
@@ -810,20 +779,15 @@ namespace System.Windows.Controls
         public string SearchText
         {
             get { return (string)GetValue(SearchTextProperty); }
-
-            private set
-            {
-                try
-                {
-                    _allowWrite = true;
-                    SetValue(SearchTextProperty, value);
-                }
-                finally
-                {
-                    _allowWrite = false;
-                }
-            }
+            private set { SetValue(SearchTextPropertyKey, value); }
         }
+
+        private static readonly DependencyPropertyKey SearchTextPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(SearchText),
+                typeof(string),
+                typeof(AutoCompleteBox),
+                new PropertyMetadata(string.Empty));
 
         /// <summary>
         /// Identifies the
@@ -833,37 +797,7 @@ namespace System.Windows.Controls
         /// <value>The identifier for the
         /// <see cref="P:System.Windows.Controls.AutoCompleteBox.SearchText" />
         /// dependency property.</value>
-        public static readonly DependencyProperty SearchTextProperty =
-            DependencyProperty.Register(
-                "SearchText",
-                typeof(string),
-                typeof(AutoCompleteBox),
-                new PropertyMetadata(string.Empty, OnSearchTextPropertyChanged));
-
-        /// <summary>
-        /// OnSearchTextProperty property changed handler.
-        /// </summary>
-        /// <param name="d">AutoCompleteBox that changed its SearchText.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnSearchTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            AutoCompleteBox source = d as AutoCompleteBox;
-            if (source._ignorePropertyChange)
-            {
-                source._ignorePropertyChange = false;
-                return;
-            }
-
-            // Ensure the property is only written when expected
-            if (!source._allowWrite)
-            {
-                // Reset the old value before it was incorrectly written
-                source._ignorePropertyChange = true;
-                source.SetValue(e.Property, e.OldValue);
-
-                throw new InvalidOperationException(Properties.Resources.AutoComplete_OnSearchTextPropertyChanged_InvalidWrite);
-            }
-        }
+        public static readonly DependencyProperty SearchTextProperty = SearchTextPropertyKey.DependencyProperty;
 #endregion public string SearchText
 
 #region public AutoCompleteFilterMode FilterMode
@@ -902,7 +836,8 @@ namespace System.Windows.Controls
                 "FilterMode",
                 typeof(AutoCompleteFilterMode),
                 typeof(AutoCompleteBox),
-                new PropertyMetadata(AutoCompleteFilterMode.StartsWith, OnFilterModePropertyChanged));
+                new PropertyMetadata(AutoCompleteFilterMode.StartsWith, OnFilterModePropertyChanged),
+                IsFilterModeValid);
 
         /// <summary>
         /// FilterModeProperty property changed handler.
@@ -913,31 +848,30 @@ namespace System.Windows.Controls
         private static void OnFilterModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             AutoCompleteBox source = d as AutoCompleteBox;
-            AutoCompleteFilterMode mode = (AutoCompleteFilterMode)e.NewValue;
-
-            if (mode != AutoCompleteFilterMode.Contains &&
-                mode != AutoCompleteFilterMode.ContainsCaseSensitive &&
-                mode != AutoCompleteFilterMode.ContainsOrdinal &&
-                mode != AutoCompleteFilterMode.ContainsOrdinalCaseSensitive &&
-                mode != AutoCompleteFilterMode.Custom && 
-                mode != AutoCompleteFilterMode.Equals &&
-                mode != AutoCompleteFilterMode.EqualsCaseSensitive &&
-                mode != AutoCompleteFilterMode.EqualsOrdinal &&
-                mode != AutoCompleteFilterMode.EqualsOrdinalCaseSensitive &&
-                mode != AutoCompleteFilterMode.None &&
-                mode != AutoCompleteFilterMode.StartsWith &&
-                mode != AutoCompleteFilterMode.StartsWithCaseSensitive &&
-                mode != AutoCompleteFilterMode.StartsWithOrdinal &&
-                mode != AutoCompleteFilterMode.StartsWithOrdinalCaseSensitive)
-            {
-                source.SetValue(e.Property, e.OldValue);
-
-                throw new ArgumentException(Properties.Resources.AutoComplete_OnFilterModePropertyChanged_InvalidValue, "value");
-            }
 
             // Sets the filter predicate for the new value
             AutoCompleteFilterMode newValue = (AutoCompleteFilterMode)e.NewValue;
             source.TextFilter = AutoCompleteSearch.GetFilter(newValue);
+        }
+
+        private static bool IsFilterModeValid(object o)
+        {
+            var mode = (AutoCompleteFilterMode)o;
+
+            return mode == AutoCompleteFilterMode.Contains ||
+                   mode == AutoCompleteFilterMode.ContainsCaseSensitive ||
+                   mode == AutoCompleteFilterMode.ContainsOrdinal ||
+                   mode == AutoCompleteFilterMode.ContainsOrdinalCaseSensitive ||
+                   mode == AutoCompleteFilterMode.Custom ||
+                   mode == AutoCompleteFilterMode.Equals ||
+                   mode == AutoCompleteFilterMode.EqualsCaseSensitive ||
+                   mode == AutoCompleteFilterMode.EqualsOrdinal ||
+                   mode == AutoCompleteFilterMode.EqualsOrdinalCaseSensitive ||
+                   mode == AutoCompleteFilterMode.None ||
+                   mode == AutoCompleteFilterMode.StartsWith ||
+                   mode == AutoCompleteFilterMode.StartsWithCaseSensitive ||
+                   mode == AutoCompleteFilterMode.StartsWithOrdinal ||
+                   mode == AutoCompleteFilterMode.StartsWithOrdinalCaseSensitive;
         }
 #endregion public AutoCompleteFilterMode FilterMode
 
