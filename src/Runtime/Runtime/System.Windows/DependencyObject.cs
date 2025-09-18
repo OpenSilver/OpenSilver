@@ -490,6 +490,7 @@ namespace System.Windows
                 dp,
                 metadata,
                 value,
+                OperationType.Unknown,
                 false);
         }
 
@@ -516,6 +517,7 @@ namespace System.Windows
                 dp,
                 metadata,
                 value,
+                OperationType.Unknown,
                 true);
         }
 
@@ -557,6 +559,7 @@ namespace System.Windows
                 dp,
                 metadata,
                 value,
+                OperationType.Unknown,
                 false);
         }
 
@@ -583,10 +586,27 @@ namespace System.Windows
                 dp,
                 metadata,
                 value,
+                OperationType.Unknown,
                 true);
         }
 
         internal void SetValueInternal(DependencyPropertyKey key, bool value) => SetValueInternal(key, BooleanBoxes.Box(value));
+
+        internal void SetMutableDefaultValue(DependencyProperty dp, object value)
+        {
+            // Cache the metadata object this method needed to get anyway.
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            Storage storage = GetOrCreateStorage(dp, metadata);
+
+            DependencyObjectStore.SetValueCommon(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                OperationType.ChangeMutableDefaultValue,
+                true);
+        }
 
         /// <summary>
         /// Invoked whenever the effective value of any dependency property on this

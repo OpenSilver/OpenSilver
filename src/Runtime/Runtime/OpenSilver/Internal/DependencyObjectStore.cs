@@ -25,6 +25,7 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata,
         object newValue,
+        OperationType operationType,
         bool isInternal)
     {
         if (newValue == DependencyProperty.UnsetValue)
@@ -85,7 +86,7 @@ internal static class DependencyObjectStore
             oldEntry,
             newEntry,
             false, // clearValue
-            OperationType.Unknown);
+            operationType);
     }
 
     internal static void ClearValueCommon(
@@ -733,8 +734,10 @@ internal static class DependencyObjectStore
         // enforce this behavior for expressions and animated values, so we do
         // not enforce it either for now.
 
-        bool oldEntryHadContext = oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local;
-        bool newEntryNeedsContext = newEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local;
+        BaseValueSourceInternal oldValueSource = oldEntry.BaseValueSourceInternal;
+        BaseValueSourceInternal newValueSource = newEntry.BaseValueSourceInternal;
+        bool oldEntryHadContext = oldValueSource == BaseValueSourceInternal.Local;
+        bool newEntryNeedsContext = newValueSource == BaseValueSourceInternal.Local;
 
         if (valueChanged || oldEntryHadContext != newEntryNeedsContext)
         {
@@ -758,7 +761,7 @@ internal static class DependencyObjectStore
             storage.Entry = newEntry;
         }
 
-        if (valueChanged)
+        if (valueChanged || (operationType == OperationType.ChangeMutableDefaultValue && oldValueSource != newValueSource))
         {
             d.NotifyPropertyChange(
                 new DependencyPropertyChangedEventArgs(

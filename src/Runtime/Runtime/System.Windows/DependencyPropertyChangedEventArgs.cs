@@ -83,5 +83,6 @@ namespace System.Windows
     {
         Unknown = 0,
         Inherit = 1,
+        ChangeMutableDefaultValue = 2,
     }
 }
