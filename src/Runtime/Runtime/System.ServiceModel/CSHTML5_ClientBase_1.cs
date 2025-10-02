@@ -96,7 +96,14 @@ namespace System.ServiceModel
         protected void InvokeAsync(BeginOperationDelegate beginOperationDelegate, object[] inValues,
           EndOperationDelegate endOperationDelegate, SendOrPostCallback operationCompletedCallback, object userState)
         {
+            var oldSynchronizationContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(
+                Windows.Threading.Dispatcher.CurrentDispatcher.DefaultSynchronizationContext);
+
             var asyncOperation = AsyncOperationManager.CreateOperation(userState);
+
+            SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
+
             var context = new AsyncOperationContext(asyncOperation, endOperationDelegate, operationCompletedCallback);
 
             Exception error = null;
