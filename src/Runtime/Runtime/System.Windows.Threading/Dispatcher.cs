@@ -41,6 +41,8 @@ public sealed class Dispatcher
         _queue = new((int)DispatcherPriority.Send - (int)DispatcherPriority.Inactive + 1);
         _pendingOperations = new();
 
+        DefaultSynchronizationContext = new DispatcherSynchronizationContext(this);
+
         _dispatcherImpl = OpenSilver.Interop.IsRunningInTheSimulator ?
             new SimulatorDispatcher(this) : new WasmDispatcher(this);
         _dispatcherImpl.SetTickRate(DefaultTickRate);
@@ -57,6 +59,8 @@ public sealed class Dispatcher
     public static Dispatcher CurrentDispatcher { get; } = new Dispatcher();
 
     internal event EventHandler Tick;
+
+    internal DispatcherSynchronizationContext DefaultSynchronizationContext { get; }
 
     internal int TickRate
     {
