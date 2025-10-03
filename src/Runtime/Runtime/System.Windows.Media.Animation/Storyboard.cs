@@ -27,7 +27,7 @@ namespace System.Windows.Media.Animation;
 public sealed class Storyboard : Timeline
 {
     private TimelineCollection _children;
-    private TimelineClock _activeClock;
+    private WeakReference<TimelineClock> _activeClock;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Storyboard"/> class.
@@ -161,17 +161,22 @@ public sealed class Storyboard : Timeline
 
     private void BeginCommon(DependencyObject containingObject, bool alignedToLastTick)
     {
-        _activeClock?.Pause();
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            activeClock.Pause();
+        }
 
-        _activeClock = CreateClock(true);
-        ClockTreeWalkRecursive(_activeClock,
+        var newClock = CreateClock(true);
+        _activeClock = newClock.WeakReference;
+
+        ClockTreeWalkRecursive(newClock,
             containingObject,
             null,
             null,
             null,
             null);
 
-        _activeClock.Begin(alignedToLastTick);
+        newClock.Begin(alignedToLastTick);
     }
 
     /// <summary>
@@ -181,7 +186,14 @@ public sealed class Storyboard : Timeline
     /// One of the enumeration values: <see cref="ClockState.Active"/>,
     /// <see cref="ClockState.Filling"/>, or <see cref="ClockState.Stopped"/>.
     /// </returns>
-    public ClockState GetCurrentState() => _activeClock?.CurrentState ?? ClockState.Stopped;
+    public ClockState GetCurrentState()
+    {
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            return activeClock.CurrentState;
+        }
+        return ClockState.Stopped;
+    }
 
     /// <summary>
     /// Gets the current time of the storyboard.
@@ -189,17 +201,36 @@ public sealed class Storyboard : Timeline
     /// <returns>
     /// The current time of the storyboard, or null if the storyboard's clock is <see cref="ClockState.Stopped"/>.
     /// </returns>
-    public TimeSpan GetCurrentTime() => _activeClock?.CurrentTime ?? TimeSpan.Zero;
+    public TimeSpan GetCurrentTime()
+    {
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            return activeClock.CurrentTime;
+        }
+        return TimeSpan.Zero;
+    }
 
     /// <summary>
     /// Pauses the animation clock associated with the storyboard.
     /// </summary>
-    public void Pause() => _activeClock?.Pause();
+    public void Pause()
+    {
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            activeClock.Pause();
+        }
+    }
 
     /// <summary>
     /// Resumes the animation clock, or run-time state, associated with the storyboard.
     /// </summary>
-    public void Resume() => _activeClock?.Resume();
+    public void Resume()
+    {
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            activeClock.Resume();
+        }
+    }
 
     /// <summary>
     /// Moves the storyboard to the specified animation position. The storyboard performs
@@ -213,7 +244,13 @@ public sealed class Storyboard : Timeline
     /// components of the string, but the quotes, colons, and periods are all a literal part of
     /// the syntax):"[days.]hours:minutes:seconds[.fractionalSeconds]"- or -"days"
     /// </param>
-    public void Seek(TimeSpan offset) => _activeClock?.Seek(offset);
+    public void Seek(TimeSpan offset)
+    {
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            activeClock.Seek(offset);
+        }
+    }
 
     /// <summary>
     /// Moves the storyboard to the specified animation position immediately(synchronously).
@@ -227,23 +264,36 @@ public sealed class Storyboard : Timeline
     ///- or -
     ///"days"
     /// </param>
-    public void SeekAlignedToLastTick(TimeSpan offset) => _activeClock?.SeekAlignedToLastTick(offset);
+    public void SeekAlignedToLastTick(TimeSpan offset)
+    {
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            activeClock.SeekAlignedToLastTick(offset);
+        }
+    }
 
     /// <summary>
     /// Advances the current time of the storyboard's clock to the end of its active period.
     /// </summary>
-    public void SkipToFill() => _activeClock?.SkipToFill();
+    public void SkipToFill()
+    {
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
+        {
+            activeClock.SkipToFill();
+        }
+    }
 
     /// <summary>
     /// Stops the storyboard.
     /// </summary>
     public void Stop()
     {
-        if (_activeClock is not null)
+        if (_activeClock is not null && _activeClock.TryGetTarget(out TimelineClock activeClock))
         {
-            _activeClock.Stop();
-            _activeClock = null;
+            activeClock.Stop();
         }
+
+        _activeClock = null;
     }
 
     internal override TimelineClock CreateClock(bool isRoot) => new StoryboardClock(this, isRoot);
