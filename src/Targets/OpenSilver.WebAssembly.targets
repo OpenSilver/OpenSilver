@@ -79,6 +79,7 @@
 
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+                                 BaseIntermediateOutputPath="$(BaseIntermediateOutputPath)"
                                  DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/">
       <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedResources" />
     </ResourcesExtractorAndCopier>
