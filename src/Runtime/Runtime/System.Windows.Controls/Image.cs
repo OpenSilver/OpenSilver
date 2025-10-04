@@ -17,6 +17,7 @@ using System.Windows.Automation.Peers;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
+using System.Diagnostics;
 
 namespace System.Windows.Controls
 {
@@ -76,6 +77,8 @@ namespace System.Windows.Controls
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Image image = (Image)d;
+
+            image._naturalSize = new Size();
 
             if (image._sourceChangedListener != null)
             {
@@ -233,11 +236,19 @@ namespace System.Windows.Controls
             _imageDiv.Style.objectPosition = $"{hPos} {vPos}";
         }
 
-        private void OnSourceChanged(object sender, EventArgs e) => RefreshSource();
+        private void OnSourceChanged(object sender, EventArgs e)
+        {
+            _naturalSize = new Size();
+
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                RefreshSource();
+            }
+        }
 
         private void RefreshSource()
         {
-            _naturalSize = new Size();
+            Debug.Assert(_imageDiv is not null);
 
             if (Source is ImageSource source)
             {
