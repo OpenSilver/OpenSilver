@@ -344,7 +344,7 @@ public sealed class ResourcesExtractorAndCopier : Task
                 Log.LogMessage($"Skipped {resourceId} - the resource did not change.");
             }
 
-            copiedResources.Add(new TaskItem(destinationFile));
+            copiedResources.Add(new TaskItem(TaskHelper.GetRootRelativePath(_sourceDir, destinationFile)));
         }
 
         static IEnumerable<EmbeddedResource> GetManifestResources(AssemblyDefinition asm)
@@ -426,7 +426,7 @@ public sealed class ResourcesExtractorAndCopier : Task
                     Log.LogMessage($"Skipped {resourceId} - the resource did not change.");
                 }
 
-                copiedResources.Add(new TaskItem(destinationFile));
+                copiedResources.Add(new TaskItem(TaskHelper.GetRootRelativePath(_sourceDir, destinationFile)));
             }
         }
 

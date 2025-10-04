@@ -60,11 +60,10 @@
       For each file, we include relative and absolute paths. Currently Blazor targets use relative path, we 
       do this in case it changes in future versions.
       -->
-      <_OpenSilverOldStaticWebAssets Include="wwwroot/libs/**/*" />
-      <_OpenSilverOldStaticWebAssets Include="wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
-      <_OpenSilverOldStaticWebAssets Include="$(MSBuildProjectDirectory)/wwwroot/libs/**/*" />
-      <_OpenSilverOldStaticWebAssets Include="$(MSBuildProjectDirectory)/wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
-      <Content Remove="@(_OpenSilverOldStaticWebAssets)" />
+      <Content Remove="wwwroot/libs/**/*" />
+      <Content Remove="wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
+      <Content Remove="$(MSBuildProjectDirectory)/wwwroot/libs/**/*" />
+      <Content Remove="$(MSBuildProjectDirectory)/wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
     </ItemGroup>
 
     <ItemGroup>
@@ -73,20 +72,18 @@
 
     <Copy SourceFiles="@(_OpenSilverScripts)"
           SkipUnchangedFiles="true"
-          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/libs/">
-      <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedFiles" />
-    </Copy>
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/libs/" />
+
+    <ItemGroup>
+      <Content Include="wwwroot/libs/**/*" />
+    </ItemGroup>
 
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
                                  BaseIntermediateOutputPath="$(BaseIntermediateOutputPath)"
                                  DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/">
-      <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedResources" />
+      <Output ItemName="Content" TaskParameter="CopiedResources" />
     </ResourcesExtractorAndCopier>
-
-    <ItemGroup>
-      <Content Include="@(_OpenSilverStaticWebAssets)" />
-    </ItemGroup>
 
   </Target>
 
