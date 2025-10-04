@@ -35,11 +35,37 @@
 
   </Target>
 
-  <Target Name="_CopyWasmResources" BeforeTargets="PostBuildEvent">
+  <Target Name="_CopyWasmResources"
+          BeforeTargets="ResolveProjectStaticWebAssets"
+          DependsOnTargets="ResolveAssemblyReferences">
+
+    <PropertyGroup>
+      <_IsMainBuild>true</_IsMainBuild>
+      <_IsMainBuild Condition="'$(DesignTimeBuild)' == 'true' OR '$(BuildingProject)' != 'true'">false</_IsMainBuild>
+    </PropertyGroup>
+
+    <CallTarget Condition="'$(_IsMainBuild)' == 'true'" Targets="_CopyWasmResourcesMain" />
+
+  </Target>
+
+  <Target Name="_CopyWasmResourcesMain">
 
     <PropertyGroup>
       <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)' == ''">resources/</Cshtml5OutputResourcesPath>
     </PropertyGroup>
+
+    <ItemGroup>
+      <!--
+      Exclude all resources that have been copied during previous build to avoid duplicated resources error.
+      For each file, we include relative and absolute paths. Currently Blazor targets use relative path, we 
+      do this in case it changes in future versions.
+      -->
+      <_OpenSilverOldStaticWebAssets Include="wwwroot/libs/**/*" />
+      <_OpenSilverOldStaticWebAssets Include="wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
+      <_OpenSilverOldStaticWebAssets Include="$(MSBuildProjectDirectory)/wwwroot/libs/**/*" />
+      <_OpenSilverOldStaticWebAssets Include="$(MSBuildProjectDirectory)/wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
+      <Content Remove="@(_OpenSilverOldStaticWebAssets)" />
+    </ItemGroup>
 
     <ItemGroup>
       <_OpenSilverScripts Include="$(MSBuildThisFileDirectory)../content/**/*" />
@@ -47,11 +73,19 @@
 
     <Copy SourceFiles="@(_OpenSilverScripts)"
           SkipUnchangedFiles="true"
-          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/libs/" />
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/libs/">
+      <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedFiles" />
+    </Copy>
 
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/" />
+                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/">
+      <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedResources" />
+    </ResourcesExtractorAndCopier>
+
+    <ItemGroup>
+      <Content Include="@(_OpenSilverStaticWebAssets)" />
+    </ItemGroup>
 
   </Target>
 

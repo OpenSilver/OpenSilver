@@ -62,6 +62,9 @@ public sealed class ResourcesExtractorAndCopier : Task
     [Required]
     public ITaskItem[] ResolvedReferences { get; set; }
 
+    [Output]
+    public ITaskItem[] CopiedResources { get; set; }
+
     public override bool Execute()
     {
         const string operationName = "C#/XAML for HTML5: ResourcesExtractorAndCopier";
@@ -102,7 +105,7 @@ public sealed class ResourcesExtractorAndCopier : Task
                 }
 
                 // Do the extraction and copy:
-                ExtractResources(storage);
+                CopiedResources = ExtractResources(storage).ToArray();
             }
 
             //------- DISPLAY THE PROGRESS -------
@@ -123,8 +126,10 @@ public sealed class ResourcesExtractorAndCopier : Task
         }
     }
 
-    private void ExtractResources(MonoCecilAssemblyStorage storage)
+    private List<ITaskItem> ExtractResources(MonoCecilAssemblyStorage storage)
     {
+        List<ITaskItem> copiedResources = new();
+
         // Determine the absolute output path:
         string destinationFolder = NormalizeDirectorySeparator(DestinationFolder);
 
@@ -140,17 +145,19 @@ public sealed class ResourcesExtractorAndCopier : Task
             switch (compatibilityVersion)
             {
                 case 0:
-                    LegacyExtractResourcesFromAssembly(asm, destinationFolder);
+                    LegacyExtractResourcesFromAssembly(asm, destinationFolder, copiedResources);
                     break;
 
                 default:
-                    ExtractResourcesFromAssembly(asm, destinationFolder);
+                    ExtractResourcesFromAssembly(asm, destinationFolder, copiedResources);
                     break;
             }
         }
+
+        return copiedResources;
     }
 
-    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder)
+    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources)
     {
         string assemblyName = asm.Name.Name;
 
@@ -190,6 +197,8 @@ public sealed class ResourcesExtractorAndCopier : Task
 
             // Create the file:
             File.WriteAllBytes(destinationFile, fileContent);
+
+            copiedResources.Add(new TaskItem(destinationFile));
         }
 
         static IEnumerable<EmbeddedResource> GetManifestResources(AssemblyDefinition asm)
@@ -207,7 +216,7 @@ public sealed class ResourcesExtractorAndCopier : Task
         }
     }
 
-    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder)
+    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources)
     {
         if (GetResourceManifest(asm) is not EmbeddedResource manifest)
         {
@@ -257,6 +266,8 @@ public sealed class ResourcesExtractorAndCopier : Task
                 {
                     stream.CopyTo(fs);
                 }
+
+                copiedResources.Add(new TaskItem(destinationFile));
             }
         }
 
