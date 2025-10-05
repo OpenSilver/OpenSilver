@@ -49,21 +49,12 @@ namespace CSHTML5.Internal
             object[] callbackArgsObject,
             bool returnValue)
         {
-            object result;
-
-            try
+            if (JavaScriptCallback.Get(callbackId) is not JavaScriptCallback jsCallback)
             {
-                result = OnCallBackImpl.Instance.OnCallbackFromJavaScript(
-                    callbackId,
-                    idWhereCallbackArgsAreStored,
-                    callbackArgsObject);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                throw;
+                return null;
             }
 
+            object result = jsCallback.Invoke(idWhereCallbackArgsAreStored, callbackArgsObject);
             return returnValue ? result : null;
         }
 

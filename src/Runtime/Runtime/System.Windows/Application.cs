@@ -75,9 +75,6 @@ namespace System.Windows
 
             AppParams = GetAppParams();
 
-            AppDomain.CurrentDomain.UnhandledException +=
-                (s, e) => OnUnhandledException(e.ExceptionObject as Exception, false);
-
             new DOMEventManager(GetWindow, "unload", ProcessOnExit).AttachToDomEvents();
 
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
@@ -150,7 +147,7 @@ namespace System.Windows
                     }
                     catch (Exception ex)
                     {
-                        OnUnhandledException(ex, false);
+                        HandleException(ex);
                     }
                 }
             }
@@ -328,6 +325,24 @@ namespace System.Windows
         /// Occurs when an application is started.
         /// </summary>
         public event StartupEventHandler Startup;
+
+        /// <summary>
+        /// Occurs when an exception that is raised is not handled.
+        /// </summary>
+        public event EventHandler<ApplicationUnhandledExceptionEventArgs> UnhandledException;
+
+        internal static bool CallHandleException(Exception exception) => Current is Application app && app.HandleException(exception);
+
+        internal bool HandleException(Exception exception)
+        {
+            if (UnhandledException is EventHandler<ApplicationUnhandledExceptionEventArgs> handler)
+            {
+                var args = new ApplicationUnhandledExceptionEventArgs(exception, false);
+                handler(this, args);
+                return args.Handled;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Gets or sets the main application UI. This is an alias for the 
