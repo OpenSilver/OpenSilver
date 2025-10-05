@@ -39,11 +39,10 @@ namespace System.Runtime.Serialization
             OmitXmlDeclaration = true,
         };
 
-        private readonly Type _type;
-        private bool _useXmlSerializerFormat;
-        private List<Type> _knownTypes;
-        private XmlSerializer _xmlSerializer;
-        private DataContractSerializer _dataContractSerializer;
+        private readonly List<Type> _knownTypes;
+        private readonly bool _useXmlSerializerFormat;
+        private readonly XmlSerializer _xmlSerializer;
+        private readonly DataContractSerializer _dataContractSerializer;
 
         /// <summary>
         /// Initializes a new instance of the System.Runtime.Serialization.DataContractSerializer
@@ -53,19 +52,20 @@ namespace System.Runtime.Serialization
         /// <param name="useXmlSerializerFormat"></param>
         public DataContractSerializer_CSHTML5Ver(Type type, bool useXmlSerializerFormat = false)
         {
-            if (type == null)
+            if (type is null)
             {
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
             }
-            this._type = type;
 
-            if (this._useXmlSerializerFormat = useXmlSerializerFormat)
+            _useXmlSerializerFormat = useXmlSerializerFormat;
+
+            if (useXmlSerializerFormat)
             {
-                this._xmlSerializer = new XmlSerializer(type);
+                _xmlSerializer = new XmlSerializer(type);
             }
             else
             {
-                this._dataContractSerializer = new DataContractSerializer(type);
+                _dataContractSerializer = new DataContractSerializer(type);
             }
         }
 
@@ -82,31 +82,28 @@ namespace System.Runtime.Serialization
         /// <param name="useXmlSerializerFormat"></param>
         public DataContractSerializer_CSHTML5Ver(Type type, IEnumerable<Type> knownTypes, bool useXmlSerializerFormat = false)
         {
-            if (type == null)
+            if (type is null)
             {
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
             }
-            this._type = type;
 
-            if (knownTypes != null)
+            _knownTypes = [.. KnownTypesHelper.KnownTypes];
+
+            if (knownTypes is not null)
             {
-                this._knownTypes = new List<Type>(knownTypes);
+                foreach (Type knownType in knownTypes)
+                {
+                    _knownTypes.Add(knownType);
+                }
             }
-            if (this._knownTypes == null)
+
+            if (_useXmlSerializerFormat = useXmlSerializerFormat)
             {
-                this._knownTypes = new List<Type>(KnownTypesHelper.KnownTypes);
-            }
-            else
-            {
-                this._knownTypes.AddRange(KnownTypesHelper.KnownTypes);
-            }
-            if (this._useXmlSerializerFormat = useXmlSerializerFormat)
-            {
-                this._xmlSerializer = new XmlSerializer(type);
+                _xmlSerializer = new XmlSerializer(type);
             }
             else
             {
-                this._dataContractSerializer = new DataContractSerializer(type, this._knownTypes);
+                _dataContractSerializer = new DataContractSerializer(type, KnownTypes);
             }
         }
 
@@ -114,15 +111,12 @@ namespace System.Runtime.Serialization
         /// Gets a collection of types that may be present in the object graph serialized
         /// using this instance of the System.Runtime.Serialization.DataContractSerializer.
         /// </summary>
-        public IReadOnlyList<Type> KnownTypes
-        {
-            get { return this._knownTypes; }
-        }
+        public IReadOnlyList<Type> KnownTypes => _knownTypes;
 
         public string SerializeToString(object obj, bool indentXml = false, bool omitXmlDeclaration = false)
         {
             return (omitXmlDeclaration ? "" : (@"<?xml version=""1.0"" encoding=""UTF-8""?>" + Environment.NewLine)) +
-                this.SerializeToXDocument(obj).ToString(indentXml ? SaveOptions.None : SaveOptions.DisableFormatting);
+                SerializeToXDocument(obj).ToString(indentXml ? SaveOptions.None : SaveOptions.DisableFormatting);
         }
 
         public XDocument SerializeToXDocument(object obj)
@@ -156,9 +150,9 @@ namespace System.Runtime.Serialization
 
         public object DeserializeFromString(string xml)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                using (StreamWriter sw = new StreamWriter(ms))
+                using (var sw = new StreamWriter(ms))
                 {
                     sw.Write(xml);
                     sw.Flush();
@@ -196,13 +190,13 @@ namespace System.Runtime.Serialization
 
         private void SerializePrivate(Stream s, object o)
         {
-            if (this._useXmlSerializerFormat)
+            if (_useXmlSerializerFormat)
             {
-                this._xmlSerializer.Serialize(s, o);
+                _xmlSerializer.Serialize(s, o);
             }
             else
             {
-                this._dataContractSerializer.WriteObject(s, o);
+                _dataContractSerializer.WriteObject(s, o);
             }
         }
 
