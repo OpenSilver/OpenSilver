@@ -1131,6 +1131,11 @@ namespace System.ServiceModel
                     }
                 }
 
+                if (operation.IsOneWay)
+                {
+                    return (null, null);
+                }
+
                 object result = ReadResponseReferenceType(
                     bodyElement,
                     operation,
@@ -1146,6 +1151,8 @@ namespace System.ServiceModel
                 Type requestResponseType,
                 IReadOnlyList<Type> knownTypes)
             {
+                Debug.Assert(!operation.IsOneWay);
+
                 // we make sure this is not a method with no return type
                 // Note: we test for the "Object" type since it is what we put instead of "void"
                 // to allow passing it as Generic type argument when calling CallWebMethod.
