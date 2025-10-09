@@ -185,6 +185,7 @@ document.createImageManager = function (loadCallback, errorCallback) {
             element.style.lineHeight = '0px';
 
             const img = document._createElement('img', imgId, parent.windowid);
+            img.setAttribute('draggable', false);
             img.setAttribute('alt', ' ');
             img.style.display = 'none';
             img.style.width = 'inherit';
