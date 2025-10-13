@@ -253,7 +253,7 @@ namespace System.Windows.Controls.Theming
 #else
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    if (assembly.GetCustomAttribute<OpenSilverAssemblyAttribute>() != null)
+                    if (assembly.IsDefined(typeof(OpenSilverAssemblyAttribute), true))
                     {
                         yield return assembly;
                     }

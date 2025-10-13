@@ -78,7 +78,7 @@ internal static class AppResourcesManager
         _resourceManagers[assembly.GetName().Name] = new(assembly);
 
     private static bool IsOpenSilverAssembly(Assembly assembly) =>
-        assembly.GetCustomAttribute<OpenSilverAssemblyAttribute>() is not null;
+        assembly.IsDefined(typeof(OpenSilverAssemblyAttribute), true);
 
     private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs e)
     {

@@ -98,7 +98,7 @@ namespace System.ComponentModel.Composition
         {
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (asm.GetCustomAttribute<OpenSilverAssemblyAttribute>() is not null)
+                if (asm.IsDefined(typeof(OpenSilverAssemblyAttribute), true))
                 {
                     yield return asm;
                 }
