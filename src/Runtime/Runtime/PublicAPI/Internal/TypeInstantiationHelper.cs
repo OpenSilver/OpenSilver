@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,14 @@
 *  
 \*====================================================================================*/
 
-
+using OpenSilver.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace CSHTML5.Internal
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Activator instead.")]
     public static class TypeInstantiationHelper
     {
         /// <summary>

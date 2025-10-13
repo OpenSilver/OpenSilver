@@ -307,7 +307,7 @@ End Sub
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
-                        $"Return CType(Global.CSHTML5.Internal.TypeInstantiationHelper.Instantiate(GetType({componentTypeFullName})), {componentTypeFullName})",
+                        $"Return Global.System.Activator.CreateInstance(Of {componentTypeFullName})()",
                         parameters.ResultingMethods,
                         $"Global.{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,

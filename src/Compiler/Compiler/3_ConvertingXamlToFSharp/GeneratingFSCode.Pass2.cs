@@ -337,7 +337,7 @@ namespace OpenSilver.Compiler
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
-                        $"        global.CSHTML5.Internal.TypeInstantiationHelper.Instantiate(System.Type.GetType(\"{behindClassTypeName}\")) :?> {componentTypeFullName}",
+                        $"        global.System.Activator.CreateInstance<{componentTypeFullName}>()",
                         parameters.ResultingMethods,
                         $"global.{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,
