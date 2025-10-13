@@ -2,6 +2,7 @@
   <Import Project="..\Directory.Build.props" />
 
   <PropertyGroup>
+    <GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
     <OpenSilverDependencyVersion>3.2.0</OpenSilverDependencyVersion>
     <OpenSilverTargetsDirectory>$(MSBuildThisFileDirectory)..\packages\OpenSilver.$(OpenSilverDependencyVersion)\build</OpenSilverTargetsDirectory>
     <OpenSilverTargets>$(OpenSilverTargetsDirectory)\OpenSilver.targets</OpenSilverTargets>
