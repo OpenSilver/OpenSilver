@@ -38,7 +38,7 @@ namespace System.Windows.Controls
     /// </example>
     public class StackPanel : Panel, IBorderElement
     {
-        private WeakEventListener<StackPanel, Brush, EventArgs> _borderBrushChangedListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Gets a value that represents the <see cref="Controls.Orientation"/> of the <see cref="StackPanel"/>.
@@ -146,20 +146,20 @@ namespace System.Windows.Controls
         {
             var panel = (StackPanel)d;
 
-            if (panel._borderBrushChangedListener != null)
+            if (panel._weakEventToken != null)
             {
-                panel._borderBrushChangedListener.Detach();
-                panel._borderBrushChangedListener = null;
+                panel._weakEventToken.Dispose();
+                panel._weakEventToken= null;
             }
 
             if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
-                panel._borderBrushChangedListener = new(panel, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += panel._borderBrushChangedListener.OnEvent;
+                panel._weakEventToken = WeakEvent.Subscribe<StackPanel, Brush, EventArgs>(
+                    panel,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 

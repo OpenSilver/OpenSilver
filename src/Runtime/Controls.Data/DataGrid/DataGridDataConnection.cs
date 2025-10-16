@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Data;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -28,10 +29,10 @@ namespace System.Windows.Controls
         private DataGrid _owner;
         private bool _scrollForCurrentChanged;
         private DataGridSelectionAction _selectionActionForCurrentChanged;
-        private WeakEventListener<DataGridDataConnection, object, NotifyCollectionChangedEventArgs> _collectionChangedListener;
-        private WeakEventListener<DataGridDataConnection, object, NotifyCollectionChangedEventArgs> _sortDescriptionsCollectionChangedListener;
-        private WeakEventListener<DataGridDataConnection, object, EventArgs> _currentChangedListener;
-        private WeakEventListener<DataGridDataConnection, object, CurrentChangingEventArgs> _currentChangingListener;
+        private WeakEventToken _weakCollectionChangedEventToken;
+        private WeakEventToken _weakSortDescriptionsCollectionChangedEventToken;
+        private WeakEventToken _weakCurrentChangedEventToken;
+        private WeakEventToken _weakCurrentChangingEventToken;
 
         #endregion Data
 
@@ -536,28 +537,28 @@ namespace System.Windows.Controls
 
         internal void UnWireEvents(IEnumerable value)
         {
-            if (this._collectionChangedListener != null)
+            if (this._weakCollectionChangedEventToken != null)
             {
-                this._collectionChangedListener.Detach();
-                this._collectionChangedListener = null;
+                this._weakCollectionChangedEventToken.Dispose();
+                this._weakCollectionChangedEventToken = null;
             }
 
-            if (this._sortDescriptionsCollectionChangedListener != null)
+            if (this._weakSortDescriptionsCollectionChangedEventToken != null)
             {
-                this._sortDescriptionsCollectionChangedListener.Detach();
-                this._sortDescriptionsCollectionChangedListener = null;
+                this._weakSortDescriptionsCollectionChangedEventToken.Dispose();
+                this._weakSortDescriptionsCollectionChangedEventToken = null;
             }
 
-            if (this._currentChangedListener != null)
+            if (this._weakCurrentChangedEventToken != null)
             {
-                this._currentChangedListener.Detach();
-                this._currentChangedListener = null;
+                this._weakCurrentChangedEventToken.Dispose();
+                this._weakCurrentChangedEventToken = null;
             }
 
-            if (this._currentChangingListener != null)
+            if (this._weakCurrentChangingEventToken != null)
             {
-                this._currentChangingListener.Detach();
-                this._currentChangingListener = null;
+                this._weakCurrentChangingEventToken.Dispose();
+                this._weakCurrentChangingEventToken = null;
             }
 
             this.EventsWired = false;
@@ -568,41 +569,41 @@ namespace System.Windows.Controls
             INotifyCollectionChanged notifyingDataSource = value as INotifyCollectionChanged;
             if (notifyingDataSource != null)
             {
-                this._collectionChangedListener = new(this)
-                {
-                    OnEventAction = static (instance, source, args) => instance.NotifyingDataSource_CollectionChanged(source, args),
-                    OnDetachAction = listener => notifyingDataSource.CollectionChanged -= listener.OnEvent,
-                };
-                notifyingDataSource.CollectionChanged += this._collectionChangedListener.OnEvent;
+                this._weakCollectionChangedEventToken = WeakEvent.Subscribe<DataGridDataConnection, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                    this,
+                    notifyingDataSource,
+                    static (instance, source, args) => instance.NotifyingDataSource_CollectionChanged(source, args),
+                    static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                    static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
             }
 
             INotifyCollectionChanged sortDescriptions = this.SortDescriptions;
             if (sortDescriptions != null)
             {
-                this._sortDescriptionsCollectionChangedListener = new(this)
-                {
-                    OnEventAction = static (instance, source, args) => instance.CollectionView_SortDescriptions_CollectionChanged(source, args),
-                    OnDetachAction = listener => sortDescriptions.CollectionChanged -= listener.OnEvent,
-                };
-                sortDescriptions.CollectionChanged += this._sortDescriptionsCollectionChangedListener.OnEvent;
+                this._weakSortDescriptionsCollectionChangedEventToken = WeakEvent.Subscribe<DataGridDataConnection, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                    this,
+                    sortDescriptions,
+                    static (instance, source, args) => instance.CollectionView_SortDescriptions_CollectionChanged(source, args),
+                    static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                    static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
             }
 
             ICollectionView collectionView = this.CollectionView;
             if (collectionView != null)
             {
-                this._currentChangedListener = new(this)
-                {
-                    OnEventAction = static (instance, source, args) => instance.CollectionView_CurrentChanged(source, args),
-                    OnDetachAction = listener => collectionView.CurrentChanged -= listener.OnEvent,
-                };
-                collectionView.CurrentChanged += this._currentChangedListener.OnEvent;
+                this._weakCurrentChangedEventToken = WeakEvent.Subscribe<DataGridDataConnection, ICollectionView, EventArgs>(
+                    this,
+                    collectionView,
+                    static (instance, source, args) => instance.CollectionView_CurrentChanged(source, args),
+                    static (handler, source) => source.CurrentChanged -= new EventHandler(handler),
+                    static (handler, source) => source.CurrentChanged += new EventHandler(handler));
 
-                this._currentChangingListener = new(this)
-                {
-                    OnEventAction = static (instance, source, args) => instance.CollectionView_CurrentChanging(source, args),
-                    OnDetachAction = listener => collectionView.CurrentChanging -= listener.OnEvent,
-                };
-                collectionView.CurrentChanging += this._currentChangingListener.OnEvent;
+                this._weakCurrentChangingEventToken = WeakEvent.Subscribe<DataGridDataConnection, ICollectionView, CurrentChangingEventArgs>(
+                    this,
+                    collectionView,
+                    static (instance, source, args) => instance.CollectionView_CurrentChanging(source, args),
+                    static (handler, source) => source.CurrentChanging -= new CurrentChangingEventHandler(handler),
+                    static (handler, source) => source.CurrentChanging += new CurrentChangingEventHandler(handler));
             }
 
             this.EventsWired = true;

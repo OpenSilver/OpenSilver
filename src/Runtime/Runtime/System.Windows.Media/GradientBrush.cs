@@ -27,7 +27,7 @@ namespace System.Windows.Media
     [ContentProperty(nameof(GradientStops))]
     public class GradientBrush : Brush
     {
-        private WeakEventListener<GradientBrush, GradientStopCollection, EventArgs> _gradientStopsChangedListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GradientBrush"/> class.
@@ -93,20 +93,20 @@ namespace System.Windows.Media
 
         private void OnGradientStopsChanged(GradientStopCollection oldStops, GradientStopCollection newStops)
         {
-            if (_gradientStopsChangedListener != null)
+            if (_weakEventToken != null)
             {
-                _gradientStopsChangedListener.Detach();
-                _gradientStopsChangedListener = null;
+                _weakEventToken.Dispose();
+                _weakEventToken = null;
             }
 
             if (newStops is not null)
             {
-                _gradientStopsChangedListener = new(this, newStops)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnGradientStopCollectionChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newStops.Changed += _gradientStopsChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<GradientBrush, GradientStopCollection, EventArgs>(
+                    this,
+                    newStops,
+                    static (instance, sender, args) => instance.OnGradientStopCollectionChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 

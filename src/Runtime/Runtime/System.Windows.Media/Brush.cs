@@ -26,7 +26,7 @@ namespace System.Windows.Media
     [TypeConverter(typeof(BrushConverter))]
     public class Brush : DependencyObject
     {
-        private WeakEventListener<Brush, Transform, EventArgs> _transformChangedListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Brush"/> class.
@@ -116,20 +116,20 @@ namespace System.Windows.Media
         {
             Brush brush = (Brush)d;
 
-            if (brush._transformChangedListener != null)
+            if (brush._weakEventToken != null)
             {
-                brush._transformChangedListener.Detach();
-                brush._transformChangedListener = null;
+                brush._weakEventToken.Dispose();
+                brush._weakEventToken = null;
             }
 
             if (e.NewValue is Transform newTransform)
             {
-                brush._transformChangedListener = new(brush, newTransform)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newTransform.Changed += brush._transformChangedListener.OnEvent;
+                brush._weakEventToken = WeakEvent.Subscribe<Brush, Transform, EventArgs>(
+                    brush,
+                    newTransform,
+                    static (instance, sender, args) => instance.OnTransformChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
 
             brush.RaiseTransformChanged();

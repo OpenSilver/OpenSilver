@@ -12,6 +12,7 @@ using System.Windows.Controls.DataVisualization.Collections;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
@@ -207,10 +208,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
             if (null != oldValueINotifyCollectionChanged)
             {
                 // Detach the WeakEventListener
-                if (null != _weakEventListener)
+                if (null != _weakEventToken)
                 {
-                    _weakEventListener.Detach();
-                    _weakEventListener = null;
+                    _weakEventToken.Dispose();
+                    _weakEventToken = null;
                 }
             }
 
@@ -219,10 +220,12 @@ namespace System.Windows.Controls.DataVisualization.Charting
             if (null != newValueINotifyCollectionChanged)
             {
                 // Use a WeakEventListener so that the backwards reference doesn't keep this object alive
-                _weakEventListener = new WeakEventListener<DataPointSeries, object, NotifyCollectionChangedEventArgs>(this);
-                _weakEventListener.OnEventAction = (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs);
-                _weakEventListener.OnDetachAction = (weakEventListener) => newValueINotifyCollectionChanged.CollectionChanged -= weakEventListener.OnEvent;
-                newValueINotifyCollectionChanged.CollectionChanged += _weakEventListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<DataPointSeries, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                    this,
+                    newValueINotifyCollectionChanged,
+                    static (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs),
+                    static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                    static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
             }
 
             if (TemplateApplied)
@@ -350,7 +353,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// WeakEventListener used to handle INotifyCollectionChanged events.
         /// </summary>
-        private WeakEventListener<DataPointSeries, object, NotifyCollectionChangedEventArgs> _weakEventListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// The plot area canvas.

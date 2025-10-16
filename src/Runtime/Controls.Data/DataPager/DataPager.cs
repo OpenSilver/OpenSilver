@@ -19,6 +19,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using OpenSilver.Controls;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -405,7 +406,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Holds the weak event listener for the INotifyPropertyChanged.PropertyChanged event.
         /// </summary>
-        private WeakEventListener<DataPager, object, PropertyChangedEventArgs> _weakEventListenerPropertyChanged;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Delegate for calling page move operations
@@ -1127,10 +1128,10 @@ namespace System.Windows.Controls
             DataPager pager = d as DataPager;
 
             INotifyPropertyChanged oldNotifyPropertyChanged = e.OldValue as INotifyPropertyChanged;
-            if (oldNotifyPropertyChanged != null && pager._weakEventListenerPropertyChanged != null)
+            if (oldNotifyPropertyChanged != null && pager._weakEventToken != null)
             {
-                pager._weakEventListenerPropertyChanged.Detach();
-                pager._weakEventListenerPropertyChanged = null;
+                pager._weakEventToken.Dispose();
+                pager._weakEventToken = null;
             }
 
             IPagedCollectionView newPagedCollectionView = e.NewValue as IPagedCollectionView;
@@ -1139,10 +1140,12 @@ namespace System.Windows.Controls
                 INotifyPropertyChanged newNotifyPropertyChanged = e.NewValue as INotifyPropertyChanged;
                 if (newNotifyPropertyChanged != null)
                 {
-                    pager._weakEventListenerPropertyChanged = new WeakEventListener<DataPager, object, PropertyChangedEventArgs>(pager);
-                    pager._weakEventListenerPropertyChanged.OnEventAction = (instance, source, eventArgs) => instance.OnSourcePropertyChanged(source, eventArgs);
-                    pager._weakEventListenerPropertyChanged.OnDetachAction = (weakEventListener) => newNotifyPropertyChanged.PropertyChanged -= weakEventListener.OnEvent;
-                    newNotifyPropertyChanged.PropertyChanged += pager._weakEventListenerPropertyChanged.OnEvent;
+                    pager._weakEventToken = WeakEvent.Subscribe<DataPager, INotifyPropertyChanged, PropertyChangedEventArgs>(
+                        pager,
+                        newNotifyPropertyChanged,
+                        static (instance, source, eventArgs) => instance.OnSourcePropertyChanged(source, eventArgs),
+                        static (handler, source) => source.PropertyChanged -= new PropertyChangedEventHandler(handler),
+                        static (handler, source) => source.PropertyChanged += new PropertyChangedEventHandler(handler));
                 }
 
                 if (pager.PageSize != 0)

@@ -24,7 +24,7 @@ namespace System.Windows.Shapes;
 /// </summary>
 public sealed class Polyline : Shape
 {
-    private WeakEventListener<Polyline, PointCollection, EventArgs> _pointsChanged;
+    private WeakEventToken _weakEventToken;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Polyline"/> class.
@@ -117,20 +117,20 @@ public sealed class Polyline : Shape
         Polyline polyline = (Polyline)d;
         PointCollection points = (PointCollection)e.NewValue;
 
-        if (polyline._pointsChanged is not null)
+        if (polyline._weakEventToken is not null)
         {
-            polyline._pointsChanged.Detach();
-            polyline._pointsChanged = null;
+            polyline._weakEventToken.Dispose();
+            polyline._weakEventToken = null;
         }
 
         if (points is not null)
         {
-            polyline._pointsChanged = new(polyline, points)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnPointsCollectionChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            points.Changed += polyline._pointsChanged.OnEvent;
+            polyline._weakEventToken = WeakEvent.Subscribe<Polyline, PointCollection, EventArgs>(
+                polyline,
+                points,
+                static (instance, sender, args) => instance.OnPointsCollectionChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
     }
 

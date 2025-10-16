@@ -13,6 +13,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Markup;
 using System.Windows.Data;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls.DataVisualization
 {
@@ -243,10 +244,10 @@ namespace System.Windows.Controls.DataVisualization
             if (null != oldValueINotifyCollectionChanged)
             {
                 // Detach the WeakEventListener
-                if (null != _weakEventListener)
+                if (null != _weakEventToken)
                 {
-                    _weakEventListener.Detach();
-                    _weakEventListener = null;
+                    _weakEventToken.Dispose();
+                    _weakEventToken = null;
                 }
             }
 
@@ -255,10 +256,12 @@ namespace System.Windows.Controls.DataVisualization
             if (null != newValueINotifyCollectionChanged)
             {
                 // Use a WeakEventListener so that the backwards reference doesn't keep this object alive
-                _weakEventListener = new WeakEventListener<TreeMap, object, NotifyCollectionChangedEventArgs>(this);
-                _weakEventListener.OnEventAction = (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs);
-                _weakEventListener.OnDetachAction = (weakEventListener) => newValueINotifyCollectionChanged.CollectionChanged -= weakEventListener.OnEvent;
-                newValueINotifyCollectionChanged.CollectionChanged += _weakEventListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<TreeMap, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                    this,
+                    newValueINotifyCollectionChanged,
+                    static (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs),
+                    static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                    static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
             }
 
             // Handle property change
@@ -268,7 +271,7 @@ namespace System.Windows.Controls.DataVisualization
         /// <summary>
         /// WeakEventListener used to handle INotifyCollectionChanged events.
         /// </summary>
-        private WeakEventListener<TreeMap, object, NotifyCollectionChangedEventArgs> _weakEventListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Method that handles the ObservableCollection.CollectionChanged event for the ItemsSource property.
@@ -588,15 +591,17 @@ namespace System.Windows.Controls.DataVisualization
                         children = Enumerable.Empty<TreeMapNode>();
 
                     // Subscribe to CollectionChanged for the collection
-                    WeakEventListener<TreeMap, object, NotifyCollectionChangedEventArgs> weakEventListener = null;
+                    WeakEventToken weakEventToken = null;
                     INotifyCollectionChanged objectChildrenINotifyCollectionChanged = objectChildren as INotifyCollectionChanged;
                     if (objectChildrenINotifyCollectionChanged != null)
                     {
                         // Use a WeakEventListener so that the backwards reference doesn't keep this object alive
-                        weakEventListener = new WeakEventListener<TreeMap, object, NotifyCollectionChangedEventArgs>(this);
-                        weakEventListener.OnEventAction = (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs);
-                        weakEventListener.OnDetachAction = (wel) => objectChildrenINotifyCollectionChanged.CollectionChanged -= wel.OnEvent;
-                        objectChildrenINotifyCollectionChanged.CollectionChanged += weakEventListener.OnEvent;
+                        weakEventToken = WeakEvent.Subscribe<TreeMap, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                            this,
+                            objectChildrenINotifyCollectionChanged,
+                            static (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs),
+                            static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                            static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
                     }
 
                     // Auto-aggregate children area values
@@ -641,7 +646,7 @@ namespace System.Windows.Controls.DataVisualization
                                             ItemDefinition = template,
                                             ChildItemPadding = template.ChildItemPadding,
                                             Children = children,
-                                            WeakEventListener = weakEventListener,
+                                            WeakEventToken = weakEventToken,
                                         });
                     }
                 }
@@ -725,9 +730,9 @@ namespace System.Windows.Controls.DataVisualization
             if (ContainerElement != null)
             {
                 // Unhook from CollectionChanged
-                foreach (TreeMapNode treeMapNode in GetTreeMapNodes().Where(n => n.WeakEventListener != null))
+                foreach (TreeMapNode treeMapNode in GetTreeMapNodes().Where(n => n.WeakEventToken != null))
                 {
-                    treeMapNode.WeakEventListener.Detach();
+                    treeMapNode.WeakEventToken.Dispose();
                 }
 
                 // Reset all interpolators

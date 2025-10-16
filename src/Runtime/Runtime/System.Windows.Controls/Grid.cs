@@ -26,7 +26,7 @@ namespace System.Windows.Controls;
 /// </summary>
 public class Grid : Panel, IBorderElement
 {
-    private WeakEventListener<Grid, Brush, EventArgs> _borderBrushChangedListener;
+    private WeakEventToken _weakEventToken;
 
     static Grid()
     {
@@ -427,20 +427,20 @@ public class Grid : Panel, IBorderElement
     {
         var panel = (Grid)d;
 
-        if (panel._borderBrushChangedListener != null)
+        if (panel._weakEventToken != null)
         {
-            panel._borderBrushChangedListener.Detach();
-            panel._borderBrushChangedListener = null;
+            panel._weakEventToken.Dispose();
+            panel._weakEventToken = null;
         }
 
         if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
         {
-            panel._borderBrushChangedListener = new(panel, newBrush)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            newBrush.Changed += panel._borderBrushChangedListener.OnEvent;
+            panel._weakEventToken = WeakEvent.Subscribe<Grid, Brush, EventArgs>(
+                panel,
+                newBrush,
+                static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
     }
 

@@ -24,8 +24,8 @@
     <Compile Include="..\Controls.Toolkit\Common\EnumerableExtensions.cs">
       <Link>EnumerableExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\Controls.Data\WeakEventListener.cs">
-      <Link>WeakEventListener.cs</Link>
+    <Compile Include="..\Runtime\OpenSilver\Internal\WeakEvent.cs">
+      <Link>WeakEvent.cs</Link>
     </Compile>
     <Compile Include="AggregatedObservableCollection.cs" />
     <Compile Include="Charting\Axis\IAnchoredToOrigin.cs" />

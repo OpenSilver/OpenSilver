@@ -40,10 +40,10 @@ namespace OpenSilver.Internal.Data
 
                 if (_groupBy != null)
                 {
-                    if (_propertyChangedListener != null)
+                    if (_weakEventToken != null)
                     {
-                        _propertyChangedListener.Detach();
-                        _propertyChangedListener = null;
+                        _weakEventToken.Dispose();
+                        _weakEventToken = null;
                     }
                 }
 
@@ -51,12 +51,12 @@ namespace OpenSilver.Internal.Data
 
                 if (_groupBy != null)
                 {
-                    _propertyChangedListener = new WeakEventListener<CollectionViewGroupInternal, INotifyPropertyChanged, PropertyChangedEventArgs>(this, _groupBy)
-                    {
-                        OnEventAction = static (instance, source, args) => instance.OnGroupByChanged(source, args),
-                        OnDetachAction = static (listener, source) => source.PropertyChanged -= listener.OnEvent,
-                    };
-                    ((INotifyPropertyChanged)_groupBy).PropertyChanged += _propertyChangedListener.OnEvent;
+                    _weakEventToken = WeakEvent.Subscribe<CollectionViewGroupInternal, INotifyPropertyChanged, PropertyChangedEventArgs>(
+                        this,
+                        _groupBy,
+                        static (instance, source, eventArgs) => instance.OnGroupByChanged(source, eventArgs),
+                        static (handler, source) => source.PropertyChanged -= new PropertyChangedEventHandler(handler),
+                        static (handler, source) => source.PropertyChanged += new PropertyChangedEventHandler(handler));
                 }
 
                 // choose a comparer based on info in the GroupDescription and the owning collection view
@@ -197,10 +197,10 @@ namespace OpenSilver.Internal.Data
             if (_groupBy != null)
             {
                 // This group has subgroups.  Disconnect from GroupDescription events
-                if (_propertyChangedListener != null)
+                if (_weakEventToken != null)
                 {
-                    _propertyChangedListener.Detach();
-                    _propertyChangedListener = null;
+                    _weakEventToken.Dispose();
+                    _weakEventToken = null;
                 }
 
                 _groupBy = null;
@@ -679,7 +679,7 @@ namespace OpenSilver.Internal.Data
         private Dictionary<object, WeakReference> _nameToGroupMap; // To cache the mapping between name and subgroup
         private bool _mapCleanupScheduled = false;
 
-        private WeakEventListener<CollectionViewGroupInternal, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
+        private WeakEventToken _weakEventToken;
 
         private sealed class LeafEnumerator : IEnumerator
         {

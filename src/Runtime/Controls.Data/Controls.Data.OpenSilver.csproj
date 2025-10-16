@@ -105,7 +105,9 @@
     </Compile>
     <Compile Include="ValidationUtil.cs" />
     <Compile Include="VisualStates.cs" />
-    <Compile Include="WeakEventListener.cs" />
+    <Compile Include="..\Runtime\OpenSilver\Internal\WeakEvent.cs">
+      <Link>WeakEvent.cs</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

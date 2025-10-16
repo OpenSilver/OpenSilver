@@ -448,10 +448,10 @@ namespace System.Windows.Data
             {
                 if (_dataProvider != null)
                 {
-                    if (_dataChangedListener != null)
+                    if (_weakEventToken != null)
                     {
-                        _dataChangedListener.Detach();
-                        _dataChangedListener = null;
+                        _weakEventToken.Dispose();
+                        _weakEventToken = null;
                     }
                 }
 
@@ -459,12 +459,13 @@ namespace System.Windows.Data
 
                 if (_dataProvider != null)
                 {
-                    _dataChangedListener = new WeakEventListener<CollectionViewSource, DataSourceProvider, EventArgs>(this, _dataProvider)
-                    {
-                        OnEventAction = static (instance, sender, args) => instance.OnDataChanged(sender, args),
-                        OnDetachAction = static (listener, source) => source.DataChanged -= listener.OnEvent,
-                    };
-                    _dataProvider.DataChanged += _dataChangedListener.OnEvent;
+                    _weakEventToken = WeakEvent.Subscribe<CollectionViewSource, DataSourceProvider, EventArgs>(
+                        this,
+                        _dataProvider,
+                        static (instance, sender, args) => instance.OnDataChanged(sender, args),
+                        static (handler, source) => source.DataChanged -= new EventHandler(handler),
+                        static (handler, source) => source.DataChanged += new EventHandler(handler));
+
                     _dataProvider.InitialLoad();
                 }
             }
@@ -705,7 +706,7 @@ namespace System.Windows.Data
         private int _deferLevel;    // counts nested calls to BeginDefer
         private DataSourceProvider _dataProvider;  // DataSourceProvider whose DataChanged event we want
         private FilterStub _filterStub;    // used to support the Filter event
-        private WeakEventListener<CollectionViewSource, DataSourceProvider, EventArgs> _dataChangedListener;
+        private WeakEventToken _weakEventToken;
 
         // the placeholder source for all default views
         private static readonly CollectionViewSource DefaultSource = new CollectionViewSource();

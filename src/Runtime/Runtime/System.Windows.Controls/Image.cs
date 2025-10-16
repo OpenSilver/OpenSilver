@@ -40,7 +40,7 @@ namespace System.Windows.Controls
     {
         private INTERNAL_HtmlDomElementReference _imageDiv;
         private Size _naturalSize;
-        private WeakEventListener<Image, ImageSource, EventArgs> _sourceChangedListener;
+        private WeakEventToken _weakEventToken;
 
         static Image()
         {
@@ -80,20 +80,20 @@ namespace System.Windows.Controls
 
             image._naturalSize = new Size();
 
-            if (image._sourceChangedListener != null)
+            if (image._weakEventToken != null)
             {
-                image._sourceChangedListener.Detach();
-                image._sourceChangedListener = null;
+                image._weakEventToken.Dispose();
+                image._weakEventToken = null;
             }
 
             if (e.NewValue is ImageSource source)
             {
-                image._sourceChangedListener = new(image, source)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnSourceChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                source.Changed += image._sourceChangedListener.OnEvent;
+                image._weakEventToken = WeakEvent.Subscribe<Image, ImageSource, EventArgs>(
+                    image,
+                    source,
+                    static (instance, sender, args) => instance.OnSourceChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 

@@ -23,7 +23,7 @@ namespace System.Windows.Media
     [ContentProperty(nameof(Children))]
     public sealed class TransformGroup : Transform
     {
-        private WeakEventListener<TransformGroup, TransformCollection, EventArgs> _childrenChangedListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Identifies the <see cref="Children"/> dependency property.
@@ -71,20 +71,20 @@ namespace System.Windows.Media
 
         private void OnChildrenChanged(TransformCollection oldChildren, TransformCollection newChildren)
         {
-            if (_childrenChangedListener != null)
+            if (_weakEventToken != null)
             {
-                _childrenChangedListener.Detach();
-                _childrenChangedListener = null;
+                _weakEventToken.Dispose();
+                _weakEventToken = null;
             }
 
             if (newChildren is not null)
             {
-                _childrenChangedListener = new(this, newChildren)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnChildrenCollectionChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newChildren.Changed += _childrenChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<TransformGroup, TransformCollection, EventArgs>(
+                    this,
+                    newChildren,
+                    static (instance, sender, args) => instance.OnChildrenCollectionChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 

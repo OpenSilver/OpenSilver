@@ -49,7 +49,7 @@ namespace System.Windows.Controls.Primitives
 
         private ItemInfo PendingSelectionByValue;
         private ChangeInfo _changeInfo;
-        private WeakEventListener<Selector, ICollectionView, EventArgs> _currentChangedListener;
+        private WeakEventToken _weakEventToken;
 
         // The selected items that we interact with.  Most of the time when SelectedItems
         // is in use, this is identical to the value of the SelectedItems property, but
@@ -544,20 +544,20 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnItemsSourceChanged(oldValue, newValue);
 
-            if (_currentChangedListener != null)
+            if (_weakEventToken != null)
             {
-                _currentChangedListener.Detach();
-                _currentChangedListener = null;
+                _weakEventToken.Dispose();
+                _weakEventToken = null;
             }
 
             if (newValue is ICollectionView icv)
             {
-                _currentChangedListener = new(this, icv)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnCurrentChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.CurrentChanged -= listener.OnEvent,
-                };
-                icv.CurrentChanged += _currentChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<Selector, ICollectionView, EventArgs>(
+                    this,
+                    icv,
+                    static (instance, sender, args) => instance.OnCurrentChanged(sender, args),
+                    static (handler, source) => source.CurrentChanged -= new EventHandler(handler),
+                    static (handler, source) => source.CurrentChanged += new EventHandler(handler));
             }
 
             SetSynchronizationWithCurrentItem();

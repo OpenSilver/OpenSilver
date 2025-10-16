@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls.DataVisualization
 {
@@ -34,7 +35,7 @@ namespace System.Windows.Controls.DataVisualization
         /// ItemsSource that created the children of this node.
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used by implementation; warning is only for the test project.")]
-        internal WeakEventListener<TreeMap, object, NotifyCollectionChangedEventArgs> WeakEventListener { get; set; }
+        internal WeakEventToken WeakEventToken { get; set; }
 
         /// <summary>
         /// Gets or sets a value representing a reference to the user's custom data object.

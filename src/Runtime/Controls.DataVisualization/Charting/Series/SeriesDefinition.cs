@@ -12,6 +12,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
@@ -52,7 +53,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Keeps a reference to the WeakEventListener used to prevent leaks of collections assigned to the ItemsSource property.
         /// </summary>
-        private WeakEventListener<SeriesDefinition, object, NotifyCollectionChangedEventArgs> _weakEventListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Gets or sets the index of the series definition.
@@ -107,10 +108,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
             if (null != oldValueINotifyCollectionChanged)
             {
                 // Detach the WeakEventListener
-                if (null != _weakEventListener)
+                if (null != _weakEventToken)
                 {
-                    _weakEventListener.Detach();
-                    _weakEventListener = null;
+                    _weakEventToken.Dispose();
+                    _weakEventToken = null;
                 }
             }
 
@@ -119,10 +120,12 @@ namespace System.Windows.Controls.DataVisualization.Charting
             if (null != newValueINotifyCollectionChanged)
             {
                 // Use a WeakEventListener so that the backwards reference doesn't keep this object alive
-                _weakEventListener = new WeakEventListener<SeriesDefinition, object, NotifyCollectionChangedEventArgs>(this);
-                _weakEventListener.OnEventAction = (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs);
-                _weakEventListener.OnDetachAction = (weakEventListener) => newValueINotifyCollectionChanged.CollectionChanged -= weakEventListener.OnEvent;
-                newValueINotifyCollectionChanged.CollectionChanged += _weakEventListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<SeriesDefinition, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                    this,
+                    newValueINotifyCollectionChanged,
+                    static (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs),
+                    static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                    static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
             }
 
             if (null != ParentDefinitionSeries)

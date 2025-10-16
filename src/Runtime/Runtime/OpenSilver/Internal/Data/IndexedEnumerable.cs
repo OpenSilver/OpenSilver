@@ -55,12 +55,12 @@ namespace OpenSilver.Internal.Data
                 INotifyCollectionChanged icc = collection as INotifyCollectionChanged;
                 if (icc != null)
                 {
-                    _collectionChangedListener = new WeakEventListener<IndexedEnumerable, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(this, icc)
-                    {
-                        OnEventAction = static (instance, source, args) => instance.OnCollectionChanged(source, args),
-                        OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
-                    };
-                    icc.CollectionChanged += _collectionChangedListener.OnEvent;
+                    _weakEventToken = WeakEvent.Subscribe<IndexedEnumerable, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                        this,
+                        icc,
+                        static (instance, source, args) => instance.OnCollectionChanged(source, args),
+                        static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                        static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
                 }
             }
         }
@@ -330,10 +330,10 @@ namespace OpenSilver.Internal.Data
                 INotifyCollectionChanged icc = Enumerable as INotifyCollectionChanged;
                 if (icc != null)
                 {
-                    if (_collectionChangedListener != null)
+                    if (_weakEventToken != null)
                     {
-                        _collectionChangedListener.Detach();
-                        _collectionChangedListener = null;
+                        _weakEventToken.Dispose();
+                        _weakEventToken = null;
                     }
                 }
             }
@@ -665,7 +665,7 @@ namespace OpenSilver.Internal.Data
 
         private Predicate<object> _filterCallback;
 
-        private WeakEventListener<IndexedEnumerable, INotifyCollectionChanged, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+        private WeakEventToken _weakEventToken;
 
         private sealed class FilteredEnumerator : IEnumerator, IDisposable
         {

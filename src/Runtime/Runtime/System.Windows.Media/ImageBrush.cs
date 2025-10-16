@@ -24,7 +24,7 @@ namespace System.Windows.Media;
 /// </summary>
 public sealed class ImageBrush : TileBrush
 {
-    private WeakEventListener<ImageBrush, ImageSource, EventArgs> _sourceChangedListener;
+    private WeakEventToken _weakEventToken;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageBrush"/> class.
@@ -57,20 +57,20 @@ public sealed class ImageBrush : TileBrush
     {
         ImageBrush ib = (ImageBrush)d;
 
-        if (ib._sourceChangedListener != null)
+        if (ib._weakEventToken != null)
         {
-            ib._sourceChangedListener.Detach();
-            ib._sourceChangedListener = null;
+            ib._weakEventToken.Dispose();
+            ib._weakEventToken = null;
         }
 
         if (e.NewValue is ImageSource source)
         {
-            ib._sourceChangedListener = new(ib, source)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnSourceChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            source.Changed += ib._sourceChangedListener.OnEvent;
+            ib._weakEventToken = WeakEvent.Subscribe<ImageBrush, ImageSource, EventArgs>(
+                ib,
+                source,
+                static (instance, sender, args) => instance.OnSourceChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
 
         ib.RaiseChanged();
@@ -142,8 +142,8 @@ public sealed class ImageBrush : TileBrush
         private readonly ImageBrush _imageBrush;
         private readonly INTERNAL_HtmlDomElementReference _pattern;
         private readonly INTERNAL_HtmlDomElementReference _image;
-        private readonly WeakEventListener<SvgPattern, Brush, EventArgs> _transformChangedListener;
-        private readonly WeakEventListener<SvgPattern, Shape, SizeChangedEventArgs> _sizeChangedListener;
+        private readonly WeakEventToken _weakTransformChangedEventToken;
+        private readonly WeakEventToken _weakSizeChangedEventToken;
 
         public SvgPattern(Shape shape, ImageBrush imageBrush)
         {
@@ -157,27 +157,27 @@ public sealed class ImageBrush : TileBrush
 
             DrawPattern(shape);
 
-            _transformChangedListener = new(this, imageBrush)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            imageBrush.TransformChanged += _transformChangedListener.OnEvent;
+            _weakTransformChangedEventToken = WeakEvent.Subscribe<SvgPattern, Brush, EventArgs>(
+                this,
+                imageBrush,
+                static (instance, sender, args) => instance.OnTransformChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
 
-            _sizeChangedListener = new(this, shape)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnRenderSizeChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.SizeChanged -= listener.OnEvent,
-            };
-            shape.SizeChanged += _sizeChangedListener.OnEvent;
+            _weakSizeChangedEventToken = WeakEvent.Subscribe<SvgPattern, Shape, SizeChangedEventArgs>(
+                this,
+                shape,
+                static (instance, sender, args) => instance.OnRenderSizeChanged(sender, args),
+                static (handler, source) => source.SizeChanged -= new SizeChangedEventHandler(handler),
+                static (handler, source) => source.SizeChanged += new SizeChangedEventHandler(handler));
         }
 
         public string GetBrush(Shape shape) => $"url(#{_pattern.UniqueIdentifier})";
 
         public void DestroyBrush(Shape shape)
         {
-            _transformChangedListener.Detach();
-            _sizeChangedListener.Detach();
+            _weakTransformChangedEventToken.Dispose();
+            _weakSizeChangedEventToken.Dispose();
             INTERNAL_HtmlDomManager.RemoveNodeNative(_pattern);
         }
 

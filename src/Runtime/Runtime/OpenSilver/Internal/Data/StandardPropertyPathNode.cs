@@ -25,7 +25,7 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
     private readonly string _propertyName;
 
     private PropertyChangeListener _dpListener;
-    private WeakEventListener<StandardPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
+    private WeakEventToken _weakEventToken;
     private DependencyProperty _dp;
     private PropertyInfo _prop;
     private FieldInfo _field;
@@ -103,10 +103,10 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
 
     internal override void OnSourceChanged(object oldValue, object newValue)
     {
-        if (_propertyChangedListener is not null)
+        if (_weakEventToken is not null)
         {
-            _propertyChangedListener.Detach();
-            _propertyChangedListener = null;
+            _weakEventToken.Dispose();
+            _weakEventToken = null;
         }
 
         if (_dpListener is PropertyChangeListener listener)
@@ -155,12 +155,12 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
         {
             if (newValue is INotifyPropertyChanged inpc)
             {
-                _propertyChangedListener = new(this, inpc)
-                {
-                    OnEventAction = static (instance, source, args) => instance.OnPropertyChanged(source, args),
-                    OnDetachAction = static (listener, source) => source.PropertyChanged -= listener.OnEvent,
-                };
-                inpc.PropertyChanged += _propertyChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<StandardPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs>(
+                    this,
+                    inpc,
+                    static (instance, source, args) => instance.OnPropertyChanged(source, args),
+                    static (handler, source) => source.PropertyChanged -= new PropertyChangedEventHandler(handler),
+                    static (handler, source) => source.PropertyChanged += new PropertyChangedEventHandler(handler));
             }
 
             if (_dp is not null)

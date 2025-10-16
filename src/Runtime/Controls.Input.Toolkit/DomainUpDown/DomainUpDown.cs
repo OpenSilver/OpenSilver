@@ -114,7 +114,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// WeakEventListener used to handle INotifyCollectionChanged events.
         /// </summary>
-        private WeakEventListener<DomainUpDown, INotifyCollectionChanged, NotifyCollectionChangedEventArgs> _weakEventListener;
+        private WeakEventToken _weakEventToken;
         
         #region IsEditing
         /// <summary>
@@ -663,10 +663,10 @@ namespace System.Windows.Controls
             {
                 // no longer react to changes in this collection.
                 // Detach the WeakEventListener
-                if (null != _weakEventListener)
+                if (null != _weakEventToken)
                 {
-                    _weakEventListener.Detach();
-                    _weakEventListener = null;
+                    _weakEventToken.Dispose();
+                    _weakEventToken = null;
                 }
             }
 
@@ -714,12 +714,12 @@ namespace System.Windows.Controls
                 {
                     // if ItemsSource supplies CollectionChanged events, subscribe to them.
                     // Use a WeakEventListener so that the backwards reference doesn't keep this object alive
-                    _weakEventListener = new(this, newObservableItemsSource)
-                    {
-                        OnEventAction = static (instance, source, eventArgs) => instance.OnItemsChanged(source, eventArgs),
-                        OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
-                    };
-                    newObservableItemsSource.CollectionChanged += _weakEventListener.OnEvent;
+                    _weakEventToken = WeakEvent.Subscribe<DomainUpDown, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                        this,
+                        newObservableItemsSource,
+                        static (instance, source, eventArgs) => instance.OnItemsChanged(source, eventArgs),
+                        static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                        static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
                 }
             }
             else

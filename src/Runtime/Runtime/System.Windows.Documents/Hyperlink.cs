@@ -30,7 +30,7 @@ public sealed class Hyperlink : Span, ICommandSource
 {
     private static readonly SolidColorBrush _defaultMouseOverBrush;
 
-    private WeakEventListener<Hyperlink, ICommand, EventArgs> _canExecuteChangedListener;
+    private CanExecuteChangedWeakEventListener _canExecuteChangedListener;
     private JavaScriptCallback _clickCallback;
     private bool _canExecute = true;
 
@@ -407,13 +407,7 @@ public sealed class Hyperlink : Span, ICommandSource
 
         if (newCommand is not null)
         {
-            _canExecuteChangedListener = new(this, newCommand)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.CanExecuteChanged -= listener.OnEvent,
-            };
-
-            newCommand.CanExecuteChanged += _canExecuteChangedListener.OnEvent;
+            _canExecuteChangedListener = new CanExecuteChangedWeakEventListener(this, newCommand);
         }
 
         UpdateCanExecute();
@@ -444,5 +438,27 @@ public sealed class Hyperlink : Span, ICommandSource
                 CoerceValue(IsEnabledProperty);
             }
         }
+    }
+
+    private sealed class CanExecuteChangedWeakEventListener
+    {
+        private readonly WeakEventToken _listener;
+        private EventHandler _handler;
+
+        public CanExecuteChangedWeakEventListener(Hyperlink hyperlink, ICommand command)
+        {
+            _listener = WeakEvent.Subscribe<Hyperlink, ICommand, EventArgs>(
+                hyperlink,
+                command,
+                static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
+                (handler, source) => source.CanExecuteChanged -= _handler,
+                (handler, source) =>
+                {
+                    _handler = new EventHandler(handler);
+                    source.CanExecuteChanged += _handler;
+                });
+        }
+
+        public void Detach() => _listener.Dispose();
     }
 }

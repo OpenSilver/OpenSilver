@@ -42,8 +42,8 @@
     <Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">
       <Link>Common\VisualStates.cs</Link>
     </Compile>
-    <Compile Include="..\Runtime\OpenSilver\Internal\WeakEventListener.cs">
-      <Link>Common\WeakEventListener.cs</Link>
+    <Compile Include="..\Runtime\OpenSilver\Internal\WeakEvent.cs">
+      <Link>Common\WeakEvent.cs</Link>
     </Compile>
     <Compile Include="..\Runtime\System.Runtime.CompilerServices\IsExternalInit.cs">
       <Link>System.Runtime.CompilerServices\IsExternalInit.cs</Link>

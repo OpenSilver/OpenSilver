@@ -24,8 +24,7 @@ namespace System.Windows.Controls.Primitives
     /// </summary>
     public class ButtonBase : ContentControl, ICommandSource
     {
-        private WeakEventListener<ButtonBase, ICommand, EventArgs> _canExecuteChangedListener;
-        private EventHandler _canExecuteChangedHandler;
+        private CanExecuteChangedWeakEventListener _canExecuteChangedListener;
         private bool _commandDisabled;
         private bool _isMouseCaptured;
         private bool _isSpaceKeyDown;
@@ -727,19 +726,11 @@ namespace System.Windows.Controls.Primitives
             {
                 _canExecuteChangedListener.Detach();
                 _canExecuteChangedListener = null;
-                _canExecuteChangedHandler = null;
             }
 
             if (newCommand is not null)
             {
-                _canExecuteChangedListener = new(this, newCommand)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.CanExecuteChanged -= listener.OnEvent,
-                };
-
-                _canExecuteChangedHandler = _canExecuteChangedListener.OnEvent;
-                newCommand.CanExecuteChanged += _canExecuteChangedHandler;
+                _canExecuteChangedListener = new CanExecuteChangedWeakEventListener(this, newCommand);
             }
 
             UpdateCanExecute();
@@ -757,6 +748,28 @@ namespace System.Windows.Controls.Primitives
             {
                 CanExecute = true;
             }
+        }
+
+        private sealed class CanExecuteChangedWeakEventListener
+        {
+            private readonly WeakEventToken _listener;
+            private EventHandler _handler;
+
+            public CanExecuteChangedWeakEventListener(ButtonBase button, ICommand command)
+            {
+                _listener = WeakEvent.Subscribe<ButtonBase, ICommand, EventArgs>(
+                    button,
+                    command,
+                    static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
+                    (handler, source) => source.CanExecuteChanged -= _handler,
+                    (handler, source) =>
+                    {
+                        _handler = new EventHandler(handler);
+                        source.CanExecuteChanged += _handler;
+                    });
+            }
+
+            public void Detach() => _listener.Dispose();
         }
     }
 }
