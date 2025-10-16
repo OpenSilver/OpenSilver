@@ -19,6 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Runtime\OpenSilver\Internal\WeakEvent.cs">
+      <Link>DataForm\WeakEvent.cs</Link>
+    </Compile>
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\TypeHelper.cs" />
     <Compile Include="DataField\DataField.cs" />
@@ -41,7 +44,6 @@
     <Compile Include="DataForm\DataFormValueConverter.cs" />
     <Compile Include="DataForm\PathOrderPair.cs" />
     <Compile Include="DataForm\ValidationUtil.cs" />
-    <Compile Include="DataForm\WeakEventListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <DesignTime>True</DesignTime>

@@ -23,7 +23,7 @@ namespace System.Windows.Shapes
     /// </summary>
     public sealed class Polygon : Shape
     {
-        private WeakEventListener<Polygon, PointCollection, EventArgs> _pointsChanged;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Polygon"/> class.
@@ -122,20 +122,20 @@ namespace System.Windows.Shapes
 
         private void OnPointsChanged(PointCollection oldPoints, PointCollection newPoints)
         {
-            if (_pointsChanged is not null)
+            if (_weakEventToken is not null)
             {
-                _pointsChanged.Detach();
-                _pointsChanged = null;
+                _weakEventToken.Dispose();
+                _weakEventToken = null;
             }
 
             if (newPoints is not null)
             {
-                _pointsChanged = new(this, newPoints)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnPointsCollectionChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newPoints.Changed += _pointsChanged.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<Polygon, PointCollection, EventArgs>(
+                    this,
+                    newPoints,
+                    static (instance, sender, args) => instance.OnPointsCollectionChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 

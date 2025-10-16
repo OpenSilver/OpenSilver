@@ -52,8 +52,8 @@ namespace System.Windows.Controls
     public class Border : FrameworkElement
     {
         private UIElement _child;
-        private WeakEventListener<Border, Brush, EventArgs> _backgroundChangedListener;
-        private WeakEventListener<Border, Brush, EventArgs> _borderBrushChangedListener;
+        private WeakEventToken _weakBackgroundEventToken;
+        private WeakEventToken _weakBorderBrushEventToken;
         private bool _refreshBackgroundOnSizeChange;
 
         /// <summary>
@@ -190,20 +190,20 @@ namespace System.Windows.Controls
 
             border._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
-            if (border._backgroundChangedListener != null)
+            if (border._weakBackgroundEventToken != null)
             {
-                border._backgroundChangedListener.Detach();
-                border._backgroundChangedListener = null;
+                border._weakBackgroundEventToken.Dispose();
+                border._weakBackgroundEventToken = null;
             }
 
             if (e.NewValue is Brush newBrush)
             {
-                border._backgroundChangedListener = new(border, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += border._backgroundChangedListener.OnEvent;
+                border._weakBackgroundEventToken = WeakEvent.Subscribe<Border, Brush, EventArgs>(
+                    border,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
 
             // Update pointer events
@@ -257,20 +257,20 @@ namespace System.Windows.Controls
         {
             var border = (Border)d;
 
-            if (border._borderBrushChangedListener != null)
+            if (border._weakBorderBrushEventToken != null)
             {
-                border._borderBrushChangedListener.Detach();
-                border._borderBrushChangedListener = null;
+                border._weakBorderBrushEventToken.Dispose();
+                border._weakBorderBrushEventToken = null;
             }
 
             if (e.NewValue is Brush newBrush)
             {
-                border._borderBrushChangedListener = new(border, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += border._borderBrushChangedListener.OnEvent;
+                border._weakBorderBrushEventToken = WeakEvent.Subscribe<Border, Brush, EventArgs>(
+                    border,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 

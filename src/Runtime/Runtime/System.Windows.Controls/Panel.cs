@@ -34,7 +34,7 @@ namespace System.Windows.Controls
     {
         private UIElementCollection _uiElementCollection;
         private ItemContainerGenerator _itemContainerGenerator;
-        private WeakEventListener<Panel, Brush, EventArgs> _backgroundChangedListener;
+        private WeakEventToken _weakEventToken;
         private bool _refreshBackgroundOnSizeChange;
 
         /// <summary>
@@ -196,20 +196,20 @@ namespace System.Windows.Controls
 
             panel._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
-            if (panel._backgroundChangedListener != null)
+            if (panel._weakEventToken != null)
             {
-                panel._backgroundChangedListener.Detach();
-                panel._backgroundChangedListener = null;
+                panel._weakEventToken.Dispose();
+                panel._weakEventToken = null;
             }
 
             if (e.NewValue is Brush newBrush)
             {
-                panel._backgroundChangedListener = new(panel, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += panel._backgroundChangedListener.OnEvent;
+                panel._weakEventToken = WeakEvent.Subscribe<Panel, Brush, EventArgs>(
+                    panel,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
 
             // Update pointer events

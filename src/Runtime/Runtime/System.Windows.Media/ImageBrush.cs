@@ -21,7 +21,7 @@ namespace System.Windows.Media;
 /// </summary>
 public sealed class ImageBrush : TileBrush
 {
-    private WeakEventListener<ImageBrush, ImageSource, EventArgs> _sourceChangedListener;
+    private WeakEventToken _weakEventToken;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageBrush"/> class.
@@ -54,20 +54,20 @@ public sealed class ImageBrush : TileBrush
     {
         ImageBrush ib = (ImageBrush)d;
 
-        if (ib._sourceChangedListener != null)
+        if (ib._weakEventToken != null)
         {
-            ib._sourceChangedListener.Detach();
-            ib._sourceChangedListener = null;
+            ib._weakEventToken.Dispose();
+            ib._weakEventToken = null;
         }
 
         if (e.NewValue is ImageSource source)
         {
-            ib._sourceChangedListener = new(ib, source)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnSourceChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            source.Changed += ib._sourceChangedListener.OnEvent;
+            ib._weakEventToken = WeakEvent.Subscribe<ImageBrush, ImageSource, EventArgs>(
+                ib,
+                source,
+                static (instance, sender, args) => instance.OnSourceChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
 
         ib.RaiseChanged();

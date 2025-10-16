@@ -740,22 +740,24 @@ namespace System.Windows.Controls.Primitives
 
         private sealed class CanExecuteChangedWeakEventListener
         {
-            private readonly WeakEventListener<ButtonBase, ICommand, EventArgs> _listener;
-            private readonly EventHandler _handler;
+            private readonly WeakEventToken _listener;
+            private EventHandler _handler;
 
             public CanExecuteChangedWeakEventListener(ButtonBase button, ICommand command)
             {
-                _listener = new WeakEventListener<ButtonBase, ICommand, EventArgs>(button, command)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
-                    OnDetachAction = (listener, source) => source.CanExecuteChanged -= _handler,
-                };
-
-                _handler = new EventHandler(_listener.OnEvent);
-                command.CanExecuteChanged += _handler;
+                _listener = WeakEvent.Subscribe<ButtonBase, ICommand, EventArgs>(
+                    button,
+                    command,
+                    static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
+                    (handler, source) => source.CanExecuteChanged -= _handler,
+                    (handler, source) =>
+                    {
+                        _handler = new EventHandler(handler);
+                        source.CanExecuteChanged += _handler;
+                    });
             }
 
-            public void Detach() => _listener.Detach();
+            public void Detach() => _listener.Dispose();
         }
     }
 }

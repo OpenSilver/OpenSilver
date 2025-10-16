@@ -24,6 +24,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using resources = OpenSilver.Internal.Controls.Data.DataForm.Toolkit.Resources;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -656,22 +657,22 @@ namespace System.Windows.Controls
 
             if (dataForm._collectionView != null)
             {
-                if (dataForm._weakEventListenerCurrentChanging != null)
+                if (dataForm._weakCurrentChangingEventToken != null)
                 {
-                    dataForm._weakEventListenerCurrentChanging.Detach();
-                    dataForm._weakEventListenerCurrentChanging = null;
+                    dataForm._weakCurrentChangingEventToken.Dispose();
+                    dataForm._weakCurrentChangingEventToken = null;
                 }
 
-                if (dataForm._weakEventListenerCurrentChanged != null)
+                if (dataForm._weakCurrentChangedEventToken != null)
                 {
-                    dataForm._weakEventListenerCurrentChanged.Detach();
-                    dataForm._weakEventListenerCurrentChanged = null;
+                    dataForm._weakCurrentChangedEventToken.Dispose();
+                    dataForm._weakCurrentChangedEventToken = null;
                 }
 
-                if (dataForm._weakEventListenerCollectionChanged != null)
+                if (dataForm._weakCollectionChangedEventToken != null)
                 {
-                    dataForm._weakEventListenerCollectionChanged.Detach();
-                    dataForm._weakEventListenerCollectionChanged = null;
+                    dataForm._weakCollectionChangedEventToken.Dispose();
+                    dataForm._weakCollectionChangedEventToken = null;
                 }
             }
 
@@ -1049,22 +1050,22 @@ namespace System.Windows.Controls
         /// <summary>
         /// Holds the weak event listener for the INotifyCollectionChanged.CollectionChanged event.
         /// </summary>
-        private WeakEventListener<DataForm, object, NotifyCollectionChangedEventArgs> _weakEventListenerCollectionChanged;
+        private WeakEventToken _weakCollectionChangedEventToken;
 
         /// <summary>
         /// Holds the weak event listener for the ICollectionView.CurrentChanged event.
         /// </summary>
-        private WeakEventListener<DataForm, object, EventArgs> _weakEventListenerCurrentChanged;
+        private WeakEventToken _weakCurrentChangedEventToken;
 
         /// <summary>
         /// Holds the weak event listener for the ICollectionView.CurrentChanging event.
         /// </summary>
-        private WeakEventListener<DataForm, object, CurrentChangingEventArgs> _weakEventListenerCurrentChanging;
+        private WeakEventToken _weakCurrentChangingEventToken;
 
         /// <summary>
         /// Holds the weak event listener for the INotifyPropertyChanged.PropertyChanged event.
         /// </summary>
-        private WeakEventListener<DataForm, object, PropertyChangedEventArgs> _weakEventListenerPropertyChanged;
+        private WeakEventToken _weakPropertyChangedEventToken;
 
 #endregion Fields
 
@@ -4709,20 +4710,26 @@ namespace System.Windows.Controls
         {
             Debug.Assert(this._collectionView != null, "SetUpCollectionView should never be called when there is no collection view.");
 
-            this._weakEventListenerCurrentChanging = new WeakEventListener<DataForm, object, CurrentChangingEventArgs>(this);
-            this._weakEventListenerCurrentChanging.OnEventAction = (instance, source, eventArgs) => instance.OnCollectionViewCurrentChanging(source, eventArgs);
-            this._weakEventListenerCurrentChanging.OnDetachAction = (weakEventListener) => this._collectionView.CurrentChanging -= weakEventListener.OnEvent;
-            this._collectionView.CurrentChanging += this._weakEventListenerCurrentChanging.OnEvent;
+            this._weakCurrentChangingEventToken = WeakEvent.Subscribe<DataForm, ICollectionView, CurrentChangingEventArgs>(
+                this,
+                this._collectionView,
+                static (instance, source, eventArgs) => instance.OnCollectionViewCurrentChanging(source, eventArgs),
+                static (handler, source) => source.CurrentChanging -= new CurrentChangingEventHandler(handler),
+                static (handler, source) => source.CurrentChanging += new CurrentChangingEventHandler(handler));
 
-            this._weakEventListenerCurrentChanged = new WeakEventListener<DataForm, object, EventArgs>(this);
-            this._weakEventListenerCurrentChanged.OnEventAction = (instance, source, eventArgs) => instance.OnCollectionViewCurrentChanged(source, eventArgs);
-            this._weakEventListenerCurrentChanged.OnDetachAction = (weakEventListener) => this._collectionView.CurrentChanged -= weakEventListener.OnEvent;
-            this._collectionView.CurrentChanged += this._weakEventListenerCurrentChanged.OnEvent;
+            this._weakCurrentChangedEventToken = WeakEvent.Subscribe<DataForm, ICollectionView, EventArgs>(
+                this,
+                this._collectionView,
+                static (instance, source, eventArgs) => instance.OnCollectionViewCurrentChanged(source, eventArgs),
+                static (handler, source) => source.CurrentChanged -= new EventHandler(handler),
+                static (handler, source) => source.CurrentChanged += new EventHandler(handler));
 
-            this._weakEventListenerCollectionChanged = new WeakEventListener<DataForm, object, NotifyCollectionChangedEventArgs>(this);
-            this._weakEventListenerCollectionChanged.OnEventAction = (instance, source, eventArgs) => instance.OnCollectionViewCollectionChanged(source, eventArgs);
-            this._weakEventListenerCollectionChanged.OnDetachAction = (weakEventListener) => this._collectionView.CollectionChanged -= weakEventListener.OnEvent;
-            this._collectionView.CollectionChanged += this._weakEventListenerCollectionChanged.OnEvent;
+            this._weakCollectionChangedEventToken = WeakEvent.Subscribe<DataForm, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                this,
+                this._collectionView,
+                static (instance, source, eventArgs) => instance.OnCollectionViewCollectionChanged(source, eventArgs),
+                static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
 
             if (collectionViewCreated || this._collectionView.IsCurrentBeforeFirst)
             {
@@ -4759,20 +4766,22 @@ namespace System.Windows.Controls
                 }
             }
 
-            if (this.CurrentItemNotifyPropertyChanged != null && this._weakEventListenerPropertyChanged != null)
+            if (this.CurrentItemNotifyPropertyChanged != null && this._weakPropertyChangedEventToken != null)
             {
-                this._weakEventListenerPropertyChanged.Detach();
-                this._weakEventListenerPropertyChanged = null;
+                this._weakPropertyChangedEventToken.Dispose();
+                this._weakPropertyChangedEventToken = null;
             }
 
             this.ForceEndEdit();
 
             if (this.CurrentItemNotifyPropertyChanged != null)
             {
-                this._weakEventListenerPropertyChanged = new WeakEventListener<DataForm, object, PropertyChangedEventArgs>(this);
-                this._weakEventListenerPropertyChanged.OnEventAction = (instance, source, eventArgs) => instance.OnCurrentItemPropertyChanged(source, eventArgs);
-                this._weakEventListenerPropertyChanged.OnDetachAction = (weakEventListener) => this.CurrentItemNotifyPropertyChanged.PropertyChanged -= weakEventListener.OnEvent;
-                this.CurrentItemNotifyPropertyChanged.PropertyChanged += this._weakEventListenerPropertyChanged.OnEvent;
+                this._weakPropertyChangedEventToken = WeakEvent.Subscribe<DataForm, INotifyPropertyChanged, PropertyChangedEventArgs>(
+                    this,
+                    this.CurrentItemNotifyPropertyChanged,
+                    static (instance, source, eventArgs) => instance.OnCurrentItemPropertyChanged(source, eventArgs),
+                    static (handler, source) => source.PropertyChanged -= new PropertyChangedEventHandler(handler),
+                    static (handler, source) => source.PropertyChanged += new PropertyChangedEventHandler(handler));
             }
         }
 

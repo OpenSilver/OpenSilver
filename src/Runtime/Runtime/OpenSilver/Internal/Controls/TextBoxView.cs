@@ -87,7 +87,7 @@ internal sealed class TextBoxView : TextViewBase
         IsHitTestableProperty.OverrideMetadata(typeof(TextBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
-    private WeakEventListener<TextBoxView, Brush, EventArgs> _foregroundChangedListener;
+    private WeakEventToken _weakEventToken;
 
     internal TextBoxView(TextBox host)
         : base(host)
@@ -354,20 +354,20 @@ internal sealed class TextBoxView : TextViewBase
     {
         var view = (TextBoxView)d;
 
-        if (view._foregroundChangedListener != null)
+        if (view._weakEventToken != null)
         {
-            view._foregroundChangedListener.Detach();
-            view._foregroundChangedListener = null;
+            view._weakEventToken.Dispose();
+            view._weakEventToken= null;
         }
 
         if (e.NewValue is Brush newBrush)
         {
-            view._foregroundChangedListener = new(view, newBrush)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            newBrush.Changed += view._foregroundChangedListener.OnEvent;
+            view._weakEventToken = WeakEvent.Subscribe<TextBoxView, Brush, EventArgs>(
+                view,
+                newBrush,
+                static (instance, source, eventArgs) => instance.OnForegroundChanged(source, eventArgs),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
     }
 

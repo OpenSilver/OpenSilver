@@ -100,7 +100,7 @@ public sealed class Run : Inline
             });
     }
 
-    private WeakEventListener<Run, Brush, EventArgs> _foregroundChangedListener;
+    private WeakEventToken _weakEventToken;
 
     /// <summary>
     /// Identifies the <see cref="Text"/> dependency property.
@@ -166,20 +166,20 @@ public sealed class Run : Inline
     {
         var run = (Run)d;
 
-        if (run._foregroundChangedListener != null)
+        if (run._weakEventToken != null)
         {
-            run._foregroundChangedListener.Detach();
-            run._foregroundChangedListener = null;
+            run._weakEventToken.Dispose();
+            run._weakEventToken = null;
         }
 
         if (e.NewValue is Brush newBrush)
         {
-            run._foregroundChangedListener = new(run, newBrush)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            newBrush.Changed += run._foregroundChangedListener.OnEvent;
+            run._weakEventToken = WeakEvent.Subscribe<Run, Brush, EventArgs>(
+                run,
+                newBrush,
+                static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
 
         run.OnPropertyChanged();

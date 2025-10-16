@@ -28,7 +28,7 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
     private readonly string _indexStr;
     private readonly object[] _index;
     private PropertyInfo _indexer;
-    private WeakEventListener<IndexedPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
+    private WeakEventToken _weakEventToken;
 
     private static readonly PropertyInfo _iListIndexer = typeof(IList).GetDefaultMembers()[0] as PropertyInfo;
 
@@ -36,7 +36,7 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
         : base(listener)
     {
         _indexStr = index;
-        _index = new object[1] { index };
+        _index = [index];
     }
 
     public override Type Type => _indexer?.PropertyType;
@@ -47,10 +47,10 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
 
     internal override void OnSourceChanged(object oldValue, object newValue)
     {
-        if (_propertyChangedListener is not null)
+        if (_weakEventToken is not null)
         {
-            _propertyChangedListener.Detach();
-            _propertyChangedListener = null;
+            _weakEventToken.Dispose();
+            _weakEventToken = null;
         }
 
         // todo: (?) find out how to have a listener here since it
@@ -68,12 +68,12 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
         {
             if (newValue is INotifyPropertyChanged inpc)
             {
-                _propertyChangedListener = new(this, inpc)
-                {
-                    OnEventAction = static (instance, source, args) => instance.OnPropertyChanged(source, args),
-                    OnDetachAction = static (listener, source) => source.PropertyChanged -= listener.OnEvent,
-                };
-                inpc.PropertyChanged += _propertyChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<IndexedPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs>(
+                    this,
+                    inpc,
+                    static (instance, source, args) => instance.OnPropertyChanged(source, args),
+                    static (handler, source) => source.PropertyChanged -= new PropertyChangedEventHandler(handler),
+                    static (handler, source) => source.PropertyChanged += new PropertyChangedEventHandler(handler));
             }
         }
     }

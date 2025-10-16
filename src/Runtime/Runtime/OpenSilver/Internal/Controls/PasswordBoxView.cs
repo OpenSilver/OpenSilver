@@ -73,7 +73,7 @@ internal sealed class PasswordBoxView : TextViewBase
         IsHitTestableProperty.OverrideMetadata(typeof(PasswordBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
-    private WeakEventListener<PasswordBoxView, Brush, EventArgs> _foregroundChangedListener;
+    private WeakEventToken _weakEventToken;
 
     internal PasswordBoxView(PasswordBox host)
         : base(host)
@@ -195,20 +195,20 @@ internal sealed class PasswordBoxView : TextViewBase
     {
         var view = (PasswordBoxView)d;
 
-        if (view._foregroundChangedListener != null)
+        if (view._weakEventToken != null)
         {
-            view._foregroundChangedListener.Detach();
-            view._foregroundChangedListener = null;
+            view._weakEventToken.Dispose();
+            view._weakEventToken = null;
         }
 
         if (e.NewValue is Brush newBrush)
         {
-            view._foregroundChangedListener = new(view, newBrush)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            newBrush.Changed += view._foregroundChangedListener.OnEvent;
+            view._weakEventToken = WeakEvent.Subscribe<PasswordBoxView, Brush, EventArgs>(
+                view,
+                newBrush,
+                static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
     }
 

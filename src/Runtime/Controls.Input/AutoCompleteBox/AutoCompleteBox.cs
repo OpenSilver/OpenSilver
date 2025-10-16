@@ -18,6 +18,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Properties = OpenSilver.Controls.Input.Properties;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -175,9 +176,9 @@ namespace System.Windows.Controls
         /// <summary>
         /// A weak event listener for the collection changed event.
         /// </summary>
-        private WeakEventListener<AutoCompleteBox, object, NotifyCollectionChangedEventArgs> _collectionChangedWeakEventListener;
+        private WeakEventToken _weakEventToken;
 
-#region public int MinimumPrefixLength
+        #region public int MinimumPrefixLength
         /// <summary>
         /// Gets or sets the minimum number of characters required to be entered
         /// in the text box before the
@@ -2267,20 +2268,22 @@ namespace System.Windows.Controls
         {
             // Remove handler for oldValue.CollectionChanged (if present)
             INotifyCollectionChanged oldValueINotifyCollectionChanged = oldValue as INotifyCollectionChanged;
-            if (null != oldValueINotifyCollectionChanged && null != _collectionChangedWeakEventListener)
+            if (null != oldValueINotifyCollectionChanged && null != _weakEventToken)
             {
-                _collectionChangedWeakEventListener.Detach();
-                _collectionChangedWeakEventListener = null;
+                _weakEventToken.Dispose();
+                _weakEventToken = null;
             }
 
             // Add handler for newValue.CollectionChanged (if possible)
             INotifyCollectionChanged newValueINotifyCollectionChanged = newValue as INotifyCollectionChanged;
             if (null != newValueINotifyCollectionChanged)
             {
-                _collectionChangedWeakEventListener = new WeakEventListener<AutoCompleteBox, object, NotifyCollectionChangedEventArgs>(this);
-                _collectionChangedWeakEventListener.OnEventAction = (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs);
-                _collectionChangedWeakEventListener.OnDetachAction = (weakEventListener) => newValueINotifyCollectionChanged.CollectionChanged -= weakEventListener.OnEvent;
-                newValueINotifyCollectionChanged.CollectionChanged += _collectionChangedWeakEventListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<AutoCompleteBox, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                    this,
+                    newValueINotifyCollectionChanged,
+                    static (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs),
+                    static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                    static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
             }
 
             // Store a local cached copy of the data

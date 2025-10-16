@@ -212,7 +212,7 @@ namespace System.Windows.Media
         {
             private readonly RadialGradientBrush _radialGradient;
             private readonly INTERNAL_HtmlDomElementReference _gradientRef;
-            private readonly WeakEventListener<SvgRadialGradient, Brush, EventArgs> _transformChangedListener;
+            private readonly WeakEventToken _weakEventToken;
 
             public SvgRadialGradient(Shape shape, RadialGradientBrush rgb)
             {
@@ -220,12 +220,12 @@ namespace System.Windows.Media
                 _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(shape.DefsElement, "radialGradient");
                 DrawRadialGradient();
 
-                _transformChangedListener = new(this, rgb)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.TransformChanged -= listener.OnEvent,
-                };
-                rgb.TransformChanged += _transformChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<SvgRadialGradient, Brush, EventArgs>(
+                    this,
+                    rgb,
+                    static (instance, sender, args) => instance.OnTransformChanged(sender, args),
+                    static (handler, source) => source.TransformChanged -= new EventHandler(handler),
+                    static (handler, source) => source.TransformChanged += new EventHandler(handler));
             }
 
             public string GetBrush(Shape shape) => $"url(#{_gradientRef.UniqueIdentifier})";
@@ -234,7 +234,7 @@ namespace System.Windows.Media
 
             public void DestroyBrush(Shape shape)
             {
-                _transformChangedListener.Detach();
+                _weakEventToken.Dispose();
                 INTERNAL_HtmlDomManager.RemoveNodeNative(_gradientRef);
             }
 

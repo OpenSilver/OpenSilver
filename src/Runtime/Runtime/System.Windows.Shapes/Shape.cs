@@ -78,20 +78,20 @@ namespace System.Windows.Shapes
         {
             var shape = (Shape)d;
 
-            if (shape._fillChangedListener != null)
+            if (shape._weakFillChangedEventToken != null)
             {
-                shape._fillChangedListener.Detach();
-                shape._fillChangedListener = null;
+                shape._weakFillChangedEventToken.Dispose();
+                shape._weakFillChangedEventToken = null;
             }
 
             if (e.NewValue is Brush newBrush)
             {
-                shape._fillChangedListener = new(shape, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnFillChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += shape._fillChangedListener.OnEvent;
+                shape._weakFillChangedEventToken = WeakEvent.Subscribe<Shape, Brush, EventArgs>(
+                    shape,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnFillChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 
@@ -180,20 +180,20 @@ namespace System.Windows.Shapes
         {
             var shape = (Shape)d;
 
-            if (shape._strokeChangedListener != null)
+            if (shape._weakStrokeChangedEventToken != null)
             {
-                shape._strokeChangedListener.Detach();
-                shape._strokeChangedListener = null;
+                shape._weakStrokeChangedEventToken.Dispose();
+                shape._weakStrokeChangedEventToken = null;
             }
 
             if (e.NewValue is Brush newBrush)
             {
-                shape._strokeChangedListener = new(shape, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnStrokeChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += shape._strokeChangedListener.OnEvent;
+                shape._weakStrokeChangedEventToken = WeakEvent.Subscribe<Shape, Brush, EventArgs>(
+                    shape,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnStrokeChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 
@@ -797,8 +797,8 @@ namespace System.Windows.Shapes
 
         private ISvgBrush _fillBrush;
         private ISvgBrush _strokeBrush;
-        private WeakEventListener<Shape, Brush, EventArgs> _fillChangedListener;
-        private WeakEventListener<Shape, Brush, EventArgs> _strokeChangedListener;
+        private WeakEventToken _weakFillChangedEventToken;
+        private WeakEventToken _weakStrokeChangedEventToken;
 
         private struct SVGRect
         {

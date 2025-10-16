@@ -40,7 +40,7 @@ namespace System.Windows.Controls
         private Size _noWrapSize = Size.Empty;
         private Size? _textSize;
         private bool _textContentChanging;
-        private WeakEventListener<TextBlock, Brush, EventArgs> _foregroundChangedListener;
+        private WeakEventToken _weakEventToken;
 
         static TextBlock()
         {
@@ -534,20 +534,20 @@ namespace System.Windows.Controls
         {
             var tb = (TextBlock)d;
 
-            if (tb._foregroundChangedListener != null)
+            if (tb._weakEventToken != null)
             {
-                tb._foregroundChangedListener.Detach();
-                tb._foregroundChangedListener = null;
+                tb._weakEventToken.Dispose();
+                tb._weakEventToken = null;
             }
 
             if (e.NewValue is Brush newBrush)
             {
-                tb._foregroundChangedListener = new(tb, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += tb._foregroundChangedListener.OnEvent;
+                tb._weakEventToken = WeakEvent.Subscribe<TextBlock, Brush, EventArgs>(
+                    tb,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 

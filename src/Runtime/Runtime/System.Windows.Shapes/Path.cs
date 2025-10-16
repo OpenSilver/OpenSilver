@@ -25,7 +25,7 @@ namespace System.Windows.Shapes
     public class Path : Shape
     {
         private bool _dirty;
-        private WeakEventListener<Path, Geometry, GeometryInvalidatedEventsArgs> _geometryInvalidatedListener;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Path"/> class.
@@ -76,20 +76,20 @@ namespace System.Windows.Shapes
         {
             Path path = (Path)d;
 
-            if (path._geometryInvalidatedListener != null)
+            if (path._weakEventToken != null)
             {
-                path._geometryInvalidatedListener.Detach();
-                path._geometryInvalidatedListener = null;
+                path._weakEventToken.Dispose();
+                path._weakEventToken = null;
             }
 
             if (e.NewValue is Geometry newGeometry)
             {
-                path._geometryInvalidatedListener = new(path, newGeometry)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnGeometryInvalidated(sender, args),
-                    OnDetachAction = static (listener, source) => source.Invalidated -= listener.OnEvent,
-                };
-                newGeometry.Invalidated += path._geometryInvalidatedListener.OnEvent;
+                path._weakEventToken = WeakEvent.Subscribe<Path, Geometry, GeometryInvalidatedEventsArgs>(
+                    path,
+                    newGeometry,
+                    static (instance, sender, args) => instance.OnGeometryInvalidated(sender, args),
+                    static (handler, source) => source.Invalidated -= new EventHandler<GeometryInvalidatedEventsArgs>(handler),
+                    static (handler, source) => source.Invalidated += new EventHandler<GeometryInvalidatedEventsArgs>(handler));
             }
         }
 

@@ -527,7 +527,7 @@ namespace System.Windows.Media
         {
             private readonly LinearGradientBrush _linearGradient;
             private readonly INTERNAL_HtmlDomElementReference _gradientRef;
-            private readonly WeakEventListener<SvgLinearGradient, Brush, EventArgs> _transformChangedListener;
+            private readonly WeakEventToken _weakEventToken;
 
             public SvgLinearGradient(Shape shape, LinearGradientBrush lgb)
             {
@@ -535,12 +535,12 @@ namespace System.Windows.Media
                 _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(shape.DefsElement, "linearGradient");
                 DrawLinearGradient();
 
-                _transformChangedListener = new(this, lgb)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.TransformChanged -= listener.OnEvent,
-                };
-                lgb.TransformChanged += _transformChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<SvgLinearGradient, Brush, EventArgs>(
+                    this,
+                    lgb,
+                    static (instance, sender, args) => instance.OnTransformChanged(sender, args),
+                    static (handler, source) => source.TransformChanged -= new EventHandler(handler),
+                    static (handler, source) => source.TransformChanged += new EventHandler(handler));
             }
 
             public string GetBrush(Shape shape) => $"url(#{_gradientRef.UniqueIdentifier})";
@@ -549,7 +549,7 @@ namespace System.Windows.Media
 
             public void DestroyBrush(Shape shape)
             {
-                _transformChangedListener.Detach();
+                _weakEventToken.Dispose();
                 INTERNAL_HtmlDomManager.RemoveNodeNative(_gradientRef);
             }
 

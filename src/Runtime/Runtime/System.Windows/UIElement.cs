@@ -394,20 +394,20 @@ namespace System.Windows
         {
             UIElement uie = (UIElement)d;
 
-            if (uie._clipGeometryListener is not null)
+            if (uie._weakClipChangedEventToken is not null)
             {
-                uie._clipGeometryListener.Detach();
-                uie._clipGeometryListener = null;
+                uie._weakClipChangedEventToken.Dispose();
+                uie._weakClipChangedEventToken = null;
             }
 
             if (e.NewValue is Geometry clipGeo)
             {
-                uie._clipGeometryListener = new(uie, clipGeo)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnClipGeometryChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Invalidated -= listener.OnEvent,
-                };
-                clipGeo.Invalidated += uie._clipGeometryListener.OnEvent;
+                uie._weakClipChangedEventToken = WeakEvent.Subscribe<UIElement, Geometry, GeometryInvalidatedEventsArgs>(
+                    uie,
+                    clipGeo,
+                    static (instance, sender, args) => instance.OnClipGeometryChanged(sender, args),
+                    static (handler, source) => source.Invalidated -= new EventHandler<GeometryInvalidatedEventsArgs>(handler),
+                    static (handler, source) => source.Invalidated += new EventHandler<GeometryInvalidatedEventsArgs>(handler));
             }
         }
 
@@ -419,7 +419,7 @@ namespace System.Windows
             }
         }
 
-        private WeakEventListener<UIElement, Geometry, GeometryInvalidatedEventsArgs> _clipGeometryListener;
+        private WeakEventToken _weakClipChangedEventToken;
 
         #endregion
 
@@ -569,27 +569,27 @@ namespace System.Windows
         private static void OnEffectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
-            
-            if (element._effectChangedListener != null)
+
+            if (element._weakEffectChangedEventToken != null)
             {
-                element._effectChangedListener.Detach();
-                element._effectChangedListener = null;
+                element._weakEffectChangedEventToken.Dispose();
+                element._weakEffectChangedEventToken = null;
             }
 
             if (e.NewValue is Effect newEffect)
             {
-                element._effectChangedListener = new(element, newEffect)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnEffectChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newEffect.Changed += element._effectChangedListener.OnEvent;
+                element._weakEffectChangedEventToken = WeakEvent.Subscribe<UIElement, Effect, EventArgs>(
+                    element,
+                    newEffect,
+                    static (instance, sender, args) => instance.OnEffectChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 
         private void OnEffectChanged(object sender, EventArgs e) => ((Effect)sender).Render(this);
 
-        private WeakEventListener<UIElement, Effect, EventArgs> _effectChangedListener;
+        private WeakEventToken _weakEffectChangedEventToken;
 
         #endregion
 
@@ -630,20 +630,20 @@ namespace System.Windows
         {
             UIElement uie = (UIElement)d;
 
-            if (uie._renderTransformChangedListener != null)
+            if (uie._weakRenderTransformChangedEventToken != null)
             {
-                uie._renderTransformChangedListener.Detach();
-                uie._renderTransformChangedListener = null;
+                uie._weakRenderTransformChangedEventToken.Dispose();
+                uie._weakRenderTransformChangedEventToken = null;
             }
 
             if (e.NewValue is Transform newTransform)
             {
-                uie._renderTransformChangedListener = new(uie, newTransform)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnRenderTransformChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newTransform.Changed += uie._renderTransformChangedListener.OnEvent;
+                uie._weakRenderTransformChangedEventToken = WeakEvent.Subscribe<UIElement, Transform, EventArgs>(
+                    uie,
+                    newTransform,
+                    static (instance, sender, args) => instance.OnRenderTransformChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 
@@ -655,7 +655,7 @@ namespace System.Windows
             }
         }
 
-        private WeakEventListener<UIElement, Transform, EventArgs> _renderTransformChangedListener;
+        private WeakEventToken _weakRenderTransformChangedEventToken;
 
         /// <summary>
         /// Identifies the <see cref="RenderTransformOrigin"/> dependency property.
@@ -992,20 +992,20 @@ namespace System.Windows
         {
             var uie = (UIElement)d;
 
-            if (uie._opacityMaskChangedListener != null)
+            if (uie._weakOpacityMaskChangedEventToken != null)
             {
-                uie._opacityMaskChangedListener.Detach();
-                uie._opacityMaskChangedListener = null;
+                uie._weakOpacityMaskChangedEventToken.Dispose();
+                uie._weakOpacityMaskChangedEventToken = null;
             }
 
             if (e.NewValue is Brush newBrush)
             {
-                uie._opacityMaskChangedListener = new(uie, newBrush)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnOpacityMaskChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newBrush.Changed += uie._opacityMaskChangedListener.OnEvent;
+                uie._weakOpacityMaskChangedEventToken = WeakEvent.Subscribe<UIElement, Brush, EventArgs>(
+                    uie,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnOpacityMaskChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
             }
         }
 
@@ -1017,7 +1017,7 @@ namespace System.Windows
             }
         }
 
-        private WeakEventListener<UIElement, Brush, EventArgs> _opacityMaskChangedListener;
+        private WeakEventToken _weakOpacityMaskChangedEventToken;
 
         #endregion
 

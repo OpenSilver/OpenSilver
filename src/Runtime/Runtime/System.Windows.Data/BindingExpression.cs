@@ -38,8 +38,8 @@ namespace System.Windows.Data
 
         private DependencyPropertyChangedListener _dataContextListener;
         private DependencyPropertyChangedListener _cvsListener;
-        private WeakEventListener<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs> _sourceErrorsChangedListener;
-        private WeakEventListener<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs> _valueErrorsChangedListener;
+        private WeakEventToken _weakSourceErrorsChangedEventToken;
+        private WeakEventToken _weakValueErrorsChangedEventToken;
         private INotifyDataErrorInfo _dataErrorSource;
         private INotifyDataErrorInfo _dataErrorValue;
 
@@ -246,16 +246,16 @@ namespace System.Windows.Data
 
             if (ValidatesOnNotifyDataErrors)
             {
-                if (_sourceErrorsChangedListener != null)
+                if (_weakSourceErrorsChangedEventToken != null)
                 {
-                    _sourceErrorsChangedListener.Detach();
-                    _sourceErrorsChangedListener = null;
+                    _weakSourceErrorsChangedEventToken.Dispose();
+                    _weakSourceErrorsChangedEventToken = null;
                 }
 
-                if (_valueErrorsChangedListener != null)
+                if (_weakValueErrorsChangedEventToken != null)
                 {
-                    _valueErrorsChangedListener.Detach();
-                    _valueErrorsChangedListener = null;
+                    _weakValueErrorsChangedEventToken.Dispose();
+                    _weakValueErrorsChangedEventToken = null;
                 }
 
                 _dataErrorSource = null;
@@ -373,31 +373,31 @@ namespace System.Windows.Data
 
             if (source != _dataErrorSource)
             {
-                if (_sourceErrorsChangedListener != null)
+                if (_weakSourceErrorsChangedEventToken != null)
                 {
-                    _sourceErrorsChangedListener.Detach();
-                    _sourceErrorsChangedListener = null;
+                    _weakSourceErrorsChangedEventToken.Dispose();
+                    _weakSourceErrorsChangedEventToken = null;
                 }
 
                 _dataErrorSource = source as INotifyDataErrorInfo;
 
                 if (_dataErrorSource != null)
                 {
-                    _sourceErrorsChangedListener = new(this, _dataErrorSource)
-                    {
-                        OnEventAction = static (instance, source, args) => instance.OnSourceErrorsChanged(source, args),
-                        OnDetachAction = static (listener, source) => source.ErrorsChanged -= listener.OnEvent,
-                    };
-                    _dataErrorSource.ErrorsChanged += _sourceErrorsChangedListener.OnEvent;
+                    _weakSourceErrorsChangedEventToken = WeakEvent.Subscribe<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs>(
+                        this,
+                        _dataErrorSource,
+                        static (instance, source, args) => instance.OnSourceErrorsChanged(source, args),
+                        static (handler, source) => source.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(handler),
+                        static (handler, source) => source.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(handler));
                 }
             }
 
             if (value != _dataErrorValue)
             {
-                if (_valueErrorsChangedListener != null)
+                if (_weakValueErrorsChangedEventToken != null)
                 {
-                    _valueErrorsChangedListener.Detach();
-                    _valueErrorsChangedListener = null;
+                    _weakValueErrorsChangedEventToken.Dispose();
+                    _weakValueErrorsChangedEventToken = null;
                 }
 
                 _dataErrorValue = null;
@@ -408,12 +408,12 @@ namespace System.Windows.Data
 
                     if (_dataErrorValue != null)
                     {
-                        _valueErrorsChangedListener = new(this, _dataErrorValue)
-                        {
-                            OnEventAction = static (instance, source, args) => instance.OnValueErrorsChanged(source, args),
-                            OnDetachAction = static (listener, source) => source.ErrorsChanged -= listener.OnEvent,
-                        };
-                        _dataErrorValue.ErrorsChanged += _valueErrorsChangedListener.OnEvent;
+                        _weakValueErrorsChangedEventToken = WeakEvent.Subscribe<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs>(
+                            this,
+                            _dataErrorValue,
+                            static (instance, source, args) => instance.OnValueErrorsChanged(source, args),
+                            static (handler, source) => source.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(handler),
+                            static (handler, source) => source.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(handler));
                     }
                 }
             }

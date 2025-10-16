@@ -111,7 +111,7 @@ internal sealed class RichTextBoxView : TextViewBase
     }
 
     private DispatcherOperation _refreshOp;
-    private WeakEventListener<RichTextBoxView, Brush, EventArgs> _foregroundChangedListener;
+    private WeakEventToken _weakEventToken;
 
     public RichTextBoxView(RichTextBox rtb)
         : base(rtb)
@@ -899,20 +899,20 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         var view = (RichTextBoxView)d;
 
-        if (view._foregroundChangedListener != null)
+        if (view._weakEventToken != null)
         {
-            view._foregroundChangedListener.Detach();
-            view._foregroundChangedListener = null;
+            view._weakEventToken.Dispose();
+            view._weakEventToken = null;
         }
 
         if (e.NewValue is Brush newBrush)
         {
-            view._foregroundChangedListener = new(view, newBrush)
-            {
-                OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
-                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-            };
-            newBrush.Changed += view._foregroundChangedListener.OnEvent;
+            view._weakEventToken = WeakEvent.Subscribe<RichTextBoxView, Brush, EventArgs>(
+                view,
+                newBrush,
+                static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
     }
 

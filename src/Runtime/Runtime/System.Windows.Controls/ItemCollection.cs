@@ -26,7 +26,7 @@ namespace System.Windows.Controls
         private readonly CollectionChangedHelper _collectionChanged;
 
         private IEnumerable _itemsSource; // base collection
-        private WeakEventListener<ItemCollection, INotifyCollectionChanged, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+        private WeakEventToken _weakEventToken;
 
         private bool _isUsingListWrapper;
         private ListWrapper _listWrapper;
@@ -289,21 +289,21 @@ namespace System.Windows.Controls
         {
             if (collection is INotifyCollectionChanged incc)
             {
-                _collectionChangedListener = new(this, incc)
-                {
-                    OnEventAction = static (instance, source, args) => instance.OnSourceCollectionChanged(source, args),
-                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
-                };
-                incc.CollectionChanged += _collectionChangedListener.OnEvent;
+                _weakEventToken = WeakEvent.Subscribe<ItemCollection, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(
+                    this,
+                    incc,
+                    static (instance, source, eventArgs) => instance.OnSourceCollectionChanged(source, eventArgs),
+                    static (handler, source) => source.CollectionChanged -= new NotifyCollectionChangedEventHandler(handler),
+                    static (handler, source) => source.CollectionChanged += new NotifyCollectionChangedEventHandler(handler));
             }
         }
 
         private void TryUnsubscribeFromCollectionChangedEvent()
         {
-            if (_collectionChangedListener != null)
+            if (_weakEventToken != null)
             {
-                _collectionChangedListener.Detach();
-                _collectionChangedListener = null;
+                _weakEventToken.Dispose();
+                _weakEventToken = null;
             }
         }
 
