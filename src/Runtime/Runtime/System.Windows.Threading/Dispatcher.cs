@@ -388,6 +388,9 @@ public sealed class Dispatcher
     {
         List<Exception> unhandledExceptions = null;
 
+        var oldSynchronizationContext = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(DefaultSynchronizationContext);
+
         try
         {
             Tick?.Invoke(this, EventArgs.Empty);
@@ -401,6 +404,10 @@ public sealed class Dispatcher
                 unhandledExceptions = [];
                 unhandledExceptions.Add(ex);
             }
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
         }
 
         ProcessQueue(ref unhandledExceptions);
@@ -420,6 +427,9 @@ public sealed class Dispatcher
         {
             if (operation.Status == DispatcherOperationStatus.Pending)
             {
+                var oldSynchronizationContext = SynchronizationContext.Current;
+                SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(this, operation.Priority));
+
                 try
                 {
                     operation.Invoke();
@@ -433,6 +443,10 @@ public sealed class Dispatcher
                         unhandledExceptions ??= [];
                         unhandledExceptions.Add(ex);
                     }
+                }
+                finally
+                {
+                    SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
                 }
             }
         }
