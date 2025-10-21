@@ -144,6 +144,9 @@ namespace System.Windows.Threading
 
         private void FireTick()
         {
+            var oldSynchronizationContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(Dispatcher.CurrentDispatcher.DefaultSynchronizationContext);
+
             try
             {
                 OnTick();
@@ -156,6 +159,10 @@ namespace System.Windows.Threading
                 {
                     throw;
                 }
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
             }
         }
     }
