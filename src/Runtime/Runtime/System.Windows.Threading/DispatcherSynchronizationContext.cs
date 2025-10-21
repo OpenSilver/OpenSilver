@@ -80,7 +80,7 @@ public class DispatcherSynchronizationContext : SynchronizationContext
     /// <returns>
     /// The copy of this synchronization context.
     /// </returns>
-    public override SynchronizationContext CreateCopy() => new DispatcherSynchronizationContext(_dispatcher);
+    public override SynchronizationContext CreateCopy() => new DispatcherSynchronizationContext(_dispatcher, _priority);
 
     /// <summary>
     /// Invokes the callback in the synchronization context asynchronously.

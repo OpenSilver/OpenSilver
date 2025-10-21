@@ -13,7 +13,9 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
@@ -58,6 +60,9 @@ namespace CSHTML5.Internal
 
         private object InvokeWithExceptionHandling(string idWhereCallbackArgsAreStored, object callbackArgs)
         {
+            var oldSynchronizationContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(Dispatcher.CurrentDispatcher.DefaultSynchronizationContext);
+
             try
             {
                 return InvokeImpl(idWhereCallbackArgsAreStored, callbackArgs);
@@ -70,6 +75,10 @@ namespace CSHTML5.Internal
                 {
                     throw;
                 }
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
             }
 
             return null;
