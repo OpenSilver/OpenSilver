@@ -158,11 +158,11 @@ internal sealed class InputManager
 
     internal bool CaptureMouse(UIElement uie)
     {
-        if (Pointer.Captured is null && _mouseLeftDown)
+        if (Pointer.Captured is null && _mouseLeftDown && uie.OuterDiv is { } outerDiv)
         {
             Pointer.Captured = uie;
 
-            string sDiv = OpenSilver.Interop.GetVariableStringForJS(uie.OuterDiv);
+            string sDiv = OpenSilver.Interop.GetVariableStringForJS(outerDiv);
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.captureMouse({sDiv});");
 
             return true;
