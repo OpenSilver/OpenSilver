@@ -166,7 +166,7 @@ namespace System.Windows.Printing
         private static void InitializePrintDocumentNative()
         {
             _printDocumentNative ??= OpenSilver.Interop.ExecuteJavaScript(
-        @"(function () {
+@"(function () {
   function addStyle() {
     var element = document.createElement('style')
     element.innerHTML += `
@@ -208,7 +208,7 @@ namespace System.Windows.Printing
 
   function prepareDocument() {
     addStyle();
-    var elements = document.getElementsByClassName('print-section');   
+    var elements = document.getElementsByClassName('print-section');
     let el = document.createElement('div');
     el.id = 'print-container';      
 
