@@ -248,6 +248,7 @@ document.createShape = function (svgTagName, svgId, shapeId, defsId, parentId) {
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.classList.add('opensilver-uielement', 'opensilver-shape', 'uielement-unarranged');
+    document.inputManager.addListeners(svg, false);
     svg.setAttribute('id', svgId);
     Object.defineProperty(svg, 'xamlid', {
         value: svgId,
