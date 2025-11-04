@@ -206,7 +206,7 @@ namespace System.Windows.Printing
                 AddPrintSection();
 
                 string sPrint = OpenSilver.Interop.GetVariableStringForJS(_printDocumentNative);
-                string sTitle = OpenSilver.Interop.GetVariableStringForJS(documentName);
+                string sTitle = OpenSilver.Interop.GetVariableStringForJS(documentName ?? string.Empty);
                 string sCallback = OpenSilver.Interop.GetVariableStringForJS(_endPrintJSCallback);
                 OpenSilver.Interop.ExecuteJavaScriptVoid($"{sPrint}.print({sTitle}, {sCallback})");
 

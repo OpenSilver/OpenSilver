@@ -47,7 +47,7 @@ namespace System.Windows.Printing
                 // If this static constructor is called before the JSInterop is set up, then
                 // this will crash. Handle it and delay this object's construction to later.
             }
-        }        
+        }
 
         private PrintOperation _operation;
 
@@ -180,12 +180,13 @@ namespace System.Windows.Printing
   }
 
   .print-document-section-to-print {
+    display: block !important;
+    position: relative !important;
     left: 0 !important;
     top: 0 !important;
     margin: 0 !important;
     border: 0 !important;
     padding: 0 !important;
-    height: 100%;
     width: 100%;
   }
 
@@ -195,7 +196,7 @@ namespace System.Windows.Printing
   }
 
   #print-container {
-    display: inline !important;
+    display: block !important;
   }
 
   body>*:not(#print-container) {
