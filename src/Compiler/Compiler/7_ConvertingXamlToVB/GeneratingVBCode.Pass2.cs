@@ -2224,14 +2224,22 @@ End Sub
                     return _reflectionOnSeparateAppDomain.GetEnumValue(type, fieldString, false, false);
                 }
 
-                if (_reflectionOnSeparateAppDomain.GetField(type, fieldString, true, true) is FieldDefinition staticField)
+                FieldDefinition staticField;
+                PropertyDefinition staticProperty;
+                TypeReference declaringType;
+
+                (staticField, declaringType) = _reflectionOnSeparateAppDomain.GetField(type, fieldString, true, true);
+
+                if (staticField is not null)
                 {
-                    return $"Global.{staticField.DeclaringType.ConvertToString(SupportedLanguage.VBNet)}.{staticField.Name}";
+                    return $"Global.{declaringType.ConvertToString(SupportedLanguage.VBNet)}.{staticField.Name}";
                 }
 
-                if (_reflectionOnSeparateAppDomain.GetProperty(type, fieldString, true, true) is PropertyDefinition staticProperty)
+                (staticProperty, declaringType) = _reflectionOnSeparateAppDomain.GetProperty(type, fieldString, true, true);
+
+                if (staticProperty is not null)
                 {
-                    return $"Global.{staticProperty.DeclaringType.ConvertToString(SupportedLanguage.VBNet)}.{staticProperty.Name}";
+                    return $"Global.{declaringType.ConvertToString(SupportedLanguage.VBNet)}.{staticProperty.Name}";
                 }
 
                 throw new XamlParseException(

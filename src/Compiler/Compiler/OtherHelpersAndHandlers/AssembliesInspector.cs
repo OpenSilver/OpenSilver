@@ -114,10 +114,20 @@ namespace OpenSilver.Compiler
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
             => _monoCecilVersion.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
 
-        public FieldDefinition GetField(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
-            => MonoCecilAssembliesInspectorImpl.FindFieldDeep(type, name, out _, false, staticOnly, publicOnly);
+        public (FieldDefinition Field, TypeReference DeclaringType) GetField(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
+        {
+            FieldDefinition field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+                type, name, out TypeReference declaringType, false, staticOnly, publicOnly);
 
-        public PropertyDefinition GetProperty(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
-            => MonoCecilAssembliesInspectorImpl.FindPropertyGetterDeep(type, name, out _, staticOnly, publicOnly);
+            return (field, declaringType);
+        }
+
+        public (PropertyDefinition Property, TypeReference DeclaringType) GetProperty(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
+        {
+            PropertyDefinition property = MonoCecilAssembliesInspectorImpl.FindPropertyGetterDeep(
+                type, name, out TypeReference declaringType, staticOnly, publicOnly);
+
+            return (property, declaringType);
+        }
     }
 }
