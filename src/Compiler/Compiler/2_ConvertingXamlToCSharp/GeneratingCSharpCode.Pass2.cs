@@ -688,7 +688,10 @@ namespace OpenSilver.Compiler
 
                             string[] split = attribute.Name.LocalName.Split('.');
 
-                            XName ownerTypeXName = attribute.Name.Namespace + split[0];
+                            XNamespace attributeNS = attribute.Name.Namespace == XNamespace.None ?
+                                element.GetDefaultNamespace() :
+                                attribute.Name.Namespace;
+                            XName ownerTypeXName = attributeNS + split[0];
                             string memberName = split[1];
 
                             GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
