@@ -53,16 +53,7 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
             _weakEventToken = null;
         }
 
-        // todo: (?) find out how to have a listener here since it
-        // is a method and not a DependencyProperty (get_Item and
-        // set_Item). I guess it would be nice to be able to attach
-        // to calls on set_item and handle it from there.
-        _indexer = null;
-
-        if (newValue is not null)
-        {
-            FindIndexer(newValue.GetType());
-        }
+        FindIndexer(newValue);
 
         if (Listener.IsDynamic)
         {
@@ -116,26 +107,38 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
         }
     }
 
-    private void FindIndexer(Type type)
+    private void FindIndexer(object value)
     {
+        if (value is null)
+        {
+            _indexer = null;
+            return;
+        }
+
+        Type type = value.GetType();
+
         // 1 - Look for an Int32 indexer
         // 2 - Look for a String indexer
         // 3 - Use indexer from IList if the Binding source implement the interface
         foreach (MemberInfo member in type.GetDefaultMembers())
         {
             if (member is not PropertyInfo property)
+            {
                 continue;
+            }
 
             ParameterInfo[] parameters = property.GetIndexParameters();
             if (parameters.Length != 1)
+            {
                 continue;
+            }
 
             if (parameters[0].ParameterType == typeof(int))
             {
-                if (int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
+                if (int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index))
                 {
                     _indexer = property;
-                    _index[0] = value;
+                    _index[0] = index;
                     break;
                 }
             }
@@ -150,10 +153,10 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
 
         if (_indexer is null)
         {
-            if (type is IList)
+            if (value is IList && int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index))
             {
                 _indexer = _iListIndexer;
-                _index[0] = int.Parse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                _index[0] = index;
             }
         }
     }
