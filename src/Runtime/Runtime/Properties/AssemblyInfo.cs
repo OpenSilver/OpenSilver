@@ -19,6 +19,7 @@ using System.Windows.Markup;
 [assembly: InternalsVisibleTo("Runtime.OpenSilver.Tests")]
 [assembly: InternalsVisibleTo("OpenSilver.ControlsKit.FastControls")]
 [assembly: InternalsVisibleTo("XRSharp")]
+[assembly: InternalsVisibleTo("OpenSilver.MauiSyntax")]
 
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")] // This is used for example in the {x:Static ...} markup extension.
 
