@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Xaml;
 using System.Xml;
 using System.Xml.Linq;
@@ -23,9 +24,32 @@ namespace OpenSilver.Compiler
     {
         public static XDocument Parse(string xaml, LoadOptions options)
         {
+            // Remove XML processing instructions (like <?xml...?> and <?xaml-comp...?>) and any leading
+            // whitespace/BOM that may appear at the beginning of the file, as they cause parsing errors
+            // with the XML reader ("Data at the root level is invalid").
+            xaml = RemoveXmlProcessingInstructions(xaml);
+
+            // Load the XAML into an XDocument using the CompatibleXmlReader to handle namespaces
             XmlReader baseReader = XmlReader.Create(new StringReader(xaml), GetXmlReaderSettings(options));
             XmlReader reader = new CompatibleXmlReader(baseReader, TryGetCompatibleNamespace);
             return XDocument.Load(reader, options);
+        }
+
+        private static string RemoveXmlProcessingInstructions(string xaml)
+        {
+            // Remove XML processing instructions (like <?xml...?> and <?xaml-comp...?>)
+            // Pattern matches: <?...?> using non-greedy matching
+            string pattern = @"<\?.*?\?>";
+            xaml = Regex.Replace(xaml, pattern, string.Empty);
+
+            // Remove BOM (Byte Order Mark - character 65279 or \uFEFF) and all leading whitespace.
+            // XML parsers do not accept any characters before the root element.
+            // TrimStart with char array ensures we remove BOM, spaces, tabs, newlines, etc.
+            // Note: This will affect line numbers in error reporting, but it's necessary for parsing.
+            char[] charsToTrim = new char[] { '\uFEFF', ' ', '\t', '\r', '\n', '\v', '\f' };
+            xaml = xaml.TrimStart(charsToTrim);
+
+            return xaml;
         }
 
         private static XmlReaderSettings GetXmlReaderSettings(LoadOptions o)
