@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,6 +20,11 @@ namespace System.ServiceModel
 {
     public static class INTERNAL_WebMethodsCaller
     {
+        // Store out parameters from web method calls, keyed by IAsyncResult
+        // This is used to support out parameters in generated code that uses INTERNAL_WebMethodsCaller
+        private static readonly ConcurrentDictionary<IAsyncResult, object[]> _outParameters = new ConcurrentDictionary<IAsyncResult, object[]>();
+        
+
         /// <summary>
         /// Key for the AsyncCallback paramater that must be passed as
         /// part of the request parameters IDictionary for asynchronous 
@@ -300,12 +306,57 @@ namespace System.ServiceModel
             IDictionary<string, object> requestParameters,
             string soapVersion) where INTERFACE_TYPE : class
         {
-            return (RETURN_TYPE)EndCallWebMethod<INTERFACE_TYPE>(
+            IAsyncResult asyncResult = (IAsyncResult)requestParameters[ResultParameterName];
+            
+            object result = EndCallWebMethod<INTERFACE_TYPE>(
                 endpointAddress,
                 webMethodName,
                 typeof(RETURN_TYPE),
                 requestParameters,
                 soapVersion);
+
+            // Handle methods with out parameters
+            // If result is an array, it contains [out_param1, out_param2, ..., return_value]
+            if (result is object[] resultArray && resultArray.Length > 0)
+            {
+                // Store out parameters in the dictionary for retrieval
+                // (excluding the last element which is the return value)
+                if (resultArray.Length > 1)
+                {
+                    var outParams = new object[resultArray.Length - 1];
+                    Array.Copy(resultArray, 0, outParams, 0, outParams.Length);
+                    _outParameters[asyncResult] = outParams;
+                }
+                
+                // Return the last element (the actual return value)
+                return (RETURN_TYPE)resultArray[resultArray.Length - 1];
+            }
+
+            return (RETURN_TYPE)result;
+        }
+        
+        /// <summary>
+        /// Gets out parameters for a web method call.
+        /// This is a workaround for generated code patterns that don't support out parameters natively.
+        /// </summary>
+        /// <param name="asyncResult">The IAsyncResult from the Begin call</param>
+        /// <param name="outParamIndex">The index of the out parameter (0-based)</param>
+        /// <returns>The out parameter value, or null if not found</returns>
+        public static object GetOutParameter(IAsyncResult asyncResult, int outParamIndex)
+        {
+            if (_outParameters.TryGetValue(asyncResult, out object[] outParams) && outParamIndex < outParams.Length)
+            {
+                return outParams[outParamIndex];
+            }
+            return null;
+        }
+        
+        /// <summary>
+        /// Cleans up stored out parameters for a completed async operation.
+        /// </summary>
+        public static void CleanupOutParameters(IAsyncResult asyncResult)
+        {
+            _outParameters.TryRemove(asyncResult, out _);
         }
 
         //------------------------------------------

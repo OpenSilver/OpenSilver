@@ -529,26 +529,88 @@ namespace OpenSilver.Compiler
                     }
                     parametersDictionaryDefinition += "}";
 
-                    newBody = string.Format(
+                    // Generate out parameter handling code
+                    string outParamHandling = "";
+                    bool hasOutParams = outParamDefinitions.Count > 0;
+                    bool isAsyncEndMethod = (methodType == MethodType.AsyncEndWithReturnType || methodType == MethodType.AsyncEndWithoutReturnType);
+                    
+                    if (hasOutParams && isAsyncEndMethod)
+                    {
+                        // For AsyncEnd methods with out parameters, we need to:
+                        // 1. Store return value in a temp variable
+                        // 2. Retrieve out parameters from INTERNAL_WebMethodsCaller
+                        // 3. Cleanup
+                        // 4. Return the value
+                        
+                        string returnStatement = methodType == MethodType.AsyncEndWithReturnType ? 
+                            $"{returnType} __outParamRetVal = " : "";
+                        
+                        outParamHandling = returnStatement;
+                        
+                        // After the call, retrieve out parameters
+                        // Find the IAsyncResult parameter name (usually "result" or "asyncResult")
+                        string asyncResultParamName = parameterNamesToTheirDefinitions.ContainsKey("result") ? "result" : "asyncResult";
+                        
+                        string afterCallCode = "";
+                        int outParamIndex = 0;
+                        foreach (var outParam in outParamDefinitions)
+                        {
+                            afterCallCode += $"\n            {outParam.Key} = ({outParam.Value})System.ServiceModel.INTERNAL_WebMethodsCaller.GetOutParameter((System.IAsyncResult)({asyncResultParamName}), {outParamIndex});";
+                            outParamIndex++;
+                        }
+                        afterCallCode += $"\n            System.ServiceModel.INTERNAL_WebMethodsCaller.CleanupOutParameters((System.IAsyncResult)({asyncResultParamName}));";
+                        
+                        if (methodType == MethodType.AsyncEndWithReturnType)
+                        {
+                            afterCallCode += "\n            return __outParamRetVal;";
+                        }
+                        
+                        string methodCallPrefix = ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : ""));
+                        string methodCallSuffix = ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType) ? "Async" : "") + ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : "");
+                        
+                        newBody = string.Format(
+@"
+            {0}
+            {1}System.ServiceModel.INTERNAL_WebMethodsCaller.{2}CallWebMethod{3}
+                <{4}{5}>({6}, ""{7}"", {8}, ""{9}"");{10}
+",
+                        string.Join(" ", outParamDefinitions.Select(def => $"{def.Key} = default({def.Value});")),  // {0} - out param init
+                        outParamHandling,  // {1} - return value variable declaration
+                        methodCallPrefix,  // {2} - Begin/End prefix
+                        methodCallSuffix,  // {3} - Async suffix
+                        ((methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? returnType + ", " : ""),  // {4} - return type
+                        interfaceType,  // {5} - interface type
+                        endpointCode,  // {6} - endpoint
+                        GetMethodName(methodName, methodType),  // {7} - method name
+                        parametersDictionaryDefinition,  // {8} - parameters
+                        soapVersion,  // {9} - soap version
+                        afterCallCode  // {10} - out param retrieval code
+                        );
+                    }
+                    else
+                    {
+                        // Original code for methods without out parameters or non-AsyncEnd methods
+                        newBody = string.Format(
 
     @"
             {11}
             {6}System.ServiceModel.INTERNAL_WebMethodsCaller.{8}CallWebMethod{0}{7}
                 <{1}{2}>({9}, ""{3}"", {4}, ""{10}"");
 ",
-     ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType) ? "Async" : string.Empty),
-     ((methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? returnType + ", " : ""),
-     interfaceType,
-     GetMethodName(methodName, methodType),
-     parametersDictionaryDefinition,
-     originalCode,
-     ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? "return " : ""),
-     ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : ""),
-     ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : "")),
-     endpointCode,
-     soapVersion,
-     string.Join(" ", outParamDefinitions.Select(def => $"{def.Key} = default({def.Value});"))
-     );
+                        ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType) ? "Async" : string.Empty),
+                        ((methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? returnType + ", " : ""),
+                        interfaceType,
+                        GetMethodName(methodName, methodType),
+                        parametersDictionaryDefinition,
+                        originalCode,
+                        ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? "return " : ""),
+                        ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : ""),
+                        ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : "")),
+                        endpointCode,
+                        soapVersion,
+                        string.Join(" ", outParamDefinitions.Select(def => $"{def.Key} = default({def.Value});"))
+                        );
+                    }
                 }
                 else //case where there are no parameters
                 {

@@ -1233,28 +1233,76 @@ namespace System.ServiceModel
                             xElement.Name.NamespaceName == replyDescription.Body.WrapperNamespace);
                     }
 
-                    requestResponse = null;
-
                     var returnPart = replyDescription.Body.ReturnValue;
+                    var outParts = replyDescription.Body.Parts;
 
-                    if (returnPart is not null && returnPart.Type != typeof(void))
+                    if (outParts.Count > 0)
                     {
-                        xElement = xElement.Element(XName.Get(returnPart.Name, returnPart.Namespace));
+                        // We have out/ref parameters - need to return them as an array
+                        // The array format is: [out_param1, out_param2, ..., return_value]
+                        var results = new List<object>();
 
-                        if (xElement is not null)
+                        // First, deserialize all out parameters
+                        foreach (var part in outParts)
                         {
-                            var serializer = new DataContractSerializer(
-                                returnPart.Type,
-                                returnPart.Name,
-                                returnPart.Namespace,
-                                types);
+                            var element = xElement.Element(XName.Get(part.Name, part.Namespace));
+                            if (element is not null)
+                            {
+                                var serializer = new DataContractSerializer(
+                                    part.Type,
+                                    part.Name,
+                                    part.Namespace,
+                                    types);
+                                results.Add(DeserializeXElement(serializer, element));
+                            }
+                            else
+                            {
+                                // Element not found, add default value
+                                results.Add(part.Type.IsValueType ? Activator.CreateInstance(part.Type) : null);
+                            }
+                        }
 
-                            requestResponse = DeserializeXElement(serializer, xElement);
+                        // Then, deserialize the return value (if any)
+                        if (returnPart is not null && returnPart.Type != typeof(void))
+                        {
+                            var returnElement = xElement.Element(XName.Get(returnPart.Name, returnPart.Namespace));
+                            if (returnElement is not null)
+                            {
+                                var serializer = new DataContractSerializer(
+                                    returnPart.Type,
+                                    returnPart.Name,
+                                    returnPart.Namespace,
+                                    types);
+                                results.Add(DeserializeXElement(serializer, returnElement));
+                            }
+                            else
+                            {
+                                results.Add(returnPart.Type.IsValueType ? Activator.CreateInstance(returnPart.Type) : null);
+                            }
+                        }
+
+                        requestResponse = results.ToArray();
+                    }
+                    else
+                    {
+                        requestResponse = null;
+
+                        if (returnPart is not null && returnPart.Type != typeof(void))
+                        {
+                            xElement = xElement.Element(XName.Get(returnPart.Name, returnPart.Namespace));
+
+                            if (xElement is not null)
+                            {
+                                var serializer = new DataContractSerializer(
+                                    returnPart.Type,
+                                    returnPart.Name,
+                                    returnPart.Namespace,
+                                    types);
+
+                                requestResponse = DeserializeXElement(serializer, xElement);
+                            }
                         }
                     }
-
-                    // Note: we do not deserialize bodyDescription.Parts because it is used for out/ref parameters,
-                    // which we do not support.
                 }
 
                 return requestResponse;
