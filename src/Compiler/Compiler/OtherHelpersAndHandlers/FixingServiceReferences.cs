@@ -22,7 +22,7 @@ namespace OpenSilver.Compiler
 {
     internal static class FixingServiceReferences
     {
-        enum MethodType
+        private enum MethodType
         {
             AsyncWithReturnType,
             AsyncWithoutReturnType,
@@ -31,6 +31,13 @@ namespace OpenSilver.Compiler
             AsyncEndWithReturnType,
             AsyncEndWithoutReturnType,
             AsyncBegin
+        }
+
+        private enum ParameterKind
+        {
+            Value,
+            Out,
+            Ref
         }
 
         // this struct is used to find a given substring in a text when reading it character by character 
@@ -157,13 +164,13 @@ namespace OpenSilver.Compiler
             }
         }
 
-        private static readonly Dictionary<string, string> SupportedClientBaseTypes = 
+        private static readonly Dictionary<string, string> SupportedClientBaseTypes =
             new Dictionary<string, string>()
             {
                 ["System.ServiceModel.ClientBase"] = "System.ServiceModel.CSHTML5_ClientBase",
                 ["System.ServiceModel.DuplexClientBase"] = "System.ServiceModel.CSHTML5_DuplexClientBase",
             };
-        
+
         internal static string Fix(string inputText, string clientBaseForcedToken, string clientBaseForcedInterfaceName, string endpointCode, string soapVersion, out bool wasAnythingFixed)
         {
             soapVersion = string.IsNullOrEmpty(soapVersion) ? "1.1" : soapVersion;
@@ -314,13 +321,13 @@ namespace OpenSilver.Compiler
                             if (currentBlockAsString.Contains(clientBaseForcedToken))
                             {
                                 if (FixBlock(
-                                    ref currentBlockAsString, 
-                                    string.IsNullOrEmpty(clientBaseForcedInterfaceName) ? clientBaseInterfaceName : 
-                                                                                          clientBaseForcedInterfaceName, 
-                                    inputText, 
-                                    regexMethodIdentifier, 
-                                    clientBaseToken, 
-                                    endpointCode, 
+                                    ref currentBlockAsString,
+                                    string.IsNullOrEmpty(clientBaseForcedInterfaceName) ? clientBaseInterfaceName :
+                                                                                          clientBaseForcedInterfaceName,
+                                    inputText,
+                                    regexMethodIdentifier,
+                                    clientBaseToken,
+                                    endpointCode,
                                     soapVersion))
                                 {
                                     wasAnythingFixed = true;
@@ -433,33 +440,38 @@ namespace OpenSilver.Compiler
                 {
                     thereAreParameters = false;
                     requestParameterName = "null";
-                    originalCode = string.Format("{0}.{1}()", 
-                                                 detectedToken, 
+                    originalCode = string.Format("{0}.{1}()",
+                                                 detectedToken,
                                                  methodName);
                 }
                 else
                 {
-                    originalCode = string.Format("{0}.{1}({2})", 
-                                                 detectedToken, 
-                                                 methodName, 
+                    originalCode = string.Format("{0}.{1}({2})",
+                                                 detectedToken,
+                                                 methodName,
                                                  requestParameterName);
                 }
 
                 //Make a dictionary to know the parameters from the name:
                 //todo-perf: this and the "check the amount of parameters and adapt the body replacement:" part may be a bit redundant since they're both about the parameters of the method so we might be able to make the compilation slightly faster by changing this (probably unnoticeable).
                 Dictionary<string, string> parameterNamesToTheirDefinitions = new Dictionary<string, string>();
-                Dictionary<string, string> outParamDefinitions = new Dictionary<string, string>();
+                List<(string Name, string Type, ParameterKind Kind)> outParamDefinitions = [];
                 if (!string.IsNullOrWhiteSpace(methodParametersDefinitions))
                 {
                     string[] splittedMethodParametersDefinition = SplitStringTakingAccountOfBrackets(methodParametersDefinitions, ',');
                     foreach (string parameterDefinition in splittedMethodParametersDefinition)
                     {
                         string paramDefinition = parameterDefinition.Trim();
-                        bool isOutParam = false;
+                        ParameterKind parameterKind = ParameterKind.Value;
                         if (paramDefinition.StartsWith("out "))
                         {
                             paramDefinition = paramDefinition.Remove(0, 4).Trim();
-                            isOutParam = true;
+                            parameterKind = ParameterKind.Out;
+                        }
+                        else if (paramDefinition.StartsWith("ref "))
+                        {
+                            paramDefinition = paramDefinition.Remove(0, 4).Trim();
+                            parameterKind = ParameterKind.Ref;
                         }
 
                         string[] splittedParamDefinition = SplitStringTakingAccountOfBrackets(paramDefinition, ' ');
@@ -483,108 +495,116 @@ namespace OpenSilver.Compiler
                             }
                         }
 
-                        if (isOutParam)
+                        switch (parameterKind)
                         {
-                            outParamDefinitions.Add(parameterName, parameterTypeAsString);
-                        }
-                        else
-                        {
-                            parameterNamesToTheirDefinitions.Add(parameterName, string.Format(@"{0}", parameterName));
+                            case ParameterKind.Out:
+                                outParamDefinitions.Add((parameterName, parameterTypeAsString, ParameterKind.Out));
+                                break;
+
+                            case ParameterKind.Ref:
+                                outParamDefinitions.Add((parameterName, parameterTypeAsString, ParameterKind.Ref));
+                                parameterNamesToTheirDefinitions.Add(parameterName, parameterName);
+                                break;
+
+                            default:
+                                parameterNamesToTheirDefinitions.Add(parameterName, parameterName);
+                                break;
                         }
                     }
                 }
-                //check the amount of parameters and adapt the body replacement:
-                string[] splittedParameters = requestParameterName.Split(',');
-                string newBody = "";
+
+                string newBody = string.Empty;
+
                 if (thereAreParameters)
                 {
-                    string parametersDictionaryDefinition = "new global::System.Collections.Generic.Dictionary<string, object>() {";
-                    foreach (string paramName in splittedParameters)
+                    var parametersDictionaryDefinitionBuilder = new StringBuilder();
+                    parametersDictionaryDefinitionBuilder.Append("new global::System.Collections.Generic.Dictionary<string, object>() {");
+
+                    foreach (string paramName in requestParameterName.Split(','))
                     {
                         string trimmedParamName = paramName.Trim();
-                        bool isOutParam = false;
-                        if (paramName.StartsWith("out "))
+                        ParameterKind parameterKind = ParameterKind.Value;
+                        if (trimmedParamName.StartsWith("out "))
                         {
-                            isOutParam = true;
+                            parameterKind = ParameterKind.Out;
                             trimmedParamName = trimmedParamName.Remove(0, 4).Trim();
                         }
-
-                        if (trimmedParamName.StartsWith("ref "))
+                        else if (trimmedParamName.StartsWith("ref "))
                         {
+                            parameterKind = ParameterKind.Ref;
                             trimmedParamName = trimmedParamName.Remove(0, 4);
                         }
 
                         if (trimmedParamName == "null") continue;
 
-                        string parameterDefinition = parameterNamesToTheirDefinitions.ContainsKey(trimmedParamName) ?
-                                                     parameterNamesToTheirDefinitions[trimmedParamName] :
-                                                     "null";
-
                         // Note: Can the params names be different from trimmedParam and the one 
                         // in parameterNamesToTheirDefinitions? (probably not if properly trimmed and all)
-                        if (!isOutParam)
+                        if (parameterKind != ParameterKind.Out)
                         {
-                            parametersDictionaryDefinition += $"{{ \"{trimmedParamName}\", {parameterDefinition} }},";
+                            string parameterDefinition = parameterNamesToTheirDefinitions.ContainsKey(trimmedParamName) ?
+                                                         parameterNamesToTheirDefinitions[trimmedParamName] :
+                                                         "null";
+
+                            parametersDictionaryDefinitionBuilder.Append($"{{ \"{trimmedParamName}\", {parameterDefinition} }},");
                         }
                     }
-                    parametersDictionaryDefinition += "}";
+                    parametersDictionaryDefinitionBuilder.Append('}');
 
-                    // Generate out parameter handling code
-                    string outParamHandling = "";
                     bool hasOutParams = outParamDefinitions.Count > 0;
-                    bool isAsyncEndMethod = (methodType == MethodType.AsyncEndWithReturnType || methodType == MethodType.AsyncEndWithoutReturnType);
-                    
+                    bool isAsyncEndMethod = methodType == MethodType.AsyncEndWithReturnType || methodType == MethodType.AsyncEndWithoutReturnType;
+
                     if (hasOutParams && isAsyncEndMethod)
                     {
-                        // For AsyncEnd methods with out parameters, we need to:
-                        // 1. Store return value in a temp variable
-                        // 2. Retrieve out parameters from INTERNAL_WebMethodsCaller
-                        // 3. Cleanup
-                        // 4. Return the value
-                        
-                        string returnStatement = methodType == MethodType.AsyncEndWithReturnType ? 
-                            $"{returnType} __outParamRetVal = " : "";
-                        
-                        outParamHandling = returnStatement;
-                        
-                        // After the call, retrieve out parameters
-                        // Find the IAsyncResult parameter name (usually "result" or "asyncResult")
-                        string asyncResultParamName = parameterNamesToTheirDefinitions.ContainsKey("result") ? "result" : "asyncResult";
-                        
-                        string afterCallCode = "";
-                        int outParamIndex = 0;
-                        foreach (var outParam in outParamDefinitions)
+                        var returnResult = methodType == MethodType.AsyncEndWithReturnType;
+
+                        var resultName = $"_result_{Guid.NewGuid():N}";
+                        var argsName = $"_args_{Guid.NewGuid():N}";
+
+                        var argsBuilder = new StringBuilder();
+                        if (outParamDefinitions.Count > 0)
                         {
-                            afterCallCode += $"\n            {outParam.Key} = ({outParam.Value})System.ServiceModel.INTERNAL_WebMethodsCaller.GetOutParameter((System.IAsyncResult)({asyncResultParamName}), {outParamIndex});";
-                            outParamIndex++;
+                            argsBuilder.Append($"            var {argsName} = new object[{outParamDefinitions.Count}];");
+                            for (int i = 0; i < outParamDefinitions.Count; i++)
+                            {
+                                var def = outParamDefinitions[i];
+                                if (def.Kind == ParameterKind.Ref)
+                                {
+                                    argsBuilder.AppendLine();
+                                    argsBuilder.Append($"            {argsName}[{i}] = {def.Name};");
+                                }
+                            }
                         }
-                        afterCallCode += $"\n            System.ServiceModel.INTERNAL_WebMethodsCaller.CleanupOutParameters((System.IAsyncResult)({asyncResultParamName}));";
-                        
-                        if (methodType == MethodType.AsyncEndWithReturnType)
+
+                        var returnBuilder = new StringBuilder();
+                        for (int i = 0; i < outParamDefinitions.Count; i++)
                         {
-                            afterCallCode += "\n            return __outParamRetVal;";
+                            var def = outParamDefinitions[i];
+                            returnBuilder.AppendLine($"            {def.Name} = ({def.Type}){argsName}[{i}];");
                         }
-                        
-                        string methodCallPrefix = ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : ""));
-                        string methodCallSuffix = ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType) ? "Async" : "") + ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : "");
-                        
+                        if (returnResult)
+                        {
+                            returnBuilder.Append($"            return {resultName};");
+                        }
+
                         newBody = string.Format(
 @"
-            {0}
+{0}
             {1}System.ServiceModel.INTERNAL_WebMethodsCaller.{2}CallWebMethod{3}
-                <{4}{5}>({6}, ""{7}"", {8}, ""{9}"");{10}
+                <{4}{5}>({6}, ""{7}"", {11}, {8}, ""{9}"");
+{10}
 ",
-                        string.Join(" ", outParamDefinitions.Select(def => $"{def.Key} = default({def.Value});")),  // {0} - out param init
-                        outParamHandling,  // {1} - return value variable declaration
-                        methodCallPrefix,  // {2} - Begin/End prefix
-                        methodCallSuffix,  // {3} - Async suffix
-                        ((methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? returnType + ", " : ""),  // {4} - return type
+                        argsBuilder.ToString(),  // {0} - out param init
+                        returnResult ? $"var {resultName} = " : string.Empty,  // {1} - return value variable declaration
+                        "End",  // {2} - Begin/End prefix
+                        returnResult ? string.Empty : "_WithoutReturnValue",  // {3} - Async suffix
+                        returnResult ? returnType + ", " : string.Empty,  // {4} - return type
                         interfaceType,  // {5} - interface type
                         endpointCode,  // {6} - endpoint
                         GetMethodName(methodName, methodType),  // {7} - method name
-                        parametersDictionaryDefinition,  // {8} - parameters
+                        parametersDictionaryDefinitionBuilder.ToString(),  // {8} - parameters
                         soapVersion,  // {9} - soap version
-                        afterCallCode  // {10} - out param retrieval code
+                        returnBuilder.ToString(), // {10} - out param retrieval code and return statement
+                        argsName // {11} - name of arguments array
                         );
                     }
                     else
@@ -601,14 +621,14 @@ namespace OpenSilver.Compiler
                         ((methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? returnType + ", " : ""),
                         interfaceType,
                         GetMethodName(methodName, methodType),
-                        parametersDictionaryDefinition,
+                        parametersDictionaryDefinitionBuilder.ToString(),
                         originalCode,
                         ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? "return " : ""),
                         ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : ""),
                         ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : "")),
                         endpointCode,
                         soapVersion,
-                        string.Join(" ", outParamDefinitions.Select(def => $"{def.Key} = default({def.Value});"))
+                        string.Join(" ", outParamDefinitions.Where(def => def.Kind == ParameterKind.Out).Select(def => $"{def.Name} = default({def.Type});"))
                         );
                     }
                 }
@@ -678,8 +698,8 @@ namespace OpenSilver.Compiler
                 case MethodType.AsyncBegin:
                     if (!method.StartsWith("Begin"))
                     {
-                        return GetMethodNameUnsafe(method, 
-                                                   new string[1] { "End" }, 
+                        return GetMethodNameUnsafe(method,
+                                                   new string[1] { "End" },
                                                    new string[1] { "Async" });
                     }
                     return method.Substring(5); // skips "Begin"
@@ -693,13 +713,13 @@ namespace OpenSilver.Compiler
                                                    new string[1] { "Async" });
                     }
                     return method.Substring(3); // skips "End"
-                
+
                 case MethodType.AsyncWithoutReturnType:
                 case MethodType.AsyncWithReturnType:
                     if (!method.EndsWith("Async"))
                     {
-                        return GetMethodNameUnsafe(method, 
-                                                   new string[2] { "Begin", "End" }, 
+                        return GetMethodNameUnsafe(method,
+                                                   new string[2] { "Begin", "End" },
                                                    new string[0]);
                     }
                     return method.Substring(0, method.Length - 5); // skips "Async"
