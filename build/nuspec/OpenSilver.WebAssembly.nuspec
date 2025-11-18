@@ -13,24 +13,24 @@
     <tags>silverlight wpf webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
     <icon>images\OpenSilver_icon.png</icon>
     <dependencies>
-      <group targetFramework=".NET7.0">
-        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
-      </group>
       <group targetFramework=".NET8.0">
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
       <group targetFramework=".NET9.0">
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
+      <group targetFramework=".NET10.0">
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net7.0/OpenSilver.WebAssembly.dll" target="lib/net7.0/OpenSilver.WebAssembly.dll" />
-    <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net7.0/OpenSilver.WebAssembly.xml" target="lib/net7.0/OpenSilver.WebAssembly.xml" />
     <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net8.0/OpenSilver.WebAssembly.dll" target="lib/net8.0/OpenSilver.WebAssembly.dll" />
     <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net8.0/OpenSilver.WebAssembly.xml" target="lib/net8.0/OpenSilver.WebAssembly.xml" />
     <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net9.0/OpenSilver.WebAssembly.dll" target="lib/net9.0/OpenSilver.WebAssembly.dll" />
     <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net9.0/OpenSilver.WebAssembly.xml" target="lib/net9.0/OpenSilver.WebAssembly.xml" />
+    <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net10.0/OpenSilver.WebAssembly.dll" target="lib/net10.0/OpenSilver.WebAssembly.dll" />
+    <file src="../../src/WebAssembly/OpenSilver.WebAssembly/bin/$Configuration$/net10.0/OpenSilver.WebAssembly.xml" target="lib/net10.0/OpenSilver.WebAssembly.xml" />
 
     <file src="../../src/Targets/OpenSilver.WebAssembly.targets" target="build/OpenSilver.WebAssembly.targets" />
     <file src="../../src/Compiler/Compiler.SharedBuildTasks/bin/$Configuration$/netstandard2.0/OpenSilver.SharedBuildTasks.Config.targets" target="build/OpenSilver.SharedBuildTasks.Config.targets" />

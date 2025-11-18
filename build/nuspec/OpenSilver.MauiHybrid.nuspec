@@ -14,10 +14,13 @@
     <icon>images/OpenSilver_icon.png</icon>
     <dependencies>
       <group targetFramework=".NET8.0">
-	    <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
       <group targetFramework=".NET9.0">
-	    <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
+      <group targetFramework=".NET10.0">
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
     </dependencies>
   </metadata>
@@ -25,6 +28,7 @@
     <!-- Runtime -->
     <file src="../../src/Maui/Hybrid/bin/$Configuration$/net8.0/OpenSilver.MauiHybrid.dll" target="lib/net8.0/OpenSilver.MauiHybrid.dll" />
     <file src="../../src/Maui/Hybrid/bin/$Configuration$/net9.0/OpenSilver.MauiHybrid.dll" target="lib/net9.0/OpenSilver.MauiHybrid.dll" />
+    <file src="../../src/Maui/Hybrid/bin/$Configuration$/net10.0/OpenSilver.MauiHybrid.dll" target="lib/net10.0/OpenSilver.MauiHybrid.dll" />
 
     <!-- Targets -->
     <file src="../../src/Targets/OpenSilver.MauiHybrid.targets" target="build/OpenSilver.MauiHybrid.targets" />

@@ -14,9 +14,15 @@
     <icon>images/OpenSilver_icon.png</icon>
     <dependencies>
       <group targetFramework=".NET8.0">
+        <dependency id="Photino.NET" version="3.2.3" />
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
       <group targetFramework=".NET9.0">
+        <dependency id="Photino.NET" version="3.2.3" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
+      <group targetFramework=".NET10.0">
+        <dependency id="Photino.NET" version="3.2.3" />
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
     </dependencies>
@@ -25,6 +31,7 @@
     <!-- Runtime -->
     <file src="../../src/Photino/OpenSilver.Photino/bin/$Configuration$/net8.0/OpenSilver.Photino.dll" target="lib/net8.0/OpenSilver.Photino.dll" />
     <file src="../../src/Photino/OpenSilver.Photino/bin/$Configuration$/net9.0/OpenSilver.Photino.dll" target="lib/net9.0/OpenSilver.Photino.dll" />
+    <file src="../../src/Photino/OpenSilver.Photino/bin/$Configuration$/net10.0/OpenSilver.Photino.dll" target="lib/net10.0/OpenSilver.Photino.dll" />
 
     <!-- Targets -->
     <file src="../../src/Targets/OpenSilver.Photino.targets" target="build/OpenSilver.Photino.targets" />
