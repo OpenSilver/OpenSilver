@@ -257,7 +257,7 @@ namespace System.Windows.Controls
         {
             if (_mediaElement != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"{_mediaElement.UniqueIdentifier}.volume = {volume.ToInvariantString()}");
+                INTERNAL_HtmlDomManager.SetDomElementProperty(_mediaElement, "volume", volume);
             }
         }
 
