@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -232,6 +233,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Gets or sets the media's volume.
         /// </summary>
+        /// <returns>The media's volume represented on a linear scale between 0 and 1. The default is 0.5.</returns>
         public double Volume
         {
             get { return (double)GetValue(VolumeProperty); }
@@ -253,10 +255,9 @@ namespace System.Windows.Controls
 
         private void SetVolumeProperty(double volume)
         {
-            const string Volume = "volume";
             if (_mediaElement != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_mediaElement, Volume, volume);
+                INTERNAL_HtmlDomManager.SetDomElementProperty(_mediaElement, "volume", volume);
             }
         }
 
