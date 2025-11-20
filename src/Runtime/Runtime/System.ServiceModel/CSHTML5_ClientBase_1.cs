@@ -430,6 +430,7 @@ namespace System.ServiceModel
 
             public object EndCallWebMethod(
                 string webMethodName,
+                object[] args,
                 Type interfaceType,
                 Type methodReturnType,
                 IReadOnlyList<Type> knownTypes,
@@ -441,6 +442,7 @@ namespace System.ServiceModel
 
                 (object result, Exception error) = ReadAndPrepareResponse(
                     operation,
+                    args,
                     xmlReturnedFromTheServer,
                     methodReturnType,
                     knownTypes,
@@ -452,6 +454,23 @@ namespace System.ServiceModel
                 }
 
                 return result;
+            }
+
+            public object EndCallWebMethod(
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IReadOnlyList<Type> knownTypes,
+                string xmlReturnedFromTheServer,
+                string soapVersion)
+            {
+                return EndCallWebMethod(webMethodName,
+                    [],
+                    interfaceType,
+                    methodReturnType,
+                    knownTypes,
+                    xmlReturnedFromTheServer,
+                    soapVersion);
             }
 
             public RETURN_TYPE EndCallWebMethod<RETURN_TYPE>(
@@ -752,6 +771,7 @@ namespace System.ServiceModel
 
                 (object result, Exception error) = ReadAndPrepareResponse(
                     operation,
+                    [],
                     response,
                     methodReturnType,
                     null,
@@ -844,6 +864,7 @@ namespace System.ServiceModel
 
                 (object result, Exception error) = ReadAndPrepareResponse(
                     operation,
+                    [],
                     response,
                     methodReturnType,
                     null,
@@ -1003,6 +1024,7 @@ namespace System.ServiceModel
 
                 (object result, Exception error) = ReadAndPrepareResponse(
                     operation,
+                    [],
                     e.Result,
                     requestResponseType,
                     knownTypes,
@@ -1034,6 +1056,7 @@ namespace System.ServiceModel
 
                 (object result, Exception error) = ReadAndPrepareResponse(
                     operation,
+                    [],
                     e.Result,
                     requestResponseType,
                     knownTypes,
@@ -1051,6 +1074,7 @@ namespace System.ServiceModel
 
             private static (object Result, Exception Error) ReadAndPrepareResponse(
                 OperationDescription operation,
+                object[] args,
                 string responseAsString,
                 Type requestResponseType,
                 IReadOnlyList<Type> knownTypes,
@@ -1139,6 +1163,7 @@ namespace System.ServiceModel
                 object result = ReadResponseReferenceType(
                     bodyElement,
                     operation,
+                    args,
                     requestResponseType,
                     knownTypes);
 
@@ -1148,6 +1173,7 @@ namespace System.ServiceModel
             private static object ReadResponseReferenceType(
                 XElement bodyElement,
                 OperationDescription operation,
+                object[] args,
                 Type requestResponseType,
                 IReadOnlyList<Type> knownTypes)
             {
@@ -1239,9 +1265,9 @@ namespace System.ServiceModel
 
                     if (returnPart is not null && returnPart.Type != typeof(void))
                     {
-                        xElement = xElement.Element(XName.Get(returnPart.Name, returnPart.Namespace));
+                        var element = xElement.Element(XName.Get(returnPart.Name, returnPart.Namespace));
 
-                        if (xElement is not null)
+                        if (element is not null)
                         {
                             var serializer = new DataContractSerializer(
                                 returnPart.Type,
@@ -1249,12 +1275,34 @@ namespace System.ServiceModel
                                 returnPart.Namespace,
                                 types);
 
-                            requestResponse = DeserializeXElement(serializer, xElement);
+                            requestResponse = DeserializeXElement(serializer, element);
                         }
                     }
 
-                    // Note: we do not deserialize bodyDescription.Parts because it is used for out/ref parameters,
-                    // which we do not support.
+                    var outParts = replyDescription.Body.Parts;
+                    int outPartsCount = Math.Min(outParts.Count, args?.Length ?? 0);
+
+                    for (int i = 0; i < outPartsCount; i++)
+                    {
+                        var part = outParts[i];
+
+                        var element = xElement.Element(XName.Get(part.Name, part.Namespace));
+                        if (element is not null)
+                        {
+                            var serializer = new DataContractSerializer(
+                                part.Type,
+                                part.Name,
+                                part.Namespace,
+                                types);
+
+                            args[i] = DeserializeXElement(serializer, element);
+                        }
+                        else
+                        {
+                            // Element not found, add default value
+                            args[i] = part.Type.IsValueType ? Activator.CreateInstance(part.Type) : null;
+                        }
+                    }
                 }
 
                 return requestResponse;

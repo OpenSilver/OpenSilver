@@ -254,6 +254,7 @@ namespace System.ServiceModel
 
         public static object EndCallWebMethod<INTERFACE_TYPE>(string endpointAddress,
             string webMethodName,
+            object[] args,
             Type methodReturnType,
             IReadOnlyList<Type> knownTypes,
             IDictionary<string, object> requestParameters,
@@ -269,6 +270,7 @@ namespace System.ServiceModel
 
             object result = webMethodsCaller.EndCallWebMethod(
                 webMethodName,
+                args,
                 typeof(INTERFACE_TYPE),
                 methodReturnType,
                 knownTypes,
@@ -277,6 +279,23 @@ namespace System.ServiceModel
 
             // Return the deserialized result
             return result;
+        }
+
+
+        public static object EndCallWebMethod<INTERFACE_TYPE>(string endpointAddress,
+            string webMethodName,
+            Type methodReturnType,
+            IReadOnlyList<Type> knownTypes,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
+            return EndCallWebMethod<INTERFACE_TYPE>(endpointAddress,
+                webMethodName,
+                [],
+                methodReturnType,
+                knownTypes,
+                requestParameters,
+                soapVersion);
         }
 
         public static object EndCallWebMethod<INTERFACE_TYPE>(
@@ -297,13 +316,29 @@ namespace System.ServiceModel
         public static RETURN_TYPE EndCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
+            object[] args,
             IDictionary<string, object> requestParameters,
             string soapVersion) where INTERFACE_TYPE : class
         {
-            return (RETURN_TYPE)EndCallWebMethod<INTERFACE_TYPE>(
+            return (RETURN_TYPE)EndCallWebMethod<INTERFACE_TYPE>(endpointAddress,
+                webMethodName,
+                args,
+                typeof(RETURN_TYPE),
+                null,
+                requestParameters,
+                soapVersion);
+        }
+
+        public static RETURN_TYPE EndCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
+            string endpointAddress,
+            string webMethodName,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
+            return EndCallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
                 endpointAddress,
                 webMethodName,
-                typeof(RETURN_TYPE),
+                [],
                 requestParameters,
                 soapVersion);
         }
@@ -373,12 +408,28 @@ namespace System.ServiceModel
         public static void EndCallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
+            object[] args,
             IDictionary<string, object> requestParameters,
             string soapVersion) where INTERFACE_TYPE : class
         {
             EndCallWebMethod<object, INTERFACE_TYPE>(
                 endpointAddress,
                 webMethodName,
+                args,
+                requestParameters,
+                soapVersion);
+        }
+
+        public static void EndCallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
+            string endpointAddress,
+            string webMethodName,
+            IDictionary<string, object> requestParameters,
+            string soapVersion) where INTERFACE_TYPE : class
+        {
+            EndCallWebMethod<object, INTERFACE_TYPE>(
+                endpointAddress,
+                webMethodName,
+                [],
                 requestParameters,
                 soapVersion);
         }
