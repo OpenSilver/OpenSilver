@@ -1,7 +1,7 @@
 name: OpenSilver Build
 env:
-  next-release-version: '3.3.0'
-  current-release-version: '3.2.0'
+  next-release-version: '3.4.0'
+  current-release-version: '3.3.0'
 on:
   push:
     branches:
@@ -15,9 +15,10 @@ jobs:
       - uses: microsoft/setup-msbuild@v1.1
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      - uses: actions/setup-dotnet@v1
+      - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '9.0.102'
+          dotnet-version: '10.x'
+          dotnet-quality: 'ga'
       - name: Clone OpenSilver repo
         uses: actions/checkout@v2
         with:
