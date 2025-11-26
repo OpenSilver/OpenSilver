@@ -3,7 +3,7 @@ using System.Security;
 
 namespace System.Windows.Controls
 {
-    [Obsolete("Use OpenSilver.Controls.OpenFileDialog instead.")]
+    [Obsolete("Use OpenSilver.Controls.SaveFileDialog instead.")]
     [OpenSilver.NotImplemented]
     public sealed partial class SaveFileDialog
     {
