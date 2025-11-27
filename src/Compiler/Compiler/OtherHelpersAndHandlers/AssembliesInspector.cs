@@ -99,6 +99,11 @@ namespace OpenSilver.Compiler
                 out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName,
                 out isTypeEnum, assemblyNameIfAny, isAttached: isAttached);
 
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeEnum, out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
+            => _monoCecilVersion.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName,
+                out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName,
+                out isTypeEnum, out hasTypeConverter, assemblyNameIfAny, isAttached: isAttached);
+
         public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName, string assemblyNameIfAny = null, bool isAttached = false)
             => _monoCecilVersion.GetPropertyOrFieldInfo(propertyOrFieldName, namespaceName, localTypeName, out memberDeclaringTypeName, out memberTypeNamespace, out memberTypeName, assemblyNameIfAny, isAttached);
 

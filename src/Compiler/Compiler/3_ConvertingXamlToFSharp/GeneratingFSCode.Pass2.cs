@@ -1708,7 +1708,7 @@ namespace GlobalResource
                     out string assemblyNameIfAny);
 
                 string valueNamespaceName, valueLocalTypeName, valueAssemblyName;
-                bool isValueEnum;
+                bool isValueEnum, hasTypeConverter;
 
                 if (isAttachedProperty)
                 {
@@ -1721,6 +1721,8 @@ namespace GlobalResource
                         out valueAssemblyName,
                         out isValueEnum,
                         assemblyNameIfAny);
+
+                    hasTypeConverter = false;
                 }
                 else
                 {
@@ -1732,6 +1734,7 @@ namespace GlobalResource
                         out valueLocalTypeName,
                         out valueAssemblyName,
                         out isValueEnum,
+                        out hasTypeConverter,
                         assemblyNameIfAny);
                 }
 
@@ -1777,21 +1780,19 @@ namespace GlobalResource
                         propertyName,
                         xName);
 
-                    if (isAttachedProperty)
-                    {
-                        return ConvertFromInvariantString(
-                            value, elementWhereTheTypeIsUsed, valueTypeFullName, isKnownCoreType, isKnownSystemType);
-                    }
-                    else
+                    string preparedValue = ConvertFromInvariantString(
+                        value, elementWhereTheTypeIsUsed, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+
+                    if (!isAttachedProperty && hasTypeConverter)
                     {
                         string declaringTypeName = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                             namespaceName, localTypeName, assemblyNameIfAny);
-                        string fallbackValue = ConvertFromInvariantString(
-                            value, elementWhereTheTypeIsUsed, valueTypeFullName, isKnownCoreType, isKnownSystemType);
 
                         return XamlContextGetPropertyValue(
-                            declaringTypeName, propertyName, value, valueTypeFullName, fallbackValue);
+                            declaringTypeName, propertyName, value, valueTypeFullName, preparedValue);
                     }
+
+                    return preparedValue;
                 }
             }
 
