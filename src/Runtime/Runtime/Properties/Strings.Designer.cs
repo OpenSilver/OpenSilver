@@ -19,7 +19,7 @@ namespace OpenSilver.Internal {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -1443,6 +1443,15 @@ namespace OpenSilver.Internal {
         internal static string MarkupExtensionTypeNameBad {
             get {
                 return ResourceManager.GetString("MarkupExtensionTypeNameBad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot invert the matrix, because the matrix is not invertible..
+        /// </summary>
+        internal static string Matrix3D_NotInvertible {
+            get {
+                return ResourceManager.GetString("Matrix3D_NotInvertible", resourceCulture);
             }
         }
         

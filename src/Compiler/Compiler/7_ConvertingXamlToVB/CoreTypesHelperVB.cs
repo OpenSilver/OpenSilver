@@ -654,6 +654,23 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
         throw GetConvertException(source, "System.Windows.Media.CacheMode");
     }
 
+    public override string ConvertToMatrix3D(XElement context, string source)
+    {
+        if (source == "Identity")
+        {
+            return "Global.System.Windows.Media.Media3D.Matrix3D.Identity";
+        }
+
+        string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        if (split.Length == 16)
+        {
+            return $"New Global.System.Windows.Media.Media3D.Matrix3D({split[0]}, {split[1]}, {split[2]}, {split[3]}, {split[4]}, {split[5]}, {split[6]}, {split[7]}, {split[8]}, {split[9]}, {split[10]}, {split[11]}, {split[12]}, {split[13]}, {split[14]}, {split[15]})";
+        }
+
+        throw GetConvertException(source, "System.Windows.Media.Media3D.Matrix3D");
+    }
+
     public override string ConvertToCornerRadius(XElement context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);

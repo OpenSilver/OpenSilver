@@ -581,6 +581,9 @@
   <data name="MarkupExtensionTypeNameBad" xml:space="preserve">
     <value>'{0}' string is not valid for type.</value>
   </data>
+  <data name="Matrix3D_NotInvertible" xml:space="preserve">
+    <value>Cannot invert the matrix, because the matrix is not invertible.</value>
+  </data>
   <data name="MediaBoostBassText" xml:space="preserve">
     <value>Boost Bass</value>
   </data>

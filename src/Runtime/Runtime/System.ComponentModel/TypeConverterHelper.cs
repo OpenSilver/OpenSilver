@@ -22,6 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Media3D;
 
 namespace System.ComponentModel
 {
@@ -334,7 +335,7 @@ namespace System.ComponentModel
             var geometryConverter = new GeometryConverter();
             var transformConverter = new TransformConverter();
 
-            return new Dictionary<Type, TypeConverter>(37)
+            return new Dictionary<Type, TypeConverter>(40)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(ModifierKeys)] = new ModifierKeysConverter(),
@@ -355,6 +356,7 @@ namespace System.ComponentModel
                 [typeof(Geometry)] = geometryConverter,
                 [typeof(PathGeometry)] = geometryConverter,
                 [typeof(Matrix)] = new MatrixConverter(),
+                [typeof(Matrix3D)] = new Matrix3DConverter(),
                 [typeof(PointCollection)] = new PointCollectionConverter(),
                 [typeof(Transform)] = transformConverter,
                 [typeof(MatrixTransform)] = transformConverter,

@@ -121,6 +121,7 @@
     <Compile Include="System.Windows.Input\ManipulationVelocities.cs" />
     <Compile Include="System.Windows.Input\MouseButtonState.cs" />
     <Compile Include="System.Windows.Media.Animation\ElasticEase.cs" />
+    <Compile Include="System.Windows.Media.Media3D\Matrix3DConverter.cs" />
     <Compile Include="System.Windows.Printing\PrintDocument.Async.cs" />
     <Compile Include="System.Windows\AdaptiveTrigger.cs" />
     <Compile Include="System.Windows\AttachedPropertyBrowsableAttribute.cs" />
@@ -711,7 +712,7 @@
     <Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\SamplingMode.cs" />
     <Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\ShaderEffect.cs" />
     <Compile Include="System.Windows.Media.Imaging\WriteableBitmap.cs" />
-    <Compile Include="System.Windows.Media.Media3D\WORKINPROGRESS\Matrix3D.cs" />
+    <Compile Include="System.Windows.Media.Media3D\Matrix3D.cs" />
     <Compile Include="System.Windows.Printing\BeginPrintEventArgs.cs" />
     <Compile Include="System.Windows.Printing\PrinterFallbackSettings.cs" />
     <Compile Include="System.Windows.Shapes\Polyline.cs" />
