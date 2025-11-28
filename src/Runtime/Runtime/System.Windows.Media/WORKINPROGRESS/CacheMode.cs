@@ -11,28 +11,32 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media
+using OpenSilver.Internal;
+
+namespace System.Windows.Media;
+
+/// <summary>
+/// Represents cached content.
+/// </summary>
+[OpenSilver.NotImplemented]
+public abstract class CacheMode : DependencyObject
 {
-    [OpenSilver.NotImplemented]
-    public abstract class CacheMode : DependencyObject
+    /// <summary>
+    /// Parse - this method is called by the type converter to parse a CacheMode's string 
+    /// (provided in "value").
+    /// </summary>
+    /// <returns>
+    /// A CacheMode which was created by parsing the "value" argument.
+    /// </returns>
+    /// <param name="value"> String representation of a CacheMode. Cannot be null/empty. </param>
+    internal static CacheMode Parse(string value)
     {
-        /// <summary>
-        /// Parse - this method is called by the type converter to parse a CacheMode's string 
-        /// (provided in "value").
-        /// </summary>
-        /// <returns>
-        /// A CacheMode which was created by parsing the "value" argument.
-        /// </returns>
-        /// <param name="value"> String representation of a CacheMode. Cannot be null/empty. </param>
-        internal static CacheMode Parse(string value)
+        if (value != null &&
+            value.Equals("BitmapCache", StringComparison.OrdinalIgnoreCase))
         {
-            if (value != null &&
-                value.Equals("BitmapCache", StringComparison.OrdinalIgnoreCase))
-            {
-                return new BitmapCache();
-            }
-            
-            throw new FormatException("Token is not valid.");
+            return new BitmapCache();
         }
+
+        throw new FormatException(Strings.Parsers_IllegalToken);
     }
 }

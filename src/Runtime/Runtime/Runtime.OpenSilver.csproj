@@ -113,6 +113,12 @@
     <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
+    <Compile Include="System.Windows.Input\GestureEventArgs.cs" />
+    <Compile Include="System.Windows.Input\ManipulationCompletedEventArgs.cs" />
+    <Compile Include="System.Windows.Input\ManipulationDelta.cs" />
+    <Compile Include="System.Windows.Input\ManipulationDeltaEventArgs.cs" />
+    <Compile Include="System.Windows.Input\ManipulationStartedEventArgs.cs" />
+    <Compile Include="System.Windows.Input\ManipulationVelocities.cs" />
     <Compile Include="System.Windows.Input\MouseButtonState.cs" />
     <Compile Include="System.Windows.Media.Animation\ElasticEase.cs" />
     <Compile Include="System.Windows.Printing\PrintDocument.Async.cs" />
