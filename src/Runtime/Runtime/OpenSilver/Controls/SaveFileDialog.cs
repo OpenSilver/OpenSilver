@@ -432,8 +432,8 @@ public sealed class SaveFileDialog
                 throw new InvalidOperationException("Unable to write to an unopened file.");
             }
 
-            int bytesToWrite = BufferSize;
             int i = offset;
+            int endPosition = offset + length;
             do
             {
                 if (_isClosed)
@@ -441,10 +441,7 @@ public sealed class SaveFileDialog
                     break;
                 }
 
-                if (i + bytesToWrite > length)
-                {
-                    bytesToWrite = length - i;
-                }
+                int bytesToWrite = Math.Min(BufferSize, endPosition - i);
 
                 string base64 = Convert.ToBase64String(bytes, i, bytesToWrite);
 
@@ -509,7 +506,7 @@ public sealed class SaveFileDialog
                 await Task.Delay(1);
 
                 i += bytesToWrite;
-            } while (i < bytes.Length - 1);
+            } while (i < endPosition);
         }
 
         private async void Close()
