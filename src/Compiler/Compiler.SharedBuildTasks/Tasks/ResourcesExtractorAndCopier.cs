@@ -508,13 +508,23 @@ public sealed class ResourcesExtractorAndCopier : Task
 
     private static bool IsOpenSilverAssemblyAttribute(CustomAttribute ca) =>
         ca.AttributeType.FullName == "OpenSilver.Runtime.CompilerServices.OpenSilverAssemblyAttribute" &&
-        ca.AttributeType.Scope.Name == "OpenSilver";
+        GetAssemblyName(ca.AttributeType) == "OpenSilver";
 
     private static bool IsOpenSilverCompatibilityVersionAttribute(CustomAttribute ca) =>
         ca.AttributeType.FullName == "OpenSilver.Runtime.CompilerServices.OpenSilverCompatibilityVersionAttribute" &&
-        ca.AttributeType.Scope.Name == "OpenSilver";
+        GetAssemblyName(ca.AttributeType) == "OpenSilver";
 
     private static bool IsOpenSilverResourceExposureAttribute(CustomAttribute ca) =>
         ca.AttributeType.FullName == "OpenSilver.Runtime.CompilerServices.OpenSilverResourceExposureAttribute" &&
-        ca.AttributeType.Scope.Name == "OpenSilver";
+        GetAssemblyName(ca.AttributeType) == "OpenSilver";
+
+    private static string GetAssemblyName(TypeReference typeRef)
+    {
+        return typeRef.Scope switch
+        {
+            AssemblyNameReference anr => anr.Name,
+            ModuleDefinition md => md.Assembly.Name.Name,
+            _ => typeRef.Scope.Name,
+        };
+    }
 }

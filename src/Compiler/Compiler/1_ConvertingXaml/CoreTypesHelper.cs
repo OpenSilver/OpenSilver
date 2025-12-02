@@ -204,7 +204,7 @@ internal abstract class CoreTypesConverter
     private static bool IsCoreAssemblyOrNull(string assemblyName)
     {
         if (assemblyName is null ||
-            assemblyName.Equals(Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR, StringComparison.OrdinalIgnoreCase))
+            assemblyName.Equals(Constants.OPENSILVER_ASSEMBLY_NAME, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }

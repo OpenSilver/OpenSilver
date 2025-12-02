@@ -88,7 +88,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private const string SystemXamlNamespace = "System.Xaml";
         private const string GenericMarkupExtension = "IMarkupExtension`1";
-        private const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
         private const string DependencyProperty = "DependencyProperty";
         private const string SetPrefix = "Set";
@@ -426,6 +425,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName,
             out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
         {
+            const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
+
             hasTypeConverter = false;
 
             if (isAttached)
@@ -437,7 +438,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (FindPropertyDeep(elementType, propertyName, out TypeReference ownerElementType) is PropertyDefinition propertyInfo)
             {
-                hasTypeConverter = propertyInfo.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName);
+                if (propertyInfo.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName))
+                {
+                    hasTypeConverter = !ShouldIgnoreTypeConverter(propertyInfo);
+                }
 
                 var propertyType = propertyInfo.PropertyType;
                 var returnType = propertyType.PopulateGeneric(elementType, ownerElementType);
@@ -451,6 +455,33 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
             throw new XamlParseException($"Property or field \"{propertyName}\" not found in type \"{elementType}\".");
+        }
+
+        private static bool ShouldIgnoreTypeConverter(PropertyDefinition propertyInfo)
+        {
+            var declaringType = propertyInfo.DeclaringType;
+
+            if (declaringType.GetAssemblyName() == Constants.OPENSILVER_ASSEMBLY_NAME)
+            {
+                return declaringType.FullName switch
+                {
+                    $"{KnownNamespaces.SystemWindows}.FrameworkElement" => ShouldIgnoreFrameworkElementProperty(propertyInfo.Name),
+                    $"{KnownNamespaces.SystemWindowsDocuments}.InlineImageContainer" => ShouldIgnoreInlineImageContainerProperty(propertyInfo.Name),
+                    _ => false,
+                };
+            }
+
+            return false;
+
+            static bool ShouldIgnoreFrameworkElementProperty(string propertyName)
+            {
+                return propertyName is "Width" or "Height";
+            }
+
+            static bool ShouldIgnoreInlineImageContainerProperty(string propertyName)
+            {
+                return propertyName is "Width" or "Height";
+            }
         }
 
         private TypeReference GetMethodReturnValueType(string methodName, string namespaceName, string localTypeName,
@@ -508,7 +539,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private TypeDefinition GetDependencyObjectType()
         {
-            return FindType(KnownNamespaces.SystemWindows, DependencyObj, Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR);
+            return FindType(KnownNamespaces.SystemWindows, DependencyObj, Constants.OPENSILVER_ASSEMBLY_NAME);
         }
 
         public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName,
@@ -580,7 +611,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return FindPropertyDeep(type, TemplatePropertyName, out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == FrameworkTemplateName &&
                 prop.DeclaringType.Namespace == KnownNamespaces.SystemWindows &&
-                prop.DeclaringType.Module.Assembly.Name.Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
+                prop.DeclaringType.Module.Assembly.Name.Name == Constants.OPENSILVER_ASSEMBLY_NAME;
         }
 
         public bool IsResourceDictionarySourcePropertyVisible(string namespaceName, string typeName)
@@ -590,7 +621,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return FindPropertyDeep(type, "Source", out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == ResourceDictionaryName &&
                 prop.DeclaringType.Namespace == KnownNamespaces.SystemWindows &&
-                prop.DeclaringType.Module.Assembly.Name.Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
+                prop.DeclaringType.Module.Assembly.Name.Name == Constants.OPENSILVER_ASSEMBLY_NAME;
         }
 
         public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName,

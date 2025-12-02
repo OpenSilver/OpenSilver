@@ -82,7 +82,6 @@
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferences.cs" />
     <Compile Include="OtherHelpersAndHandlers\Constants.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesInspector.cs" />
-    <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Compiler.licenseheader" />

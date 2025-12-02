@@ -93,7 +93,7 @@ internal sealed class CommandConverter
 
     private static bool IsKnownType(TypeDefinition commandType)
     {
-        if (commandType.Scope.Name == "OpenSilver")
+        if (commandType.GetAssemblyName() == "OpenSilver")
         {
             return commandType.FullName == "System.Windows.Input.ApplicationCommands" ||
                    commandType.FullName == "System.Windows.Input.EditingCommands" ||
@@ -147,7 +147,7 @@ internal sealed class CommandConverter
     {
         bool searchAll = ownerType is null;
 
-        if (searchAll || (ownerType.Scope.Name == "OpenSilver" && ownerType.FullName == "System.Windows.Input.NavigationCommands"))
+        if (searchAll || (ownerType.GetAssemblyName() == "OpenSilver" && ownerType.FullName == "System.Windows.Input.NavigationCommands"))
         {
             string knownCommand = localName switch
             {
@@ -176,7 +176,7 @@ internal sealed class CommandConverter
             }
         }
 
-        if (searchAll || (ownerType.Scope.Name == "OpenSilver" && ownerType.FullName == "System.Windows.Input.ApplicationCommands"))
+        if (searchAll || (ownerType.GetAssemblyName() == "OpenSilver" && ownerType.FullName == "System.Windows.Input.ApplicationCommands"))
         {
             string knownCommand = localName switch
             {
@@ -212,7 +212,7 @@ internal sealed class CommandConverter
             }
         }
 
-        if (searchAll || (ownerType.Scope.Name == "OpenSilver" && ownerType.FullName == "System.Windows.Input.ComponentCommands"))
+        if (searchAll || (ownerType.GetAssemblyName() == "OpenSilver" && ownerType.FullName == "System.Windows.Input.ComponentCommands"))
         {
             string knownCommand = localName switch
             {
@@ -252,7 +252,7 @@ internal sealed class CommandConverter
             }
         }
 
-        if (searchAll || (ownerType.Scope.Name == "OpenSilver" && ownerType.FullName == "System.Windows.Input.EditingCommands"))
+        if (searchAll || (ownerType.GetAssemblyName() == "OpenSilver" && ownerType.FullName == "System.Windows.Input.EditingCommands"))
         {
             string knownCommand = localName switch
             {
@@ -330,7 +330,7 @@ internal sealed class CommandConverter
             }
         }
 
-        if (searchAll || (ownerType.Scope.Name == "OpenSilver" && ownerType.FullName == "System.Windows.Input.MediaCommands"))
+        if (searchAll || (ownerType.GetAssemblyName() == "OpenSilver" && ownerType.FullName == "System.Windows.Input.MediaCommands"))
         {
             string knownCommand = localName switch
             {

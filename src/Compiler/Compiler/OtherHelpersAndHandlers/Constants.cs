@@ -16,6 +16,6 @@ namespace OpenSilver
 {
     internal static class Constants
     {
-        public const string NAME_OF_CORE_ASSEMBLY_USING_BLAZOR = "OpenSilver";
+        public const string OPENSILVER_ASSEMBLY_NAME = "OpenSilver";
     }
 }

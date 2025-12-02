@@ -21,6 +21,15 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 {
     internal static class TypeReferenceExtensions
     {
+        public static string GetAssemblyName(this TypeReference typeRef)
+        {
+            return typeRef.Scope switch
+            {
+                AssemblyNameReference anr => anr.Name,
+                ModuleDefinition md => md.Assembly.Name.Name,
+                _ => typeRef.Scope.Name,
+            };
+        }
 
         public static bool IsString(this TypeReference typeRef) => typeRef == typeRef.Module.TypeSystem.String;
 
@@ -77,7 +86,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var res = typeRef.Resolve();
             if (res == null)
             {
-                throw new ApplicationException($"'{typeRef.FullName}' can not be resolved. Module file name is '{typeRef.Module.FileName}'. Scope name is '{typeRef.Scope.Name}'.");
+                throw new ApplicationException($"'{typeRef.FullName}' can not be resolved. Module file name is '{typeRef.Module.FileName}'. Scope name is '{typeRef.GetAssemblyName()}'.");
             }
 
             return res;
@@ -140,7 +149,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (compilerType == SupportedLanguage.FSharp &&
                 type.GetElementType() is TypeReference elementType &&
-                elementType.Scope.Name == "FSharp.Core" &&
+                elementType.GetAssemblyName() == "FSharp.Core" &&
                 elementType.FullName == "Microsoft.FSharp.Control.FSharpHandler`1")
             {
                 // Because of the CompiledNameAttribute, we need to replace this type, because FSharpHandler is not known at compile time.
