@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.7.34031.279
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{5CABE705-CE13-456F-B02E-977B59D964FA}"
+	ProjectSection(SolutionItems) = preProject
+		Runtime\Directory.Build.props = Runtime\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulator", "Simulator", "{F63723D0-B919-44EF-A4D9-AA405B4538C5}"
 EndProject
@@ -31,8 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CBAC
 		Runtime\Scripts\cshtml5.css = Runtime\Scripts\cshtml5.css
 		Runtime\Scripts\cshtml5.js = Runtime\Scripts\cshtml5.js
 		Runtime\Scripts\FileSaver.min.js = Runtime\Scripts\FileSaver.min.js
-		Runtime\Scripts\OpenSilver.js = Runtime\Scripts\OpenSilver.js
 		Runtime\Scripts\htmlToImage.js = Runtime\Scripts\htmlToImage.js
+		Runtime\Scripts\OpenSilver.js = Runtime\Scripts\OpenSilver.js
 		Runtime\Scripts\quill.core.css = Runtime\Scripts\quill.core.css
 		Runtime\Scripts\quill.min.js = Runtime\Scripts\quill.min.js
 	EndProjectSection
@@ -40,6 +43,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blend", "Blend", "{7152D73A-E43C-401B-A5B2-1401B4CBB82F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestApplication", "TestApplication", "{CD0D2100-A9DA-40FC-AEFE-95FF823739D7}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\TestApplication\Directory.Build.props = Tests\TestApplication\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Runtime.OpenSilver", "Runtime\Runtime\Runtime.OpenSilver.csproj", "{8643953F-8E1D-4D2B-AA27-A4B7A3EE7BB6}"
 EndProject
@@ -139,6 +145,55 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Photino", "Photino", "{F8B1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.Photino", "Photino\OpenSilver.Photino\OpenSilver.Photino.csproj", "{A9CF6D29-F35A-436E-94BE-DE64A4631551}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{31A29646-708B-4F7E-900E-F3D3010D9C14}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		NuGet.config = NuGet.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{4047B67C-0289-4CEF-BACD-57BC6C67C2C6}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\build-nuget-package-OpenSilver.bat = ..\build\build-nuget-package-OpenSilver.bat
+		..\build\build-nuget-package-OpenSilver.MauiHybrid.bat = ..\build\build-nuget-package-OpenSilver.MauiHybrid.bat
+		..\build\build-nuget-package-OpenSilver.Photino.bat = ..\build\build-nuget-package-OpenSilver.Photino.bat
+		..\build\build-nuget-package-OpenSilver.Simulator.bat = ..\build\build-nuget-package-OpenSilver.Simulator.bat
+		..\build\build-nuget-package-OpenSilver.Wasm.bat = ..\build\build-nuget-package-OpenSilver.Wasm.bat
+		..\build\Build_Themes.bat = ..\build\Build_Themes.bat
+		..\build\update-compiler.bat = ..\build\update-compiler.bat
+		..\build\update-nuget-packages.bat = ..\build\update-nuget-packages.bat
+		..\build\update-simulator.bat = ..\build\update-simulator.bat
+		..\build\update-wasm.bat = ..\build\update-wasm.bat
+		..\build\version_info.txt = ..\build\version_info.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuspec", "nuspec", "{3092F618-342D-4FDE-80E9-11A39FADD2A0}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\nuspec\OpenSilver.MauiHybrid.nuspec = ..\build\nuspec\OpenSilver.MauiHybrid.nuspec
+		..\build\nuspec\OpenSilver.nuspec = ..\build\nuspec\OpenSilver.nuspec
+		..\build\nuspec\OpenSilver.Photino.nuspec = ..\build\nuspec\OpenSilver.Photino.nuspec
+		..\build\nuspec\OpenSilver.Simulator.nuspec = ..\build\nuspec\OpenSilver.Simulator.nuspec
+		..\build\nuspec\OpenSilver.Theme.BubbleCreme.nuspec = ..\build\nuspec\OpenSilver.Theme.BubbleCreme.nuspec
+		..\build\nuspec\OpenSilver.Theme.BureauBlack.nuspec = ..\build\nuspec\OpenSilver.Theme.BureauBlack.nuspec
+		..\build\nuspec\OpenSilver.Theme.BureauBlue.nuspec = ..\build\nuspec\OpenSilver.Theme.BureauBlue.nuspec
+		..\build\nuspec\OpenSilver.Theme.ExpressionDark.nuspec = ..\build\nuspec\OpenSilver.Theme.ExpressionDark.nuspec
+		..\build\nuspec\OpenSilver.Theme.ExpressionLight.nuspec = ..\build\nuspec\OpenSilver.Theme.ExpressionLight.nuspec
+		..\build\nuspec\OpenSilver.Theme.RainierOrange.nuspec = ..\build\nuspec\OpenSilver.Theme.RainierOrange.nuspec
+		..\build\nuspec\OpenSilver.Theme.RainierPurple.nuspec = ..\build\nuspec\OpenSilver.Theme.RainierPurple.nuspec
+		..\build\nuspec\OpenSilver.Theme.ShinyBlue.nuspec = ..\build\nuspec\OpenSilver.Theme.ShinyBlue.nuspec
+		..\build\nuspec\OpenSilver.Theme.ShinyRed.nuspec = ..\build\nuspec\OpenSilver.Theme.ShinyRed.nuspec
+		..\build\nuspec\OpenSilver.Theme.SystemColors.nuspec = ..\build\nuspec\OpenSilver.Theme.SystemColors.nuspec
+		..\build\nuspec\OpenSilver.Theme.TwilightBlue.nuspec = ..\build\nuspec\OpenSilver.Theme.TwilightBlue.nuspec
+		..\build\nuspec\OpenSilver.Theme.WhistlerBlue.nuspec = ..\build\nuspec\OpenSilver.Theme.WhistlerBlue.nuspec
+		..\build\nuspec\OpenSilver.WebAssembly.nuspec = ..\build\nuspec\OpenSilver.WebAssembly.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{A765260E-85C8-4AEC-B09D-FC759376B694}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build-opensilver-package.yml = ..\.github\workflows\build-opensilver-package.yml
+		..\.github\workflows\build-theme-packages.yml = ..\.github\workflows\build-theme-packages.yml
+		..\.github\workflows\validate-prs.yml = ..\.github\workflows\validate-prs.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -214,11 +269,17 @@ Global
 		{C4F356FB-A607-432C-A7F0-03399A08EDFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4F356FB-A607-432C-A7F0-03399A08EDFA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3DD381BC-FDB4-4495-B587-70215B4781A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DD381BC-FDB4-4495-B587-70215B4781A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DD381BC-FDB4-4495-B587-70215B4781A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DD381BC-FDB4-4495-B587-70215B4781A7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{364AED94-6D67-4DF2-814A-E09709CB8D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{364AED94-6D67-4DF2-814A-E09709CB8D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{364AED94-6D67-4DF2-814A-E09709CB8D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{364AED94-6D67-4DF2-814A-E09709CB8D29}.Release|Any CPU.Build.0 = Release|Any CPU
 		{921697F8-E30D-4B4B-8E2E-56FB4F4FE448}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{921697F8-E30D-4B4B-8E2E-56FB4F4FE448}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{921697F8-E30D-4B4B-8E2E-56FB4F4FE448}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{921697F8-E30D-4B4B-8E2E-56FB4F4FE448}.Release|Any CPU.Build.0 = Release|Any CPU
 		{45C601D9-A208-4BB4-807B-4BF612FFE7EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{45C601D9-A208-4BB4-807B-4BF612FFE7EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45C601D9-A208-4BB4-807B-4BF612FFE7EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -324,6 +385,11 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{8869C7C7-58A9-4FC1-A5EA-E303AE1807EB} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
+		{5CABE705-CE13-456F-B02E-977B59D964FA} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
+		{F63723D0-B919-44EF-A4D9-AA405B4538C5} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
+		{09E99548-4F69-40F9-8E5B-CDFF20052F90} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
+		{3731CAAC-26BC-476D-A6F5-B80507182818} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
 		{52638437-9208-48A1-9A47-0DCA9D53782D} = {8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}
 		{5E5F6FF7-239D-44A5-9E43-1A826207DE68} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{CBAC3493-1A39-44A9-8221-C5CD1F612105} = {5CABE705-CE13-456F-B02E-977B59D964FA}
@@ -371,10 +437,14 @@ Global
 		{56D0BA59-DAC9-4054-ADC0-0767D883344F} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{7684E7CE-C72C-42EC-94B4-CE77B2C7E9FD} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{5BE991C3-6E28-46D7-953D-94D5D4AC131D} = {5CABE705-CE13-456F-B02E-977B59D964FA}
+		{14B7A75E-0BDD-45A3-A645-9FEABE7811E1} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
 		{C57535EA-4837-4C68-B389-3E3E7F16DEF0} = {14B7A75E-0BDD-45A3-A645-9FEABE7811E1}
 		{839A56F5-C47E-4569-9A3A-9443EA8A262E} = {8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}
+		{67E1D2D9-7BEC-4877-8063-856599E14B1D} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
 		{20251DFC-AF96-47D7-9E2E-907AE2257B1B} = {67E1D2D9-7BEC-4877-8063-856599E14B1D}
+		{F8B103FD-CFD6-43EB-B77E-B36654A3B7FB} = {31A29646-708B-4F7E-900E-F3D3010D9C14}
 		{A9CF6D29-F35A-436E-94BE-DE64A4631551} = {F8B103FD-CFD6-43EB-B77E-B36654A3B7FB}
+		{3092F618-342D-4FDE-80E9-11A39FADD2A0} = {4047B67C-0289-4CEF-BACD-57BC6C67C2C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}

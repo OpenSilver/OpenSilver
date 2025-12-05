@@ -3,4 +3,15 @@
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">3.3.0</AssemblyVersion>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <OpenSilverDependencyVersion>3.3.0</OpenSilverDependencyVersion>
+    <OpenSilverPkgDirectory>$(MSBuildThisFileDirectory)packages\OpenSilver.$(OpenSilverDependencyVersion)\</OpenSilverPkgDirectory>
+    <OpenSilverWasmPkgDirectory>$(MSBuildThisFileDirectory)packages\OpenSilver.WebAssembly.$(OpenSilverDependencyVersion)\</OpenSilverWasmPkgDirectory>
+    <OpenSilverSimulatorPkgDirectory>$(MSBuildThisFileDirectory)packages\OpenSilver.Simulator.$(OpenSilverDependencyVersion)\</OpenSilverSimulatorPkgDirectory>
+    <OpenSilverTargets>$(OpenSilverPkgDirectory)build\OpenSilver.targets</OpenSilverTargets>
+    <OpenSilverGenerateAssemblyInfoTargets>$(OpenSilverPkgDirectory)build\OpenSilver.GenerateAssemblyInfo.targets</OpenSilverGenerateAssemblyInfoTargets>
+    <OpenSilverWebAssemblyTargets>$(OpenSilverWasmPkgDirectory)build\OpenSilver.WebAssembly.targets</OpenSilverWebAssemblyTargets>
+    <OpenSilverSimulatorTargets>$(OpenSilverSimulatorPkgDirectory)build\OpenSilver.Simulator.targets</OpenSilverSimulatorTargets>
+  </PropertyGroup>
 </Project>

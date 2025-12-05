@@ -1,16 +1,53 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
 
-    <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0-windows</TargetFramework>
-    </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-    <ItemGroup>
-        <PackageReference Include="OpenSilver.Simulator" Version="3.1.1" />
-    </ItemGroup>
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Simulator\Simulator\Simulator.OpenSilver.csproj" />
+    <ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\cshtml5.css">
+      <Link>js_css\cshtml5.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\cshtml5.js">
+      <Link>js_css\cshtml5.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\FileSaver.min.js">
+      <Link>js_css\FileSaver.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\OpenSilver.js">
+      <Link>js_css\OpenSilver.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\quill.core.css">
+      <Link>js_css\quill.core.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\quill.min.js">
+      <Link>js_css\quill.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\interop_debug_root.html">
+      <Link>interop_debug_root.html</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\simulator_root.html">
+      <Link>simulator_root.html</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(OpenSilverSimulatorTargets)" />
 
 </Project>

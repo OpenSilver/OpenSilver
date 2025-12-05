@@ -3,11 +3,6 @@
 
   <PropertyGroup>
     <GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
-    <OpenSilverDependencyVersion>3.3.0</OpenSilverDependencyVersion>
-    <OpenSilverTargetsDirectory>$(MSBuildThisFileDirectory)..\packages\OpenSilver.$(OpenSilverDependencyVersion)\build</OpenSilverTargetsDirectory>
-    <OpenSilverTargets>$(OpenSilverTargetsDirectory)\OpenSilver.targets</OpenSilverTargets>
-    <OpenSilverGenerateAssemblyInfoTargets>$(OpenSilverTargetsDirectory)\OpenSilver.GenerateAssemblyInfo.targets</OpenSilverGenerateAssemblyInfoTargets>
-
     <OpenSilverGenerateAssemblyInfo>true</OpenSilverGenerateAssemblyInfo>
     <OpenSilverExposeResourcesToExtractor>false</OpenSilverExposeResourcesToExtractor>
     <OpenSilverXamlPreprocessorOptions>optimize</OpenSilverXamlPreprocessorOptions>

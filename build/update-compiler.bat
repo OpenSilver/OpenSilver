@@ -26,7 +26,7 @@ DEL /Q %COMPILER_DIR%\build\*
 DEL /Q %COMPILER_DIR%\tools\*
 
 ECHO. 
-ECHO %ESC%[95mBuilding %ESC%[0m%CFG% %ESC%[95mconfiguration%ESC%[0m
+ECHO %ESC%[95mBuilding %ESC%[0mOpenSilver.Compiler %ESC%[95min %ESC%[0m%CFG% %ESC%[95mconfiguration%ESC%[0m
 ECHO.
 msbuild %BUILD_DIR%\slnf\Compiler.slnf -p:Configuration=%CFG%;OpenSilverBuildUUID=%BUILD_UUID% -clp:ErrorsOnly -restore
 

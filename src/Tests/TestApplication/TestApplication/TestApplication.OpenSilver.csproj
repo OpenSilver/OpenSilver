@@ -1,13 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenSilver" Version="3.1.1" />
+    <ProjectReference Include="..\..\..\Runtime\Blend\Interactions\Expression.Interactions.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Blend\Interactivity\Interactivity.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Browser\Browser.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls.Input.Toolkit\Controls.Input.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls.Input\Controls.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls.Layout.Toolkit\Controls.Layout.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls.Navigation\Controls.Navigation.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls.Toolkit\Controls.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls\Controls.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Data\Data.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -682,11 +695,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Tests\ResourceDictionary\CachedResourceDictionary\CountableResourceDictionary.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Tests\ResourceDictionary\SomeResourceDictionary.xaml" />
-  </ItemGroup>
+
+  <!-- See ths comment on the first <Import> -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(OpenSilverTargets)" />
 
 </Project>
