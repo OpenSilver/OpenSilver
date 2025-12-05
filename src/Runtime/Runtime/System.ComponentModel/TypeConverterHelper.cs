@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
@@ -335,7 +336,7 @@ namespace System.ComponentModel
             var geometryConverter = new GeometryConverter();
             var transformConverter = new TransformConverter();
 
-            return new Dictionary<Type, TypeConverter>(40)
+            return new Dictionary<Type, TypeConverter>(41)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(ModifierKeys)] = new ModifierKeysConverter(),
@@ -377,6 +378,7 @@ namespace System.ComponentModel
                 [typeof(ResponsiveThreshold)] = new ResponsiveThresholdConverter(),
                 [typeof(RowDefinitionCollection)] = new RowDefinitionCollectionConverter(),
                 [typeof(ColumnDefinitionCollection)] = new ColumnDefinitionCollectionConverter(),
+                [typeof(XmlLanguage)] = new XmlLanguageConverter(),
             };
         }
 

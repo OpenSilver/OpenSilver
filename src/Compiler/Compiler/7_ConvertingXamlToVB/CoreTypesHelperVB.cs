@@ -671,6 +671,11 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
         throw GetConvertException(source, "System.Windows.Media.Media3D.Matrix3D");
     }
 
+    public override string ConvertToXmlLanguage(XElement context, string source)
+    {
+        return $"Global.System.Windows.Markup.XmlLanguage.GetLanguage({Escape(source)})";
+    }
+
     public override string ConvertToCornerRadius(XElement context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);

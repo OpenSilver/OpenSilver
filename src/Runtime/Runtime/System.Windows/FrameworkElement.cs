@@ -991,11 +991,10 @@ namespace System.Windows
         /// object that has its <see cref="XmlLanguage.IetfLanguageTag"/> value set
         /// to the string "en-US".
         /// </returns>
-        [TypeConverter(typeof(XmlLanguageConverter))]
         public XmlLanguage Language
         {
-            get { return (XmlLanguage)GetValue(LanguageProperty); }
-            set { SetValueInternal(LanguageProperty, value); }
+            get => (XmlLanguage)GetValue(LanguageProperty);
+            set => SetValueInternal(LanguageProperty, value);
         }
 
         /// <inheritdoc />

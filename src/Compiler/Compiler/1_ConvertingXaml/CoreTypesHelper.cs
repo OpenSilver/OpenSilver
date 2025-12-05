@@ -41,7 +41,7 @@ internal abstract class CoreTypesConverter
         // from finding the converter.
         //
 
-        _knownCoreTypes = new Dictionary<string, Func<XElement, string, string>>(43, StringComparer.OrdinalIgnoreCase)
+        _knownCoreTypes = new Dictionary<string, Func<XElement, string, string>>(44, StringComparer.OrdinalIgnoreCase)
         {
             ["System.Windows.Input.Cursor"] = ConvertToCursor,
             ["System.Windows.Input.ModifierKeys"] = ConvertToModifierKeys,
@@ -67,7 +67,9 @@ internal abstract class CoreTypesConverter
             ["System.Windows.Media.Transform"] = ConvertToTransform,
             ["System.Windows.Media.MatrixTransform"] = ConvertToTransform,
             ["System.Windows.Media.CacheMode"] = ConvertToCacheMode,
+            ["System.Windows.Media.ImageSource"] = ConvertToImageSource,
             ["System.Windows.Media.Media3D.Matrix3D"] = ConvertToMatrix3D,
+            ["System.Windows.Markup.XmlLanguage"] = ConvertToXmlLanguage,
             ["System.Windows.CornerRadius"] = ConvertToCornerRadius,
             ["System.Windows.Duration"] = ConvertToDuration,
             ["System.Windows.FontWeight"] = ConvertToFontWeight,
@@ -80,7 +82,6 @@ internal abstract class CoreTypesConverter
             ["System.Windows.FontStretch"] = ConvertToFontStretch,
             ["System.Windows.FontStyle"] = ConvertToFontStyle,
             ["System.Windows.TextDecorationCollection"] = ConvertToTextDecorationCollection,
-            ["System.Windows.media.ImageSource"] = ConvertToImageSource,
             ["System.Windows.Vector"] = ConvertToVector,
             ["System.Windows.RoutedEvent"] = ConvertToRoutedEvent,
             ["System.Windows.ResponsiveThreshold"] = ConvertToResponsiveThreshold,
@@ -132,6 +133,8 @@ internal abstract class CoreTypesConverter
     public abstract string ConvertToCacheMode(XElement context, string source);
 
     public abstract string ConvertToMatrix3D(XElement context, string source);
+
+    public abstract string ConvertToXmlLanguage(XElement context, string source);
 
     public abstract string ConvertToCornerRadius(XElement context, string source);
 
