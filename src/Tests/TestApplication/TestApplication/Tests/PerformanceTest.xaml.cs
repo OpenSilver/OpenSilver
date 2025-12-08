@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using CSHTML5.Internal;
+using OpenSilver;
 
 namespace TestApplication.Tests
 {
@@ -26,6 +27,7 @@ namespace TestApplication.Tests
         private PerformanceResult _lastResult;
         private double _startTime;
         private Dictionary<string, int> _controlCounts;
+        private int _requestedElementCount;
 
         public PerformanceTest()
         {
@@ -47,6 +49,7 @@ namespace TestApplication.Tests
             if (!int.TryParse(ElementCountTextBox.Text, out int elementCount))
                 elementCount = 5000;
             elementCount = Math.Max(100, Math.Min(50000, elementCount));
+            _requestedElementCount = elementCount;
 
             // Disable buttons during benchmark
             StartBenchmarkButton.IsEnabled = false;
@@ -64,16 +67,70 @@ namespace TestApplication.Tests
             // Create the heavy workload with mixed controls
             CreateMixedControlWorkload(elementCount);
 
-            // Use Dispatcher to measure when UI is fully rendered
-            // The dispatcher will execute this after all pending layout/render operations
-            Dispatcher.BeginInvoke(() =>
-            {
-                // This runs after the UI has been fully rendered
-                double endTime = Performance.now();
-                double renderTimeMs = endTime - _startTime;
-                
-                OnBenchmarkComplete(renderTimeMs, elementCount);
-            });
+            // Update status
+            StatusText.Text = "Waiting for browser to finish rendering...";
+
+            // Use requestAnimationFrame to wait for actual browser rendering to complete
+            // We need multiple frames to ensure the browser has fully painted everything
+            WaitForRenderComplete();
+        }
+
+        /// <summary>
+        /// Uses JavaScript to wait until the browser has actually painted all the elements on screen.
+        /// This polls until the DOM has stabilized (no more size changes) and multiple animation frames
+        /// have passed with no changes, indicating rendering is complete.
+        /// </summary>
+        private void WaitForRenderComplete()
+        {
+            // This JavaScript code waits until:
+            // 1. The scrollHeight of the render target has stabilized (no changes for 5 consecutive frames)
+            // 2. At least 10 frames have passed to allow for progressive rendering
+            // This handles cases where the browser does progressive/chunked rendering
+            Interop.ExecuteJavaScriptVoid(@"
+                (function() {
+                    var target = document.querySelector('[class*=""RenderTarget""]') || document.body;
+                    var lastHeight = 0;
+                    var stableFrames = 0;
+                    var totalFrames = 0;
+                    var maxFrames = 1000; // Safety limit: ~16 seconds at 60fps
+                    var requiredStableFrames = 5;
+                    
+                    function checkStable() {
+                        totalFrames++;
+                        var currentHeight = document.body.scrollHeight + document.body.offsetHeight;
+                        
+                        // Also check if there are pending style recalculations
+                        // by forcing a reflow and checking dimensions
+                        var forceReflow = document.body.offsetWidth;
+                        
+                        if (currentHeight === lastHeight) {
+                            stableFrames++;
+                        } else {
+                            stableFrames = 0;
+                            lastHeight = currentHeight;
+                        }
+                        
+                        // Consider render complete when:
+                        // - We've had several stable frames (no height changes), OR
+                        // - We've exceeded the safety limit
+                        if (stableFrames >= requiredStableFrames || totalFrames >= maxFrames) {
+                            $0();
+                        } else {
+                            requestAnimationFrame(checkStable);
+                        }
+                    }
+                    
+                    // Start checking on next frame
+                    requestAnimationFrame(checkStable);
+                })();
+            ", (Action)OnRenderCompleteCallback);
+        }
+
+        private void OnRenderCompleteCallback()
+        {
+            double endTime = Performance.now();
+            double renderTimeMs = endTime - _startTime;
+            OnBenchmarkComplete(renderTimeMs, _requestedElementCount);
         }
 
         private void OnBenchmarkComplete(double renderTimeMs, int requestedCount)
