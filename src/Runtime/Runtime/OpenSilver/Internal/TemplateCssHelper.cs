@@ -36,7 +36,6 @@ internal static class TemplateCssHelper
 
     /// <summary>
     /// Tracks element rendering order per templated parent.
-    /// This allows us to assign consistent element indices within each template instance.
     /// </summary>
     private static readonly ConditionalWeakTable<DependencyObject, InstanceRenderState> _instanceStates = new();
 
@@ -46,10 +45,16 @@ internal static class TemplateCssHelper
     private static int _templateIdCounter;
 
     /// <summary>
-    /// Current element being rendered (thread-static for thread safety).
+    /// Stack of render contexts to handle nested element rendering.
     /// </summary>
     [ThreadStatic]
-    private static ElementRenderContext _currentContext;
+    private static Stack<ElementRenderContext> _contextStack;
+
+    /// <summary>
+    /// Maps DOM element IDs to their render contexts for quick lookup during CSS setting.
+    /// </summary>
+    [ThreadStatic]
+    private static Dictionary<string, ElementRenderContext> _activeContexts;
 
     /// <summary>
     /// Called when an element that is part of a template starts rendering.
@@ -62,34 +67,40 @@ internal static class TemplateCssHelper
             return null;
         }
 
-        // Get the templated parent - this identifies which control instance this element belongs to
+        // Get the templated parent
         DependencyObject templatedParent = fe.TemplatedParent;
         if (templatedParent is null)
         {
             return null;
         }
 
-        // Get the template this element belongs to
+        // Get the template
         FrameworkTemplate template = GetElementTemplate(fe);
         if (template is null)
         {
             return null;
         }
 
-        // Get or create cache for this template
-        TemplateCssCache templateCache = _templateCache.GetOrCreateValue(template);
+        // Get DOM element ID
+        string elementId = element.OuterDiv?.UniqueIdentifier;
+        if (string.IsNullOrEmpty(elementId))
+        {
+            return null;
+        }
 
-        // Get or create render state for this template instance
+        // Get or create caches
+        TemplateCssCache templateCache = _templateCache.GetOrCreateValue(template);
         InstanceRenderState instanceState = _instanceStates.GetOrCreateValue(templatedParent);
-        
-        // Get element index for this element within the instance
         int elementIndex = instanceState.GetNextElementIndex();
 
-        // Set up rendering context
-        _currentContext = new ElementRenderContext
+        // Initialize thread-static collections if needed
+        _contextStack ??= new Stack<ElementRenderContext>();
+        _activeContexts ??= new Dictionary<string, ElementRenderContext>();
+
+        // Create context
+        var context = new ElementRenderContext
         {
-            ElementId = element.OuterDiv?.UniqueIdentifier,
-            Template = template,
+            ElementId = elementId,
             TemplateCache = templateCache,
             ElementIndex = elementIndex
         };
@@ -97,64 +108,76 @@ internal static class TemplateCssHelper
         // Check if we have a CSS class for this element position
         if (templateCache.TryGetCssClassName(elementIndex, out string className))
         {
-            // CSS class exists - mark context as not learning
-            _currentContext.IsLearning = false;
-            return className;
+            context.IsLearning = false;
+        }
+        else
+        {
+            context.IsLearning = true;
+            context.RecordedProperties = new Dictionary<string, string>();
+            className = null;
         }
 
-        // First time seeing this element position - enable learning mode
-        _currentContext.IsLearning = true;
-        _currentContext.RecordedProperties = new Dictionary<string, string>();
-        return null;
+        // Push context onto stack and register for quick lookup
+        _contextStack.Push(context);
+        _activeContexts[elementId] = context;
+
+        return className;
     }
 
     /// <summary>
     /// Called when a CSS property is about to be set on an element.
-    /// Returns true if the property should be skipped (already in CSS class with same value).
+    /// Returns true if the property should be skipped (already in CSS class).
     /// </summary>
     public static bool TryRecordOrSkipCss(string elementId, string propertyName, string value)
     {
-        var ctx = _currentContext;
-        if (ctx is null || ctx.ElementId != elementId)
+        if (_activeContexts is null || string.IsNullOrEmpty(elementId))
         {
-            return false; // Not in template context or different element
+            return false;
+        }
+
+        if (!_activeContexts.TryGetValue(elementId, out ElementRenderContext ctx))
+        {
+            return false;
         }
 
         if (ctx.IsLearning)
         {
-            // Learning mode - record the CSS property (last value wins if set multiple times)
-            if (ctx.RecordedProperties is not null)
-            {
-                ctx.RecordedProperties[propertyName] = value;
-            }
+            // Learning mode - record the CSS property
+            ctx.RecordedProperties[propertyName] = value;
             return false; // Don't skip, let it render normally
         }
         else
         {
-            // Only skip if property is in the cached CSS class AND value matches.
-            // This ensures TemplateBinding values (which may differ) are not skipped.
-            return ctx.TemplateCache.ShouldSkipCss(ctx.ElementIndex, propertyName, value);
+            // Skip if property is in the cached CSS class.
+            // Even if the value differs (e.g., from TemplateBinding), the inline style
+            // will be set on the NEXT render after properties are processed.
+            // For now, we skip the CSS call. If value truly differs, the inline style
+            // from a later TemplateBinding update will override the class style.
+            return ctx.TemplateCache.HasProperty(ctx.ElementIndex, propertyName);
         }
     }
 
     /// <summary>
     /// Called when an element finishes rendering.
-    /// If learning mode was active, creates a CSS class for this element position.
     /// </summary>
     public static void OnElementRenderEnd(UIElement element)
     {
-        var ctx = _currentContext;
-        if (ctx is null)
+        if (_contextStack is null || _contextStack.Count == 0)
         {
             return;
         }
 
-        // Clear context first
-        _currentContext = null;
+        var ctx = _contextStack.Pop();
 
+        // Remove from active contexts
+        if (_activeContexts is not null && ctx.ElementId is not null)
+        {
+            _activeContexts.Remove(ctx.ElementId);
+        }
+
+        // If learning mode completed, create CSS class
         if (ctx.IsLearning && ctx.RecordedProperties?.Count > 0)
         {
-            // Generate CSS class for this element position
             ctx.TemplateCache.CreateCssClass(ctx.ElementIndex, ctx.RecordedProperties);
         }
     }
@@ -186,18 +209,11 @@ internal static class TemplateCssHelper
         return null;
     }
 
-    /// <summary>
-    /// Generates a unique template ID.
-    /// </summary>
     internal static int GenerateTemplateId() => ++_templateIdCounter;
 
-    /// <summary>
-    /// Context for the element currently being rendered.
-    /// </summary>
     private sealed class ElementRenderContext
     {
         public string ElementId { get; init; }
-        public FrameworkTemplate Template { get; init; }
         public TemplateCssCache TemplateCache { get; init; }
         public int ElementIndex { get; init; }
         public bool IsLearning { get; set; }
@@ -211,13 +227,11 @@ internal static class TemplateCssHelper
 internal sealed class InstanceRenderState
 {
     private int _elementIndex;
-
     public int GetNextElementIndex() => _elementIndex++;
 }
 
 /// <summary>
 /// Stores CSS class information for a template.
-/// Shared across all instances of the same template.
 /// </summary>
 internal sealed class TemplateCssCache
 {
@@ -225,9 +239,6 @@ internal sealed class TemplateCssCache
     private readonly Dictionary<int, ElementCssClass> _elementClasses = new();
     private readonly object _lock = new();
 
-    /// <summary>
-    /// Tries to get the CSS class name for an element position.
-    /// </summary>
     public bool TryGetCssClassName(int elementIndex, out string className)
     {
         lock (_lock)
@@ -242,46 +253,33 @@ internal sealed class TemplateCssCache
         }
     }
 
-    /// <summary>
-    /// Checks if a CSS property should be skipped (exists in class with same value).
-    /// </summary>
-    public bool ShouldSkipCss(int elementIndex, string propertyName, string value)
+    public bool HasProperty(int elementIndex, string propertyName)
     {
         lock (_lock)
         {
             if (_elementClasses.TryGetValue(elementIndex, out ElementCssClass elementClass))
             {
-                return elementClass.HasPropertyWithValue(propertyName, value);
+                return elementClass.HasProperty(propertyName);
             }
             return false;
         }
     }
 
-    /// <summary>
-    /// Creates a CSS class for an element position with the given properties.
-    /// </summary>
     public void CreateCssClass(int elementIndex, Dictionary<string, string> properties)
     {
         lock (_lock)
         {
-            // Don't recreate if already exists
             if (_elementClasses.ContainsKey(elementIndex))
             {
                 return;
             }
 
             string className = $"os-tpl-{_templateId}-{elementIndex}";
-            
             _elementClasses[elementIndex] = new ElementCssClass(className, properties);
-
-            // Generate and inject CSS
             InjectCss(className, properties);
         }
     }
 
-    /// <summary>
-    /// Generates CSS string and injects it into the document.
-    /// </summary>
     private static void InjectCss(string className, Dictionary<string, string> properties)
     {
         var cssBuilder = new StringBuilder();
@@ -291,7 +289,6 @@ internal sealed class TemplateCssCache
 
         foreach (var prop in properties)
         {
-            // Convert camelCase to kebab-case
             cssBuilder.Append(ToKebabCase(prop.Key));
             cssBuilder.Append(':');
             cssBuilder.Append(prop.Value);
@@ -300,14 +297,11 @@ internal sealed class TemplateCssCache
 
         cssBuilder.Append('}');
 
-        string css = cssBuilder.ToString().Replace("'", "\\'");
+        string css = cssBuilder.ToString().Replace("'", "\\'").Replace("\\", "\\\\");
         OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
             $"(function(){{var s=document.getElementById('os-template-css');if(!s){{s=document.createElement('style');s.id='os-template-css';document.head.appendChild(s);}}s.textContent+='{css}';}})()");
     }
 
-    /// <summary>
-    /// Converts camelCase to kebab-case.
-    /// </summary>
     private static string ToKebabCase(string camelCase)
     {
         if (string.IsNullOrEmpty(camelCase))
@@ -336,28 +330,16 @@ internal sealed class TemplateCssCache
     }
 }
 
-/// <summary>
-/// Stores information about a CSS class for a single element position.
-/// </summary>
 internal sealed class ElementCssClass
 {
     public string ClassName { get; }
-    private readonly Dictionary<string, string> _properties;
+    private readonly HashSet<string> _propertyNames;
 
     public ElementCssClass(string className, Dictionary<string, string> properties)
     {
         ClassName = className;
-        // Store a copy of the properties
-        _properties = new Dictionary<string, string>(properties);
+        _propertyNames = new HashSet<string>(properties.Keys);
     }
 
-    /// <summary>
-    /// Checks if the class has a property with the specified value.
-    /// Returns true only if both property name AND value match.
-    /// </summary>
-    public bool HasPropertyWithValue(string name, string value)
-    {
-        return _properties.TryGetValue(name, out string cachedValue) 
-            && string.Equals(cachedValue, value, StringComparison.Ordinal);
-    }
+    public bool HasProperty(string name) => _propertyNames.Contains(name);
 }
