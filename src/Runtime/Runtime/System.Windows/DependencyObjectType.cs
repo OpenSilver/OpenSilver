@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using OpenSilver.Internal;
 
 namespace System.Windows;
@@ -21,6 +22,12 @@ namespace System.Windows;
 /// </remarks>
 public sealed class DependencyObjectType
 {
+    // Cached metadata lookup - provides O(1) access to PropertyMetadata for this DependencyObjectType.
+    // This is a major performance optimization as GetMetadata is called on every SetValue.
+    // The array is indexed by DependencyProperty.GlobalIndex.
+    // A null entry means the metadata hasn't been cached yet.
+    // We use a sentinel value to distinguish "not cached" from "cached but returned DefaultMetadata".
+    private PropertyMetadata[] _metadataCache;
     /// <summary>
     /// Returns a <see cref="DependencyObjectType"/> that represents a given system
     /// (CLR) type.
@@ -207,6 +214,56 @@ public sealed class DependencyObjectType
     public override int GetHashCode()
     {
         return _id;
+    }
+
+    /// <summary>
+    /// Gets the cached PropertyMetadata for the specified DependencyProperty on this type.
+    /// This provides O(1) lookup instead of walking the metadata override chain.
+    /// </summary>
+    /// <param name="dp">The dependency property to get metadata for.</param>
+    /// <returns>The cached PropertyMetadata, or null if not yet cached.</returns>
+    internal PropertyMetadata GetCachedMetadata(DependencyProperty dp)
+    {
+        int globalIndex = dp.GlobalIndex;
+        PropertyMetadata[] cache = _metadataCache;
+        
+        if (cache != null && globalIndex < cache.Length)
+        {
+            return cache[globalIndex];
+        }
+        
+        return null;
+    }
+
+    /// <summary>
+    /// Caches the PropertyMetadata for the specified DependencyProperty on this type.
+    /// </summary>
+    /// <param name="dp">The dependency property.</param>
+    /// <param name="metadata">The metadata to cache.</param>
+    internal void SetCachedMetadata(DependencyProperty dp, PropertyMetadata metadata)
+    {
+        int globalIndex = dp.GlobalIndex;
+        
+        // Ensure the cache array is large enough
+        PropertyMetadata[] cache = _metadataCache;
+        if (cache == null || globalIndex >= cache.Length)
+        {
+            // Need to grow the cache. Use the current registered property count + some buffer.
+            int newSize = Math.Max(globalIndex + 1, DependencyProperty.RegisteredPropertyCount + 16);
+            PropertyMetadata[] newCache = new PropertyMetadata[newSize];
+            
+            if (cache != null)
+            {
+                Array.Copy(cache, newCache, cache.Length);
+            }
+            
+            // Use interlocked to handle potential concurrent access
+            Interlocked.CompareExchange(ref _metadataCache, newCache, cache);
+            cache = _metadataCache;
+        }
+        
+        // Store the metadata (no lock needed - worst case we compute it twice)
+        cache[globalIndex] = metadata;
     }
 
     // DTypes may not be constructed outside of FromSystemType
