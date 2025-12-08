@@ -843,11 +843,17 @@ namespace System.Windows
             }
 
             // Fast path: check if we have cached metadata for this type
-            PropertyMetadata cachedMetadata = dependencyObjectType.GetCachedMetadata(this);
-            if (cachedMetadata != null)
+            if (dependencyObjectType.TryGetCachedMetadata(this, out PropertyMetadata cachedMetadata))
             {
                 return cachedMetadata;
             }
+
+            // Before caching, ensure the static constructor has run for this type.
+            // This guarantees that any OverrideMetadata calls in the static constructor
+            // have been executed, so we cache the correct metadata.
+            // Without this, we might cache metadata before overrides are registered,
+            // and then return stale cached metadata forever.
+            RuntimeHelpers.RunClassConstructor(dependencyObjectType.SystemType.TypeHandle);
 
             // Slow path: compute the metadata and cache it
             PropertyMetadata result = GetMetadataUncached(dependencyObjectType);

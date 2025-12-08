@@ -484,7 +484,7 @@ namespace System.Windows
         protected virtual bool IsEnabledCore => true;
 
         /// <summary>
-        /// Identifies the <see cref="IsEnabled"/> dependency property.
+        /// Identifies the <see cref="IsEnabled"/>ï¿½dependency property.
         /// </summary>
         public static readonly DependencyProperty IsEnabledProperty =
             DependencyProperty.Register(

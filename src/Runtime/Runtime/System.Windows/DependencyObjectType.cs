@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using OpenSilver.Internal;
 
 namespace System.Windows;
@@ -221,18 +220,24 @@ public sealed class DependencyObjectType
     /// This provides O(1) lookup instead of walking the metadata override chain.
     /// </summary>
     /// <param name="dp">The dependency property to get metadata for.</param>
-    /// <returns>The cached PropertyMetadata, or null if not yet cached.</returns>
-    internal PropertyMetadata GetCachedMetadata(DependencyProperty dp)
+    /// <param name="metadata">The cached metadata if found.</param>
+    /// <returns>True if a cached value was found, false otherwise.</returns>
+    internal bool TryGetCachedMetadata(DependencyProperty dp, out PropertyMetadata metadata)
     {
         int globalIndex = dp.GlobalIndex;
         PropertyMetadata[] cache = _metadataCache;
         
         if (cache != null && globalIndex < cache.Length)
         {
-            return cache[globalIndex];
+            metadata = cache[globalIndex];
+            if (metadata != null)
+            {
+                return true;
+            }
         }
         
-        return null;
+        metadata = null;
+        return false;
     }
 
     /// <summary>
@@ -243,9 +248,9 @@ public sealed class DependencyObjectType
     internal void SetCachedMetadata(DependencyProperty dp, PropertyMetadata metadata)
     {
         int globalIndex = dp.GlobalIndex;
+        PropertyMetadata[] cache = _metadataCache;
         
         // Ensure the cache array is large enough
-        PropertyMetadata[] cache = _metadataCache;
         if (cache == null || globalIndex >= cache.Length)
         {
             // Need to grow the cache. Use the current registered property count + some buffer.
@@ -257,12 +262,11 @@ public sealed class DependencyObjectType
                 Array.Copy(cache, newCache, cache.Length);
             }
             
-            // Use interlocked to handle potential concurrent access
-            Interlocked.CompareExchange(ref _metadataCache, newCache, cache);
-            cache = _metadataCache;
+            _metadataCache = newCache;
+            cache = newCache;
         }
         
-        // Store the metadata (no lock needed - worst case we compute it twice)
+        // Store the metadata
         cache[globalIndex] = metadata;
     }
 
