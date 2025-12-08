@@ -484,7 +484,7 @@ namespace System.Windows
         protected virtual bool IsEnabledCore => true;
 
         /// <summary>
-        /// Identifies the <see cref="IsEnabled"/> dependency property.
+        /// Identifies the <see cref="IsEnabled"/>ï¿½dependency property.
         /// </summary>
         public static readonly DependencyProperty IsEnabledProperty =
             DependencyProperty.Register(
@@ -1481,6 +1481,14 @@ namespace System.Windows
 
         internal void RenderVisual()
         {
+            // Check if this element is part of a template and if CSS class should be applied
+            string templateCssClass = TemplateCssHelper.OnElementRenderStart(this);
+            if (templateCssClass is not null && OuterDiv is not null)
+            {
+                // Apply the template CSS class instead of setting individual CSS properties
+                INTERNAL_HtmlDomManager.AddCSSClass(OuterDiv, templateCssClass);
+            }
+
             if (EffectiveValuesCount > 0)
             {
                 // we copy the Dictionary so that the foreach doesn't break when 
@@ -1582,6 +1590,9 @@ namespace System.Windows
             {
                 SetPointerEvents(true);
             }
+
+            // Notify template CSS helper that element rendering is complete
+            TemplateCssHelper.OnElementRenderEnd(this);
         }
 
         internal void SuspendRendering() => IsRenderingSuspended = true;

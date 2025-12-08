@@ -14,6 +14,7 @@
 
 using System;
 using System.Dynamic;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
@@ -156,9 +157,18 @@ namespace CSHTML5.Internal
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setCSSProperty('{Uid}','{propertyName}','{value}','{priority}')");
 
-        private void SetStylePropertyValue(string propertyName, string value) =>
+        private void SetStylePropertyValue(string propertyName, string value)
+        {
+            // Check if this CSS property should be skipped (already in template CSS class)
+            // or needs to be recorded (first template instantiation)
+            if (TemplateCssHelper.TryRecordOrSkipCss(Uid, propertyName, value))
+            {
+                return; // Property is in CSS class, skip individual setting
+            }
+
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setCSS('{Uid}','{propertyName}','{value}')");
+        }
 
         private string GetCSSProperty(string propertyName) =>
             OpenSilver.Interop.ExecuteJavaScriptString(
