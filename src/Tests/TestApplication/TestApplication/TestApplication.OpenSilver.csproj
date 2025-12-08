@@ -32,6 +32,9 @@
     <Compile Include="LinqSamples.cs" />
     <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="Tests\AccordionTest.xaml.cs" />
+    <Compile Include="Tests\PerformanceTest.xaml.cs">
+      <DependentUpon>PerformanceTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\DragDropTarget\ListBoxDragDropTargetTest.xaml.cs" />
     <Compile Include="Tests\DragDropTarget\PanelDragDropTargetTest.xaml.cs" />
     <Compile Include="Tests\DragDropTarget\TreeViewDragDropTargetTest.xaml.cs" />
@@ -642,6 +645,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Tests\PerformanceTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tests\DragDropTarget\ListBoxDragDropTargetTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
