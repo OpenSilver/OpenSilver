@@ -11,10 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
-using System.Windows.Input;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
+using System.Diagnostics;
+using System.Globalization;
+using System.Windows.Input;
+using System.Windows.Markup;
 
 namespace System.Windows.Data;
 
@@ -63,6 +65,8 @@ public abstract class BindingExpressionBase : Expression
     private PrivateFlags _flags;
     private PrivateFlags _defaultFlags;
     private PropertyChangeListener _targetPropertyListener;
+    private PropertyChangeListener _languageChangedListener;
+    private object _culture = DefaultValueObject;
 
     internal BindingExpressionBase(BindingBase binding, BindingExpressionBase parent)
     {
@@ -184,6 +188,34 @@ public abstract class BindingExpressionBase : Expression
     /// <summary> True if this binding expression validates on notify data errors </summary>
     internal bool ValidatesOnNotifyDataErrors => TestFlag(PrivateFlags.iValidatesOnNotifyDataErrors);
 
+    internal bool UsesLanguage => ParentBindingBase.ConverterCultureInternal is null;
+
+    /// <summary>
+    /// Compute the culture, either from the parent Binding, or from the target element.
+    /// </summary>
+    internal CultureInfo GetCulture()
+    {
+        if (_culture == DefaultValueObject)
+        {
+            // explicit culture set in Binding
+            _culture = ParentBindingBase.ConverterCultureInternal;
+
+            // if that doesn't work, use target element's xml:lang property
+            if (_culture is null)
+            {
+                if (Target is not null && Target.GetValue(FrameworkElement.LanguageProperty) is XmlLanguage xmlLanguage)
+                {
+                    _culture = xmlLanguage.GetSpecificCulture();
+                }
+            }
+        }
+
+        return (CultureInfo)_culture;
+    }
+
+    /// <summary> Culture has changed.  Re-fetch the value with the new culture. </summary>
+    private void InvalidateCulture() => _culture = DefaultValueObject;
+
     /// <summary>
     /// Invalidate the given child expression.
     /// </summary>
@@ -219,6 +251,11 @@ public abstract class BindingExpressionBase : Expression
 
         DetermineEffectiveValidatesOnNotifyDataErrors();
 
+        if (UsesLanguage)
+        {
+            _languageChangedListener = PropertyChangeListener.CreateListener(Target, FrameworkElement.LanguageProperty, OnLanguageChanged);
+        }
+
         // Listen to changes on the Target if the Binding is TwoWay:
         if (IsReflective && IsUpdateOnPropertyChanged)
         {
@@ -246,6 +283,12 @@ public abstract class BindingExpressionBase : Expression
     /// </summary>
     internal virtual void DetachOverride()
     {
+        if (_languageChangedListener != null)
+        {
+            _languageChangedListener.Dispose();
+            _languageChangedListener = null;
+        }
+
         if (_targetPropertyListener != null)
         {
             _targetPropertyListener.Dispose();
@@ -262,6 +305,8 @@ public abstract class BindingExpressionBase : Expression
 
         _flags = _defaultFlags;
     }
+
+    private void OnLanguageChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => InvalidateCulture();
 
     private void OnTargetLostFocus(object sender, RoutedEventArgs e) => Update();
 

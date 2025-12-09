@@ -69,7 +69,6 @@ namespace System.Windows.Data;
 public class Binding : BindingBase
 {
     private IValueConverter _converter;
-    private CultureInfo _culture;
     private object _converterParameter;
     private string _elementName;
     private string _xamlPath;
@@ -140,7 +139,6 @@ public class Binding : BindingBase
         if (original != null)
         {
             _converter = original._converter;
-            _culture = original._culture;
             _converterParameter = original._converterParameter;
             _elementName = original._elementName;
             _xamlPath = original._xamlPath;
@@ -185,8 +183,8 @@ public class Binding : BindingBase
     /// </returns>
     public CultureInfo ConverterCulture
     {
-        get { return _culture; }
-        set { CheckSealed(); _culture = value; }
+        get { return ConverterCultureInternal; }
+        set { CheckSealed(); ConverterCultureInternal = value; }
     }
 
     /// <summary>

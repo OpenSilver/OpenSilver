@@ -202,7 +202,7 @@ public sealed class MultiBindingExpression : BindingExpressionBase
             rawValue,
             targetTypes,
             ParentMultiBinding.ConverterParameter,
-            ParentMultiBinding.ConverterCulture);
+            GetCulture());
     }
 
     private void UpdateSource(object convertedValue)
@@ -272,21 +272,20 @@ public sealed class MultiBindingExpression : BindingExpressionBase
             value = ParentMultiBinding.Converter.Convert(_values,
                 TargetProperty.PropertyType,
                 ParentMultiBinding.ConverterParameter,
-                ParentMultiBinding.ConverterCulture);
+                GetCulture());
         }
 
-        string stringFormat = GetEffectiveStringFormat();
-        if (stringFormat is not null)
+        if (GetEffectiveStringFormat() is string stringFormat)
         {
             try
             {
                 if (value == _values)
                 {
-                    value = string.Format(ParentMultiBinding.ConverterCulture, stringFormat, _values);
+                    value = string.Format(GetCulture(), stringFormat, _values);
                 }
                 else
                 {
-                    value = string.Format(ParentMultiBinding.ConverterCulture, stringFormat, value);
+                    value = string.Format(GetCulture(), stringFormat, value);
                 }
             }
             catch (FormatException fe)

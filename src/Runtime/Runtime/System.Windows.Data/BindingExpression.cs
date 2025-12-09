@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
+using System.Windows.Markup;
 
 namespace System.Windows.Data
 {
@@ -188,7 +189,7 @@ namespace System.Windows.Data
                     value = ParentBinding.Converter.Convert(value,
                         targetType,
                         ParentBinding.ConverterParameter,
-                        ParentBinding.ConverterCulture);
+                        GetCulture());
                 }
             }
 
@@ -219,7 +220,7 @@ namespace System.Windows.Data
                         value != DependencyProperty.UnsetValue &&
                         !targetType.IsAssignableFrom(value.GetType()))
                     {
-                        value = ConvertHelper(value, targetType, Target, ParentBinding.ConverterCulture);
+                        value = ConvertHelper(value, targetType, Target, GetCulture());
                     }
                 }
             }
@@ -705,7 +706,7 @@ namespace System.Windows.Data
                     convertedValue,
                     expectedType,
                     ParentBinding.ConverterParameter,
-                    ParentBinding.ConverterCulture);
+                    GetCulture());
 
                 if (convertedValue == DependencyProperty.UnsetValue)
                 {
@@ -719,7 +720,7 @@ namespace System.Windows.Data
                     convertedValue,
                     expectedType,
                     null,
-                    ParentBinding.ConverterCulture);
+                    GetCulture());
             }
 
             if (convertedValue == DependencyProperty.UnsetValue)
@@ -850,7 +851,7 @@ namespace System.Windows.Data
                 result = ConvertHelper(value,
                     dp.PropertyType,
                     Target,
-                    ParentBinding.ConverterCulture);
+                    GetCulture());
             }
 
             return result;

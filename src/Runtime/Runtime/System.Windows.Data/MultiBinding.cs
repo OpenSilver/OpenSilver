@@ -27,7 +27,6 @@ namespace System.Windows.Data;
 public class MultiBinding : BindingBase
 {
     private object _converterParameter;
-    private CultureInfo _culture;
     private IMultiValueConverter _converter;
 
     /// <summary>
@@ -97,8 +96,8 @@ public class MultiBinding : BindingBase
     /// </returns>
     public CultureInfo ConverterCulture
     {
-        get { return _culture; }
-        set { CheckSealed(); _culture = value; }
+        get { return ConverterCultureInternal; }
+        set { CheckSealed(); ConverterCultureInternal = value; }
     }
 
     /// <summary>

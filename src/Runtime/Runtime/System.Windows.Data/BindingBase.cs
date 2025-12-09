@@ -17,6 +17,7 @@ using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Xaml;
 using OpenSilver.Internal;
+using System.Globalization;
 
 namespace System.Windows.Data;
 
@@ -68,7 +69,7 @@ public abstract class BindingBase : MarkupExtension
     private bool _isSealed;
     private object _fallbackValue;
     private object _targetNullValue;
-    protected string _stringFormat;
+    private string _stringFormat;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BindingBase"/> class.
@@ -83,6 +84,7 @@ public abstract class BindingBase : MarkupExtension
             _fallbackValue = original._fallbackValue;
             _targetNullValue = original._targetNullValue;
             _stringFormat = original._stringFormat;
+            ConverterCultureInternal = original.ConverterCultureInternal;
         }
     }
 
@@ -129,6 +131,8 @@ public abstract class BindingBase : MarkupExtension
         get { return TestFlag(PrivateFlags.ValidatesOnNotifyDataErrors); }
         set { ChangeFlag(PrivateFlags.ValidatesOnNotifyDataErrors, value); }
     }
+
+    internal CultureInfo ConverterCultureInternal { get; set; }
 
     internal PrivateFlags Flags => _flags;
 
