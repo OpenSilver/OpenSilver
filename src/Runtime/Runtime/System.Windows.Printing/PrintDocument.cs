@@ -234,11 +234,11 @@ namespace System.Windows.Printing
   	  var mql = window.matchMedia('print');
   	  const endprint = function (event) {
         if (!event.matches) {
-  		  callback();
   		  document.getElementsByTagName('style')[0].remove();
   		  document.getElementById('print-container').remove();
   		  document.title = t;
   		  mql.removeEventListener('change', endprint);
+  		  callback();
         }
       };
   	  mql.addEventListener('change', endprint);
