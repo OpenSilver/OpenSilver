@@ -32,6 +32,8 @@ namespace System.Windows.Controls
     {
         #region Data
 
+        private static readonly DataTemplate _emptyPathTemplate;
+
         // Note: this maps an item (for example a string) to the element
         // that is added to the visual tree (such a datatemplate) or to 
         // the native DOM element in case of native combo box for example.
@@ -42,6 +44,24 @@ namespace System.Windows.Controls
         #endregion Data
 
         #region Contructor
+
+        static ItemsControl()
+        {
+            _emptyPathTemplate = new DataTemplate
+            {
+                Template = new TemplateContent(
+                    new XamlContext(),
+                    static (owner, context) =>
+                    {
+                        var textBlock = new TextBlock();
+                        textBlock.SetTemplatedParent(context.TemplateOwnerReference);
+                        textBlock.SetBinding(TextBlock.TextProperty, new Binding());
+
+                        return textBlock;
+                    }),
+            };
+            _emptyPathTemplate.Seal();
+        }
 
         /// <summary>
         /// Initializes a new instance of the ItemsControl class.
@@ -847,17 +867,11 @@ namespace System.Windows.Controls
         private DataTemplate SelectTemplate(DependencyObject element, object item)
         {
             DataTemplate template = null;
-            if (!(item is UIElement))
+            if (item is not UIElement)
             {
-                template = this.ItemTemplate;
-                if (template == null)
-                {
-                    template = (DataTemplate)ContentPresenter.FindTemplateResourceInternal(element, item);
-                    if (template == null)
-                    {
-                        template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
-                    }
-                }
+                template = ItemTemplate ??
+                    (DataTemplate)ContentPresenter.FindTemplateResourceInternal(element, item) ??
+                    GetDataTemplateForDisplayMemberPath(DisplayMemberPath);
             }
 
             return template;
@@ -865,22 +879,24 @@ namespace System.Windows.Controls
 
         internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
         {
-            DataTemplate template = new DataTemplate
+            if (string.IsNullOrEmpty(displayMemberPath))
+            {
+                return _emptyPathTemplate;
+            }
+
+            return new DataTemplate
             {
                 Template = new TemplateContent(
                     new XamlContext(),
                     (control, context) =>
                     {
-                        TextBlock textBlock = new TextBlock();
+                        var textBlock = new TextBlock();
                         textBlock.SetTemplatedParent(context.TemplateOwnerReference);
-                        textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
+                        textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath));
 
                         return textBlock;
-                    }                    
-                )
+                    })
             };
-
-            return template;
         }
 
         public static ItemsControl GetItemsOwner(DependencyObject element)
