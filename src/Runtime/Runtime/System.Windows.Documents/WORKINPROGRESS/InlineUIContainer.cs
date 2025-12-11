@@ -36,10 +36,9 @@ namespace System.Windows.Documents
             }
             set
             {
-                if (this._isLoaded)
+                if (this.IsLoadedCache)
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
                 }
                 _child = value;

@@ -15,7 +15,7 @@ namespace System.Windows;
 
 public partial class UIElement : IInternalUIElement
 {
-    bool IInternalUIElement.IsLoaded => _isLoaded;
+    bool IInternalUIElement.IsLoaded => IsLoadedCache;
 
     bool IInternalUIElement.IsConnectedToLiveTree => IsConnectedToLiveTree;
 

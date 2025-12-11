@@ -52,10 +52,6 @@ namespace System.Windows
             RegisterEvents(typeof(UIElement));
         }
 
-        internal bool IsConnectedToLiveTree { get; set; }
-
-        internal bool IsUnloading { get; set; }
-
         #region Visual Children
 
         /// <summary>
@@ -299,9 +295,6 @@ namespace System.Windows
         internal INTERNAL_HtmlDomElementReference OuterDiv { get; set; }
         internal HashSet<UIElement> VisualChildrenInformation { get; set; }
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
-        internal bool _isLoaded;
-
-        internal bool RenderingIsDeferred { get; set; } = false;
 
         public UIElement()
         {
@@ -317,7 +310,7 @@ namespace System.Windows
         /// <inheritdoc />
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (e.Metadata is PropertyMetadata metadata && _isLoaded)
+            if (e.Metadata is PropertyMetadata metadata && IsLoadedCache)
             {
                 metadata.MethodToUpdateDom?.Invoke(this, e.NewValue);
                 metadata.MethodToUpdateDom2?.Invoke(this, e.OldValue, e.NewValue);
@@ -788,7 +781,7 @@ namespace System.Windows
             uie.VisibilityCache = newVisibility;
 
             // The IsVisible property depends on this property.
-            uie.UpdateIsVisible();
+            uie.UpdateIsVisibleCache();
         }
 
         private static object CoerceVisibility(DependencyObject d, object baseValue)
@@ -838,10 +831,8 @@ namespace System.Windows
 
         #region IsVisible
 
-        // The IsVisible property is a read-only reflection of the Visibility
-        // property.
-        private static readonly PropertyMetadata _isVisibleMetadata =
-            new ReadOnlyPropertyMetadata(BooleanBoxes.FalseBox, GetIsVisible, OnIsVisibleChanged, CoerceIsVisible);
+        // The IsVisible property is a read-only reflection of the Visibility property.
+        private static readonly ReadOnlyPropertyMetadata _isVisibleMetadata = new(BooleanBoxes.FalseBox, GetIsVisible, OnIsVisibleChanged);
 
         private static readonly DependencyPropertyKey IsVisiblePropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -871,13 +862,11 @@ namespace System.Windows
             UIElement uie = (UIElement)d;
             bool isVisible = (bool)e.NewValue;
 
-            uie.WriteFlag(CoreFlags.IsVisibleCache, isVisible);
-
             if (isVisible)
             {
-                if (uie.RenderingIsDeferred)
+                if (uie.IsRenderingSuspended)
                 {
-                    uie.RenderingIsDeferred = false;
+                    uie.IsRenderingSuspended = false;
                     INTERNAL_VisualTreeManager.RenderElementsAndRaiseChangedEventOnAllDependencyProperties(uie);
                 }
             }
@@ -893,13 +882,16 @@ namespace System.Windows
             uie.CoerceIsHitTestable();
         }
 
-        private static object CoerceIsVisible(DependencyObject d, object baseValue)
-        {
-            UIElement uie = (UIElement)d;
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsVisible"/> property changes on this element.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsVisibleChanged;
 
+        internal void UpdateIsVisibleCache()
+        {
             // IsVisible is a read-only property.  It derives its "base" value
             // from the Visibility property.
-            bool isVisible = uie.Visibility == Visibility.Visible;
+            bool isVisible = Visibility == Visibility.Visible;
 
             // We must be false if our parent is false, but we can be
             // either true or false if our parent is true.
@@ -911,13 +903,13 @@ namespace System.Windows
                 bool constraintAllowsVisible;
 
                 // Our parent can constrain us.
-                if (VisualTreeHelper.GetParent(uie) is UIElement parent)
+                if (VisualTreeHelper.GetParent(this) is UIElement parent)
                 {
                     constraintAllowsVisible = parent.IsVisible;
                 }
                 else
                 {
-                    constraintAllowsVisible = INTERNAL_VisualTreeManager.IsElementInVisualTree(uie);
+                    constraintAllowsVisible = INTERNAL_VisualTreeManager.IsElementInVisualTree(this);
                 }
 
                 if (!constraintAllowsVisible)
@@ -926,15 +918,20 @@ namespace System.Windows
                 }
             }
 
-            return BooleanBoxes.Box(isVisible);
+            if (isVisible != IsVisible)
+            {
+                // Our IsVisible force-inherited property has changed.  Update our
+                // cache and raise a change notification.
+
+                WriteFlag(CoreFlags.IsVisibleCache, isVisible);
+                NotifyPropertyChange(
+                    new DependencyPropertyChangedEventArgs(
+                        BooleanBoxes.Box(!isVisible),
+                        BooleanBoxes.Box(isVisible),
+                        IsVisibleProperty,
+                        _isVisibleMetadata));
+            }
         }
-
-        /// <summary>
-        /// Occurs when the value of the <see cref="IsVisible"/> property changes on this element.
-        /// </summary>
-        public event DependencyPropertyChangedEventHandler IsVisibleChanged;
-
-        internal void UpdateIsVisible() => CoerceValue(IsVisibleProperty);
 
         #endregion
 
@@ -1096,17 +1093,22 @@ namespace System.Windows
         internal virtual void SetPointerEvents(bool hitTestable) =>
             OuterDiv.Style.pointerEvents = hitTestable ? "auto" : "none";
 
-        private static readonly DependencyProperty IsHitTestableProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey IsHitTestablePropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(IsHitTestable),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(BooleanBoxes.FalseBox, null, CoerceIsHitTestable)
+                new ReadOnlyPropertyMetadata(BooleanBoxes.FalseBox, GetIsHitTestable)
                 {
+                    CoerceValueCallback = CoerceIsHitTestable,
                     MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetPointerEvents((bool)newValue),
                 });
 
-        internal bool IsHitTestable => (bool)GetValue(IsHitTestableProperty);
+        private static readonly DependencyProperty IsHitTestableProperty = IsHitTestablePropertyKey.DependencyProperty;
+
+        internal bool IsHitTestable => ReadVisualFlag(VisualFlags.IsHitTestable);
+
+        private static object GetIsHitTestable(DependencyObject d) => BooleanBoxes.Box(((UIElement)d).IsHitTestable);
 
         private static object CoerceIsHitTestable(DependencyObject d, object value)
         {
@@ -1311,7 +1313,7 @@ namespace System.Windows
 
             if ((bool)parent.GetValue(IsVisibleProperty))
             {
-                uie.UpdateIsVisible();
+                uie.UpdateIsVisibleCache();
             }
         }
 
@@ -1322,17 +1324,45 @@ namespace System.Windows
             {
                 if (GetVisualChild(i) is UIElement child)
                 {
-                    child.CoerceValue(property);
+                    if (property == IsVisibleProperty)
+                    {
+                        child.UpdateIsVisibleCache();
+                    }
+                    else
+                    {
+                        child.CoerceValue(property);
+                    }
                 }
             }
         }
 
-#endregion ForceInherit property support
+        #endregion ForceInherit property support
 
-        internal bool ReadFlag(CoreFlags field)
+        internal bool IsLoadedCache
         {
-            return (_flags & field) != 0;
+            get => ReadVisualFlag(VisualFlags.IsLoadedCache);
+            set => WriteVisualFlag(VisualFlags.IsLoadedCache, value);
         }
+
+        internal bool IsRenderingSuspended
+        {
+            get => ReadVisualFlag(VisualFlags.IsRenderingSuspended);
+            set => WriteVisualFlag(VisualFlags.IsRenderingSuspended, value);
+        }
+
+        internal bool IsConnectedToLiveTree
+        {
+            get => ReadVisualFlag(VisualFlags.IsConnectedToLiveTree);
+            set => WriteVisualFlag(VisualFlags.IsConnectedToLiveTree, value);
+        }
+
+        internal bool IsUnloading
+        {
+            get => ReadVisualFlag(VisualFlags.IsUnloading);
+            set => WriteVisualFlag(VisualFlags.IsUnloading, value);
+        }
+
+        internal bool ReadFlag(CoreFlags field) => (_flags & field) != 0;
 
         internal void WriteFlag(CoreFlags field, bool value)
         {
@@ -1346,10 +1376,7 @@ namespace System.Windows
             }
         }
 
-        internal bool ReadVisualFlag(VisualFlags field)
-        {
-            return (_visualFlags & field) != 0;
-        }
+        internal bool ReadVisualFlag(VisualFlags field) => (_visualFlags & field) != 0;
 
         internal void WriteVisualFlag(VisualFlags field, bool value)
         {
@@ -1450,79 +1477,40 @@ namespace System.Windows
         TreeLevelBit9 = 0x00000200,
         TreeLevelBit10 = 0x00000400,
 
-        //// IsSubtreeDirtyForPrecompute indicates that at least one Visual in the sub-graph of this Visual needs
-        //// a bounding box update.
-        //IsSubtreeDirtyForPrecompute = 0x00000800,
-
-        //// Should post render indicates that this is a root visual and therefore we need to indicate that this
-        //// visual tree needs to be re-rendered. Today we are doing this by posting a render queue item.
-        //ShouldPostRender = 0x00001000,
-
         // Needs documentation
-        IsUIElement = 0x00002000,
+        IsUIElement = 0x00000800,
 
         // For UIElement -- It's in VisualFlags so that it can be propagated through the
         // Visual subtree without casting.
-        IsLayoutSuspended = 0x00004000,
+        IsLayoutSuspended = 0x00001000,
 
         // Are we in the process of iterating the visual children. 
         // This flag is set during a descendents walk, for property invalidation.
-        IsVisualChildrenIterationInProgress = 0x00008000,
-
-        //// Used on ModelVisual3D to signify that its content bounds
-        //// cache is valid.
-        ////
-        //// Stop over-invalidating _bboxSubgraph
-        ////
-        //// We use this flag to maintain a separate cache of a ModelVisual3D’s content
-        //// bounds.  A better solution that would be both a 2D and 3D win would be to
-        //// stop invalidating _bboxSubgraph when a visual’s transform changes.
-        //// 
-        //Are3DContentBoundsValid = 0x00010000,
+        IsVisualChildrenIterationInProgress = 0x00002000,
 
         // FindCommonAncestor is used to find the common ancestor of a Visual.
-        FindCommonAncestor = 0x00020000,
-
-        //// IsLayoutIslandRoot indicates that this Visual is a root of Element Layout Island.
-        //IsLayoutIslandRoot = 0x00040000,
-
-        //// UseLayoutRounding indicates that layout rounding should be applied during Measure/Arrange for this UIElement.
-        //UseLayoutRounding = 0x00080000,
+        FindCommonAncestor = 0x00004000,
 
         // These bits together make up UIElement.VisibilityCache
-        VisibilityCache_Visible = 0x00100000,
-        //VisibilityCache_TakesSpace = 0x00200000,
-
-        //// Indicates that a given node is registered for AncestorChanged.
-        //RegisteredForAncestorChanged = 0x00400000,
-
-        //// Indicates that a node below this node is registered for AncestorChanged.
-        //SubTreeHoldsAncestorChanged = 0x00800000,
-
-        //// Indicates that this node is used by a cyclic brush
-        //NodeIsCyclicBrushRoot = 0x01000000,
-
-        //// Indicates that this node has an Effect
-        //NodeHasEffect = 0x02000000,
-
-        //// Indicates that this node is of Viewport3DVisual class.
-        //IsViewport3DVisual = 0x04000000,
-
-        //// Used to discover cycles in VisualBrush scenarios.
-        //ReentrancyFlag = 0x08000000,
+        VisibilityCache_Visible = 0x00010000,
 
         // Indicates if the visual has any children. Avoids calls to visualchildrencount while checking for presence of children.
-        HasChildren = 0x10000000,
+        HasChildren = 0x00020000,
 
-        //// Controls if the bitmap effect emulation layer is enabled. 
-        //BitmapEffectEmulationDisabled = 0x20000000,
+        // Indicates if rendering is suspended for this Visual. Rendering is suspended when an element is inside a collapsed
+        // visual tree.
+        IsRenderingSuspended = 0x00040000,
 
-        //// These two DPI flags are used to determine the DPI value of a Visual.
-        //// Combination of these two flags point to 4 possible choices (DpiScaleFlag1 being the LSB) : Choice 0-2 directly 
-        //// represent the index in the static array (in UIElement) on which DPI is stored. Choice 3 indicates that the index is stored 
-        //// in an uncommon field on the Visual.
-        //DpiScaleFlag1 = 0x40000000,
+        // Indicates if this Visual is connected to the render tree.
+        IsConnectedToLiveTree = 0x00080000,
 
-        //DpiScaleFlag2 = 0x80000000,
+        // Indicates if this Visual has been loaded into the render tree. (see FrameworkElement.IsLoaded).
+        IsLoadedCache = 0x00100000,
+
+        // Indicates if this Visual is being detached from the render tree.
+        IsUnloading = 0x00200000,
+
+        // Indicates if this Visual can be the target of pointer events.
+        IsHitTestable = 0x00400000,
     }
 }

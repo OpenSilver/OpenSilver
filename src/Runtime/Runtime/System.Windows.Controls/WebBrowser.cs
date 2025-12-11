@@ -131,7 +131,7 @@ namespace System.Windows.Controls
         {
             _htmlString = text;
 
-            if (this._isLoaded) // Note: if not loaded, we will set the HTML later when adding the control to the visual tree.
+            if (IsLoaded) // Note: if not loaded, we will set the HTML later when adding the control to the visual tree.
             {
                 string sIFrame = OpenSilver.Interop.GetVariableStringForJS(_iFrame);
                 if (_htmlString != null)
@@ -156,7 +156,7 @@ namespace System.Windows.Controls
         /// </summary>
         private void OnIframeLoad()
         {
-            if (null != LoadCompleted && this._isLoaded)
+            if (null != LoadCompleted && IsLoaded)
             {
                 Uri source;
                 source = this.SourceUri;
