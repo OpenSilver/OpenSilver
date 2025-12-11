@@ -248,7 +248,7 @@ internal struct DescendentsWalker<T>
 
     private void VisitNode(IInternalUIElement uie, bool visitedViaVisualTree)
     {
-        if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
+        if (_recursionDepth <= LayoutManager.LayoutRecursionLimit)
         {
             // For the case when the collection contains the node
             // being visted, we do not need to visit it again. Also
@@ -290,7 +290,7 @@ internal struct DescendentsWalker<T>
 
     private void VisitNode(DependencyObject d, bool visitedViaVisualTree)
     {
-        if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
+        if (_recursionDepth <= LayoutManager.LayoutRecursionLimit)
         {
             if (d is IInternalUIElement uie)
             {

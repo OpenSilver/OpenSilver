@@ -19,7 +19,7 @@ namespace OpenSilver.Internal {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -687,6 +687,15 @@ namespace OpenSilver.Internal {
         internal static string ItemsSourceInUse {
             get {
                 return ResourceManager.GetString("ItemsSourceInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout recursion reached allowed limit to avoid stack overflow: &apos;{0}&apos;. Either the tree contains a loop or is too deep..
+        /// </summary>
+        internal static string LayoutManager_DeepRecursion {
+            get {
+                return ResourceManager.GetString("LayoutManager_DeepRecursion", resourceCulture);
             }
         }
         

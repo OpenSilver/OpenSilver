@@ -11,15 +11,18 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Threading;
-using CSHTML5.Internal;
 
 namespace System.Windows
 {
     internal sealed class LayoutManager
     {
+        internal const int LayoutRecursionLimit = UIElement.MAX_ELEMENTS_IN_ROUTE; //to keep these two constants in sync
+
         private UIElement _forceLayoutElement; //set in extreme situations, forces the update of the whole tree containing the element
         private UIElement _lastExceptionElement; //set on exception in Measure or Arrange.
 
@@ -230,6 +233,10 @@ namespace System.Windows
         {
             _lastExceptionElement = null;
             _measuresOnStack++;
+            if (_measuresOnStack > LayoutRecursionLimit)
+            {
+                throw new InvalidOperationException(string.Format(Strings.LayoutManager_DeepRecursion, LayoutRecursionLimit));
+            }
 
             _firePostLayoutEvents = true;
         }
@@ -243,6 +250,10 @@ namespace System.Windows
         {
             _lastExceptionElement = null;
             _arrangesOnStack++;
+            if (_arrangesOnStack > LayoutRecursionLimit)
+            {
+                throw new InvalidOperationException(string.Format(Strings.LayoutManager_DeepRecursion, LayoutRecursionLimit));
+            }
 
             _firePostLayoutEvents = true;
         }
