@@ -29,11 +29,6 @@ namespace System.Windows.Controls
         private string _htmlString;
         private JavaScriptCallback _jsCallbackOnIframeLoaded;
 
-        static WebBrowser()
-        {
-            IsHitTestableProperty.OverrideMetadata(typeof(WebBrowser), new PropertyMetadata(BooleanBoxes.TrueBox));
-        }
-
         public WebBrowser()
         {
             Unloaded += (o, e) => DisposeJsCallbacks();

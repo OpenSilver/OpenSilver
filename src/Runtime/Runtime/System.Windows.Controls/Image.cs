@@ -42,11 +42,6 @@ namespace System.Windows.Controls
         private Size _naturalSize;
         private WeakEventToken _weakEventToken;
 
-        static Image()
-        {
-            IsHitTestableProperty.OverrideMetadata(typeof(Image), new PropertyMetadata(BooleanBoxes.TrueBox));
-        }
-
         internal override bool EnablePointerEventsCore => true;
 
         /// <summary>

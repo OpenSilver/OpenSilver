@@ -83,8 +83,6 @@ internal sealed class TextBoxView : TextViewBase
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetTextAlignment((TextAlignment)newValue),
             });
-
-        IsHitTestableProperty.OverrideMetadata(typeof(TextBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
     private WeakEventToken _weakEventToken;

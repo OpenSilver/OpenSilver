@@ -69,8 +69,6 @@ internal sealed class PasswordBoxView : TextViewBase
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetForeground(oldValue as Brush, (Brush)newValue),
             });
-
-        IsHitTestableProperty.OverrideMetadata(typeof(PasswordBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
     private WeakEventToken _weakEventToken;

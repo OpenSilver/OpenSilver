@@ -107,7 +107,6 @@ internal sealed class RichTextBoxView : TextViewBase
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBoxView)d).SetTextAlignment((TextAlignment)newValue),
             });
-        IsHitTestableProperty.OverrideMetadata(typeof(RichTextBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
     private DispatcherOperation _refreshOp;
