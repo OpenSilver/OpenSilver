@@ -303,14 +303,14 @@ namespace CSHTML5.Internal
 
                 Storage[] storages = ArrayPool<Storage>.Shared.Rent(uie.EffectiveValuesCount);
                 int length = 0;
-                foreach (KeyValuePair<int, Storage> kvp in uie.EffectiveValues)
+                foreach (Storage storage in uie.EffectiveValues)
                 {
-                    if (kvp.Value.Entry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
+                    if (storage.Entry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
                     {
                         continue;
                     }
 
-                    storages[length++] = kvp.Value;
+                    storages[length++] = storage;
                 }
 
                 Span<Storage> span = storages.AsSpan(0, length);
@@ -334,7 +334,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                value = DependencyObjectStore.GetEffectiveValue(ref storage.Entry, RequestFlags.FullyResolved);
                                 valueWasRetrieved = true;
                             }
 
@@ -346,7 +346,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                value = DependencyObjectStore.GetEffectiveValue(ref storage.Entry, RequestFlags.FullyResolved);
                                 valueWasRetrieved = true;
                             }
 
@@ -369,7 +369,7 @@ namespace CSHTML5.Internal
                         {
                             if (!valueWasRetrieved)
                             {
-                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                value = DependencyObjectStore.GetEffectiveValue(ref storage.Entry, RequestFlags.FullyResolved);
                                 valueWasRetrieved = true;
                             }
                             

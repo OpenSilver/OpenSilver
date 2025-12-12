@@ -11,14 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
+using OpenSilver.Internal.Media.Animation;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Threading;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Data;
-using OpenSilver.Internal.Media.Animation;
 
 namespace System.Windows
 {
@@ -28,25 +27,35 @@ namespace System.Windows
     /// other important Silverlight classes, such as <see cref="UIElement"/>, <see cref="Geometry"/>,
     /// <see cref="FrameworkTemplate"/>, <see cref="Style"/>, and <see cref="ResourceDictionary"/>.
     /// </summary>
-    public class DependencyObject : IDependencyObject
+    public partial class DependencyObject : IDependencyObject
     {
-        private Dictionary<int, DependentList> _dependentListMap;
-        private Dictionary<int, Storage> _effectiveValues;
+        [Flags]
+        private enum Flags
+        {
+            InheritableEffectiveValuesCountMask = short.MaxValue,
+            ModifiersMask = CanBeInheritanceContext | IsInheritanceContextSealed | UseWeakContextReference,
+            CanBeInheritanceContext = 0x00008000,
+            IsInheritanceContextSealed = 0x00010000,
+            UseWeakContextReference = 0x00020000,
+        }
+
+        private PropertyStore<Storage> _effectiveValues;
+        private PropertyStore<DependentList> _dependentListMap;
         private DependencyObjectType _dType;
-        private int _inheritableEffectiveValuesCount;
-        private ContextStorage _contextStorage;
+        private object _context;
+        private Flags _packedData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DependencyObject"/> class.
         /// </summary>
         public DependencyObject()
         {
-            CanBeInheritanceContext = true;
+            _packedData = Flags.CanBeInheritanceContext;
         }
 
         internal event EventHandler InheritedContextChanged;
 
-        internal Dictionary<int, Storage> EffectiveValues => _effectiveValues ??= new();
+        internal ReadOnlySpan<Storage> EffectiveValues => _effectiveValues is null ? [] : _effectiveValues.Span;
 
         internal int EffectiveValuesCount => _effectiveValues?.Count ?? 0;
 
@@ -56,14 +65,68 @@ namespace System.Windows
         internal DependencyObjectType DependencyObjectType =>
             _dType ??= DependencyObjectType.FromSystemTypeInternal(GetType());
 
-        internal bool CanBeInheritanceContext { get; set; }
+        internal bool CanBeInheritanceContext
+        {
+            get => ReadFlag(Flags.CanBeInheritanceContext);
+            set => WriteFlag(Flags.CanBeInheritanceContext, value);
+        }
 
-        internal bool IsInheritanceContextSealed { get; set; }
+        internal bool IsInheritanceContextSealed
+        {
+            get => ReadFlag(Flags.IsInheritanceContextSealed);
+            set => WriteFlag(Flags.IsInheritanceContextSealed, value);
+        }
+
+        private bool UseWeakContextReference
+        {
+            get => ReadFlag(Flags.UseWeakContextReference);
+            set => WriteFlag(Flags.UseWeakContextReference, value);
+        }
+
+        private int InheritableEffectiveValuesCount
+        {
+            get => (int)(_packedData & Flags.InheritableEffectiveValuesCountMask);
+            set => _packedData = (_packedData & Flags.ModifiersMask) | ((Flags)value & Flags.InheritableEffectiveValuesCountMask);
+        }
+
+        private bool ReadFlag(Flags field) => (_packedData & field) != 0;
+
+        private void WriteFlag(Flags field, bool value)
+        {
+            if (value)
+            {
+                _packedData |= field;
+            }
+            else
+            {
+                _packedData &= (~field);
+            }
+        }
 
         internal DependencyObject InheritanceContext
         {
-            get => _contextStorage?.GetContext();
-            set => (_contextStorage ??= new ContextStorage()).SetContext(value);
+            get
+            {
+                if (UseWeakContextReference)
+                {
+                    var wr = (WeakReference<DependencyObject>)_context;
+                    if (!wr.TryGetTarget(out DependencyObject context))
+                    {
+                        UseWeakContextReference = false;
+                        _context = null;
+                    }
+
+                    return context;
+                }
+
+                return (DependencyObject)_context;
+            }
+            set
+            {
+                bool useWeakRef = value is FrameworkElement;
+                UseWeakContextReference = useWeakRef;
+                _context = useWeakRef ? new WeakReference<DependencyObject>(value) : value;
+            }
         }
 
         // We never provide an inherited context for a FrameworkElement because the DataContext takes
@@ -221,7 +284,7 @@ namespace System.Windows
 
             if (GetStorage(dependencyProperty, metadata, false) is Storage storage)
             {
-                return DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                return DependencyObjectStore.GetEffectiveValue(ref storage.Entry, RequestFlags.FullyResolved);
             }
 
             if (!dependencyProperty.IsDefaultValueChanged &&
@@ -623,7 +686,7 @@ namespace System.Windows
                         d.SetInheritedValue(
                             dp,
                             metadata,
-                            DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved),
+                            DependencyObjectStore.GetEffectiveValue(ref storage.Entry, RequestFlags.FullyResolved),
                             true);
                     }
                 }
@@ -631,14 +694,13 @@ namespace System.Windows
 
             static Storage[] CopyInheritedStorages(DependencyObject d)
             {
-                int count = d._inheritableEffectiveValuesCount;
+                int count = d.InheritableEffectiveValuesCount;
                 if (count > 0)
                 {
                     var storages = new Storage[count];
                     int i = 0;
-                    foreach (KeyValuePair<int, Storage> kvp in d._effectiveValues)
+                    foreach (Storage storage in d._effectiveValues.Span)
                     {
-                        Storage storage = kvp.Value;
                         if (storage.Inheritable)
                         {
                             storages[i++] = storage;
@@ -651,7 +713,7 @@ namespace System.Windows
                     return storages;
                 }
 
-                return Array.Empty<Storage>();
+                return [];
             }
         }
 
@@ -784,7 +846,7 @@ namespace System.Windows
 
             if (GetStorage(dp, metadata, false) is Storage storage)
             {
-                return DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.AnimationBaseValue);
+                return DependencyObjectStore.GetEffectiveValue(ref storage.Entry, RequestFlags.AnimationBaseValue);
             }
 
             return metadata.GetDefaultValue(this, dp);
@@ -797,8 +859,10 @@ namespace System.Windows
                 return;
             }
 
-            if (_dependentListMap.TryGetValue(args.Property.GlobalIndex, out var dependents))
+            int entryIndex = _dependentListMap.LookupEntry(args.Property.GlobalIndex);
+            if (entryIndex >= 0)
             {
+                ref DependentList dependents = ref _dependentListMap[entryIndex];
                 if (dependents.IsEmpty)
                 {
                     dependents.Clear();
@@ -812,13 +876,17 @@ namespace System.Windows
 
         internal void AddDependent(DependencyProperty dp, DependencyPropertyChangedListener dependent)
         {
-            int propertyIndex = dp.GlobalIndex;
-            _dependentListMap ??= new();
-            if (!_dependentListMap.TryGetValue(propertyIndex, out var dependents))
+            _dependentListMap ??= new PropertyStore<DependentList>(2);
+
+            int entryIndex = _dependentListMap.LookupEntry(dp.GlobalIndex);
+
+            if (entryIndex < 0)
             {
-                _dependentListMap[propertyIndex] = dependents = new();
+                entryIndex = ~entryIndex;
+                _dependentListMap.InsertEntry(new DependentList(dp.GlobalIndex), entryIndex);
             }
-            dependents.Add(dependent);
+
+            _dependentListMap[entryIndex].Add(dependent);
         }
 
         internal void RemoveDependent(DependencyProperty dp, DependencyPropertyChangedListener dependent)
@@ -828,12 +896,16 @@ namespace System.Windows
                 return;
             }
 
-            if (_dependentListMap.TryGetValue(dp.GlobalIndex, out var dependents))
+            int entryIndex = _dependentListMap.LookupEntry(dp.GlobalIndex);
+
+            if (entryIndex >= 0)
             {
+                ref DependentList dependents = ref _dependentListMap[entryIndex];
                 dependents.Remove(dependent);
+
                 if (dependents.IsEmpty)
                 {
-                    dependents.Clear();
+                    _dependentListMap.RemoveAt(entryIndex);
                 }
             }
         }
@@ -874,60 +946,43 @@ namespace System.Windows
 
         internal Storage GetStorage(DependencyProperty dp, PropertyMetadata metadata, bool createIfNotFound)
         {
-            Storage storage = null;
-            int propertyIndex = dp.GlobalIndex;
-            if (_effectiveValues is not null && _effectiveValues.TryGetValue(propertyIndex, out storage))
+            int entryIndex = -1;
+
+            if (_effectiveValues is not null)
             {
-                return storage;
+                entryIndex = _effectiveValues.LookupEntry(dp.GlobalIndex);
+                if (entryIndex >= 0)
+                {
+                    return _effectiveValues[entryIndex];
+                }
             }
 
             if (createIfNotFound)
             {
+                _effectiveValues ??= new PropertyStore<Storage>();
                 metadata ??= dp.GetMetadata(DependencyObjectType);
-                storage = Storage.CreateDefaultValueEntry(dp, metadata.Inherits, metadata.GetDefaultValue(this, dp));
-                EffectiveValues.Add(propertyIndex, storage);
+
+                var storage = new Storage(dp, metadata.Inherits);
+                _effectiveValues.InsertEntry(storage, ~entryIndex);
+
                 if (metadata.Inherits)
                 {
-                    _inheritableEffectiveValuesCount++;
+                    InheritableEffectiveValuesCount++;
                 }
+
+                storage.Entry = new EffectiveValueEntry(metadata.GetDefaultValue(this, dp));
+
+                return storage;
             }
 
-            return storage;
+            return null;
         }
 
         internal void RemoveStorage(Storage storage)
         {
             if (_effectiveValues.Remove(storage.PropertyIndex) && storage.Inheritable)
             {
-                _inheritableEffectiveValuesCount--;
-            }
-        }
-
-        private sealed class ContextStorage
-        {
-            private object _context;
-            private bool _useWeakRef;
-
-            public DependencyObject GetContext()
-            {
-                if (_useWeakRef)
-                {
-                    var wr = (WeakReference<DependencyObject>)_context;
-                    if (!wr.TryGetTarget(out DependencyObject context))
-                    {
-                        SetContext(null);
-                    }
-
-                    return context;
-                }
-
-                return (DependencyObject)_context;
-            }
-
-            public void SetContext(DependencyObject context)
-            {
-                _useWeakRef = context is FrameworkElement;
-                _context = _useWeakRef ? new WeakReference<DependencyObject>(context) : context;
+                InheritableEffectiveValuesCount--;
             }
         }
     }

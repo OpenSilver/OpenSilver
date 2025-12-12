@@ -143,6 +143,7 @@
     <Compile Include="System.Windows.Media.Animation\VectorAnimation.cs" />
     <Compile Include="System.Windows.Media.Animation\VectorAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\VectorKeyFrame.cs" />
+    <Compile Include="System.Windows\DependencyObject.PropertyStore.cs" />
     <Compile Include="System.Windows\DynamicResourceExtension.cs" />
     <Compile Include="System.Windows\HierarchicalDataTemplate.cs" />
     <Compile Include="System.Windows\LengthConverter.cs" />

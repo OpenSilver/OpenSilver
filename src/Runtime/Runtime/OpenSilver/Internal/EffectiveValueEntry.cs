@@ -15,7 +15,7 @@ using System.Windows;
 
 namespace OpenSilver.Internal;
 
-internal sealed class EffectiveValueEntry
+internal struct EffectiveValueEntry
 {
     public EffectiveValueEntry(object value)
     {
