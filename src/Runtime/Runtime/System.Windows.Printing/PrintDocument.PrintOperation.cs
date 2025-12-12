@@ -13,6 +13,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
@@ -78,6 +79,7 @@ namespace System.Windows.Printing
                             () =>
                             {
                                 _endPrintJSCallback = null;
+                                RemovePrintSection();
                                 OnEndPrint(new EndPrintEventArgs());
                                 _printDocument.EndPendingOperation();
                             });
@@ -125,6 +127,7 @@ namespace System.Windows.Printing
                             async () =>
                             {
                                 _endPrintJSCallback = null;
+                                RemovePrintSection();
                                 await OnEndPrintAsync(new EndPrintEventArgs());
                                 _printDocument.EndPendingOperation();
                             });
@@ -209,8 +212,6 @@ namespace System.Windows.Printing
                 string sTitle = OpenSilver.Interop.GetVariableStringForJS(documentName ?? string.Empty);
                 string sCallback = OpenSilver.Interop.GetVariableStringForJS(_endPrintJSCallback);
                 OpenSilver.Interop.ExecuteJavaScriptVoid($"{sPrint}.print({sTitle}, {sCallback})");
-
-                RemovePrintSection();
             }
 
             private void AddPrintSection()
@@ -226,7 +227,7 @@ namespace System.Windows.Printing
             private void RemovePrintSection()
             {
                 // Remove 'print-section' class for elements we want to print
-                foreach (UIElement e in _elements)
+                foreach (UIElement e in _elements.Where(x => x.OuterDiv != null))
                 {
                     OpenSilver.Interop.ExecuteJavaScriptVoid(
                         $"{OpenSilver.Interop.GetVariableStringForJS(e.OuterDiv)}.classList.remove(\"print-section\")");
