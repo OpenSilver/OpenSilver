@@ -22,7 +22,7 @@ namespace CSHTML5.Internal
 {
     internal sealed class JavaScriptCallback : IJavaScriptConvertible, IDisposable
     {
-        private static readonly SynchronyzedStore<JavaScriptCallback> _store = new();
+        private static readonly SynchronyzedStore<JavaScriptCallback> _store = new(256);
 
         private readonly int _id;
         private readonly Delegate _callback;

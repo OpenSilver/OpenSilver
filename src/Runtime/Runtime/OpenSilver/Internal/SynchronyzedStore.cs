@@ -21,11 +21,6 @@ internal sealed class SynchronyzedStore<T>
     private readonly Dictionary<int, T> _items;
     private int _slot;
 
-    public SynchronyzedStore()
-        : this(8192)
-    {
-    }
-
     public SynchronyzedStore(int initialCapacity)
     {
         _items = new Dictionary<int, T>(initialCapacity);
