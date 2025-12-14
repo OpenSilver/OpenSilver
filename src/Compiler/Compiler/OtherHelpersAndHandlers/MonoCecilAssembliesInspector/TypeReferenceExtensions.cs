@@ -21,6 +21,15 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 {
     internal static class TypeReferenceExtensions
     {
+        public static string GetAssemblyName(this TypeReference typeRef)
+        {
+            return typeRef.Scope switch
+            {
+                AssemblyNameReference anr => anr.Name,
+                ModuleDefinition md => md.Assembly.Name.Name,
+                _ => typeRef.Scope.Name,
+            };
+        }
 
         public static bool IsString(this TypeReference typeRef) => typeRef == typeRef.Module.TypeSystem.String;
 
@@ -77,7 +86,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var res = typeRef.Resolve();
             if (res == null)
             {
-                throw new ApplicationException($"'{typeRef.FullName}' can not be resolved. Module file name is '{typeRef.Module.FileName}'. Scope name is '{typeRef.Scope.Name}'.");
+                throw new ApplicationException($"'{typeRef.FullName}' can not be resolved. Module file name is '{typeRef.Module.FileName}'. Scope name is '{typeRef.GetAssemblyName()}'.");
             }
 
             return res;

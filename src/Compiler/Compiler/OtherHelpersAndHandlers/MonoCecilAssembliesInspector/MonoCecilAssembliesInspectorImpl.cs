@@ -90,7 +90,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private const string GlobalPrefix_FS = "global.";
         private const string SystemXamlNamespace = "System.Xaml";
         private const string GenericMarkupExtension = "IMarkupExtension`1";
-        private const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
         private const string DependencyProperty = "DependencyProperty";
         private const string SetPrefix = "Set";
@@ -395,6 +394,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName,
             out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
         {
+            const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
+
             hasTypeConverter = false;
 
             if (isAttached)
@@ -406,7 +407,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (FindPropertyDeep(elementType, propertyName, out TypeReference ownerElementType) is PropertyDefinition propertyInfo)
             {
-                hasTypeConverter = propertyInfo.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName);
+                if (propertyInfo.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName))
+                {
+                    hasTypeConverter = !ShouldIgnoreTypeConverter(propertyInfo);
+                }
 
                 var propertyType = propertyInfo.PropertyType;
                 var returnType = propertyType.PopulateGeneric(elementType, ownerElementType);
@@ -420,6 +424,39 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
             throw new XamlParseException($"Property or field \"{propertyName}\" not found in type \"{elementType}\".");
+        }
+
+        private bool ShouldIgnoreTypeConverter(PropertyDefinition propertyInfo)
+        {
+            var declaringType = propertyInfo.DeclaringType;
+
+            if (declaringType.GetAssemblyName() == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR)
+            {
+                if (declaringType.Namespace == _metadata.SystemWindowsNS && declaringType.Name == "FrameworkElement")
+                {
+                    return ShouldIgnoreFrameworkElementProperty(propertyInfo.Name);
+                }
+                else if (declaringType.Namespace == _metadata.SystemWindowsDocumentsNS && declaringType.Name == "InlineImageContainer")
+                {
+                    return ShouldIgnoreInlineImageContainerProperty(propertyInfo.Name);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return false;
+
+            static bool ShouldIgnoreFrameworkElementProperty(string propertyName)
+            {
+                return propertyName is "Width" or "Height";
+            }
+
+            static bool ShouldIgnoreInlineImageContainerProperty(string propertyName)
+            {
+                return propertyName is "Width" or "Height";
+            }
         }
 
         private TypeReference GetMethodReturnValueType(string methodName, string namespaceName, string localTypeName,

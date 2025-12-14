@@ -91,6 +91,7 @@ namespace OpenSilver.Compiler
                     return "global.System.Double.NaN";
 
                 case "infinity":
+                case "+infinity":
                     return "global.System.Double.PositiveInfinity";
 
                 case "-infinity":
@@ -129,6 +130,7 @@ namespace OpenSilver.Compiler
                     return "global.System.Single.NaN";
 
                 case "infinity":
+                case "+infinity":
                     return "global.System.Single.PositiveInfinity";
 
                 case "-infinity":
