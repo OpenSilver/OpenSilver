@@ -90,6 +90,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private const string GlobalPrefix_FS = "global.";
         private const string SystemXamlNamespace = "System.Xaml";
         private const string GenericMarkupExtension = "IMarkupExtension`1";
+        private const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
         private const string DependencyProperty = "DependencyProperty";
         private const string SetPrefix = "Set";
@@ -387,28 +388,38 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName,
             string assemblyNameIfAny = null, bool isAttached = false)
         {
+            return GetPropertyOrFieldType(propertyName, namespaceName, localTypeName,
+                out _, assemblyNameIfAny, isAttached);
+        }
+
+        private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName,
+            out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
+        {
+            hasTypeConverter = false;
+
             if (isAttached)
-                return GetMethodReturnValueType(GetPrefix + propertyName, namespaceName, localTypeName,
-                    assemblyNameIfAny);
+            {
+                return GetMethodReturnValueType(GetPrefix + propertyName, namespaceName, localTypeName, assemblyNameIfAny);
+            }
 
             var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-            var propertyInfo = FindPropertyDeep(elementType, propertyName, out var ownerElementType);
 
-            if (propertyInfo == null)
+            if (FindPropertyDeep(elementType, propertyName, out TypeReference ownerElementType) is PropertyDefinition propertyInfo)
             {
-                var fieldInfo = FindFieldDeep(elementType, propertyName, out var fieldOwnerElementType);
-                if (fieldInfo == null)
-                {
-                    throw new XamlParseException($"Property or field \"{propertyName}\" not found in type \"{elementType}\".");
-                }
+                hasTypeConverter = propertyInfo.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName);
 
+                var propertyType = propertyInfo.PropertyType;
+                var returnType = propertyType.PopulateGeneric(elementType, ownerElementType);
+                return returnType;
+            }
+
+            if (FindFieldDeep(elementType, propertyName, out TypeReference fieldOwnerElementType) is FieldDefinition fieldInfo)
+            {
                 var fieldType = fieldInfo.FieldType;
                 return fieldType.PopulateGeneric(elementType, fieldOwnerElementType);
             }
 
-            var propertyType = propertyInfo.PropertyType;
-            var returnType = propertyType.PopulateGeneric(elementType, ownerElementType);
-            return returnType;
+            throw new XamlParseException($"Property or field \"{propertyName}\" not found in type \"{elementType}\".");
         }
 
         private TypeReference GetMethodReturnValueType(string methodName, string namespaceName, string localTypeName,
@@ -576,8 +587,17 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
             out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
         {
+            GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName,
+                out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName,
+                out isTypeEnum, out _, assemblyNameIfAny, isAttached);
+        }
+
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName,
+            out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
+            out bool isTypeEnum, out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
+        {
             var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName,
-                assemblyNameIfAny, isAttached);
+                out hasTypeConverter, assemblyNameIfAny, isAttached);
             propertyNamespaceName = typeRef.BuildFullPath();
             propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false, _compilerType);
             propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;

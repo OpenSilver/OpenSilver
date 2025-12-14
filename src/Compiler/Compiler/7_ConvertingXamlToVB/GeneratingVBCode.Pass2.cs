@@ -1610,7 +1610,7 @@ End Sub
                     out string assemblyNameIfAny);
 
                 string valueNamespaceName, valueLocalTypeName, valueAssemblyName;
-                bool isValueEnum;
+                bool isValueEnum, hasTypeConverter;
 
                 if (isAttachedProperty)
                 {
@@ -1623,6 +1623,8 @@ End Sub
                         out valueAssemblyName,
                         out isValueEnum,
                         assemblyNameIfAny);
+
+                    hasTypeConverter = false;
                 }
                 else
                 {
@@ -1634,6 +1636,7 @@ End Sub
                         out valueLocalTypeName,
                         out valueAssemblyName,
                         out isValueEnum,
+                        out hasTypeConverter,
                         assemblyNameIfAny);
                 }
 
@@ -1707,19 +1710,19 @@ End Sub
                     bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
                         valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
 
-                    if (isAttachedProperty)
-                    {
-                        return ConvertFromInvariantString(
-                            value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
-                    }
-                    else
+                    string preparedValue = ConvertFromInvariantString(
+                        value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+
+                    if (!isAttachedProperty && hasTypeConverter)
                     {
                         string declaringTypeName = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
                             namespaceName, localTypeName, assemblyNameIfAny);
 
-                        return ConvertFromInvariantString(
-                            declaringTypeName, propertyName, value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+                        return XamlContextGetPropertyValue(
+                            declaringTypeName, propertyName, value, valueTypeFullName, preparedValue);
                     }
+
+                    return preparedValue;
                 }
             }
 
@@ -1972,13 +1975,12 @@ End Sub
                 return preparedValue;
             }
 
-            private string ConvertFromInvariantString(
+            private string XamlContextGetPropertyValue(
                 string propertyDeclaringType,
                 string propertyName,
                 string value,
                 string propertyType,
-                bool isKnownCoreType,
-                bool isKnownSystemType)
+                string fallbackValue)
             {
                 return string.Format(
                     "{0}.GetPropertyValue(Of {1})(GetType({2}), {3}, {4}, Function() {5})",
@@ -1987,7 +1989,7 @@ End Sub
                     propertyDeclaringType,
                     EscapeString(propertyName),
                     EscapeString(value),
-                    ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType));
+                    fallbackValue);
             }
 
             private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)

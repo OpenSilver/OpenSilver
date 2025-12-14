@@ -1606,7 +1606,7 @@ namespace OpenSilver.Compiler
                     out string assemblyNameIfAny);
 
                 string valueNamespaceName, valueLocalTypeName, valueAssemblyName;
-                bool isValueEnum;
+                bool isValueEnum, hasTypeConverter;
 
                 if (isAttachedProperty)
                 {
@@ -1619,6 +1619,8 @@ namespace OpenSilver.Compiler
                         out valueAssemblyName,
                         out isValueEnum,
                         assemblyNameIfAny);
+
+                    hasTypeConverter = false;
                 }
                 else
                 {
@@ -1630,6 +1632,7 @@ namespace OpenSilver.Compiler
                         out valueLocalTypeName,
                         out valueAssemblyName,
                         out isValueEnum,
+                        out hasTypeConverter,
                         assemblyNameIfAny);
                 }
 
@@ -1703,19 +1706,19 @@ namespace OpenSilver.Compiler
                     bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
                         valueTypeFullName.Substring("global::".Length), valueAssemblyName);
 
-                    if (isAttachedProperty)
-                    {
-                        return ConvertFromInvariantString(
-                            value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
-                    }
-                    else
+                    string preparedValue = ConvertFromInvariantString(
+                        value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+
+                    if (!isAttachedProperty && hasTypeConverter)
                     {
                         string declaringTypeName = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
                             namespaceName, localTypeName, assemblyNameIfAny);
 
-                        return ConvertFromInvariantString(
-                            declaringTypeName, propertyName, value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+                        return XamlContextGetPropertyValue(
+                            declaringTypeName, propertyName, value, valueTypeFullName, preparedValue);
                     }
+
+                    return preparedValue;
                 }
             }
 
@@ -1968,13 +1971,12 @@ namespace OpenSilver.Compiler
                 return preparedValue;
             }
 
-            private string ConvertFromInvariantString(
+            private string XamlContextGetPropertyValue(
                 string propertyDeclaringType,
                 string propertyName,
                 string value,
                 string propertyType,
-                bool isKnownCoreType,
-                bool isKnownSystemType)
+                string fallbackValue)
             {
                 return string.Format(
                     "{0}.GetPropertyValue<{1}>(typeof({2}), {3}, {4}, () => {5})",
@@ -1983,7 +1985,7 @@ namespace OpenSilver.Compiler
                     propertyDeclaringType,
                     EscapeString(propertyName),
                     EscapeString(value),
-                    ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType));
+                    fallbackValue);
             }
 
             private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)
