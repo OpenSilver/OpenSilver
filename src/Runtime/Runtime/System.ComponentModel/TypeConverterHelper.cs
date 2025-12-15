@@ -21,6 +21,7 @@ using System.Windows.Input;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Markup;
 
 namespace System.ComponentModel
 {
@@ -328,7 +329,7 @@ namespace System.ComponentModel
         /// </summary>
         private static Dictionary<Type, TypeConverter> GetCoreTypeConverters()
         {
-            return new Dictionary<Type, TypeConverter>(29)
+            return new Dictionary<Type, TypeConverter>(30)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(KeyTime)] = new KeyTimeConverter(),
@@ -359,6 +360,7 @@ namespace System.ComponentModel
                 [typeof(CacheMode)] = new CacheModeConverter(),
                 [typeof(FontStretch)] = new FontStretchConverter(),
                 [typeof(Vector)] = new VectorConverter(),
+                [typeof(XmlLanguage)] = new XmlLanguageConverter(),
             };
         }
 

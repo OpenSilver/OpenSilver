@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
 {
@@ -42,7 +43,7 @@ namespace OpenSilver.Compiler
         //
         private static Dictionary<string, Func<string, string>> GetSupportedCoreTypes()
         {
-            return new Dictionary<string, Func<string, string>>(29)
+            return new Dictionary<string, Func<string, string>>(30)
             {
                 ["system.windows.input.cursor"] = (s => CoreTypesHelper.ConvertToCursor(s, "global::System.Windows.Input.Cursor", "global::System.Windows.Input.Cursors")),
                 ["system.windows.media.animation.keytime"] = (s => CoreTypesHelper.ConvertToKeyTime(s, "global::System.Windows.Media.Animation.KeyTime")),
@@ -60,6 +61,7 @@ namespace OpenSilver.Compiler
                 ["system.windows.media.transform"] = (s => CoreTypesHelper.ConvertToTransform(s, "global::System.Windows.Media.MatrixTransform", "global::System.Windows.Media.Matrix")),
                 ["system.windows.media.matrixtransform"] = (s => CoreTypesHelper.ConvertToTransform(s, "global::System.Windows.Media.MatrixTransform", "global::System.Windows.Media.Matrix")),
                 ["system.windows.media.cachemode"] = (s => CoreTypesHelper.ConvertToCacheMode(s, "global::System.Windows.Media.CacheMode", "global::System.Windows.Media.BitmapCache")),
+                ["system.windows.markup.xmllanguage"] = (s => CoreTypesHelper.ConvertToXmlLanguage(s, "global::System.Windows.Markup.XmlLanguage")),
                 ["system.windows.cornerradius"] = (s => CoreTypesHelper.ConvertToCornerRadius(s, "global::System.Windows.CornerRadius")),
                 ["system.windows.duration"] = (s => CoreTypesHelper.ConvertToDuration(s, "global::System.Windows.Duration")),
                 ["system.windows.fontweight"] = (s => CoreTypesHelper.ConvertToFontWeight(s, "global::System.Windows.FontWeight", "global::System.Windows.FontWeights")),
@@ -440,6 +442,11 @@ namespace OpenSilver.Compiler
             }
 
             throw GetConvertException(source, destinationType);
+        }
+
+        internal static string ConvertToXmlLanguage(string source, string destinationType)
+        {
+            return $"{destinationType}.GetLanguage({Escape(source)})";
         }
 
         internal static string ConvertToCornerRadius(string source, string destinationType)

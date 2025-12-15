@@ -60,6 +60,7 @@ namespace OpenSilver.Compiler
                 ["system.windows.media.transform"] = (s => CoreTypesHelperVB.ConvertToTransform(s, "Global.System.Windows.Media.MatrixTransform", "Global.System.Windows.Media.Matrix")),
                 ["system.windows.media.matrixtransform"] = (s => CoreTypesHelperVB.ConvertToTransform(s, "Global.System.Windows.Media.MatrixTransform", "Global.System.Windows.Media.Matrix")),
                 ["system.windows.media.cachemode"] = (s => CoreTypesHelperVB.ConvertToCacheMode(s, "Global.System.Windows.Media.CacheMode", "Global.System.Windows.Media.BitmapCache")),
+                ["system.windows.markup.xmllanguage"] = (s => CoreTypesHelperVB.ConvertToXmlLanguage(s, "Global.System.Windows.Markup.XmlLanguage")),
                 ["system.windows.cornerradius"] = (s => CoreTypesHelperVB.ConvertToCornerRadius(s, "Global.System.Windows.CornerRadius")),
                 ["system.windows.duration"] = (s => CoreTypesHelperVB.ConvertToDuration(s, "Global.System.Windows.Duration")),
                 ["system.windows.fontweight"] = (s => CoreTypesHelperVB.ConvertToFontWeight(s, "Global.System.Windows.FontWeight", "Global.System.Windows.FontWeights")),
@@ -441,6 +442,11 @@ namespace OpenSilver.Compiler
             }
 
             throw GetConvertException(source, destinationType);
+        }
+
+        internal static string ConvertToXmlLanguage(string source, string destinationType)
+        {
+            return $"{destinationType}.GetLanguage({Escape(source)})";
         }
 
         internal static string ConvertToCornerRadius(string source, string destinationType)
