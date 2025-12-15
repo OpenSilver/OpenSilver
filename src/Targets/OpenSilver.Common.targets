@@ -78,6 +78,7 @@
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
     <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
+    <OpenSilverMaxDegreeOfParallelism Condition="'$(OpenSilverMaxDegreeOfParallelism)' == ''">-1</OpenSilverMaxDegreeOfParallelism>
   </PropertyGroup>
 
   <!--============================================================
@@ -230,6 +231,7 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
+      MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)"
       Language="$(Language)"
       IsDesignTime="false">
       <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />
@@ -321,6 +323,7 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
+      MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)"
       Language="$(Language)"
       IsDesignTime="true">
       <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />

@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -86,6 +87,22 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 attribute.AttributeType.FullName == XmlnsDefinitionAttributeFullName;
         }
 
+        private sealed class ConcurrentHashSet<T> : IEnumerable<T>
+        {
+            private readonly ConcurrentDictionary<T, byte> _table;
+
+            public ConcurrentHashSet()
+            {
+                _table = [];
+            }
+
+            public bool TryAdd(T value) => _table.TryAdd(value, 0);
+
+            public IEnumerator<T> GetEnumerator() => _table.Keys.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
         private const string SystemXamlNamespace = "System.Xaml";
         private const string GenericMarkupExtension = "IMarkupExtension`1";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
@@ -104,8 +121,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private readonly MonoCecilAssemblyStorage _storage;
         private readonly Dictionary<AssemblyDefinition, AssemblyData> _assemblies = new();
-        private readonly Dictionary<string, TypeDefinition> _typeNameToType = new();
-        private readonly Dictionary<AssemblyDefinition, HashSet<string>> _typesPerAssembly = new();
+        private readonly ConcurrentDictionary<string, TypeDefinition> _typeNameToType = new();
+        private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<string>> _typesPerAssembly = new();
 
         private readonly SupportedLanguage _compilerType;
         private readonly string _globalPrefix;
@@ -140,7 +157,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private AssemblyDefinition StoreAssembly(AssemblyDefinition assembly)
         {
             _assemblies.Add(assembly, new AssemblyData(assembly));
-            _typesPerAssembly.Add(assembly, new HashSet<string>());
+            _typesPerAssembly.Add(assembly, new ConcurrentHashSet<string>());
             return assembly;
         }
 
@@ -158,9 +175,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             _storage.UnloadAssembly(assemblyDefinition);
             _assemblies.Remove(assemblyDefinition);
-            foreach(var t in _typesPerAssembly[assemblyDefinition])
+            foreach (var t in _typesPerAssembly[assemblyDefinition])
             {
-                _typeNameToType.Remove(t);
+                _typeNameToType.TryRemove(t, out _);
             }
             _typesPerAssembly.Remove(assemblyDefinition);
         }
@@ -258,7 +275,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     if (type != null)
                     {
                         _typeNameToType[fullTypeNameWithNamespaceInsideBraces] = type;
-                        _typesPerAssembly[assembly].Add(fullTypeNameWithNamespaceInsideBraces);
+                        _typesPerAssembly[assembly].TryAdd(fullTypeNameWithNamespaceInsideBraces);
                         return type;
                     }
                 }

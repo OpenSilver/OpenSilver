@@ -59,6 +59,7 @@
 
     <PropertyGroup>
       <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)' == ''">resources/</Cshtml5OutputResourcesPath>
+      <OpenSilverMaxDegreeOfParallelism Condition="'$(OpenSilverMaxDegreeOfParallelism)' == ''">-1</OpenSilverMaxDegreeOfParallelism>
     </PropertyGroup>
 
     <ItemGroup>
@@ -87,7 +88,8 @@
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
                                  BaseIntermediateOutputPath="$(BaseIntermediateOutputPath)"
-                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/">
+                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/"
+                                 MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)">
       <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedResources" />
     </ResourcesExtractorAndCopier>
 

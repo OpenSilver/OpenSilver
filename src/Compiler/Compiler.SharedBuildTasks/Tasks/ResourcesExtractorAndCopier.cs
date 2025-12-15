@@ -14,22 +14,26 @@
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Mono.Cecil;
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
-using System.Threading;
 using System.Runtime.Serialization.Json;
 using System.Security.Cryptography;
 using System.Text;
-using Mono.Cecil;
+using System.Threading;
+using System.Threading.Tasks;
+using MSTask = Microsoft.Build.Utilities.Task;
 
 namespace OpenSilver.Compiler;
 
-public sealed class ResourcesExtractorAndCopier : Task
+public sealed class ResourcesExtractorAndCopier : MSTask
 {
     private const int MaxAttemptsCount = 10;
     private const int MaxWaitTimeSeconds = 5;
@@ -88,6 +92,9 @@ public sealed class ResourcesExtractorAndCopier : Task
     }
 
     [Required]
+    public int MaxDegreeOfParallelism { get; set; }
+
+    [Required]
     public ITaskItem[] ResolvedReferences { get; set; }
 
     [Output]
@@ -105,6 +112,12 @@ public sealed class ResourcesExtractorAndCopier : Task
                 {operationName}: INFO: The resources folder has been overridden. Make sure to change the value of CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath accordingly. You can add the following line in the constructor of your Application:
                 CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @"{OutputResourcesPath}";
                 """);
+        }
+
+        if (MaxDegreeOfParallelism == 0 || MaxDegreeOfParallelism < -1)
+        {
+            Log.LogWarning($"'{MaxDegreeOfParallelism}' is not a valid value for MaxDegreeOfParallelism. Supported values are -1 or non-zero positive integers.");
+            MaxDegreeOfParallelism = 1;
         }
 
         // Validate input strings:
@@ -154,7 +167,7 @@ public sealed class ResourcesExtractorAndCopier : Task
                             }
 
                             // Do the extraction and copy:
-                            CopiedResources = ExtractResources(storage).ToArray();
+                            CopiedResources = ExtractResources(storage);
                         }
 
                         //------- DISPLAY THE PROGRESS -------
@@ -229,9 +242,9 @@ public sealed class ResourcesExtractorAndCopier : Task
         return (Dictionary<string, string>)serializer.ReadObject(stream);
     }
 
-    private List<ITaskItem> ExtractResources(MonoCecilAssemblyStorage storage)
+    private ITaskItem[] ExtractResources(MonoCecilAssemblyStorage storage)
     {
-        List<ITaskItem> copiedResources = new();
+        ConcurrentBag<ITaskItem> copiedResources = new();
 
         var resourcesHashFileName = Path.Combine(BaseIntermediateOutputPath, ResourcesCopierHashDictFile);
         var resourcesHashDict = LoadDictionary(resourcesHashFileName);
@@ -262,7 +275,7 @@ public sealed class ResourcesExtractorAndCopier : Task
 
         SaveDictionary(resourcesHashDict, resourcesHashFileName);
 
-        return copiedResources;
+        return copiedResources.ToArray();
     }
 
     private string GetHash(Stream stream)
@@ -291,7 +304,7 @@ public sealed class ResourcesExtractorAndCopier : Task
         }
     }
 
-    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
+    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, ConcurrentBag<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
     {
         string assemblyName = asm.Name.Name;
 
@@ -300,7 +313,7 @@ public sealed class ResourcesExtractorAndCopier : Task
         //-----------------------------------------------
 
         // Copy files:
-        foreach (EmbeddedResource resource in GetManifestResources(asm))
+        Parallel.ForEach(GetManifestResources(asm), new ParallelOptions { MaxDegreeOfParallelism = MaxDegreeOfParallelism }, resource =>
         {
             string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(resource.Name, UriFormat.Unescaped);
             byte[] fileContent = resource.GetResourceData();
@@ -320,12 +333,12 @@ public sealed class ResourcesExtractorAndCopier : Task
                 if (destinationFile.Length >= 256)
                 {
                     Log.LogWarning($"Could not create the following output file because its path is too long: {destinationFile}");
-                    continue;
+                    return;
                 }
 
                 if (!destinationFile.StartsWith(resourcesRootDir, StringComparison.OrdinalIgnoreCase))
                 {
-                    continue;
+                    return;
                 }
 
                 string destinationDir = Path.GetDirectoryName(destinationFile);
@@ -345,7 +358,7 @@ public sealed class ResourcesExtractorAndCopier : Task
             }
 
             copiedResources.Add(new TaskItem(TaskHelper.GetRootRelativePath(_sourceDir, destinationFile)));
-        }
+        });
 
         static IEnumerable<EmbeddedResource> GetManifestResources(AssemblyDefinition asm)
         {
@@ -362,26 +375,26 @@ public sealed class ResourcesExtractorAndCopier : Task
         }
     }
 
-    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
+    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, ConcurrentBag<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
     {
         if (GetResourceManifest(asm) is not EmbeddedResource manifest)
         {
             return;
         }
 
+
         using (var resourceSet = new ResourceSet(manifest.GetResourceStream()))
         {
             string assemblyName = asm.Name.Name;
 
-            var enumerator = resourceSet.GetEnumerator();
-            while (enumerator.MoveNext())
+            Parallel.ForEach(resourceSet.Cast<DictionaryEntry>(), entry =>
             {
-                if (enumerator.Value is not Stream stream)
+                if (entry.Value is not Stream stream)
                 {
-                    continue;
+                    return;
                 }
 
-                string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(enumerator.Key.ToString(), UriFormat.Unescaped);
+                string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(entry.Key.ToString(), UriFormat.Unescaped);
 
                 string hash = GetHash(stream);
 
@@ -399,12 +412,12 @@ public sealed class ResourcesExtractorAndCopier : Task
                     if (destinationFile.Length >= 256)
                     {
                         Log.LogWarning($"Could not create the following output file because its path is too long: {destinationFile}");
-                        continue;
+                        return;
                     }
 
                     if (!destinationFile.StartsWith(resourcesRootDir, StringComparison.OrdinalIgnoreCase))
                     {
-                        continue;
+                        return;
                     }
 
                     string destinationDir = Path.GetDirectoryName(destinationFile);
@@ -427,7 +440,7 @@ public sealed class ResourcesExtractorAndCopier : Task
                 }
 
                 copiedResources.Add(new TaskItem(TaskHelper.GetRootRelativePath(_sourceDir, destinationFile)));
-            }
+            });
         }
 
         static EmbeddedResource GetResourceManifest(AssemblyDefinition asm)

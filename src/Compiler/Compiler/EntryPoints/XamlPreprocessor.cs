@@ -15,17 +15,19 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using System.Linq;
-using System.Diagnostics;
+using System.Threading.Tasks;
+using MSTask = Microsoft.Build.Utilities.Task;
 
 namespace OpenSilver.Compiler
 {
-    public class XamlPreprocessor : Task
+    public class XamlPreprocessor : MSTask
     {
         public const string CompiledXamlFilePathMetadata = "CompiledXamlFilePath";
         private const string XamlHash = "XamlHash";
@@ -38,32 +40,22 @@ namespace OpenSilver.Compiler
         private static MD5 Hash => _hash ??= MD5.Create();
 
         private readonly Stopwatch _watch;
-        private AssembliesInspector _assembliesInspector;
-        private CoreTypesConverter _coreTypesConverter;
+        private readonly Lazy<AssembliesInspector> _assembliesInspector;
+        private readonly Lazy<CoreTypesConverter> _coreTypesConverter;
         private SupportedLanguage _supportedLanguage = SupportedLanguage.Unknown;
         private string _language;
         private XamlPreprocessorOptions _options;
 
-        private AssembliesInspector AssembliesInspector => _assembliesInspector ??= LoadAssemblies();
+        private AssembliesInspector AssembliesInspector => _assembliesInspector.Value;
 
-        private CoreTypesConverter CoreTypesConverter
-        {
-            get
-            {
-                return _coreTypesConverter ??=
-                    _supportedLanguage switch
-                    {
-                        SupportedLanguage.CSharp => new CoreTypesConverterCS(AssembliesInspector, AssemblyName),
-                        SupportedLanguage.VBNet => new CoreTypesConverterVB(AssembliesInspector, AssemblyName),
-                        SupportedLanguage.FSharp => new CoreTypesConverterFS(AssembliesInspector, AssemblyName),
-                        _ => throw new InvalidOperationException($"'{Language}' is not a supported language (C#, Visual Basic and F#)."),
-                    };
-            }
-        }
+        private CoreTypesConverter CoreTypesConverter => _coreTypesConverter.Value;
 
         public XamlPreprocessor()
         {
             _watch = new Stopwatch();
+
+            _assembliesInspector = new Lazy<AssembliesInspector>(LoadAssemblies);
+            _coreTypesConverter = new Lazy<CoreTypesConverter>(GetCoreTypesConverter);
         }
 
         [Required]
@@ -76,6 +68,9 @@ namespace OpenSilver.Compiler
                 _supportedLanguage = LanguageHelpers.GetLanguage(_language);
             }
         }
+
+        [Required]
+        public int MaxDegreeOfParallelism { get; set; }
 
         [Required]
         public ITaskItem[] PageFiles { get; set; }
@@ -128,6 +123,12 @@ namespace OpenSilver.Compiler
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
+            if (MaxDegreeOfParallelism == 0 || MaxDegreeOfParallelism < -1)
+            {
+                Log.LogWarning($"'{MaxDegreeOfParallelism}' is not a valid value for MaxDegreeOfParallelism. Supported values are -1 or non-zero positive integers.");
+                MaxDegreeOfParallelism = 1;
+            }
+
             if (_supportedLanguage == SupportedLanguage.Unknown)
             {
                 Log.LogError($"'{Language}' is not a supported language (C#, Visual Basic and F#).");
@@ -147,16 +148,19 @@ namespace OpenSilver.Compiler
             (var generatedApplicationDefinitionFiles, var processedApplicationDefinitionFiles) = ProcessFiles(ApplicationDefinitionFiles);
             (var generatedContentFiles, var processedContentFiles) = ProcessFiles(ContentFiles);
 
-            _assembliesInspector?.Dispose();
+            if (_assembliesInspector.IsValueCreated)
+            {
+                _assembliesInspector.Value.Dispose();
+            }
 
             generatedFiles.AddRange(generatedPageFiles);
             generatedFiles.AddRange(generatedApplicationDefinitionFiles);
             generatedFiles.AddRange(generatedContentFiles);
 
             GeneratedFiles = generatedFiles.ToArray();
-            ProcessedPageFiles = processedPageFiles.ToArray();
-            ProcessedApplicationDefinitionFiles = processedApplicationDefinitionFiles.ToArray();
-            ProcessedContentFiles = processedContentFiles.ToArray();
+            ProcessedPageFiles = processedPageFiles;
+            ProcessedApplicationDefinitionFiles = processedApplicationDefinitionFiles;
+            ProcessedContentFiles = processedContentFiles;
 
             if (Log.HasLoggedErrors)
             {
@@ -171,30 +175,28 @@ namespace OpenSilver.Compiler
             return IsDesignTime || !Log.HasLoggedErrors;
         }
 
-        private (List<ITaskItem> GeneratedFiles, List<ITaskItem> ProcessedFiles) ProcessFiles(ITaskItem[] sourceFiles)
+        private (ITaskItem[] GeneratedFiles, ITaskItem[] ProcessedFiles) ProcessFiles(ITaskItem[] sourceFiles)
         {
-            var generatedFiles = new List<ITaskItem>();
-            var processedFiles = new List<ITaskItem>();
+            ITaskItem[] xamlSourceFiles = sourceFiles.Where(IsXamlFile).ToArray();
 
-            if (sourceFiles.Length > 0)
+            var generatedFiles = new ITaskItem[xamlSourceFiles.Length];
+            var processedFiles = new ITaskItem[xamlSourceFiles.Length];
+
+            if (xamlSourceFiles.Length > 0)
             {
-                foreach (ITaskItem item in sourceFiles)
+                Parallel.For(0, xamlSourceFiles.Length, new ParallelOptions { MaxDegreeOfParallelism = MaxDegreeOfParallelism }, i =>
                 {
-                    if (!IsXamlFile(item))
-                    {
-                        continue;
-                    }
-
+                    ITaskItem item = xamlSourceFiles[i];
                     string sourceFile = item.GetMetadata("FullPath");
 
                     try
                     {
                         ITaskItem generatedFile = GenerateOutputFile(item);
-                        generatedFiles.Add(generatedFile);
+                        generatedFiles[i] = generatedFile;
 
                         ITaskItem processedFile = new TaskItem(item);
                         processedFile.SetMetadata(CompiledXamlFilePathMetadata, generatedFile.ItemSpec);
-                        processedFiles.Add(processedFile);
+                        processedFiles[i] = processedFile;
                     }
                     catch (Exception ex)
                     {
@@ -210,7 +212,7 @@ namespace OpenSilver.Compiler
                             Log.LogErrorFromException(ex, true, true, sourceFile);
                         }
                     }
-                }
+                });
             }
 
             return (generatedFiles, processedFiles);
@@ -243,6 +245,17 @@ namespace OpenSilver.Compiler
                     Log.LogWarning($"Failed to load '{assemblyPath}': {ex.Message}");
                 }
             }
+        }
+
+        private CoreTypesConverter GetCoreTypesConverter()
+        {
+            return _supportedLanguage switch
+            {
+                SupportedLanguage.CSharp => new CoreTypesConverterCS(AssembliesInspector, AssemblyName),
+                SupportedLanguage.VBNet => new CoreTypesConverterVB(AssembliesInspector, AssemblyName),
+                SupportedLanguage.FSharp => new CoreTypesConverterFS(AssembliesInspector, AssemblyName),
+                _ => throw new InvalidOperationException($"'{Language}' is not a supported language (C#, Visual Basic and F#)."),
+            };
         }
 
         private string GenerateCode(string xaml, string sourceFile, string fileIdentity, XamlPreprocessorOptions options)

@@ -24,10 +24,17 @@
   </PropertyGroup>
 
   <Target Name="ResourcesExtractor" AfterTargets="CoreBuild">
+
+    <PropertyGroup>
+      <OpenSilverMaxDegreeOfParallelism Condition="'$(OpenSilverMaxDegreeOfParallelism)' == ''">-1</OpenSilverMaxDegreeOfParallelism>
+    </PropertyGroup>
+    
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="resources/"
                                  BaseIntermediateOutputPath="$(BaseIntermediateOutputPath)"
-                                 DestinationFolder="$(OutputPath)/wwwroot/"/>
+                                 DestinationFolder="$(OutputPath)/wwwroot/"
+                                 MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)"/>
+
   </Target>
 
 </Project>
