@@ -60,13 +60,7 @@ internal sealed class UncommonField<T>
         // Set the value if it's not the default, otherwise remove the value.
         if (!ReferenceEquals(value, _defaultValue))
         {
-            if (instance.GetStorage(GlobalIndex) is not Storage storage)
-            {
-                storage = new Storage(GlobalIndex);
-                instance.EffectiveValues.Add(GlobalIndex, storage);
-            }
-
-            storage.LocalValue = value;
+            instance.GetUncommonStorage(GlobalIndex).LocalValue = value;
             _hasBeenSet = true;
         }
         else
@@ -109,6 +103,6 @@ internal sealed class UncommonField<T>
     {
         Debug.Assert(instance is not null);
 
-        instance.EffectiveValues.Remove(GlobalIndex);
+        instance.RemoveUncommonStorage(GlobalIndex);
     }
 }

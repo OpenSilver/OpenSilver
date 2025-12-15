@@ -26,9 +26,15 @@ namespace OpenSilver.Internal;
 // the Invalidation callbacks call Add / Remove.   But multi-threaded
 // access is not expected and so locks are not used.
 //
-internal sealed class DependentList
+internal struct DependentList
 {
+    private readonly int _propertyIndex;
     private List<Dependent> _listStore;
+
+    public DependentList(int propertyIndex)
+    {
+        _propertyIndex = propertyIndex;
+    }
 
     public int Count => _listStore?.Count ?? 0;
 
@@ -123,6 +129,13 @@ internal sealed class DependentList
             }
         }
     }
+
+    // CRITICAL: DependencyObject uses a custom collection to store Storage and DependentList that requires
+    // these objects to override GetHashCode() to return a DependencyProperty index. This method cannot be
+    // removed or changed.
+    public override int GetHashCode() => _propertyIndex;
+
+    public override bool Equals(object obj) => base.Equals(obj);
 
     private void CleanUpDeadWeakReferences()
     {

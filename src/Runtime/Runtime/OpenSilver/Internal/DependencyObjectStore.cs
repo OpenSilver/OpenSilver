@@ -36,8 +36,8 @@ internal static class DependencyObjectStore
 
         ValidateValue(dp, newValue, true, isInternal);
 
-        EffectiveValueEntry oldEntry = storage.Entry;
-        EffectiveValueEntry newEntry = null;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
+        EffectiveValueEntry newEntry = default;
 
         if (oldEntry.IsExpression)
         {
@@ -66,7 +66,7 @@ internal static class DependencyObjectStore
             }
         }
 
-        if (newEntry is null)
+        if (newEntry.FullValueSource == 0)
         {
             // Set the new local value
             storage.LocalValue = newValue;
@@ -83,8 +83,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false, // clearValue
             operationType);
     }
@@ -95,7 +95,7 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata)
     {
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         object current = storage.LocalValue;
 
@@ -136,8 +136,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             true, // clearValue
             OperationType.Unknown);
     }
@@ -151,7 +151,7 @@ internal static class DependencyObjectStore
     {
         ValidateValue(dp, value, false, true);
 
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         var newEntry = new EffectiveValueEntry(oldEntry);
         newEntry.SetAnimatedValue(value);
@@ -161,8 +161,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false, // clearValue
             OperationType.Unknown);
     }
@@ -173,7 +173,7 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata)
     {
-        var oldEntry = storage.Entry;
+        ref var oldEntry = ref storage.Entry;
         if (!oldEntry.IsAnimated)
         {
             return;
@@ -185,7 +185,7 @@ internal static class DependencyObjectStore
         {
             var expression = (Expression)oldEntry.ModifiedValue.BaseValue;
             newEntry.Value = expression;
-            EvaluateExpression(newEntry, d, dp, metadata, expression);
+            EvaluateExpression(ref newEntry, d, dp, metadata, expression);
         }
         else
         {
@@ -196,8 +196,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             true,
             OperationType.Unknown);
     }
@@ -213,7 +213,7 @@ internal static class DependencyObjectStore
 
         storage.LocalStyleValue = newValue;
 
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         // Check for early exit if effective value is not impacted
         if (BaseValueSourceInternal.Style < oldEntry.BaseValueSourceInternal)
@@ -242,8 +242,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false,
             OperationType.Unknown);
     }
@@ -254,7 +254,7 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata)
     {
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         storage.LocalStyleValue = DependencyProperty.UnsetValue;
 
@@ -285,8 +285,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             true,
             OperationType.Unknown);
     }
@@ -300,7 +300,7 @@ internal static class DependencyObjectStore
     {
         Debug.Assert(newValue != DependencyProperty.UnsetValue);
 
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         storage.ThemeStyleValue = newValue;
 
@@ -334,8 +334,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false,
             OperationType.Unknown);
     }
@@ -346,7 +346,7 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata)
     {
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         storage.ThemeStyleValue = DependencyProperty.UnsetValue;
 
@@ -377,8 +377,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             true,
             OperationType.Unknown);
     }
@@ -395,7 +395,7 @@ internal static class DependencyObjectStore
 
         storage.InheritedValue = newValue;
 
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         // Check for early exit if effective value is not impacted
         if (BaseValueSourceInternal.Inherited < oldEntry.BaseValueSourceInternal)
@@ -411,8 +411,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false,
             propagateChanges ? OperationType.Unknown : OperationType.Inherit);
     }
@@ -426,7 +426,7 @@ internal static class DependencyObjectStore
     {
         storage.InheritedValue = DependencyProperty.UnsetValue;
 
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         if (oldEntry.BaseValueSourceInternal > BaseValueSourceInternal.Inherited)
         {
@@ -445,8 +445,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             true,
             propagateChanges ? OperationType.Inherit : OperationType.Unknown);
     }
@@ -470,7 +470,7 @@ internal static class DependencyObjectStore
 
         bool handled = false;
 
-        var oldEntry = storage.Entry;
+        ref var oldEntry = ref storage.Entry;
         var newEntry = new EffectiveValueEntry(oldEntry);
 
         if (oldEntry.IsExpression)
@@ -490,11 +490,11 @@ internal static class DependencyObjectStore
         if (!handled)
         {
             // Coerce to current value
-            object baseValue = GetEffectiveValue(newEntry, RequestFlags.CoercionBaseValue);
+            object baseValue = GetEffectiveValue(ref newEntry, RequestFlags.CoercionBaseValue);
             ProcessCoerceValue(d,
                 dp,
                 metadata,
-                newEntry,
+                ref newEntry,
                 newValue, // controlValue
                 null, // old value is unused when coerceWithCurrentValue is true
                 baseValue,
@@ -505,8 +505,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false, // clearValue
             OperationType.Unknown); // propagateChanges
     }
@@ -517,7 +517,7 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata)
     {
-        EffectiveValueEntry oldEntry = storage.Entry;
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
         if (oldEntry.IsCoercedWithCurrentValue)
         {
@@ -536,8 +536,8 @@ internal static class DependencyObjectStore
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false,
             OperationType.Unknown);
     }
@@ -553,22 +553,22 @@ internal static class DependencyObjectStore
         Debug.Assert(storage.Entry.IsExpression, "Property base value is not a BindingExpression !");
         Debug.Assert(storage.Entry.ModifiedValue.BaseValue == expression, "Expression is not active !");
 
-        var oldEntry = storage.Entry;
+        ref var oldEntry = ref storage.Entry;
         var newEntry = new EffectiveValueEntry(oldEntry);
 
-        EvaluateExpression(newEntry, d, dp, metadata, expression);
+        EvaluateExpression(ref newEntry, d, dp, metadata, expression);
 
         UpdateEffectiveValue(storage,
             d,
             dp,
             metadata,
-            oldEntry,
-            newEntry,
+            ref oldEntry,
+            ref newEntry,
             false, // clearValue
             OperationType.Unknown);
     }
 
-    internal static object GetEffectiveValue(EffectiveValueEntry entry, RequestFlags requests)
+    internal static object GetEffectiveValue(ref EffectiveValueEntry entry, RequestFlags requests)
     {
         if (entry.HasModifiers)
         {
@@ -623,7 +623,7 @@ internal static class DependencyObjectStore
             expression.OnAttach(d, dp);
 
             entry.Value = expression;
-            EvaluateExpression(entry, d, dp, metadata, expression);
+            EvaluateExpression(ref entry, d, dp, metadata, expression);
         }
         else
         {
@@ -634,7 +634,7 @@ internal static class DependencyObjectStore
     }
 
     private static void EvaluateExpression(
-        EffectiveValueEntry entry,
+        ref EffectiveValueEntry entry,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -662,26 +662,15 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata)
     {
-        if (storage.LocalValue != DependencyProperty.UnsetValue)
+        (object effectiveValue, BaseValueSourceInternal kind) = storage.GetValue();
+
+        if (kind == BaseValueSourceInternal.Default)
         {
-            return (storage.LocalValue, BaseValueSourceInternal.Local);
-        }
-        else if (storage.LocalStyleValue != DependencyProperty.UnsetValue)
-        {
-            return (storage.LocalStyleValue, BaseValueSourceInternal.Style);
-        }
-        else if (storage.ThemeStyleValue != DependencyProperty.UnsetValue)
-        {
-            return (storage.ThemeStyleValue, BaseValueSourceInternal.ThemeStyle);
-        }
-        else if (storage.InheritedValue != DependencyProperty.UnsetValue)
-        {
-            return (storage.InheritedValue, BaseValueSourceInternal.Inherited);
-        }
-        else // Property default value
-        {
+            // default value is not stored in Storage
             return (metadata.GetDefaultValue(owner, dp), BaseValueSourceInternal.Default);
         }
+
+        return (effectiveValue, kind);
     }
 
     internal static bool UpdateEffectiveValue(
@@ -689,29 +678,29 @@ internal static class DependencyObjectStore
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
-        EffectiveValueEntry oldEntry,
-        EffectiveValueEntry newEntry,
+        ref EffectiveValueEntry oldEntry,
+        ref EffectiveValueEntry newEntry,
         bool clearValue,
         OperationType operationType)
     {
-        object oldValue = GetEffectiveValue(oldEntry, RequestFlags.FullyResolved);
+        object oldValue = GetEffectiveValue(ref oldEntry, RequestFlags.FullyResolved);
 
         // Coerce Value
         // We don't want to coerce the value if it's being reset to the property's default value
         if (metadata.CoerceValueCallback != null && !(clearValue && newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default))
         {
-            object baseValue = GetEffectiveValue(newEntry, RequestFlags.CoercionBaseValue);
+            object baseValue = GetEffectiveValue(ref newEntry, RequestFlags.CoercionBaseValue);
             ProcessCoerceValue(d,
                 dp,
                 metadata,
-                newEntry,
+                ref newEntry,
                 null, // controlValue
                 oldValue,
                 baseValue,
                 false);
         }
 
-        object newValue = GetEffectiveValue(newEntry, RequestFlags.FullyResolved);
+        object newValue = GetEffectiveValue(ref newEntry, RequestFlags.FullyResolved);
 
         bool valueChanged = !Equals(dp, oldValue, newValue);
 
@@ -779,7 +768,7 @@ internal static class DependencyObjectStore
         DependencyObject target,
         DependencyProperty dp,
         PropertyMetadata metadata,
-        EffectiveValueEntry newEntry,
+        ref EffectiveValueEntry newEntry,
         object controlValue,
         object oldValue,
         object baseValue,

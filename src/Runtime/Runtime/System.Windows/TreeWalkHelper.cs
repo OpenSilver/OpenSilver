@@ -215,8 +215,8 @@ internal static class TreeWalkHelper
                         d,
                         dp,
                         metadata,
-                        storage.Entry,
-                        storage.Entry,
+                        ref storage.Entry,
+                        ref storage.Entry,
                         false,
                         OperationType.Inherit);
                 }
