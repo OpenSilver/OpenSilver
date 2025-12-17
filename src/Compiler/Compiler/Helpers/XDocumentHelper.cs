@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.IO;
 using System.Xaml;
 using System.Xml;
@@ -23,9 +24,17 @@ namespace OpenSilver.Compiler
     {
         public static XDocument Parse(string xaml, LoadOptions options)
         {
-            XmlReader baseReader = XmlReader.Create(new StringReader(xaml), GetXmlReaderSettings(options));
-            XmlReader reader = new CompatibleXmlReader(baseReader, TryGetCompatibleNamespace);
-            return XDocument.Load(reader, options);
+            try
+            {
+                XmlReader baseReader = XmlReader.Create(new StringReader(xaml), GetXmlReaderSettings(options));
+                XmlReader reader = new CompatibleXmlReader(baseReader, TryGetCompatibleNamespace);
+                return XDocument.Load(reader, options);
+            }
+            catch (XmlException ex)
+            {
+                // Wrap XmlException in XamlParseException to ensure line information is properly preserved
+                throw new XamlParseException(ex.Message, ex.LineNumber, ex.LinePosition, ex);
+            }
         }
 
         private static XmlReaderSettings GetXmlReaderSettings(LoadOptions o)

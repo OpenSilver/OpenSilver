@@ -556,7 +556,21 @@ namespace OpenSilver.Compiler
                                 {
                                     // Check if the attribute corresponds to a Property, an Event, etc.:
                                     string memberName = attribute.Name.LocalName;
-                                    MemberTypes memberType = _settings.Inspector.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
+                                    MemberTypes memberType;
+                                    try
+                                    {
+                                        memberType = _settings.Inspector.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
+                                    }
+                                    catch (XamlParseException ex) when (ex.LineNumber == 0)
+                                    {
+                                        // Add line info from the attribute if not already present
+                                        var lineInfo = attribute as IXmlLineInfo;
+                                        if (lineInfo != null && lineInfo.HasLineInfo())
+                                        {
+                                            throw new XamlParseException(ex.Message, lineInfo.LineNumber, lineInfo.LinePosition, ex.InnerException);
+                                        }
+                                        throw;
+                                    }
                                     switch (memberType)
                                     {
                                         case MemberTypes.Event:

@@ -12,9 +12,11 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -94,7 +96,21 @@ namespace OpenSilver.Compiler
                         out string namespaceName,
                         out string localName,
                         out string assemblyNameIfAny);
-                    var contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+                    
+                    string contentPropertyName;
+                    try
+                    {
+                        contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+                    }
+                    catch (XamlParseException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Wrap with line info from the element
+                        throw new XamlParseException(ex.Message, (IXmlLineInfo)currentElement, ex);
+                    }
                     XElement contentWrapper = currentElement;
                     
                     if (contentPropertyName != null)
@@ -139,9 +155,22 @@ namespace OpenSilver.Compiler
                         out string localName,
                         out string assemblyNameIfAny);
 
-                    string elementTypeInCSharp = settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                            namespaceName, localName, assemblyNameIfAny, false
-                    );
+                    string elementTypeInCSharp;
+                    try
+                    {
+                        elementTypeInCSharp = settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
+                                namespaceName, localName, assemblyNameIfAny, false
+                        );
+                    }
+                    catch (XamlParseException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Wrap with line info from the element
+                        throw new XamlParseException(ex.Message, (IXmlLineInfo)currentElement, ex);
+                    }
                                     
 
                     // Distinguish system types (string, double, etc.) to other types
@@ -185,7 +214,20 @@ namespace OpenSilver.Compiler
                             // cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
                             contentValue = Regex.Replace(contentValue, @"\s{2,}", " ");
 
-                            string contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+                            string contentPropertyName;
+                            try
+                            {
+                                contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+                            }
+                            catch (XamlParseException)
+                            {
+                                throw;
+                            }
+                            catch (Exception ex)
+                            {
+                                // Wrap with line info from the element
+                                throw new XamlParseException(ex.Message, (IXmlLineInfo)currentElement, ex);
+                            }
 
                             if (!string.IsNullOrEmpty(contentPropertyName))
                             {
