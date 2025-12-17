@@ -212,6 +212,25 @@ namespace OpenSilver.Compiler
 
             public string Generate() => GenerateImpl(new GeneratorContext());
 
+            /// <summary>
+            /// Emits a #line directive to map C# compilation errors back to the original XAML file.
+            /// </summary>
+            private void EmitLineDirective(StringBuilder sb, XElement element)
+            {
+                if (element is IXmlLineInfo lineInfo && lineInfo.HasLineInfo())
+                {
+                    sb.AppendLine($"#line {lineInfo.LineNumber} \"{_sourceFile}\"");
+                }
+            }
+
+            /// <summary>
+            /// Emits #line default to reset the line mapping.
+            /// </summary>
+            private static void EmitLineDirectiveDefault(StringBuilder sb)
+            {
+                sb.AppendLine("#line default");
+            }
+
             private string GenerateImpl(GeneratorContext parameters)
             {
                 parameters.GenerateFieldsForNamedElements =
@@ -418,8 +437,11 @@ namespace OpenSilver.Compiler
                         }
 
                         string preparedValue = _settings.SystemTypes.ConvertKnownType(directContent, elementType.Substring("global::".Length));
+                        // Emit #line directive so C# compilation errors map back to the XAML source
+                        EmitLineDirective(parameters.StringBuilder, element);
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue});");
+                        EmitLineDirectiveDefault(parameters.StringBuilder);
                     }
                     else if (element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null)
                     {
@@ -435,13 +457,19 @@ namespace OpenSilver.Compiler
                         string preparedValue = ConvertFromInvariantString(
                             stringValue, element, elementType, isKnownCoreType, false);
 
+                        // Emit #line directive so C# compilation errors map back to the XAML source
+                        EmitLineDirective(parameters.StringBuilder, element);
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue});");
+                        EmitLineDirectiveDefault(parameters.StringBuilder);
                     }
                     else
                     {
+                        // Emit #line directive so C# compilation errors map back to the XAML source
+                        EmitLineDirective(parameters.StringBuilder, element);
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new {elementType}());");
+                        EmitLineDirectiveDefault(parameters.StringBuilder);
 
                         if (IsResourceDictionaryCreatedFromSource(element))
                         {
