@@ -675,6 +675,11 @@ namespace System.Windows.Controls
             }
             else if (this.DisplayData.LastScrollingSlot <= slot)
             {
+                if (this.DisplayData.LastScrollingSlot == -1)
+                {
+                    return false;
+                }
+
                 // Scroll down to the new row so it's entirely displayed.  If the height of the row
                 // is greater than the height of the DataGrid, then show the top of the row at the top
                 // of the grid
