@@ -14,7 +14,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Resources;
 using OpenSilver.Internal;
@@ -622,12 +621,7 @@ namespace System.Windows
                 throw new ArgumentException("Uri must be relative.");
             }
 
-            if (AppResourcesManager.GetResourceStream(uriResource.ToString()) is Stream stream)
-            {
-                return Task.FromResult(new StreamResourceInfo(stream, null));
-            }
-
-            return Task.FromResult<StreamResourceInfo>(null);
+            return AppResourcesManager.GetResourceStream(uriResource.ToString());
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]

@@ -79,6 +79,8 @@
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
     <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
     <OpenSilverMaxDegreeOfParallelism Condition="'$(OpenSilverMaxDegreeOfParallelism)' == ''">-1</OpenSilverMaxDegreeOfParallelism>
+    <!-- When set to false, Resource and Content files will NOT be embedded into the DLL, only copied to wwwroot/resources -->
+    <OpenSilverEmbedResources Condition="'$(OpenSilverEmbedResources)' == ''">true</OpenSilverEmbedResources>
   </PropertyGroup>
 
   <!--============================================================
@@ -103,7 +105,7 @@
       <Output ItemName="_ResourceClassifierRemovedContentFiles" TaskParameter="RemovedContentFiles" />
     </ResourceClassifier>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(OpenSilverEmbedResources)' == 'true'">
       <Content Remove="@(_ResourceClassifierRemovedContentFiles)" />
     </ItemGroup>
 
@@ -123,6 +125,7 @@
     <ResourcesGenerator ResourceFiles="@(MainEmbeddedFiles)"
                         OutputPath="$(IntermediateOutputPath)"
                         OutputResourcesFile="$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)"
+                        EmbedResources="$(OpenSilverEmbedResources)"
                         Condition="'@(MainEmbeddedFiles)' != ''">
 
       <!-- Put the generated files in item FileWrites so that they can be cleaned up appropriately in a next Rebuild -->

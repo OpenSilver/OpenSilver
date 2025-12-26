@@ -127,6 +127,12 @@ public class ResourcesGenerator : Task
     [Required]
     public ITaskItem OutputResourcesFile { get; set; }
 
+    /// <summary>
+    /// When false, generates lightweight resource entries with source file paths
+    /// instead of full file content. Default is true (full embedding).
+    /// </summary>
+    public bool EmbedResources { get; set; } = true;
+
     public override bool Execute()
     {
         if (!ValidResourceFiles(ResourceFiles))
@@ -155,11 +161,22 @@ public class ResourcesGenerator : Task
                     string resFileName = resourceFile.ItemSpec;
                     string resourceId = GetResourceIdForResourceFile(resourceFile);
 
-                    // We're handing off lifetime management for the stream.
-                    // True for the third argument tells resWriter to dispose of the stream when it's done.
-                    resWriter.AddResource(resourceId, new LazyFileStream(resFileName), true);
+                    if (EmbedResources)
+                    {
+                        // We're handing off lifetime management for the stream.
+                        // True for the third argument tells resWriter to dispose of the stream when it's done.
+                        resWriter.AddResource(resourceId, new LazyFileStream(resFileName), true);
+                        Log.LogMessage(MessageImportance.Low, $"Reading Resource file: '{resFileName}'...");
+                    }
+                    else
+                    {
+                        // In lightweight mode, store full source file path as a string
+                        // ResourcesExtractorAndCopier will copy from this path to wwwroot
+                        string fullPath = Path.GetFullPath(resFileName);
+                        resWriter.AddResource(resourceId, fullPath);
+                        Log.LogMessage(MessageImportance.Low, $"Adding lightweight resource: '{resourceId}' -> '{fullPath}'");
+                    }
 
-                    Log.LogMessage(MessageImportance.Low, $"Reading Resource file: '{resFileName}'...");
                     Log.LogMessage(MessageImportance.Low, $"Resource ID is '{resourceId}'.");
                 }
 
