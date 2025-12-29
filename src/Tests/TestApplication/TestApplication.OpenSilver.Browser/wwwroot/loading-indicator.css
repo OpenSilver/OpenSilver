@@ -1,26 +1,23 @@
-﻿﻿@keyframes loading-indicator-ball-anim {
-	0%
+﻿@keyframes loading-indicator-ball-anim {
+	0% {
+		transform: translate(-50%, -50%) scale(0);
+		opacity: 0;
+	}
 
-{
-	transform: translate(-50%, -50%) scale(0);
-	opacity: 0;
-}
+	25% {
+		transform: translate(-50%, -50%) scale(1);
+		opacity: 1;
+	}
 
-25% {
-	transform: translate(-50%, -50%) scale(1);
-	opacity: 1;
-}
+	32% {
+		transform: translate(-50%, -50%) scale(0.5);
+		opacity: 0;
+	}
 
-32% {
-	transform: translate(-50%, -50%) scale(0.5);
-	opacity: 0;
-}
-
-100% {
-	transform: translate(-50%, -50%) scale(0);
-	opacity: 0;
-}
-
+	100% {
+		transform: translate(-50%, -50%) scale(0);
+		opacity: 0;
+	}
 }
 
 body {
