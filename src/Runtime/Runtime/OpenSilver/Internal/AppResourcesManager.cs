@@ -14,11 +14,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using System.Reflection;
 using System.Resources;
-using System.Threading.Tasks;
-using System.Windows.Resources;
 using OpenSilver.Runtime.CompilerServices;
 
 namespace OpenSilver.Internal;
@@ -42,7 +39,7 @@ internal static class AppResourcesManager
         }
     }
 
-    public static Task<StreamResourceInfo> GetResourceStream(string uri)
+    public static Stream GetResourceStream(string uri)
     {
         if (IsComponentUri(uri))
         {
@@ -54,7 +51,7 @@ internal static class AppResourcesManager
             }
         }
 
-        return Task.FromResult<StreamResourceInfo>(null);
+        return null;
     }
 
     private static void EnsureAssembliesLoaded()
@@ -167,39 +164,18 @@ internal static class AppResourcesManager
     {
         private readonly Assembly _assembly;
         private ResourceManager _resourceManager;
-        private HttpClient _httpClient;
 
         public AssemblyResourceManager(Assembly assembly)
         {
             _assembly = assembly;
         }
 
-        public async Task<StreamResourceInfo> GetStream(string name)
+        public Stream GetStream(string name)
         {
-            var assemblyName = _assembly.GetName().Name;
-            _resourceManager ??= new ResourceManager($"{assemblyName}.g", _assembly);
+            _resourceManager ??= new ResourceManager($"{_assembly.GetName().Name}.g", _assembly);
             try
             {
-                object resource = _resourceManager.GetObject(name);
-
-                // Check if this is a lightweight resource (string with source file path)
-                if (resource is string)
-                {
-                    if (Interop.IsRunningInTheSimulator)
-                    {
-                        var filePath = Path.Combine(AppContext.BaseDirectory, "wwwroot", "resources", assemblyName, name);
-                        return new StreamResourceInfo(File.OpenRead(filePath), null);
-                    }
-                    else
-                    {
-                        string resourcePath = $"/resources/{assemblyName.ToLowerInvariant()}/{name}";
-                        _httpClient ??= new HttpClient { BaseAddress = new Uri(Interop.ExecuteJavaScriptString("document.baseURI")) };
-                        var result = await _httpClient.GetAsync(resourcePath);
-                        return new StreamResourceInfo(await result.Content.ReadAsStreamAsync(), result.Content.Headers.ContentType.MediaType);
-                    }
-                }
-
-                return new StreamResourceInfo(resource as Stream, null);
+                return _resourceManager.GetStream(name);
             }
             catch
             {
