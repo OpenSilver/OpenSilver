@@ -15,13 +15,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler;
 
 internal abstract class CoreTypesConverter
 {
-    private readonly Dictionary<string, Func<XElement, string, string>> _knownCoreTypes;
+    private readonly Dictionary<string, Func<XObject, string, string>> _knownCoreTypes;
 
     protected CoreTypesConverter()
     {
@@ -41,7 +42,7 @@ internal abstract class CoreTypesConverter
         // from finding the converter.
         //
 
-        _knownCoreTypes = new Dictionary<string, Func<XElement, string, string>>(44, StringComparer.OrdinalIgnoreCase)
+        _knownCoreTypes = new Dictionary<string, Func<XObject, string, string>>(44, StringComparer.OrdinalIgnoreCase)
         {
             ["System.Windows.Input.Cursor"] = ConvertToCursor,
             ["System.Windows.Input.ModifierKeys"] = ConvertToModifierKeys,
@@ -92,85 +93,85 @@ internal abstract class CoreTypesConverter
 
     public abstract string ConvertFromInvariantString(string source, string destinationType);
 
-    public abstract string ConvertToCursor(XElement context, string source);
+    public abstract string ConvertToCursor(XObject context, string source);
 
-    public abstract string ConvertToModifierKeys(XElement context, string source);
+    public abstract string ConvertToModifierKeys(XObject context, string source);
 
-    public abstract string ConvertToKey(XElement context, string source);
+    public abstract string ConvertToKey(XObject context, string source);
 
-    public abstract string ConvertToMouseAction(XElement context, string source);
+    public abstract string ConvertToMouseAction(XObject context, string source);
 
-    public abstract string ConvertToKeyGesture(XElement context, string source);
+    public abstract string ConvertToKeyGesture(XObject context, string source);
 
-    public abstract string ConvertToMouseGesture(XElement context, string source);
+    public abstract string ConvertToMouseGesture(XObject context, string source);
 
-    public abstract string ConvertToCommand(XElement context, string source);
+    public abstract string ConvertToCommand(XObject context, string source);
 
-    public abstract string ConvertToKeyTime(XElement context, string source);
+    public abstract string ConvertToKeyTime(XObject context, string source);
 
-    public abstract string ConvertToRepeatBehavior(XElement context, string source);
+    public abstract string ConvertToRepeatBehavior(XObject context, string source);
 
-    public abstract string ConvertToKeySpline(XElement context, string source);
+    public abstract string ConvertToKeySpline(XObject context, string source);
 
-    public abstract string ConvertToBrush(XElement context, string source);
+    public abstract string ConvertToBrush(XObject context, string source);
 
-    public abstract string ConvertToColor(XElement context, string source);
+    public abstract string ConvertToColor(XObject context, string source);
 
-    public abstract string ConvertToDoubleCollection(XElement context, string source);
+    public abstract string ConvertToDoubleCollection(XObject context, string source);
 
-    public abstract string ConvertToFontFamily(XElement context, string source);
+    public abstract string ConvertToFontFamily(XObject context, string source);
 
-    public abstract string ConvertToGeometry(XElement context, string source);
+    public abstract string ConvertToGeometry(XObject context, string source);
 
-    public abstract string ConvertToPathGeometry(XElement context, string source);
+    public abstract string ConvertToPathGeometry(XObject context, string source);
 
-    public abstract string ConvertToMatrix(XElement context, string source);
+    public abstract string ConvertToMatrix(XObject context, string source);
 
-    public abstract string ConvertToPointCollection(XElement context, string source);
+    public abstract string ConvertToPointCollection(XObject context, string source);
 
-    public abstract string ConvertToTransform(XElement context, string source);
+    public abstract string ConvertToTransform(XObject context, string source);
 
-    public abstract string ConvertToCacheMode(XElement context, string source);
+    public abstract string ConvertToCacheMode(XObject context, string source);
 
-    public abstract string ConvertToMatrix3D(XElement context, string source);
+    public abstract string ConvertToMatrix3D(XObject context, string source);
 
-    public abstract string ConvertToXmlLanguage(XElement context, string source);
+    public abstract string ConvertToXmlLanguage(XObject context, string source);
 
-    public abstract string ConvertToCornerRadius(XElement context, string source);
+    public abstract string ConvertToCornerRadius(XObject context, string source);
 
-    public abstract string ConvertToDuration(XElement context, string source);
+    public abstract string ConvertToDuration(XObject context, string source);
 
-    public abstract string ConvertToFontWeight(XElement context, string source);
+    public abstract string ConvertToFontWeight(XObject context, string source);
 
-    public abstract string ConvertToGridLength(XElement context, string source);
+    public abstract string ConvertToGridLength(XObject context, string source);
 
-    public abstract string ConvertToPoint(XElement context, string source);
+    public abstract string ConvertToPoint(XObject context, string source);
 
-    public abstract string ConvertToPropertyPath(XElement context, string source);
+    public abstract string ConvertToPropertyPath(XObject context, string source);
 
-    public abstract string ConvertToRect(XElement context, string source);
+    public abstract string ConvertToRect(XObject context, string source);
 
-    public abstract string ConvertToSize(XElement context, string source);
+    public abstract string ConvertToSize(XObject context, string source);
 
-    public abstract string ConvertToThickness(XElement context, string source);
+    public abstract string ConvertToThickness(XObject context, string source);
 
-    public abstract string ConvertToFontStretch(XElement context, string source);
+    public abstract string ConvertToFontStretch(XObject context, string source);
 
-    public abstract string ConvertToFontStyle(XElement context, string source);
+    public abstract string ConvertToFontStyle(XObject context, string source);
 
-    public abstract string ConvertToTextDecorationCollection(XElement context, string source);
+    public abstract string ConvertToTextDecorationCollection(XObject context, string source);
 
-    public abstract string ConvertToImageSource(XElement context, string source);
+    public abstract string ConvertToImageSource(XObject context, string source);
 
-    public abstract string ConvertToVector(XElement context, string source);
+    public abstract string ConvertToVector(XObject context, string source);
 
-    public abstract string ConvertToRoutedEvent(XElement context, string source);
+    public abstract string ConvertToRoutedEvent(XObject context, string source);
 
-    public abstract string ConvertToResponsiveThreshold(XElement context, string source);
+    public abstract string ConvertToResponsiveThreshold(XObject context, string source);
 
-    public abstract string ConvertToRowDefinitionCollection(XElement context, string source);
+    public abstract string ConvertToRowDefinitionCollection(XObject context, string source);
 
-    public abstract string ConvertToColumnDefinitionCollection(XElement context, string source);
+    public abstract string ConvertToColumnDefinitionCollection(XObject context, string source);
 
     public bool IsKnownType(string typeFullName, string assemblyName)
     {
@@ -196,12 +197,27 @@ internal abstract class CoreTypesConverter
             return converter(context, source);
         }
 
-        throw new InvalidOperationException($"Cannot find a converter for type '{typeFullName}'");
+        throw new InvalidOperationException($"Cannot find a converter for type '{typeFullName}'.");
     }
 
-    public static XamlParseException GetConvertException(string value, string destinationTypeFullName)
+    public static XamlParseException GetConvertException(string value, string destinationTypeFullName, IXmlLineInfo lineInfo)
     {
-        return new XamlParseException($"Cannot convert '{value}' to '{destinationTypeFullName}'.");
+        return new XamlParseException($"Cannot convert '{value}' to '{destinationTypeFullName}'.", lineInfo);
+    }
+
+    internal static XElement GetClosestXElement(XObject xo)
+    {
+        if (xo is XElement xe)
+        {
+            return xe;
+        }
+
+        if (xo.Parent is XElement parent)
+        {
+            return parent;
+        }
+
+        return null;
     }
 
     private static bool IsCoreAssemblyOrNull(string assemblyName)

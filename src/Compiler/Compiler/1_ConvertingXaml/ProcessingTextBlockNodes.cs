@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,15 +12,9 @@
 *  
 \*====================================================================================*/
 
-
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
-
 
 namespace OpenSilver.Compiler
 {
@@ -59,7 +52,9 @@ namespace OpenSilver.Compiler
                     || GeneratingCode.IsParagraph(parentElement, settings.AssemblyName))
                 {
                     // Surround with a <Run>:
-                    XElement contentWrapper = new XElement(XName.Get("Run", GeneratingCode.DefaultXamlNamespace)); //todo: read the "ContentWrapperAttribute" of the collection (cf. InlineCollection.cs) instead of hard-coding this.
+                    var contentWrapper = new ExtendedXElement(XName.Get("Run", GeneratingCode.DefaultXamlNamespace));
+                    contentWrapper.SetLineInfo(currentNode);
+
                     XNode content = currentNode;
                     currentNode.ReplaceWith(contentWrapper);
                     contentWrapper.Add(content);

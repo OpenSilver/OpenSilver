@@ -15,14 +15,14 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
 using System.Xml.Linq;
 using Mono.Cecil;
 
-namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector
+namespace OpenSilver.Compiler
 {
     internal class MonoCecilAssembliesInspectorImpl : IDisposable
     {
@@ -124,31 +124,30 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private readonly ConcurrentDictionary<string, TypeDefinition> _typeNameToType = new();
         private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<string>> _typesPerAssembly = new();
 
-        private readonly SupportedLanguage _compilerType;
-        private readonly string _globalPrefix;
         private readonly SystemTypesHelper _systemTypesHelper;
+        private readonly TypeReferenceHelper _typeReferenceHelper;
 
         public MonoCecilAssembliesInspectorImpl(SupportedLanguage compilerType)
         {
-            _compilerType = compilerType;
-            if (_compilerType == SupportedLanguage.CSharp)
+            switch (compilerType)
             {
-                _globalPrefix = "global::";
-                _systemTypesHelper = SystemTypesHelper.CSharp;
-            }
-            else if (_compilerType == SupportedLanguage.VBNet)
-            {
-                _globalPrefix = "Global.";
-                _systemTypesHelper = SystemTypesHelper.VisualBasic;
-            }
-            else if (_compilerType == SupportedLanguage.FSharp)
-            {
-                _globalPrefix = "global.";
-                _systemTypesHelper = SystemTypesHelper.FSharp;
-            }
-            else
-            {
-                throw new InvalidCompilerTypeException();
+                case SupportedLanguage.CSharp:
+                    _systemTypesHelper = SystemTypesHelper.CSharp;
+                    _typeReferenceHelper = TypeReferenceHelper.CSharp;
+                    break;
+
+                case SupportedLanguage.VBNet:
+                    _systemTypesHelper = SystemTypesHelper.VisualBasic;
+                    _typeReferenceHelper = TypeReferenceHelper.VisualBasic;
+                    break;
+
+                case SupportedLanguage.FSharp:
+                    _systemTypesHelper = SystemTypesHelper.FSharp;
+                    _typeReferenceHelper = TypeReferenceHelper.FSharp;
+                    break;
+
+                default:
+                    throw new InvalidCompilerTypeException();
             }
 
             _storage = new MonoCecilAssemblyStorage();
@@ -188,7 +187,15 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             _assemblies.Clear();
         }
 
-        internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName = null,
+        private TypeDefinition FindType(string namespaceName, string typeName) => FindType(namespaceName, typeName, null, null);
+
+        internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName)
+            => FindType(namespaceName, typeName, assemblyName, null);
+
+        private TypeDefinition FindType(string namespaceName, string typeName, IXmlLineInfo lineInfo)
+            => FindType(namespaceName, typeName, null, lineInfo);
+
+        internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo,
             bool doNotRaiseExceptionIfNotFound = false)
         {
             // Fix the namespace:
@@ -206,9 +213,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style
             // namespace (cf. section that handles Binding in "GeneratingCSharpCode.cs")
-            if (namespaceName.StartsWith(_globalPrefix, StringComparison.CurrentCultureIgnoreCase))
+            if (namespaceName.StartsWith(_typeReferenceHelper.Global, StringComparison.CurrentCultureIgnoreCase))
             {
-                namespaceName = namespaceName.Substring(_globalPrefix.Length);
+                namespaceName = namespaceName.Substring(_typeReferenceHelper.Global.Length);
             }
 
             // Handle special cases:
@@ -286,7 +293,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 return null;
             }
 
-            throw new Exception($"Type not found: {fullTypeNameWithNamespaceInsideBraces}");
+            throw new XamlParseException($"Cannot find type '{fullTypeNameWithNamespaceInsideBraces}'.", lineInfo);
         }
 
         private static bool IsNamespaceAnXmlNamespace(string namespaceName)
@@ -294,10 +301,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return namespaceName.StartsWith("http://"); //todo: are there other conditions possible for XML namespaces declared with xmlnsDefinitionAttribute?
         }
 
-        private IMemberDefinition GetMemberInfo(string memberName, string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null, bool returnNullIfNotFoundInsteadOfException = false)
+        private IMemberDefinition GetMemberInfo(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny,
+            IXmlLineInfo lineInfo, bool returnNullIfNotFoundInsteadOfException = false)
         {
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
             var typeIterator = elementType;
             while (typeIterator != null)
             {
@@ -319,10 +326,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             if (returnNullIfNotFoundInsteadOfException)
                 return null;
 
-            throw new XamlParseException($"Member \"{memberName}\" not found in type \"{elementType}\"");
+            throw new XamlParseException($"Member '{memberName}' not found in type '{elementType}'.", lineInfo);
         }
 
-        private static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName, out TypeReference ownerElementType)
+        internal static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName, out TypeReference ownerElementType)
             => FindPropertyDeep(elementType, propertyName, out ownerElementType, false, false, false);
 
         private static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName,
@@ -433,14 +440,14 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         }
 
         private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null, bool isAttached = false)
+            string assemblyNameIfAny, IXmlLineInfo lineInfo, bool isAttached = false)
         {
-            return GetPropertyOrFieldType(propertyName, namespaceName, localTypeName,
-                out _, assemblyNameIfAny, isAttached);
+            return GetPropertyOrFieldType(propertyName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
+                out _, isAttached);
         }
 
-        private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName,
-            out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
+        private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName, string assemblyNameIfAny,
+            IXmlLineInfo lineInfo, out bool hasTypeConverter, bool isAttached = false)
         {
             const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
 
@@ -448,10 +455,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (isAttached)
             {
-                return GetMethodReturnValueType(GetPrefix + propertyName, namespaceName, localTypeName, assemblyNameIfAny);
+                return GetMethodReturnValueType(GetPrefix + propertyName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
             }
 
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
 
             if (FindPropertyDeep(elementType, propertyName, out TypeReference ownerElementType) is PropertyDefinition propertyInfo)
             {
@@ -471,7 +478,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 return fieldType.PopulateGeneric(elementType, fieldOwnerElementType);
             }
 
-            throw new XamlParseException($"Property or field \"{propertyName}\" not found in type \"{elementType}\".");
+            throw new XamlParseException($"Property or field '{propertyName}' not found in type '{elementType}'.", lineInfo);
         }
 
         private static bool ShouldIgnoreTypeConverter(PropertyDefinition propertyInfo)
@@ -501,15 +508,19 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
         }
 
-        private TypeReference GetMethodReturnValueType(string methodName, string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null)
+        private TypeReference GetMethodReturnValueType(
+            string methodName,
+            string namespaceName,
+            string localTypeName,
+            string assemblyNameIfAny,
+            IXmlLineInfo lineInfo)
         {
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
             var methodInfo = FindMethodDeep(elementType, methodName, false, false, out var ownerElementType);
 
             if (methodInfo == null)
             {
-                throw new XamlParseException($"Method \"{methodName}\" not found in type \"{elementType}\".");
+                throw new XamlParseException($"Method '{methodName}' not found in type '{elementType}'.", lineInfo);
             }
 
             return methodInfo.ReturnType.PopulateGeneric(elementType, ownerElementType);
@@ -527,15 +538,15 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return iDictionary.IsAssignableFrom(elementType);
         }
 
-        private bool IsElementACollection(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
+        private bool IsElementACollection(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
+            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
             return IsCollection(elementType);
         }
 
-        private bool IsDictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
+        private bool IsDictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
+            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
             return IsDictionary(elementType);
         }
 
@@ -559,8 +570,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return FindType(KnownNamespaces.SystemWindows, DependencyObj, Constants.OPENSILVER_ASSEMBLY_NAME);
         }
 
-        public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
+        public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny,
+            IXmlLineInfo lineInfo, bool ifTypeNotFoundTryGuessing = false)
         {
             // Distinguish between system types (String, Double...) and other types
             if (_systemTypesHelper.IsKnownType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
@@ -568,13 +579,12 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             // Find the type:
             var type = FindType(
-                namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing
-            );
+                namespaceName, localTypeName, assemblyNameIfAny, lineInfo, ifTypeNotFoundTryGuessing);
 
             if (type != null)
             {
                 // Use information from the type
-                return $"{_globalPrefix}{type}";
+                return $"{_typeReferenceHelper.Global}{type}";
             }
 
             if (ifTypeNotFoundTryGuessing)
@@ -584,37 +594,37 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     // Attempt to find the type in the current namespace
                     return localTypeName;
 
-                return $"{_globalPrefix}{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
+                return $"{_typeReferenceHelper.Global}{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
             }
 
-            throw new XamlParseException($"Type '{localTypeName}' not found in namespace '{namespaceName}'.");
+            throw new XamlParseException($"Type '{localTypeName}' not found in namespace '{namespaceName}'.", lineInfo);
         }
 
         public string GetAssemblyQualifiedNameOfXamlType(
             string namespaceName,
             string localTypeName,
-            string assemblyNameIfAny)
+            string assemblyNameIfAny,
+            IXmlLineInfo lineInfo)
         {
-            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny, true);
+            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo, true);
 
             if (type != null)
             {
-                return type.ConvertToString(_compilerType) + ", " + type.Module.Assembly.Name.Name;
+                return _typeReferenceHelper.ConvertToString(type) + ", " + type.Module.Assembly.Name.Name;
             }
 
             return null;
         }
 
-        public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName,
-            string fromTypeName)
+        public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName, IXmlLineInfo lineInfo)
         {
-            var type = FindType(namespaceName, typeName);
-            var fromType = FindType(fromNamespaceName, fromTypeName);
+            var type = FindType(namespaceName, typeName, lineInfo);
+            var fromType = FindType(fromNamespaceName, fromTypeName, lineInfo);
 
             return type.IsAssignableFrom(fromType);
         }
 
-        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName)
+        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, IXmlLineInfo lineInfo)
         {
             const string TemplatePropertyName = "Template";
 
@@ -623,7 +633,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 return false;
             }
 
-            var type = FindType(namespaceName, typeName);
+            var type = FindType(namespaceName, typeName, lineInfo);
 
             return FindPropertyDeep(type, TemplatePropertyName, out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == FrameworkTemplateName &&
@@ -631,9 +641,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 prop.DeclaringType.Module.Assembly.Name.Name == Constants.OPENSILVER_ASSEMBLY_NAME;
         }
 
-        public bool IsResourceDictionarySourcePropertyVisible(string namespaceName, string typeName)
+        public bool IsResourceDictionarySourcePropertyVisible(string namespaceName, string typeName, IXmlLineInfo lineInfo)
         {
-            var type = FindType(namespaceName, typeName);
+            var type = FindType(namespaceName, typeName, lineInfo);
 
             return FindPropertyDeep(type, "Source", out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == ResourceDictionaryName &&
@@ -641,10 +651,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 prop.DeclaringType.Module.Assembly.Name.Name == Constants.OPENSILVER_ASSEMBLY_NAME;
         }
 
-        public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null)
+        public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
-            var memberInfo = GetMemberInfo(memberName, namespaceName, localTypeName, assemblyNameIfAny);
+            var memberInfo = GetMemberInfo(memberName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
             switch (memberInfo)
             {
                 case PropertyDefinition _:
@@ -661,9 +670,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         }
 
         public (MemberTypes Type, MethodDefinition Method, TypeReference DeclaringType) GetAttachedMemberType(
-            string memberName, string ownerTypeNamespace, string ownerTypeName, string ownerTypeAssemblyName)
+            string memberName, string ownerTypeNamespace, string ownerTypeName, string ownerTypeAssemblyName, IXmlLineInfo lineInfo)
         {
-            TypeDefinition ownerType = FindType(ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName);
+            TypeDefinition ownerType = FindType(ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName, lineInfo);
 
             TypeReference declaringType;
 
@@ -682,52 +691,50 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return (MemberTypes.Custom, null, null);
         }
 
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName,
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo,
             out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
-            out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
+            out bool isTypeEnum, bool isAttached = false)
         {
-            GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName,
+            GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
                 out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName,
-                out isTypeEnum, out _, assemblyNameIfAny, isAttached);
+                out isTypeEnum, out _, isAttached);
         }
 
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName,
-            out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
-            out bool isTypeEnum, out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny,
+            IXmlLineInfo lineInfo, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
+            out bool isTypeEnum, out bool hasTypeConverter, bool isAttached = false)
         {
-            var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName,
-                out hasTypeConverter, assemblyNameIfAny, isAttached);
-            propertyNamespaceName = typeRef.BuildFullPath();
-            propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false, _compilerType);
+            var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
+                out hasTypeConverter, isAttached);
+            propertyNamespaceName = _typeReferenceHelper.BuildFullPath(typeRef);
+            propertyLocalTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(typeRef, false);
             propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;
-            isTypeEnum = typeRef.ResolveOrThrow().IsEnum || (_compilerType == SupportedLanguage.FSharp && typeRef.ResolveOrThrow().CustomAttributes.Any(attr => attr.AttributeType.FullName == "Microsoft.FSharp.Core.CompilationMappingAttribute"));
+            isTypeEnum = _typeReferenceHelper.IsEnum(typeRef.ResolveOrThrow());
         }
 
-        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName,
+        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo,
             out string returnValueNamespaceName, out string returnValueLocalTypeName,
-            out string returnValueAssemblyName, out bool isTypeEnum,
-            string assemblyNameIfAny = null)
+            out string returnValueAssemblyName, out bool isTypeEnum)
         {
-            var typeDef = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
-            returnValueNamespaceName = typeDef.BuildFullPath();
-            returnValueLocalTypeName = typeDef.GetTypeNameIncludingGenericArguments(false, _compilerType);
+            var typeDef = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
+            returnValueNamespaceName = _typeReferenceHelper.BuildFullPath(typeDef);
+            returnValueLocalTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(typeDef, false);
             returnValueAssemblyName = typeDef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
         }
 
-        public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName,
-            string assemblyNameIfAny)
+        public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
-
+            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
             var markupExtensionGeneric = FindType(SystemXamlNamespace, GenericMarkupExtension);
 
             return markupExtensionGeneric.IsAssignableFrom(elementType);
         }
 
-        public bool IsTypeAssignableFrom(string nameSpaceOfTypeToAssignFrom, string nameOfTypeToAssignFrom,
-            string assemblyNameOfTypeToAssignFrom, string nameSpaceOfTypeToAssignTo, string nameOfTypeToAssignTo,
-            string assemblyNameOfTypeToAssignTo, bool isAttached = false)
+        public bool IsTypeAssignableFrom(
+            string nameSpaceOfTypeToAssignFrom, string nameOfTypeToAssignFrom, string assemblyNameOfTypeToAssignFrom,
+            string nameSpaceOfTypeToAssignTo, string nameOfTypeToAssignTo, string assemblyNameOfTypeToAssignTo,
+            IXmlLineInfo lineInfo, bool isAttached = false)
         {
             TypeDefinition typeOfElementToAssignFrom;
             TypeDefinition typeOfElementToAssignTo;
@@ -737,47 +744,46 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             if (indexOfLastDot == -1)
             {
                 typeOfElementToAssignFrom = FindType(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom,
-                    assemblyNameOfTypeToAssignFrom);
+                    assemblyNameOfTypeToAssignFrom, lineInfo);
             }
             else
             {
                 var localTypeName = nameOfTypeToAssignFrom.Substring(0, indexOfLastDot);
                 var propertyName = nameOfTypeToAssignFrom.Substring(indexOfLastDot + 1);
                 typeOfElementToAssignFrom = GetPropertyOrFieldType(propertyName, nameSpaceOfTypeToAssignFrom,
-                    localTypeName, assemblyNameOfTypeToAssignFrom).ResolveOrThrow();
+                    localTypeName, assemblyNameOfTypeToAssignFrom, lineInfo).ResolveOrThrow();
             }
 
             indexOfLastDot = nameOfTypeToAssignTo.LastIndexOf('.');
             if (indexOfLastDot == -1)
             {
                 typeOfElementToAssignTo = FindType(nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo,
-                    assemblyNameOfTypeToAssignTo);
+                    assemblyNameOfTypeToAssignTo, lineInfo);
             }
             else
             {
                 var localTypeName = nameOfTypeToAssignTo.Substring(0, indexOfLastDot);
                 var propertyName = nameOfTypeToAssignTo.Substring(indexOfLastDot + 1);
                 typeOfElementToAssignTo = GetPropertyOrFieldType(propertyName, nameSpaceOfTypeToAssignTo, localTypeName,
-                    assemblyNameOfTypeToAssignTo, isAttached).ResolveOrThrow();
+                    assemblyNameOfTypeToAssignTo, lineInfo, isAttached).ResolveOrThrow();
             }
 
             return typeOfElementToAssignTo.IsAssignableFrom(typeOfElementToAssignFrom);
         }
 
-        public string GetContentPropertyName(string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null)
+        public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
-            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
 
             // Get instance of the attribute:
             var contentPropertyAttr = GetCustomAttributeDeep(type, ContentPropertyAttributeFullName);
 
             if (contentPropertyAttr == null &&
-                !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny) &&
-                !IsDictionary(namespaceName, localTypeName, assemblyNameIfAny))
+                !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny, lineInfo) &&
+                !IsDictionary(namespaceName, localTypeName, assemblyNameIfAny, lineInfo))
             {
                 //if the element is a collection, it is possible to add the children directly to this element.
-                throw new XamlParseException($"No default content property exists for element: {localTypeName}");
+                throw new XamlParseException($"No default content property exists for element: '{localTypeName}'.", lineInfo);
             }
 
             if (contentPropertyAttr == null)
@@ -789,15 +795,15 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (string.IsNullOrEmpty(value))
             {
-                throw new Exception("The ContentPropertyAttribute must have a non-empty Name.");
+                throw new XamlParseException("The ContentPropertyAttribute must have a non-empty Name.", lineInfo);
             }
 
             return value;
         }
 
-        public bool IsTypeAnEnum(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
+        public bool IsTypeAnEnum(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var elementType = FindType(namespaceName, typeName, assemblyName, lineInfo);
             return elementType.IsEnum;
         }
 
@@ -808,11 +814,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 m.Name == methodName && (!onlyPublic || m.IsPublic) && (!onlyStatic || m.IsStatic));
         }
 
-        public bool IsPropertyAttached(string propertyOrFieldName, string declaringTypeNamespaceName,
-            string declaringTypeLocalName, string parentNamespaceName, string parentLocalTypeName,
-            string parentAssemblyNameIfAny = null)
+        public bool IsPropertyAttached(string propertyOrFieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
-            var elementType = FindType(declaringTypeNamespaceName, declaringTypeLocalName, parentAssemblyNameIfAny);
+            var elementType = FindType(namespaceName, typeName, assemblyName, lineInfo);
 
             var field = FindFieldDeep(elementType, propertyOrFieldName + PropertySuffix, out _) ??
                         FindFieldDeep(elementType, propertyOrFieldName + PropertySuffix.ToLower(), out _);
@@ -834,41 +838,34 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return method.Parameters.Count == nbOfParameters;
         }
 
-        public bool IsPropertyOrFieldACollection(string propertyOrFieldName, string namespaceName,
-            string localTypeName, string assemblyNameIfAny = null)
+        public bool IsPropertyOrFieldACollection(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
-            var propertyOrFieldType = GetPropertyOrFieldType(propertyOrFieldName, namespaceName,
-                localTypeName, assemblyNameIfAny);
-            return IsCollection(propertyOrFieldType.ResolveOrThrow())
-                   || IsDictionary(propertyOrFieldType.ResolveOrThrow());
+            var propertyOrFieldType = GetPropertyOrFieldType(propertyName, namespaceName, typeName, assemblyName, lineInfo);
+            return IsCollection(propertyOrFieldType.ResolveOrThrow()) || IsDictionary(propertyOrFieldType.ResolveOrThrow());
         }
 
-        public bool IsPropertyOrFieldADictionary(string propertyName, string namespaceName,
-            string localTypeName, string assemblyNameIfAny = null)
+        public bool IsPropertyOrFieldADictionary(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
-            var propertyOrFieldType = GetPropertyOrFieldType(propertyName, namespaceName, localTypeName,
-                assemblyNameIfAny);
+            var propertyOrFieldType = GetPropertyOrFieldType(propertyName, namespaceName, typeName, assemblyName, lineInfo);
             return IsDictionary(propertyOrFieldType.ResolveOrThrow());
         }
 
-        public XName GetCSharpEquivalentOfXamlTypeAsXName(string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null)
+        public XName GetCSharpEquivalentOfXamlTypeAsXName(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
             //todo: in this method, we assume that the alias will be global, which will be false if the user chose something else --> find the right alias.
             // Find the type:
-            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-            if (type == null)
-                throw new XamlParseException($"Type \"{localTypeName}\" not found in namespace \"{namespaceName}\".");
+            if (FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo) is not TypeDefinition type)
+            {
+                throw new XamlParseException($"Type '{localTypeName}' not found in namespace '{namespaceName}'.", lineInfo);
+            }
 
             // Use information from the type:
             return XName.Get(type.Name, namespaceName);
         }
 
-        public bool DoesTypeContainNameMemberOfTypeString(string namespaceName, string localTypeName,
-            string assemblyNameIfAny = null)
+        public bool DoesTypeContainNameMemberOfTypeString(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
-            var memberInfo = GetMemberInfo(Name, namespaceName, localTypeName, assemblyNameIfAny,
-                true);
+            var memberInfo = GetMemberInfo(Name, namespaceName, localTypeName, assemblyNameIfAny, lineInfo, true);
             if (memberInfo == null) return false;
 
             if (memberInfo is FieldDefinition fd && fd.FieldType.IsString() && fd.IsPublic && !fd.IsStatic) return true;
@@ -878,52 +875,49 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return false;
         }
 
-        public bool DoesMethodReturnACollection(string methodName, string typeNamespaceName, string localTypeName,
-            string typeAssemblyNameIfAny = null)
+        public bool DoesMethodReturnACollection(string methodName, string typeNamespaceName, string localTypeName, string assemblyName,
+            IXmlLineInfo lineInfo)
         {
-            var propertyType =
-                GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
+            var propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, assemblyName, lineInfo);
             return IsCollection(propertyType.ResolveOrThrow())
                    || IsDictionary(propertyType.ResolveOrThrow());
         }
 
-        public bool DoesMethodReturnADictionary(string methodName, string typeNamespaceName, string localTypeName,
-            string typeAssemblyNameIfAny = null)
+        public bool DoesMethodReturnADictionary(string methodName, string typeNamespaceName, string localTypeName, string assemblyName,
+            IXmlLineInfo lineInfo)
         {
-            var propertyType =
-                GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
+            var propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, assemblyName, lineInfo);
             return IsDictionary(propertyType.ResolveOrThrow());
         }
 
-        public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
+        public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
-            var type = FindType(namespaceName, typeName, null, true);
+            var type = FindType(namespaceName, typeName, null, lineInfo, true);
 
             var field = FindFieldDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
             if (field != null && (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
-                return $"{type.GetTypeNameIncludingGenericArguments(true, _compilerType)}.{field.Name}";
+                return $"{_typeReferenceHelper.GetTypeNameIncludingGenericArguments(type, true)}.{field.Name}";
 
             return null;
         }
 
-        public string GetProperty(string fieldName, string namespaceName, string typeName, string assemblyName)
+        public string GetProperty(string fieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
-            var type = FindType(namespaceName, typeName, null, true);
+            var type = FindType(namespaceName, typeName, null, lineInfo, true);
 
             var property = FindPropertyDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
             if (property != null && (property.GetMethod.IsPublic || property.GetMethod.IsAssembly || property.GetMethod.IsFamilyOrAssembly))
             {
-                return $"{type.GetTypeNameIncludingGenericArguments(true, _compilerType)}.{property.Name}";
+                return $"{_typeReferenceHelper.GetTypeNameIncludingGenericArguments(type, true)}.{property.Name}";
             }
 
             return null;
         }
 
-        public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName,
-            out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName,
-            string assemblyNameIfAny = null, bool isAttached = false)
+        public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny,
+            IXmlLineInfo lineInfo, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName)
         {
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
             var propertyInfo = FindPropertyDeep(elementType, propertyOrFieldName, out var ownerElementType);
             TypeReference propertyOrFieldType;
             TypeReference propertyOrFieldDeclaringType;
@@ -933,7 +927,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 var fieldInfo = FindFieldDeep(elementType, propertyOrFieldName, out var fieldOwnerElementType);
                 if (fieldInfo == null)
                 {
-                    throw new XamlParseException($"Property or field \"{propertyOrFieldName}\" not found in type \"{elementType}\".");
+                    throw new XamlParseException($"Property or field '{propertyOrFieldName}' not found in type '{elementType}'.", lineInfo);
                 }
 
                 propertyOrFieldType = fieldInfo.FieldType.PopulateGeneric(elementType, fieldOwnerElementType);
@@ -946,16 +940,24 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
 
-            memberDeclaringTypeName = propertyOrFieldDeclaringType.GetTypeNameIncludingGenericArguments(true, _compilerType);
-            memberTypeNamespace = propertyOrFieldType.BuildFullPath();
-            memberTypeName = propertyOrFieldType.GetTypeNameIncludingGenericArguments(false, _compilerType);
+            memberDeclaringTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(propertyOrFieldDeclaringType, true);
+            memberTypeNamespace = _typeReferenceHelper.BuildFullPath(propertyOrFieldType);
+            memberTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(propertyOrFieldType, false);
         }
 
-        public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, string assemblyNameIfAny = null)
+        public void GetAttachedPropertyGetMethodInfo(
+            string methodName,
+            string namespaceName,
+            string localTypeName,
+            string assemblyNameIfAny,
+            IXmlLineInfo lineInfo,
+            out string declaringTypeName,
+            out string returnValueNamespaceName,
+            out string returnValueLocalTypeName)
         {
             var dependencyObjectType = GetDependencyObjectType();
 
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
             TypeReference currentType = elementType;
             while (currentType != null)
             {
@@ -965,24 +967,24 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     dependencyObjectType.IsAssignableFrom(m.Parameters[0].ParameterType.ResolveOrThrow()));
                 if (method != null)
                 {
-                    declaringTypeName = currentType.GetTypeNameIncludingGenericArguments(true, _compilerType);
+                    declaringTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(currentType, true);
                     var returnType = method.ReturnType.PopulateGeneric(elementType, currentType);
-                    returnValueNamespaceName = returnType.BuildFullPath();
-                    returnValueLocalTypeName = returnType.GetTypeNameIncludingGenericArguments(false, _compilerType);
+                    returnValueNamespaceName = _typeReferenceHelper.BuildFullPath(returnType);
+                    returnValueLocalTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(returnType, false);
                     return;
                 }
                 currentType = resolved.BaseType?.PopulateGeneric(elementType, currentType);
             }
-            throw new XamlParseException($"Method \"{methodName}\" not found in type \"{elementType}\".");
+            throw new XamlParseException($"Method '{methodName}' not found in type '{elementType}'.", lineInfo);
         }
 
-        public bool IsElementADictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
+        public bool IsElementADictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
+            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
             return IsDictionary(elementType);
         }
 
-        public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+        public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue, IXmlLineInfo lineInfo)
         {
             name = name.Trim();
 
@@ -994,92 +996,19 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
                     // integer values are not allowed when we have multiple values
                     yield return GetEnumValue(enumType, fieldName, ignoreCase, false) ??
-                        throw new XamlParseException($"Field '{fieldName}' not found in type: '{enumType.ConvertToString(_compilerType)}'.");
+                        throw new XamlParseException($"Field '{fieldName}' not found in type: '{_typeReferenceHelper.ConvertToString(enumType)}'.", lineInfo);
                 }
             }
             else
             {
                 yield return GetEnumValue(enumType, name, ignoreCase, allowIntegerValue) ??
-                    throw new XamlParseException($"Field '{name}' not found in type: '{enumType.ConvertToString(_compilerType)}'.");
+                    throw new XamlParseException($"Field '{name}' not found in type: '{_typeReferenceHelper.ConvertToString(enumType)}'.", lineInfo);
             }
         }
 
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
         {
-            Debug.Assert(enumType is not null && enumType.IsEnum);
-
-            name = name.Trim();
-
-            var field = FindFieldDeep(enumType, name, out _, ignoreCase, true, true);
-
-            if (_compilerType == SupportedLanguage.CSharp)
-            {
-                if (field is not null)
-                {
-                    return $"{_globalPrefix}{enumType.ConvertToString(_compilerType)}.{field.Name}";
-                }
-                if (allowIntegerValue)
-                {
-                    if (long.TryParse(name, out var l))
-                    {
-                        return $"({_globalPrefix}{enumType.ConvertToString(_compilerType)}){l}";
-                    }
-                    if (ulong.TryParse(name, out var ul))
-                    {
-                        return $"({_globalPrefix}{enumType.ConvertToString(_compilerType)}){ul}";
-                    }
-                }
-            }
-            else if (_compilerType == SupportedLanguage.VBNet)
-            {
-                if (field is not null)
-                {
-                    return $"{_globalPrefix}{enumType.ConvertToString(_compilerType)}.{field.Name}";
-                }
-                if (allowIntegerValue)
-                {
-                    if (long.TryParse(name, out var l))
-                    {
-                        return $"CType({l}, {_globalPrefix}{enumType.ConvertToString(_compilerType)})";
-                    }
-                    if (ulong.TryParse(name, out var ul))
-                    {
-                        return $"CType({ul}, {_globalPrefix}{enumType.ConvertToString(_compilerType)})";
-                    }
-                }
-            }
-            else if (_compilerType == SupportedLanguage.FSharp)
-            {
-                if (field is not null)
-                {
-                    return $"{_globalPrefix}{enumType.ConvertToString(_compilerType)}.{field.Name}";
-                }
-
-                // At F#, Enum works like property
-                var property = FindPropertyDeep(enumType, name, out _);
-                if (property is not null)
-                {
-                    return $"{_globalPrefix}{enumType.ConvertToString(_compilerType)}.{property.Name}";
-                }
-
-                if (allowIntegerValue)
-                {
-                    if (long.TryParse(name, out var l))
-                    {
-                        return $"enum<{_globalPrefix}{enumType.ConvertToString(_compilerType)}> {1}";
-                    }
-                    if (ulong.TryParse(name, out var ul))
-                    {
-                        return $"enum<{_globalPrefix}{enumType.ConvertToString(_compilerType)}> {ul}";
-                    }
-                }
-            }
-            else
-            {
-                throw new InvalidCompilerTypeException();
-            }
-
-            return null;
+            return _typeReferenceHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
         }
     }
     public class InvalidCompilerTypeException : Exception

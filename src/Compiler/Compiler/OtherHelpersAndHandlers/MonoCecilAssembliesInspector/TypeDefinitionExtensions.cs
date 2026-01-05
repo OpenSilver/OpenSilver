@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 
-namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector
+namespace OpenSilver.Compiler
 {
     internal static class TypeDefinitionExtensions
     {
@@ -40,7 +40,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             if (!parentInterface.IsInterface)
             {
-                throw new ArgumentException("Parent type must be an interface", nameof(parentInterface));
+                throw new ArgumentException("Parent type must be an interface.", nameof(parentInterface));
             }
 
             return
@@ -60,7 +60,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             if (!parentInterface.IsInterface)
             {
-                throw new ArgumentException("Parent type must be an interface", nameof(parentInterface));
+                throw new ArgumentException("Parent type must be an interface.", nameof(parentInterface));
             }
 
             return childType
@@ -79,11 +79,11 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             if (!childInterface.IsInterface)
             {
-                throw new ArgumentException("Child type must be an interface", nameof(parentInterface));
+                throw new ArgumentException("Child type must be an interface.", nameof(parentInterface));
             }
             if (!parentInterface.IsInterface)
             {
-                throw new ArgumentException("Parent type must be an interface", nameof(parentInterface));
+                throw new ArgumentException("Parent type must be an interface.", nameof(parentInterface));
             }
             return Equals(childInterface, parentInterface) || childInterface.DoesAnySubTypeImplementInterface(parentInterface);
         }

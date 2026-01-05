@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
@@ -217,17 +216,20 @@ namespace OpenSilver.Compiler
                 parameters.GenerateFieldsForNamedElements =
                     !_settings.Inspector.IsAssignableFrom(
                         KnownNamespaces.SystemWindows, "ResourceDictionary",
-                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
+                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName,
+                        _reader.Document.Root)
                     &&
                     !_settings.Inspector.IsAssignableFrom(
                         KnownNamespaces.SystemWindows, "Application",
-                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName);
+                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName,
+                        _reader.Document.Root);
 
                 parameters.PushScope(
                     new RootScope(GeneratingCode.GetUniqueName(_reader.Document.Root),
                         _settings.Inspector.IsAssignableFrom(
                             KnownNamespaces.SystemWindows, "IFrameworkElement",
-                            _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)));
+                            _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName,
+                            _reader.Document.Root)));
 
                 // Traverse the tree in "post order" (ie. start with child elements then traverse parent elements):
                 while (_reader.Read())
@@ -268,7 +270,8 @@ namespace OpenSilver.Compiler
                 // Get general information about the class:
                 GetClassInformationFromXaml(_reader.Document, _settings.Inspector,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
-                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
+
+                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, _reader.Document.Root, true);
 
                 if (hasCodeBehind)
                 {
@@ -355,7 +358,7 @@ namespace OpenSilver.Compiler
 
                 // Check if the element is the root element:
                 string elementType = GetCSharpEquivalentOfXamlTypeAsString(
-                    element.Name,
+                    element,
                     out string namespaceName,
                     out string localTypeName,
                     out string assemblyNameIfAny);
@@ -462,18 +465,21 @@ namespace OpenSilver.Compiler
 
                 // Set templated parent if any
                 if (parameters.IsInsideTemplate &&
-                    _settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
+                    _settings.Inspector.IsAssignableFrom(
+                        KnownNamespaces.SystemWindows, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName, element))
                 {
                     parameters.StringBuilder.AppendLine(
                         $"{RuntimeHelperClass}.XamlContext_SetTemplatedParent({parameters.CurrentXamlContext}, {elementUid});");
                 }
 
-                if (_settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindowsMediaAnimation, "Timeline", element.Name.NamespaceName, element.Name.LocalName))
+                if (_settings.Inspector.IsAssignableFrom(
+                    KnownNamespaces.SystemWindowsMediaAnimation, "Timeline", element.Name.NamespaceName, element.Name.LocalName, element))
                 {
                     parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUid});");
                 }
 
-                if (_settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "IUIElement", element.Name.NamespaceName, element.Name.LocalName))
+                if (_settings.Inspector.IsAssignableFrom(
+                    KnownNamespaces.SystemWindows, "IUIElement", element.Name.NamespaceName, element.Name.LocalName, element))
                 {
                     string xamlPath = element.Attribute(GeneratingPathInXaml.PathInXamlAttribute)?.Value ?? string.Empty;
                     parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUid}, \"{xamlPath}\");");
@@ -528,7 +534,7 @@ namespace OpenSilver.Compiler
                                 if (isXNameAttr)
                                 {
                                     if (_settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "DependencyObject",
-                                        element.Name.NamespaceName, element.Name.LocalName))
+                                        element.Name.NamespaceName, element.Name.LocalName, element))
                                     {
                                         parameters.StringBuilder.AppendLine(
                                             $"{elementUid}.SetValue(global::{KnownNamespaces.SystemWindows}.FrameworkElement.NameProperty, \"{name}\");");
@@ -536,7 +542,7 @@ namespace OpenSilver.Compiler
                                 }
                                 else
                                 {
-                                    if (_settings.Inspector.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny))
+                                    if (_settings.Inspector.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny, attribute))
                                     {
                                         parameters.StringBuilder.AppendLine($"{elementUid}.Name = \"{name}\";");
                                     }
@@ -556,7 +562,7 @@ namespace OpenSilver.Compiler
                                 {
                                     // Check if the attribute corresponds to a Property, an Event, etc.:
                                     string memberName = attribute.Name.LocalName;
-                                    MemberTypes memberType = _settings.Inspector.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
+                                    MemberTypes memberType = _settings.Inspector.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny, attribute);
                                     switch (memberType)
                                     {
                                         case MemberTypes.Event:
@@ -582,45 +588,49 @@ namespace OpenSilver.Compiler
                                             if (elementType == $"global::{KnownNamespaces.SystemWindows}.Setter")
                                             {
                                                 //we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
-                                                if (element.Parent != null && element.Parent.Parent != null && element.Parent.Parent.Name.LocalName == "Style")
+                                                if (element.Parent is null || element.Parent.Parent is null || element.Parent.Parent.Name.LocalName != "Style")
                                                 {
-                                                    if (attributeName == "Property")
+                                                    throw new XamlParseException("'<Setter />' tags can only be declared inside a '<Style />'.", element);
+                                                }
+
+                                                if (attributeName == "Property")
+                                                {
+                                                    // Style setter property:
+                                                    value = GenerateCodeForSetterProperty(element.Parent.Parent, attribute, attributeValue); //todo: support attached properties used in a Setter
+                                                }
+                                                else if (attributeName == "Value")
+                                                {
+                                                    if (element.Attribute("Property") is not XAttribute property)
                                                     {
-                                                        // Style setter property:
-                                                        value = GenerateCodeForSetterProperty(element.Parent.Parent, attributeValue); //todo: support attached properties used in a Setter
+                                                        throw new XamlParseException("The '<Setter />' element must declare a 'Property' attribute.", element);
                                                     }
-                                                    else if (attributeName == "Value")
-                                                    {
-                                                        var property = element.Attribute("Property");
-                                                        if (property != null)
-                                                        {
-                                                            bool isSetterForAttachedProperty = property.Value.Contains('.');
-                                                            XName name = GetCSharpXNameFromTargetTypeOrAttachedPropertyString(element, isSetterForAttachedProperty);
-                                                            //string str = GetCSharpFullTypeNameFromTargetTypeString(styleNode, reflectionOnSeparateAppDomain);
-                                                            //string[] s = {"::"};
-                                                            //string[] splittedStr = str.Split(s, StringSplitOptions.RemoveEmptyEntries);
-                                                            //string[] splittedTypeName = splittedStr[splittedStr.Length - 1].Split('.');
-                                                            //XName typeName = XName.Get(splittedTypeName[splittedTypeName.Length - 1], splittedStr[0]); 
-                                                            string propertyName = isSetterForAttachedProperty ? property.Value.Split('.')[1] : property.Value;
-                                                            value = GenerateCodeForInstantiatingAttributeValue(name,
-                                                                propertyName,
-                                                                isSetterForAttachedProperty,
-                                                                attributeValue,
-                                                                element);
-                                                        }
-                                                        else
-                                                            throw new XamlParseException(@"The <Setter> element must declare a ""Property"" attribute.");
-                                                    }
-                                                    else
-                                                        throw new XamlParseException(@"The <Setter> element cannot have attributes other than ""Property"" and ""Value"".");
+
+                                                    bool isSetterForAttachedProperty = property.Value.Contains('.');
+                                                    XName name = GetCSharpXNameFromTargetTypeOrAttachedPropertyString(element, isSetterForAttachedProperty);
+                                                    //string str = GetCSharpFullTypeNameFromTargetTypeString(styleNode, reflectionOnSeparateAppDomain);
+                                                    //string[] s = {"::"};
+                                                    //string[] splittedStr = str.Split(s, StringSplitOptions.RemoveEmptyEntries);
+                                                    //string[] splittedTypeName = splittedStr[splittedStr.Length - 1].Split('.');
+                                                    //XName typeName = XName.Get(splittedTypeName[splittedTypeName.Length - 1], splittedStr[0]); 
+                                                    string propertyName = isSetterForAttachedProperty ? property.Value.Split('.')[1] : property.Value;
+                                                    value = GenerateCodeForInstantiatingAttributeValue(name,
+                                                        propertyName,
+                                                        isSetterForAttachedProperty,
+                                                        attributeValue,
+                                                        element,
+                                                        property);
                                                 }
                                                 else
-                                                    throw new XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
+                                                {
+                                                    throw new XamlParseException(
+                                                        "The '<Setter />' element cannot have attributes other than 'Property' and 'Value'.",
+                                                        element);
+                                                }
                                             }
                                             else if (elementType == $"global::{KnownNamespaces.SystemWindowsData}.Binding"
                                                 && memberName == "Path")
                                             {
-                                                if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
+                                                if (TryResolvePathForBinding(attributeValue, element, attribute, out string resolvedPath))
                                                 {
                                                     string xamlPath = _settings.SystemTypes.ConvertToString(resolvedPath);
                                                     parameters.StringBuilder.AppendLine($"{elementUid}.XamlPath = {xamlPath};");
@@ -634,7 +644,8 @@ namespace OpenSilver.Compiler
                                                     propertyName,
                                                     isAttachedMember,
                                                     attributeValue,
-                                                    element);
+                                                    element,
+                                                    attribute);
                                             }
                                             else if (elementType == $"global::{KnownNamespaces.SystemWindows}.TemplateBindingExtension" && memberName == "Path")
                                             {
@@ -664,7 +675,8 @@ namespace OpenSilver.Compiler
                                                     propertyName,
                                                     isAttachedMember,
                                                     attributeValue,
-                                                    element);
+                                                    element,
+                                                    attribute);
                                             }
 
                                             // Append the statement:
@@ -702,19 +714,20 @@ namespace OpenSilver.Compiler
 
                             (MemberTypes memberType, MethodDefinition method, TypeReference declaringType) =
                                 _settings.Inspector.GetAttachedMemberType(
-                                    memberName, ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName);
+                                    memberName, ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName, attribute);
 
                             switch (memberType)
                             {
                                 case MemberTypes.Property:
                                     {
-                                        string ownerType = $"global::{declaringType.ConvertToString(SupportedLanguage.CSharp)}";
+                                        string ownerType = $"global::{TypeReferenceHelper.CSharp.ConvertToString(declaringType)}";
                                         string value = GenerateCodeForInstantiatingAttributeValue(
                                             ownerTypeXName,
                                             memberName,
                                             isAttachedMember,
                                             attributeValue,
-                                            element);
+                                            element,
+                                            attribute);
 
                                         parameters.StringBuilder.AppendLine(
                                             $"{ownerType}.Set{memberName}({elementUid}, {value});");
@@ -723,7 +736,7 @@ namespace OpenSilver.Compiler
 
                                 case MemberTypes.Event:
                                     {
-                                        string ownerType = $"global::{declaringType.ConvertToString(SupportedLanguage.CSharp)}";
+                                        string ownerType = $"global::{TypeReferenceHelper.CSharp.ConvertToString(declaringType)}";
                                         int componentId = parameters.ComponentConnector.ConnectAttachedEventHandler(elementType, ownerType, memberName, attributeValue);
 
                                         parameters.StringBuilder.AppendLine(
@@ -748,17 +761,18 @@ namespace OpenSilver.Compiler
                 // we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
                 if (eventSetter.Parent is null || eventSetter.Parent.Parent is null || eventSetter.Parent.Parent.Name.LocalName != "Style")
                 {
-                    throw new XamlParseException("\"<EventSetter/>\" tags can only be declared inside a <Style/>.");
+                    throw new XamlParseException("'<EventSetter />' tags can only be declared inside a '<Style />'.", eventSetter);
                 }
 
                 XElement style = eventSetter.Parent.Parent;
                 XAttribute eventAttribute = eventSetter.Attribute("Event"); // required
                 XAttribute handlerAttribute = eventSetter.Attribute("Handler"); // required
                 XAttribute handledEventsTooAttribute = eventSetter.Attribute("HandledEventsToo");
+                IXmlLineInfo lineInfo = eventSetter;
 
                 if (eventAttribute is null || handlerAttribute is null)
                 {
-                    throw new XamlParseException("\"EventSetter\" must declare an \"Event\" and a \"Handler\".", eventSetter);
+                    throw new XamlParseException("'EventSetter' must declare an 'Event' and a 'Handler'.", eventSetter);
                 }
 
                 // First, find the event
@@ -787,6 +801,8 @@ namespace OpenSilver.Compiler
 
                     if (style.Attribute("TargetType") is XAttribute targetType)
                     {
+                        lineInfo = targetType;
+
                         GetClrNamespaceAndLocalName(targetType.Value, style, out namespaceName, out typeName, out assemblyName);
                     }
                     else
@@ -799,17 +815,17 @@ namespace OpenSilver.Compiler
 
                 string handlerTypeString;
 
-                TypeDefinition ownerType = _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName);
-                string ownerTypeString = ownerType.ConvertToString(SupportedLanguage.CSharp);
+                TypeDefinition ownerType = _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
+                string ownerTypeString = TypeReferenceHelper.CSharp.ConvertToString(ownerType);
 
                 if (_settings.Inspector.GetEvent(ownerType, eventName, false) is EventDefinition eventDefinition)
                 {
-                    handlerTypeString = eventDefinition.EventType.ConvertToString(SupportedLanguage.CSharp);
+                    handlerTypeString = TypeReferenceHelper.CSharp.ConvertToString(eventDefinition.EventType);
                 }
                 else if (_settings.Inspector.GetMethod(ownerType, $"Add{eventName}Handler", false, true) is MethodDefinition addHandlerMethodDefinition &&
                     addHandlerMethodDefinition.Parameters.Count == 2)
                 {
-                    handlerTypeString = addHandlerMethodDefinition.Parameters[1].ParameterType.ConvertToString(SupportedLanguage.CSharp);
+                    handlerTypeString = TypeReferenceHelper.CSharp.ConvertToString(addHandlerMethodDefinition.Parameters[1].ParameterType);
                 }
                 else
                 {
@@ -856,7 +872,7 @@ namespace OpenSilver.Compiler
                 string typeName = member.Name.LocalName.Substring(0, idx);
                 string propertyName = member.Name.LocalName.Substring(idx + 1);
 
-                if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, member.Name.NamespaceName, typeName))
+                if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, member.Name.NamespaceName, typeName, member))
                 {
                     if (member.Elements().Count() > 1)
                     {
@@ -887,7 +903,7 @@ namespace OpenSilver.Compiler
                 string propertyName = element.Name.LocalName.Split('.')[1];
                 XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
 
-                if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, element.Name.NamespaceName, typeName))
+                if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, element.Name.NamespaceName, typeName, element))
                 {
                     // TODO move call to RuntimeHelpers.SetTemplateContent(...) here
                     parameters.PopScope();
@@ -912,7 +928,8 @@ namespace OpenSilver.Compiler
                             string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                 elementName.Namespace.NamespaceName,
                                 elementName.LocalName,
-                                assemblyNameIfAny);
+                                assemblyNameIfAny,
+                                element);
 
                             codeToAccessTheEnumerable = $"{elementType}.Get{propertyName}({parentUid})";
                         }
@@ -958,7 +975,8 @@ namespace OpenSilver.Compiler
                         {
                             if (isAttachedProperty)
                             {
-                                string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
+                                string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
+                                    elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny, element);
                                 parameters.StringBuilder.AppendLine(
                                     $"{elementType}.Set{propertyName}({parentUid}, {childUid});"); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
                             }
@@ -986,17 +1004,18 @@ namespace OpenSilver.Compiler
                                 if (isAttachedProperty)
                                 {
                                     string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                                        element.Name.NamespaceName, splittedLocalName[0], assemblyNameIfAny);
+                                        element.Name.NamespaceName, splittedLocalName[0], assemblyNameIfAny, element);
 
                                     _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         element.Name.NamespaceName,
                                         splittedLocalName[0],
+                                        assemblyNameIfAny,
+                                        element,
                                         out propertyNamespaceName,
                                         out propertyLocalTypeName,
                                         out _,
                                         out _,
-                                        assemblyNameIfAny,
                                         isAttached: true);
 
                                     string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
@@ -1009,11 +1028,12 @@ namespace OpenSilver.Compiler
                                         propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out propertyNamespaceName,
                                         out propertyLocalTypeName,
                                         out _,
                                         out _,
-                                        assemblyNameIfAny,
                                         isAttached: false);
 
                                     string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
@@ -1032,7 +1052,8 @@ namespace OpenSilver.Compiler
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _settings.AssemblyName) != null;
+                                        _settings.AssemblyName,
+                                        isAttachedProperty ? element : parent) != null;
 
                                 string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
@@ -1040,23 +1061,24 @@ namespace OpenSilver.Compiler
                                 if (!isAttachedProperty)
                                 {
                                     _settings.Inspector.GetPropertyOrFieldInfo(propertyName,
-                                                                                         parent.Name.Namespace.NamespaceName,
-                                                                                         parent.Name.LocalName,
-                                                                                         out propertyDeclaringTypeName,
-                                                                                         out propertyTypeNamespace,
-                                                                                         out propertyTypeName,
-                                                                                         assemblyNameIfAny,
-                                                                                         false);
+                                        parent.Name.Namespace.NamespaceName,
+                                        parent.Name.LocalName,
+                                        assemblyNameIfAny,
+                                        element,
+                                        out propertyDeclaringTypeName,
+                                        out propertyTypeNamespace,
+                                        out propertyTypeName);
                                 }
                                 else
                                 {
                                     _settings.Inspector.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
-                                        out propertyTypeName,
-                                        assemblyNameIfAny);
+                                        out propertyTypeName);
                                 }
                                 string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
 
@@ -1088,7 +1110,8 @@ namespace OpenSilver.Compiler
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _settings.AssemblyName);
+                                        _settings.AssemblyName,
+                                        isAttachedProperty ? element : parent);
 
                                 string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
@@ -1098,21 +1121,22 @@ namespace OpenSilver.Compiler
                                     _settings.Inspector.GetPropertyOrFieldInfo(propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
-                                        out propertyTypeName,
-                                        assemblyNameIfAny,
-                                        false);
+                                        out propertyTypeName);
                                 }
                                 else
                                 {
                                     _settings.Inspector.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
-                                        out propertyTypeName,
-                                        assemblyNameIfAny);
+                                        out propertyTypeName);
                                 }
 
                                 if (dependencyPropertyName is null)
@@ -1120,7 +1144,8 @@ namespace OpenSilver.Compiler
                                     string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
-                                        assemblyNameIfAny);
+                                        assemblyNameIfAny,
+                                        element);
 
                                     if (elementType == $"global::{KnownNamespaces.SystemWindows}.Setter" && propertyName == "Value")
                                     {
@@ -1167,7 +1192,8 @@ namespace OpenSilver.Compiler
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _settings.AssemblyName);
+                                        _settings.AssemblyName,
+                                        isAttachedProperty ? element : parent);
 
                                 parameters.StringBuilder.AppendLine(
                                     $"{parentUid}.SetValue({dpName}, {RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}));");
@@ -1180,7 +1206,8 @@ namespace OpenSilver.Compiler
 
                                 if (isAttachedProperty)
                                 {
-                                    string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
+                                    string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
+                                        elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny, element);
                                     parameters.StringBuilder.AppendLine($"{elementType}.Set{propertyName}({parentUid}, null);");
                                 }
                                 else
@@ -1199,17 +1226,19 @@ namespace OpenSilver.Compiler
                                         propertyName,
                                         element.Name.NamespaceName,
                                         typeName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out string propertyTypeNS,
                                         out string propertyTypeName,
                                         out _,
                                         out _,
-                                        assemblyNameIfAny,
                                         isAttached: true);
 
                                     string type = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
-                                        assemblyNameIfAny);
+                                        assemblyNameIfAny,
+                                        element);
 
                                     parameters.StringBuilder.AppendLine(
                                         $"{type}.Set{propertyName}({parentUid}, ({GetFullTypeName(propertyTypeNS, propertyTypeName)})(object){staticMemberName});");
@@ -1220,11 +1249,12 @@ namespace OpenSilver.Compiler
                                         propertyName,
                                         parent.Name.NamespaceName,
                                         parent.Name.LocalName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out string propertyTypeNS,
                                         out string propertyTypeName,
                                         out _,
                                         out _,
-                                        assemblyNameIfAny,
                                         isAttached: false);
 
                                     parameters.StringBuilder.AppendLine(
@@ -1241,17 +1271,19 @@ namespace OpenSilver.Compiler
                                         propertyName,
                                         element.Name.NamespaceName,
                                         typeName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out string propertyTypeNS,
                                         out string propertyTypeName,
                                         out _,
                                         out _,
-                                        assemblyNameIfAny,
                                         isAttached: true);
 
                                     string type = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
-                                        assemblyNameIfAny);
+                                        assemblyNameIfAny,
+                                        element);
 
                                     parameters.StringBuilder.AppendLine(
                                         $"{type}.Set{propertyName}({parentUid}, ({GetFullTypeName(propertyTypeNS, propertyTypeName)})(object)typeof(global::{resolvedTypeName}));");
@@ -1262,11 +1294,12 @@ namespace OpenSilver.Compiler
                                         propertyName,
                                         parent.Name.NamespaceName,
                                         parent.Name.LocalName,
+                                        assemblyNameIfAny,
+                                        element,
                                         out string propertyTypeNS,
                                         out string propertyTypeName,
                                         out _,
                                         out _,
-                                        assemblyNameIfAny,
                                         isAttached: false);
 
                                     parameters.StringBuilder.AppendLine(
@@ -1295,18 +1328,20 @@ namespace OpenSilver.Compiler
                                     propertyName,
                                     propertyOwnerTypeNS,
                                     propertyOwnerTypeName,
+                                    assemblyNameIfAny,
+                                    element,
                                     out string propertyTypeNS,
                                     out string propertyTypeName,
                                     out _,
                                     out _,
-                                    assemblyNameIfAny,
                                     isAttachedProperty);
 
                                 string dpName = _settings.Inspector.GetField(
                                     propertyName + "Property",
                                     propertyOwnerTypeNS,
                                     propertyOwnerTypeName,
-                                    _settings.AssemblyName);
+                                    _settings.AssemblyName,
+                                    isAttachedProperty ? element : parent);
 
                                 if (dpName != null)
                                 {
@@ -1321,7 +1356,7 @@ namespace OpenSilver.Compiler
                                     if (isAttachedProperty)
                                     {
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                                            propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
+                                            propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny, element);
 
                                         parameters.StringBuilder
                                             .AppendLine($"    {elementType}.Set{propertyName}({parentUid}, ({propertyTypeFullName}){markupValue});");
@@ -1339,7 +1374,7 @@ namespace OpenSilver.Compiler
                                     if (isAttachedProperty)
                                     {
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                                            propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
+                                            propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny, element);
 
                                         string markupExtension =
                                             $"(({IMarkupExtensionClass}){childUid}).ProvideValue(new global::System.ServiceProvider({parentUid}, null))";
@@ -1397,7 +1432,7 @@ namespace OpenSilver.Compiler
                 {
                     method(parameters);
                 }
-                catch (XamlParseException)
+                catch (XamlParseException ex) when (ex.HasLineInfo())
                 {
                     throw;
                 }
@@ -1405,10 +1440,7 @@ namespace OpenSilver.Compiler
                 {
                     IXmlLineInfo info = _reader.ObjectData?.Element ?? _reader.MemberData?.Member;
 
-                    throw new XamlParseException(
-                        "An unexpected error occurred, see inner exception for more details.",
-                        info,
-                        ex);
+                    throw new XamlParseException($"An unexpected error occurred: {ex.Message}", info, ex);
                 }
             }
 
@@ -1427,13 +1459,13 @@ namespace OpenSilver.Compiler
                 if (element.Attribute("Source") != null)
                 {
                     return _settings.Inspector.IsResourceDictionarySourcePropertyVisible(
-                        element.Name.NamespaceName, element.Name.LocalName);
+                        element.Name.NamespaceName, element.Name.LocalName, element);
                 }
 
                 return false;
             }
 
-            private string GenerateCodeForSetterProperty(XElement styleElement, string attributeValue)
+            private string GenerateCodeForSetterProperty(XElement styleElement, XAttribute propertyAttribute, string attributeValue)
             {
                 bool isAttachedProperty = attributeValue.Contains(".");
                 string elementType, dependencyPropertyName;
@@ -1462,10 +1494,12 @@ namespace OpenSilver.Compiler
                         styleElement,
                         out string elementNamespaceName,
                         out string elementLocalTypeName,
-                        out string _);
+                        out string elementAssemblyName);
                     elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                         elementNamespaceName,
-                        elementLocalTypeName);
+                        elementLocalTypeName,
+                        elementAssemblyName,
+                        propertyAttribute);
 
                     dependencyPropertyName = splittedAttachedProperty[1] + "Property";
                 }
@@ -1489,14 +1523,18 @@ namespace OpenSilver.Compiler
                     currentXElement = setterElement;
                     attributeToLookAt = currentXElement.Attribute("Property");
                     if (attributeToLookAt == null)
-                        throw new XamlParseException("Setter must declare a Property.");
+                    {
+                        throw new XamlParseException("Setter must declare a Property.", setterElement);
+                    }
                 }
                 else
                 {
                     currentXElement = setterElement.Parent.Parent;
                     attributeToLookAt = currentXElement.Attribute("TargetType");
                     if (attributeToLookAt == null)
-                        throw new XamlParseException("Style must declare a TargetType.");
+                    {
+                        throw new XamlParseException("Style must declare a TargetType.", currentXElement);
+                    }
                 }
 
                 string attributeTypeString;
@@ -1513,7 +1551,7 @@ namespace OpenSilver.Compiler
                         }
                         else
                         {
-                            throw new XamlParseException(@"Namespaces or prefixes must be followed by a type.");
+                            throw new XamlParseException("Namespaces or prefixes must be followed by a type.", attributeToLookAt);
                         }
                     }
                     else
@@ -1527,14 +1565,17 @@ namespace OpenSilver.Compiler
                 }
 
                 GetClrNamespaceAndLocalName(attributeTypeString, currentXElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
-                return _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny);
+                return _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny, attributeToLookAt);
             }
 
             private string GetCSharpFullTypeNameFromTargetTypeString(XElement styleElement, bool isDataType = false)
             {
-                var targetTypeAttribute = styleElement.Attribute(isDataType ? "DataType" : "TargetType");
-                if (targetTypeAttribute == null)
-                    throw new XamlParseException(isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.");
+                if (styleElement.Attribute(isDataType ? "DataType" : "TargetType") is not XAttribute targetTypeAttribute)
+                {
+                    throw new XamlParseException(
+                        isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.",
+                        styleElement);
+                }
 
                 GetClrNamespaceAndLocalName(targetTypeAttribute.Value,
                     styleElement,
@@ -1545,12 +1586,13 @@ namespace OpenSilver.Compiler
                     namespaceName,
                     localTypeName,
                     assemblyNameIfAny,
+                    targetTypeAttribute,
                     ifTypeNotFoundTryGuessing: false);
 
                 return elementType;
             }
 
-            private string GetCSharpFullTypeName(string typeString, XElement elementWhereTheTypeIsUsed)
+            private string GetCSharpFullTypeName(string typeString, XElement elementWhereTheTypeIsUsed, IXmlLineInfo lineInfo)
             {
                 GetClrNamespaceAndLocalName(typeString,
                     elementWhereTheTypeIsUsed,
@@ -1561,6 +1603,7 @@ namespace OpenSilver.Compiler
                     namespaceName,
                     localTypeName,
                     assemblyNameIfAny,
+                    lineInfo,
                     ifTypeNotFoundTryGuessing: false);
 
                 return elementType;
@@ -1593,7 +1636,9 @@ namespace OpenSilver.Compiler
                 }
                 else
                 {
-                    throw new XamlParseException("Each dictionary entry must have an associated key. The element named '" + element.Name.LocalName + "' does not have a key.");
+                    throw new XamlParseException(
+                        $"Each dictionary entry must have an associated key. The element named '{element.Name.LocalName}' does not have a key.",
+                        element);
                 }
             }
 
@@ -1602,7 +1647,8 @@ namespace OpenSilver.Compiler
                 string propertyName,
                 bool isAttachedProperty,
                 string value,
-                XElement elementWhereTheTypeIsUsed)
+                XElement elementWhereTheTypeIsUsed,
+                IXmlLineInfo lineInfo)
             {
                 GetClrNamespaceAndLocalName(
                     xName,
@@ -1619,11 +1665,12 @@ namespace OpenSilver.Compiler
                         "Get" + propertyName,
                         namespaceName,
                         localTypeName,
+                        assemblyNameIfAny,
+                        lineInfo,
                         out valueNamespaceName,
                         out valueLocalTypeName,
                         out valueAssemblyName,
-                        out isValueEnum,
-                        assemblyNameIfAny);
+                        out isValueEnum);
 
                     hasTypeConverter = false;
                 }
@@ -1633,12 +1680,13 @@ namespace OpenSilver.Compiler
                         propertyName,
                         namespaceName,
                         localTypeName,
+                        assemblyNameIfAny,
+                        lineInfo,
                         out valueNamespaceName,
                         out valueLocalTypeName,
                         out valueAssemblyName,
                         out isValueEnum,
-                        out hasTypeConverter,
-                        assemblyNameIfAny);
+                        out hasTypeConverter);
                 }
 
                 string valueTypeFullName = GetFullTypeName(valueNamespaceName, valueLocalTypeName);
@@ -1657,17 +1705,19 @@ namespace OpenSilver.Compiler
                     TypeDefinition enumType = _settings.Inspector.GetTypeDefinition(
                         valueNamespaceName,
                         valueLocalTypeName,
-                        valueAssemblyName);
+                        valueAssemblyName,
+                        lineInfo);
 
                     return string.Join(" | ", _settings.Inspector.GetEnumValues(
                         enumType,
                         value.Trim(),
                         true,
-                        true));
+                        true,
+                        lineInfo));
                 }
                 else if (valueTypeFullName == "global::System.Type")
                 {
-                    string typeFullName = GetCSharpFullTypeName(value, elementWhereTheTypeIsUsed);
+                    string typeFullName = GetCSharpFullTypeName(value, elementWhereTheTypeIsUsed, lineInfo);
 
                     return $"typeof({typeFullName})";
                 }
@@ -1689,7 +1739,7 @@ namespace OpenSilver.Compiler
                     if (!isAttachedProperty && hasTypeConverter)
                     {
                         string declaringTypeName = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                            namespaceName, localTypeName, assemblyNameIfAny);
+                            namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
 
                         return XamlContextGetPropertyValue(
                             declaringTypeName, propertyName, value, valueTypeFullName, preparedValue);
@@ -1753,7 +1803,7 @@ namespace OpenSilver.Compiler
                 return false;
             }
 
-            private bool TryResolvePathForBinding(string path, XElement element, out string resolvedPath)
+            private bool TryResolvePathForBinding(string path, XElement element, IXmlLineInfo lineInfo, out string resolvedPath)
             {
                 if (path == "" || path == ".")
                 {
@@ -1854,8 +1904,7 @@ namespace OpenSilver.Compiler
                         out string assemblyName);
 
                     string assemblyQualifiedName = _settings.Inspector.GetAssemblyQualifiedNameOfXamlType(
-                        namespaceName, localTypeName, assemblyName
-                    );
+                        namespaceName, localTypeName, assemblyName, lineInfo);
 
                     if (assemblyQualifiedName == null)
                     {
@@ -1898,7 +1947,7 @@ namespace OpenSilver.Compiler
                     XNamespace xmlNamespace = xmlPrefix == null ? element.GetDefaultNamespace() : element.GetNamespaceOfPrefix(xmlPrefix);
                     try
                     {
-                        typeName = GetCSharpEquivalentOfXamlTypeAsString(XName.Get(type, xmlNamespace.NamespaceName));
+                        typeName = GetCSharpEquivalentOfXamlTypeAsString(XName.Get(type, xmlNamespace.NamespaceName), element);
                     }
                     catch { }
                 }
@@ -1969,14 +2018,14 @@ namespace OpenSilver.Compiler
 
             private bool IsPropertyAttached(XElement propertyElement)
             {
-                GetClrNamespaceAndLocalName(propertyElement.Name, out string namespaceName, out string localName, out string assemblyNameIfAny);
+                GetClrNamespaceAndLocalName(propertyElement.Name, out string namespaceName, out string localName, out string assemblyName);
                 if (localName.Contains("."))
                 {
                     var split = localName.Split('.');
-                    var typeLocalName = split[0];
+                    var typeName = split[0];
                     var propertyOrFieldName = split[1];
-                    GetClrNamespaceAndLocalName(propertyElement.Parent.Name, out string parentNamespaceName, out string parentLocalTypeName, out string parentAssemblyIfAny);
-                    return _settings.Inspector.IsPropertyAttached(propertyOrFieldName, namespaceName, typeLocalName, parentNamespaceName, parentLocalTypeName, assemblyNameIfAny);
+                    return _settings.Inspector.IsPropertyAttached(
+                        propertyOrFieldName, namespaceName, typeName, assemblyName, propertyElement);
                 }
 
                 return false;
@@ -1989,14 +2038,16 @@ namespace OpenSilver.Compiler
                     string methodName = "Get" + propertyElement.Name.LocalName.Split('.')[1]; // In case of attached property, we check the return type of the method "GetPROPERTYNAME()". For example, in case of "Grid.Row", we check the return type of the method "Grid.GetRow()".
                     XName elementName = propertyElement.Name.Namespace + propertyElement.Name.LocalName.Split('.')[0]; // eg. if the propertyElement is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
                     GetClrNamespaceAndLocalName(elementName, out string namespaceName, out string localName, out string assemblyNameIfAny);
-                    return _settings.Inspector.DoesMethodReturnACollection(methodName, namespaceName, localName, assemblyNameIfAny);
+                    return _settings.Inspector.DoesMethodReturnACollection(
+                        methodName, namespaceName, localName, assemblyNameIfAny, propertyElement);
                 }
                 else
                 {
                     var propertyOrFieldName = propertyElement.Name.LocalName.Split('.')[1];
                     var parentElement = propertyElement.Parent;
                     GetClrNamespaceAndLocalName(parentElement.Name, out string parentNamespaceName, out string parentLocalName, out string parentAssemblyNameIfAny);
-                    return _settings.Inspector.IsPropertyOrFieldACollection(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
+                    return _settings.Inspector.IsPropertyOrFieldACollection(
+                        propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny, propertyElement);
                 }
             }
 
@@ -2014,7 +2065,7 @@ namespace OpenSilver.Compiler
 
                 XElement child = element.Elements().First();
 
-                return !IsTypeAssignableFrom(child.Name, element.Name, isAttachedProperty) &&
+                return !IsTypeAssignableFrom(child, element, isAttachedProperty) &&
                     !GeneratingCode.IsBinding(child, _settings.AssemblyName) &&
                     child.Name.LocalName != "StaticResource" &&
                     child.Name.LocalName != "StaticResourceExtension" &&
@@ -2033,34 +2084,42 @@ namespace OpenSilver.Compiler
                     string methodName = "Get" + propertyElement.Name.LocalName.Split('.')[1]; // In case of attached property, we check the return type of the method "GetPROPERTYNAME()". For example, in case of "Grid.Row", we check the return type of the method "Grid.GetRow()".
                     XName elementName = propertyElement.Name.Namespace + propertyElement.Name.LocalName.Split('.')[0]; // eg. if the propertyElement is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
                     GetClrNamespaceAndLocalName(elementName, out string namespaceName, out string localName, out string assemblyNameIfAny);
-                    return _settings.Inspector.DoesMethodReturnADictionary(methodName, namespaceName, localName, assemblyNameIfAny);
+                    return _settings.Inspector.DoesMethodReturnADictionary(
+                        methodName, namespaceName, localName, assemblyNameIfAny, propertyElement);
                 }
                 else
                 {
                     var propertyOrFieldName = propertyElement.Name.LocalName.Split('.')[1];
                     var parentElement = propertyElement.Parent;
                     GetClrNamespaceAndLocalName(parentElement.Name, out string parentNamespaceName, out string parentLocalName, out string parentAssemblyNameIfAny);
-                    return _settings.Inspector.IsPropertyOrFieldADictionary(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
+                    return _settings.Inspector.IsPropertyOrFieldADictionary(
+                        propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny, propertyElement);
                 }
             }
 
             private bool IsElementADictionary(XElement element)
             {
                 GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
-                return _settings.Inspector.IsElementADictionary(elementNameSpace, elementLocalName, assemblyNameIfAny);
+                return _settings.Inspector.IsElementADictionary(elementNameSpace, elementLocalName, assemblyNameIfAny, element);
             }
 
             private bool IsElementAMarkupExtension(XElement element)
             {
                 GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
-                return _settings.Inspector.IsElementAMarkupExtension(elementNameSpace, elementLocalName, assemblyNameIfAny);
+                return _settings.Inspector.IsElementAMarkupExtension(elementNameSpace, elementLocalName, assemblyNameIfAny, element);
             }
 
-            private bool IsTypeAssignableFrom(XName elementOfTypeToAssignFrom, XName elementOfTypeToAssignTo, bool isAttached = false)
+            private bool IsTypeAssignableFrom(XElement from, XElement to, bool isAttached = false)
             {
-                GetClrNamespaceAndLocalName(elementOfTypeToAssignFrom, out string nameSpaceOfTypeToAssignFrom, out string nameOfTypeToAssignFrom, out string assemblyNameOfTypeToAssignFrom);
-                GetClrNamespaceAndLocalName(elementOfTypeToAssignTo, out string nameSpaceOfTypeToAssignTo, out string nameOfTypeToAssignTo, out string assemblyNameOfTypeToAssignTo);
-                return _settings.Inspector.IsTypeAssignableFrom(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom, nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo, isAttached);
+                GetClrNamespaceAndLocalName(from.Name,
+                    out string nameSpaceOfTypeToAssignFrom, out string nameOfTypeToAssignFrom, out string assemblyNameOfTypeToAssignFrom);
+                GetClrNamespaceAndLocalName(to.Name,
+                    out string nameSpaceOfTypeToAssignTo, out string nameOfTypeToAssignTo, out string assemblyNameOfTypeToAssignTo);
+
+                return _settings.Inspector.IsTypeAssignableFrom(
+                    nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom,
+                    nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo,
+                    to, isAttached);
             }
 
             private static void GetClrNamespaceAndLocalName(
@@ -2087,6 +2146,7 @@ namespace OpenSilver.Compiler
 
             private string GetCSharpEquivalentOfXamlTypeAsString(
                 XName xName,
+                IXmlLineInfo lineInfo,
                 bool ifTypeNotFoundTryGuessing,
                 out string namespaceName,
                 out string typeName,
@@ -2102,24 +2162,25 @@ namespace OpenSilver.Compiler
                     namespaceName,
                     typeName,
                     assemblyName,
+                    lineInfo,
                     ifTypeNotFoundTryGuessing);
             }
 
             private string GetCSharpEquivalentOfXamlTypeAsString(
-                XName xName,
+                XElement element,
                 out string namespaceName,
                 out string typeName,
                 out string assemblyName)
-                => GetCSharpEquivalentOfXamlTypeAsString(xName, false, out namespaceName, out typeName, out assemblyName);
+                => GetCSharpEquivalentOfXamlTypeAsString(element.Name, element, false, out namespaceName, out typeName, out assemblyName);
 
-            private string GetCSharpEquivalentOfXamlTypeAsString(XName xName, bool ifTypeNotFoundTryGuessing = false)
-                => GetCSharpEquivalentOfXamlTypeAsString(xName, ifTypeNotFoundTryGuessing, out _, out _, out _);
+            private string GetCSharpEquivalentOfXamlTypeAsString(XName xName, IXmlLineInfo lineInfo, bool ifTypeNotFoundTryGuessing = false)
+                => GetCSharpEquivalentOfXamlTypeAsString(xName, lineInfo, ifTypeNotFoundTryGuessing, out _, out _, out _);
 
             private string ResolveStaticExtension(XElement element)
             {
                 if (element.Attribute("Member") is not XAttribute member)
                 {
-                    throw new XamlParseException("StaticExtension must have Member property set.");
+                    throw new XamlParseException("StaticExtension must have Member property set.", element);
                 }
 
                 string fieldString;
@@ -2128,32 +2189,38 @@ namespace OpenSilver.Compiler
 
                 if (element.Attribute("MemberType") is XAttribute typeAttribute)
                 {
-                    type = GetTypeDefinitionFromString(element, typeAttribute.Value);
+                    type = GetTypeDefinitionFromString(element, typeAttribute.Value, typeAttribute);
                     fieldString = member.Value;
-                    typeNameForError = type.ConvertToString(SupportedLanguage.CSharp);
+                    typeNameForError = TypeReferenceHelper.CSharp.ConvertToString(type);
                 }
                 else
                 {
                     int dotIndex = member.Value.IndexOf('.');
                     if (dotIndex < 0)
                     {
-                        throw new XamlParseException($"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+                        throw new XamlParseException(
+                            $"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property.",
+                            member);
                     }
 
                     // Pull out the type substring (this will include any XML prefix, e.g. "av:Button")
                     string typeString = member.Value.Substring(0, dotIndex);
                     if (string.IsNullOrEmpty(typeString))
                     {
-                        throw new XamlParseException($"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+                        throw new XamlParseException(
+                            $"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property.",
+                            member);
                     }
 
-                    type = GetTypeDefinitionFromString(element, typeString);
+                    type = GetTypeDefinitionFromString(element, typeString, member);
 
                     // Get the member name substring.
                     fieldString = member.Value.Substring(dotIndex + 1, member.Value.Length - dotIndex - 1);
                     if (string.IsNullOrEmpty(typeString))
                     {
-                        throw new XamlParseException($"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+                        throw new XamlParseException(
+                            $"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property.",
+                            member);
                     }
                 }
 
@@ -2170,42 +2237,43 @@ namespace OpenSilver.Compiler
 
                 if (staticField is not null)
                 {
-                    return $"global::{declaringType.ConvertToString(SupportedLanguage.CSharp)}.{staticField.Name}";
+                    return $"global::{TypeReferenceHelper.CSharp.ConvertToString(declaringType)}.{staticField.Name}";
                 }
 
                 (staticProperty, declaringType) = _settings.Inspector.GetProperty(type, fieldString, true, true);
 
                 if (staticProperty is not null)
                 {
-                    return $"global::{declaringType.ConvertToString(SupportedLanguage.CSharp)}.{staticProperty.Name}";
+                    return $"global::{TypeReferenceHelper.CSharp.ConvertToString(declaringType)}.{staticProperty.Name}";
                 }
 
                 throw new XamlParseException(
-                    $"'{(typeNameForError is not null ? $"{typeNameForError}.{member.Value}" : member.Value)}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+                    $"'{(typeNameForError is not null ? $"{typeNameForError}.{member.Value}" : member.Value)}' StaticExtension value cannot be resolved to an enumeration, static field, or static property.",
+                    member);
             }
 
             private string ResolveTypeExtension(XElement element)
             {
                 if (element.Attribute("Type") is XAttribute typeAttribute)
                 {
-                    return GetTypeDefinitionFromString(element, typeAttribute.Value).ConvertToString(SupportedLanguage.CSharp);
+                    return TypeReferenceHelper.CSharp.ConvertToString(GetTypeDefinitionFromString(element, typeAttribute.Value, typeAttribute));
                 }
 
                 if (element.Attribute("TypeName") is not XAttribute typeNameAttribute)
                 {
-                    throw new XamlParseException("TypeExtension must have TypeName property set.");
+                    throw new XamlParseException("TypeExtension must have TypeName property set.", element);
                 }
 
-                return GetTypeDefinitionFromString(element, typeNameAttribute.Value).ConvertToString(SupportedLanguage.CSharp);
+                return TypeReferenceHelper.CSharp.ConvertToString(GetTypeDefinitionFromString(element, typeNameAttribute.Value, typeNameAttribute));
             }
 
-            private TypeDefinition GetTypeDefinitionFromString(XElement element, string value)
+            private TypeDefinition GetTypeDefinitionFromString(XElement element, string value, IXmlLineInfo lineInfo)
             {
                 Debug.Assert(value is not null);
 
                 GetClrNamespaceAndLocalName(value, element, out string namespaceName, out string typeName, out string assemblyName);
 
-                return _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName);
+                return _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
             }
         }
     }

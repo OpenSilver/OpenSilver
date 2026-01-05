@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 using System;
 using System.Xml.Linq;
 
@@ -22,23 +21,19 @@ namespace OpenSilver.Compiler;
 internal sealed class CommandConverter
 {
     private readonly AssembliesInspector _inspector;
-    private readonly SupportedLanguage _language;
-    private readonly string _globalKeyword;
-    private readonly string _nullKeyword;
+    private readonly TypeReferenceHelper _helper;
 
-    public CommandConverter(AssembliesInspector inspector, SupportedLanguage language, string globalKeyword, string nullKeyword)
+    public CommandConverter(AssembliesInspector inspector, TypeReferenceHelper helper)
     {
         _inspector = inspector;
-        _language = language;
-        _globalKeyword = globalKeyword;
-        _nullKeyword = nullKeyword;
+        _helper = helper;
     }
 
-    public string Convert(XElement context, string source)
+    public string Convert(XObject context, string source)
     {
         if (source == string.Empty)
         {
-            return _nullKeyword; // String.Empty <==> null , (for roundtrip cases where Command property values are null)
+            return _helper.Null; // String.Empty <==> null , (for roundtrip cases where Command property values are null)
         }
 
         // Parse "ns:Class.Command" into "ns:Class", and "Command".
@@ -53,7 +48,7 @@ internal sealed class CommandConverter
             return command;
         }
 
-        throw CoreTypesConverter.GetConvertException(source, "System.Windows.Input.ICommand");
+        throw CoreTypesConverter.GetConvertException(source, "System.Windows.Input.ICommand", context);
     }
 
     private string ConvertFromHelper(TypeDefinition ownerType, string localName)
@@ -74,7 +69,7 @@ internal sealed class CommandConverter
             (PropertyDefinition property, TypeReference declaringType) = _inspector.GetProperty(ownerType, localName, true, true);
             if (property is not null)
             {
-                return $"{_globalKeyword}{declaringType.ConvertToString(_language)}.{property.Name}";
+                return $"{_helper.Global}{_helper.ConvertToString(declaringType)}.{property.Name}";
             }
 
             if (command is null)
@@ -83,7 +78,7 @@ internal sealed class CommandConverter
                 (FieldDefinition field, declaringType) = _inspector.GetField(ownerType, localName, true, true);
                 if (field is not null)
                 {
-                    return $"{_globalKeyword}{declaringType.ConvertToString(_language)}.{field.Name}";
+                    return $"{_helper.Global}{_helper.ConvertToString(declaringType)}.{field.Name}";
                 }
             }
         }
@@ -104,8 +99,10 @@ internal sealed class CommandConverter
         return false;
     }
 
-    private TypeDefinition GetTypeFromContext(XElement context, string typeName)
+    private TypeDefinition GetTypeFromContext(XObject context, string typeName)
     {
+        XElement nsProvider = CoreTypesConverter.GetClosestXElement(context);
+
         // Parser Context must exist to get the namespace info from prefix, if not, we assume it is known command.
         if (context is not null && typeName is not null)
         {
@@ -115,15 +112,15 @@ internal sealed class CommandConverter
             if (offset >= 0)
             {
                 string prefix = typeName.Substring(0, offset);
-                xmlns = context.GetNamespaceOfPrefix(prefix).NamespaceName;
+                xmlns = nsProvider.GetNamespaceOfPrefix(prefix).NamespaceName;
                 typeName = typeName.Substring(offset + 1);
             }
             else
             {
-                xmlns = context.GetDefaultNamespace().NamespaceName;
+                xmlns = nsProvider.GetDefaultNamespace().NamespaceName;
             }
 
-            return _inspector.GetTypeDefinition(xmlns, typeName, null, throwIfNull: false);
+            return _inspector.GetTypeDefinition(xmlns, typeName, null, context, throwIfNull: false);
         }
 
         return null;
@@ -151,22 +148,22 @@ internal sealed class CommandConverter
         {
             string knownCommand = localName switch
             {
-                "BrowseBack" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.BrowseBack",
-                "BrowseForward" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.BrowseForward",
-                "BrowseHome" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.BrowseHome",
-                "BrowseStop" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.BrowseStop",
-                "Refresh" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.Refresh",
-                "Favorites" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.Favorites",
-                "Search" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.Search",
-                "IncreaseZoom" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.IncreaseZoom",
-                "DecreaseZoom" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.DecreaseZoom",
-                "Zoom" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.Zoom",
-                "NextPage" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.NextPage",
-                "PreviousPage" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.PreviousPage",
-                "FirstPage" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.FirstPage",
-                "LastPage" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.LastPage",
-                "GoToPage" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.GoToPage",
-                "NavigateJournal" => $"{_globalKeyword}System.Windows.Input.NavigationCommands.NavigateJournal",
+                "BrowseBack" => $"{_helper.Global}System.Windows.Input.NavigationCommands.BrowseBack",
+                "BrowseForward" => $"{_helper.Global}System.Windows.Input.NavigationCommands.BrowseForward",
+                "BrowseHome" => $"{_helper.Global}System.Windows.Input.NavigationCommands.BrowseHome",
+                "BrowseStop" => $"{_helper.Global}System.Windows.Input.NavigationCommands.BrowseStop",
+                "Refresh" => $"{_helper.Global}System.Windows.Input.NavigationCommands.Refresh",
+                "Favorites" => $"{_helper.Global}System.Windows.Input.NavigationCommands.Favorites",
+                "Search" => $"{_helper.Global}System.Windows.Input.NavigationCommands.Search",
+                "IncreaseZoom" => $"{_helper.Global}System.Windows.Input.NavigationCommands.IncreaseZoom",
+                "DecreaseZoom" => $"{_helper.Global}System.Windows.Input.NavigationCommands.DecreaseZoom",
+                "Zoom" => $"{_helper.Global}System.Windows.Input.NavigationCommands.Zoom",
+                "NextPage" => $"{_helper.Global}System.Windows.Input.NavigationCommands.NextPage",
+                "PreviousPage" => $"{_helper.Global}System.Windows.Input.NavigationCommands.PreviousPage",
+                "FirstPage" => $"{_helper.Global}System.Windows.Input.NavigationCommands.FirstPage",
+                "LastPage" => $"{_helper.Global}System.Windows.Input.NavigationCommands.LastPage",
+                "GoToPage" => $"{_helper.Global}System.Windows.Input.NavigationCommands.GoToPage",
+                "NavigateJournal" => $"{_helper.Global}System.Windows.Input.NavigationCommands.NavigateJournal",
                 _ => null,
             };
 
@@ -180,29 +177,29 @@ internal sealed class CommandConverter
         {
             string knownCommand = localName switch
             {
-                "Cut" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Cut",
-                "Copy" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Copy",
-                "Paste" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Paste",
-                "Undo" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Undo",
-                "Redo" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Redo",
-                "Delete" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Delete",
-                "Find" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Find",
-                "Replace" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Replace",
-                "Help" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Help",
-                "New" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.New",
-                "Open" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Open",
-                "Save" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Save",
-                "SaveAs" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.SaveAs",
-                "Close" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Close",
-                "Print" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Print",
-                "CancelPrint" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.CancelPrint",
-                "PrintPreview" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.PrintPreview",
-                "Properties" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Properties",
-                "ContextMenu" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.ContextMenu",
-                "CorrectionList" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.CorrectionList",
-                "SelectAll" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.SelectAll",
-                "Stop" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.Stop",
-                "NotACommand" => $"{_globalKeyword}System.Windows.Input.ApplicationCommands.NotACommand",
+                "Cut" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Cut",
+                "Copy" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Copy",
+                "Paste" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Paste",
+                "Undo" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Undo",
+                "Redo" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Redo",
+                "Delete" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Delete",
+                "Find" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Find",
+                "Replace" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Replace",
+                "Help" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Help",
+                "New" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.New",
+                "Open" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Open",
+                "Save" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Save",
+                "SaveAs" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.SaveAs",
+                "Close" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Close",
+                "Print" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Print",
+                "CancelPrint" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.CancelPrint",
+                "PrintPreview" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.PrintPreview",
+                "Properties" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Properties",
+                "ContextMenu" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.ContextMenu",
+                "CorrectionList" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.CorrectionList",
+                "SelectAll" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.SelectAll",
+                "Stop" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.Stop",
+                "NotACommand" => $"{_helper.Global}System.Windows.Input.ApplicationCommands.NotACommand",
                 _ => null,
             };
 
@@ -216,33 +213,33 @@ internal sealed class CommandConverter
         {
             string knownCommand = localName switch
             {
-                "ScrollPageLeft" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ScrollPageLeft",
-                "ScrollPageRight" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ScrollPageRight",
-                "ScrollPageUp" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ScrollPageUp",
-                "ScrollPageDown" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ScrollPageDown",
-                "ScrollByLine" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ScrollByLine",
-                "MoveLeft" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveLeft",
-                "MoveRight" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveRight",
-                "MoveUp" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveUp",
-                "MoveDown" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveDown",
-                "ExtendSelectionUp" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ExtendSelectionUp",
-                "ExtendSelectionDown" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ExtendSelectionDown",
-                "ExtendSelectionLeft" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ExtendSelectionLeft",
-                "ExtendSelectionRight" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.ExtendSelectionRight",
-                "MoveToHome" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveToHome",
-                "MoveToEnd" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveToEnd",
-                "MoveToPageUp" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveToPageUp",
-                "MoveToPageDown" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveToPageDown",
-                "SelectToHome" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.SelectToHome",
-                "SelectToEnd" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.SelectToEnd",
-                "SelectToPageDown" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.SelectToPageDown",
-                "SelectToPageUp" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.SelectToPageUp",
-                "MoveFocusUp" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveFocusUp",
-                "MoveFocusDown" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveFocusDown",
-                "MoveFocusBack" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveFocusBack",
-                "MoveFocusForward" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveFocusForward",
-                "MoveFocusPageUp" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveFocusPageUp",
-                "MoveFocusPageDown" => $"{_globalKeyword}System.Windows.Input.ComponentCommands.MoveFocusPageDown",
+                "ScrollPageLeft" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ScrollPageLeft",
+                "ScrollPageRight" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ScrollPageRight",
+                "ScrollPageUp" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ScrollPageUp",
+                "ScrollPageDown" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ScrollPageDown",
+                "ScrollByLine" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ScrollByLine",
+                "MoveLeft" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveLeft",
+                "MoveRight" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveRight",
+                "MoveUp" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveUp",
+                "MoveDown" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveDown",
+                "ExtendSelectionUp" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ExtendSelectionUp",
+                "ExtendSelectionDown" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ExtendSelectionDown",
+                "ExtendSelectionLeft" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ExtendSelectionLeft",
+                "ExtendSelectionRight" => $"{_helper.Global}System.Windows.Input.ComponentCommands.ExtendSelectionRight",
+                "MoveToHome" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveToHome",
+                "MoveToEnd" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveToEnd",
+                "MoveToPageUp" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveToPageUp",
+                "MoveToPageDown" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveToPageDown",
+                "SelectToHome" => $"{_helper.Global}System.Windows.Input.ComponentCommands.SelectToHome",
+                "SelectToEnd" => $"{_helper.Global}System.Windows.Input.ComponentCommands.SelectToEnd",
+                "SelectToPageDown" => $"{_helper.Global}System.Windows.Input.ComponentCommands.SelectToPageDown",
+                "SelectToPageUp" => $"{_helper.Global}System.Windows.Input.ComponentCommands.SelectToPageUp",
+                "MoveFocusUp" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveFocusUp",
+                "MoveFocusDown" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveFocusDown",
+                "MoveFocusBack" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveFocusBack",
+                "MoveFocusForward" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveFocusForward",
+                "MoveFocusPageUp" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveFocusPageUp",
+                "MoveFocusPageDown" => $"{_helper.Global}System.Windows.Input.ComponentCommands.MoveFocusPageDown",
                 _ => null,
             };
 
@@ -256,71 +253,71 @@ internal sealed class CommandConverter
         {
             string knownCommand = localName switch
             {
-                "ToggleInsert" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleInsert",
-                "Delete" => $"{_globalKeyword}System.Windows.Input.EditingCommands.Delete",
-                "Backspace" => $"{_globalKeyword}System.Windows.Input.EditingCommands.Backspace",
-                "DeleteNextWord" => $"{_globalKeyword}System.Windows.Input.EditingCommands.DeleteNextWord",
-                "DeletePreviousWord" => $"{_globalKeyword}System.Windows.Input.EditingCommands.DeletePreviousWord",
-                "EnterParagraphBreak" => $"{_globalKeyword}System.Windows.Input.EditingCommands.EnterParagraphBreak",
-                "EnterLineBreak" => $"{_globalKeyword}System.Windows.Input.EditingCommands.EnterLineBreak",
-                "TabForward" => $"{_globalKeyword}System.Windows.Input.EditingCommands.TabForward",
-                "TabBackward" => $"{_globalKeyword}System.Windows.Input.EditingCommands.TabBackward",
-                "MoveRightByCharacter" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveRightByCharacter",
-                "MoveLeftByCharacter" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveLeftByCharacter",
-                "MoveRightByWord" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveRightByWord",
-                "MoveLeftByWord" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveLeftByWord",
-                "MoveDownByLine" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveDownByLine",
-                "MoveUpByLine" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveUpByLine",
-                "MoveDownByParagraph" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveDownByParagraph",
-                "MoveUpByParagraph" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveUpByParagraph",
-                "MoveDownByPage" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveDownByPage",
-                "MoveUpByPage" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveUpByPage",
-                "MoveToLineStart" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveToLineStart",
-                "MoveToLineEnd" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveToLineEnd",
-                "MoveToDocumentStart" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveToDocumentStart",
-                "MoveToDocumentEnd" => $"{_globalKeyword}System.Windows.Input.EditingCommands.MoveToDocumentEnd",
-                "SelectRightByCharacter" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectRightByCharacter",
-                "SelectLeftByCharacter" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectLeftByCharacter",
-                "SelectRightByWord" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectRightByWord",
-                "SelectLeftByWord" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectLeftByWord",
-                "SelectDownByLine" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectDownByLine",
-                "SelectUpByLine" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectUpByLine",
-                "SelectDownByParagraph" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectDownByParagraph",
-                "SelectUpByParagraph" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectUpByParagraph",
-                "SelectDownByPage" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectDownByPage",
-                "SelectUpByPage" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectUpByPage",
-                "SelectToLineStart" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectToLineStart",
-                "SelectToLineEnd" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectToLineEnd",
-                "SelectToDocumentStart" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectToDocumentStart",
-                "SelectToDocumentEnd" => $"{_globalKeyword}System.Windows.Input.EditingCommands.SelectToDocumentEnd",
-                "ToggleBold" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleBold",
-                "ToggleItalic" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleItalic",
-                "ToggleUnderline" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleUnderline",
-                "ToggleSubscript" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleSubscript",
-                "ToggleSuperscript" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleSuperscript",
-                "IncreaseFontSize" => $"{_globalKeyword}System.Windows.Input.EditingCommands.IncreaseFontSize",
-                "DecreaseFontSize" => $"{_globalKeyword}System.Windows.Input.EditingCommands.DecreaseFontSize",
+                "ToggleInsert" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleInsert",
+                "Delete" => $"{_helper.Global}System.Windows.Input.EditingCommands.Delete",
+                "Backspace" => $"{_helper.Global}System.Windows.Input.EditingCommands.Backspace",
+                "DeleteNextWord" => $"{_helper.Global}System.Windows.Input.EditingCommands.DeleteNextWord",
+                "DeletePreviousWord" => $"{_helper.Global}System.Windows.Input.EditingCommands.DeletePreviousWord",
+                "EnterParagraphBreak" => $"{_helper.Global}System.Windows.Input.EditingCommands.EnterParagraphBreak",
+                "EnterLineBreak" => $"{_helper.Global}System.Windows.Input.EditingCommands.EnterLineBreak",
+                "TabForward" => $"{_helper.Global}System.Windows.Input.EditingCommands.TabForward",
+                "TabBackward" => $"{_helper.Global}System.Windows.Input.EditingCommands.TabBackward",
+                "MoveRightByCharacter" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveRightByCharacter",
+                "MoveLeftByCharacter" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveLeftByCharacter",
+                "MoveRightByWord" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveRightByWord",
+                "MoveLeftByWord" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveLeftByWord",
+                "MoveDownByLine" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveDownByLine",
+                "MoveUpByLine" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveUpByLine",
+                "MoveDownByParagraph" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveDownByParagraph",
+                "MoveUpByParagraph" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveUpByParagraph",
+                "MoveDownByPage" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveDownByPage",
+                "MoveUpByPage" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveUpByPage",
+                "MoveToLineStart" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveToLineStart",
+                "MoveToLineEnd" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveToLineEnd",
+                "MoveToDocumentStart" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveToDocumentStart",
+                "MoveToDocumentEnd" => $"{_helper.Global}System.Windows.Input.EditingCommands.MoveToDocumentEnd",
+                "SelectRightByCharacter" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectRightByCharacter",
+                "SelectLeftByCharacter" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectLeftByCharacter",
+                "SelectRightByWord" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectRightByWord",
+                "SelectLeftByWord" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectLeftByWord",
+                "SelectDownByLine" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectDownByLine",
+                "SelectUpByLine" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectUpByLine",
+                "SelectDownByParagraph" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectDownByParagraph",
+                "SelectUpByParagraph" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectUpByParagraph",
+                "SelectDownByPage" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectDownByPage",
+                "SelectUpByPage" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectUpByPage",
+                "SelectToLineStart" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectToLineStart",
+                "SelectToLineEnd" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectToLineEnd",
+                "SelectToDocumentStart" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectToDocumentStart",
+                "SelectToDocumentEnd" => $"{_helper.Global}System.Windows.Input.EditingCommands.SelectToDocumentEnd",
+                "ToggleBold" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleBold",
+                "ToggleItalic" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleItalic",
+                "ToggleUnderline" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleUnderline",
+                "ToggleSubscript" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleSubscript",
+                "ToggleSuperscript" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleSuperscript",
+                "IncreaseFontSize" => $"{_helper.Global}System.Windows.Input.EditingCommands.IncreaseFontSize",
+                "DecreaseFontSize" => $"{_helper.Global}System.Windows.Input.EditingCommands.DecreaseFontSize",
                 // BEGIN Application Compatibility Note
                 // The following commands are internal, but they are exposed publicly
                 // from our command converter.  We cannot change this behavior
                 // because it is well documented.  For example, in the
                 // "WPF XAML Vocabulary Specification 2006" found here:
                 // http://msdn.microsoft.com/en-us/library/dd361848(PROT.10).aspx
-                "ApplyFontSize" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ApplyFontSize",
-                "ApplyFontFamily" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ApplyFontFamily",
-                "ApplyForeground" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ApplyForeground",
-                "ApplyBackground" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ApplyBackground",
+                "ApplyFontSize" => $"{_helper.Global}System.Windows.Input.EditingCommands.ApplyFontSize",
+                "ApplyFontFamily" => $"{_helper.Global}System.Windows.Input.EditingCommands.ApplyFontFamily",
+                "ApplyForeground" => $"{_helper.Global}System.Windows.Input.EditingCommands.ApplyForeground",
+                "ApplyBackground" => $"{_helper.Global}System.Windows.Input.EditingCommands.ApplyBackground",
                 // END Application Compatibility Note
-                "AlignLeft" => $"{_globalKeyword}System.Windows.Input.EditingCommands.AlignLeft",
-                "AlignCenter" => $"{_globalKeyword}System.Windows.Input.EditingCommands.AlignCenter",
-                "AlignRight" => $"{_globalKeyword}System.Windows.Input.EditingCommands.AlignRight",
-                "AlignJustify" => $"{_globalKeyword}System.Windows.Input.EditingCommands.AlignJustify",
-                "ToggleBullets" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleBullets",
-                "ToggleNumbering" => $"{_globalKeyword}System.Windows.Input.EditingCommands.ToggleNumbering",
-                "IncreaseIndentation" => $"{_globalKeyword}System.Windows.Input.EditingCommands.IncreaseIndentation",
-                "DecreaseIndentation" => $"{_globalKeyword}System.Windows.Input.EditingCommands.DecreaseIndentation",
-                "CorrectSpellingError" => $"{_globalKeyword}System.Windows.Input.EditingCommands.CorrectSpellingError",
-                "IgnoreSpellingError" => $"{_globalKeyword}System.Windows.Input.EditingCommands.IgnoreSpellingError",
+                "AlignLeft" => $"{_helper.Global}System.Windows.Input.EditingCommands.AlignLeft",
+                "AlignCenter" => $"{_helper.Global}System.Windows.Input.EditingCommands.AlignCenter",
+                "AlignRight" => $"{_helper.Global}System.Windows.Input.EditingCommands.AlignRight",
+                "AlignJustify" => $"{_helper.Global}System.Windows.Input.EditingCommands.AlignJustify",
+                "ToggleBullets" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleBullets",
+                "ToggleNumbering" => $"{_helper.Global}System.Windows.Input.EditingCommands.ToggleNumbering",
+                "IncreaseIndentation" => $"{_helper.Global}System.Windows.Input.EditingCommands.IncreaseIndentation",
+                "DecreaseIndentation" => $"{_helper.Global}System.Windows.Input.EditingCommands.DecreaseIndentation",
+                "CorrectSpellingError" => $"{_helper.Global}System.Windows.Input.EditingCommands.CorrectSpellingError",
+                "IgnoreSpellingError" => $"{_helper.Global}System.Windows.Input.EditingCommands.IgnoreSpellingError",
                 _ => null,
             };
 
@@ -334,30 +331,30 @@ internal sealed class CommandConverter
         {
             string knownCommand = localName switch
             {
-                "Play" => $"{_globalKeyword}System.Windows.Input.MediaCommands.Play",
-                "Pause" => $"{_globalKeyword}System.Windows.Input.MediaCommands.Pause",
-                "Stop" => $"{_globalKeyword}System.Windows.Input.MediaCommands.Stop",
-                "Record" => $"{_globalKeyword}System.Windows.Input.MediaCommands.Record",
-                "NextTrack" => $"{_globalKeyword}System.Windows.Input.MediaCommands.NextTrack",
-                "PreviousTrack" => $"{_globalKeyword}System.Windows.Input.MediaCommands.PreviousTrack",
-                "FastForward" => $"{_globalKeyword}System.Windows.Input.MediaCommands.FastForward",
-                "Rewind" => $"{_globalKeyword}System.Windows.Input.MediaCommands.Rewind",
-                "ChannelUp" => $"{_globalKeyword}System.Windows.Input.MediaCommands.ChannelUp",
-                "ChannelDown" => $"{_globalKeyword}System.Windows.Input.MediaCommands.ChannelDown",
-                "TogglePlayPause" => $"{_globalKeyword}System.Windows.Input.MediaCommands.TogglePlayPause",
-                "IncreaseVolume" => $"{_globalKeyword}System.Windows.Input.MediaCommands.IncreaseVolume",
-                "DecreaseVolume" => $"{_globalKeyword}System.Windows.Input.MediaCommands.DecreaseVolume",
-                "MuteVolume" => $"{_globalKeyword}System.Windows.Input.MediaCommands.MuteVolume",
-                "IncreaseTreble" => $"{_globalKeyword}System.Windows.Input.MediaCommands.IncreaseTreble",
-                "DecreaseTreble" => $"{_globalKeyword}System.Windows.Input.MediaCommands.DecreaseTreble",
-                "IncreaseBass" => $"{_globalKeyword}System.Windows.Input.MediaCommands.IncreaseBass",
-                "DecreaseBass" => $"{_globalKeyword}System.Windows.Input.MediaCommands.DecreaseBass",
-                "BoostBass" => $"{_globalKeyword}System.Windows.Input.MediaCommands.BoostBass",
-                "IncreaseMicrophoneVolume" => $"{_globalKeyword}System.Windows.Input.MediaCommands.IncreaseMicrophoneVolume",
-                "DecreaseMicrophoneVolume" => $"{_globalKeyword}System.Windows.Input.MediaCommands.DecreaseMicrophoneVolume",
-                "MuteMicrophoneVolume" => $"{_globalKeyword}System.Windows.Input.MediaCommands.MuteMicrophoneVolume",
-                "ToggleMicrophoneOnOff" => $"{_globalKeyword}System.Windows.Input.MediaCommands.ToggleMicrophoneOnOff",
-                "Select" => $"{_globalKeyword}System.Windows.Input.MediaCommands.Select",
+                "Play" => $"{_helper.Global}System.Windows.Input.MediaCommands.Play",
+                "Pause" => $"{_helper.Global}System.Windows.Input.MediaCommands.Pause",
+                "Stop" => $"{_helper.Global}System.Windows.Input.MediaCommands.Stop",
+                "Record" => $"{_helper.Global}System.Windows.Input.MediaCommands.Record",
+                "NextTrack" => $"{_helper.Global}System.Windows.Input.MediaCommands.NextTrack",
+                "PreviousTrack" => $"{_helper.Global}System.Windows.Input.MediaCommands.PreviousTrack",
+                "FastForward" => $"{_helper.Global}System.Windows.Input.MediaCommands.FastForward",
+                "Rewind" => $"{_helper.Global}System.Windows.Input.MediaCommands.Rewind",
+                "ChannelUp" => $"{_helper.Global}System.Windows.Input.MediaCommands.ChannelUp",
+                "ChannelDown" => $"{_helper.Global}System.Windows.Input.MediaCommands.ChannelDown",
+                "TogglePlayPause" => $"{_helper.Global}System.Windows.Input.MediaCommands.TogglePlayPause",
+                "IncreaseVolume" => $"{_helper.Global}System.Windows.Input.MediaCommands.IncreaseVolume",
+                "DecreaseVolume" => $"{_helper.Global}System.Windows.Input.MediaCommands.DecreaseVolume",
+                "MuteVolume" => $"{_helper.Global}System.Windows.Input.MediaCommands.MuteVolume",
+                "IncreaseTreble" => $"{_helper.Global}System.Windows.Input.MediaCommands.IncreaseTreble",
+                "DecreaseTreble" => $"{_helper.Global}System.Windows.Input.MediaCommands.DecreaseTreble",
+                "IncreaseBass" => $"{_helper.Global}System.Windows.Input.MediaCommands.IncreaseBass",
+                "DecreaseBass" => $"{_helper.Global}System.Windows.Input.MediaCommands.DecreaseBass",
+                "BoostBass" => $"{_helper.Global}System.Windows.Input.MediaCommands.BoostBass",
+                "IncreaseMicrophoneVolume" => $"{_helper.Global}System.Windows.Input.MediaCommands.IncreaseMicrophoneVolume",
+                "DecreaseMicrophoneVolume" => $"{_helper.Global}System.Windows.Input.MediaCommands.DecreaseMicrophoneVolume",
+                "MuteMicrophoneVolume" => $"{_helper.Global}System.Windows.Input.MediaCommands.MuteMicrophoneVolume",
+                "ToggleMicrophoneOnOff" => $"{_helper.Global}System.Windows.Input.MediaCommands.ToggleMicrophoneOnOff",
+                "Select" => $"{_helper.Global}System.Windows.Input.MediaCommands.Select",
                 _ => null,
             };
 

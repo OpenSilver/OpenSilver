@@ -42,7 +42,7 @@ namespace OpenSilver.Compiler
             {
                 GetClassInformationFromXaml(_reader.Document, _settings.Inspector,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
-                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
+                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root, true);
 
                 List<string> resultingFieldsForNamedElements = new List<string>();
                 List<string> resultingMethods = new List<string>();
@@ -78,7 +78,7 @@ namespace OpenSilver.Compiler
                             // or any other c# keyword)
                             string fieldName = "@" + name;
                             resultingFieldsForNamedElements.Add(
-                                $"{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element.Name, true)} {fieldName};");
+                                $"{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element, true)} {fieldName};");
                         }
                     }
                 }
@@ -154,14 +154,14 @@ namespace OpenSilver.Compiler
             }
 
             private string GetCSharpEquivalentOfXamlTypeAsString(
-                XName xName,
+                XElement element,
                 bool ifTypeNotFoundTryGuessing,
                 out string namespaceName,
                 out string typeName,
                 out string assemblyName)
             {
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
-                    xName,
+                    element.Name,
                     out namespaceName,
                     out typeName,
                     out assemblyName);
@@ -170,11 +170,12 @@ namespace OpenSilver.Compiler
                     namespaceName,
                     typeName,
                     assemblyName,
+                    element,
                     ifTypeNotFoundTryGuessing);
             }
 
-            private string GetCSharpEquivalentOfXamlTypeAsString(XName xName, bool ifTypeNotFoundTryGuessing = false)
-                => GetCSharpEquivalentOfXamlTypeAsString(xName, ifTypeNotFoundTryGuessing, out _, out _, out _);
+            private string GetCSharpEquivalentOfXamlTypeAsString(XElement element, bool ifTypeNotFoundTryGuessing = false)
+                => GetCSharpEquivalentOfXamlTypeAsString(element, ifTypeNotFoundTryGuessing, out _, out _, out _);
         }
     }
 }

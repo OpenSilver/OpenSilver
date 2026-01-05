@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -82,7 +83,8 @@ namespace OpenSilver.Compiler
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
                                 settings.Inspector,
-                                currentElement));
+                                currentElement,
+                                currentAttribute));
                         }
                         else // currentAttribute is an attached property
                         {
@@ -91,7 +93,8 @@ namespace OpenSilver.Compiler
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
                                 settings.Inspector,
-                                currentElement));
+                                currentElement,
+                                currentAttribute));
                         }
                         currentAttribute.Remove();
                     }
@@ -116,8 +119,8 @@ namespace OpenSilver.Compiler
                     if (indexOfClosingBracket < 0)
                     {
                         throw new XamlParseException(
-                            $"Invalid value for attribute '{attribute.Name}'. Use \"{{}}\" to escape '{{'.",
-                            GeneratingCode.GetLineNumber(attribute.Parent), -1);
+                            $"Invalid value for attribute '{attribute.Name}'. Use '{{}}' to escape '{{'.",
+                            attribute);
                     }
                     string contentBetweenBrackets = value.Substring(1, indexOfClosingBracket - 1);
                     if (string.IsNullOrEmpty(contentBetweenBrackets)) //handle special case where '{' is escaped with "{}"
@@ -135,8 +138,8 @@ namespace OpenSilver.Compiler
                         else
                         {
                             throw new XamlParseException(
-                                $"Invalid value for attribute '{attribute.Name}'. Use {{}} to escape '{{'.",
-                                GeneratingCode.GetLineNumber(attribute.Parent), -1);
+                                $"Invalid value for attribute '{attribute.Name}'. Use '{{}}' to escape '{{'.",
+                                attribute);
                         }
                     }
                 }
@@ -156,7 +159,8 @@ namespace OpenSilver.Compiler
             string attributeValue,
             XNamespace lastDefaultNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
-            XElement currentElement)
+            XElement currentElement,
+            IXmlLineInfo lineInfo)
         {
             Dictionary<string, string> listOfSubAttributes = GenerateListOfAttributesFromString(attributeValue);
             var elementsToAdd = new List<XElement>();
@@ -202,7 +206,7 @@ namespace OpenSilver.Compiler
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(currentSubAttributeWithoutUselessPart.Length - 1, 1); //to remove the '}' at the end
 
                         // We add the suffix "Extension" to the markup extension name (unless it is a Binding or RelativeSource). For example, "StaticResource" becomes "StaticResourceExtension":
-                        if (ShouldAddExtension(nextClassName, currentElement, reflectionOnSeparateAppDomain))
+                        if (ShouldAddExtension(nextClassName, currentElement, reflectionOnSeparateAppDomain, lineInfo))
                         {
                             // this is a trick, we need to check if :
                             // - type named 'MyCurrentMarkupExtensionName' exist.
@@ -215,7 +219,7 @@ namespace OpenSilver.Compiler
                         // Determine the namespace and local name:
                         XNamespace ns;
                         string localName;
-                        if (!TryGetNamespaceFromNameThatMayHaveAPrefix(nextClassName, currentElement, out ns, out localName))
+                        if (!TryGetNamespaceFromNameThatMayHaveAPrefix(nextClassName, currentElement, lineInfo, out ns, out localName))
                         {
                             ns = lastDefaultNamespace;
                             localName = nextClassName;
@@ -227,17 +231,21 @@ namespace OpenSilver.Compiler
                             currentSubAttributeWithoutUselessPart,
                             lastDefaultNamespace,
                             reflectionOnSeparateAppDomain,
-                            currentElement);
+                            currentElement,
+                            lineInfo);
                         XElement subXElement1 = subXElement;
                         if (!nodeName.LocalName.Contains('.'))
                         {
-                            subXElement1 = new XElement(nodeName + "." + keyString, subXElement);
+                            var e = new ExtendedXElement(nodeName + "." + keyString, subXElement);
+                            e.SetLineInfo(lineInfo);
+
+                            subXElement1 = e;
                         }
                         elementsToAdd.Add(subXElement1);
                     }
                     catch (Exception ex)
                     {
-                        throw new XamlParseException("Error in the following markup extension: \"" + currentAttribute + "\". " + ex.Message);
+                        throw new XamlParseException($"Error in the following markup extension: '{currentAttribute}'.", lineInfo, ex);
                     }
                 }
                 else //it can be directly set as an attribute because it is not a markupExtension:
@@ -254,7 +262,9 @@ namespace OpenSilver.Compiler
                             out string namespaceName,
                             out string localName,
                             out string assemblyNameIfAny);
-                        keyStringAfterPlaceHolderReplacement = reflectionOnSeparateAppDomain.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+
+                        keyStringAfterPlaceHolderReplacement = reflectionOnSeparateAppDomain.GetContentPropertyName(
+                            namespaceName, localName, assemblyNameIfAny, lineInfo);
                     }
                     else if (keyStringAfterPlaceHolderReplacement.StartsWith("{")) //if we enter this if, it means that keyString is of the form "{Binding ElementName" so we want to remove "{Binding "
                     {
@@ -277,7 +287,10 @@ namespace OpenSilver.Compiler
                         }
                     }
                     currentAttribute = currentAttribute.Replace("<COMMA>", ","); // Unescape (cf. code where <COMMA> is added)
-                    XAttribute attribute = new XAttribute(keyStringAfterPlaceHolderReplacement, currentAttribute);
+
+                    var attribute = new ExtendedXAttribute(keyStringAfterPlaceHolderReplacement, currentAttribute);
+                    attribute.SetLineInfo(lineInfo);
+
                     attributesToAdd.Add(attribute);
                 }
             }
@@ -290,13 +303,15 @@ namespace OpenSilver.Compiler
             {
                 actualNodeName = splittedNodeName[1] + "." + splittedNodeName[2];
             }
-            XElement xElement = new XElement(nodeNamespace + actualNodeName, attributesToAdd, elementsToAdd);
+            var xElement = new ExtendedXElement(nodeNamespace + actualNodeName, attributesToAdd, elementsToAdd);
+            xElement.SetLineInfo(lineInfo);
             return xElement;
         }
 
-        static bool TryGetNamespaceFromNameThatMayHaveAPrefix(
+        private static bool TryGetNamespaceFromNameThatMayHaveAPrefix(
             string nameThatMayHaveAPrefix,
             XElement currentElement,
+            IXmlLineInfo lineInfo,
             out XNamespace ns,
             out string localName)
         {
@@ -315,13 +330,13 @@ namespace OpenSilver.Compiler
                     else
                     {
                         // Unknown prefix.
-                        throw new XamlParseException($"Unknown prefix '{prefix}' in '{nameThatMayHaveAPrefix}'");
+                        throw new XamlParseException($"'{prefix}' is an undeclared prefix.", lineInfo);
                     }
                 }
                 else
                 {
                     // Empty prefix.
-                    throw new XamlParseException($"Empty prefix in '{nameThatMayHaveAPrefix}'");
+                    throw new XamlParseException("Name cannot begin with the ':' character.", lineInfo);
                 }
             }
             else
@@ -492,7 +507,7 @@ namespace OpenSilver.Compiler
             });
         }
 
-        private static bool ShouldAddExtension(string name, XElement currentElement, AssembliesInspector reflectionOnSeparateAppDomain)
+        private static bool ShouldAddExtension(string name, XElement currentElement, AssembliesInspector reflectionOnSeparateAppDomain, IXmlLineInfo lineInfo)
         {
             string typeName;
             XNamespace xmlns;
@@ -513,7 +528,7 @@ namespace OpenSilver.Compiler
             {
                 (string clrNS, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(xmlns.NamespaceName);
 
-                return reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(clrNS, typeName, assemblyName) == null;
+                return reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(clrNS, typeName, assemblyName, lineInfo) == null;
             }
 
             return false;

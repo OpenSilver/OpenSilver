@@ -11,13 +11,13 @@
 *
 \*====================================================================================*/
 
+using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Xml;
 using System.Xml.Linq;
-using Mono.Cecil;
-using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 
 namespace OpenSilver.Compiler
 {
@@ -38,98 +38,98 @@ namespace OpenSilver.Compiler
 
         public void UnloadAssembly(AssemblyDefinition assembly) => _monoCecilVersion.UnloadAssembly(assembly);
 
-        public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-            => _monoCecilVersion.GetContentPropertyName(namespaceName, localTypeName, assemblyNameIfAny);
+        public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetContentPropertyName(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
 
-        public bool IsPropertyAttached(string propertyName, string declaringTypeNamespaceName, string declaringTypeLocalName, string parentNamespaceName, string parentLocalTypeName, string declaringTypeAssemblyIfAny = null)
-            => _monoCecilVersion.IsPropertyAttached(propertyName, declaringTypeNamespaceName, declaringTypeLocalName, parentNamespaceName, parentLocalTypeName, declaringTypeAssemblyIfAny);
+        public bool IsPropertyAttached(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsPropertyAttached(propertyName, namespaceName, typeName, assemblyName, lineInfo);
 
-        public bool IsPropertyOrFieldACollection(string propertyName, string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
-            => _monoCecilVersion.IsPropertyOrFieldACollection(propertyName, parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
+        public bool IsPropertyOrFieldACollection(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsPropertyOrFieldACollection(propertyName, namespaceName, typeName, assemblyName, lineInfo);
 
-        public bool IsPropertyOrFieldADictionary(string propertyName, string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
-            => _monoCecilVersion.IsPropertyOrFieldADictionary(propertyName, parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
+        public bool IsPropertyOrFieldADictionary(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsPropertyOrFieldADictionary(propertyName, namespaceName, typeName, assemblyName, lineInfo);
 
-        public bool DoesMethodReturnACollection(string methodName, string typeNamespaceName, string localTypeName, string typeAssemblyNameIfAny = null)
-            => _monoCecilVersion.DoesMethodReturnACollection(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
+        public bool DoesMethodReturnACollection(string methodName, string typeNamespaceName, string localTypeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.DoesMethodReturnACollection(methodName, typeNamespaceName, localTypeName, assemblyName, lineInfo);
 
-        public bool DoesMethodReturnADictionary(string methodName, string typeNamespaceName, string localTypeName, string typeAssemblyNameIfAny = null)
-            => _monoCecilVersion.DoesMethodReturnADictionary(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
+        public bool DoesMethodReturnADictionary(string methodName, string typeNamespaceName, string localTypeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.DoesMethodReturnADictionary(methodName, typeNamespaceName, localTypeName, assemblyName, lineInfo);
 
-        public bool IsElementADictionary(string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
-            => _monoCecilVersion.IsElementADictionary(parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
+        public bool IsElementADictionary(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsElementADictionary(namespaceName, typeName, assemblyName, lineInfo);
 
-        public bool IsElementAMarkupExtension(string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
-            => _monoCecilVersion.IsElementAMarkupExtension(parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
+        public bool IsElementAMarkupExtension(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsElementAMarkupExtension(namespaceName, typeName, assemblyName, lineInfo);
 
-        public bool IsTypeAssignableFrom(string nameSpaceOfTypeToAssignFrom, string nameOfTypeToAssignFrom, string assemblyNameOfTypeToAssignFrom, string nameSpaceOfTypeToAssignTo, string nameOfTypeToAssignTo, string assemblyNameOfTypeToAssignTo, bool isAttached = false)
-            => _monoCecilVersion.IsTypeAssignableFrom(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom, nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo, isAttached);
+        public bool IsTypeAssignableFrom(string nameSpaceOfTypeToAssignFrom, string nameOfTypeToAssignFrom, string assemblyNameOfTypeToAssignFrom, string nameSpaceOfTypeToAssignTo, string nameOfTypeToAssignTo, string assemblyNameOfTypeToAssignTo, IXmlLineInfo lineInfo, bool isAttached = false)
+            => _monoCecilVersion.IsTypeAssignableFrom(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom, nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo, lineInfo, isAttached);
 
-        public bool DoesTypeContainNameMemberOfTypeString(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-            => _monoCecilVersion.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny);
+        public bool DoesTypeContainNameMemberOfTypeString(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
 
-        public XName GetCSharpEquivalentOfXamlTypeAsXName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-            => _monoCecilVersion.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny);
+        public XName GetCSharpEquivalentOfXamlTypeAsXName(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
 
-        public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
-            => _monoCecilVersion.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName,
-                assemblyNameIfAny, ifTypeNotFoundTryGuessing);
+        public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny,
+            IXmlLineInfo lineInfo, bool ifTypeNotFoundTryGuessing = false)
+            => _monoCecilVersion.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, lineInfo, ifTypeNotFoundTryGuessing);
 
-        public string GetAssemblyQualifiedNameOfXamlType(string namespaceName, string localTypeName, string assemblyName)
-            => _monoCecilVersion.GetAssemblyQualifiedNameOfXamlType(namespaceName, localTypeName, assemblyName);
+        public string GetAssemblyQualifiedNameOfXamlType(string namespaceName, string localTypeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetAssemblyQualifiedNameOfXamlType(namespaceName, localTypeName, assemblyName, lineInfo);
 
-        public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-            => _monoCecilVersion.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
+        public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
 
-        public (MemberTypes Type, MethodDefinition Method, TypeReference DeclaringType) GetAttachedMemberType(string memberName, string ownerTypeNamespace, string ownerTypeName, string ownerTypeAssemblyName)
-            => _monoCecilVersion.GetAttachedMemberType(memberName, ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName);
+        public (MemberTypes Type, MethodDefinition Method, TypeReference DeclaringType) GetAttachedMemberType(string memberName, string ownerTypeNamespace, string ownerTypeName, string ownerTypeAssemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetAttachedMemberType(memberName, ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName, lineInfo);
 
-        public bool IsTypeAnEnum(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-            => _monoCecilVersion.IsTypeAnEnum(namespaceName, localTypeName, assemblyNameIfAny);
+        public bool IsTypeAnEnum(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsTypeAnEnum(namespaceName, typeName, assemblyName, lineInfo);
 
-        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out string returnValueAssemblyName, out bool isTypeEnum, string assemblyNameIfAny = null)
-            => _monoCecilVersion.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out returnValueAssemblyName, out isTypeEnum, assemblyNameIfAny);
+        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo, out string returnValueNamespaceName, out string returnValueLocalTypeName, out string returnValueAssemblyName, out bool isTypeEnum)
+            => _monoCecilVersion.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo, out returnValueNamespaceName, out returnValueLocalTypeName, out returnValueAssemblyName, out isTypeEnum);
 
-        public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, string assemblyNameIfAny = null)
-            => _monoCecilVersion.GetAttachedPropertyGetMethodInfo(methodName, namespaceName, localTypeName,
-                out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, assemblyNameIfAny);
+        public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName)
+            => _monoCecilVersion.GetAttachedPropertyGetMethodInfo(methodName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
+                out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName);
 
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
-            => _monoCecilVersion.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName,
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeEnum, bool isAttached = false)
+            => _monoCecilVersion.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
                 out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName,
-                out isTypeEnum, assemblyNameIfAny, isAttached: isAttached);
+                out isTypeEnum, isAttached: isAttached);
 
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeEnum, out bool hasTypeConverter, string assemblyNameIfAny = null, bool isAttached = false)
-            => _monoCecilVersion.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName,
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeEnum, out bool hasTypeConverter, bool isAttached = false)
+            => _monoCecilVersion.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
                 out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName,
-                out isTypeEnum, out hasTypeConverter, assemblyNameIfAny, isAttached: isAttached);
+                out isTypeEnum, out hasTypeConverter, isAttached: isAttached);
 
-        public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName, string assemblyNameIfAny = null, bool isAttached = false)
-            => _monoCecilVersion.GetPropertyOrFieldInfo(propertyOrFieldName, namespaceName, localTypeName, out memberDeclaringTypeName, out memberTypeNamespace, out memberTypeName, assemblyNameIfAny, isAttached);
+        public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName)
+            => _monoCecilVersion.GetPropertyOrFieldInfo(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo, out memberDeclaringTypeName, out memberTypeNamespace, out memberTypeName);
 
-        public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName)
-            => _monoCecilVersion.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName);
+        public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName, lineInfo);
 
-        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName)
-            => _monoCecilVersion.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName);
+        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName, lineInfo);
 
-        public bool IsResourceDictionarySourcePropertyVisible( string namespaceName, string typeName)
-            => _monoCecilVersion.IsResourceDictionarySourcePropertyVisible(namespaceName, typeName);
+        public bool IsResourceDictionarySourcePropertyVisible(string namespaceName, string typeName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsResourceDictionarySourcePropertyVisible(namespaceName, typeName, lineInfo);
 
-        public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
-            => _monoCecilVersion.GetField(fieldName, namespaceName, typeName, assemblyName);
+        public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetField(fieldName, namespaceName, typeName, assemblyName, lineInfo);
 
-        public string GetProperty(string fieldName, string namespaceName, string typeName, string assemblyName)
-            => _monoCecilVersion.GetProperty(fieldName, namespaceName, typeName, assemblyName);
+        public string GetProperty(string fieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetProperty(fieldName, namespaceName, typeName, assemblyName, lineInfo);
 
-        public TypeDefinition GetTypeDefinition(string namespaceName, string typeName, string assemblyName, bool throwIfNull = true)
-            => _monoCecilVersion.FindType(namespaceName, typeName, assemblyName, !throwIfNull);
+        public TypeDefinition GetTypeDefinition(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo, bool throwIfNull = true)
+            => _monoCecilVersion.FindType(namespaceName, typeName, assemblyName, lineInfo, !throwIfNull);
 
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
             => _monoCecilVersion.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
 
-        public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
-            => _monoCecilVersion.GetEnumValues(enumType, name, ignoreCase, allowIntegerValue);
+        public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.GetEnumValues(enumType, name, ignoreCase, allowIntegerValue, lineInfo);
 
         public (FieldDefinition Field, TypeReference DeclaringType) GetField(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
         {

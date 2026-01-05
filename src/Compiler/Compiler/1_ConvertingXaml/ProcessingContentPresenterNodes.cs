@@ -51,7 +51,8 @@ internal static class ProcessingContentPresenterNodes
 
         if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains(".") &&
             settings.Inspector.IsAssignableFrom(SystemWindowsControlsClrNamespace, "ContentPresenter",
-                currentElement.Name.NamespaceName, currentElement.Name.LocalName))
+                currentElement.Name.NamespaceName, currentElement.Name.LocalName,
+                currentElement))
         {
             bool hasContentAttribute = HasAttribute(currentElement, "Content", settings.Inspector);
             bool hasContentTemplateAttribute = HasAttribute(currentElement, "ContentTemplate", settings.Inspector);
@@ -126,7 +127,8 @@ internal static class ProcessingContentPresenterNodes
                 SystemWindowsControlsClrNamespace,
                 "ContentControl",
                 namespaceName,
-                typeName);
+                typeName,
+                element);
         }
 
         return false;
@@ -152,7 +154,8 @@ internal static class ProcessingContentPresenterNodes
                             SystemWindowsControlsClrNamespace,
                             "ContentPresenter",
                             namespaceName,
-                            typeAndProperty[0]);
+                            typeAndProperty[0],
+                            child);
 
                         if (isProperty)
                         {

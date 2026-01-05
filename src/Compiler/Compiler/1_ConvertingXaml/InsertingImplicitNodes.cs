@@ -94,13 +94,16 @@ namespace OpenSilver.Compiler
                         out string namespaceName,
                         out string localName,
                         out string assemblyNameIfAny);
-                    var contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+                    var contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny, currentElement);
                     XElement contentWrapper = currentElement;
                     
                     if (contentPropertyName != null)
                     {
                         // Wrap the child elements
-                        contentWrapper = new XElement(currentElement.Name + "." + contentPropertyName);
+                        var wrapper = new ExtendedXElement(currentElement.Name + "." + contentPropertyName);
+                        wrapper.SetLineInfo(currentElement);
+
+                        contentWrapper = wrapper;
                     }
                     
                     foreach (var childElement in nodesThatAreNotPropertiesOfTheObject)
@@ -140,10 +143,8 @@ namespace OpenSilver.Compiler
                         out string assemblyNameIfAny);
 
                     string elementTypeInCSharp = settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                            namespaceName, localName, assemblyNameIfAny, false
-                    );
+                        namespaceName, localName, assemblyNameIfAny, currentElement, false);
                                     
-
                     // Distinguish system types (string, double, etc.) to other types
                     if (settings.SystemTypes.IsKnownType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
                     {
@@ -151,7 +152,7 @@ namespace OpenSilver.Compiler
                         // later in the process. Example: "<sys:Double>50</sys:Double>"
                         // becomes "Double x = 50;"
                     }
-                    else if (settings.Inspector.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny) ||
+                    else if (settings.Inspector.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny, currentElement) ||
                              settings.CoreTypes.IsKnownType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
                     {
                         // Add the attribute that will tell the compiler to later
@@ -185,14 +186,14 @@ namespace OpenSilver.Compiler
                             // cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
                             contentValue = Regex.Replace(contentValue, @"\s{2,}", " ");
 
-                            string contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+                            string contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny, currentElement);
 
                             if (!string.IsNullOrEmpty(contentPropertyName))
                             {
                                 // Verify that the attribute is not already set
                                 if (currentElement.Attribute(contentPropertyName) != null)
                                 {
-                                    throw new XamlParseException($"The property '{contentPropertyName}' is set more than once.");
+                                    throw new XamlParseException($"The property '{contentPropertyName}' is set more than once.", directTextContent);
                                 }
 
                                 // SPECIAL CASE: If we are in a TextBlock, we want to set the
@@ -203,7 +204,9 @@ namespace OpenSilver.Compiler
                                 }
 
                                 // Add the Content attribute
-                                XAttribute attribute = new XAttribute(contentPropertyName, contentValue);
+                                var attribute = new ExtendedXAttribute(contentPropertyName, contentValue);
+                                attribute.SetLineInfo(directTextContent);
+
                                 currentElement.Add(attribute);
 
                                 // Remove the direct text content
@@ -211,7 +214,7 @@ namespace OpenSilver.Compiler
                             }
                             else
                             {
-                                throw new XamlParseException($"The element '{currentElement.Name}' does not support direct content.");
+                                throw new XamlParseException($"The element '{currentElement.Name}' does not support direct content.", directTextContent);
                             }
                         }
                     }
@@ -254,11 +257,14 @@ namespace OpenSilver.Compiler
                     // Verify that the attribute is not already set:
                     if (currentElement.Attribute(xName.LocalName) != null)
                     {
-                        throw new XamlParseException($"The property '{xName.LocalName}' is set more than once.");
+                        throw new XamlParseException($"The property '{xName.LocalName}' is set more than once.", currentElement);
                     }
 
                     // Add the attribute
-                    currentElement.Parent.Add(new XAttribute(xName, contentValue));
+                    var attribute = new ExtendedXAttribute(xName, contentValue);
+                    attribute.SetLineInfo(currentElement);
+
+                    currentElement.Parent.Add(attribute);
 
                     // Remove the element
                     currentElement.Remove();

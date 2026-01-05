@@ -15,9 +15,8 @@ using Mono.Cecil;
 using Mono.Cecil.Rocks;
 using System;
 using System.Linq;
-using System.Text;
 
-namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector
+namespace OpenSilver.Compiler
 {
     internal static class TypeReferenceExtensions
     {
@@ -90,103 +89,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
             return res;
-        }
-
-        public static string ConvertToString(this TypeReference typeRef, SupportedLanguage compilerType)
-        {
-            var fullNamespace = typeRef.BuildFullPath();
-            var typeName = typeRef.GetTypeNameIncludingGenericArguments(false, compilerType);
-
-            return string.IsNullOrEmpty(fullNamespace) ? typeName : $"{fullNamespace}.{typeName}";
-        }
-
-        public static string BuildFullPath(this TypeReference type)
-        {
-            var fullPath = string.Empty;
-            var parentType = type;
-            var rootType = type;
-            while ((parentType = parentType.DeclaringType) != null)
-            {
-                if (!string.IsNullOrEmpty(fullPath)) fullPath = "." + fullPath;
-
-                fullPath = parentType.Name + fullPath;
-                rootType = parentType;
-            }
-
-            fullPath = rootType.Namespace +
-                       (!string.IsNullOrEmpty(rootType.Namespace) && !string.IsNullOrEmpty(fullPath) ? "." : string.Empty) +
-                       fullPath;
-            return fullPath;
-        }
-
-        public static string GetTypeNameIncludingGenericArguments(this TypeReference type, bool appendNamespace, SupportedLanguage compilerType)
-        {
-            var result = new StringBuilder();
-
-            string prefix= "";
-            if (compilerType == SupportedLanguage.CSharp)
-            {
-                prefix = "global::";
-            }
-            else if (compilerType == SupportedLanguage.VBNet)
-            {
-                prefix = "Global.";
-            }
-            else if (compilerType == SupportedLanguage.FSharp)
-            {
-                prefix = "global.";
-            }
-            else
-            {
-                throw new InvalidCompilerTypeException();
-            }
-
-            if (appendNamespace)
-            {
-                result.Append(prefix);
-                if (!string.IsNullOrEmpty(type.Namespace)) result.Append(type.Namespace + ".");
-            }
-
-            if (compilerType == SupportedLanguage.FSharp &&
-                type.GetElementType() is TypeReference elementType &&
-                elementType.GetAssemblyName() == "FSharp.Core" &&
-                elementType.FullName == "Microsoft.FSharp.Control.FSharpHandler`1")
-            {
-                // Because of the CompiledNameAttribute, we need to replace this type, because FSharpHandler is not known at compile time.
-                result.Append("Handler`1");
-            }
-            else
-            {
-                result.Append(type.Name);
-            }
-
-            if (type is not GenericInstanceType genericInstanceType)
-            {
-                return result.ToString();
-            }
-
-            result = new StringBuilder(result.ToString().Split('`')[0]);
-            if (compilerType == SupportedLanguage.CSharp)
-            {
-                result.Append(
-                    $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))}>");
-            }
-            else if (compilerType == SupportedLanguage.VBNet)
-            {
-                result.Append(
-                    $"(Of {string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))})");
-            }
-            else if (compilerType == SupportedLanguage.FSharp)
-            {
-                result.Append(
-                    $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))}>");
-            }
-            else
-            {
-                throw new InvalidCompilerTypeException();
-            }
-
-            return result.ToString();
         }
     }
 }

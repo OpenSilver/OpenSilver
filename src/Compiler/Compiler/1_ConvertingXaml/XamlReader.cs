@@ -133,7 +133,7 @@ namespace OpenSilver.Compiler
         {
             if (IsMemberNode(element))
             {
-                throw new XamlParseException("Nested properties", element);
+                throw new XamlParseException("Nested properties.", element);
             }
         }
     }

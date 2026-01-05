@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 using System.Xml.Linq;
-using System.Xml;
 
 namespace OpenSilver.Compiler
 {
@@ -29,33 +28,6 @@ namespace OpenSilver.Compiler
 
         internal static readonly XNamespace[] DefaultXamlNamespaces = [DefaultXamlNamespace, LegacyXamlNamespace];
         internal static readonly XNamespace xNamespace = "http://schemas.microsoft.com/winfx/2006/xaml"; // Used for example for "x:Name" attributes and {x:Null} markup extensions.
-
-        internal static int GetLineNumber(XNode element)
-        {
-            // Get the line number in the original XAML file by walking up the tree until we find a node that contains line number information:
-
-            while (element != null)
-            {
-                // See if the current element has line information:
-                if (((IXmlLineInfo)element).HasLineInfo())
-                {
-                    return ((IXmlLineInfo)element).LineNumber;
-                }
-
-                // If not, go to the previous sibling node if any:
-                var previousNode = element.PreviousNode;
-                if (previousNode != null)
-                {
-                    element = previousNode;
-                }
-                else
-                {
-                    // Alternatively, walk up the tree to go to the parent node:
-                    element = element.Parent;
-                }
-            }
-            return -1;
-        }
 
         internal static bool IsXNameAttribute(XAttribute attr) =>
             attr.Name.LocalName == "Name" && attr.Name.NamespaceName == xNamespace;

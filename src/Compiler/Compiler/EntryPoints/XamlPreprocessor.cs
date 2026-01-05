@@ -23,6 +23,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using MSTask = Microsoft.Build.Utilities.Task;
 
 namespace OpenSilver.Compiler
@@ -198,19 +199,19 @@ namespace OpenSilver.Compiler
                         processedFile.SetMetadata(CompiledXamlFilePathMetadata, generatedFile.ItemSpec);
                         processedFiles[i] = processedFile;
                     }
+                    catch (XamlParseException ex) when (ex.HasLineInfo())
+                    {
+                        string message = $"{string.Join(Environment.NewLine, GetInnerExceptions(ex).Select(e => e.Message))}";
+                        Log.LogError(string.Empty, string.Empty, string.Empty, sourceFile, ex.LineNumber, ex.LinePosition, 0, 0, message);
+                    }
+                    catch (XmlException ex)
+                    {
+                        string message = $"{string.Join(Environment.NewLine, GetInnerExceptions(ex).Select(e => e.Message))}";
+                        Log.LogError(string.Empty, string.Empty, string.Empty, sourceFile, ex.LineNumber, ex.LinePosition, 0, 0, message);
+                    }
                     catch (Exception ex)
                     {
-                        if (ex is XamlParseException xamlException)
-                        {
-                            int lineNumber = xamlException.LineNumber;
-                            int columnNumber = xamlException.LinePosition;
-                            string message = $"{string.Join(Environment.NewLine, GetInnerExceptions(ex).Select(e => e.Message))}";
-                            Log.LogError(string.Empty, string.Empty, string.Empty, sourceFile, lineNumber, columnNumber, 0, 0, message);
-                        }
-                        else
-                        {
-                            Log.LogErrorFromException(ex, true, true, sourceFile);
-                        }
+                        Log.LogErrorFromException(ex, true, true, sourceFile);
                     }
                 });
             }
@@ -467,10 +468,7 @@ namespace OpenSilver.Compiler
 
         private static IEnumerable<Exception> GetInnerExceptions(Exception ex)
         {
-            if (ex == null)
-            {
-                throw new ArgumentNullException(nameof(ex));
-            }
+            Debug.Assert(ex is not null);
 
             var innerException = ex;
             do

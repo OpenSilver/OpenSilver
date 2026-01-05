@@ -13,11 +13,11 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler;
@@ -36,7 +36,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
     {
         _inspector = inspector;
         _assemblyName = assemblyName;
-        _commandConverter = new CommandConverter(_inspector, SupportedLanguage.FSharp, "global.", "null");
+        _commandConverter = new CommandConverter(_inspector, TypeReferenceHelper.FSharp);
     }
 
     public override string ConvertFromInvariantString(string source, string destinationType)
@@ -44,12 +44,12 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return $"{RuntimeHelperClass}.ConvertFromInvariantString<{destinationType}>({Escape(source)})";
     }
 
-    public override string ConvertToCursor(XElement context, string source)
+    public override string ConvertToCursor(XObject context, string source)
     {
         return $"global.System.Windows.Input.Cursors.{source}";
     }
 
-    public override string ConvertToModifierKeys(XElement context, string source)
+    public override string ConvertToModifierKeys(XObject context, string source)
     {
         char[] separator = ['+'];
 
@@ -71,8 +71,8 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 return modifier;
             }
 
-            TypeDefinition modifierKeysType = _inspector.GetTypeDefinition("System.Windows.Input", "ModifierKeys", "OpenSilver");
-            return string.Join(" ||| ", _inspector.GetEnumValues(modifierKeysType, modifiersToken, true, true));
+            TypeDefinition modifierKeysType = _inspector.GetTypeDefinition("System.Windows.Input", "ModifierKeys", "OpenSilver", context);
+            return string.Join(" ||| ", _inspector.GetEnumValues(modifierKeysType, modifiersToken, true, true, context));
         }
 
         var sb = new StringBuilder();
@@ -93,7 +93,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
 
             if (!TryParseModifier(modifier, out string key))
             {
-                throw GetConvertException(source, "System.Windows.Input.ModifierKeys");
+                throw GetConvertException(source, "System.Windows.Input.ModifierKeys", context);
             }
 
             if (sb.Length > 0)
@@ -129,7 +129,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         }
     }
 
-    public override string ConvertToKey(XElement context, string source)
+    public override string ConvertToKey(XObject context, string source)
     {
         string keyToken = source.Trim();
 
@@ -158,7 +158,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             }
             else
             {
-                throw GetConvertException(source, "System.Windows.Input.Key");
+                throw GetConvertException(source, "System.Windows.Input.Key", context);
             }
         }
 
@@ -211,17 +211,17 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             //_ when keyToken.Equals("PLAY", StringComparison.OrdinalIgnoreCase) => "global.System.Windows.Input.Key.Play",
             //_ when keyToken.Equals("ZOOM", StringComparison.OrdinalIgnoreCase) => "global.System.Windows.Input.Key.Zoom",
             //_ when keyToken.Equals("PA1", StringComparison.OrdinalIgnoreCase) => "global.System.Windows.Input.Key.Pa1",
-            _ => Parse(keyToken, _inspector) ?? throw GetConvertException(source, "System.Windows.Input.Key"),
+            _ => Parse(keyToken, context, _inspector) ?? throw GetConvertException(source, "System.Windows.Input.Key", context),
         };
 
-        static string Parse(string source, AssembliesInspector inspector)
+        static string Parse(string source, IXmlLineInfo lineInfo, AssembliesInspector inspector)
         {
-            TypeDefinition keyType = inspector.GetTypeDefinition("System.Windows.Input", "Key", "OpenSilver");
+            TypeDefinition keyType = inspector.GetTypeDefinition("System.Windows.Input", "Key", "OpenSilver", lineInfo);
             return inspector.GetEnumValue(keyType, source, true, true);
         }
     }
 
-    public override string ConvertToMouseAction(XElement context, string source)
+    public override string ConvertToMouseAction(XObject context, string source)
     {
         string mouseActionToken = source.Trim();
         return mouseActionToken switch
@@ -235,11 +235,11 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             _ when mouseActionToken.Equals("LeftDoubleClick", StringComparison.OrdinalIgnoreCase) => "global.System.Windows.Input.MouseAction.LeftDoubleClick",
             _ when mouseActionToken.Equals("RightDoubleClick", StringComparison.OrdinalIgnoreCase) => "global.System.Windows.Input.MouseAction.RightDoubleClick",
             _ when mouseActionToken.Equals("MiddleDoubleClick", StringComparison.OrdinalIgnoreCase) => "global.System.Windows.Input.MouseAction.MiddleDoubleClick",
-            _ => throw new NotSupportedException($"Unsupported MouseAction '{mouseActionToken}'."),
+            _ => throw new XamlParseException($"Unsupported MouseAction '{mouseActionToken}'.", context),
         };
     }
 
-    public override string ConvertToKeyGesture(XElement context, string source)
+    public override string ConvertToKeyGesture(XObject context, string source)
     {
         const char MODIFIERS_DELIMITER = '+';
         const char DISPLAYSTRING_SEPARATOR = ',';
@@ -285,7 +285,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return $"new global.System.Windows.Input.KeyGesture({resultkey}, {modifiers}, {Escape(displayString)})";
     }
 
-    public override string ConvertToMouseGesture(XElement context, string source)
+    public override string ConvertToMouseGesture(XObject context, string source)
     {
         const char MODIFIERS_DELIMITER = '+';
 
@@ -315,23 +315,23 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         }
     }
 
-    public override string ConvertToCommand(XElement context, string source)
+    public override string ConvertToCommand(XObject context, string source)
     {
         return _commandConverter.Convert(context, source);
     }
 
-    public override string ConvertToKeyTime(XElement context, string source)
+    public override string ConvertToKeyTime(XObject context, string source)
     {
         string stringValue = source.Trim();
 
         if (stringValue == "Paced")
         {
-            throw new XamlParseException("The 'System.Windows.Media.Animation.KeyTime.Placed' property is not supported yet.");
+            throw new XamlParseException("The 'System.Windows.Media.Animation.KeyTime.Placed' property is not supported yet.", context);
         }
         else if (stringValue.Length > 0 &&
                  stringValue[stringValue.Length - 1] == '%')
         {
-            throw new XamlParseException("Percentage values for 'System.Windows.Media.Animation.KeyTime' are not supported yet.");
+            throw new XamlParseException("Percentage values for 'System.Windows.Media.Animation.KeyTime' are not supported yet.", context);
         }
         else if (stringValue == "Uniform")
         {
@@ -344,7 +344,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         }
     }
 
-    public override string ConvertToRepeatBehavior(XElement context, string source)
+    public override string ConvertToRepeatBehavior(XObject context, string source)
     {
         string stringValue = source.Trim();
 
@@ -365,7 +365,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return $"new global.System.Windows.Media.Animation.RepeatBehavior({timeSpanValue})";
     }
 
-    public override string ConvertToKeySpline(XElement context, string source)
+    public override string ConvertToKeySpline(XObject context, string source)
     {
         if (string.IsNullOrEmpty(source))
         {
@@ -378,15 +378,15 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return $"new global.System.Windows.Media.Animation.KeySpline({split[0]}, {split[1]}, {split[2]}, {split[3]})";
         }
 
-        throw GetConvertException(source, "System.Windows.Media.Animation.KeySpline");
+        throw GetConvertException(source, "System.Windows.Media.Animation.KeySpline", context);
     }
 
-    public override string ConvertToBrush(XElement context, string source)
+    public override string ConvertToBrush(XObject context, string source)
     {
         return $"new global.System.Windows.Media.SolidColorBrush({ConvertToColor(context, source)})";
     }
 
-    public override string ConvertToColor(XElement context, string source)
+    public override string ConvertToColor(XObject context, string source)
     {
         const int s_zeroChar = (int)'0';
         const int s_aLower = (int)'a';
@@ -422,7 +422,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return trimmedString;
         }
 
-        static int ParseHexChar(char c)
+        static int ParseHexChar(char c, XObject context)
         {
             int intChar = (int)c;
 
@@ -440,45 +440,45 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             {
                 return (intChar - s_aUpper + 10);
             }
-            throw new FormatException("Token is not valid.");
+            throw new XamlParseException("Token is not valid.", context);
         }
 
-        static string ParseHexColor(string trimmedColor)
+        static string ParseHexColor(string trimmedColor, XObject context)
         {
             int a, r, g, b;
             a = 255;
 
             if (trimmedColor.Length > 7)
             {
-                a = ParseHexChar(trimmedColor[1]) * 16 + ParseHexChar(trimmedColor[2]);
-                r = ParseHexChar(trimmedColor[3]) * 16 + ParseHexChar(trimmedColor[4]);
-                g = ParseHexChar(trimmedColor[5]) * 16 + ParseHexChar(trimmedColor[6]);
-                b = ParseHexChar(trimmedColor[7]) * 16 + ParseHexChar(trimmedColor[8]);
+                a = ParseHexChar(trimmedColor[1], context) * 16 + ParseHexChar(trimmedColor[2], context);
+                r = ParseHexChar(trimmedColor[3], context) * 16 + ParseHexChar(trimmedColor[4], context);
+                g = ParseHexChar(trimmedColor[5], context) * 16 + ParseHexChar(trimmedColor[6], context);
+                b = ParseHexChar(trimmedColor[7], context) * 16 + ParseHexChar(trimmedColor[8], context);
             }
             else if (trimmedColor.Length > 5)
             {
-                r = ParseHexChar(trimmedColor[1]) * 16 + ParseHexChar(trimmedColor[2]);
-                g = ParseHexChar(trimmedColor[3]) * 16 + ParseHexChar(trimmedColor[4]);
-                b = ParseHexChar(trimmedColor[5]) * 16 + ParseHexChar(trimmedColor[6]);
+                r = ParseHexChar(trimmedColor[1], context) * 16 + ParseHexChar(trimmedColor[2], context);
+                g = ParseHexChar(trimmedColor[3], context) * 16 + ParseHexChar(trimmedColor[4], context);
+                b = ParseHexChar(trimmedColor[5], context) * 16 + ParseHexChar(trimmedColor[6], context);
             }
             else if (trimmedColor.Length > 4)
             {
-                a = ParseHexChar(trimmedColor[1]);
+                a = ParseHexChar(trimmedColor[1], context);
                 a = a + a * 16;
-                r = ParseHexChar(trimmedColor[2]);
+                r = ParseHexChar(trimmedColor[2], context);
                 r = r + r * 16;
-                g = ParseHexChar(trimmedColor[3]);
+                g = ParseHexChar(trimmedColor[3], context);
                 g = g + g * 16;
-                b = ParseHexChar(trimmedColor[4]);
+                b = ParseHexChar(trimmedColor[4], context);
                 b = b + b * 16;
             }
             else
             {
-                r = ParseHexChar(trimmedColor[1]);
+                r = ParseHexChar(trimmedColor[1], context);
                 r = r + r * 16;
-                g = ParseHexChar(trimmedColor[2]);
+                g = ParseHexChar(trimmedColor[2], context);
                 g = g + g * 16;
-                b = ParseHexChar(trimmedColor[3]);
+                b = ParseHexChar(trimmedColor[3], context);
                 b = b + b * 16;
             }
 
@@ -489,11 +489,11 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return $"global.System.Windows.Media.Color.FromArgb((byte){A}, (byte){R}, (byte){G}, (byte){B})";
         }
 
-        static string ParseScRgbColor(string trimmedColor)
+        static string ParseScRgbColor(string trimmedColor, XObject context)
         {
             if (!trimmedColor.StartsWith("sc#", StringComparison.Ordinal))
             {
-                throw new FormatException("Token is not valid.");
+                throw new XamlParseException("Token is not valid.", context);
             }
 
             string tokens = trimmedColor.Substring(3, trimmedColor.Length - 3);
@@ -516,10 +516,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 return $"global.System.Windows.Media.Color.FromScRgb({a}F, {r}F, {g}F, {b}F)";
             }
 
-            throw new FormatException("Token is not valid.");
+            throw new XamlParseException("Token is not valid.", context);
         }
 
-        static string ParseColor(string colorString)
+        static string ParseColor(string colorString, XObject context)
         {
             string trimmedColor = MatchColor(
                 colorString, out bool isPossibleKnowColor, out bool isNumericColor, out bool isScRgbColor
@@ -528,11 +528,11 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             //Is it a number?
             if (isNumericColor)
             {
-                return ParseHexColor(trimmedColor);
+                return ParseHexColor(trimmedColor, context);
             }
             else if (isScRgbColor)
             {
-                return ParseScRgbColor(trimmedColor);
+                return ParseScRgbColor(trimmedColor, context);
             }
             else
             {
@@ -550,13 +550,13 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 }
             }
 
-            throw GetConvertException(colorString, "System.Windows.Media.Color");
+            throw GetConvertException(colorString, "System.Windows.Media.Color", context);
         }
 
-        return ParseColor(source);
+        return ParseColor(source, context);
     }
 
-    public override string ConvertToDoubleCollection(XElement context, string source)
+    public override string ConvertToDoubleCollection(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -577,24 +577,24 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return sb.ToString();
     }
 
-    public override string ConvertToFontFamily(XElement context, string source)
+    public override string ConvertToFontFamily(XObject context, string source)
     {
         string fontName = Escape(source.Trim());
 
         return $"new global.System.Windows.Media.FontFamily({fontName})";
     }
 
-    public override string ConvertToGeometry(XElement context, string source)
+    public override string ConvertToGeometry(XObject context, string source)
     {
         return ConvertFromInvariantString(source, "global.System.Windows.Media.Geometry");
     }
 
-    public override string ConvertToPathGeometry(XElement context, string source)
+    public override string ConvertToPathGeometry(XObject context, string source)
     {
         return ConvertFromInvariantString(source, "global.System.Windows.Media.PathGeometry");
     }
 
-    public override string ConvertToMatrix(XElement context, string source)
+    public override string ConvertToMatrix(XObject context, string source)
     {
         if (source == "Identity")
         {
@@ -608,17 +608,17 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return $"new global.System.Windows.Media.Matrix({split[0]}, {split[1]}, {split[2]}, {split[3]}, {split[4]}, {split[5]})";
         }
 
-        throw GetConvertException(source, "System.Windows.Media.Matrix");
+        throw GetConvertException(source, "System.Windows.Media.Matrix", context);
     }
 
-    public override string ConvertToPointCollection(XElement context, string source)
+    public override string ConvertToPointCollection(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
         // Points count needs to be an even number
         if (split.Length % 2 == 1)
         {
-            throw GetConvertException(source, "System.Windows.Media.PointCollection");
+            throw GetConvertException(source, "System.Windows.Media.PointCollection", context);
         }
 
         var sb = new StringBuilder();
@@ -635,22 +635,22 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return sb.ToString();
     }
 
-    public override string ConvertToTransform(XElement context, string source)
+    public override string ConvertToTransform(XObject context, string source)
     {
         return $"new global.System.Windows.Media.MatrixTransform({ConvertToMatrix(context, source)})";
     }
 
-    public override string ConvertToCacheMode(XElement context, string source)
+    public override string ConvertToCacheMode(XObject context, string source)
     {
         if (source.Equals("BitmapCache", StringComparison.OrdinalIgnoreCase))
         {
             return "new global.System.Windows.Media.BitmapCache()";
         }
 
-        throw GetConvertException(source, "System.Windows.Media.CacheMode");
+        throw GetConvertException(source, "System.Windows.Media.CacheMode", context);
     }
 
-    public override string ConvertToMatrix3D(XElement context, string source)
+    public override string ConvertToMatrix3D(XObject context, string source)
     {
         if (source == "Identity")
         {
@@ -664,15 +664,15 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return $"new global.System.Windows.Media.Media3D.Matrix3D({split[0]}, {split[1]}, {split[2]}, {split[3]}, {split[4]}, {split[5]}, {split[6]}, {split[7]}, {split[8]}, {split[9]}, {split[10]}, {split[11]}, {split[12]}, {split[13]}, {split[14]}, {split[15]})";
         }
 
-        throw GetConvertException(source, "System.Windows.Media.Media3D.Matrix3D");
+        throw GetConvertException(source, "System.Windows.Media.Media3D.Matrix3D", context);
     }
 
-    public override string ConvertToXmlLanguage(XElement context, string source)
+    public override string ConvertToXmlLanguage(XObject context, string source)
     {
         return $"global.System.Windows.Markup.XmlLanguage.GetLanguage({Escape(source)})";
     }
 
-    public override string ConvertToCornerRadius(XElement context, string source)
+    public override string ConvertToCornerRadius(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -685,10 +685,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 return $"new global.System.Windows.CornerRadius({split[0]}, {split[1]}, {split[2]}, {split[3]})";
         }
 
-        throw GetConvertException(source, "System.Windows.CornerRadius");
+        throw GetConvertException(source, "System.Windows.CornerRadius", context);
     }
 
-    public override string ConvertToDuration(XElement context, string source)
+    public override string ConvertToDuration(XObject context, string source)
     {
         string stringValue = source.Trim();
 
@@ -706,7 +706,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         }
     }
 
-    public override string ConvertToFontWeight(XElement context, string source)
+    public override string ConvertToFontWeight(XObject context, string source)
     {
         if (Enum.TryParse(source, true, out FontWeightsCode fontCode))
         {
@@ -721,10 +721,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             }
         }
 
-        throw GetConvertException(source, "System.Windows.FontWeight");
+        throw GetConvertException(source, "System.Windows.FontWeight", context);
     }
 
-    public override string ConvertToGridLength(XElement context, string source)
+    public override string ConvertToGridLength(XObject context, string source)
     {
         static string ReadDouble(string seq, string defaultValue)
         {
@@ -787,7 +787,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return $"new global.System.Windows.GridLength({value}, {unit})";
     }
 
-    public override string ConvertToPoint(XElement context, string source)
+    public override string ConvertToPoint(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -801,7 +801,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return ConvertPointHelper(split[0], split[1]);
         }
 
-        throw GetConvertException(source, "System.Windows.Point");
+        throw GetConvertException(source, "System.Windows.Point", context);
     }
 
     private static string ConvertPointHelper(string x, string y)
@@ -809,12 +809,12 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return $"new global.System.Windows.Point({x}, {y})";
     }
 
-    public override string ConvertToPropertyPath(XElement context, string source)
+    public override string ConvertToPropertyPath(XObject context, string source)
     {
         return $"new global.System.Windows.PropertyPath({Escape(source)})";
     }
 
-    public override string ConvertToRect(XElement context, string source)
+    public override string ConvertToRect(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -823,10 +823,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return $"new global.System.Windows.Rect({split[0]}, {split[1]}, {split[2]}, {split[3]})";
         }
 
-        throw GetConvertException(source, "System.Windows.Rect");
+        throw GetConvertException(source, "System.Windows.Rect", context);
     }
 
-    public override string ConvertToSize(XElement context, string source)
+    public override string ConvertToSize(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -835,10 +835,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return $"new global.System.Windows.Size({split[0]}, {split[1]})";
         }
 
-        throw GetConvertException(source, "System.Windows.Size");
+        throw GetConvertException(source, "System.Windows.Size", context);
     }
 
-    public override string ConvertToThickness(XElement context, string source)
+    public override string ConvertToThickness(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -854,10 +854,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 return $"new global.System.Windows.Thickness({split[0]}, {split[1]}, {split[2]}, {split[3]})";
         }
 
-        throw GetConvertException(source, "System.Windows.Thickness");
+        throw GetConvertException(source, "System.Windows.Thickness", context);
     }
 
-    public override string ConvertToFontStretch(XElement context, string source)
+    public override string ConvertToFontStretch(XObject context, string source)
     {
         string stringValue = source.Trim();
         if (stringValue.Equals("UltraCondensed", StringComparison.OrdinalIgnoreCase))
@@ -897,10 +897,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return "global.System.Windows.FontStretches.UltraExpanded";
         }
 
-        throw GetConvertException(source, "System.Windows.FontStretch");
+        throw GetConvertException(source, "System.Windows.FontStretch", context);
     }
 
-    public override string ConvertToFontStyle(XElement context, string source)
+    public override string ConvertToFontStyle(XObject context, string source)
     {
         if (source.Equals("Normal", StringComparison.OrdinalIgnoreCase))
         {
@@ -915,10 +915,10 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return "global.System.Windows.FontStyles.Italic";
         }
 
-        throw GetConvertException(source, "System.Windows.FontStyle");
+        throw GetConvertException(source, "System.Windows.FontStyle", context);
     }
 
-    public override string ConvertToTextDecorationCollection(XElement context, string source)
+    public override string ConvertToTextDecorationCollection(XObject context, string source)
     {
         switch (source.Trim().ToLower())
         {
@@ -934,11 +934,11 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 return "null";
 
             default:
-                throw GetConvertException(source, "System.Windows.TextDecorationCollection");
+                throw GetConvertException(source, "System.Windows.TextDecorationCollection", context);
         }
     }
 
-    public override string ConvertToImageSource(XElement context, string source)
+    public override string ConvertToImageSource(XObject context, string source)
     {
         string uriKind;
         if (source.Contains(":/"))
@@ -953,7 +953,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return $"new global.System.Windows.Media.Imaging.BitmapImage(new global.System.Uri({Escape(source)}, {uriKind}))";
     }
 
-    public override string ConvertToVector(XElement context, string source)
+    public override string ConvertToVector(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -972,19 +972,20 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             return $"new global.System.Windows.Vector({split[0]}, {split[1]})";
         }
 
-        throw GetConvertException(source, "System.Windows.Vector");
+        throw GetConvertException(source, "System.Windows.Vector", context);
     }
 
-    public override string ConvertToRoutedEvent(XElement context, string source)
+    public override string ConvertToRoutedEvent(XObject context, string source)
     {
         string eventName, namespaceName, typeName, assemblyName;
+        IXmlLineInfo lineInfo = context;
 
         int index = source.IndexOf('.');
         if (index >= 0)
         {
             eventName = source.Substring(index + 1);
             GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
-                source.Substring(0, index), context, out namespaceName, out typeName, out assemblyName);
+                source.Substring(0, index), GetClosestXElement(context), out namespaceName, out typeName, out assemblyName);
         }
         else
         {
@@ -999,7 +1000,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 eventName = source;
             }
 
-            XElement style = context;
+            XElement style = GetClosestXElement(context);
             while (style is not null && !GeneratingCode.IsStyle(style, _assemblyName))
             {
                 style = style.Parent;
@@ -1007,6 +1008,8 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
 
             if (style is not null && style.Attribute("TargetType") is XAttribute targetType)
             {
+                lineInfo = targetType;
+
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     targetType.Value, style, out namespaceName, out typeName, out assemblyName);
             }
@@ -1018,13 +1021,13 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
             }
         }
 
-        TypeDefinition ownerType = _inspector.GetTypeDefinition(namespaceName, typeName, assemblyName);
-        string ownerTypeString = ownerType.ConvertToString(SupportedLanguage.FSharp);
+        TypeDefinition ownerType = _inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
+        string ownerTypeString = TypeReferenceHelper.FSharp.ConvertToString(ownerType);
 
         return $"{RuntimeHelperClass}.RoutedEventFromName(\"{eventName}\", typeof<global.{ownerTypeString}>)";
     }
 
-    public override string ConvertToResponsiveThreshold(XElement context, string source)
+    public override string ConvertToResponsiveThreshold(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -1032,11 +1035,11 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         {
             1 => $"new global.System.Windows.ResponsiveThreshold({split[0]})",
             2 => $"new global.System.Windows.ResponsiveThreshold({split[0]}, {split[1]})",
-            _ => throw GetConvertException(source, "System.Windows.ResponsiveThreshold"),
+            _ => throw GetConvertException(source, "System.Windows.ResponsiveThreshold", context),
         };
     }
 
-    public override string ConvertToRowDefinitionCollection(XElement context, string source)
+    public override string ConvertToRowDefinitionCollection(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -1060,7 +1063,7 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         return sb.ToString();
     }
 
-    public override string ConvertToColumnDefinitionCollection(XElement context, string source)
+    public override string ConvertToColumnDefinitionCollection(XObject context, string source)
     {
         string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
