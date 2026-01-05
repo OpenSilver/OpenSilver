@@ -15,158 +15,194 @@
 using System;
 using System.Xml.Linq;
 
-namespace OpenSilver.Compiler
+namespace OpenSilver.Compiler;
+
+internal static class ProcessingContentPresenterNodes
 {
-    internal static class ProcessingContentPresenterNodes
+    private const string SystemWindowsClrNamespace = $"clr-namespace:{KnownNamespaces.SystemWindows};assembly={Constants.OPENSILVER_ASSEMBLY_NAME}";
+    private const string SystemWindowsControlsClrNamespace = $"clr-namespace:{KnownNamespaces.SystemWindowsControls};assembly={Constants.OPENSILVER_ASSEMBLY_NAME}";
+
+    [ThreadStatic]
+    private static Random _random;
+
+    private static Random Random => _random ??= new Random();
+
+    //------------------------------------------------------------
+    // This class will process the "ContentPresenter" nodes
+    // in order to transform "<ContentPresenter />" into
+    // "<ContentPresenter Content="{TemplateBinding Content}"
+    // ContentTemplate="{TemplateBinding ContentTemplate}" />"
+    //------------------------------------------------------------
+
+    public static void Process(XDocument doc, ConversionSettings settings)
     {
-        [ThreadStatic]
-        private static Random _random;
+        TraverseNextElement(doc.Root, false, settings);
+    }
 
-        private static Random Random => _random ??= new Random();
-
-        //------------------------------------------------------------
-        // This class will process the "ContentPresenter" nodes
-        // in order to transform "<ContentPresenter />" into
-        // "<ContentPresenter Content="{TemplateBinding Content}"
-        // ContentTemplate="{TemplateBinding ContentTemplate}" />"
-        //------------------------------------------------------------
-
-        public static void Process(XDocument doc, ConversionSettings settings)
+    private static void TraverseNextElement(
+        XElement currentElement,
+        bool isInsideControlTemplate,
+        ConversionSettings settings)
+    {
+        if (GeneratingCode.IsControlTemplate(currentElement, settings.AssemblyName))
         {
-            TraverseNextElement(doc.Root, false, settings);
+            isInsideControlTemplate = IsContentControlTargetType(currentElement, settings);
         }
 
-        private static void TraverseNextElement(
-            XElement currentElement,
-            bool isInsideControlTemplate,
-            ConversionSettings settings)
+        if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains(".") &&
+            settings.Inspector.IsAssignableFrom(SystemWindowsControlsClrNamespace, "ContentPresenter",
+                currentElement.Name.NamespaceName, currentElement.Name.LocalName))
         {
-            if (GeneratingCode.IsControlTemplate(currentElement, settings.AssemblyName))
-            {
-                isInsideControlTemplate = true;
-            }
+            bool hasContentAttribute = HasAttribute(currentElement, "Content", settings.Inspector);
+            bool hasContentTemplateAttribute = HasAttribute(currentElement, "ContentTemplate", settings.Inspector);
+            bool hasContentTemplateSelectorAttribute = HasAttribute(currentElement, "ContentTemplateSelector", settings.Inspector);
 
-            if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains(".") &&
-                settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindowsControls, "ContentPresenter",
-                    currentElement.Name.NamespaceName, currentElement.Name.LocalName))
+            if (!hasContentAttribute || (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute))
             {
-                bool hasContentAttribute = HasAttribute(currentElement, "Content", settings.Inspector);
-                bool hasContentTemplateAttribute = HasAttribute(currentElement, "ContentTemplate", settings.Inspector);
-                bool hasContentTemplateSelectorAttribute = HasAttribute(currentElement, "ContentTemplateSelector", settings.Inspector);
+                string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
 
-                if (!hasContentAttribute || (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute))
+                // First look for the default namespace, it should cover 99% of cases.
+                if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, currentElement.GetDefaultNamespace()) == -1)
                 {
-                    string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
+                    systemWindowsPrefix = GenerateXmlnsPrefix(currentElement);
+                    currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), SystemWindowsClrNamespace);
 
-                    // First look for the default namespace, it should cover 99% of cases.
-                    if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, currentElement.GetDefaultNamespace()) == -1)
-                    {
-                        systemWindowsPrefix = GenerateXmlnsPrefix(currentElement);
-                        currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), "clr-namespace:System.Windows;assembly=OpenSilver");
+                    systemWindowsControlsPrefix = GenerateXmlnsPrefix(currentElement);
+                    currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), SystemWindowsControlsClrNamespace);
+                }
 
-                        systemWindowsControlsPrefix = GenerateXmlnsPrefix(currentElement);
-                        currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), "clr-namespace:System.Windows.Controls;assembly=OpenSilver");
-                    }
+                string xPrefix = currentElement.GetPrefixOfNamespace(GeneratingCode.xNamespace);
+                if (xPrefix is null)
+                {
+                    xPrefix = GenerateXmlnsPrefix(currentElement);
+                    currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(xPrefix), GeneratingCode.xNamespace.NamespaceName);
+                }
 
-                    string xPrefix = currentElement.GetPrefixOfNamespace(GeneratingCode.xNamespace);
-                    if (xPrefix is null)
-                    {
-                        xPrefix = GenerateXmlnsPrefix(currentElement);
-                        currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(xPrefix), GeneratingCode.xNamespace.NamespaceName);
-                    }
+                if (!hasContentAttribute)
+                {
+                    SetTemplateBinding(currentElement, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                }
 
-                    if (!hasContentAttribute)
-                    {
-                        SetTemplateBinding(currentElement, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                    }
-
-                    if (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute)
-                    {
-                        SetTemplateBinding(currentElement, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                        SetTemplateBinding(currentElement, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                    }
+                if (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute)
+                {
+                    SetTemplateBinding(currentElement, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                    SetTemplateBinding(currentElement, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
                 }
             }
-
-            // Recursion:
-            foreach (var childElements in currentElement.Elements())
-            {
-                TraverseNextElement(childElements, isInsideControlTemplate, settings);
-            }
         }
 
-        private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector reflectionOnSeparateAppDomain)
+        // Recursion:
+        foreach (var childElements in currentElement.Elements())
         {
-            bool found = cp.Attribute(attributeName) != null;
-            if (!found)
+            TraverseNextElement(childElements, isInsideControlTemplate, settings);
+        }
+    }
+
+    private static bool IsContentControlTargetType(XElement element, ConversionSettings settings)
+    {
+        if (element.Attribute("TargetType") is XAttribute targetType)
+        {
+            string namespaceName, typeName;
+
+            int index = targetType.Value.IndexOf(':');
+            if (index > -1)
             {
-                foreach (var child in cp.Elements())
+                string prefix = targetType.Value.Substring(0, index);
+                if (element.GetNamespaceOfPrefix(prefix) is not XNamespace xmlns)
                 {
-                    string namespaceName = child.Name.NamespaceName;
-                    string[] typeAndProperty = child.Name.LocalName.Split('.');
+                    throw new XamlParseException($"'{prefix}' is an undeclared prefix.", targetType);
+                }
 
-                    if (typeAndProperty.Length == 2)
+                namespaceName = xmlns.NamespaceName;
+                typeName = targetType.Value.Substring(index + 1);
+            }
+            else
+            {
+                namespaceName = element.GetDefaultNamespace().NamespaceName;
+                typeName = targetType.Value;
+            }
+
+            return settings.Inspector.IsAssignableFrom(
+                SystemWindowsControlsClrNamespace,
+                "ContentControl",
+                namespaceName,
+                typeName);
+        }
+
+        return false;
+    }
+
+    private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector reflectionOnSeparateAppDomain)
+    {
+        bool found = cp.Attribute(attributeName) != null;
+        if (!found)
+        {
+            foreach (var child in cp.Elements())
+            {
+                string namespaceName = child.Name.NamespaceName;
+                string[] typeAndProperty = child.Name.LocalName.Split('.');
+
+                if (typeAndProperty.Length == 2)
+                {
+                    // First check if this is the right property.
+                    if (typeAndProperty[1].Trim() == attributeName)
                     {
-                        // First check if this is the right property.
-                        if (typeAndProperty[1].Trim() == attributeName)
-                        {
-                            // Then make sure this is not an attached property.
-                            bool isProperty = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                                KnownNamespaces.SystemWindowsControls,
-                                "ContentPresenter",
-                                namespaceName,
-                                typeAndProperty[0]);
+                        // Then make sure this is not an attached property.
+                        bool isProperty = reflectionOnSeparateAppDomain.IsAssignableFrom(
+                            SystemWindowsControlsClrNamespace,
+                            "ContentPresenter",
+                            namespaceName,
+                            typeAndProperty[0]);
 
-                            if (isProperty)
-                            {
-                                found = true;
-                                break;
-                            }
+                        if (isProperty)
+                        {
+                            found = true;
+                            break;
                         }
                     }
                 }
             }
-
-            return found;
         }
 
-        private static void SetTemplateBinding(XElement element, string propertyName, string systemWindowsPrefix, string systemWindowsControlsPrefix, string xPrefix)
+        return found;
+    }
+
+    private static void SetTemplateBinding(XElement element, string propertyName, string systemWindowsPrefix, string systemWindowsControlsPrefix, string xPrefix)
+    {
+        element.SetAttributeValue(propertyName, (systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix) switch
         {
-            element.SetAttributeValue(propertyName, (systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix) switch
-            {
-                (null or "", null or "", null or "") => $"{{TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
-                (null or "", null or "", _) => $"{{TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
-                (null or "", _, null or "") => $"{{TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-                (_, null or "", null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
-                (null or "", _, _) => $"{{TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-                (_, null or "", _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
-                (_, _, null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-                (_, _, _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-            });
-        }
+            (null or "", null or "", null or "") => $"{{TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
+            (null or "", null or "", _) => $"{{TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
+            (null or "", _, null or "") => $"{{TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+            (_, null or "", null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
+            (null or "", _, _) => $"{{TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+            (_, null or "", _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
+            (_, _, null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+            (_, _, _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+        });
+    }
 
-        private static string GenerateXmlnsPrefix(XElement element)
+    private static string GenerateXmlnsPrefix(XElement element)
+    {
+        string prefix = GenerateXmlnsPrefix();
+        while (element.GetNamespaceOfPrefix(prefix) is not null)
         {
-            string prefix = GenerateXmlnsPrefix();
-            while (element.GetNamespaceOfPrefix(prefix) is not null)
-            {
-                prefix = GenerateXmlnsPrefix();
-            }
-            return prefix;
+            prefix = GenerateXmlnsPrefix();
         }
+        return prefix;
+    }
 
-        private static string GenerateXmlnsPrefix()
+    private static string GenerateXmlnsPrefix()
+    {
+        const string Choices = "abcdefghijklmnopqrstuvwxyz";
+
+        Span<char> items = stackalloc char[8];
+
+        for (int i = 0; i < items.Length; i++)
         {
-            const string Choices = "abcdefghijklmnopqrstuvwxyz";
-
-            Span<char> items = stackalloc char[8];
-
-            for (int i = 0; i < items.Length; i++)
-            {
-                items[i] = Choices[Random.Next(Choices.Length)];
-            }
-
-            return items.ToString();
+            items[i] = Choices[Random.Next(Choices.Length)];
         }
+
+        return items.ToString();
     }
 }
