@@ -127,13 +127,6 @@ public class ResourcesGenerator : Task
     [Required]
     public ITaskItem OutputResourcesFile { get; set; }
 
-    /// <summary>
-    /// When false, generates lightweight resource entries with source file paths
-    /// instead of full file content. This is the default value used when a resource
-    /// doesn't have explicit IsEmbedded metadata. Default is true (full embedding).
-    /// </summary>
-    public bool EmbedResources { get; set; } = true;
-
     public override bool Execute()
     {
         if (!ValidResourceFiles(ResourceFiles))
@@ -162,7 +155,7 @@ public class ResourcesGenerator : Task
                     string resFileName = resourceFile.ItemSpec;
                     string resourceId = GetResourceIdForResourceFile(resourceFile);
 
-                    if (ShouldEmbedResource(resourceFile))
+                    if (IsEmbedded(resourceFile))
                     {
                         // We're handing off lifetime management for the stream.
                         // True for the third argument tells resWriter to dispose of the stream when it's done.
@@ -175,7 +168,7 @@ public class ResourcesGenerator : Task
                         // ResourcesExtractorAndCopier will copy from this path to wwwroot
                         string fullPath = Path.GetFullPath(resFileName);
                         resWriter.AddResource(resourceId, fullPath);
-                        Log.LogMessage(MessageImportance.Low, $"Adding lightweight resource: '{resourceId}' -> '{fullPath}'");
+                        Log.LogMessage(MessageImportance.Low, $"Adding lightweight resource: '{resourceId}' -> '{fullPath}'.");
                     }
 
                     Log.LogMessage(MessageImportance.Low, $"Resource ID is '{resourceId}'.");
@@ -286,11 +279,9 @@ public class ResourcesGenerator : Task
         return ResourceIDHelper.GetResourceIDFromRelativePath(relPath, UriFormat.UriEscaped);
     }
 
-    private bool ShouldEmbedResource(ITaskItem item)
+    private bool IsEmbedded(ITaskItem item)
     {
-        string isEmbeddedMetadata = item.GetMetadata(Constants.IS_EMBEDDED_RESOURCE_METADATA_NAME);
-        return !string.IsNullOrEmpty(isEmbeddedMetadata) 
-            ? bool.TryParse(isEmbeddedMetadata, out bool result) && result 
-            : EmbedResources;
+        string metadata = item.GetMetadata(Constants.IS_EMBEDDED_RESOURCE_METADATA_NAME);
+        return bool.TryParse(metadata, out bool isEmbedded) && isEmbedded;
     }
 }

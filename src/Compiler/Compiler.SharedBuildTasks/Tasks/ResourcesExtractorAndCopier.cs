@@ -389,27 +389,16 @@ public sealed class ResourcesExtractorAndCopier : MSTask
 
             Parallel.ForEach(resourceSet.Cast<DictionaryEntry>(), entry =>
             {
-                Stream stream = null;
-
-                switch (entry.Value)
+                using Stream stream = entry.Value switch
                 {
-                    case string sourceFilePath:
-                        // Lightweight resource: read from source file
-                        try
-                        {
-                            stream = new FileStream(sourceFilePath, FileMode.Open);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.LogWarning($"Could not open lightweight resource file {sourceFilePath}: {ex.Message}");
-                            return;
-                        }
-                        break;
-                    case Stream embeddedStream:
-                        stream = embeddedStream;
-                        break;
-                    default:
-                        return;
+                    Stream embeddedStream => embeddedStream,
+                    string sourceFilePath => OpenFile(sourceFilePath),
+                    _ => null,
+                };
+
+                if (stream is null)
+                {
+                    return;
                 }
 
                 string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(entry.Key.ToString(), UriFormat.Unescaped);
@@ -474,6 +463,18 @@ public sealed class ResourcesExtractorAndCopier : MSTask
             }
 
             return null;
+        }
+
+        static FileStream OpenFile(string path)
+        {
+            try
+            {
+                return File.OpenRead(path);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 
