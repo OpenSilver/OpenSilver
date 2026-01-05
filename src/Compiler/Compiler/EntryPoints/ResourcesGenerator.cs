@@ -129,7 +129,8 @@ public class ResourcesGenerator : Task
 
     /// <summary>
     /// When false, generates lightweight resource entries with source file paths
-    /// instead of full file content. Default is true (full embedding).
+    /// instead of full file content. This is the default value used when a resource
+    /// doesn't have explicit IsEmbedded metadata. Default is true (full embedding).
     /// </summary>
     public bool EmbedResources { get; set; } = true;
 
@@ -161,7 +162,7 @@ public class ResourcesGenerator : Task
                     string resFileName = resourceFile.ItemSpec;
                     string resourceId = GetResourceIdForResourceFile(resourceFile);
 
-                    if (EmbedResources)
+                    if (ShouldEmbedResource(resourceFile))
                     {
                         // We're handing off lifetime management for the stream.
                         // True for the third argument tells resWriter to dispose of the stream when it's done.
@@ -283,5 +284,13 @@ public class ResourcesGenerator : Task
         //
 
         return ResourceIDHelper.GetResourceIDFromRelativePath(relPath, UriFormat.UriEscaped);
+    }
+
+    private bool ShouldEmbedResource(ITaskItem item)
+    {
+        string isEmbeddedMetadata = item.GetMetadata(Constants.IS_EMBEDDED_RESOURCE_METADATA_NAME);
+        return !string.IsNullOrEmpty(isEmbeddedMetadata) 
+            ? bool.TryParse(isEmbeddedMetadata, out bool result) && result 
+            : EmbedResources;
     }
 }

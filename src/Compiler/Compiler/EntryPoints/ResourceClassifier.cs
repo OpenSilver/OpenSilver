@@ -86,6 +86,7 @@ public class ResourceClassifier : Task
         // Selectively copy metadata over.
         outputItem.SetMetadata("Link", inputItem.GetMetadata("Link"));
         outputItem.SetMetadata("LogicalName", inputItem.GetMetadata("LogicalName"));
+        outputItem.SetMetadata(Constants.IS_EMBEDDED_RESOURCE_METADATA_NAME, inputItem.GetMetadata(Constants.IS_EMBEDDED_RESOURCE_METADATA_NAME));
 
         return outputItem;
     }
