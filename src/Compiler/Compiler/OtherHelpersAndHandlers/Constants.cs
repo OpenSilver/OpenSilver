@@ -17,5 +17,7 @@ namespace OpenSilver
     internal static class Constants
     {
         public const string OPENSILVER_ASSEMBLY_NAME = "OpenSilver";
+
+        public const string IS_EMBEDDED_RESOURCE_METADATA_NAME = "IsEmbedded";
     }
 }

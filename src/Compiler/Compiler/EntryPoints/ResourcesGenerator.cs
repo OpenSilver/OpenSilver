@@ -155,11 +155,22 @@ public class ResourcesGenerator : Task
                     string resFileName = resourceFile.ItemSpec;
                     string resourceId = GetResourceIdForResourceFile(resourceFile);
 
-                    // We're handing off lifetime management for the stream.
-                    // True for the third argument tells resWriter to dispose of the stream when it's done.
-                    resWriter.AddResource(resourceId, new LazyFileStream(resFileName), true);
+                    if (IsEmbedded(resourceFile))
+                    {
+                        // We're handing off lifetime management for the stream.
+                        // True for the third argument tells resWriter to dispose of the stream when it's done.
+                        resWriter.AddResource(resourceId, new LazyFileStream(resFileName), true);
+                        Log.LogMessage(MessageImportance.Low, $"Reading Resource file: '{resFileName}'...");
+                    }
+                    else
+                    {
+                        // In lightweight mode, store full source file path as a string
+                        // ResourcesExtractorAndCopier will copy from this path to wwwroot
+                        string fullPath = Path.GetFullPath(resFileName);
+                        resWriter.AddResource(resourceId, fullPath);
+                        Log.LogMessage(MessageImportance.Low, $"Adding lightweight resource: '{resourceId}' -> '{fullPath}'.");
+                    }
 
-                    Log.LogMessage(MessageImportance.Low, $"Reading Resource file: '{resFileName}'...");
                     Log.LogMessage(MessageImportance.Low, $"Resource ID is '{resourceId}'.");
                 }
 
@@ -266,5 +277,11 @@ public class ResourcesGenerator : Task
         //
 
         return ResourceIDHelper.GetResourceIDFromRelativePath(relPath, UriFormat.UriEscaped);
+    }
+
+    private bool IsEmbedded(ITaskItem item)
+    {
+        string metadata = item.GetMetadata(Constants.IS_EMBEDDED_RESOURCE_METADATA_NAME);
+        return bool.TryParse(metadata, out bool isEmbedded) && isEmbedded;
     }
 }

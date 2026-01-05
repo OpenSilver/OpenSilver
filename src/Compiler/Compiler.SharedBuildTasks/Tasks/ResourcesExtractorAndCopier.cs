@@ -389,7 +389,14 @@ public sealed class ResourcesExtractorAndCopier : MSTask
 
             Parallel.ForEach(resourceSet.Cast<DictionaryEntry>(), entry =>
             {
-                if (entry.Value is not Stream stream)
+                using Stream stream = entry.Value switch
+                {
+                    Stream embeddedStream => embeddedStream,
+                    string sourceFilePath => OpenFile(sourceFilePath),
+                    _ => null,
+                };
+
+                if (stream is null)
                 {
                     return;
                 }
@@ -456,6 +463,18 @@ public sealed class ResourcesExtractorAndCopier : MSTask
             }
 
             return null;
+        }
+
+        static FileStream OpenFile(string path)
+        {
+            try
+            {
+                return File.OpenRead(path);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 

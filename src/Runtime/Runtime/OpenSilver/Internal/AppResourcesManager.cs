@@ -162,7 +162,7 @@ internal static class AppResourcesManager
 
     private sealed class AssemblyResourceManager
     {
-        public readonly Assembly _assembly;
+        private readonly Assembly _assembly;
         private ResourceManager _resourceManager;
 
         public AssemblyResourceManager(Assembly assembly)

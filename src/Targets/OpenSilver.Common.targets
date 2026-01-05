@@ -78,7 +78,15 @@
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
     <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
-    <OpenSilverMaxDegreeOfParallelism Condition="'$(OpenSilverMaxDegreeOfParallelism)' == ''">-1</OpenSilverMaxDegreeOfParallelism>
+    <OpenSilverMaxDegreeOfParallelism Condition=" '$(OpenSilverMaxDegreeOfParallelism)' == '' ">-1</OpenSilverMaxDegreeOfParallelism>
+    <!--
+      Controls the default behavior for whether Resource and Content files are embedded into the DLL. Default: true.  
+      Individual resources can override this behavior with IsEmbedded metadata:
+      <Resource Include="MyFile.txt">
+        <IsEmbedded>false</IsEmbedded>
+      </Resource>
+    -->
+    <OpenSilverEnableDefaultResourceEmbedding Condition=" '$(OpenSilverEnableDefaultResourceEmbedding)' == '' ">true</OpenSilverEnableDefaultResourceEmbedding>
   </PropertyGroup>
 
   <!--============================================================
@@ -99,9 +107,15 @@
     <ResourceClassifier Condition="'@(Resource)' != '' or '@(Content)' != ''"
                         ResourceFiles="@(Resource)"
                         ContentFiles="@(Content)">
-      <Output ItemName="MainEmbeddedFiles" TaskParameter="MainEmbeddedFiles" />
+      <Output ItemName="_ResourceClassifierMainEmbeddedFiles" TaskParameter="MainEmbeddedFiles" />
       <Output ItemName="_ResourceClassifierRemovedContentFiles" TaskParameter="RemovedContentFiles" />
     </ResourceClassifier>
+
+    <ItemGroup>
+      <MainEmbeddedFiles Include="@(_ResourceClassifierMainEmbeddedFiles)">
+        <IsEmbedded Condition=" '%(_ResourceClassifierMainEmbeddedFiles.IsEmbedded)' == '' ">$(OpenSilverEnableDefaultResourceEmbedding)</IsEmbedded>
+      </MainEmbeddedFiles>
+    </ItemGroup>
 
     <ItemGroup>
       <Content Remove="@(_ResourceClassifierRemovedContentFiles)" />
