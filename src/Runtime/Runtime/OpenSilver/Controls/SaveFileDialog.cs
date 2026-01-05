@@ -122,7 +122,7 @@ public sealed class SaveFileDialog
     /// The file name for the selected file associated with the <see cref="SaveFileDialog"/>.
     /// The default is <see cref="string.Empty"/>.
     /// </returns>
-    public string SafeFileName => Path.GetFileName(GetFilename());
+    public string SafeFileName { get; private set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the default file name extension applied to files that are saved with the <see cref="SaveFileDialog"/>.
@@ -175,14 +175,17 @@ public sealed class SaveFileDialog
             }
         }
 
+        var suggestedFileName = Path.GetFileName(GetSuggestedFilename());
+
         if (!IsFileSystemApiAvailable)
         {
+            SafeFileName = suggestedFileName;
             return true;
         }
 
-        var tcs = new TaskCompletionSource<object>();
+        var tcs = new TaskCompletionSource<string>();
 
-        var onSuccess = JavaScriptCallback.Create(() => tcs.SetResult(null));
+        var onSuccess = JavaScriptCallback.Create((string fileName) => tcs.SetResult(fileName));
         var onError = JavaScriptCallback.Create((string error) =>
         {
             // Errors thrown when dialogs are canceled are suppressed
@@ -193,7 +196,6 @@ public sealed class SaveFileDialog
         });
 
         bool dialogResult;
-
         try
         {
             _handle = Interop.ExecuteJavaScript(
@@ -206,7 +208,7 @@ public sealed class SaveFileDialog
                             types: {{TranslateFilterToTypes()}}
                         };
                         return await window.showSaveFilePicker(opts);
-                    })().then(handle => { $0(); return handle; }, error => { $1(error.toString()) });
+                    })().then(handle => { $0(handle.name); return handle; }, error => { $1(error.toString()) });
                 } catch (error) {
                     console.error(error);
                     throw error;
@@ -214,9 +216,9 @@ public sealed class SaveFileDialog
                 """,
                 onSuccess,
                 onError,
-                SafeFileName);
+                suggestedFileName);
 
-            await tcs.Task;
+            SafeFileName = await tcs.Task;
 
             dialogResult = true;
         }
@@ -229,6 +231,7 @@ public sealed class SaveFileDialog
         {
             // Falling back to not using File System API as it might not be supported on this browser
             _isFileSystemApiAvailable = false;
+            SafeFileName = suggestedFileName;
             dialogResult = true;
         }
 
@@ -238,7 +241,7 @@ public sealed class SaveFileDialog
         return dialogResult;
     }
 
-    private string GetFilename()
+    private string GetSuggestedFilename()
     {
         if (_filterEntries?.Count < FilterIndex)
         {

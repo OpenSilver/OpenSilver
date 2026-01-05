@@ -104,6 +104,7 @@ namespace TestApplication.OpenSilver.Tests
                     saveFileStream.Flush();
 #endif
                 }
+                SavingStatus.Text = $"File saved: '{saveFileDialog.SafeFileName}'";
             }
             else
             {
