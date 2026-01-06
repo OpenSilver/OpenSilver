@@ -6,97 +6,215 @@
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="320"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         
         <!-- Controls Panel -->
-        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="10">
-            <TextBlock Text="PlaneProjection Test" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-            
-            <!-- Rotation X -->
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <TextBlock Text="Rotation X:" Width="100"/>
-                <Slider x:Name="RotationXSlider" Width="200" Minimum="-90" Maximum="90" Value="0" 
-                        ValueChanged="RotationSlider_ValueChanged"/>
-                <TextBlock x:Name="RotationXValue" Text="0" Width="50"/>
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="PlaneProjection Test" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                
+                <!-- Rotation Section -->
+                <TextBlock Text="Rotation" FontWeight="Bold" Margin="0,10,0,5"/>
+                
+                <!-- Rotation X -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="RotationX:" Width="100"/>
+                    <Slider x:Name="RotationXSlider" Width="150" Minimum="-180" Maximum="180" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="RotationXValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- Rotation Y -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="RotationY:" Width="100"/>
+                    <Slider x:Name="RotationYSlider" Width="150" Minimum="-180" Maximum="180" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="RotationYValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- Rotation Z -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="RotationZ:" Width="100"/>
+                    <Slider x:Name="RotationZSlider" Width="150" Minimum="-180" Maximum="180" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="RotationZValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- Center of Rotation Section -->
+                <TextBlock Text="Center of Rotation (0-1)" FontWeight="Bold" Margin="0,15,0,5"/>
+                
+                <!-- CenterOfRotationX -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="CenterX:" Width="100"/>
+                    <Slider x:Name="CenterXSlider" Width="150" Minimum="0" Maximum="1" Value="0.5" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="CenterXValue" Text="0.5" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- CenterOfRotationY -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="CenterY:" Width="100"/>
+                    <Slider x:Name="CenterYSlider" Width="150" Minimum="0" Maximum="1" Value="0.5" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="CenterYValue" Text="0.5" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- CenterOfRotationZ -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="CenterZ:" Width="100"/>
+                    <Slider x:Name="CenterZSlider" Width="150" Minimum="-200" Maximum="200" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="CenterZValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- Local Offset Section -->
+                <TextBlock Text="Local Offset (in rotated space)" FontWeight="Bold" Margin="0,15,0,5"/>
+                
+                <!-- LocalOffsetX -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="LocalOffsetX:" Width="100"/>
+                    <Slider x:Name="LocalOffsetXSlider" Width="150" Minimum="-200" Maximum="200" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="LocalOffsetXValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- LocalOffsetY -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="LocalOffsetY:" Width="100"/>
+                    <Slider x:Name="LocalOffsetYSlider" Width="150" Minimum="-200" Maximum="200" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="LocalOffsetYValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- LocalOffsetZ -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="LocalOffsetZ:" Width="100"/>
+                    <Slider x:Name="LocalOffsetZSlider" Width="150" Minimum="-500" Maximum="500" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="LocalOffsetZValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- Global Offset Section -->
+                <TextBlock Text="Global Offset (in screen space)" FontWeight="Bold" Margin="0,15,0,5"/>
+                
+                <!-- GlobalOffsetX -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="GlobalOffsetX:" Width="100"/>
+                    <Slider x:Name="GlobalOffsetXSlider" Width="150" Minimum="-200" Maximum="200" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="GlobalOffsetXValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- GlobalOffsetY -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="GlobalOffsetY:" Width="100"/>
+                    <Slider x:Name="GlobalOffsetYSlider" Width="150" Minimum="-200" Maximum="200" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="GlobalOffsetYValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- GlobalOffsetZ -->
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="GlobalOffsetZ:" Width="100"/>
+                    <Slider x:Name="GlobalOffsetZSlider" Width="150" Minimum="-500" Maximum="500" Value="0" 
+                            ValueChanged="Slider_ValueChanged"/>
+                    <TextBlock x:Name="GlobalOffsetZValue" Text="0" Width="40" TextAlignment="Right"/>
+                </StackPanel>
+                
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+                    <Button Content="Reset All" Width="80" Margin="0,0,10,0" Click="ResetButton_Click"/>
+                    <Button Content="Flip Card" Width="80" Margin="0,0,10,0" Click="FlipCardButton_Click"/>
+                    <Button Content="Spin" Width="80" Click="SpinButton_Click"/>
+                </StackPanel>
+                
+                <!-- Presets -->
+                <TextBlock Text="Presets" FontWeight="Bold" Margin="0,15,0,5"/>
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <Button Content="Tilt Left" Width="70" Margin="0,0,5,0" Click="PresetTiltLeft_Click"/>
+                    <Button Content="Tilt Right" Width="70" Margin="0,0,5,0" Click="PresetTiltRight_Click"/>
+                    <Button Content="Lean Back" Width="70" Margin="0,0,5,0" Click="PresetLeanBack_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Button Content="Carousel" Width="70" Margin="0,0,5,0" Click="PresetCarousel_Click"/>
+                    <Button Content="Zoom In" Width="70" Margin="0,0,5,0" Click="PresetZoomIn_Click"/>
+                    <Button Content="3D Rotate" Width="70" Margin="0,0,5,0" Click="Preset3DRotate_Click"/>
+                </StackPanel>
             </StackPanel>
-            
-            <!-- Rotation Y -->
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <TextBlock Text="Rotation Y:" Width="100"/>
-                <Slider x:Name="RotationYSlider" Width="200" Minimum="-90" Maximum="90" Value="0" 
-                        ValueChanged="RotationSlider_ValueChanged"/>
-                <TextBlock x:Name="RotationYValue" Text="0" Width="50"/>
-            </StackPanel>
-            
-            <!-- Rotation Z -->
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <TextBlock Text="Rotation Z:" Width="100"/>
-                <Slider x:Name="RotationZSlider" Width="200" Minimum="-180" Maximum="180" Value="0" 
-                        ValueChanged="RotationSlider_ValueChanged"/>
-                <TextBlock x:Name="RotationZValue" Text="0" Width="50"/>
-            </StackPanel>
-            
-            <!-- Global Offset X -->
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <TextBlock Text="Global Offset X:" Width="100"/>
-                <Slider x:Name="GlobalOffsetXSlider" Width="200" Minimum="-100" Maximum="100" Value="0" 
-                        ValueChanged="RotationSlider_ValueChanged"/>
-                <TextBlock x:Name="GlobalOffsetXValue" Text="0" Width="50"/>
-            </StackPanel>
-            
-            <!-- Global Offset Y -->
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <TextBlock Text="Global Offset Y:" Width="100"/>
-                <Slider x:Name="GlobalOffsetYSlider" Width="200" Minimum="-100" Maximum="100" Value="0" 
-                        ValueChanged="RotationSlider_ValueChanged"/>
-                <TextBlock x:Name="GlobalOffsetYValue" Text="0" Width="50"/>
-            </StackPanel>
-            
-            <!-- Reset Button -->
-            <Button Content="Reset" Width="100" Margin="0,10,0,0" Click="ResetButton_Click"/>
-        </StackPanel>
+        </ScrollViewer>
         
         <!-- Test Elements -->
-        <Grid Grid.Row="1" Margin="10">
+        <Grid Grid.Column="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Test Rectangle with PlaneProjection -->
-            <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="1" Padding="20" Background="#F5F5F5">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="Rectangle with PlaneProjection" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+            <!-- Test 1: Rectangle -->
+            <Border Grid.Row="0" Grid.Column="0" BorderBrush="Gray" BorderThickness="1" Margin="5" Background="#F0F0F0">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Rectangle x:Name="TestRectangle" 
-                               Width="150" Height="100" 
-                               Fill="Blue" 
-                               HorizontalAlignment="Center">
+                               Width="120" Height="80" 
+                               Fill="#4A90D9">
                         <Rectangle.Projection>
-                            <PlaneProjection x:Name="RectangleProjection" RotationY="0"/>
+                            <PlaneProjection x:Name="RectangleProjection"/>
                         </Rectangle.Projection>
                     </Rectangle>
-                </StackPanel>
+                    <TextBlock Text="Rectangle" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Grid>
             </Border>
             
-            <!-- Test Button with PlaneProjection -->
-            <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Padding="20" Background="#F5F5F5">
+            <!-- Test 2: Button -->
+            <Border Grid.Row="0" Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Margin="5" Background="#F0F0F0">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="Button with PlaneProjection" HorizontalAlignment="Center" Margin="0,0,0,20"/>
                     <Button x:Name="TestButton" 
                             Content="Click Me!" 
-                            Width="150" Height="50" 
+                            Width="120" Height="40" 
                             Click="TestButton_Click">
                         <Button.Projection>
-                            <PlaneProjection x:Name="ButtonProjection" RotationX="0"/>
+                            <PlaneProjection x:Name="ButtonProjection"/>
                         </Button.Projection>
                     </Button>
                     <TextBlock x:Name="ClickCount" Text="Clicks: 0" HorizontalAlignment="Center" Margin="0,10,0,0"/>
                 </StackPanel>
             </Border>
+            
+            <!-- Test 3: Image/Border with content -->
+            <Border Grid.Row="1" Grid.Column="0" BorderBrush="Gray" BorderThickness="1" Margin="5" Background="#F0F0F0">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Border x:Name="CardBorder" Width="100" Height="140" Background="#E74C3C" CornerRadius="8">
+                        <Border.Projection>
+                            <PlaneProjection x:Name="CardProjection"/>
+                        </Border.Projection>
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="♠" FontSize="40" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="A" FontSize="24" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+            
+            <!-- Test 4: TextBlock -->
+            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Margin="5" Background="#F0F0F0">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock x:Name="TestText" 
+                               Text="3D Text!" 
+                               FontSize="28" 
+                               FontWeight="Bold" 
+                               Foreground="#2ECC71">
+                        <TextBlock.Projection>
+                            <PlaneProjection x:Name="TextProjection"/>
+                        </TextBlock.Projection>
+                    </TextBlock>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </sdk:Page>
-
