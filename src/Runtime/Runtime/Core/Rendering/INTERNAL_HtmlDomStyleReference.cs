@@ -124,6 +124,9 @@ namespace CSHTML5.Internal
         public string textShadow { set { SetStylePropertyValue("textShadow", value); } }
         public string transform { set { SetStylePropertyValue("transform", value); } }
         public string transformOrigin { set { SetStylePropertyValue("transformOrigin", value); } }
+        public string transformStyle { set { SetStylePropertyValue("transformStyle", value); } }
+        public string perspective { set { SetStylePropertyValue("perspective", value); } }
+        public string perspectiveOrigin { set { SetStylePropertyValue("perspectiveOrigin", value); } }
         public string top { set { SetStylePropertyValue("top", value); } }
         public string touchAction { set { SetStylePropertyValue("touchAction", value); } }
         public string verticalAlign { set { SetStylePropertyValue("verticalAlign", value); } }

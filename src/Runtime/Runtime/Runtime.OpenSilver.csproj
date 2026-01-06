@@ -704,8 +704,9 @@
     <Compile Include="System.Windows.Media\WORKINPROGRESS\Fonts.cs" />
     <Compile Include="System.Windows.Media\GlyphTypeface.cs" />
     <Compile Include="System.Windows.Media\ImageBrush.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\Matrix3DProjection.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\PlaneProjection.cs" />
+    <Compile Include="System.Windows.Media\Matrix3DProjection.cs" />
+    <Compile Include="System.Windows.Media\PlaneProjection.cs" />
+    <Compile Include="System.Windows.Media\Projection.cs" />
     <Compile Include="System.Windows.Media\TileBrush.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\Typeface.cs" />
     <Compile Include="System.Windows.Media.Animation\PointAnimation.cs" />
@@ -1012,7 +1013,6 @@
     <Compile Include="System.Windows.Media\WORKINPROGRESS\BitmapCache.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CacheMode.cs" />
     <Compile Include="System.Windows.Media\GeometryCollection.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\Projection.cs" />
     <Compile Include="System.Windows.Media\RectangleGeometry.cs" />
     <Compile Include="System.Windows.Navigation\NavigatedEventHandler.cs" />
     <Compile Include="System.Windows.Navigation\NavigationEventArgs.cs" />

@@ -256,6 +256,57 @@ internal static class UIElementHelpers
         };
     }
 
+    internal static void SetProjection(this UIElement uie, Projection projection)
+    {
+        if (uie.OuterDiv is not { } outerDiv)
+        {
+            return;
+        }
+
+        if (projection is null)
+        {
+            outerDiv.Style.transform = string.Empty;
+            outerDiv.Style.transformStyle = string.Empty;
+            // Clear perspective on parent if possible
+            if (VisualTreeHelper.GetParent(uie) is UIElement parent && parent.OuterDiv is { } parentDiv)
+            {
+                parentDiv.Style.perspective = string.Empty;
+            }
+            return;
+        }
+
+        // Get element dimensions - ActualWidth/ActualHeight are on FrameworkElement
+        double width = 0;
+        double height = 0;
+        if (uie is FrameworkElement fe)
+        {
+            width = fe.ActualWidth;
+            height = fe.ActualHeight;
+        }
+
+        // Get the CSS transform from the projection
+        string cssTransform = projection.GetCssTransform(width, height);
+
+        if (string.IsNullOrEmpty(cssTransform))
+        {
+            outerDiv.Style.transform = string.Empty;
+            outerDiv.Style.transformStyle = string.Empty;
+        }
+        else
+        {
+            // Apply the 3D transform
+            outerDiv.Style.transform = cssTransform;
+            outerDiv.Style.transformStyle = "preserve-3d";
+
+            // Apply perspective to the parent element for proper 3D rendering
+            double perspective = projection.GetPerspective();
+            if (perspective > 0 && VisualTreeHelper.GetParent(uie) is UIElement parent && parent.OuterDiv is { } parentDiv)
+            {
+                parentDiv.Style.perspective = $"{perspective.ToInvariantString()}px";
+            }
+        }
+    }
+
     internal static void SetZIndex(this UIElement uie, int value)
     {
         Debug.Assert(uie is not null);

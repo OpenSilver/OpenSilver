@@ -14,6 +14,8 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows.Media;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -188,18 +190,64 @@ namespace System.Windows
                                         typeof(UIElement), 
                                         null);
 
-		[OpenSilver.NotImplemented]
+        #region Projection
+
+        /// <summary>
+        /// Identifies the <see cref="Projection"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ProjectionProperty =
+            DependencyProperty.Register(
+                nameof(Projection),
+                typeof(Projection),
+                typeof(UIElement),
+                new PropertyMetadata(null, OnProjectionChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetProjection((Projection)newValue),
+                });
+
+        /// <summary>
+        /// Gets or sets the perspective projection (3-D effect) to apply when rendering this element.
+        /// </summary>
+        /// <returns>
+        /// The perspective projection applied to this element. The default is null.
+        /// </returns>
         public Projection Projection
         {
             get { return (Projection)GetValue(ProjectionProperty); }
             set { SetValueInternal(ProjectionProperty, value); }
         }
 
-		[OpenSilver.NotImplemented]
-        public static readonly DependencyProperty ProjectionProperty =
-            DependencyProperty.Register(nameof(Projection), 
-                                        typeof(Projection), 
-                                        typeof(UIElement), 
-                                        null);
+        private static void OnProjectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UIElement element = (UIElement)d;
+
+            if (element._weakProjectionChangedEventToken != null)
+            {
+                element._weakProjectionChangedEventToken.Dispose();
+                element._weakProjectionChangedEventToken = null;
+            }
+
+            if (e.NewValue is Projection newProjection)
+            {
+                element._weakProjectionChangedEventToken = WeakEvent.Subscribe<UIElement, Projection, EventArgs>(
+                    element,
+                    newProjection,
+                    static (instance, sender, args) => instance.OnProjectionChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
+            }
+        }
+
+        private void OnProjectionChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                this.SetProjection((Projection)sender);
+            }
+        }
+
+        private WeakEventToken _weakProjectionChangedEventToken;
+
+        #endregion
     }
 }

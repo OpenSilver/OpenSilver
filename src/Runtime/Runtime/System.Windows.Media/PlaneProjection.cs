@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Globalization;
 using System.Windows.Media.Media3D;
 
 namespace System.Windows.Media
@@ -18,7 +19,6 @@ namespace System.Windows.Media
     /// <summary>
     /// Represents a perspective transform (a 3-D-like effect) on an object.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public sealed class PlaneProjection : Projection
     {
         #region Constructor
@@ -26,7 +26,6 @@ namespace System.Windows.Media
         /// <summary>
         /// Initializes a new instance of the <see cref="PlaneProjection"/> class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public PlaneProjection()
         {
         }
@@ -38,15 +37,14 @@ namespace System.Windows.Media
         #region Rotation
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.RotationX" /> dependency property.
+        /// Identifies the <see cref="RotationX"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationXProperty =
            DependencyProperty.Register(
-               "RotationX",
+               nameof(RotationX),
                typeof(double),
                typeof(PlaneProjection),
-               new PropertyMetadata(0d));
+               new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the number of degrees to rotate the object around the x-axis of rotation.
@@ -54,7 +52,6 @@ namespace System.Windows.Media
         /// <returns>
         /// The number of degrees to rotate the object around the x-axis of rotation. The default is 0.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double RotationX
         {
             get { return (double)GetValue(RotationXProperty); }
@@ -62,15 +59,14 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.RotationY" /> dependency property.
+        /// Identifies the <see cref="RotationY"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationYProperty =
             DependencyProperty.Register(
-                "RotationY",
+                nameof(RotationY),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the number of degrees to rotate the object around the y-axis of rotation.
@@ -78,7 +74,6 @@ namespace System.Windows.Media
         /// <returns>
         /// The number of degrees to rotate the object around the y-axis of rotation. The default is 0.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double RotationY
         {
             get { return (double)GetValue(RotationYProperty); }
@@ -86,15 +81,14 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.RotationZ" /> dependency property.
+        /// Identifies the <see cref="RotationZ"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationZProperty =
             DependencyProperty.Register(
-                "RotationZ",
+                nameof(RotationZ),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the number of degrees to rotate the object around the z-axis of rotation.
@@ -102,7 +96,6 @@ namespace System.Windows.Media
         /// <returns>
         /// The number of degrees to rotate the object around the z-axis of rotation. The default is 0.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double RotationZ
         {
             get { return (double)GetValue(RotationZProperty); }
@@ -114,15 +107,14 @@ namespace System.Windows.Media
         #region CenterOfRotation
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.CenterOfRotationX" /> dependency property.
+        /// Identifies the <see cref="CenterOfRotationX"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationXProperty =
             DependencyProperty.Register(
-                "CenterOfRotationX",
+                nameof(CenterOfRotationX),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0.5d));
+                new PropertyMetadata(0.5d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the x-coordinate of the center of rotation of the object you rotate. 
@@ -134,7 +126,6 @@ namespace System.Windows.Media
         /// rotation accordingly. 
         /// The default is 0.5 (the center of object). 
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double CenterOfRotationX
         {
             get { return (double)GetValue(CenterOfRotationXProperty); }
@@ -143,15 +134,14 @@ namespace System.Windows.Media
 
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.CenterOfRotationY" /> dependency property.
+        /// Identifies the <see cref="CenterOfRotationY"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationYProperty =
             DependencyProperty.Register(
-                "CenterOfRotationY",
+                nameof(CenterOfRotationY),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0.5d));
+                new PropertyMetadata(0.5d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the y-coordinate of the center of rotation of the object you rotate.
@@ -163,7 +153,6 @@ namespace System.Windows.Media
         /// rotation accordingly. 
         /// The default is 0.5 (the center of object).
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double CenterOfRotationY
         {
             get { return (double)GetValue(CenterOfRotationYProperty); }
@@ -172,15 +161,14 @@ namespace System.Windows.Media
 
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.CenterOfRotationZ" /> dependency property.
+        /// Identifies the <see cref="CenterOfRotationZ"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationZProperty =
             DependencyProperty.Register(
-                "CenterOfRotationZ",
+                nameof(CenterOfRotationZ),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the z-coordinate of the center of rotation of the object you rotate.
@@ -191,7 +179,6 @@ namespace System.Windows.Media
         /// of the object, and negative values correspond to coordinates behind the plane of the 
         /// object.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double CenterOfRotationZ
         {
             get { return (double)GetValue(CenterOfRotationZProperty); }
@@ -203,20 +190,18 @@ namespace System.Windows.Media
         #region Local Offset
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.LocalOffsetX" /> dependency property.
+        /// Identifies the <see cref="LocalOffsetX"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetXProperty =
             DependencyProperty.Register(
-                "LocalOffsetX",
+                nameof(LocalOffsetX),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance the object is translated along the x-axis of the plane of the object. 
         /// </summary>
-        [OpenSilver.NotImplemented]
         public double LocalOffsetX
         {
             get { return (double)GetValue(LocalOffsetXProperty); }
@@ -224,20 +209,18 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.LocalOffsetY" /> dependency property.
+        /// Identifies the <see cref="LocalOffsetY"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetYProperty =
              DependencyProperty.Register(
-                "LocalOffsetY",
+                nameof(LocalOffsetY),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance the object is translated along the y-axis of the plane of the object.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public double LocalOffsetY
         {
             get { return (double)GetValue(LocalOffsetYProperty); }
@@ -245,20 +228,18 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.LocalOffsetZ" /> dependency property.
+        /// Identifies the <see cref="LocalOffsetZ"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetZProperty =
              DependencyProperty.Register(
-                "LocalOffsetZ",
+                nameof(LocalOffsetZ),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance the object is translated along the z-axis of the plane of the object.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public double LocalOffsetZ
         {
             get { return (double)GetValue(LocalOffsetZProperty); }
@@ -270,20 +251,18 @@ namespace System.Windows.Media
         #region Global Offset
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.GlobalOffsetX" /> dependency property.
+        /// Identifies the <see cref="GlobalOffsetX"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetXProperty =
             DependencyProperty.Register(
-                "GlobalOffsetX",
+                nameof(GlobalOffsetX),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance the object is translated along the x-axis of the screen. 
         /// </summary>
-        [OpenSilver.NotImplemented]
         public double GlobalOffsetX
         {
             get { return (double)GetValue(GlobalOffsetXProperty); }
@@ -291,20 +270,18 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.GlobalOffsetY" /> dependency property.
+        /// Identifies the <see cref="GlobalOffsetY"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetYProperty =
             DependencyProperty.Register(
-                "GlobalOffsetY",
+                nameof(GlobalOffsetY),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance the object is translated along the y-axis of the screen. 
         /// </summary>
-        [OpenSilver.NotImplemented]
         public double GlobalOffsetY
         {
             get { return (double)GetValue(GlobalOffsetYProperty); }
@@ -312,20 +289,18 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.GlobalOffsetZ" /> dependency property.
+        /// Identifies the <see cref="GlobalOffsetZ"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetZProperty =
             DependencyProperty.Register(
-                "GlobalOffsetZ",
+                nameof(GlobalOffsetZ),
                 typeof(double),
                 typeof(PlaneProjection),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d, OnProjectionPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance the object is translated along the z-axis of the screen.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public double GlobalOffsetZ
         {
             get { return (double)GetValue(GlobalOffsetZProperty); }
@@ -336,30 +311,174 @@ namespace System.Windows.Media
 
         #region Projection Matrix
 
-        /// <summary>
-        ///  Identifies the <see cref="PlaneProjection.ProjectionMatrix" /> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty ProjectionMatrixProperty =
-            DependencyProperty.Register(
-                "ProjectionMatrix",
+        private static readonly DependencyPropertyKey ProjectionMatrixPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ProjectionMatrix),
                 typeof(Matrix3D),
                 typeof(PlaneProjection),
                 new PropertyMetadata(Matrix3D.Identity));
 
         /// <summary>
-        /// Gets the projection matrix on the <see cref="PlaneProjection" />.
+        ///  Identifies the <see cref="ProjectionMatrix"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ProjectionMatrixProperty = ProjectionMatrixPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets the projection matrix on the <see cref="PlaneProjection"/>.
         /// The default value is <see cref="Matrix3D.Identity"/>.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public Matrix3D ProjectionMatrix
         {
             get { return (Matrix3D)GetValue(ProjectionMatrixProperty); }
-            private set { SetValueInternal(ProjectionMatrixProperty, value); }
+            private set { SetValueInternal(ProjectionMatrixPropertyKey, value); }
         }
 
         #endregion Projection Matrix
 
         #endregion Dependency Properties
+
+        private static void OnProjectionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            PlaneProjection projection = (PlaneProjection)d;
+            projection.UpdateProjectionMatrix();
+            projection.RaiseChanged();
+        }
+
+        private void UpdateProjectionMatrix()
+        {
+            ProjectionMatrix = CalculateProjectionMatrix();
+        }
+
+        private Matrix3D CalculateProjectionMatrix()
+        {
+            double radX = RotationX * Math.PI / 180.0;
+            double radY = RotationY * Math.PI / 180.0;
+            double radZ = RotationZ * Math.PI / 180.0;
+
+            double cosX = Math.Cos(radX);
+            double sinX = Math.Sin(radX);
+            double cosY = Math.Cos(radY);
+            double sinY = Math.Sin(radY);
+            double cosZ = Math.Cos(radZ);
+            double sinZ = Math.Sin(radZ);
+
+            Matrix3D rotX = new Matrix3D(
+                1, 0, 0, 0,
+                0, cosX, sinX, 0,
+                0, -sinX, cosX, 0,
+                0, 0, 0, 1);
+
+            Matrix3D rotY = new Matrix3D(
+                cosY, 0, -sinY, 0,
+                0, 1, 0, 0,
+                sinY, 0, cosY, 0,
+                0, 0, 0, 1);
+
+            Matrix3D rotZ = new Matrix3D(
+                cosZ, sinZ, 0, 0,
+                -sinZ, cosZ, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1);
+
+            Matrix3D rotation = rotZ * rotY * rotX;
+
+            Matrix3D localOffset = new Matrix3D(
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                LocalOffsetX, LocalOffsetY, LocalOffsetZ, 1);
+
+            Matrix3D result = rotation * localOffset;
+
+            result.OffsetX += GlobalOffsetX;
+            result.OffsetY += GlobalOffsetY;
+            result.OffsetZ += GlobalOffsetZ;
+
+            return result;
+        }
+
+        internal override string GetCssTransform(double elementWidth, double elementHeight)
+        {
+            if (IsIdentity())
+            {
+                return string.Empty;
+            }
+
+            double centerX = elementWidth * CenterOfRotationX;
+            double centerY = elementHeight * CenterOfRotationY;
+            double centerZ = CenterOfRotationZ;
+
+            var transforms = new System.Text.StringBuilder();
+
+            if (GlobalOffsetX != 0 || GlobalOffsetY != 0 || GlobalOffsetZ != 0)
+            {
+                transforms.Append(string.Format(CultureInfo.InvariantCulture,
+                    "translate3d({0}px,{1}px,{2}px) ",
+                    Math.Round(GlobalOffsetX, 4),
+                    Math.Round(GlobalOffsetY, 4),
+                    Math.Round(GlobalOffsetZ, 4)));
+            }
+
+            if (centerX != 0 || centerY != 0 || centerZ != 0)
+            {
+                transforms.Append(string.Format(CultureInfo.InvariantCulture,
+                    "translate3d({0}px,{1}px,{2}px) ",
+                    Math.Round(centerX, 4),
+                    Math.Round(centerY, 4),
+                    Math.Round(centerZ, 4)));
+            }
+
+            if (LocalOffsetX != 0 || LocalOffsetY != 0 || LocalOffsetZ != 0)
+            {
+                transforms.Append(string.Format(CultureInfo.InvariantCulture,
+                    "translate3d({0}px,{1}px,{2}px) ",
+                    Math.Round(LocalOffsetX, 4),
+                    Math.Round(LocalOffsetY, 4),
+                    Math.Round(LocalOffsetZ, 4)));
+            }
+
+            if (RotationX != 0)
+            {
+                transforms.Append(string.Format(CultureInfo.InvariantCulture,
+                    "rotateX({0}deg) ", Math.Round(RotationX, 4)));
+            }
+
+            if (RotationY != 0)
+            {
+                transforms.Append(string.Format(CultureInfo.InvariantCulture,
+                    "rotateY({0}deg) ", Math.Round(RotationY, 4)));
+            }
+
+            if (RotationZ != 0)
+            {
+                transforms.Append(string.Format(CultureInfo.InvariantCulture,
+                    "rotateZ({0}deg) ", Math.Round(RotationZ, 4)));
+            }
+
+            if (centerX != 0 || centerY != 0 || centerZ != 0)
+            {
+                transforms.Append(string.Format(CultureInfo.InvariantCulture,
+                    "translate3d({0}px,{1}px,{2}px)",
+                    Math.Round(-centerX, 4),
+                    Math.Round(-centerY, 4),
+                    Math.Round(-centerZ, 4)));
+            }
+
+            return transforms.ToString().Trim();
+        }
+
+        private bool IsIdentity()
+        {
+            return RotationX == 0 &&
+                   RotationY == 0 &&
+                   RotationZ == 0 &&
+                   LocalOffsetX == 0 &&
+                   LocalOffsetY == 0 &&
+                   LocalOffsetZ == 0 &&
+                   GlobalOffsetX == 0 &&
+                   GlobalOffsetY == 0 &&
+                   GlobalOffsetZ == 0;
+        }
     }
 }
+
