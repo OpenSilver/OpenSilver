@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -25,14 +26,17 @@ namespace OpenSilver.Compiler
         {
             private readonly XamlReader _reader;
             private readonly ConversionSettings _settings;
+            private readonly string _sourceFile;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             
             public GeneratorPass1(XDocument doc,
+                string sourceFile,
                 string fileNameWithPathRelativeToProjectRoot,
                 ConversionSettings settings)
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
+                _sourceFile = sourceFile;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
             }
 
@@ -77,8 +81,20 @@ namespace OpenSilver.Compiler
                             // add '@' to handle cases where x:Name is a forbidden word (for instance 'this'
                             // or any other c# keyword)
                             string fieldName = "@" + name;
-                            resultingFieldsForNamedElements.Add(
-                                $"{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element, true)} {fieldName};");
+
+                            // Add #line directive to map C# errors back to XAML source
+                            if (element is IXmlLineInfo lineInfo && lineInfo.HasLineInfo())
+                            {
+                                // https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-10.0/enhanced-line-directives#detailed-design
+                                string lineDirective = $"#line ({lineInfo.LineNumber}, {lineInfo.LinePosition}) - ({lineInfo.LineNumber}, {lineInfo.LinePosition + 5}) 65536 \"{_sourceFile}\"";
+                                resultingFieldsForNamedElements.Add(
+                                    $"{lineDirective}\n{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element, true)} {fieldName};\n#line default");
+                            }
+                            else
+                            {
+                                resultingFieldsForNamedElements.Add(
+                                    $"{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element, true)} {fieldName};");
+                            }
                         }
                     }
                 }

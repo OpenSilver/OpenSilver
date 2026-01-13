@@ -189,7 +189,7 @@ internal abstract class CoreTypesConverter
         return false;
     }
 
-    public string ConvertKnownType(string source, string typeFullName, XElement context)
+    public string ConvertKnownType(string source, string typeFullName, XObject context)
     {
         if (_knownCoreTypes.TryGetValue(typeFullName, out var converter))
         {

@@ -32,6 +32,8 @@ namespace OpenSilver.Compiler
         {
             private abstract class GeneratorScope
             {
+                private readonly StringBuilder _stringBuilder = new();
+
                 protected GeneratorScope(string rootElement)
                 {
                     Root = rootElement;
@@ -42,13 +44,13 @@ namespace OpenSilver.Compiler
 
                 public string XamlContext { get; }
 
-                public StringBuilder StringBuilder { get; } = new StringBuilder();
+                public void AppendLine(string value) => _stringBuilder.AppendLine(value);
 
                 public abstract void RegisterName(string name, string scopedElement);
 
-                protected abstract string ToStringCore();
+                public string Build() => BuildCore(_stringBuilder);
 
-                public sealed override string ToString() => ToStringCore();
+                protected abstract string BuildCore(StringBuilder stringBuilder);
             }
 
             private sealed class RootScope : GeneratorScope
@@ -60,10 +62,10 @@ namespace OpenSilver.Compiler
                 {
                     _buildNamescope = createNameScope;
 
-                    StringBuilder.AppendLine($"Dim {XamlContext} = {RuntimeHelperClass}.Create_XamlContext()");
+                    AppendLine($"Dim {XamlContext} = {RuntimeHelperClass}.Create_XamlContext()");
                     if (createNameScope)
                     {
-                        StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_InitializeNameScope({XamlContext}, {rootElementName})");
+                        AppendLine($"{RuntimeHelperClass}.XamlContext_InitializeNameScope({XamlContext}, {rootElementName})");
                     }
                 }
 
@@ -71,11 +73,11 @@ namespace OpenSilver.Compiler
                 {
                     if (_buildNamescope)
                     {
-                        StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement})");
+                        AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement})");
                     }
                 }
 
-                protected override string ToStringCore() => StringBuilder.ToString();
+                protected override string BuildCore(StringBuilder stringBuilder) => stringBuilder.ToString();
             }
 
             private sealed class NewObjectScope : GeneratorScope
@@ -93,15 +95,15 @@ namespace OpenSilver.Compiler
 
                 public override void RegisterName(string name, string scopedElement)
                 {
-                    StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement})");
+                    AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement})");
                 }
 
-                protected override string ToStringCore()
+                protected override string BuildCore(StringBuilder stringBuilder)
                 {
                     StringBuilder builder = new StringBuilder();
 
                     builder.AppendLine($"Private Shared Function {MethodName}({XamlContext} As {XamlContextClass}) As {ObjectType}")
-                        .Append(StringBuilder.ToString());
+                        .Append(stringBuilder.ToString());
                     builder.AppendLine($"Return {Root}")
                         .AppendLine("End Function");
 
@@ -127,15 +129,15 @@ namespace OpenSilver.Compiler
 
                 public override void RegisterName(string name, string scopedElement)
                 {
-                    StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement})");
+                    AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement})");
                 }
 
-                protected override string ToStringCore()
+                protected override string BuildCore(StringBuilder stringBuilder)
                 {
                     StringBuilder builder = new StringBuilder();
 
                     builder.AppendLine($"Private Shared Function {MethodName}({TemplateOwner} As Global.{KnownNamespaces.SystemWindows}.IFrameworkElement, {XamlContext} As {XamlContextClass}) As Global.{KnownNamespaces.SystemWindows}.IFrameworkElement")
-                        .Append(StringBuilder.ToString());
+                        .Append(stringBuilder.ToString());
                     builder.AppendLine($"Return {Root}")
                         .AppendLine("End Function");
 
@@ -143,7 +145,7 @@ namespace OpenSilver.Compiler
                 }
             }
 
-            private class GeneratorContext
+            private sealed class GeneratorContext
             {
                 private readonly Stack<GeneratorScope> _scopes = new();
 
@@ -156,7 +158,7 @@ namespace OpenSilver.Compiler
                 public bool GenerateFieldsForNamedElements { get; set; }
                 public bool IsInsideTemplate => _frameworkTemplateCount > 0;
                 public GeneratorScope CurrentScope => _scopes.Peek();
-                public StringBuilder StringBuilder => CurrentScope.StringBuilder;
+                public string CurrentXamlContext => CurrentScope.XamlContext;
 
                 public void PushScope(GeneratorScope scope)
                 {
@@ -182,10 +184,14 @@ namespace OpenSilver.Compiler
                         _frameworkTemplateCount--;
                     }
 
-                    ResultingMethods.Add(scope.ToString());
+                    ResultingMethods.Add(scope.Build());
                 }
 
-                public string CurrentXamlContext => CurrentScope.XamlContext;
+                public GeneratorContext AppendLine(string value)
+                {
+                    CurrentScope.AppendLine(value);
+                    return this;
+                }
             }
 
             private readonly XamlReader _reader;
@@ -308,7 +314,7 @@ End Sub
                         componentTypeFullName,
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
-                        parameters.CurrentScope.ToString(),
+                        parameters.CurrentScope.Build(),
                         $"Return Global.System.Activator.CreateInstance(Of {componentTypeFullName})()",
                         parameters.ResultingMethods,
                         $"Global.{KnownNamespaces.SystemWindows}.UIElement",
@@ -329,7 +335,7 @@ End Sub
                         baseType,
                         baseType,
                         rootElementName,
-                        parameters.CurrentScope.ToString(),
+                        parameters.CurrentScope.Build(),
                         string.Join(Environment.NewLine, $"Dim {rootElementName} = New {baseType}()", $"LoadComponentImpl({rootElementName})", $"Return {rootElementName}"),
                         parameters.ResultingMethods,
                         $"Global.{KnownNamespaces.SystemWindows}.UIElement",
@@ -377,8 +383,7 @@ End Sub
                 {
                     var objectScope = new NewObjectScope(elementUid, elementType);
 
-                    parameters.StringBuilder.AppendLine(
-                        $"Dim {elementUid} = {objectScope.MethodName}({parameters.CurrentXamlContext})");
+                    parameters.AppendLine($"Dim {elementUid} = {objectScope.MethodName}({parameters.CurrentXamlContext})");
 
                     parameters.PushScope(objectScope);
                 }
@@ -404,7 +409,7 @@ End Sub
 
                 if (IsElementTheRootElement(element))
                 {
-                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUid})");
+                    parameters.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUid})");
                 }
                 else
                 {
@@ -426,7 +431,7 @@ End Sub
                         }
 
                         string preparedValue = _settings.SystemTypes.ConvertKnownType(directContent, elementType.Substring("Global.".Length));
-                        parameters.StringBuilder.AppendLine(
+                        parameters.AppendLine(
                             $"Dim {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue})");
                     }
                     else if (element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null)
@@ -443,12 +448,12 @@ End Sub
                         string preparedValue = ConvertFromInvariantString(
                             stringValue, element, elementType, isKnownCoreType, false);
 
-                        parameters.StringBuilder.AppendLine(
+                        parameters.AppendLine(
                             $"Dim {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue})");
                     }
                     else
                     {
-                        parameters.StringBuilder.AppendLine(
+                        parameters.AppendLine(
                             $"Dim {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, New {elementType}())");
 
                         if (IsResourceDictionaryCreatedFromSource(element))
@@ -462,7 +467,7 @@ End Sub
                                 _settings.AssemblyName);
                             string loadTypeFullName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
 
-                            parameters.StringBuilder.AppendLine(
+                            parameters.AppendLine(
                                 $"CType(New {loadTypeFullName}(), {IXamlComponentLoaderClass}).LoadComponent({elementUid})");
                         }
                     }
@@ -473,22 +478,22 @@ End Sub
                     _settings.Inspector.IsAssignableFrom(
                         KnownNamespaces.SystemWindows, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName, element))
                 {
-                    parameters.StringBuilder.AppendLine(
+                    parameters.AppendLine(
                         $"{RuntimeHelperClass}.XamlContext_SetTemplatedParent({parameters.CurrentXamlContext}, {elementUid})");
                 }
 
                 if (_settings.Inspector.IsAssignableFrom(
                     KnownNamespaces.SystemWindowsMediaAnimation, "Timeline", element.Name.NamespaceName, element.Name.LocalName, element))
                 {
-                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUid})");
+                    parameters.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUid})");
                 }
 
                 if (_settings.Inspector.IsAssignableFrom(
                     KnownNamespaces.SystemWindows, "IUIElement", element.Name.NamespaceName, element.Name.LocalName, element))
                 {
                     string xamlPath = element.Attribute(GeneratingPathInXaml.PathInXamlAttribute)?.Value ?? string.Empty;
-                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUid}, \"{xamlPath}\")");
-                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetFilePath({elementUid}, \"{_sourceFile}\")");
+                    parameters.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUid}, \"{xamlPath}\")");
+                    parameters.AppendLine($"{XamlDesignerBridgeClass}.SetFilePath({elementUid}, \"{_sourceFile}\")");
                 }
 
                 // Add the attributes:
@@ -541,7 +546,7 @@ End Sub
                                     if (_settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "DependencyObject",
                                         element.Name.NamespaceName, element.Name.LocalName, element))
                                     {
-                                        parameters.StringBuilder.AppendLine(
+                                        parameters.AppendLine(
                                             $"{elementUid}.SetValue(Global.{KnownNamespaces.SystemWindows}.FrameworkElement.NameProperty, \"{name}\")");
                                     }
                                 }
@@ -549,7 +554,7 @@ End Sub
                                 {
                                     if (_settings.Inspector.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny, attribute))
                                     {
-                                        parameters.StringBuilder.AppendLine($"{elementUid}.Name = \"{name}\"");
+                                        parameters.AppendLine($"{elementUid}.Name = \"{name}\"");
                                     }
                                 }
 
@@ -577,7 +582,7 @@ End Sub
                                             //------------
 
                                             int componentId = parameters.ComponentConnector.ConnectEventHandler(elementType, attributeName, attributeValue);
-                                            parameters.StringBuilder.AppendLine(
+                                            parameters.AppendLine(
                                                 $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid})");
 
                                             break;
@@ -638,7 +643,7 @@ End Sub
                                                 if (TryResolvePathForBinding(attributeValue, element, attribute, out string resolvedPath))
                                                 {
                                                     string xamlPath = _settings.SystemTypes.ConvertToString(resolvedPath);
-                                                    parameters.StringBuilder.AppendLine($"{elementUid}.XamlPath = {xamlPath}");
+                                                    parameters.AppendLine($"{elementUid}.XamlPath = {xamlPath}");
                                                 }
 
                                                 XName typeName = element.Name;
@@ -656,11 +661,11 @@ End Sub
                                                 && memberName == "Path")
                                             {
                                                 ResolvePathForTemplateBinding(attributeValue, element, out string typeName, out string propertyName);
-                                                parameters.StringBuilder.AppendLine(
+                                                parameters.AppendLine(
                                                     $"{elementUid}.DependencyPropertyName = {_settings.SystemTypes.ConvertToString(propertyName)}");
                                                 if (typeName != null)
                                                 {
-                                                    parameters.StringBuilder.AppendLine(
+                                                    parameters.AppendLine(
                                                         $"{elementUid}.DependencyPropertyOwnerType = GetType({typeName})");
                                                 }
 
@@ -688,7 +693,7 @@ End Sub
                                             // Append the statement:
                                             if (value != null)
                                             {
-                                                parameters.StringBuilder.AppendLine($"{elementUid}.{attributeName} = {value}");
+                                                parameters.AppendLine($"{elementUid}.{attributeName} = {value}");
                                             }
 
                                             break;
@@ -732,8 +737,7 @@ End Sub
                                             element,
                                             attribute);
 
-                                        parameters.StringBuilder.AppendLine(
-                                            $"{ownerType}.Set{memberName}({elementUid}, {value})");
+                                        parameters.AppendLine($"{ownerType}.Set{memberName}({elementUid}, {value})");
                                     }
                                     break;
 
@@ -742,7 +746,7 @@ End Sub
                                         string ownerType = $"Global.{TypeReferenceHelper.VisualBasic.ConvertToString(declaringType)}";
 
                                         int componentId = parameters.ComponentConnector.ConnectAttachedEventHandler(elementType, ownerType, memberName, attributeValue);
-                                        parameters.StringBuilder.AppendLine(
+                                        parameters.AppendLine(
                                             $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid})");
                                     }
                                     break;
@@ -840,25 +844,25 @@ End Sub
 
                 string eventSetterName = GeneratingCode.GetUniqueName(eventSetter);
 
-                parameters.StringBuilder.AppendLine(
+                parameters.AppendLine(
                     $"Dim {eventSetterName} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, New Global.{KnownNamespaces.SystemWindows}.EventSetter())");
 
-                parameters.StringBuilder.AppendLine(
+                parameters.AppendLine(
                     $"{eventSetterName}.Event = {RuntimeHelperClass}.RoutedEventFromName(\"{eventName}\", GetType(Global.{ownerTypeString}))");
 
-                parameters.StringBuilder.AppendLine(
+                parameters.AppendLine(
                     $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {eventSetterName})");
 
                 if (handledEventsTooAttribute is not null)
                 {
                     string value = _settings.SystemTypes.ConvertToBoolean(GetAttributeValue(handledEventsTooAttribute));
-                    parameters.StringBuilder.AppendLine($"{eventSetterName}.HandledEventsToo = {value}");
+                    parameters.AppendLine($"{eventSetterName}.HandledEventsToo = {value}");
                 }
             }
 
             private void OnWriteEndObject(GeneratorContext parameters)
             {
-                parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteEndObject({parameters.CurrentXamlContext})");
+                parameters.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteEndObject({parameters.CurrentXamlContext})");
 
                 if (_nodeSelector.IsMatch(_reader.ObjectData.Element))
                 {
@@ -886,7 +890,7 @@ End Sub
 
                     var scope = new FrameworkTemplateScope(frameworkTemplateName, GeneratingCode.GetUniqueName(member.Elements().First()));
 
-                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, AddressOf {scope.MethodName})");
+                    parameters.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, AddressOf {scope.MethodName})");
 
                     parameters.PushScope(scope);
                 }
@@ -946,22 +950,22 @@ End Sub
                             string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                             if (isImplicitStyle)
                             {
-                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {childUid})");
+                                parameters.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {childUid})");
                             }
                             else if (isImplicitDataTemplate)
                             {
                                 string key = $"New Global.{KnownNamespaces.SystemWindows}.DataTemplateKey(GetType({childKey}))";
 
-                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add({key}, {childUid})");
+                                parameters.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add({key}, {childUid})");
                             }
                             else
                             {
-                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {childUid})");
+                                parameters.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {childUid})");
                             }
                         }
                         else
                         {
-                            parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IList).Add({childUid})");
+                            parameters.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IList).Add({childUid})");
                         }
                     }
                     else
@@ -980,12 +984,12 @@ End Sub
                             {
                                 string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                     elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny, element);
-                                parameters.StringBuilder.AppendLine(
+                                parameters.AppendLine(
                                     $"{elementType}.Set{propertyName}({parentUid}, {childUid})"); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
                             }
                             else
                             {
-                                parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = {childUid}");
+                                parameters.AppendLine($"{parentUid}.{propertyName} = {childUid}");
                             }
                         }
                         else
@@ -1022,7 +1026,7 @@ End Sub
                                         isAttached: true);
 
                                     string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
-                                    parameters.StringBuilder.AppendLine(
+                                    parameters.AppendLine(
                                         $"{elementType}.Set{propertyName}({parentUid}, CType({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}), {propertyType}))");
                                 }
                                 else
@@ -1040,7 +1044,7 @@ End Sub
                                         isAttached: false);
 
                                     string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
-                                    parameters.StringBuilder.AppendLine(
+                                    parameters.AppendLine(
                                         $"{parentUid}.{propertyName} = CType({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}), {propertyType})");
                                 }
                             }
@@ -1093,12 +1097,12 @@ End Sub
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
-                                    parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = {childUid}");
+                                    parameters.AppendLine($"{parentUid}.{propertyName} = {childUid}");
                                 }
                                 else
                                 {
                                     string dpFullName = $"{propertyDeclaringTypeName}.{propertyName}Property";
-                                    parameters.StringBuilder.AppendLine(
+                                    parameters.AppendLine(
                                         $"Global.{KnownNamespaces.SystemWindowsData}.BindingOperations.SetBinding({parentUid}, {dpFullName}, {childUid})");
                                 }
                             }
@@ -1152,7 +1156,7 @@ End Sub
 
                                     if (elementType == $"Global.{KnownNamespaces.SystemWindows}.Setter" && propertyName == "Value")
                                     {
-                                        parameters.StringBuilder.AppendLine(
+                                        parameters.AppendLine(
                                             $"{parentUid}.{propertyName} = {childUid}");
                                     }
                                     else
@@ -1169,22 +1173,20 @@ End Sub
                                         $"Global.{propertyTypeName}" :
                                         $"Global.{propertyTypeNamespace}.{propertyTypeName}";
 
-                                    parameters.StringBuilder
+                                    parameters
                                         .AppendLine($"Dim {markupValue} As Object = Nothing")
                                         .AppendLine($"If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentUid}, {dependencyPropertyName}, {childUid}, {markupValue})");
 
                                     if (!isAttachedProperty)
                                     {
-                                        parameters.StringBuilder
-                                            .AppendLine($"    {parentUid}.{propertyName} = CType({markupValue}, {propertyTypeFullName})");
+                                        parameters.AppendLine($"    {parentUid}.{propertyName} = CType({markupValue}, {propertyTypeFullName})");
                                     }
                                     else
                                     {
-                                        parameters.StringBuilder
-                                            .AppendLine($"    {propertyDeclaringTypeName}.Set{propertyName}({parentUid}, CType({markupValue}, {propertyTypeFullName}))");
+                                        parameters.AppendLine($"    {propertyDeclaringTypeName}.Set{propertyName}({parentUid}, CType({markupValue}, {propertyTypeFullName}))");
                                     }
 
-                                    parameters.StringBuilder.AppendLine("End If");
+                                    parameters.AppendLine("End If");
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
@@ -1197,7 +1199,7 @@ End Sub
                                         _settings.AssemblyName,
                                         isAttachedProperty ? element : parent);
 
-                                parameters.StringBuilder.AppendLine(
+                                parameters.AppendLine(
                                     $"{parentUid}.SetValue({dpName}, {RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}))");
                             }
                             else if (GeneratingCode.IsNullExtension(child))
@@ -1210,11 +1212,11 @@ End Sub
                                 {
                                     string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                         elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny, element);
-                                    parameters.StringBuilder.AppendLine($"{elementType}.Set{propertyName}({parentUid}, Nothing)");
+                                    parameters.AppendLine($"{elementType}.Set{propertyName}({parentUid}, Nothing)");
                                 }
                                 else
                                 {
-                                    parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = Nothing");
+                                    parameters.AppendLine($"{parentUid}.{propertyName} = Nothing");
                                 }
                                 //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new Global.System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
                             }
@@ -1242,7 +1244,7 @@ End Sub
                                         assemblyNameIfAny,
                                         element);
 
-                                    parameters.StringBuilder.AppendLine(
+                                    parameters.AppendLine(
                                         $"{type}.Set{propertyName}({parentUid}, CType(CType({staticMemberName}, Object), {GetFullTypeName(propertyTypeNS, propertyTypeName)}))");
                                 }
                                 else
@@ -1259,7 +1261,7 @@ End Sub
                                         out _,
                                         isAttached: false);
 
-                                    parameters.StringBuilder.AppendLine(
+                                    parameters.AppendLine(
                                         $"{parentUid}.{propertyName} = CType(CType({staticMemberName}, Object), {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                 }
                             }
@@ -1287,7 +1289,7 @@ End Sub
                                         assemblyNameIfAny,
                                         element);
 
-                                    parameters.StringBuilder.AppendLine(
+                                    parameters.AppendLine(
                                         $"{type}.Set{propertyName}({parentUid}, CType(CType(GetType(Global.{resolvedTypeName}), Object), {GetFullTypeName(propertyTypeNS, propertyTypeName)}))");
                                 }
                                 else
@@ -1304,7 +1306,7 @@ End Sub
                                         out _,
                                         isAttached: false);
 
-                                    parameters.StringBuilder.AppendLine(
+                                    parameters.AppendLine(
                                         $"{parentUid}.{propertyName} = CType(CType(GetType(Global.{resolvedTypeName}), Object), {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                 }
                             }
@@ -1350,7 +1352,7 @@ End Sub
                                     string markupValue = GeneratingUniqueNames.GenerateUniqueName("tmp");
                                     string propertyTypeFullName = GetFullTypeName(propertyTypeNS, propertyTypeName);
 
-                                    parameters.StringBuilder
+                                    parameters
                                         .AppendLine($"Dim {markupValue} As Object = Nothing")
                                         .AppendLine($"If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentUid}, {dpName}, {childUid}, {markupValue})");
 
@@ -1359,16 +1361,14 @@ End Sub
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny, element);
 
-                                        parameters.StringBuilder
-                                            .AppendLine($"    {elementType}.Set{propertyName}({parentUid}, CType({markupValue}, {propertyTypeFullName}))");
+                                        parameters.AppendLine($"    {elementType}.Set{propertyName}({parentUid}, CType({markupValue}, {propertyTypeFullName}))");
                                     }
                                     else
                                     {
-                                        parameters.StringBuilder
-                                            .AppendLine($"    {parentUid}.{propertyName} = CType({markupValue}, {propertyTypeFullName})");
+                                        parameters.AppendLine($"    {parentUid}.{propertyName} = CType({markupValue}, {propertyTypeFullName})");
                                     }
 
-                                    parameters.StringBuilder.AppendLine("End If");
+                                    parameters.AppendLine("End If");
                                 }
                                 else
                                 {
@@ -1380,12 +1380,12 @@ End Sub
                                         string markupExtension = 
                                             $"CType({childUid},{IMarkupExtensionClass}).ProvideValue(New Global.System.ServiceProvider({parentUid}, Nothing))";
 
-                                        parameters.StringBuilder.AppendLine(
+                                        parameters.AppendLine(
                                             $"{elementType}.Set{propertyName}({parentUid}, CType({markupExtension},{GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                     }
                                     else
                                     {
-                                        parameters.StringBuilder.AppendLine(
+                                        parameters.AppendLine(
                                             $"{parentUid}.{propertyName} = CType((CType({childUid}, {IMarkupExtensionClass}).ProvideValue(New Global.System.ServiceProvider({parentUid}, Nothing)), {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                     }
                                 }
@@ -1408,22 +1408,22 @@ End Sub
                     string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                     if (isImplicitStyle)
                     {
-                        parameters.StringBuilder.AppendLine($"CType({targetUid}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {childUid})");
+                        parameters.AppendLine($"CType({targetUid}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {childUid})");
                     }
                     else if (isImplicitDataTemplate)
                     {
                         string key = $"New Global.{KnownNamespaces.SystemWindows}.DataTemplateKey(GetType({childKey}))";
 
-                        parameters.StringBuilder.AppendLine($"CType({targetUid}, Global.System.Collections.IDictionary).Add({key}, {childUid})");
+                        parameters.AppendLine($"CType({targetUid}, Global.System.Collections.IDictionary).Add({key}, {childUid})");
                     }
                     else
                     {
-                        parameters.StringBuilder.AppendLine($"CType({targetUid}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {childUid})");
+                        parameters.AppendLine($"CType({targetUid}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {childUid})");
                     }
                 }
                 else
                 {
-                    parameters.StringBuilder.AppendLine($"CType({targetUid}, Global.System.Collections.IList).Add({childUid})");
+                    parameters.AppendLine($"CType({targetUid}, Global.System.Collections.IList).Add({childUid})");
                 }
             }
 
@@ -1649,7 +1649,7 @@ End Sub
                 bool isAttachedProperty,
                 string value,
                 XElement elementWhereTheTypeIsUsed,
-                IXmlLineInfo lineInfo)
+                XObject lineInfo)
             {
                 GetClrNamespaceAndLocalName(
                     xName,
@@ -1735,7 +1735,7 @@ End Sub
                         xName);
 
                     string preparedValue = ConvertFromInvariantString(
-                        value, elementWhereTheTypeIsUsed, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+                        value, lineInfo, valueTypeFullName, isKnownCoreType, isKnownSystemType);
 
                     if (!isAttachedProperty && hasTypeConverter)
                     {
@@ -1950,7 +1950,7 @@ End Sub
                 }
             }
 
-            private string ConvertFromInvariantString(string value, XElement context, string type, bool isKnownCoreType, bool isKnownSystemType)
+            private string ConvertFromInvariantString(string value, XObject context, string type, bool isKnownCoreType, bool isKnownSystemType)
             {
                 type = type.Substring("Global.".Length);
 

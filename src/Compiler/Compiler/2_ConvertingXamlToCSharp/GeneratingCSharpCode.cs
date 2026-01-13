@@ -163,6 +163,7 @@ namespace OpenSilver.Compiler
             if (isFirstPass)
             {
                 generator = new GeneratorPass1(doc,
+                    sourceFile,
                     fileNameWithPathRelativeToProjectRoot,
                     settings);
             }
