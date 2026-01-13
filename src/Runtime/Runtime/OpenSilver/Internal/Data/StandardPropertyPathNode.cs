@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
@@ -29,6 +30,7 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
     private DependencyProperty _dp;
     private PropertyInfo _prop;
     private FieldInfo _field;
+    private IDictionary<string, object> _dictionary;
 
     internal StandardPropertyPathNode(BindingExpression listener, string typeName, string propertyName)
         : base(listener)
@@ -56,13 +58,22 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
                 return _field.FieldType;
             }
 
+            if (_dictionary is not null)
+            {
+                if (_dictionary.TryGetValue(_propertyName, out object value) && value is not null)
+                {
+                    return value.GetType();
+                }
+                return typeof(object);
+            }
+
             return null;
         }
     }
 
     public override string PropertyName => _propertyName;
 
-    public override bool IsBound => _dp is not null || _prop is not null;
+    public override bool IsBound => _dp is not null || _prop is not null || _dictionary is not null;
 
     internal override void SetValue(object value)
     {
@@ -77,6 +88,10 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
         else if (_field is not null)
         {
             _field.SetValue(Source, value);
+        }
+        else if (_dictionary is not null)
+        {
+            _dictionary[_propertyName] = value;
         }
     }
 
@@ -94,11 +109,21 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
         {
             UpdateValueAndIsBroken(_field.GetValue(Source), false);
         }
+        else if (_dictionary is not null)
+        {
+            if (_dictionary.TryGetValue(_propertyName, out object value))
+            {
+                UpdateValueAndIsBroken(value, false);
+            }
+            else
+            {
+                UpdateValueAndIsBroken(DependencyProperty.UnsetValue, true);
+            }
+        }
         else
         {
             UpdateValueAndIsBroken(DependencyProperty.UnsetValue, true);
         }
-
     }
 
     internal override void OnSourceChanged(object oldValue, object newValue)
@@ -118,6 +143,7 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
         _dp = null;
         _prop = null;
         _field = null;
+        _dictionary = null;
 
         if (Source is null) return;
 
@@ -149,6 +175,12 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
                 // Try in case it is a simple field instead of a property:
                 _field = sourceType.GetField(_propertyName);
             }
+
+            // This enables binding to ExpandoObject and similar dynamic objects
+            if (_prop is null && _field is null)
+            {
+                _dictionary = Source as IDictionary<string, object>;
+            }
         }
 
         if (Listener.IsDynamic)
@@ -174,7 +206,8 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop is not null || _field is not null))
+        if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName))
+            && (_prop is not null || _field is not null || _dictionary is not null))
         {
             UpdateValue(true);
         }
