@@ -894,6 +894,9 @@
   <data name="PropertyPathIndexWrongType" xml:space="preserve">
     <value>Le paramètre d'indexeur du chemin d'accès possède une valeur qui ne peut pas être résolue: '{0}'</value>
   </data>
+  <data name="PropertyPathNoProperty" xml:space="preserve">
+    <value>Chemin de propriété non valide. '{0}' n'a pas de propriété publique appelée '{1}'.</value>
+  </data>
   <data name="PropertyToSortByNotFoundOnType" xml:space="preserve">
     <value>Le type '{0}' n'a pas de propriété nommée '{1}'. Impossible de trier la collecte de données.</value>
   </data>

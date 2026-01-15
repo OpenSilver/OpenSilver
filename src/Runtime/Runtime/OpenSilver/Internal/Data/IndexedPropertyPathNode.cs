@@ -26,8 +26,8 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
     private const string IndexerPropertyName = "Item[]";
 
     private readonly string _indexStr;
-    private readonly object[] _index;
-    private PropertyInfo _indexer;
+    private readonly object[] _indexerArguments;
+    private IndexerAccessor _accessor;
     private WeakEventToken _weakEventToken;
 
     private static readonly PropertyInfo _iListIndexer = typeof(IList).GetDefaultMembers()[0] as PropertyInfo;
@@ -36,14 +36,29 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
         : base(listener)
     {
         _indexStr = index;
-        _index = [index];
+        _indexerArguments = [index];
     }
 
-    public override Type Type => _indexer?.PropertyType;
+    public override Type Type => _accessor?.PropertyType;
 
-    public override string PropertyName => $"{_indexer?.Name ?? string.Empty}[{_indexStr}]";
+    public override string PropertyName => _accessor?.GetPropertyName(_indexStr) ?? $"[{_indexStr}]";
 
-    public override bool IsBound => _indexer is not null;
+    public override bool IsBound => _accessor is not null;
+
+    internal override void SetValue(object value) => _accessor?.SetValue(Source, _indexerArguments, value);
+
+    internal override void OnUpdateValue()
+    {
+        if (_accessor is null)
+        {
+            UpdateValueAndIsBroken(DependencyProperty.UnsetValue, true);
+        }
+        else
+        {
+            object value = _accessor.GetValue(Source, _indexerArguments);
+            UpdateValueAndIsBroken(value, value == DependencyProperty.UnsetValue);
+        }
+    }
 
     internal override void OnSourceChanged(object oldValue, object newValue)
     {
@@ -53,11 +68,19 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
             _weakEventToken = null;
         }
 
-        FindIndexer(newValue);
+        ConnectToSource(newValue);
+    }
+
+    private void ConnectToSource(object source)
+    {
+        _accessor = GetAccessor(source, out object indexerArgument);
+        _indexerArguments[0] = indexerArgument;
+
+        if (_accessor is null) return;
 
         if (Listener.IsDynamic)
         {
-            if (newValue is INotifyPropertyChanged inpc)
+            if (source is INotifyPropertyChanged inpc)
             {
                 _weakEventToken = WeakEvent.Subscribe<IndexedPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs>(
                     this,
@@ -69,53 +92,17 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
         }
     }
 
-    internal override void SetValue(object value)
+    private IndexerAccessor GetAccessor(object source, out object indexerArgument)
     {
-        if (_indexer is not null)
+        if (source is null)
         {
-            try
-            {
-                _indexer.SetValue(Source, value, _index);
-            }
-            catch { }
-        }
-    }
-
-    internal override void OnUpdateValue()
-    {
-        object value = DependencyProperty.UnsetValue;
-        bool isBroken = true;
-
-        if (_indexer is not null)
-        {
-            try
-            {
-                value = _indexer.GetValue(Source, _index);
-                isBroken = false;
-            }
-            catch { }
+            indexerArgument = _indexStr;
+            return null;
         }
 
-        UpdateValueAndIsBroken(value, isBroken);
-    }
-
-    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == IndexerPropertyName && _indexer is not null)
-        {
-            UpdateValue(true);
-        }
-    }
-
-    private void FindIndexer(object value)
-    {
-        if (value is null)
-        {
-            _indexer = null;
-            return;
-        }
-
-        Type type = value.GetType();
+        int index;
+        PropertyInfo indexer = null;
+        Type type = source.GetType();
 
         // 1 - Look for an Int32 indexer
         // 2 - Look for a String indexer
@@ -135,29 +122,47 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
 
             if (parameters[0].ParameterType == typeof(int))
             {
-                if (int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index))
+                if (int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out index))
                 {
-                    _indexer = property;
-                    _index[0] = index;
-                    break;
+                    indexerArgument = index;
+                    return new ClrIndexerAccessor(property);
                 }
             }
             else if (parameters[0].ParameterType == typeof(string))
             {
-                _indexer = property;
-                _index[0] = _indexStr;
+                indexer = property;
                 // Do not exit the loop because we can still find an Int32 indexer,
                 // which takes priority over this one.
             }
         }
 
-        if (_indexer is null)
+        if (indexer is not null)
         {
-            if (value is IList && int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index))
-            {
-                _indexer = _iListIndexer;
-                _index[0] = index;
-            }
+            indexerArgument = _indexStr;
+            return new ClrIndexerAccessor(indexer);
+        }
+
+        if (source is IList && int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out index))
+        {
+            indexerArgument = index;
+            return new ClrIndexerAccessor(_iListIndexer);
+        }
+
+        if (IsIDynamicMetaObjectProvider(source))
+        {
+            indexerArgument = _indexStr;
+            return DynamicIndexerAccessor.GetIndexerAccessor(_indexerArguments.Length);
+        }
+
+        indexerArgument = _indexStr;
+        return null;
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == IndexerPropertyName && _accessor is not null)
+        {
+            UpdateValue(true);
         }
     }
 }

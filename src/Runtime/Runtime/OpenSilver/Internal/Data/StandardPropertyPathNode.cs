@@ -24,11 +24,9 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
     private readonly Type _resolvedType;
     private readonly string _propertyName;
 
+    private PropertyAccessor _accessor;
     private PropertyChangeListener _dpListener;
     private WeakEventToken _weakEventToken;
-    private DependencyProperty _dp;
-    private PropertyInfo _prop;
-    private FieldInfo _field;
 
     internal StandardPropertyPathNode(BindingExpression listener, string typeName, string propertyName)
         : base(listener)
@@ -37,68 +35,24 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
         _propertyName = propertyName;
     }
 
-    public override Type Type
-    {
-        get
-        {
-            if (_dp is not null)
-            {
-                return _dp.PropertyType;
-            }
-
-            if (_prop is not null)
-            {
-                return _prop.PropertyType;
-            }
-
-            if (_field is not null)
-            {
-                return _field.FieldType;
-            }
-
-            return null;
-        }
-    }
+    public override Type Type => _accessor?.PropertyType;
 
     public override string PropertyName => _propertyName;
 
-    public override bool IsBound => _dp is not null || _prop is not null;
+    public override bool IsBound => _accessor is not null;
 
-    internal override void SetValue(object value)
-    {
-        if (_dp is not null)
-        {
-            ((DependencyObject)Source).SetValue(_dp, value);
-        }
-        else if (_prop is not null)
-        {
-            _prop.SetValue(Source, value);
-        }
-        else if (_field is not null)
-        {
-            _field.SetValue(Source, value);
-        }
-    }
+    internal override void SetValue(object value) => _accessor?.SetValue(Source, value);
 
     internal override void OnUpdateValue()
     {
-        if (_dp is not null)
-        {
-            UpdateValueAndIsBroken(((DependencyObject)Source).GetValue(_dp), false);
-        }
-        else if (_prop is not null)
-        {
-            UpdateValueAndIsBroken(_prop.GetValue(Source), false);
-        }
-        else if (_field is not null)
-        {
-            UpdateValueAndIsBroken(_field.GetValue(Source), false);
-        }
-        else
+        if (_accessor is null)
         {
             UpdateValueAndIsBroken(DependencyProperty.UnsetValue, true);
         }
-
+        else
+        {
+            UpdateValueAndIsBroken(_accessor.GetValue(Source), false);
+        }
     }
 
     internal override void OnSourceChanged(object oldValue, object newValue)
@@ -115,45 +69,18 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
             listener.Dispose();
         }
 
-        _dp = null;
-        _prop = null;
-        _field = null;
+        ConnectToSource(newValue);
+    }
 
-        if (Source is null) return;
+    private void ConnectToSource(object source)
+    {
+        _accessor = GetAccessor(source, out DependencyProperty dp);
 
-        var sourceDO = newValue as DependencyObject;
-
-        if (sourceDO is not null)
-        {
-            Type type = _resolvedType ?? Source.GetType();
-            _dp = DependencyProperty.FromName(_propertyName, type);
-        }
-
-        if (_dp is null)
-        {
-            Type sourceType = Source.GetType();
-            for (Type t = sourceType; t is not null; t = t.BaseType)
-            {
-                _prop = t.GetProperty(
-                    _propertyName,
-                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-
-                if (_prop is not null)
-                {
-                    break;
-                }
-            }
-
-            if (_prop is null)
-            {
-                // Try in case it is a simple field instead of a property:
-                _field = sourceType.GetField(_propertyName);
-            }
-        }
+        if (_accessor is null) return;
 
         if (Listener.IsDynamic)
         {
-            if (newValue is INotifyPropertyChanged inpc)
+            if (source is INotifyPropertyChanged inpc)
             {
                 _weakEventToken = WeakEvent.Subscribe<StandardPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs>(
                     this,
@@ -163,18 +90,74 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
                     static (handler, source) => source.PropertyChanged += new PropertyChangedEventHandler(handler));
             }
 
-            if (_dp is not null)
+            if (dp is not null)
             {
-                _dpListener = PropertyChangeListener.CreateListener(sourceDO, _dp, OnPropertyChanged);
+                _dpListener = PropertyChangeListener.CreateListener((DependencyObject)source, dp, OnPropertyChanged);
             }
         }
+    }
+
+    private PropertyAccessor GetAccessor(object source, out DependencyProperty dependencyProperty)
+    {
+        if (source is null)
+        {
+            dependencyProperty = null;
+            return null;
+        }
+
+        if (source is DependencyObject)
+        {
+            Type type = _resolvedType ?? source.GetType();
+
+            if (DependencyProperty.FromName(_propertyName, type) is DependencyProperty dp)
+            {
+                dependencyProperty = dp;
+                return new DependencyPropertyAccessor(dp);
+            }
+        }
+
+        dependencyProperty = null;
+
+        Type sourceType = source.GetType();
+
+        if (GetPropertyInfo(sourceType, _propertyName) is PropertyInfo propertyInfo)
+        {
+            return new ClrPropertyAccessor(propertyInfo);
+        }
+
+        if (sourceType.GetField(_propertyName) is FieldInfo fieldInfo)
+        {
+            return new ClrFieldAccessor(fieldInfo);
+        }
+
+        if (IsIDynamicMetaObjectProvider(source))
+        {
+            return new DynamicPropertyAccessor(_propertyName);
+        }
+
+        return null;
+    }
+
+    private static PropertyInfo GetPropertyInfo(Type type, string propertyName)
+    {
+        const BindingFlags Lookup = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+
+        for (Type t = type; t is not null; t = t.BaseType)
+        {
+            if (t.GetProperty(propertyName, Lookup) is PropertyInfo propertyInfo)
+            {
+                return propertyInfo;
+            }
+        }
+
+        return null;
     }
 
     private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args) => UpdateValue(true);
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop is not null || _field is not null))
+        if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && _accessor is not null)
         {
             UpdateValue(true);
         }

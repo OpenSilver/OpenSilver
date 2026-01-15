@@ -896,6 +896,9 @@
   <data name="PropertyPathIndexWrongType" xml:space="preserve">
     <value>Path indexer parameter has value that cannot be resolved: '{0}'</value>
   </data>
+  <data name="PropertyPathNoProperty" xml:space="preserve">
+    <value>Property path is not valid. '{0}' does not have a public property named '{1}'.</value>
+  </data>
   <data name="PropertyToSortByNotFoundOnType" xml:space="preserve">
     <value>'{0}' type does not have property named '{1}', so cannot sort data collection.</value>
   </data>

@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Windows;
 using System.Windows.Data;
 
@@ -123,4 +124,6 @@ internal abstract class PropertyPathNode : IPropertyPathNode
     internal abstract void OnUpdateValue();
 
     internal abstract void SetValue(object value);
+
+    internal static bool IsIDynamicMetaObjectProvider(object o) => o is IDynamicMetaObjectProvider;
 }

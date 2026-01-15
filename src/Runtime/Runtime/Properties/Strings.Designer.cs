@@ -2392,6 +2392,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property path is not valid. &apos;{0}&apos; does not have a public property named &apos;{1}&apos;..
+        /// </summary>
+        internal static string PropertyPathNoProperty {
+            get {
+                return ResourceManager.GetString("PropertyPathNoProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; type does not have property named &apos;{1}&apos;, so cannot sort data collection..
         /// </summary>
         internal static string PropertyToSortByNotFoundOnType {
