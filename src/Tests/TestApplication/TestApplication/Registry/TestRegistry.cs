@@ -8,6 +8,7 @@ namespace TestApplication
 
         static TestRegistry()
         {
+            Tests.Add(new Test("⚡ Performance Benchmark", "Performance"));
             Tests.Add(new Test("Sandbox", "Sandbox"));
             Tests.Add(new Test("CheckBox indeterminate", "CheckBox indeterminate"));
             Tests.Add(new Test("Double Click", "Double Click"));
