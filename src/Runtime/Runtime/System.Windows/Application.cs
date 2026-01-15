@@ -11,22 +11,23 @@
 *  
 \*====================================================================================*/
 
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows.Resources;
+using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
-using System.Text.Json;
-using System.Collections.ObjectModel;
-using System.Xaml.Markup;
-using System.ApplicationModel.Activation;
-using System.Windows.Input;
-using System.Windows.Threading;
-using CSHTML5.Internal;
 using OpenSilver.Theming;
+using System.ApplicationModel.Activation;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using System.Windows.Resources;
+using System.Windows.Threading;
+using System.Xaml.Markup;
 
 namespace System.Windows
 {
@@ -187,6 +188,8 @@ namespace System.Windows
                     }
                 }
             }
+
+            OpenSilverCompatibilityPreferences.Seal();
         }
 
         internal IDictionary<string, string> AppParams { get; }

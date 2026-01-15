@@ -19,6 +19,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows.Threading;
@@ -403,28 +404,7 @@ public sealed class Dispatcher
     {
         List<Exception> unhandledExceptions = null;
 
-        var oldSynchronizationContext = SynchronizationContext.Current;
-        SynchronizationContext.SetSynchronizationContext(DefaultSynchronizationContext);
-
-        try
-        {
-            Tick?.Invoke(this, EventArgs.Empty);
-        }
-        catch (Exception ex)
-        {
-            bool handled = Application.CallHandleException(ex);
-
-            if (!handled)
-            {
-                unhandledExceptions = [];
-                unhandledExceptions.Add(ex);
-            }
-        }
-        finally
-        {
-            SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
-        }
-
+        FireTickEvent(ref unhandledExceptions);
         ProcessQueue(ref unhandledExceptions);
         ProcessPendingOperations();
 
@@ -434,6 +414,40 @@ public sealed class Dispatcher
         }
     }
 
+    private void FireTickEvent(ref List<Exception> unhandledExceptions)
+    {
+        if (OpenSilverCompatibilityPreferences.HandleDispatcherExceptions)
+        {
+            var oldSynchronizationContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(DefaultSynchronizationContext);
+
+            try
+            {
+                Tick?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                bool handled = Application.CallHandleException(ex);
+
+                if (!handled)
+                {
+                    unhandledExceptions ??= [];
+                    unhandledExceptions.Add(ex);
+                }
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
+            }
+        }
+        else
+        {
+            OnTick();
+        }
+    }
+
+    private void OnTick() => Tick?.Invoke(this, EventArgs.Empty);
+
     private void ProcessQueue(ref List<Exception> unhandledExceptions)
     {
         _isProcessingQueue = true;
@@ -442,31 +456,55 @@ public sealed class Dispatcher
         {
             if (operation.Status == DispatcherOperationStatus.Pending)
             {
-                var oldSynchronizationContext = SynchronizationContext.Current;
-                SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(this, operation.Priority));
-
-                try
+                if (OpenSilverCompatibilityPreferences.HandleDispatcherExceptions)
                 {
-                    operation.Invoke();
+                    InvokeOperation(operation, ref unhandledExceptions);
                 }
-                catch (Exception ex)
+                else
                 {
-                    bool handled = Application.CallHandleException(ex);
-
-                    if (!handled)
-                    {
-                        unhandledExceptions ??= [];
-                        unhandledExceptions.Add(ex);
-                    }
-                }
-                finally
-                {
-                    SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
+                    LegacyInvokeOperation(operation);
                 }
             }
         }
 
         _isProcessingQueue = false;
+    }
+
+    private void InvokeOperation(DispatcherOperation operation, ref List<Exception> unhandledExceptions)
+    {
+        var oldSynchronizationContext = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(this, operation.Priority));
+
+        try
+        {
+            operation.Invoke();
+        }
+        catch (Exception ex)
+        {
+            bool handled = Application.CallHandleException(ex);
+
+            if (!handled)
+            {
+                unhandledExceptions ??= [];
+                unhandledExceptions.Add(ex);
+            }
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
+        }
+    }
+
+    private void LegacyInvokeOperation(DispatcherOperation operation)
+    {
+        try
+        {
+            operation.Invoke();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Dispatcher: Method execution failed: " + ex);
+        }
     }
 
     private void ProcessPendingOperations()

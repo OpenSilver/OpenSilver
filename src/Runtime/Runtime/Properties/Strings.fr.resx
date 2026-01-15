@@ -291,6 +291,9 @@
   <data name="CollectionView_WrongType" xml:space="preserve">
     <value>Le type '{0}' n'est pas un type CollectionView.</value>
   </data>
+  <data name="CompatibilityPreferencesSealed" xml:space="preserve">
+    <value>Impossible de changer la propriété '{0}'. La classe '{1}' est sealed.</value>
+  </data>
   <data name="ContextMenuKeyDisplayString" xml:space="preserve">
     <value>Maj+F10 ; Apps</value>
   </data>

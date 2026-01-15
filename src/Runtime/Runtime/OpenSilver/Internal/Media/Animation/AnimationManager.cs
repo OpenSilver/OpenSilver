@@ -36,7 +36,7 @@ internal sealed class AnimationManager
 
     private void OnDispatcherTick(object sender, EventArgs e)
     {
-        RequestAnimationFrame?.Invoke(this, new RenderingEventArgs(_clock.Elapsed));
+        RequestAnimationFrame?.Invoke(sender, new RenderingEventArgs(_clock.Elapsed));
 
         _isProcessingFrame = true;
         try

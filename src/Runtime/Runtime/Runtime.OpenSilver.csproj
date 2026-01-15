@@ -24,6 +24,7 @@
     <Compile Include="Core\Main\CopyOnWriteList.cs" />
     <Compile Include="OpenSilver\Controls\SaveFileDialog.cs" />
     <Compile Include="OpenSilver\Features.cs" />
+    <Compile Include="OpenSilver\OpenSilverCompatibilityPreferences.cs" />
     <Compile Include="OpenSilver\Internal\Commands\CommandHelpers.cs" />
     <Compile Include="OpenSilver\Internal\CommandLibraryHelper.cs" />
     <Compile Include="OpenSilver\Internal\Controls\IBorderElement.cs" />

@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
@@ -50,12 +51,19 @@ namespace CSHTML5.Internal
 
         internal object Invoke(string idWhereCallbackArgsAreStored, object callbackArgs)
         {
-            if (_handleExceptions)
+            if (OpenSilverCompatibilityPreferences.HandleJavaScriptCallbackExceptions)
             {
-                return InvokeWithExceptionHandling(idWhereCallbackArgsAreStored, callbackArgs);
-            }
+                if (_handleExceptions)
+                {
+                    return InvokeWithExceptionHandling(idWhereCallbackArgsAreStored, callbackArgs);
+                }
 
-            return InvokeImpl(idWhereCallbackArgsAreStored, callbackArgs);
+                return InvokeImpl(idWhereCallbackArgsAreStored, callbackArgs);
+            }
+            else
+            {
+                return LegacyInvoke(idWhereCallbackArgsAreStored, callbackArgs);
+            }
         }
 
         private object InvokeWithExceptionHandling(string idWhereCallbackArgsAreStored, object callbackArgs)
@@ -86,6 +94,19 @@ namespace CSHTML5.Internal
 
         private object InvokeImpl(string idWhereCallbackArgsAreStored, object callbackArgs)
             => OnCallBackImpl.Instance.OnCallbackFromJavaScript(_callback, idWhereCallbackArgsAreStored, callbackArgs);
+
+        private object LegacyInvoke(string idWhereCallbackArgsAreStored, object callbackArgs)
+        {
+            try
+            {
+                return InvokeImpl(idWhereCallbackArgsAreStored, callbackArgs);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                throw;
+            }
+        }
 
         public void Dispose() => _store.Clean(_id);
 

@@ -14,6 +14,7 @@
 using System.Diagnostics;
 using System.Threading;
 using DotNetForHtml5.Core;
+using OpenSilver;
 
 namespace System.Windows.Threading
 {
@@ -144,25 +145,32 @@ namespace System.Windows.Threading
 
         private void FireTick()
         {
-            var oldSynchronizationContext = SynchronizationContext.Current;
-            SynchronizationContext.SetSynchronizationContext(Dispatcher.CurrentDispatcher.DefaultSynchronizationContext);
-
-            try
+            if (OpenSilverCompatibilityPreferences.HandleDispatcherTimerExceptions)
             {
-                OnTick();
-            }
-            catch (Exception ex)
-            {
-                bool handled = Application.CallHandleException(ex);
+                var oldSynchronizationContext = SynchronizationContext.Current;
+                SynchronizationContext.SetSynchronizationContext(Dispatcher.CurrentDispatcher.DefaultSynchronizationContext);
 
-                if (!handled)
+                try
                 {
-                    throw;
+                    OnTick();
+                }
+                catch (Exception ex)
+                {
+                    bool handled = Application.CallHandleException(ex);
+
+                    if (!handled)
+                    {
+                        throw;
+                    }
+                }
+                finally
+                {
+                    SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
                 }
             }
-            finally
+            else
             {
-                SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
+                OnTick();
             }
         }
     }

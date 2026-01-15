@@ -583,6 +583,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; cannot be changed. The &apos;{1}&apos; class has been sealed..
+        /// </summary>
+        internal static string CompatibilityPreferencesSealed {
+            get {
+                return ResourceManager.GetString("CompatibilityPreferencesSealed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Shift+F10;Apps.
         /// </summary>
         internal static string ContextMenuKeyDisplayString {
