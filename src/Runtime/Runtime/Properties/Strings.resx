@@ -293,6 +293,9 @@
   <data name="CollectionView_WrongType" xml:space="preserve">
     <value>'{0}' type is not a CollectionView type.</value>
   </data>
+  <data name="CompatibilityPreferencesSealed" xml:space="preserve">
+    <value>The property '{0}' cannot be changed. The '{1}' class has been sealed.</value>
+  </data>
   <data name="ContextMenuKeyDisplayString" xml:space="preserve">
     <value>Shift+F10;Apps</value>
   </data>
