@@ -36,27 +36,12 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
                     
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Element Count:" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="0" Grid.Column="1" x:Name="ElementCountTextBox" Text="5000" 
                              Margin="5" Width="100" HorizontalAlignment="Left"/>
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="(1000-50000)" Foreground="Gray" 
                                VerticalAlignment="Center" FontSize="11"/>
-                    
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Nesting Depth:" VerticalAlignment="Center" Margin="0,5,0,0"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="NestingDepthTextBox" Text="5" 
-                             Margin="5" Width="100" HorizontalAlignment="Left"/>
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="(1-20)" Foreground="Gray" 
-                               VerticalAlignment="Center" FontSize="11" Margin="0,5,0,0"/>
-                    
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Enable Bindings:" VerticalAlignment="Center" Margin="0,5,0,0"/>
-                    <CheckBox Grid.Row="2" Grid.Column="1" x:Name="EnableBindingsCheckBox" IsChecked="True" 
-                              Margin="5" VerticalAlignment="Center"/>
                 </Grid>
                 
                 <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
@@ -108,7 +93,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="1" x:Name="ElementCountText" Text="--" Margin="0,5,0,0"/>
                     
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Control Types:" FontWeight="SemiBold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="BindingCountText" Text="--" Margin="0,5,0,0" TextWrapping="Wrap" MaxWidth="500"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="BindingCountText" Text="--" Margin="0,5,0,0" TextWrapping="Wrap" MaxWidth="500" HorizontalAlignment="Left"/>
                     
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Baseline Comparison:" FontWeight="SemiBold" Margin="0,5,0,0"/>
                     <TextBlock Grid.Row="4" Grid.Column="1" x:Name="ComparisonText" Text="--" Margin="0,5,0,0"/>
@@ -118,15 +103,28 @@
         
         <!-- Render Target (where heavy content is rendered) -->
         <Border Grid.Row="3" Background="White" Margin="10,0,10,10" BorderBrush="#BDC3C7" BorderThickness="1">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="RenderTarget" Background="White"/>
-            </ScrollViewer>
+            <StackPanel x:Name="RenderTarget" Background="White"/>
         </Border>
         
         <!-- History -->
         <Border Grid.Row="4" Background="#2C3E50" Padding="10">
             <StackPanel>
-                <TextBlock Text="Recent Results (stored locally)" Foreground="White" FontWeight="Bold" Margin="0,0,0,5"/>
+                <Grid Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Recent Results (stored locally)" Foreground="White" FontWeight="Bold"/>
+                    <Button Grid.Column="1"
+                            x:Name="ClearResultsButton"
+                            Content="🗑 Clear Results" 
+                            Click="ClearResultsButton_Click"
+                            Background="#34495E"
+                            Foreground="#2C3E50" 
+                            Padding="20,10" 
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"/>
+                </Grid>
                 <ItemsControl x:Name="HistoryList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>

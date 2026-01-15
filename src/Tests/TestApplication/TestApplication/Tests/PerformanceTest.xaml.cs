@@ -1,19 +1,18 @@
+using CSHTML5.Internal;
+using OpenSilver;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
+using System.Diagnostics;
 using System.IO.IsolatedStorage;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
-using CSHTML5.Internal;
-using OpenSilver;
 
 namespace TestApplication.Tests
 {
@@ -22,11 +21,11 @@ namespace TestApplication.Tests
         private const string HistoryFileName = "perf_history.json";
         private const string BaselineFileName = "perf_baseline.json";
         
-        private ObservableCollection<PerformanceResult> _history;
+        private readonly ObservableCollection<PerformanceResult> _history;
+        private readonly Dictionary<string, int> _controlCounts;
+        private readonly Stopwatch _watch;
         private PerformanceResult _baseline;
         private PerformanceResult _lastResult;
-        private double _startTime;
-        private Dictionary<string, int> _controlCounts;
         private int _requestedElementCount;
 
         public PerformanceTest()
@@ -34,6 +33,7 @@ namespace TestApplication.Tests
             InitializeComponent();
             _history = new ObservableCollection<PerformanceResult>();
             _controlCounts = new Dictionary<string, int>();
+            _watch = new Stopwatch();
             HistoryList.ItemsSource = _history;
             LoadHistory();
             LoadBaseline();
@@ -54,6 +54,7 @@ namespace TestApplication.Tests
             // Disable buttons during benchmark
             StartBenchmarkButton.IsEnabled = false;
             ClearButton.IsEnabled = false;
+            ClearResultsButton.IsEnabled = false;
             StatusText.Text = "Running benchmark...";
             StatusText.Foreground = new SolidColorBrush(Colors.Orange);
 
@@ -62,7 +63,7 @@ namespace TestApplication.Tests
             _controlCounts.Clear();
 
             // Record start time RIGHT before we start creating elements
-            _startTime = Performance.now();
+            _watch.Restart();
 
             // Create the heavy workload with mixed controls
             CreateMixedControlWorkload(elementCount);
@@ -128,8 +129,8 @@ namespace TestApplication.Tests
 
         private void OnRenderCompleteCallback()
         {
-            double endTime = Performance.now();
-            double renderTimeMs = endTime - _startTime;
+            _watch.Stop();
+            double renderTimeMs = _watch.ElapsedMilliseconds;
             OnBenchmarkComplete(renderTimeMs, _requestedElementCount);
         }
 
@@ -176,6 +177,7 @@ namespace TestApplication.Tests
             // Re-enable buttons
             StartBenchmarkButton.IsEnabled = true;
             ClearButton.IsEnabled = true;
+            ClearResultsButton.IsEnabled = true;
         }
 
         private void CreateMixedControlWorkload(int targetElementCount)
@@ -387,33 +389,25 @@ namespace TestApplication.Tests
             }
 
             // DatePicker
-            try
+            var datePicker = new DatePicker
             {
-                var datePicker = new DatePicker
-                {
-                    SelectedDate = DateTime.Now.AddDays(rowIndex),
-                    Width = 150,
-                    Margin = new Thickness(2)
-                };
-                parent.Children.Add(datePicker);
-                IncrementCount("DatePicker");
-            }
-            catch { }
+                SelectedDate = DateTime.Now.AddDays(rowIndex),
+                Width = 150,
+                Margin = new Thickness(2)
+            };
+            parent.Children.Add(datePicker);
+            IncrementCount("DatePicker");
 
             // Calendar (smaller)
             if (rowIndex % 5 == 0) // Only add occasionally as it's heavy
             {
-                try
+                var calendar = new Calendar
                 {
-                    var calendar = new Calendar
-                    {
-                        DisplayDate = DateTime.Now,
-                        Margin = new Thickness(2)
-                    };
-                    parent.Children.Add(calendar);
-                    IncrementCount("Calendar");
-                }
-                catch { }
+                    DisplayDate = DateTime.Now,
+                    Margin = new Thickness(2)
+                };
+                parent.Children.Add(calendar);
+                IncrementCount("Calendar");
             }
         }
 
@@ -450,18 +444,14 @@ namespace TestApplication.Tests
             IncrementCount("ListBox");
 
             // AutoCompleteBox
-            try
+            var autoComplete = new AutoCompleteBox
             {
-                var autoComplete = new AutoCompleteBox
-                {
-                    Width = 120,
-                    Margin = new Thickness(2)
-                };
-                autoComplete.ItemsSource = new[] { "Apple", "Banana", "Cherry", "Date", "Elderberry" };
-                parent.Children.Add(autoComplete);
-                IncrementCount("AutoCompleteBox");
-            }
-            catch { }
+                Width = 120,
+                Margin = new Thickness(2)
+            };
+            autoComplete.ItemsSource = new[] { "Apple", "Banana", "Cherry", "Date", "Elderberry" };
+            parent.Children.Add(autoComplete);
+            IncrementCount("AutoCompleteBox");
         }
 
         private void AddListControls(Panel parent, int rowIndex)
@@ -928,6 +918,12 @@ namespace TestApplication.Tests
             _lastResult = null;
         }
 
+        private void ClearResultsButton_Click(object sender, RoutedEventArgs e)
+        {
+            _history.Clear();
+            SaveHistory();
+        }
+
         private void SaveBaselineButton_Click(object sender, RoutedEventArgs e)
         {
             if (_lastResult == null)
@@ -994,87 +990,45 @@ namespace TestApplication.Tests
 
         private void SaveHistory()
         {
-            try
-            {
-                var list = new List<PerformanceResult>(_history);
-                string json = JsonSerializer.Serialize(list);
-                WriteToStorage(HistoryFileName, json);
-            }
-            catch { }
+            var list = new List<PerformanceResult>(_history);
+            string json = JsonSerializer.Serialize(list);
+            WriteToStorage(HistoryFileName, json);
         }
 
         private void LoadHistory()
         {
-            try
+            string json = ReadFromStorage(HistoryFileName);
+            if (!string.IsNullOrEmpty(json))
             {
-                string json = ReadFromStorage(HistoryFileName);
-                if (!string.IsNullOrEmpty(json))
+                var list = JsonSerializer.Deserialize<List<PerformanceResult>>(json);
+                if (list != null)
                 {
-                    var list = JsonSerializer.Deserialize<List<PerformanceResult>>(json);
-                    if (list != null)
+                    foreach (var item in list)
                     {
-                        foreach (var item in list)
-                        {
-                            _history.Add(item);
-                        }
+                        _history.Add(item);
                     }
                 }
             }
-            catch { }
         }
 
         private void SaveBaseline()
         {
-            try
-            {
-                string json = JsonSerializer.Serialize(_baseline);
-                WriteToStorage(BaselineFileName, json);
-            }
-            catch { }
+            string json = JsonSerializer.Serialize(_baseline);
+            WriteToStorage(BaselineFileName, json);
         }
 
         private void LoadBaseline()
         {
-            try
+            string json = ReadFromStorage(BaselineFileName);
+            if (!string.IsNullOrEmpty(json))
             {
-                string json = ReadFromStorage(BaselineFileName);
-                if (!string.IsNullOrEmpty(json))
-                {
-                    _baseline = JsonSerializer.Deserialize<PerformanceResult>(json);
-                }
-            }
-            catch { }
-        }
-
-        private void WriteToStorage(string fileName, string content)
-        {
-            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                using (IsolatedStorageFileStream fs = storage.CreateFile(fileName))
-                {
-                    byte[] bytes = Encoding.UTF8.GetBytes(content);
-                    fs.Write(bytes, 0, bytes.Length);
-                }
+                _baseline = JsonSerializer.Deserialize<PerformanceResult>(json);
             }
         }
 
-        private string ReadFromStorage(string fileName)
-        {
-            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                if (storage.FileExists(fileName))
-                {
-                    using (IsolatedStorageFileStream fs = storage.OpenFile(fileName, FileMode.Open))
-                    {
-                        using (StreamReader sr = new StreamReader(fs))
-                        {
-                            return sr.ReadToEnd();
-                        }
-                    }
-                }
-            }
-            return null;
-        }
+        private void WriteToStorage(string fileName, string content) => IsolatedStorageSettings.ApplicationSettings[fileName] = content;
+
+        private string ReadFromStorage(string fileName) => (string)IsolatedStorageSettings.ApplicationSettings[fileName];
 
         #endregion
     }
