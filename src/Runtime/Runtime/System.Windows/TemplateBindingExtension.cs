@@ -101,6 +101,12 @@ public class TemplateBindingExtension : MarkupExtension
                 {
                     Type type = DependencyPropertyOwnerType ?? source.GetType();
                     dp = DependencyProperty.FromName(DependencyPropertyName, type);
+
+                    // Property can be registered on the source type even if defined on a different owner type.
+                    if (dp is null && DependencyPropertyName is not null)
+                    {
+                        dp = DependencyProperty.FromName(DependencyPropertyName, source.GetType());
+                    }
                 }
                 else if (Path is not null)
                 {
@@ -145,6 +151,12 @@ public class TemplateBindingExtension : MarkupExtension
                     string propertyName = DependencyPropertyName ?? Path;
                     Type type = DependencyPropertyOwnerType ?? source.GetType();
                     dp = DependencyProperty.FromName(propertyName, type);
+
+                    // Property can be registered on the source type even if defined on a different owner type.
+                    if (dp is null && DependencyPropertyName is not null)
+                    {
+                        dp = DependencyProperty.FromName(propertyName, source.GetType());
+                    }
                 }
 
                 if (dp is not null)

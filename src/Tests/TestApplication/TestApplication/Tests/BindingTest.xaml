@@ -5,7 +5,8 @@
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
-           xmlns:converters="clr-namespace:TestApplication.OpenSilver.Converters">
+           xmlns:converters="clr-namespace:TestApplication.OpenSilver.Converters"
+           xmlns:local="clr-namespace:TestApplication.Tests">
     <sdk:Page.Resources>
          <converters:BooleanVisibilityConverter x:Key="booleanVisibilityConverter" />
     </sdk:Page.Resources>
@@ -37,6 +38,24 @@
             <TextBlock x:Name="hiddenLabel" Text="Should not be Visible"
                 Visibility="{Binding Path=WrongPath, Converter={StaticResource booleanVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Visible }"
                            />
-         </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <TextBlock Text="TemplateBindingExtension test:"/>
+            <TextBox>
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="local:TemplateBindingExample.TemplateBindingText"
+                                Value="This text shows up if TemplateBindingExtension allows for properties with different Source and Owner types."/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TextBox">
+                                    <TextBlock FontWeight="Bold" Text="{TemplateBinding local:TemplateBindingExample.TemplateBindingText}"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+        </StackPanel>
     </StackPanel>
 </sdk:Page>

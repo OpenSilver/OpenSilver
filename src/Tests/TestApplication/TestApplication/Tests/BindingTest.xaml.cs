@@ -74,4 +74,26 @@ namespace TestApplication.Tests
             ((BindingTestClass)StackPanelForBinding.DataContext).Text = new Random().Next().ToString();
         }
     }
+
+    public class TemplateBindingExample
+    {
+        public static DependencyProperty TemplateBindingTextProperty =
+            DependencyProperty.RegisterAttached
+            (
+                "TemplateBindingText",
+                typeof(string),
+                typeof(TextBox), // different source type (TextBox) than dependency property owner type (TemplateBindingExample)
+                new PropertyMetadata(string.Empty)
+            );
+
+        public static void SetTemplateBindingText(TextBox element, string value)
+        {
+            element.SetValue(TemplateBindingTextProperty, value);
+        }
+
+        public static string GetTemplateBindingText(TextBox element)
+        {
+            return element.GetValue(TemplateBindingTextProperty)?.ToString();
+        }
+    }
 }
