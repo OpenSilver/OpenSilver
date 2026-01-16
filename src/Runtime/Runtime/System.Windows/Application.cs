@@ -38,14 +38,15 @@ namespace System.Windows
     {
         private static readonly Dictionary<string, string> _resourcesCache = new(StringComparer.OrdinalIgnoreCase);
 
-        private readonly Window _mainWindow;
         private readonly INTERNAL_HtmlDomElementReference _rootDiv;
+        private readonly ApplicationLifetimeObjectsCollection _lifetimeObjects = [];
 
-        private ApplicationLifetimeObjectsCollection _lifetimeObjects;
+        private Window _mainWindow;
         private ResourceDictionary _resources;
         private Dictionary<object, object> _implicitResourcesCache;
         private Host _host;
         private Theme _theme;
+        private Uri _startupUri;
 
         /// <summary>
         /// Gets the Application object for the current application.
@@ -87,9 +88,6 @@ namespace System.Windows
             // Keep a reference to the startup assembly:
             StartupAssemblyInfo.StartupAssembly = GetType().Assembly;
 
-            Window.Current = _mainWindow = new Window();
-            _mainWindow.AttachToDomElement(_rootDiv);
-
             // We call the "Startup" event and the "OnLaunched" method using the Dispatcher, because usually the user registers the "Startup" event in the constructor of the "App.cs" class, which is derived from "Application.cs", and therefore when we arrive here the event is not yet registered. Executing the code in the Dispatcher ensures that the constructor of the "App.cs" class has finished before running the code.
             Dispatcher.CurrentDispatcher.InvokeAsync(DoStartup);
         }
@@ -130,18 +128,62 @@ namespace System.Windows
         /// <returns>
         /// The registered services.
         /// </returns>
-        public IList ApplicationLifetimeObjects => PrivateApplicationLifetimeObjects;
-
-        private ApplicationLifetimeObjectsCollection PrivateApplicationLifetimeObjects => _lifetimeObjects ??= [];
+        public IList ApplicationLifetimeObjects => _lifetimeObjects;
 
         private void DoStartup()
         {
-            ApplicationLifetimeObjectsCollection services = PrivateApplicationLifetimeObjects;
-            services.Close();
+            StartServices();
+            NotifyLifetimeAwareServicesStarting();
+            DoStartupInternal();
+            NotifyLifetimeAwareServicesStarted();
 
-            for (int i = 0; i < services.Count;)
+            OpenSilverCompatibilityPreferences.Seal();
+        }
+
+        private void DoStartupInternal()
+        {
+            OnStartup(new StartupEventArgs());
+
+#pragma warning disable CS0618
+            OnLaunched(new LaunchActivatedEventArgs());
+#pragma warning restore CS0618
+
+            if (StartupUri is null)
             {
-                IApplicationService service = (IApplicationService)services[i];
+                return;
+            }
+
+            string startupUri = StartupUri.ToString();
+
+            if (!AppResourcesManager.IsComponentUri(startupUri))
+            {
+                throw new ArgumentException(Strings.StartupUriMustUseComponentSyntax, nameof(StartupUri));
+            }
+
+            if (GetXamlComponentLoader(startupUri) is not IXamlComponentFactory factory)
+            {
+                throw new InvalidOperationException(string.Format(Strings.UnableToLocateResource, startupUri));
+            }
+
+            if (factory.CreateComponent() is not FrameworkElement component)
+            {
+                throw new InvalidOperationException(Strings.ApplicationRootMustBeFrameworkElement);
+            }
+
+            MainWindow = component switch
+            {
+                Window window => window,
+                _ => new Window { Content = component },
+            };
+        }
+
+        private void StartServices()
+        {
+            _lifetimeObjects.Close();
+
+            for (int i = 0; i < _lifetimeObjects.Count;)
+            {
+                IApplicationService service = (IApplicationService)_lifetimeObjects[i];
 
                 try
                 {
@@ -150,12 +192,15 @@ namespace System.Windows
                 }
                 catch (Exception ex)
                 {
-                    services.RemoveServiceAt(i);
+                    _lifetimeObjects.RemoveServiceAt(i);
                     HandleException(ex);
                 }
             }
+        }
 
-            foreach (IApplicationService service in services)
+        private void NotifyLifetimeAwareServicesStarting()
+        {
+            foreach (IApplicationService service in _lifetimeObjects)
             {
                 if (service is IApplicationLifetimeAware lifetimeAwareService)
                 {
@@ -169,12 +214,11 @@ namespace System.Windows
                     }
                 }
             }
+        }
 
-            OnStartup(new StartupEventArgs());
-
-            OnLaunched(new LaunchActivatedEventArgs());
-
-            foreach (IApplicationService service in services)
+        private void NotifyLifetimeAwareServicesStarted()
+        {
+            foreach (IApplicationService service in _lifetimeObjects)
             {
                 if (service is IApplicationLifetimeAware lifetimeAwareService)
                 {
@@ -188,8 +232,6 @@ namespace System.Windows
                     }
                 }
             }
-
-            OpenSilverCompatibilityPreferences.Seal();
         }
 
         internal IDictionary<string, string> AppParams { get; }
@@ -371,6 +413,8 @@ namespace System.Windows
         /// Window.
         /// </summary>
         /// <param name="args">Event data for the event.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use OnStartup(StartupEventArgs) instead.")]
         protected virtual void OnLaunched(LaunchActivatedEventArgs args)
         {
         }
@@ -417,34 +461,59 @@ namespace System.Windows
         /// </summary>
         public UIElement RootVisual
         {
-            get => _mainWindow.Content;
-            set => _mainWindow.Content = value as FrameworkElement;
+            get => MainWindow?.Content;
+            set
+            {
+                if (value is not FrameworkElement rootVisual)
+                {
+                    throw new ArgumentException(Strings.ApplicationRootMustBeFrameworkElement, nameof(value));
+                }
+
+                (MainWindow ??= new Window()).Content = rootVisual;
+            }
         }
 
-        internal INTERNAL_HtmlDomElementReference GetRootDiv() => _rootDiv;
+        /// <summary>
+        /// Gets or sets a UI that is automatically shown when an application starts.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Uri"/> that refers to the UI that automatically opens when an application starts.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// StartupUri is set with a value of null.
+        /// </exception>
+        public Uri StartupUri
+        {
+            get => _startupUri;
+            set => _startupUri = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         /// <summary>
         /// Gets the application main window.
         /// </summary>
-        public Window MainWindow => _mainWindow;
+        public Window MainWindow
+        {
+            get => _mainWindow;
+            private set
+            {
+                if (_mainWindow is not null)
+                {
+                    throw new InvalidOperationException(Strings.MainWindowCanOnlyBeSetOnce);
+                }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     The System.Uri that is passed to System.Windows.Application.GetResourceStream(System.Uri)
-        //     is null.
-        //
-        //   System.ArgumentException:
-        //     The System.Uri.OriginalString property of the System.Uri that is passed to
-        //     System.Windows.Application.GetResourceStream(System.Uri) is null.
-        //
-        //   System.ArgumentException:
-        //     The System.Uri that is passed to System.Windows.Application.GetResourceStream(System.Uri)
-        //     is either not relative, or is absolute but not in the pack://application:,,,/
-        //     form.
-        //
-        //   System.IO.IOException:
-        //     The System.Uri that is passed to System.Windows.Application.GetResourceStream(System.Uri)
-        //     cannot be found.
+                if (value is null)
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                Window.Current = _mainWindow = value;
+
+                _mainWindow.AttachToDomElement(_rootDiv);
+            }
+        }
+
+        internal INTERNAL_HtmlDomElementReference GetRootDiv() => _rootDiv;
+
         /// <summary>
         /// Returns a string that contains the content of the file that is located at the
         /// specified System.Uri.
@@ -698,12 +767,10 @@ namespace System.Windows
 
         private void StopApplicationServices()
         {
-            ApplicationLifetimeObjectsCollection services = PrivateApplicationLifetimeObjects;
-
             // Note: Silverlight invokes the Exiting method before firing the Exit event. However, since
             // we allow cancellation of the Exit event, we need to call this method after the Exit event,
             // because we only want to stop the services if the event was not cancelled.
-            foreach (IApplicationService service in services)
+            foreach (IApplicationService service in _lifetimeObjects)
             {
                 if (service is IApplicationLifetimeAware lifetimeAwareService)
                 {
@@ -718,7 +785,7 @@ namespace System.Windows
                 }
             }
 
-            foreach (IApplicationService service in services)
+            foreach (IApplicationService service in _lifetimeObjects)
             {
                 if (service is IApplicationLifetimeAware lifetimeAwareService)
                 {
@@ -734,9 +801,9 @@ namespace System.Windows
             }
 
             // Note: Silverlight stops the services in reverse order of their registration.
-            for (int i = services.Count - 1; i >= 0; i--)
+            for (int i = _lifetimeObjects.Count - 1; i >= 0; i--)
             {
-                IApplicationService service = (IApplicationService)services[i];
+                IApplicationService service = (IApplicationService)_lifetimeObjects[i];
 
                 try
                 {

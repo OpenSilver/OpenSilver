@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -25,6 +26,7 @@ namespace OpenSilver.Compiler
     {
         internal const string DefaultXamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
         internal const string LegacyXamlNamespace = "http://schemas.microsoft.com/client/2007"; // XAML namespace used for Silverlight 1.0 application
+        internal const string SdkXamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk";
 
         internal static readonly XNamespace[] DefaultXamlNamespaces = [DefaultXamlNamespace, LegacyXamlNamespace];
         internal static readonly XNamespace xNamespace = "http://schemas.microsoft.com/winfx/2006/xaml"; // Used for example for "x:Name" attributes and {x:Null} markup extensions.
@@ -192,6 +194,94 @@ namespace OpenSilver.Compiler
             (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(element.Name.NamespaceName);
 
             return ns == "System.Windows" && assemblyName == "OpenSilver";
+        }
+
+        public static bool IsUriAbsolute(string path)
+        {
+            if (path.StartsWith("~"))
+            {
+                return true;
+            }
+
+            int index = path.IndexOf(':');
+            if (index >= 0)
+            {
+                string scheme = path.Substring(0, index);
+                return Uri.CheckSchemeName(scheme);
+            }
+
+            return false;
+        }
+
+        public static bool IsComponentUri(string value) => value.Contains(";component/", StringComparison.OrdinalIgnoreCase);
+
+        public static bool IsUriMapping(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
+        {
+            return IsOfType(
+                namespaceName, typeName, assemblyName,
+                KnownNamespaces.SystemWindowsNavigation, [DefaultXamlNamespace, SdkXamlNamespace], "UriMapping", Constants.OPENSILVER_CONTROLS_NAVIGATION_ASSEMBLY_NAME,
+                processedAssemblyName);
+        }
+
+        public static bool IsFrame(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
+        {
+            return IsOfType(
+                namespaceName, typeName, assemblyName,
+                KnownNamespaces.SystemWindowsControls, [DefaultXamlNamespace, SdkXamlNamespace], "Frame", Constants.OPENSILVER_CONTROLS_NAVIGATION_ASSEMBLY_NAME,
+                processedAssemblyName);
+        }
+
+        public static bool IsHyperlinkButton(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
+        {
+            return IsOfType(
+                namespaceName, typeName, assemblyName,
+                KnownNamespaces.SystemWindowsControls, [DefaultXamlNamespace, LegacyXamlNamespace], "HyperlinkButton", Constants.OPENSILVER_ASSEMBLY_NAME,
+                processedAssemblyName);
+        }
+
+        public static bool IsHyperlink(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
+        {
+            return IsOfType(
+                namespaceName, typeName, assemblyName,
+                KnownNamespaces.SystemWindowsDocuments, [DefaultXamlNamespace, LegacyXamlNamespace], "Hyperlink", Constants.OPENSILVER_ASSEMBLY_NAME,
+                processedAssemblyName);
+        }
+
+        public static bool IsApplicationStartupUriProperty(string propertyName, string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
+        {
+            if (propertyName != "StartupUri")
+            {
+                return false;
+            }
+
+            return IsOfType(
+                namespaceName, typeName, assemblyName,
+                KnownNamespaces.SystemWindows, [DefaultXamlNamespace, LegacyXamlNamespace], "Application", Constants.OPENSILVER_ASSEMBLY_NAME,
+                processedAssemblyName);
+        }
+
+        private static bool IsOfType(
+            string namespaceName, string typeName, string assemblyName,
+            string targetClrNamespace, string[] targetXmlNamespaces, string targetTypeName, string targetAssemblyName,
+            string processedAssemblyName)
+        {
+            if (typeName == targetTypeName)
+            {
+                for (int i = 0; i < targetXmlNamespaces.Length; i++)
+                {
+                    if (namespaceName == targetXmlNamespaces[i])
+                    {
+                        return true;
+                    }
+                }
+
+                if (namespaceName == targetClrNamespace)
+                {
+                    return assemblyName == targetAssemblyName || (assemblyName == null && processedAssemblyName == targetAssemblyName);
+                }
+            }
+
+            return false;
         }
     }
 }

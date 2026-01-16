@@ -24,4 +24,5 @@ internal static class KnownNamespaces
     public const string SystemWindowsControls = "System.Windows.Controls";
     public const string SystemWindowsMedia = "System.Windows.Media";
     public const string SystemWindowsMediaAnimation = "System.Windows.Media.Animation";
+    public const string SystemWindowsNavigation = "System.Windows.Navigation";
 }

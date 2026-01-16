@@ -115,6 +115,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RootVisual must be a FrameworkElement..
+        /// </summary>
+        internal static string ApplicationRootMustBeFrameworkElement {
+            get {
+                return ResourceManager.GetString("ApplicationRootMustBeFrameworkElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} (&apos;{1}&apos;) must be a non-negative value..
         /// </summary>
         internal static string ArgumentOutOfRange_Generic_MustBeNonNegative {
@@ -1371,6 +1380,15 @@ namespace OpenSilver.Internal {
         internal static string LogicalTreeLoop {
             get {
                 return ResourceManager.GetString("LogicalTreeLoop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MainWindow can only be set once..
+        /// </summary>
+        internal static string MainWindowCanOnlyBeSetOnce {
+            get {
+                return ResourceManager.GetString("MainWindowCanOnlyBeSetOnce", resourceCulture);
             }
         }
         
@@ -2959,6 +2977,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to StartupUri must use the &apos;;component/&apos; syntax..
+        /// </summary>
+        internal static string StartupUriMustUseComponentSyntax {
+            get {
+                return ResourceManager.GetString("StartupUriMustUseComponentSyntax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Esc.
         /// </summary>
         internal static string StopKeyDisplayString {
@@ -3468,6 +3495,15 @@ namespace OpenSilver.Internal {
         internal static string UIElement_NotChild {
             get {
                 return ResourceManager.GetString("UIElement_NotChild", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot locate resource &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnableToLocateResource {
+            get {
+                return ResourceManager.GetString("UnableToLocateResource", resourceCulture);
             }
         }
         

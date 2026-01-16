@@ -348,7 +348,7 @@ namespace OpenSilver.Compiler
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.Build(),
-                        $"return global::System.Activator.CreateInstance<{componentTypeFullName}>();",
+                        $"return ({componentTypeFullName})global::System.Activator.CreateInstance(typeof({componentTypeFullName}), true);",
                         parameters.ResultingMethods,
                         $"global::{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,
@@ -1782,11 +1782,7 @@ namespace OpenSilver.Compiler
                     // PROPERTY IS OF ANOTHER TYPE
                     //----------------------------
 
-                    ChangeRelativePathIntoAbsolutePathIfNecessary(
-                        ref value,
-                        valueTypeFullName,
-                        propertyName,
-                        xName);
+                    value = ConvertRelativeUri(value, propertyName, valueTypeFullName, namespaceName, localTypeName, assemblyNameIfAny);
 
                     string preparedValue = ConvertFromInvariantString(
                         value, lineInfo, valueTypeFullName, isKnownCoreType, isKnownSystemType);
@@ -1804,58 +1800,64 @@ namespace OpenSilver.Compiler
                 }
             }
 
-            private void ChangeRelativePathIntoAbsolutePathIfNecessary(ref string path,
-                string valueTypeFullName,
+            private string ConvertRelativeUri(
+                string value,
                 string propertyName,
-                XName parentXName)
+                string propertyType,
+                string declaringTypeNS,
+                string declaringTypeName,
+                string declaringTypeAssembly)
             {
-                // In the case of the "Frame" control, a relative URI to a ".xaml" file (used for navigation) should not be changed
-                // into an absolute URI, because it is relative to the Startup assembly, not to the current assembly where the value
-                // is defined:
-                if (parentXName.LocalName == "UriMapping" ||
-                    parentXName.LocalName == "Frame" ||
-                    parentXName.LocalName == "HyperlinkButton" ||
-                    parentXName.LocalName == "Hyperlink")
+                if (GeneratingCode.IsUriMapping(declaringTypeNS, declaringTypeName, declaringTypeAssembly, _settings.AssemblyName) ||
+                    GeneratingCode.IsFrame(declaringTypeNS, declaringTypeName, declaringTypeAssembly, _settings.AssemblyName) ||
+                    GeneratingCode.IsHyperlinkButton(declaringTypeNS, declaringTypeName, declaringTypeAssembly, _settings.AssemblyName) ||
+                    GeneratingCode.IsHyperlink(declaringTypeNS, declaringTypeName, declaringTypeAssembly, _settings.AssemblyName))
                 {
-                    return;
+                    return value;
                 }
 
-                // We change relative paths into absolute paths in case of <Image> controls and other controls that have the "Source" property:
-                if ((valueTypeFullName == $"global::{KnownNamespaces.SystemWindowsMedia}.ImageSource"
-                    || valueTypeFullName == "global::System.Uri"
-                    || (propertyName == "FontFamily" && path.Contains('.')))
-                    && !path.ToLower().EndsWith(".xaml")) // Note: this is to avoid messing with Frame controls, which paths are always relative to the startup assembly (in SL).
+                if (GeneratingCode.IsUriAbsolute(value))
                 {
-                    if (!IsUriAbsolute(path) // This lines checks if the URI is in the form "ms-appx://" or "http://" or "https://" or "mailto:..." etc.
-                        && !path.ToLower().Contains(@";component/")) // This line checks if the URI is in the form "/assemblyName;component/FolderName/FileName.xaml"
-                    {
-                        // Get the relative path of the current XAML file:
-                        string relativePathOfTheCurrentFile = Path.GetDirectoryName(_fileNameWithPathRelativeToProjectRoot.Replace('\\', '/'));
-
-                        // Combine the relative path of the current file with the path specified by the user:
-                        string pathRelativeToProjectRoot = Path.Combine(relativePathOfTheCurrentFile.Replace('\\', '/'), path.Replace('\\', '/')).Replace('\\', '/');
-
-                        // Surround the path with the assembly name to make it an absolute path in the form: "/assemblyName;component/FolderName/FileName.xaml"
-                        path = $"/{_settings.AssemblyName};component/{pathRelativeToProjectRoot}";
-                    }
+                    return value;
                 }
+
+                if (GeneratingCode.IsComponentUri(value))
+                {
+                    return value;
+                }
+
+                if (GeneratingCode.IsApplicationStartupUriProperty(propertyName, declaringTypeNS, declaringTypeName, declaringTypeAssembly, _settings.AssemblyName))
+                {
+                    return CreateComponentUri(value);
+                }
+
+                if (value.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
+                {
+                    return value;
+                }
+
+                if (propertyType != "global::System.Uri" &&
+                    propertyType != $"global::{KnownNamespaces.SystemWindowsMedia}.ImageSource" &&
+                    (propertyName != "FontFamily" || !value.Contains(".")))
+                {
+                    return value;
+                }
+
+                return CreateComponentUri(value);
             }
 
-            private static bool IsUriAbsolute(string path)
+            private string CreateComponentUri(string relativePath)
             {
-                if (path.StartsWith("~"))
-                {
-                    return true;
-                }
+                // Get the relative path of the current XAML file:
+                string relativePathOfTheCurrentFile = Path.GetDirectoryName(
+                    _fileNameWithPathRelativeToProjectRoot.Replace('\\', '/'));
 
-                int index = path.IndexOf(':');
-                if (index >= 0)
-                {
-                    string scheme = path.Substring(0, index);
-                    return Uri.CheckSchemeName(scheme);
-                }
+                // Combine the relative path of the current file with the path specified by the user:
+                string pathRelativeToProjectRoot = Path.Combine(
+                    relativePathOfTheCurrentFile.Replace('\\', '/'),
+                    relativePath.Replace('\\', '/')).Replace('\\', '/');
 
-                return false;
+                return $"/{_settings.AssemblyName};component/{pathRelativeToProjectRoot}";
             }
 
             private bool TryResolvePathForBinding(string path, XElement element, IXmlLineInfo lineInfo, out string resolvedPath)

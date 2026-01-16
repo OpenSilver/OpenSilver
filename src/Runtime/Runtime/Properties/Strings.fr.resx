@@ -132,6 +132,9 @@
   <data name="Animation_DependencyPropertyIsNotAnimatable" xml:space="preserve">
     <value>La propriété '{0}' ne peut pas être animée sur la classe '{1}', car l'indicateur IsAnimationProhibited a été défini en fonction du UIPropertyMetadata utilisé pour associer la propriété à la classe.</value>
   </data>
+  <data name="ApplicationRootMustBeFrameworkElement" xml:space="preserve">
+    <value>RootVisual doit être un FrameworkElement.</value>
+  </data>
   <data name="Application_ServiceMustImplementInterface" xml:space="preserve">
     <value>L’élément déclaré comme service d’application n’implémente pas l’interface IApplicationService.</value>
   </data>
@@ -554,6 +557,9 @@
   </data>
   <data name="LogicalTreeLoop" xml:space="preserve">
     <value>Profondeur de l'arborescence logique dépassée lors du parcours de l'arborescence. Peut-être est-ce le signe d'un cycle dans l'arborescence.</value>
+  </data>
+  <data name="MainWindowCanOnlyBeSetOnce" xml:space="preserve">
+    <value>MainWindow ne peut être définie qu’une seule fois.</value>
   </data>
   <data name="MarkupExtensionBadStatic" xml:space="preserve">
     <value>La valeur StaticExtension '{0}' ne peut pas être résolue en énumération, champ statique ou propriété statique.</value>
@@ -1083,6 +1089,9 @@
   <data name="SpecialMethodMustBePublic" xml:space="preserve">
     <value>Les méthodes ShouldSerializeProperty et ResetProperty doivent être publiques ('{0}').</value>
   </data>
+  <data name="StartupUriMustUseComponentSyntax" xml:space="preserve">
+    <value>StartupUri doit utiliser la syntaxe ';component/'.</value>
+  </data>
   <data name="StopKeyDisplayString" xml:space="preserve">
     <value>Esc</value>
   </data>
@@ -1253,6 +1262,9 @@
   </data>
   <data name="UIElement_NotChild" xml:space="preserve">
     <value>L'objet UIElement spécifié n'est pas un enfant de cet objet UIElement.</value>
+  </data>
+  <data name="UnableToLocateResource" xml:space="preserve">
+    <value>Impossible de trouver la ressource '{0}'.</value>
   </data>
   <data name="UndoKeyDisplayString" xml:space="preserve">
     <value>Ctrl+Z</value>

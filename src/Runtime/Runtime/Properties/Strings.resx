@@ -132,6 +132,9 @@
   <data name="Animation_DependencyPropertyIsNotAnimatable" xml:space="preserve">
     <value>'{0}' property is not animatable on '{1}' class because the IsAnimationProhibited flag has been set on the UIPropertyMetadata used to associate the property with the class.</value>
   </data>
+  <data name="ApplicationRootMustBeFrameworkElement" xml:space="preserve">
+    <value>RootVisual must be a FrameworkElement.</value>
+  </data>
   <data name="Application_ServiceMustImplementInterface" xml:space="preserve">
     <value>Element declared as Application Service does not implement IApplicationService interface.</value>
   </data>
@@ -556,6 +559,9 @@
   </data>
   <data name="LogicalTreeLoop" xml:space="preserve">
     <value>Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree.</value>
+  </data>
+  <data name="MainWindowCanOnlyBeSetOnce" xml:space="preserve">
+    <value>MainWindow can only be set once.</value>
   </data>
   <data name="MarkupExtensionBadStatic" xml:space="preserve">
     <value>'{0}' StaticExtension value cannot be resolved to an enumeration, static field, or static property.</value>
@@ -1085,6 +1091,9 @@
   <data name="SpecialMethodMustBePublic" xml:space="preserve">
     <value>ShouldSerializeProperty and ResetProperty methods must be public ('{0}').</value>
   </data>
+  <data name="StartupUriMustUseComponentSyntax" xml:space="preserve">
+    <value>StartupUri must use the ';component/' syntax.</value>
+  </data>
   <data name="StopKeyDisplayString" xml:space="preserve">
     <value>Esc</value>
   </data>
@@ -1255,6 +1264,9 @@
   </data>
   <data name="UIElement_NotChild" xml:space="preserve">
     <value>Specified UIElement is not a child of this UIElement.</value>
+  </data>
+  <data name="UnableToLocateResource" xml:space="preserve">
+    <value>Cannot locate resource '{0}'.</value>
   </data>
   <data name="UndoKeyDisplayString" xml:space="preserve">
     <value>Ctrl+Z</value>

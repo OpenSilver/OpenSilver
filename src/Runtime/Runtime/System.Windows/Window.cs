@@ -126,10 +126,10 @@ namespace System.Windows
                 throw new InvalidOperationException("The method 'Window.AttachToDomElement' can be called only once.");
             }
 
-            ParentWindow = this;
-
             //Note: The "rootDomElement" will contain one DIV for the root of the window visual tree, and other DIVs to host the popups.
             RootDomElement = rootDomElement ?? throw new ArgumentNullException(nameof(rootDomElement));
+
+            ParentWindow = this;
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
             RootDomElement.Style.display = "grid";
@@ -158,6 +158,8 @@ namespace System.Windows
 
             // Raise the "Loaded" event:
             RaiseLoadedEvent();
+
+            SetLayoutSize();
         }
 
         private static void OnGotFocus(object sender, RoutedEventArgs e) => Current = (Window)sender;
@@ -234,7 +236,7 @@ namespace System.Windows
 
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, window);
 
-            window.SetLayoutSize();
+            window.InvalidateMeasure();
         }
 
         private void SetLayoutSize()

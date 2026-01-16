@@ -11,22 +11,18 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 
-namespace OpenSilver.Internal.Xaml
-{
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use IXamlComponentLoader instead.")]
-    public interface IXamlComponentFactory
-    {
-        object CreateComponent();
-    }
+namespace OpenSilver.Internal.Xaml;
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use IXamlComponentLoader instead.")]
-    public interface IXamlComponentFactory<T> : IXamlComponentFactory
-    {
-        new T CreateComponent();
-    }
+[EditorBrowsable(EditorBrowsableState.Never)]
+public interface IXamlComponentFactory
+{
+    object CreateComponent();
+}
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public interface IXamlComponentFactory<T> : IXamlComponentFactory
+{
+    new T CreateComponent();
 }

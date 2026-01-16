@@ -55,7 +55,7 @@ namespace OpenSilver.Compiler
             {
                 var builder = new StringBuilder();
 
-                builder.Append(' ', 4).AppendLine("interface global.OpenSilver.Internal.Xaml.IComponentConnector with")
+                builder.Append(' ', 4).AppendLine($"interface {IComponentConnectorClass} with")
                     .Append(' ', 4 * 2).AppendLine("[<global.System.Diagnostics.DebuggerNonUserCode>]")
                     .Append(' ', 4 * 2).AppendLine("[<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]")
                     .Append(' ', 4 * 2 ).AppendLine($"member this.Connect({componentIdParam}: int, {targetParam}: obj): unit = ");

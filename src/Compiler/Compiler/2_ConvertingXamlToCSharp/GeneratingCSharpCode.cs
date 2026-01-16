@@ -338,9 +338,7 @@ namespace {namespaceStringIfAny}
 /// </summary>
 [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-#pragma warning disable CS0618
 public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>, {IXamlComponentLoaderClass}<{baseTypeFullName}>
-#pragma warning restore CS0618
 {{
     /// <summary>
     /// Instantiate

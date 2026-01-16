@@ -13,17 +13,16 @@
 
 using System.ComponentModel;
 
-namespace OpenSilver.Internal.Xaml
-{
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public interface IXamlComponentLoader
-    {
-        void LoadComponent(object component);
-    }
+namespace OpenSilver.Internal.Xaml;
 
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public interface IXamlComponentLoader<T> : IXamlComponentLoader
-    {
-        void LoadComponent(T component);
-    }
+[EditorBrowsable(EditorBrowsableState.Advanced)]
+public interface IXamlComponentLoader
+{
+    void LoadComponent(object component);
+}
+
+[EditorBrowsable(EditorBrowsableState.Advanced)]
+public interface IXamlComponentLoader<T> : IXamlComponentLoader
+{
+    void LoadComponent(T component);
 }
