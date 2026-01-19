@@ -191,6 +191,9 @@
     <Compile Include="Tests\DataGrids\DataGridColumn_VisibilityTest.xaml.cs">
       <DependentUpon>DataGridColumn_VisibilityTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\DataTemplateTest.xaml.cs">
+      <DependentUpon>DataTemplateTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\DateTimeTest.xaml.cs">
       <DependentUpon>DateTimeTest.xaml</DependentUpon>
     </Compile>
@@ -498,6 +501,10 @@
     <Page Include="Tests\DataGrids\DataGridColumn_VisibilityTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\DataTemplateTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tests\DateTimeTest.xaml">
       <SubType>Designer</SubType>

@@ -1,0 +1,28 @@
+﻿<sdk:Page
+    x:Class="TestApplication.OpenSilver.Tests.DataTemplateTest"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:TestApplication.OpenSilver.Tests"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <TextBlock Text="Nested ContentControls test:"/>
+            <ContentControl Name="OuterContentControl" Content="{Binding OuterViewModel}">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="local:OuterViewModel">
+                        <Grid>
+                            <Grid.Resources>
+                                <DataTemplate DataType="local:InnerViewModel">
+                                    <TextBlock Text="This text only shows up if the nested ContentControls with DataTemplates have worked."
+                                               FontWeight="Bold"/>
+                                </DataTemplate>
+                            </Grid.Resources>
+                            <ContentControl Name="InnerContentControl" DataContext="{Binding InnerViewModel}" Content="{Binding}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
+        </StackPanel>
+    </StackPanel>
+</sdk:Page>
