@@ -1497,10 +1497,6 @@ namespace System.Windows.Controls
             private bool IsVerticalScrollBarVisible => _scrollViewer.ComputedVerticalScrollBarVisibility == Visibility.Visible;
             private bool IsEnabled => this == _current;
 
-            private bool IsUsingVirtualizingPanel =>
-                _scrollViewer.ElementScrollContentPresenter?.Content is ItemsPresenter itemsPresenter &&
-                itemsPresenter.TemplateChild is VirtualizingPanel;
-
             public PanHelper(ScrollViewer scrollViewer)
             {
                 Debug.Assert(scrollViewer is not null);
@@ -1526,11 +1522,6 @@ namespace System.Windows.Controls
                     _velocityX = 0;
                     _velocityY = 0;
                     _lastMoveTime = GetTime();
-
-                    if (IsUsingVirtualizingPanel)
-                    {
-                        _scrollViewer.CanContentScroll = false;
-                    }
                 }
             }
 
