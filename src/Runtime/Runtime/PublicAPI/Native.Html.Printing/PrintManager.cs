@@ -74,7 +74,7 @@ namespace CSHTML5.Native.Html.Printing
         public static void ResetPrintArea()
         {
             // Set the print area to be the whole window (this is the default value, also called from the "setter" of "Window.Current.Content"):
-            var root = Window.Current.Content;
+            var root = Window.Current?.Content;
             if (root != null)
             {
                 SetPrintArea(root);

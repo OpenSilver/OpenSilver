@@ -173,8 +173,8 @@ public class MemoryLeakTest
             fe.SizeChanged += (o, e) => { };
             MemoryLeaksHelper.SetTracker(fe, tracker);
 
-            Application.Current.RootVisual = fe;
-            Application.Current.RootVisual = null;
+            Application.Current.MainWindow.Content = fe;
+            Application.Current.MainWindow.Content = null;
         }
 
         var c = new GCTracker();

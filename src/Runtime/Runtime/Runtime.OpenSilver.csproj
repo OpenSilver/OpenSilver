@@ -743,7 +743,6 @@
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomStyleReference.cs" />
-    <Compile Include="Core\Rendering\PopupsManager.cs" />
     <Compile Include="Core\Rendering\INTERNAL_VisualTreeManager.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs.cs" />

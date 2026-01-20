@@ -226,7 +226,10 @@ namespace OpenSilver.Simulator.XamlInspection
 
         private static IEnumerable GetVisualTreeRootElements()
         {
-            yield return opensilver::System.Windows.Window.Current;
+            if (opensilver::System.Windows.Window.Current is not null)
+            {
+                yield return opensilver::System.Windows.Window.Current;
+            }
 
             foreach (var popupRoot in opensilver::System.Windows.Controls.Primitives.PopupRoot.GetActivePopupRoots())
             {
