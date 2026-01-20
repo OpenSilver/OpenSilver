@@ -1004,7 +1004,7 @@ namespace System.Windows.Data
                     //      is Content, use the parent.  This enables
                     //          <ContentPresenter Content="{Binding...}"/>
                     if (TargetProperty == FrameworkElement.DataContextProperty ||
-                        TargetProperty == ContentPresenter.ContentProperty)
+                        (TargetProperty == ContentPresenter.ContentProperty && Target is ContentPresenter))
                     {
                         contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
                         if (contextElement == null && !lastAttempt)

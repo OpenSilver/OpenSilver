@@ -147,6 +147,8 @@ namespace TestApplication
             Tests.Add(new Test("RightToLeft", "RightToLeft"));
 
             Tests.Add(new Test("ResourceDictionary", "ResourceDictionary/ResourceDictionary"));
+
+            Tests.Add(new Test("DataTemplate", "DataTemplate"));
         }
     }
 }
