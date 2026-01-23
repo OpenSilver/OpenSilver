@@ -21,7 +21,6 @@
   <files>
     <!-- OpenSilver runtime -->
     <file src="../../src/Runtime/Controls.Theming.ExpressionLight/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ExpressionLight.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ExpressionLight.dll" />
-    <file src="../../src/Runtime/Controls.Theming.ExpressionLight/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ExpressionLight.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ExpressionLight.pdb" />
     <file src="../../src/Runtime/Controls.Theming.ExpressionLight/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ExpressionLight.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ExpressionLight.xml" />
 
     <!-- OpenSilver icon -->

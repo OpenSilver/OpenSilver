@@ -21,7 +21,6 @@
   <files>
     <!-- OpenSilver runtime -->
     <file src="../../src/Runtime/Controls.Theming.BureauBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.BureauBlue.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.BureauBlue.dll" />
-    <file src="../../src/Runtime/Controls.Theming.BureauBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.BureauBlue.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Theming.BureauBlue.pdb" />
     <file src="../../src/Runtime/Controls.Theming.BureauBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.BureauBlue.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.BureauBlue.xml" />
 
     <!-- OpenSilver icon -->

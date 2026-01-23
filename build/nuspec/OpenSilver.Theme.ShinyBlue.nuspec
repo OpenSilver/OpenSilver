@@ -21,7 +21,6 @@
   <files>
     <!-- OpenSilver runtime -->
     <file src="../../src/Runtime/Controls.Theming.ShinyBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.dll" />
-    <file src="../../src/Runtime/Controls.Theming.ShinyBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.pdb" />
     <file src="../../src/Runtime/Controls.Theming.ShinyBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.xml" />
 
     <!-- OpenSilver icon -->

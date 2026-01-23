@@ -21,7 +21,6 @@
   <files>
     <!-- OpenSilver runtime -->
     <file src="../../src/Runtime/Controls.Theming.TwilightBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.dll" />
-    <file src="../../src/Runtime/Controls.Theming.TwilightBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.pdb" />
     <file src="../../src/Runtime/Controls.Theming.TwilightBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.xml" />
 
     <!-- OpenSilver icon -->
