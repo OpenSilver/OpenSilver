@@ -37,7 +37,8 @@ public class StaticExtension : MarkupExtension
     /// </param>
     public StaticExtension(string member)
     {
-        _member = member ?? throw new ArgumentNullException(nameof(member));
+        ArgumentNullException.ThrowIfNull(member);
+        _member = member;
     }
 
     /// <summary>
@@ -126,10 +127,7 @@ public class StaticExtension : MarkupExtension
 
             // Get the IXamlTypeResolver from the service provider
 
-            if (serviceProvider is null)
-            {
-                throw new ArgumentNullException(nameof(serviceProvider));
-            }
+            ArgumentNullException.ThrowIfNull(serviceProvider);
 
             if (serviceProvider.GetService(typeof(IXamlTypeResolver)) is not IXamlTypeResolver xamlTypeResolver)
             {

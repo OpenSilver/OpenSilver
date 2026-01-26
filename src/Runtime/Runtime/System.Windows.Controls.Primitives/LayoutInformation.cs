@@ -36,10 +36,7 @@ namespace System.Windows.Controls.Primitives
         /// </exception>
 		public static Geometry GetLayoutClip(FrameworkElement element)
 		{
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element.LayoutClip is Rect layoutClip)
             {
@@ -82,10 +79,7 @@ namespace System.Windows.Controls.Primitives
         /// </exception>
         public static Rect GetLayoutSlot(FrameworkElement element)
 		{
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return element.PreviousArrangeRect;
         }

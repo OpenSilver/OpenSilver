@@ -3,13 +3,14 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Collections.Specialized;
-using System.Linq;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Automation.Peers;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Windows.Automation.Peers;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Xml.Linq;
 using SR = OpenSilver.Internal.Strings;
 
 namespace System.Windows.Controls
@@ -801,10 +802,7 @@ namespace System.Windows.Controls
         /// </param>
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (e == null)
-            {
-                throw new ArgumentNullException(nameof(e));
-            }
+            ArgumentNullException.ThrowIfNull(e);
 
             base.OnItemsChanged(e);
             HasItems = Items.Count > 0;
@@ -1150,10 +1148,7 @@ namespace System.Windows.Controls
         /// </param>
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            if (e == null)
-            {
-                throw new ArgumentNullException(nameof(e));
-            }
+            ArgumentNullException.ThrowIfNull(e);
 
             TreeView parent;
             if (!e.Handled && (parent = ParentTreeView) != null && parent.HandleMouseButtonDown())

@@ -58,10 +58,7 @@ namespace System.Windows.Media
         /// </exception>
         public PathSegmentCollection(IEnumerable<PathSegment> segments)
         {
-            if (segments is null)
-            {
-                throw new ArgumentNullException(nameof(segments));
-            }
+            ArgumentNullException.ThrowIfNull(segments);
 
             foreach (PathSegment item in segments)
             {

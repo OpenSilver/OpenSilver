@@ -39,10 +39,7 @@ namespace CSHTML5.Internal
 
         public static JavaScriptCallback Create(Delegate callback, bool handleExceptions = true)
         {
-            if (callback is null)
-            {
-                throw new ArgumentNullException(nameof(callback));
-            }
+            ArgumentNullException.ThrowIfNull(callback);
 
             return new JavaScriptCallback(callback, handleExceptions);
         }

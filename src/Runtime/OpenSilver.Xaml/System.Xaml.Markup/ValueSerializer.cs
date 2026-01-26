@@ -47,9 +47,9 @@ namespace System.Xaml.Markup
 		// untested
 		public static ValueSerializer GetSerializerFor(PropertyInfo descriptor, IValueSerializerContext context)
 		{
-			if (descriptor == null)
-				throw new ArgumentNullException("descriptor");
-			if (context != null)
+			ArgumentNullException.ThrowIfNull(descriptor);
+
+            if (context != null)
 				return context.GetValueSerializerFor(descriptor);
 
 			var tc = descriptor.GetTypeConverter();
@@ -60,9 +60,9 @@ namespace System.Xaml.Markup
 
 		public static ValueSerializer GetSerializerFor(Type type, IValueSerializerContext context)
 		{
-			if (type == null)
-				throw new ArgumentNullException("type");
-			if (context != null)
+			ArgumentNullException.ThrowIfNull(type);
+
+            if (context != null)
 				return context.GetValueSerializerFor(type);
 
 			// Standard MarkupExtensions are serialized without ValueSerializer.

@@ -259,15 +259,8 @@ namespace System.Windows
         /// </exception>
         public void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo)
         {
-            if (routedEvent is null)
-            {
-                throw new ArgumentNullException(nameof(routedEvent));
-            }
-
-            if (handler is null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
+            ArgumentNullException.ThrowIfNull(routedEvent);
+            ArgumentNullException.ThrowIfNull(handler);
 
             if (!routedEvent.IsLegalHandler(handler))
             {
@@ -301,15 +294,8 @@ namespace System.Windows
         /// </exception>
         public void RemoveHandler(RoutedEvent routedEvent, Delegate handler)
         {
-            if (routedEvent is null)
-            {
-                throw new ArgumentNullException(nameof(routedEvent));
-            }
-
-            if (handler is null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
+            ArgumentNullException.ThrowIfNull(routedEvent);
+            ArgumentNullException.ThrowIfNull(handler);
 
             if (!routedEvent.IsLegalHandler(handler))
             {
@@ -364,10 +350,7 @@ namespace System.Windows
         /// </param>
         public void RaiseEvent(RoutedEventArgs e)
         {
-            if (e is null)
-            {
-                throw new ArgumentNullException(nameof(e));
-            }
+            ArgumentNullException.ThrowIfNull(e);
 
             e.ClearUserInitiated();
 
@@ -589,15 +572,8 @@ namespace System.Windows
         /// </param>
         private void AddToEventRoute(EventRoute route, RoutedEventArgs e)
         {
-            if (route is null)
-            {
-                throw new ArgumentNullException(nameof(route));
-            }
-
-            if (e is null)
-            {
-                throw new ArgumentNullException(nameof(e));
-            }
+            ArgumentNullException.ThrowIfNull(route);
+            ArgumentNullException.ThrowIfNull(e);
 
             // Get class listeners for this UIElement
             RoutedEventHandlerInfoList classListeners =

@@ -21,10 +21,7 @@ public static class ContextMenuService
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static ContextMenu GetContextMenu(DependencyObject obj)
     {
-        if (obj is null)
-        {
-            throw new ArgumentNullException(nameof(obj));
-        }
+        ArgumentNullException.ThrowIfNull(obj);
 
         return (ContextMenu)obj.GetValue(ContextMenuProperty);
     }
@@ -36,10 +33,7 @@ public static class ContextMenuService
     /// <param name="value">Value to set.</param>
     public static void SetContextMenu(DependencyObject obj, ContextMenu value)
     {
-        if (obj is null)
-        {
-            throw new ArgumentNullException(nameof(obj));
-        }
+        ArgumentNullException.ThrowIfNull(obj);
 
         obj.SetValueInternal(ContextMenuProperty, value);
     }
@@ -97,10 +91,7 @@ public static class ContextMenuService
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static UIElement GetPlacementTarget(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (UIElement)element.GetValue(PlacementTargetProperty);
     }
@@ -116,10 +107,7 @@ public static class ContextMenuService
     /// </param>
     public static void SetPlacementTarget(DependencyObject element, UIElement value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(PlacementTargetProperty, value);
     }
@@ -146,10 +134,7 @@ public static class ContextMenuService
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static PlacementMode GetPlacement(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (PlacementMode)element.GetValue(PlacementProperty);
     }
@@ -165,10 +150,7 @@ public static class ContextMenuService
     /// </param>
     public static void SetPlacement(DependencyObject element, PlacementMode value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(PlacementProperty, value);
     }

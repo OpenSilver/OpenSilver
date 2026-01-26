@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Controls;
 using System.Diagnostics;
 using System.Windows.Controls;
-using OpenSilver.Internal.Controls;
+using System.Xml.Linq;
 
 namespace System.Windows.Documents
 {
@@ -157,14 +158,9 @@ namespace System.Windows.Documents
         /// </exception>
         public void Select(TextPointer anchorPosition, TextPointer movingPosition)
         {
-            if (anchorPosition is null)
-            {
-                throw new ArgumentNullException(nameof(anchorPosition));
-            }
-            if (movingPosition is null)
-            {
-                throw new ArgumentNullException(nameof(movingPosition));
-            }
+            ArgumentNullException.ThrowIfNull(anchorPosition);
+            ArgumentNullException.ThrowIfNull(movingPosition);
+
             if (anchorPosition.VisualParent != _richTextBox || movingPosition.VisualParent != _richTextBox)
             {
                 throw new ArgumentException("TextPointer is not in the TextTree associated with this object.");

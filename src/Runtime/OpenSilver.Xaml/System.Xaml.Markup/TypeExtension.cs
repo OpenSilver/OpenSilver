@@ -40,7 +40,8 @@ public class TypeExtension : MarkupExtension
     /// </exception>
     public TypeExtension(string typeName)
     {
-        _typeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
+        ArgumentNullException.ThrowIfNull(typeName);
+        _typeName = typeName;
     }
 
     /// <summary>
@@ -54,7 +55,8 @@ public class TypeExtension : MarkupExtension
     /// </exception>
     public TypeExtension(Type type)
     {
-        _type = type ?? throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
+        _type = type;
     }
 
     /// <summary>
@@ -73,8 +75,10 @@ public class TypeExtension : MarkupExtension
         get => _type;
         set
         {
+            ArgumentNullException.ThrowIfNull(value);
+
             // Reset the type name so ProvideValue does not use the existing type name.
-            _type = value ?? throw new ArgumentNullException(nameof(value));
+            _type = value;
             _typeName = null;
         }
     }
@@ -92,8 +96,10 @@ public class TypeExtension : MarkupExtension
         get => _typeName;
         set
         {
+            ArgumentNullException.ThrowIfNull(value);
+
             // Reset the type so ProvideValue does not use the existing type.
-            _typeName = value ?? throw new ArgumentNullException(nameof(value));
+            _typeName = value;
             _type = null;
         }
     }
@@ -133,12 +139,9 @@ public class TypeExtension : MarkupExtension
             throw new InvalidOperationException(Strings.MarkupExtensionTypeName);
         }
 
-        // Get the IXamlTypeResolver from the service provider
-        if (serviceProvider is null)
-        {
-            throw new ArgumentNullException(nameof(serviceProvider));
-        }
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
+        // Get the IXamlTypeResolver from the service provider
         if (serviceProvider.GetService(typeof(IXamlTypeResolver)) is not IXamlTypeResolver xamlTypeResolver)
         {
             throw new InvalidOperationException(string.Format(Strings.MarkupExtensionNoContext1, GetType().Name, nameof(IXamlTypeResolver)));

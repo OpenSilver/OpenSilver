@@ -39,10 +39,7 @@ public static class DumpHelper
     {
         AssertDEBUG();
 
-        if (obj is null)
-        {
-            throw new ArgumentNullException(nameof(obj));
-        }
+        ArgumentNullException.ThrowIfNull(obj);
 
         Type type = obj.GetType();
         var properties = new List<PropertyInfo>();

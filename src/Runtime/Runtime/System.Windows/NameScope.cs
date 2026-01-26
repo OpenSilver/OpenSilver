@@ -71,15 +71,8 @@ public class NameScope : INameScopeDictionary
     /// </exception>
     public void RegisterName(string name, object scopedElement)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
-        if (scopedElement is null)
-        {
-            throw new ArgumentNullException(nameof(scopedElement));
-        }
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(scopedElement);
 
         if (name == string.Empty)
         {
@@ -123,10 +116,7 @@ public class NameScope : INameScopeDictionary
     /// </exception>
     public void UnregisterName(string name)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentNullException.ThrowIfNull(name);
 
         if (name == string.Empty)
         {
@@ -163,10 +153,7 @@ public class NameScope : INameScopeDictionary
     /// </exception>
     public static INameScope GetNameScope(DependencyObject dependencyObject)
     {
-        if (dependencyObject is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyObject));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyObject);
 
         return (INameScope)dependencyObject.GetValue(NameScopeProperty);
     }
@@ -185,30 +172,21 @@ public class NameScope : INameScopeDictionary
     /// </exception>
     public static void SetNameScope(DependencyObject dependencyObject, INameScope value)
     {
-        if (dependencyObject is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyObject));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyObject);
 
         dependencyObject.SetValueInternal(NameScopeProperty, value);
     }
 
     internal static INameScope GetNameScope(IDependencyObject dependencyObject)
     {
-        if (dependencyObject is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyObject));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyObject);
 
         return (INameScope)dependencyObject.GetValue(NameScopeProperty);
     }
 
     internal static void SetNameScope(IDependencyObject dependencyObject, INameScope value)
     {
-        if (dependencyObject is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyObject));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyObject);
 
         dependencyObject.SetValue(NameScopeProperty, value);
     }
@@ -355,24 +333,14 @@ public class NameScope : INameScopeDictionary
     {
         get
         {
-            if (key is null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            ArgumentNullException.ThrowIfNull(key);
 
             return FindName(key);
         }
         set
         {
-            if (key is null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(value);
 
             RegisterName(key, value);
         }
@@ -392,10 +360,7 @@ public class NameScope : INameScopeDictionary
     /// </exception>
     public void Add(string key, object value)
     {
-        if (key is null)
-        {
-            throw new ArgumentNullException(nameof(key));
-        }
+        ArgumentNullException.ThrowIfNull(key);
 
         RegisterName(key, value);
     }
@@ -415,10 +380,7 @@ public class NameScope : INameScopeDictionary
     /// </exception>
     public bool ContainsKey(string key)
     {
-        if (key is null)
-        {
-            throw new ArgumentNullException(nameof(key));
-        }
+        ArgumentNullException.ThrowIfNull(key);
 
         return FindName(key) is not null;
     }
@@ -458,10 +420,7 @@ public class NameScope : INameScopeDictionary
     /// </returns>
     public bool TryGetValue(string key, out object value)
     {
-        if (key is null)
-        {
-            throw new ArgumentNullException(nameof(key));
-        }
+        ArgumentNullException.ThrowIfNull(key);
 
         value = FindName(key);
         return value is not null;

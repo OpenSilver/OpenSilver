@@ -431,25 +431,9 @@ namespace System.Windows
             Type propertyType,
             Type ownerType)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (name.Length == 0)
-            {
-                throw new ArgumentException(Strings.StringEmpty);
-            }
-
-            if (ownerType == null)
-            {
-                throw new ArgumentNullException(nameof(ownerType));
-            }
-
-            if (propertyType == null)
-            {
-                throw new ArgumentNullException(nameof(propertyType));
-            }
+            ArgumentException.ThrowIfNullOrEmpty(name);
+            ArgumentNullException.ThrowIfNull(ownerType);
+            ArgumentNullException.ThrowIfNull(propertyType);
         }
 
         private static DependencyProperty RegisterCommon(
@@ -603,15 +587,8 @@ namespace System.Windows
             out DependencyObjectType dType,
             out PropertyMetadata baseMetadata)
         {
-            if (forType == null)
-            {
-                throw new ArgumentNullException(nameof(forType));
-            }
-
-            if (typeMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(typeMetadata));
-            }
+            ArgumentNullException.ThrowIfNull(forType);
+            ArgumentNullException.ThrowIfNull(typeMetadata);
 
             if (typeMetadata.Sealed)
             {
@@ -695,10 +672,7 @@ namespace System.Windows
         {
             SetupOverrideMetadata(forType, typeMetadata, out DependencyObjectType dType, out PropertyMetadata baseMetadata);
 
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            ArgumentNullException.ThrowIfNull(key);
 
             if (ReadOnly)
             {
@@ -794,10 +768,8 @@ namespace System.Windows
         /// </exception>
         public PropertyMetadata GetMetadata(Type forType)
         {
-            if (forType == null)
-            {
-                throw new ArgumentNullException(nameof(forType));
-            }
+            ArgumentNullException.ThrowIfNull(forType);
+
             return GetMetadata(DependencyObjectType.FromSystemType(forType));
         }
 
@@ -817,10 +789,8 @@ namespace System.Windows
         /// </exception>
         public PropertyMetadata GetMetadata(DependencyObject dependencyObject)
         {
-            if (dependencyObject == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyObject));
-            }
+            ArgumentNullException.ThrowIfNull(dependencyObject);
+
             return GetMetadata(dependencyObject.DependencyObjectType);
         }
 
@@ -953,10 +923,7 @@ namespace System.Windows
         /// </returns>
         public DependencyProperty AddOwner(Type ownerType, PropertyMetadata typeMetadata)
         {
-            if (ownerType == null)
-            {
-                throw new ArgumentNullException(nameof(ownerType));
-            }
+            ArgumentNullException.ThrowIfNull(ownerType);
 
             // Map owner type to this property
             // Build key
@@ -1161,15 +1128,8 @@ namespace System.Windows
         {
             DependencyProperty dp;
 
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (ownerType is null)
-            {
-                throw new ArgumentNullException(nameof(ownerType));
-            }
+            ArgumentNullException.ThrowIfNull(name);
+            ArgumentNullException.ThrowIfNull(ownerType);
 
             do
             {

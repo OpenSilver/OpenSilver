@@ -96,10 +96,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static int GetCharacterSpacing(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (int)element.GetValue(CharacterSpacingProperty);
         }
@@ -118,10 +115,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetCharacterSpacing(DependencyObject element, int value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(CharacterSpacingProperty, value);
         }
@@ -166,10 +160,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static FontFamily GetFontFamily(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (FontFamily)element.GetValue(FontFamilyProperty);
         }
@@ -188,10 +179,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetFontFamily(DependencyObject element, FontFamily value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(FontFamilyProperty, value);
         }
@@ -235,10 +223,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static double GetFontSize(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (double)element.GetValue(FontSizeProperty);
         }
@@ -257,10 +242,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetFontSize(DependencyObject element, double value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(FontSizeProperty, value);
         }
@@ -302,10 +284,7 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         public static FontStretch GetFontStretch(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (FontStretch)element.GetValue(FontStretchProperty);
         }
@@ -325,10 +304,7 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         public static void SetFontStretch(DependencyObject element, FontStretch value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(FontStretchProperty, value);
         }
@@ -368,10 +344,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static FontStyle GetFontStyle(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (FontStyle)element.GetValue(FontStyleProperty);
         }
@@ -390,10 +363,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetFontStyle(DependencyObject element, FontStyle value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(FontStyleProperty, value);
         }
@@ -435,10 +405,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static FontWeight GetFontWeight(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (FontWeight)element.GetValue(FontWeightProperty);
         }
@@ -457,10 +424,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetFontWeight(DependencyObject element, FontWeight value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(FontWeightProperty, value);
         }
@@ -507,10 +471,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static Brush GetForeground(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (Brush)element.GetValue(ForegroundProperty);
         }
@@ -529,10 +490,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetForeground(DependencyObject element, Brush value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(ForegroundProperty, value);
         }
@@ -609,10 +567,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static double GetLineHeight(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (double)element.GetValue(LineHeightProperty);
         }
@@ -634,10 +589,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetLineHeight(DependencyObject element, double value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(LineHeightProperty, value);
         }
@@ -683,10 +635,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static LineStackingStrategy GetLineStackingStrategy(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (LineStackingStrategy)element.GetValue(LineStackingStrategyProperty);
         }
@@ -705,10 +654,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetLineStackingStrategy(DependencyObject element, LineStackingStrategy value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(LineStackingStrategyProperty, value);
         }
@@ -783,10 +729,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static TextAlignment GetTextAlignment(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (TextAlignment)element.GetValue(TextAlignmentProperty);
         }
@@ -805,10 +748,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetTextAlignment(DependencyObject element, TextAlignment value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(TextAlignmentProperty, value);
         }

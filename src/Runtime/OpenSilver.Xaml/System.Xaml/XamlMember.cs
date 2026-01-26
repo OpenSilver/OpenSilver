@@ -78,9 +78,9 @@ namespace System.Xaml
 		public XamlMember(EventInfo eventInfo, XamlSchemaContext schemaContext, XamlMemberInvoker invoker)
 			: this(schemaContext, invoker)
 		{
-			if (eventInfo == null)
-				throw new ArgumentNullException("eventInfo");
-			Name = eventInfo.Name;
+			ArgumentNullException.ThrowIfNull(eventInfo);
+
+            Name = eventInfo.Name;
 			underlying_member = eventInfo;
 			DeclaringType = schemaContext.GetXamlType(eventInfo.DeclaringType);
 			target_type = DeclaringType;
@@ -96,9 +96,9 @@ namespace System.Xaml
 		public XamlMember(PropertyInfo propertyInfo, XamlSchemaContext schemaContext, XamlMemberInvoker invoker)
 			: this(schemaContext, invoker)
 		{
-			if (propertyInfo == null)
-				throw new ArgumentNullException("propertyInfo");
-			Name = propertyInfo.Name;
+			ArgumentNullException.ThrowIfNull(propertyInfo);
+
+            Name = propertyInfo.Name;
 			underlying_member = propertyInfo;
 			DeclaringType = schemaContext.GetXamlType(propertyInfo.DeclaringType);
 			target_type = DeclaringType;
@@ -114,11 +114,10 @@ namespace System.Xaml
 		public XamlMember(string attachableEventName, MethodInfo adder, XamlSchemaContext schemaContext, XamlMemberInvoker invoker)
 			: this(schemaContext, invoker)
 		{
-			if (attachableEventName == null)
-				throw new ArgumentNullException("attachableEventName");
-			if (adder == null)
-				throw new ArgumentNullException("adder");
-			Name = attachableEventName;
+			ArgumentNullException.ThrowIfNull(attachableEventName);
+			ArgumentNullException.ThrowIfNull(adder);
+
+            Name = attachableEventName;
 			VerifyAdderSetter(adder);
 			underlying_member = adder;
 			DeclaringType = schemaContext.GetXamlType(adder.DeclaringType);
@@ -135,8 +134,8 @@ namespace System.Xaml
 		public XamlMember(string attachablePropertyName, MethodInfo getter, MethodInfo setter, XamlSchemaContext schemaContext, XamlMemberInvoker invoker)
 			: this(schemaContext, invoker)
 		{
-			if (attachablePropertyName == null)
-				throw new ArgumentNullException("attachablePropertyName");
+			ArgumentNullException.ThrowIfNull(attachablePropertyName);
+
 			if (getter == null && setter == null)
 				throw new ArgumentNullException("getter", "Either property getter or setter must be non-null.");
 			Name = attachablePropertyName;
@@ -170,11 +169,10 @@ namespace System.Xaml
 
 		public XamlMember(string name, XamlType declaringType, bool isAttachable)
 		{
-			if (name == null)
-				throw new ArgumentNullException("name");
-			if (declaringType == null)
-				throw new ArgumentNullException("declaringType");
-			Name = name;
+			ArgumentNullException.ThrowIfNull(name);
+			ArgumentNullException.ThrowIfNull(declaringType);
+
+            Name = name;
 			context = declaringType.SchemaContext;
 			DeclaringType = declaringType;
 			target_type = DeclaringType;
@@ -183,18 +181,18 @@ namespace System.Xaml
 
 		internal XamlMember(string name, string preferredNamespace)
 		{
-			if (name == null)
-				throw new ArgumentNullException("name");
-			Name = name;
+			ArgumentNullException.ThrowIfNull(name);
+
+            Name = name;
 			flags.Set(MemberFlags.IsUnknown, true);
 			ns.Set(preferredNamespace);
 		}
 
 		XamlMember(XamlSchemaContext schemaContext, XamlMemberInvoker invoker)
 		{
-			if (schemaContext == null)
-				throw new ArgumentNullException("schemaContext");
-			context = schemaContext;
+			ArgumentNullException.ThrowIfNull(schemaContext);
+
+            context = schemaContext;
 			this.invoker = invoker;
 		}
 

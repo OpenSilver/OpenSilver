@@ -69,10 +69,7 @@ namespace System.Windows
             get => _navigationState;
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullException.ThrowIfNull(value);
 
                 OpenSilver.Interop.ExecuteJavaScriptVoid($"window.location.hash = {OpenSilver.Interop.GetVariableStringForJS(value)}");
             }

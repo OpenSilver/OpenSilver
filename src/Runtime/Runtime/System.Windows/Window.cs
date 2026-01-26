@@ -126,8 +126,10 @@ namespace System.Windows
                 throw new InvalidOperationException("The method 'Window.AttachToDomElement' can be called only once.");
             }
 
+            ArgumentNullException.ThrowIfNull(rootDomElement);
+
             //Note: The "rootDomElement" will contain one DIV for the root of the window visual tree, and other DIVs to host the popups.
-            RootDomElement = rootDomElement ?? throw new ArgumentNullException(nameof(rootDomElement));
+            RootDomElement = rootDomElement;
 
             ParentWindow = this;
 

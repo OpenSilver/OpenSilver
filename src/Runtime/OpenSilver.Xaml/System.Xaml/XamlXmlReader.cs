@@ -261,12 +261,10 @@ namespace System.Xaml
 		static XamlXmlReaderSettings default_settings = new XamlXmlReaderSettings();
 		public XamlXmlParser(XmlReader xmlReader, XamlSchemaContext schemaContext, XamlXmlReaderSettings settings)
 		{
-			if (xmlReader == null)
-				throw new ArgumentNullException(nameof(xmlReader));
-			if (schemaContext == null)
-				throw new ArgumentNullException(nameof(schemaContext));
+			ArgumentNullException.ThrowIfNull(xmlReader);
+			ArgumentNullException.ThrowIfNull(schemaContext);
 
-			sctx = schemaContext;
+            sctx = schemaContext;
 			this.settings = settings ?? default_settings;
 			if (settings?.SkipXmlCompatibilityProcessing != true)
 			{

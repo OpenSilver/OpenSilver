@@ -11,17 +11,18 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
+using OpenSilver.Internal.Xaml.Context;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Windows.Markup;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Xaml.Context;
-using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls
 {
@@ -590,10 +591,7 @@ namespace System.Windows.Controls
         /// </returns>
         public static int GetAlternationIndex(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (int)element.GetValue(AlternationIndexProperty);
         }

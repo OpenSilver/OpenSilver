@@ -209,10 +209,7 @@ namespace System.Windows.Controls
             get => (string)GetValue(PasswordProperty);
             set
             {
-                if (value is null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullException.ThrowIfNull(value);
 
                 SetValueInternal(PasswordProperty, value);
             }

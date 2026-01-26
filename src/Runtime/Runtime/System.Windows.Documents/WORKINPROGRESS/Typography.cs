@@ -46,10 +46,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStandardLigatures(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StandardLigaturesProperty);
     }
 
@@ -67,10 +65,8 @@ public static class Typography
     /// </exception>
     public static void SetStandardLigatures(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StandardLigaturesProperty, value);
     }
 
@@ -99,10 +95,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetContextualLigatures(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(ContextualLigaturesProperty);
     }
 
@@ -120,10 +114,8 @@ public static class Typography
     /// </exception>
     public static void SetContextualLigatures(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(ContextualLigaturesProperty, value);
     }
 
@@ -152,10 +144,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetDiscretionaryLigatures(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(DiscretionaryLigaturesProperty);
     }
 
@@ -173,10 +163,8 @@ public static class Typography
     /// </exception>
     public static void SetDiscretionaryLigatures(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(DiscretionaryLigaturesProperty, value);
     }
 
@@ -205,10 +193,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetHistoricalLigatures(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(HistoricalLigaturesProperty);
     }
 
@@ -226,10 +212,8 @@ public static class Typography
     /// </exception>
     public static void SetHistoricalLigatures(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(HistoricalLigaturesProperty, value);
     }
 
@@ -258,10 +242,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static int GetAnnotationAlternates(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (int)element.GetValue(AnnotationAlternatesProperty);
     }
 
@@ -279,10 +261,8 @@ public static class Typography
     /// </exception>
     public static void SetAnnotationAlternates(DependencyObject element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(AnnotationAlternatesProperty, value);
     }
 
@@ -311,10 +291,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetContextualAlternates(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(ContextualAlternatesProperty);
     }
 
@@ -332,10 +310,8 @@ public static class Typography
     /// </exception>
     public static void SetContextualAlternates(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(ContextualAlternatesProperty, value);
     }
 
@@ -364,10 +340,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetHistoricalForms(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(HistoricalFormsProperty);
     }
 
@@ -385,10 +359,8 @@ public static class Typography
     /// </exception>
     public static void SetHistoricalForms(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(HistoricalFormsProperty, value);
     }
 
@@ -417,10 +389,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetKerning(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(KerningProperty);
     }
 
@@ -438,10 +408,8 @@ public static class Typography
     /// </exception>
     public static void SetKerning(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(KerningProperty, value);
     }
 
@@ -470,10 +438,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetCapitalSpacing(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(CapitalSpacingProperty);
     }
 
@@ -491,10 +457,8 @@ public static class Typography
     /// </exception>
     public static void SetCapitalSpacing(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(CapitalSpacingProperty, value);
     }
 
@@ -523,10 +487,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetCaseSensitiveForms(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(CaseSensitiveFormsProperty);
     }
 
@@ -544,10 +506,8 @@ public static class Typography
     /// </exception>
     public static void SetCaseSensitiveForms(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(CaseSensitiveFormsProperty, value);
     }
 
@@ -576,10 +536,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet1(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet1Property);
     }
 
@@ -597,10 +555,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet1(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet1Property, value);
     }
 
@@ -629,10 +585,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet2(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet2Property);
     }
 
@@ -650,10 +604,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet2(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet2Property, value);
     }
 
@@ -682,10 +634,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet3(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet3Property);
     }
 
@@ -703,10 +653,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet3(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet3Property, value);
     }
 
@@ -735,10 +683,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet4(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet4Property);
     }
 
@@ -756,10 +702,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet4(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet4Property, value);
     }
 
@@ -788,10 +732,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet5(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet5Property);
     }
 
@@ -809,10 +751,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet5(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet5Property, value);
     }
 
@@ -841,10 +781,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet6(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet6Property);
     }
 
@@ -862,10 +800,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet6(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet6Property, value);
     }
 
@@ -894,10 +830,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet7(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet7Property);
     }
 
@@ -915,10 +849,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet7(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet7Property, value);
     }
 
@@ -947,10 +879,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet8(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet8Property);
     }
 
@@ -968,10 +898,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet8(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet8Property, value);
     }
 
@@ -1000,10 +928,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet9(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet9Property);
     }
 
@@ -1021,10 +947,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet9(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet9Property, value);
     }
 
@@ -1053,10 +977,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet10(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet10Property);
     }
 
@@ -1074,10 +996,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet10(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet10Property, value);
     }
 
@@ -1106,10 +1026,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet11(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet11Property);
     }
 
@@ -1127,10 +1045,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet11(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet11Property, value);
     }
 
@@ -1159,10 +1075,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet12(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet12Property);
     }
 
@@ -1180,10 +1094,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet12(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet12Property, value);
     }
 
@@ -1212,10 +1124,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet13(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet13Property);
     }
 
@@ -1233,10 +1143,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet13(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet13Property, value);
     }
 
@@ -1265,10 +1173,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet14(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet14Property);
     }
 
@@ -1286,10 +1192,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet14(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet14Property, value);
     }
 
@@ -1318,10 +1222,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet15(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet15Property);
     }
 
@@ -1339,10 +1241,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet15(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet15Property, value);
     }
 
@@ -1371,10 +1271,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet16(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet16Property);
     }
 
@@ -1392,10 +1290,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet16(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet16Property, value);
     }
 
@@ -1424,10 +1320,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet17(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet17Property);
     }
 
@@ -1445,10 +1339,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet17(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet17Property, value);
     }
 
@@ -1477,10 +1369,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet18(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet18Property);
     }
 
@@ -1498,10 +1388,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet18(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet18Property, value);
     }
 
@@ -1530,10 +1418,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet19(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet19Property);
     }
 
@@ -1551,10 +1437,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet19(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet19Property, value);
     }
 
@@ -1583,10 +1467,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetStylisticSet20(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(StylisticSet20Property);
     }
 
@@ -1604,10 +1486,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticSet20(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticSet20Property, value);
     }
 
@@ -1636,10 +1516,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static FontFraction GetFraction(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (FontFraction)element.GetValue(FractionProperty);
     }
 
@@ -1657,10 +1535,8 @@ public static class Typography
     /// </exception>
     public static void SetFraction(DependencyObject element, FontFraction value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(FractionProperty, value);
     }
 
@@ -1689,10 +1565,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetSlashedZero(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(SlashedZeroProperty);
     }
 
@@ -1710,10 +1584,8 @@ public static class Typography
     /// </exception>
     public static void SetSlashedZero(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(SlashedZeroProperty, value);
     }
 
@@ -1742,10 +1614,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetMathematicalGreek(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(MathematicalGreekProperty);
     }
 
@@ -1763,10 +1633,8 @@ public static class Typography
     /// </exception>
     public static void SetMathematicalGreek(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(MathematicalGreekProperty, value);
     }
 
@@ -1795,10 +1663,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetEastAsianExpertForms(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(EastAsianExpertFormsProperty);
     }
 
@@ -1816,10 +1682,8 @@ public static class Typography
     /// </exception>
     public static void SetEastAsianExpertForms(DependencyObject element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(EastAsianExpertFormsProperty, value);
     }
 
@@ -1848,10 +1712,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static FontVariants GetVariants(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (FontVariants)element.GetValue(VariantsProperty);
     }
 
@@ -1869,10 +1731,8 @@ public static class Typography
     /// </exception>
     public static void SetVariants(DependencyObject element, FontVariants value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(VariantsProperty, value);
     }
 
@@ -1901,10 +1761,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static FontCapitals GetCapitals(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (FontCapitals)element.GetValue(CapitalsProperty);
     }
 
@@ -1922,10 +1780,8 @@ public static class Typography
     /// </exception>
     public static void SetCapitals(DependencyObject element, FontCapitals value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(CapitalsProperty, value);
     }
 
@@ -1954,10 +1810,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static FontNumeralStyle GetNumeralStyle(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (FontNumeralStyle)element.GetValue(NumeralStyleProperty);
     }
 
@@ -1975,10 +1829,8 @@ public static class Typography
     /// </exception>
     public static void SetNumeralStyle(DependencyObject element, FontNumeralStyle value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(NumeralStyleProperty, value);
     }
 
@@ -2007,10 +1859,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static FontNumeralAlignment GetNumeralAlignment(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (FontNumeralAlignment)element.GetValue(NumeralAlignmentProperty);
     }
 
@@ -2028,10 +1878,8 @@ public static class Typography
     /// </exception>
     public static void SetNumeralAlignment(DependencyObject element, FontNumeralAlignment value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(NumeralAlignmentProperty, value);
     }
 
@@ -2060,10 +1908,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static FontEastAsianWidths GetEastAsianWidths(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (FontEastAsianWidths)element.GetValue(EastAsianWidthsProperty);
     }
 
@@ -2081,10 +1927,8 @@ public static class Typography
     /// </exception>
     public static void SetEastAsianWidths(DependencyObject element, FontEastAsianWidths value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(EastAsianWidthsProperty, value);
     }
 
@@ -2113,10 +1957,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static FontEastAsianLanguage GetEastAsianLanguage(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (FontEastAsianLanguage)element.GetValue(EastAsianLanguageProperty);
     }
 
@@ -2134,10 +1976,8 @@ public static class Typography
     /// </exception>
     public static void SetEastAsianLanguage(DependencyObject element, FontEastAsianLanguage value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(EastAsianLanguageProperty, value);
     }
 
@@ -2166,10 +2006,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static int GetStandardSwashes(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (int)element.GetValue(StandardSwashesProperty);
     }
 
@@ -2187,10 +2025,8 @@ public static class Typography
     /// </exception>
     public static void SetStandardSwashes(DependencyObject element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StandardSwashesProperty, value);
     }
 
@@ -2219,10 +2055,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static int GetContextualSwashes(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (int)element.GetValue(ContextualSwashesProperty);
     }
 
@@ -2240,10 +2074,8 @@ public static class Typography
     /// </exception>
     public static void SetContextualSwashes(DependencyObject element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(ContextualSwashesProperty, value);
     }
 
@@ -2272,10 +2104,8 @@ public static class Typography
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static int GetStylisticAlternates(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (int)element.GetValue(StylisticAlternatesProperty);
     }
 
@@ -2293,11 +2123,8 @@ public static class Typography
     /// </exception>
     public static void SetStylisticAlternates(DependencyObject element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(StylisticAlternatesProperty, value);
     }
-
 }

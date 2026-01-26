@@ -40,10 +40,7 @@ internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
     /// <inheritdoc />
     protected override void InsertItem(int index, VisualStateGroup item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         base.InsertItem(index, item);
 
@@ -81,10 +78,7 @@ internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
     /// <inheritdoc />
     protected override void SetItem(int index, VisualStateGroup item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         VisualStateGroup oldGroup = this[index];
 

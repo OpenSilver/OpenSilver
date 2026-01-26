@@ -1143,8 +1143,8 @@
   <data name="Storyboard_UnrecognizedTimeSeekOrigin" xml:space="preserve">
     <value>Valeur TimeSeekOrigin non valide.</value>
   </data>
-  <data name="StringEmpty" xml:space="preserve">
-    <value>Le paramètre ne peut pas être une chaîne nulle.</value>
+  <data name="Argument_EmptyString" xml:space="preserve">
+    <value>La valeur ne peut pas être une chaîne vide.</value>
   </data>
   <data name="StyleForWrongType" xml:space="preserve">
     <value>Un style destiné au type '{0}' ne peut pas être appliqué au type '{1}'.</value>

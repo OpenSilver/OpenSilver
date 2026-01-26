@@ -174,10 +174,7 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
     /// </returns>
     public object FindName(string name, FrameworkElement templatedParent)
     {
-        if (templatedParent is null)
-        {
-            throw new ArgumentNullException(nameof(templatedParent));
-        }
+        ArgumentNullException.ThrowIfNull(templatedParent);
 
         if (this != templatedParent.TemplateInternal)
         {

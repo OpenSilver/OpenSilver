@@ -76,10 +76,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static int GetCharacterSpacing(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (int)element.GetValue(CharacterSpacingProperty);
     }
@@ -98,10 +95,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static void SetCharacterSpacing(DependencyObject element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(CharacterSpacingProperty, value);
     }
@@ -144,10 +138,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static FontFamily GetFontFamily(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (FontFamily)element.GetValue(FontFamilyProperty);
     }
@@ -166,10 +157,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static void SetFontFamily(DependencyObject element, FontFamily value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(FontFamilyProperty, value);
     }
@@ -212,10 +200,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static double GetFontSize(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (double)element.GetValue(FontSizeProperty);
     }
@@ -234,10 +219,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static void SetFontSize(DependencyObject element, double value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(FontSizeProperty, value);
     }
@@ -282,10 +264,7 @@ public abstract class TextElement : UIElement
     [OpenSilver.NotImplemented]
     public static FontStretch GetFontStretch(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (FontStretch)element.GetValue(FontStretchProperty);
     }
@@ -305,10 +284,7 @@ public abstract class TextElement : UIElement
     [OpenSilver.NotImplemented]
     public static void SetFontStretch(DependencyObject element, FontStretch value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(FontStretchProperty, value);
     }
@@ -350,10 +326,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static FontStyle GetFontStyle(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (FontStyle)element.GetValue(FontStyleProperty);
     }
@@ -372,10 +345,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static void SetFontStyle(DependencyObject element, FontStyle value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(FontStyleProperty, value);
     }
@@ -418,10 +388,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static FontWeight GetFontWeight(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (FontWeight)element.GetValue(FontWeightProperty);
     }
@@ -440,10 +407,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static void SetFontWeight(DependencyObject element, FontWeight value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(FontWeightProperty, value);
     }
@@ -485,10 +449,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static Brush GetForeground(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (Brush)element.GetValue(ForegroundProperty);
     }
@@ -507,10 +468,7 @@ public abstract class TextElement : UIElement
     /// </exception>
     public static void SetForeground(DependencyObject element, Brush value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(ForegroundProperty, value);
     }

@@ -34,10 +34,7 @@ public class VisualStateManager : DependencyObject
     /// <returns>true if the state changed successfully, false otherwise.</returns>
     private static bool GoToStateCommon(FrameworkElement control, FrameworkElement stateGroupsRoot, string stateName, bool useTransitions)
     {
-        if (stateName is null)
-        {
-            throw new ArgumentNullException(nameof(stateName));
-        }
+        ArgumentNullException.ThrowIfNull(stateName);
 
         if (stateGroupsRoot is null)
         {
@@ -90,10 +87,7 @@ public class VisualStateManager : DependencyObject
     /// </exception>
     public static bool GoToState(FrameworkElement control, string stateName, bool useTransitions)
     {
-        if (control is null)
-        {
-            throw new ArgumentNullException(nameof(control));
-        }
+        ArgumentNullException.ThrowIfNull(control);
 
         FrameworkElement stateGroupsRoot = control.StateGroupsRoot;
 
@@ -145,10 +139,7 @@ public class VisualStateManager : DependencyObject
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static bool GoToElementState(FrameworkElement stateGroupsRoot, string stateName, bool useTransitions)
     {
-        if (stateGroupsRoot is null)
-        {
-            throw new ArgumentNullException(nameof(stateGroupsRoot));
-        }
+        ArgumentNullException.ThrowIfNull(stateGroupsRoot);
 
         return GoToStateCommon(null, stateGroupsRoot, stateName, useTransitions);
     }
@@ -184,10 +175,7 @@ public class VisualStateManager : DependencyObject
         VisualState state,
         bool useTransitions)
     {
-        if (state is null)
-        {
-            throw new ArgumentNullException(nameof(state));
-        }
+        ArgumentNullException.ThrowIfNull(state);
 
         return GoToStateInternal(control, templateRoot, group, state, useTransitions);
     }
@@ -218,10 +206,7 @@ public class VisualStateManager : DependencyObject
     /// </exception>
     public static VisualStateManager GetCustomVisualStateManager(FrameworkElement obj)
     {
-        if (obj is null)
-        {
-            throw new ArgumentNullException(nameof(obj));
-        }
+        ArgumentNullException.ThrowIfNull(obj);
 
         return (VisualStateManager)obj.GetValue(CustomVisualStateManagerProperty);
     }
@@ -240,10 +225,7 @@ public class VisualStateManager : DependencyObject
     /// </exception>
     public static void SetCustomVisualStateManager(FrameworkElement obj, VisualStateManager value)
     {
-        if (obj is null)
-        {
-            throw new ArgumentNullException(nameof(obj));
-        }
+        ArgumentNullException.ThrowIfNull(obj);
 
         obj.SetValueInternal(CustomVisualStateManagerProperty, value);
     }
@@ -285,10 +267,7 @@ public class VisualStateManager : DependencyObject
     /// </exception>
     public static IList GetVisualStateGroups(FrameworkElement obj)
     {
-        if (obj is null)
-        {
-            throw new ArgumentNullException(nameof(obj));
-        }
+        ArgumentNullException.ThrowIfNull(obj);
 
         if (obj.GetValue(VisualStateGroupsProperty) is not VisualStateGroupCollection value)
         {
@@ -327,10 +306,7 @@ public class VisualStateManager : DependencyObject
         VisualState state,
         bool useTransitions)
     {
-        if (stateGroupsRoot is null)
-        {
-            throw new ArgumentNullException(nameof(stateGroupsRoot));
-        }
+        ArgumentNullException.ThrowIfNull(stateGroupsRoot);
 
         if (group is null)
         {
@@ -392,15 +368,8 @@ public class VisualStateManager : DependencyObject
         FrameworkElement control,
         FrameworkElement stateGroupsRoot)
     {
-        if (stateGroup is null)
-        {
-            throw new ArgumentNullException(nameof(stateGroup));
-        }
-
-        if (newState is null)
-        {
-            throw new ArgumentNullException(nameof(newState));
-        }
+        ArgumentNullException.ThrowIfNull(stateGroup);
+        ArgumentNullException.ThrowIfNull(newState);
 
         if (stateGroupsRoot is null)
         {
@@ -432,10 +401,7 @@ public class VisualStateManager : DependencyObject
     [EditorBrowsable(EditorBrowsableState.Never)]
     protected void RaiseCurrentStateChanging(VisualStateGroup stateGroup, VisualState oldState, VisualState newState, Control control)
     {
-        if (control is null)
-        {
-            throw new ArgumentNullException(nameof(control));
-        }
+        ArgumentNullException.ThrowIfNull(control);
 
         RaiseCurrentStateChanging(stateGroup, oldState, newState, control, control.StateGroupsRoot);
     }
@@ -469,15 +435,8 @@ public class VisualStateManager : DependencyObject
         FrameworkElement control,
         FrameworkElement stateGroupsRoot)
     {
-        if (stateGroup is null)
-        {
-            throw new ArgumentNullException(nameof(stateGroup));
-        }
-
-        if (newState is null)
-        {
-            throw new ArgumentNullException(nameof(newState));
-        }
+        ArgumentNullException.ThrowIfNull(stateGroup);
+        ArgumentNullException.ThrowIfNull(newState);
 
         if (stateGroupsRoot is null)
         {
@@ -509,10 +468,7 @@ public class VisualStateManager : DependencyObject
     [EditorBrowsable(EditorBrowsableState.Never)]
     protected void RaiseCurrentStateChanged(VisualStateGroup stateGroup, VisualState oldState, VisualState newState, Control control)
     {
-        if (control is null)
-        {
-            throw new ArgumentNullException(nameof(control));
-        }
+        ArgumentNullException.ThrowIfNull(control);
 
         RaiseCurrentStateChanged(stateGroup, oldState, newState, control, control.StateGroupsRoot);
     }

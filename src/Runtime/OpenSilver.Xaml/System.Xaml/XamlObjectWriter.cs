@@ -84,8 +84,8 @@ namespace System.Xaml
         [EnhancedXaml]
         public XamlObjectWriter(XamlSchemaContext schemaContext, XamlObjectWriterSettings settings, IAmbientProvider parentAmbientProvider)
         {
-            if (schemaContext == null)
-                throw new ArgumentNullException("schemaContext");
+            ArgumentNullException.ThrowIfNull(schemaContext);
+
             this.sctx = schemaContext;
             this.settings = settings ?? new XamlObjectWriterSettings();
             var manager = new XamlWriterStateManager<XamlObjectWriterException, XamlObjectWriterException>(false);

@@ -65,15 +65,8 @@ namespace System.Windows.Markup
         /// <returns>instance of Command</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object source)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(source);
 
             DependencyProperty property = ResolveProperty(context, source);
 

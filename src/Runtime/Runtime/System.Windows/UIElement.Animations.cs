@@ -39,10 +39,7 @@ public partial class UIElement
     /// </remarks>
     public void BeginAnimation(DependencyProperty dp, AnimationTimeline animation)
     {
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(dp);
 
         if (!IsPropertyAnimatable(this, dp))
         {

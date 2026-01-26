@@ -108,7 +108,9 @@ namespace System.Windows.Automation.Peers
                 throw new ElementNotEnabledException();
             }
 
-            owner.Text = value ?? throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(value);
+
+            owner.Text = value;
         }
     }
 }

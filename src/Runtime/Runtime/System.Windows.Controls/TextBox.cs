@@ -11,16 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
-using System.Windows.Automation.Peers;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Media;
-using System.Windows.Input;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Media;
+using System.ComponentModel;
+using System.Windows.Automation.Peers;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace System.Windows.Controls
 {
@@ -601,10 +602,7 @@ namespace System.Windows.Controls
             get => _textViewHost?.View.SelectedText ?? string.Empty;
             set
             {
-                if (value is null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullException.ThrowIfNull(value);
 
                 if (_textViewHost is not null)
                 {

@@ -28,10 +28,7 @@ internal sealed class DependencyPropertyAttribute : Attribute
     /// </summary>
     internal DependencyPropertyAttribute(DependencyProperty dependencyProperty, bool isAttached)
     {
-        if (dependencyProperty is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyProperty));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyProperty);
 
         DependencyProperty = dependencyProperty;
         IsAttached = isAttached;

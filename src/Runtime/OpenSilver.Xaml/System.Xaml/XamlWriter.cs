@@ -58,10 +58,9 @@ namespace System.Xaml
 
 		public void WriteNode(XamlReader reader)
 		{
-			if (reader == null)
-				throw new ArgumentNullException("reader");
+			ArgumentNullException.ThrowIfNull(reader);
 
-			switch (reader.NodeType)
+            switch (reader.NodeType)
 			{
 				case XamlNodeType.Value:
 					WriteValue(reader.Value);

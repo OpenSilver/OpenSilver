@@ -84,10 +84,7 @@ namespace System.Windows.Media
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Task<bool> LoadFontAsync(FontFamily font)
         {
-            if (font is null)
-            {
-                throw new ArgumentNullException(nameof(font));
-            }
+            ArgumentNullException.ThrowIfNull(font);
 
             return LoadFontAsync(font.Source);
         }

@@ -67,14 +67,8 @@ public sealed class AttachedPropertyBrowsableForChildrenAttribute : AttachedProp
     /// </summary>
     internal override bool IsBrowsable(DependencyObject d, DependencyProperty dp)
     {
-        if (d is null)
-        {
-            throw new ArgumentNullException(nameof(d));
-        }
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(d);
+        ArgumentNullException.ThrowIfNull(dp);
 
         DependencyObject walk = d;
         Type ownerType = dp.OwnerType;

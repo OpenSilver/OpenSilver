@@ -64,10 +64,7 @@ namespace OpenSilver.Internal
     {
         internal static int BinarySearch<T>(this List<T> list, int index, int count, T item, IComparer comparer)
         {
-            if (list == null)
-            {
-                throw new ArgumentNullException(nameof(list));
-            }
+            ArgumentNullException.ThrowIfNull(list);
 
             IComparer<T> comparerT = comparer as IComparer<T>;
             if (comparerT == null)
@@ -80,10 +77,7 @@ namespace OpenSilver.Internal
 
         internal static void Sort<T>(this List<T> list, IComparer comparer)
         {
-            if (list == null)
-            {
-                throw new ArgumentNullException(nameof(list));
-            }
+            ArgumentNullException.ThrowIfNull(list);
 
             IComparer<T> comparerT = comparer as IComparer<T>;
             if (comparerT == null)

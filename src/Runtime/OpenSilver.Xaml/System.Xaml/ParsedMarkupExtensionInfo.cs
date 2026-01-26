@@ -50,9 +50,9 @@ namespace System.Xaml
 
 		public ParsedMarkupExtensionInfo(string value, IXamlNamespaceResolver nsResolver, XamlSchemaContext sctx)
 		{
-			if (value == null)
-				throw new ArgumentNullException("value");
-			this.value = value;
+			ArgumentNullException.ThrowIfNull(value);
+
+            this.value = value;
 			this.nsResolver = nsResolver;
 			this.sctx = sctx;
 		}

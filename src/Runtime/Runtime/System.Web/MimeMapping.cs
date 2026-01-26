@@ -21,10 +21,7 @@ internal static class MimeMapping
 
     public static string GetMimeMapping(string fileName)
     {
-        if (fileName is null)
-        {
-            throw new ArgumentNullException(nameof(fileName));
-        }
+        ArgumentNullException.ThrowIfNull(fileName);
 
         fileName = GetFileName(fileName); // strip off path separators
 

@@ -24,13 +24,11 @@ internal sealed class TemplateContent : ITemplateContent
 
     internal TemplateContent(XamlContext xamlContext, Func<IFrameworkElement, XamlContext, IFrameworkElement> factory)
     {
-        if (xamlContext is null)
-        {
-            throw new ArgumentNullException(nameof(xamlContext));
-        }
+        ArgumentNullException.ThrowIfNull(xamlContext);
+        ArgumentNullException.ThrowIfNull(factory);
 
         _xamlContext = new XamlContext(xamlContext);
-        _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        _factory = factory;
     }
 
     public IFrameworkElement LoadContent<T>(T owner) where T : DependencyObject, IFrameworkElement

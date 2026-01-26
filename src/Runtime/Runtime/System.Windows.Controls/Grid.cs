@@ -86,10 +86,7 @@ public class Grid : Panel, IBorderElement
     [AttachedPropertyBrowsableForChildren]
     public static int GetColumn(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (int)element.GetValue(ColumnProperty);
     }
@@ -105,10 +102,7 @@ public class Grid : Panel, IBorderElement
     /// </param>
     public static void SetColumn(UIElement element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(ColumnProperty, value);
     }
@@ -136,10 +130,7 @@ public class Grid : Panel, IBorderElement
     [AttachedPropertyBrowsableForChildren]
     public static int GetRow(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (int)element.GetValue(RowProperty);
     }
@@ -155,10 +146,7 @@ public class Grid : Panel, IBorderElement
     /// </param>
     public static void SetRow(UIElement element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(RowProperty, value);
     }
@@ -186,10 +174,7 @@ public class Grid : Panel, IBorderElement
     [AttachedPropertyBrowsableForChildren]
     public static int GetColumnSpan(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (int)element.GetValue(ColumnSpanProperty);
     }
@@ -205,10 +190,7 @@ public class Grid : Panel, IBorderElement
     /// </param>
     public static void SetColumnSpan(UIElement element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(ColumnSpanProperty, value);
     }
@@ -236,10 +218,7 @@ public class Grid : Panel, IBorderElement
     [AttachedPropertyBrowsableForChildren]
     public static int GetRowSpan(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (int)element.GetValue(RowSpanProperty);
     }
@@ -255,10 +234,7 @@ public class Grid : Panel, IBorderElement
     /// </param>
     public static void SetRowSpan(UIElement element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(RowSpanProperty, value);
     }
@@ -284,10 +260,7 @@ public class Grid : Panel, IBorderElement
     /// </returns>
     public static bool GetIsSharedSizeScope(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (bool)element.GetValue(IsSharedSizeScopeProperty);
     }
@@ -303,10 +276,7 @@ public class Grid : Panel, IBorderElement
     /// </param>
     public static void SetIsSharedSizeScope(UIElement element, bool value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(IsSharedSizeScopeProperty, value);
     }

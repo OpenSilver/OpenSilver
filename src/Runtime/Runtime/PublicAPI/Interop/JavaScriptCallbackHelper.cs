@@ -33,8 +33,9 @@ namespace CSHTML5.Internal
 
             public SelfDisposedJavaScriptCallback(Action action)
             {
-                _action = action ?? throw new ArgumentNullException(nameof(action));
+                ArgumentNullException.ThrowIfNull(action);
 
+                _action = action;
                 JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose);
             }
 
@@ -52,8 +53,9 @@ namespace CSHTML5.Internal
 
             public SelfDisposedJavaScriptCallback(Action<T> action)
             {
-                _action = action ?? throw new ArgumentNullException(nameof(action));
+                ArgumentNullException.ThrowIfNull(action);
 
+                _action = action;
                 JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose);
             }
 
@@ -71,8 +73,9 @@ namespace CSHTML5.Internal
 
             public SelfDisposedJavaScriptCallback(Action<T1, T2> action)
             {
-                _action = action ?? throw new ArgumentNullException(nameof(action));
+                ArgumentNullException.ThrowIfNull(action);
 
+                _action = action;
                 JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose);
             }
 

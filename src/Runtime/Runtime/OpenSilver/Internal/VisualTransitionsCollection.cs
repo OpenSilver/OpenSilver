@@ -31,10 +31,7 @@ internal sealed class VisualTransitionsCollection : Collection<VisualTransition>
     /// <inheritdoc />
     protected override void InsertItem(int index, VisualTransition item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         base.InsertItem(index, item);
 
@@ -70,10 +67,7 @@ internal sealed class VisualTransitionsCollection : Collection<VisualTransition>
     /// <inheritdoc />
     protected override void SetItem(int index, VisualTransition item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         VisualTransition oldTransition = this[index];
 

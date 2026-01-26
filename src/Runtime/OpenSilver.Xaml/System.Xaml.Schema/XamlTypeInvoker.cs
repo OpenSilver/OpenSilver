@@ -44,8 +44,7 @@ namespace System.Xaml.Schema
 
 		public XamlTypeInvoker(XamlType type)
 		{
-			if (ReferenceEquals(type, null))
-				throw new ArgumentNullException("type");
+			ArgumentNullException.ThrowIfNull(type);
 			Type = type;
 		}
 
@@ -86,12 +85,10 @@ namespace System.Xaml.Schema
 
 		public virtual void AddToCollection(object instance, object item)
 		{
-			if (instance == null)
-				throw new ArgumentNullException("instance");
-			if (item == null)
-				throw new ArgumentNullException("item");
+			ArgumentNullException.ThrowIfNull(instance);
+			ArgumentNullException.ThrowIfNull(item);
 
-			var collectionType = instance.GetType();
+            var collectionType = instance.GetType();
 			var itemType = item.GetType();
 			var key = Tuple.Create(collectionType, itemType);
 
@@ -194,8 +191,7 @@ namespace System.Xaml.Schema
 
 		public virtual void AddToDictionary(object instance, object key, object item)
 		{
-			if (instance == null)
-				throw new ArgumentNullException("instance");
+			ArgumentNullException.ThrowIfNull(instance);
 
 			var instanceType = instance.GetType();
 
@@ -337,10 +333,9 @@ namespace System.Xaml.Schema
 
 		public virtual IEnumerator GetItems(object instance)
 		{
-			if (instance == null)
-				throw new ArgumentNullException(nameof(instance));
+			ArgumentNullException.ThrowIfNull(instance);
 
-			// cannot get enumerator of immutable collections
+            // cannot get enumerator of immutable collections
 			if (Type?.IsMutableDefault(instance) == true)
 				return Enumerable.Empty<object>().GetEnumerator();
 

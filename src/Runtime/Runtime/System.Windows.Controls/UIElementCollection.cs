@@ -27,9 +27,9 @@ namespace System.Windows.Controls
 
         internal UIElementCollection(UIElement visualParent, FrameworkElement logicalParent)
         {
-            if (visualParent == null)
+            if (visualParent is null)
             {
-                throw new ArgumentNullException(string.Format(Strings.Panel_NoNullVisualParent, nameof(visualParent), GetType()));
+                throw new ArgumentNullException(nameof(visualParent), string.Format(Strings.Panel_NoNullVisualParent, nameof(visualParent), GetType()));
             }
 
             VisualParent = visualParent;

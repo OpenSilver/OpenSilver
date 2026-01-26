@@ -14,10 +14,7 @@ internal sealed class NamedObject
 
     public NamedObject(string name)
     {
-        if (string.IsNullOrEmpty(name))
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentException.ThrowIfNullOrEmpty(name);
         
         _name = name;
     }

@@ -31,7 +31,9 @@ public sealed class CanExecuteRoutedEventArgs : RoutedEventArgs
 {
     internal CanExecuteRoutedEventArgs(ICommand command, object parameter)
     {
-        Command = command ?? throw new ArgumentNullException(nameof(command));
+        ArgumentNullException.ThrowIfNull(command);
+
+        Command = command;
         Parameter = parameter;
     }
 

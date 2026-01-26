@@ -41,10 +41,7 @@ namespace System.Windows.Media
         /// </exception>
         public GradientStopCollection(IEnumerable<GradientStop> collection)
         {
-            if (collection is null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            ArgumentNullException.ThrowIfNull(collection);
 
             foreach (GradientStop value in collection)
             {

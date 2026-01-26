@@ -14,6 +14,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace System.Windows.Input;
 
@@ -172,10 +173,7 @@ public class KeyGestureConverter : TypeConverter
     /// </exception>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
-        if (destinationType is null)
-        {
-            throw new ArgumentNullException(nameof(destinationType));
-        }
+        ArgumentNullException.ThrowIfNull(destinationType);
 
         if (destinationType == typeof(string))
         {

@@ -42,8 +42,11 @@ namespace CSHTML5.Internal
 
         public PendingJavascript(INativeMethods nativeMethods, CharArrayBuilder buffer)
         {
-            _nativeMethods = nativeMethods ?? throw new ArgumentNullException(nameof(nativeMethods));
-            _charArrayBuilder = buffer ?? throw new ArgumentNullException(nameof(buffer));
+            ArgumentNullException.ThrowIfNull(nativeMethods);
+            ArgumentNullException.ThrowIfNull(buffer);
+
+            _nativeMethods = nativeMethods;
+            _charArrayBuilder = buffer;
         }
 
         public void AcquireLock() { }
@@ -83,8 +86,11 @@ namespace CSHTML5.Internal
 
         public PendingJavascriptSimulator(IJavaScriptExecutionHandler jsExecutionHandler, CharArrayBuilder buffer)
         {
-            _jsExecutionHandler = jsExecutionHandler ?? throw new ArgumentNullException(nameof(jsExecutionHandler));
-            _charArrayBuilder = buffer ?? throw new ArgumentNullException(nameof(buffer));
+            ArgumentNullException.ThrowIfNull(jsExecutionHandler);
+            ArgumentNullException.ThrowIfNull(buffer);
+
+            _jsExecutionHandler = jsExecutionHandler;
+            _charArrayBuilder = buffer;
         }
 
         public void AcquireLock() => Monitor.Enter(_sync);

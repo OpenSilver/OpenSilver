@@ -55,17 +55,16 @@ namespace System.Xaml.Schema
 
 		public XamlMemberInvoker(XamlMember member)
 		{
-			if (ReferenceEquals(member, null))
-				throw new ArgumentNullException("member");
-			Member = member;
+			ArgumentNullException.ThrowIfNull(member);
+
+            Member = member;
 		}
 
 		public virtual object GetValue(object instance)
 		{
-			if (instance == null)
-				throw new ArgumentNullException(nameof(instance));
+			ArgumentNullException.ThrowIfNull(instance);
 
-			if (getDelegate != null)
+            if (getDelegate != null)
 			{
 				// all checks already done
 				return getDelegate(instance);
@@ -123,10 +122,9 @@ namespace System.Xaml.Schema
 
 		public virtual void SetValue(object instance, object value)
 		{
-			if (instance == null)
-				throw new ArgumentNullException(nameof(instance));
+			ArgumentNullException.ThrowIfNull(instance);
 
-			if (setDelegate != null)
+            if (setDelegate != null)
 			{
 				// all checks already done
 				setDelegate(instance, value);

@@ -11,10 +11,11 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using OpenSilver.Internal;
+using System.Xml.Linq;
 
 namespace System.Windows.Input;
 
@@ -193,10 +194,7 @@ public class ModifierKeysConverter : TypeConverter
     /// </exception>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
-        if (destinationType is null)
-        {
-            throw new ArgumentNullException(nameof(destinationType));
-        }
+        ArgumentNullException.ThrowIfNull(destinationType);
 
         // We can only convert to string
         if (destinationType != typeof(string))

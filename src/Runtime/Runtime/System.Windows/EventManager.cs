@@ -44,10 +44,7 @@ public static class EventManager
     /// </returns>
     public static RoutedEvent RegisterRoutedEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentNullException.ThrowIfNull(name);
 
         if (routingStrategy != RoutingStrategy.Tunnel &&
             routingStrategy != RoutingStrategy.Bubble &&
@@ -56,15 +53,8 @@ public static class EventManager
             throw new InvalidEnumArgumentException(nameof(routingStrategy), (int)routingStrategy, typeof(RoutingStrategy));
         }
 
-        if (handlerType is null)
-        {
-            throw new ArgumentNullException(nameof(handlerType));
-        }
-
-        if (ownerType is null)
-        {
-            throw new ArgumentNullException(nameof(ownerType));
-        }
+        ArgumentNullException.ThrowIfNull(handlerType);
+        ArgumentNullException.ThrowIfNull(ownerType);
 
         if (GlobalEventManager.GetRoutedEventFromName(name, ownerType, false) != null)
         {
@@ -76,10 +66,7 @@ public static class EventManager
 
     internal static RoutedEvent RegisterCoreEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentNullException.ThrowIfNull(name);
 
         if (routingStrategy != RoutingStrategy.Tunnel &&
             routingStrategy != RoutingStrategy.Bubble &&
@@ -88,15 +75,8 @@ public static class EventManager
             throw new InvalidEnumArgumentException(nameof(routingStrategy), (int)routingStrategy, typeof(RoutingStrategy));
         }
 
-        if (handlerType is null)
-        {
-            throw new ArgumentNullException(nameof(handlerType));
-        }
-
-        if (ownerType is null)
-        {
-            throw new ArgumentNullException(nameof(ownerType));
-        }
+        ArgumentNullException.ThrowIfNull(handlerType);
+        ArgumentNullException.ThrowIfNull(ownerType);
 
         if (GlobalEventManager.GetRoutedEventFromName(name, ownerType, false) != null)
         {
@@ -153,15 +133,8 @@ public static class EventManager
     public static void RegisterClassHandler<TClassType>(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo)
         where TClassType : DependencyObject, IUIElement
     {
-        if (routedEvent is null)
-        {
-            throw new ArgumentNullException(nameof(routedEvent));
-        }
-
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(routedEvent);
+        ArgumentNullException.ThrowIfNull(handler);
 
         if (!routedEvent.IsLegalHandler(handler))
         {
@@ -190,20 +163,9 @@ public static class EventManager
     /// </param>
     public static void RegisterClassHandler(Type classType, RoutedEvent routedEvent, Delegate handler, bool handledEventsToo)
     {
-        if (classType is null)
-        {
-            throw new ArgumentNullException(nameof(classType));
-        }
-
-        if (routedEvent is null)
-        {
-            throw new ArgumentNullException(nameof(routedEvent));
-        }
-
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(classType);
+        ArgumentNullException.ThrowIfNull(routedEvent);
+        ArgumentNullException.ThrowIfNull(handler);
 
         if (!typeof(DependencyObject).IsAssignableFrom(classType) || !typeof(IUIElement).IsAssignableFrom(classType))
         {
@@ -237,10 +199,7 @@ public static class EventManager
     /// </returns>
     public static RoutedEvent[] GetRoutedEventsForOwner(Type ownerType)
     {
-        if (ownerType is null)
-        {
-            throw new ArgumentNullException(nameof(ownerType));
-        }
+        ArgumentNullException.ThrowIfNull(ownerType);
 
         return GlobalEventManager.GetRoutedEventsForOwner(ownerType);
     }
@@ -272,15 +231,8 @@ public static class EventManager
     /// </returns>
     internal static RoutedEvent GetRoutedEventFromName(string name, Type ownerType)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
-        if (ownerType is null)
-        {
-            throw new ArgumentNullException(nameof(ownerType));
-        }
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(ownerType);
 
         return GlobalEventManager.GetRoutedEventFromName(name, ownerType, true);
     }

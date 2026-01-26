@@ -13,6 +13,7 @@
 
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace System.Windows.Documents;
 
@@ -99,10 +100,7 @@ public class TextPointer
     /// </exception>
     public int CompareTo(TextPointer position)
     {
-        if (position is null)
-        {
-            throw new ArgumentNullException(nameof(position));
-        }
+        ArgumentNullException.ThrowIfNull(position);
 
         if (VisualParent != position.VisualParent)
         {

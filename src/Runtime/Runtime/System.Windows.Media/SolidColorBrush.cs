@@ -103,7 +103,9 @@ namespace System.Windows.Media
 
             public SvgSolidColorBrush(SolidColorBrush scb)
             {
-                _brush = scb ?? throw new ArgumentNullException(nameof(scb));
+                ArgumentNullException.ThrowIfNull(scb);
+
+                _brush = scb;
             }
 
             public string GetBrush(Shape shape) => _brush.ToHtmlString();

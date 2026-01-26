@@ -106,10 +106,7 @@ public sealed class CommandBindingCollection : IList<CommandBinding>, IList
     /// </param>
     public void AddRange(ICollection collection)
     {
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
+        ArgumentNullException.ThrowIfNull(collection);
 
         if (collection.Count > 0)
         {

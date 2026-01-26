@@ -730,10 +730,7 @@ namespace System.Windows
         /// </returns>
         public object FindName(string name)
         {
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            ArgumentNullException.ThrowIfNull(name);
 
             if (TemplatedParent is DependencyObject templatedParent)
             {

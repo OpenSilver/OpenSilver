@@ -80,7 +80,9 @@ public class RoutedUICommand : RoutedCommand
     public RoutedUICommand(string text, string name, Type ownerType, InputGestureCollection inputGestures)
         : base(name, ownerType, inputGestures)
     {
-        _text = text ?? throw new ArgumentNullException(nameof(text));
+        ArgumentNullException.ThrowIfNull(text);
+
+        _text = text;
     }
 
     /// <summary>

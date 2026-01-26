@@ -124,6 +124,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value cannot be an empty string..
+        /// </summary>
+        internal static string Argument_EmptyString {
+            get {
+                return ResourceManager.GetString("Argument_EmptyString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} (&apos;{1}&apos;) must be a non-negative value..
         /// </summary>
         internal static string ArgumentOutOfRange_Generic_MustBeNonNegative {
@@ -3135,15 +3144,6 @@ namespace OpenSilver.Internal {
         internal static string Storyboard_UnrecognizedTimeSeekOrigin {
             get {
                 return ResourceManager.GetString("Storyboard_UnrecognizedTimeSeekOrigin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Parameter cannot be a zero-length string..
-        /// </summary>
-        internal static string StringEmpty {
-            get {
-                return ResourceManager.GetString("StringEmpty", resourceCulture);
             }
         }
         

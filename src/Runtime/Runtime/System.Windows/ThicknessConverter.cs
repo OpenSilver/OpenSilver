@@ -128,15 +128,8 @@ public class ThicknessConverter : TypeConverter
     /// </exception>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo cultureInfo, object value, Type destinationType)
     {
-        if (value is null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
-
-        if (destinationType is null)
-        {
-            throw new ArgumentNullException(nameof(destinationType));
-        }
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(destinationType);
 
         if (value is not Thickness thickness)
         {

@@ -38,22 +38,9 @@ namespace System.ComponentModel
             MethodInfo getMethod,
             MethodInfo setMethod)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (name.Length == 0)
-            {
-                throw new ArgumentException(nameof(name));
-            }
-            if (componentClass == null)
-            {
-                throw new ArgumentNullException(nameof(componentClass));
-            }
-            if (type == null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
+            ArgumentException.ThrowIfNullOrEmpty(name);
+            ArgumentNullException.ThrowIfNull(componentClass);
+            ArgumentNullException.ThrowIfNull(type);
 
             _name = name;
             _componentClass = componentClass;

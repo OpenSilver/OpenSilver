@@ -31,7 +31,9 @@ public sealed class AttachedPropertyBrowsableWhenAttributePresentAttribute : Att
     /// </param>
     public AttachedPropertyBrowsableWhenAttributePresentAttribute(Type attributeType)
     {
-        AttributeType = attributeType ?? throw new ArgumentNullException(nameof(attributeType));
+        ArgumentNullException.ThrowIfNull(attributeType);
+
+        AttributeType = attributeType;
     }
 
     /// <summary>
@@ -72,14 +74,8 @@ public sealed class AttachedPropertyBrowsableWhenAttributePresentAttribute : Att
     /// </summary>
     internal override bool IsBrowsable(DependencyObject d, DependencyProperty dp)
     {
-        if (d is null)
-        {
-            throw new ArgumentNullException(nameof(d));
-        }
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(d);
+        ArgumentNullException.ThrowIfNull(dp);
 
         Attribute a = TypeDescriptor.GetAttributes(d)[AttributeType];
         return a != null && !a.IsDefaultAttribute();

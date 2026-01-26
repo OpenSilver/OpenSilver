@@ -103,20 +103,14 @@ public class FontFamilyConverter : TypeConverter
     /// </exception>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
-        if (value is null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         if (value is not FontFamily fontFamily)
         {
             throw new ArgumentException(string.Format(Strings.General_Expected_Type, nameof(FontFamily)), nameof(value));
         }
 
-        if (destinationType is null)
-        {
-            throw new ArgumentNullException(nameof(destinationType));
-        }
+        ArgumentNullException.ThrowIfNull(destinationType);
 
         if (destinationType == typeof(string))
         {

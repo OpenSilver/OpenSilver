@@ -33,10 +33,7 @@ public sealed class DependencyObjectType
     /// </returns>
     public static DependencyObjectType FromSystemType(Type systemType)
     {
-        if (systemType is null)
-        {
-            throw new ArgumentNullException(nameof(systemType));
-        }
+        ArgumentNullException.ThrowIfNull(systemType);
 
         if (!typeof(DependencyObject).IsAssignableFrom(systemType))
         {

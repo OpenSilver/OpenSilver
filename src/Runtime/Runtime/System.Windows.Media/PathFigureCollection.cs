@@ -59,10 +59,7 @@ public sealed class PathFigureCollection : PresentationFrameworkCollection<PathF
     /// </exception>
     public PathFigureCollection(IEnumerable<PathFigure> figures)
     {
-        if (figures is null)
-        {
-            throw new ArgumentNullException(nameof(figures));
-        }
+        ArgumentNullException.ThrowIfNull(figures);
 
         foreach (PathFigure item in figures)
         {

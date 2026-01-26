@@ -30,10 +30,9 @@ namespace System.Windows.Controls
 
         private void UpdateCollection(ICollection<T> list, Action<T> action)
         {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
+            ArgumentNullException.ThrowIfNull(list);
 
-            if (!list.Any())
+            if (list.Count == 0)
             {
                 return;
             }

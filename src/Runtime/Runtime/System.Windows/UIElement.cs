@@ -1381,10 +1381,7 @@ namespace System.Windows
 
         internal bool IsDescendantOf(DependencyObject ancestor)
         {
-            if (ancestor is null)
-            {
-                throw new ArgumentNullException(nameof(ancestor));
-            }
+            ArgumentNullException.ThrowIfNull(ancestor);
 
             if (ancestor is not UIElement)
             {

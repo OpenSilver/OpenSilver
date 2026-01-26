@@ -185,15 +185,8 @@ public static class DependencyPropertyHelper
     /// </returns>
     public static ValueSource GetValueSource(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
     {
-        if (dependencyObject is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyObject));
-        }
-
-        if (dependencyProperty is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyProperty));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyObject);
+        ArgumentNullException.ThrowIfNull(dependencyProperty);
 
         if (dependencyObject.GetStorage(dependencyProperty.GlobalIndex) is Storage storage)
         {

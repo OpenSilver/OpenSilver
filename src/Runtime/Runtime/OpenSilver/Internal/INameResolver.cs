@@ -28,10 +28,7 @@ namespace OpenSilver.Internal
 
         public TemplateNameResolver(IInternalFrameworkElement templateRoot)
         {
-            if (templateRoot is null)
-            {
-                throw new ArgumentNullException(nameof(templateRoot));
-            }
+            ArgumentNullException.ThrowIfNull(templateRoot);
 
             _templateRootRef = new WeakReference<IInternalFrameworkElement>(templateRoot);
         }
@@ -63,10 +60,7 @@ namespace OpenSilver.Internal
 
         public XamlNameResolver(IInternalFrameworkElement namescopeOwner)
         {
-            if (namescopeOwner is null)
-            {
-                throw new ArgumentNullException(nameof(namescopeOwner));
-            }
+            ArgumentNullException.ThrowIfNull(namescopeOwner);
 
             _namescopeOwnerRef = new WeakReference<IInternalFrameworkElement>(namescopeOwner);
         }

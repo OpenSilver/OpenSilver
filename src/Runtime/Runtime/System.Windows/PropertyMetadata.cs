@@ -340,10 +340,7 @@ namespace System.Windows
         /// </param>
         protected virtual void Merge(PropertyMetadata baseMetadata, DependencyProperty dp)
         {
-            if (baseMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(baseMetadata));
-            }
+            ArgumentNullException.ThrowIfNull(baseMetadata);
 
             CheckSealed();
 

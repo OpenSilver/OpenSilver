@@ -152,10 +152,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static bool GetCanContentScroll(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (bool)element.GetValue(CanContentScrollProperty);
         }
@@ -175,10 +172,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetCanContentScroll(DependencyObject element, bool canContentScroll)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(CanContentScrollProperty, canContentScroll);
         }
@@ -341,10 +335,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static ScrollBarVisibility GetHorizontalScrollBarVisibility(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (ScrollBarVisibility)element.GetValue(HorizontalScrollBarVisibilityProperty);
         }
@@ -364,10 +355,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetHorizontalScrollBarVisibility(DependencyObject element, ScrollBarVisibility horizontalScrollBarVisibility)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(HorizontalScrollBarVisibilityProperty, horizontalScrollBarVisibility);
         }
@@ -387,10 +375,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static ScrollBarVisibility GetVerticalScrollBarVisibility(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (ScrollBarVisibility)element.GetValue(VerticalScrollBarVisibilityProperty);
         }
@@ -410,10 +395,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetVerticalScrollBarVisibility(DependencyObject element, ScrollBarVisibility verticalScrollBarVisibility)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(VerticalScrollBarVisibilityProperty, verticalScrollBarVisibility);
         }

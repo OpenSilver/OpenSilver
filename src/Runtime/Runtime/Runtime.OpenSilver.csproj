@@ -1111,6 +1111,7 @@
     <Compile Include="System.Windows\AssemblyPart.cs" />
     <Compile Include="System.Windows\AssemblyPartCollection.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />
+    <Compile Include="System\Polyfills.cs" />
     <Compile Include="__SPECIFIC__\IJavaScriptExecutionHandler.cs" />
   </ItemGroup>
 

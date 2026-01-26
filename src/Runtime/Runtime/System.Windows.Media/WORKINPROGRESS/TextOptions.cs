@@ -36,10 +36,7 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public static TextFormattingMode GetTextFormattingMode(FrameworkElement element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (TextFormattingMode)element.GetValue(TextFormattingModeProperty);
         }
@@ -53,10 +50,7 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public static TextHintingMode GetTextHintingMode(FrameworkElement element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (TextHintingMode)element.GetValue(TextHintingModeProperty);
         }
@@ -70,10 +64,7 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public static TextRenderingMode GetTextRenderingMode(FrameworkElement element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (TextRenderingMode)element.GetValue(TextRenderingModeProperty);
         }
@@ -87,10 +78,7 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public static void SetTextFormattingMode(FrameworkElement element, TextFormattingMode value)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(TextFormattingModeProperty, value);
         }
@@ -104,10 +92,7 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public static void SetTextHintingMode(FrameworkElement element, TextHintingMode value)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(TextHintingModeProperty, value);
         }
@@ -121,10 +106,7 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public static void SetTextRenderingMode(FrameworkElement element, TextRenderingMode value)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(TextRenderingModeProperty, value);
         }

@@ -94,10 +94,7 @@ public class Style : DependencyObject, ISealable
                 throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(Style)));
             }
 
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             _targetType = value;
         }

@@ -399,10 +399,7 @@ namespace System.Windows
         /// </param>
         public void CopyTo(DictionaryEntry[] array, int arrayIndex)
         {
-            if (array == null)
-            {
-                throw new ArgumentNullException(nameof(array));
-            }
+            ArgumentNullException.ThrowIfNull(array);
 
             ((ICollection)_baseDictionary).CopyTo(array, arrayIndex);
         }
@@ -432,10 +429,7 @@ namespace System.Windows
                 throw new InvalidOperationException(Strings.ResourceDictionaryIsReadOnly);
             }
 
-            if (key is null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            ArgumentNullException.ThrowIfNull(key);
 
             if (_baseDictionary.TryGetValue(key, out object resource))
             {

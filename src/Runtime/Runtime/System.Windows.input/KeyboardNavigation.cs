@@ -49,10 +49,8 @@ public sealed class KeyboardNavigation
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static int GetTabIndex(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (int)element.GetValue(TabIndexProperty);
     }
 
@@ -70,10 +68,8 @@ public sealed class KeyboardNavigation
     /// </exception>
     public static void SetTabIndex(DependencyObject element, int index)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(TabIndexProperty, index);
     }
 
@@ -102,10 +98,8 @@ public sealed class KeyboardNavigation
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetIsTabStop(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(IsTabStopProperty);
     }
 
@@ -123,10 +117,8 @@ public sealed class KeyboardNavigation
     /// </exception>
     public static void SetIsTabStop(DependencyObject element, bool isTabStop)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(IsTabStopProperty, isTabStop);
     }
 
@@ -155,10 +147,8 @@ public sealed class KeyboardNavigation
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static KeyboardNavigationMode GetTabNavigation(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (KeyboardNavigationMode)element.GetValue(TabNavigationProperty);
     }
 
@@ -176,10 +166,8 @@ public sealed class KeyboardNavigation
     /// </exception>
     public static void SetTabNavigation(DependencyObject element, KeyboardNavigationMode mode)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(TabNavigationProperty, mode);
     }
 
@@ -208,10 +196,8 @@ public sealed class KeyboardNavigation
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static bool GetAcceptsReturn(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (bool)element.GetValue(AcceptsReturnProperty);
     }
 
@@ -229,10 +215,8 @@ public sealed class KeyboardNavigation
     /// </exception>
     public static void SetAcceptsReturn(DependencyObject element, bool enabled)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(AcceptsReturnProperty, enabled);
     }
 

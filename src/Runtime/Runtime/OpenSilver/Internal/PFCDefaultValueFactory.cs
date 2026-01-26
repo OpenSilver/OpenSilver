@@ -25,8 +25,11 @@ internal sealed class PFCDefaultValueFactory<T> : DefaultValueFactory
         Func<PresentationFrameworkCollection<T>> getPrototypeDelegate,
         Func<DependencyObject, DependencyProperty, PresentationFrameworkCollection<T>> createDefaultValueDelegate)
     {
-        _getPrototypeDelegate = getPrototypeDelegate ?? throw new ArgumentNullException(nameof(getPrototypeDelegate));
-        _createDefaultValueDelegate = createDefaultValueDelegate ?? throw new ArgumentNullException(nameof(createDefaultValueDelegate));
+        ArgumentNullException.ThrowIfNull(getPrototypeDelegate);
+        ArgumentNullException.ThrowIfNull(createDefaultValueDelegate);
+
+        _getPrototypeDelegate = getPrototypeDelegate;
+        _createDefaultValueDelegate = createDefaultValueDelegate;
     }
 
     internal override object DefaultValue => _getPrototypeDelegate();

@@ -39,20 +39,8 @@ public static class LogicalTreeHelper
     /// </returns>
     public static DependencyObject FindLogicalNode(DependencyObject logicalTreeNode, string elementName)
     {
-        if (logicalTreeNode is null)
-        {
-            throw new ArgumentNullException(nameof(logicalTreeNode));
-        }
-
-        if (elementName is null)
-        {
-            throw new ArgumentNullException(nameof(elementName));
-        }
-
-        if (elementName.Length == 0)
-        {
-            throw new ArgumentException(Strings.StringEmpty, nameof(elementName));
-        }
+        ArgumentNullException.ThrowIfNull(logicalTreeNode);
+        ArgumentException.ThrowIfNullOrEmpty(elementName);
 
         DependencyObject namedElement = null;
         DependencyObject childNode;
@@ -104,10 +92,7 @@ public static class LogicalTreeHelper
     /// </returns>
     public static IEnumerable GetChildren(DependencyObject current)
     {
-        if (current is null)
-        {
-            throw new ArgumentNullException(nameof(current));
-        }
+        ArgumentNullException.ThrowIfNull(current);
 
         if (current is IInternalFrameworkElement fe)
         {
@@ -129,10 +114,7 @@ public static class LogicalTreeHelper
     /// </returns>
     public static IEnumerable GetChildren(UIElement current)
     {
-        if (current is null)
-        {
-            throw new ArgumentNullException(nameof(current));
-        }
+        ArgumentNullException.ThrowIfNull(current);
 
         if (current is FrameworkElement fe)
         {
@@ -154,10 +136,7 @@ public static class LogicalTreeHelper
     /// </returns>
     public static IEnumerable GetChildren(FrameworkElement current)
     {
-        if (current is null)
-        {
-            throw new ArgumentNullException(nameof(current));
-        }
+        ArgumentNullException.ThrowIfNull(current);
 
         return EnumeratorWrapper.Create(current.LogicalChildren);
     }
@@ -173,10 +152,7 @@ public static class LogicalTreeHelper
     /// </returns>
     public static DependencyObject GetParent(DependencyObject current)
     {
-        if (current is null)
-        {
-            throw new ArgumentNullException(nameof(current));
-        }
+        ArgumentNullException.ThrowIfNull(current);
 
         if (current is IInternalFrameworkElement fe)
         {
@@ -197,10 +173,7 @@ public static class LogicalTreeHelper
     /// </returns>
     public static DependencyObject GetParent(UIElement current)
     {
-        if (current is null)
-        {
-            throw new ArgumentNullException(nameof(current));
-        }
+        ArgumentNullException.ThrowIfNull(current);
 
         if (current is FrameworkElement fe)
         {
@@ -221,10 +194,7 @@ public static class LogicalTreeHelper
     /// </returns>
     public static DependencyObject GetParent(FrameworkElement current)
     {
-        if (current is null)
-        {
-            throw new ArgumentNullException(nameof(current));
-        }
+        ArgumentNullException.ThrowIfNull(current);
 
         return current.Parent;
     }

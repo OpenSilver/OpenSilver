@@ -60,10 +60,7 @@ public class WeakEventManager<TEventSource, TEventArgs> : WeakEventManager
     /// </exception>
     public static void AddHandler(TEventSource source, string eventName, EventHandler<TEventArgs> handler)
     {
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(handler);
 
         CurrentManager(eventName).ProtectedAddHandler(source, handler);
     }
@@ -85,10 +82,7 @@ public class WeakEventManager<TEventSource, TEventArgs> : WeakEventManager
     /// </exception>
     public static void RemoveHandler(TEventSource source, string eventName, EventHandler<TEventArgs> handler)
     {
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(handler);
 
         CurrentManager(eventName).ProtectedRemoveHandler(source, handler);
     }

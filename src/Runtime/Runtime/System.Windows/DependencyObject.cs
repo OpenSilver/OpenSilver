@@ -291,10 +291,7 @@ namespace System.Windows
         /// </exception>
         public object GetValue(DependencyProperty dependencyProperty)
         {
-            if (dependencyProperty == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyProperty));
-            }
+            ArgumentNullException.ThrowIfNull(dependencyProperty);
 
             PropertyMetadata metadata = null;
 
@@ -342,10 +339,7 @@ namespace System.Windows
         /// </exception>
         public void SetCurrentValue(DependencyProperty dp, object value)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
@@ -361,10 +355,7 @@ namespace System.Windows
 
         internal void SetCurrentValueInternal(DependencyProperty dp, object value)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
@@ -427,10 +418,7 @@ namespace System.Windows
         /// </returns>
         public object ReadLocalValue(DependencyProperty dp)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             if (GetStorage(dp.GlobalIndex) is Storage storage)
             {
@@ -539,10 +527,7 @@ namespace System.Windows
         /// </exception>
         public void SetValue(DependencyProperty dp, object value)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
@@ -566,10 +551,7 @@ namespace System.Windows
 
         internal void SetValueInternal(DependencyProperty dp, object value)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
@@ -608,10 +590,7 @@ namespace System.Windows
         /// </exception>
         public void SetValue(DependencyPropertyKey key, object value)
         {
-            if (key is null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            ArgumentNullException.ThrowIfNull(key);
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
 
@@ -635,10 +614,7 @@ namespace System.Windows
 
         internal void SetValueInternal(DependencyPropertyKey key, object value)
         {
-            if (key is null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            ArgumentNullException.ThrowIfNull(key);
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
 
@@ -789,10 +765,7 @@ namespace System.Windows
         /// </exception>
         public void CoerceValue(DependencyProperty dp)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
 
@@ -910,10 +883,7 @@ namespace System.Windows
         /// </exception>
         public void ClearValue(DependencyProperty dp)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             if (IsSealed)
             {
@@ -939,10 +909,7 @@ namespace System.Windows
         /// </exception>
         public void ClearValue(DependencyPropertyKey key)
         {
-            if (key is null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            ArgumentNullException.ThrowIfNull(key);
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
 
@@ -980,10 +947,7 @@ namespace System.Windows
         /// </exception>
         public object GetAnimationBaseValue(DependencyProperty dp)
         {
-            if (dp is null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            ArgumentNullException.ThrowIfNull(dp);
 
             if (GetStorage(dp.GlobalIndex) is Storage storage)
             {

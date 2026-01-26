@@ -76,10 +76,7 @@ namespace System.Windows
             get => GetItemOverride(index);
             set
             {
-                if (value is null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullException.ThrowIfNull(value);
 
                 SetItemOverride(index, value);
             }
@@ -138,10 +135,7 @@ namespace System.Windows
         /// <param name="value">The object to add.</param>
         public void Add(T value)
         {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             AddOverride(value);
         }
@@ -217,10 +211,7 @@ namespace System.Windows
         /// <param name="value">The object to insert into the <see cref="PresentationFrameworkCollection{T}"/>.</param>
         public void Insert(int index, T value)
         {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             InsertOverride(index, value);
         }

@@ -44,20 +44,18 @@ namespace System.Xaml
 		public XamlDirective(string xamlNamespace, string name)
 			: this(new string[] { xamlNamespace }, name, new XamlType(typeof(object), new XamlSchemaContext(new XamlSchemaContextSettings())), null, AllowedMemberLocations.Any)
 		{
-			if (xamlNamespace == null)
-				throw new ArgumentNullException("xamlNamespace");
-			is_unknown = true;
+			ArgumentNullException.ThrowIfNull(xamlNamespace);
+
+            is_unknown = true;
 		}
 
 		public XamlDirective(IEnumerable<string> xamlNamespaces, string name, XamlType xamlType, XamlValueConverter<TypeConverter> typeConverter, AllowedMemberLocations allowedLocation)
 			: base(true, xamlNamespaces != null ? xamlNamespaces.FirstOrDefault() : null, name)
 		{
-			if (xamlNamespaces == null)
-				throw new ArgumentNullException("xamlNamespaces");
-			if (ReferenceEquals(xamlType, null))
-				throw new ArgumentNullException("xamlType");
+			ArgumentNullException.ThrowIfNull(xamlNamespaces);
+			ArgumentNullException.ThrowIfNull(xamlType);
 
-			type = xamlType;
+            type = xamlType;
 			xaml_namespaces = new List<string>(xamlNamespaces);
 			AllowedLocation = allowedLocation;
 			type_converter = typeConverter;

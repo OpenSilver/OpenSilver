@@ -94,7 +94,9 @@ namespace System.Windows.Automation.Peers
                 throw new ElementNotEnabledException();
             }
 
-            ((PasswordBox)Owner).Password = value ?? throw new ArgumentNullException(nameof(value));
+            ArgumentNullException.ThrowIfNull(value);
+
+            ((PasswordBox)Owner).Password = value;
         }
     }
 }

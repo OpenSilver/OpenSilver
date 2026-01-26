@@ -63,10 +63,7 @@ public class DispatcherSynchronizationContext : SynchronizationContext
     /// </exception>
     public DispatcherSynchronizationContext(Dispatcher dispatcher, DispatcherPriority priority)
     {
-        if (dispatcher is null)
-        {
-            throw new ArgumentNullException(nameof(dispatcher));
-        }
+        ArgumentNullException.ThrowIfNull(dispatcher);
 
         Dispatcher.ValidatePriority(priority);
 

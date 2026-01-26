@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.ComponentModel;
 using System.Globalization;
-using OpenSilver.Internal;
+using System.Xml.Linq;
 
 namespace System.Windows.Input;
 
@@ -123,10 +124,7 @@ public class KeyGesture : InputGesture
             throw new InvalidEnumArgumentException(nameof(key), (int)key, typeof(Key));
         }
 
-        if (displayString is null)
-        {
-            throw new ArgumentNullException(nameof(displayString));
-        }
+        ArgumentNullException.ThrowIfNull(displayString);
 
         if (validateGesture && !IsValid(key, modifiers))
         {

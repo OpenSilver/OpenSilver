@@ -131,10 +131,7 @@ public partial class FrameworkElement
     /// </exception>
     public object FindResource(object resourceKey)
     {
-        if (resourceKey is null)
-        {
-            throw new ArgumentNullException(nameof(resourceKey));
-        }
+        ArgumentNullException.ThrowIfNull(resourceKey);
 
         object resource = FindResourceInternal(this, null, resourceKey, null, false);
 
@@ -161,10 +158,7 @@ public partial class FrameworkElement
     /// </exception>
     public object TryFindResource(object resourceKey)
     {
-        if (resourceKey is null)
-        {
-            throw new ArgumentNullException(nameof(resourceKey));
-        }
+        ArgumentNullException.ThrowIfNull(resourceKey);
 
         object resource = FindResourceInternal(this, null, resourceKey, null, false);
 

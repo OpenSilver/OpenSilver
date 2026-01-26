@@ -58,10 +58,7 @@ internal sealed class BindingCollection : Collection<BindingBase>
     /// </summary>
     protected override void InsertItem(int index, BindingBase item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         ValidateItem(item);
         _owner.CheckSealed();
@@ -76,10 +73,7 @@ internal sealed class BindingCollection : Collection<BindingBase>
     /// </summary>
     protected override void SetItem(int index, BindingBase item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         ValidateItem(item);
         _owner.CheckSealed();

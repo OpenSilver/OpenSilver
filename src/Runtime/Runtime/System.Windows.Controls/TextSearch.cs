@@ -30,7 +30,9 @@ namespace System.Windows.Controls
         /// <param name="itemsControl"></param>
         private TextSearch(ItemsControl itemsControl)
         {
-            _attachedTo = itemsControl ?? throw new ArgumentNullException(nameof(itemsControl));
+            ArgumentNullException.ThrowIfNull(itemsControl);
+
+            _attachedTo = itemsControl;
 
             ResetState();
         }
@@ -76,10 +78,7 @@ namespace System.Windows.Controls
         [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static string GetTextPath(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (string)element.GetValue(TextPathProperty);
         }
@@ -95,10 +94,7 @@ namespace System.Windows.Controls
         /// </param>
         public static void SetTextPath(DependencyObject element, string path)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(TextPathProperty, path);
         }
@@ -128,10 +124,7 @@ namespace System.Windows.Controls
         [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static string GetText(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (string)element.GetValue(TextProperty);
         }
@@ -150,10 +143,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetText(DependencyObject element, string text)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(TextProperty, text);
         }

@@ -32,9 +32,9 @@ namespace System.Xaml
 	{
 		public XamlObjectEventArgs(object instance)
 		{
-			if (instance == null)
-				throw new ArgumentNullException("instance");
-			Instance = instance;
+			ArgumentNullException.ThrowIfNull(instance);
+
+            Instance = instance;
 		}
 
 		public object Instance { get; private set; }

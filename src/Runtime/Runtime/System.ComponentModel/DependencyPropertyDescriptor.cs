@@ -61,10 +61,7 @@ public sealed class DependencyPropertyDescriptor : PropertyDescriptor
     /// </exception>
     public static DependencyPropertyDescriptor FromProperty(PropertyDescriptor property)
     {
-        if (property is null)
-        {
-            throw new ArgumentNullException(nameof(property));
-        }
+        ArgumentNullException.ThrowIfNull(property);
 
         DependencyPropertyDescriptor dpd;
         bool found;
@@ -124,14 +121,8 @@ public sealed class DependencyPropertyDescriptor : PropertyDescriptor
     /// </summary>
     internal static DependencyPropertyDescriptor FromProperty(DependencyProperty dependencyProperty, Type ownerType, Type targetType, bool ignorePropertyType)
     {
-        if (dependencyProperty is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyProperty));
-        }
-        if (targetType is null)
-        {
-            throw new ArgumentNullException(nameof(targetType));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyProperty);
+        ArgumentNullException.ThrowIfNull(targetType);
 
         // We have a different codepath here for attached and direct
         // properties.  For direct properties, we route through Type
@@ -206,14 +197,8 @@ public sealed class DependencyPropertyDescriptor : PropertyDescriptor
     /// </exception>
     public static DependencyPropertyDescriptor FromProperty(DependencyProperty dependencyProperty, Type targetType)
     {
-        if (dependencyProperty is null)
-        {
-            throw new ArgumentNullException(nameof(dependencyProperty));
-        }
-        if (targetType is null)
-        {
-            throw new ArgumentNullException(nameof(targetType));
-        }
+        ArgumentNullException.ThrowIfNull(dependencyProperty);
+        ArgumentNullException.ThrowIfNull(targetType);
 
         // We have a different codepath here for attached and direct
         // properties.  For direct properties, we route through Type
@@ -286,18 +271,9 @@ public sealed class DependencyPropertyDescriptor : PropertyDescriptor
     /// </exception>
     public static DependencyPropertyDescriptor FromName(string name, Type ownerType, Type targetType)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-        if (ownerType is null)
-        {
-            throw new ArgumentNullException(nameof(ownerType));
-        }
-        if (targetType is null)
-        {
-            throw new ArgumentNullException(nameof(targetType));
-        }
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(ownerType);
+        ArgumentNullException.ThrowIfNull(targetType);
 
         DependencyProperty dp = DependencyProperty.FromName(name, ownerType);
         if (dp != null)
@@ -332,18 +308,9 @@ public sealed class DependencyPropertyDescriptor : PropertyDescriptor
     /// </exception>
     public static DependencyPropertyDescriptor FromName(string name, Type ownerType, Type targetType, bool ignorePropertyType)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-        if (ownerType is null)
-        {
-            throw new ArgumentNullException(nameof(ownerType));
-        }
-        if (targetType is null)
-        {
-            throw new ArgumentNullException(nameof(targetType));
-        }
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(ownerType);
+        ArgumentNullException.ThrowIfNull(targetType);
 
         DependencyProperty dp = DependencyProperty.FromName(name, ownerType);
         if (dp != null)

@@ -66,10 +66,7 @@ public abstract class Block : TextElement
     /// </exception>
     public static double GetLineHeight(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (double)element.GetValue(LineHeightProperty);
     }
@@ -91,10 +88,7 @@ public abstract class Block : TextElement
     /// </exception>
     public static void SetLineHeight(DependencyObject element, double value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(LineHeightProperty, value);
     }
@@ -140,10 +134,7 @@ public abstract class Block : TextElement
     /// </exception>
     public static LineStackingStrategy GetLineStackingStrategy(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (LineStackingStrategy)element.GetValue(LineStackingStrategyProperty);
     }
@@ -162,10 +153,7 @@ public abstract class Block : TextElement
     /// </exception>
     public static void SetLineStackingStrategy(DependencyObject element, LineStackingStrategy value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(LineStackingStrategyProperty, value);
     }
@@ -204,10 +192,7 @@ public abstract class Block : TextElement
     /// </exception>
     public static TextAlignment GetTextAlignment(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (TextAlignment)element.GetValue(TextAlignmentProperty);
     }
@@ -226,10 +211,7 @@ public abstract class Block : TextElement
     /// </exception>
     public static void SetTextAlignment(DependencyObject element, TextAlignment value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(TextAlignmentProperty, value);
     }

@@ -12,8 +12,9 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
-using System.Windows.Markup;
 using System.Globalization;
+using System.Windows.Markup;
+using System.Xml.Linq;
 
 namespace System.Windows.Data;
 
@@ -97,10 +98,7 @@ public class Binding : BindingBase
     /// </exception>
     public Binding(string path)
     {
-        if (path is null)
-        {
-            throw new ArgumentNullException(nameof(path));
-        }
+        ArgumentNullException.ThrowIfNull(path);
 
         Path = new PropertyPath(path);
     }
@@ -118,10 +116,7 @@ public class Binding : BindingBase
     [EditorBrowsable(EditorBrowsableState.Never)]
     public Binding(DependencyProperty dp)
     {
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(dp);
 
         Path = new PropertyPath(dp);
     }
@@ -258,7 +253,9 @@ public class Binding : BindingBase
         set
         {
             CheckSealed();
-            _path = value ?? throw new ArgumentNullException(nameof(value));
+
+            ArgumentNullException.ThrowIfNull(value);
+            _path = value;
         }
     }
 

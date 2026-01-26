@@ -122,9 +122,9 @@ namespace System.Xaml
 		public XamlType(Type underlyingType, XamlSchemaContext schemaContext, XamlTypeInvoker invoker)
 			: this(schemaContext, invoker)
 		{
-			if (underlyingType == null)
-				throw new ArgumentNullException("underlyingType");
-			type = underlyingType;
+			ArgumentNullException.ThrowIfNull(underlyingType);
+
+            type = underlyingType;
 			underlying_type = type;
 
 			XamlType xt;
@@ -157,12 +157,9 @@ namespace System.Xaml
 		public XamlType(string unknownTypeNamespace, string unknownTypeName, IList<XamlType> typeArguments, XamlSchemaContext schemaContext)
 			: this(schemaContext, null)
 		{
-			if (unknownTypeNamespace == null)
-				throw new ArgumentNullException("unknownTypeNamespace");
-			if (unknownTypeName == null)
-				throw new ArgumentNullException("unknownTypeName");
-			if (schemaContext == null)
-				throw new ArgumentNullException("schemaContext");
+			ArgumentNullException.ThrowIfNull(unknownTypeNamespace);
+			ArgumentNullException.ThrowIfNull(unknownTypeName);
+			ArgumentNullException.ThrowIfNull(schemaContext);
 
 			type = typeof(object);
 			Name = unknownTypeName;
@@ -178,9 +175,9 @@ namespace System.Xaml
 
 		XamlType(XamlSchemaContext schemaContext, XamlTypeInvoker invoker)
 		{
-			if (schemaContext == null)
-				throw new ArgumentNullException("schemaContext");
-			SchemaContext = schemaContext;
+			ArgumentNullException.ThrowIfNull(schemaContext);
+
+            SchemaContext = schemaContext;
 			this.invoker = invoker;
 		}
 

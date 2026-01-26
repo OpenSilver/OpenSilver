@@ -60,10 +60,7 @@ namespace System.Windows
 
         public Application(string rootDivId)
         {
-            if (string.IsNullOrEmpty(rootDivId))
-            {
-                throw new ArgumentNullException(nameof(rootDivId));
-            }
+            ArgumentException.ThrowIfNullOrEmpty(rootDivId);
 
             _rootDiv = new(rootDivId);
 
@@ -501,10 +498,7 @@ namespace System.Windows
                     throw new InvalidOperationException(Strings.MainWindowCanOnlyBeSetOnce);
                 }
 
-                if (value is null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullException.ThrowIfNull(value);
 
                 Window.Current = _mainWindow = value;
 
@@ -606,15 +600,8 @@ namespace System.Windows
         /// <param name="resourceLocator">Resource Locator</param>
         public static void LoadComponent(object component, Uri resourceLocator)
         {
-            if (component is null)
-            {
-                throw new ArgumentNullException(nameof(component));
-            }
-
-            if (resourceLocator is null)
-            {
-                throw new ArgumentNullException(nameof(resourceLocator));
-            }
+            ArgumentNullException.ThrowIfNull(component);
+            ArgumentNullException.ThrowIfNull(resourceLocator);
 
             if (resourceLocator.IsAbsoluteUri)
             {
@@ -634,15 +621,8 @@ namespace System.Windows
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static void LoadComponent(object component, IXamlComponentLoader loader)
         {
-            if (component is null)
-            {
-                throw new ArgumentNullException(nameof(component));
-            }
-
-            if (loader is null)
-            {
-                throw new ArgumentNullException(nameof(loader));
-            }
+            ArgumentNullException.ThrowIfNull(component);
+            ArgumentNullException.ThrowIfNull(loader);
 
             loader.LoadComponent(component);
         }
@@ -684,10 +664,7 @@ namespace System.Windows
         /// </exception>
         public static Task<StreamResourceInfo> GetResourceStream(Uri uriResource)
         {
-            if (uriResource is null)
-            {
-                throw new ArgumentNullException(nameof(uriResource));
-            }
+            ArgumentNullException.ThrowIfNull(uriResource);
 
             if (uriResource.IsAbsoluteUri)
             {

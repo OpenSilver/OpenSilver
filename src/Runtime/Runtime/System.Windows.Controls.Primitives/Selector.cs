@@ -1531,10 +1531,7 @@ namespace System.Windows.Controls.Primitives
         /// </exception>
         public static bool GetIsSelectionActive(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (bool)element.GetValue(IsSelectionActivePropertyKey.DependencyProperty);
         }

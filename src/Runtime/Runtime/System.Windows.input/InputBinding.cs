@@ -43,15 +43,8 @@ public class InputBinding : DependencyObject, ICommandSource
     /// </exception>
     public InputBinding(ICommand command, InputGesture gesture)
     {
-        if (command is null)
-        {
-            throw new ArgumentNullException(nameof(command));
-        }
-
-        if (gesture is null)
-        {
-            throw new ArgumentNullException(nameof(gesture));
-        }
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(gesture);
 
         Command = command;
         _gesture = gesture;
@@ -139,10 +132,7 @@ public class InputBinding : DependencyObject, ICommandSource
                 throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(InputBinding)));
             }
 
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             _gesture = value;
         }

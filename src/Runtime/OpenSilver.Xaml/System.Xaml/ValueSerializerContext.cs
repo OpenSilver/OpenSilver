@@ -63,8 +63,11 @@ namespace System.Xaml
 
         void Initialize(PrefixLookup prefixLookup, XamlSchemaContext schemaContext, Func<IAmbientProvider> ambientProvider, IProvideValueTarget provideValue, IRootObjectProvider rootProvider, IDestinationTypeProvider destinationProvider, IXamlObjectWriterFactory objectWriterFactory, ITemplateOwnerProvider templateOwnerProvider)
 		{
-			prefix_lookup = prefixLookup ?? throw new ArgumentNullException("prefixLookup");
-			sctx = schemaContext ?? throw new ArgumentNullException("schemaContext");
+			ArgumentNullException.ThrowIfNull(prefixLookup);
+			ArgumentNullException.ThrowIfNull(schemaContext);
+
+            prefix_lookup = prefixLookup;
+			sctx = schemaContext;
 			_ambientProviderProvider = ambientProvider;
 			this.provideValue = provideValue;
 			this.rootProvider = rootProvider;

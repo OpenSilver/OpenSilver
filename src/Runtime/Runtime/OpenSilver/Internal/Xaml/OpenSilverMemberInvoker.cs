@@ -24,7 +24,8 @@ internal sealed class OpenSilverMemberInvoker : XamlMemberInvoker
     public OpenSilverMemberInvoker(OpenSilverXamlMember member)
         : base(member)
     {
-        _member = member ?? throw new ArgumentNullException(nameof(member));
+        ArgumentNullException.ThrowIfNull(member);
+        _member = member;
     }
 
     public override object GetValue(object instance)

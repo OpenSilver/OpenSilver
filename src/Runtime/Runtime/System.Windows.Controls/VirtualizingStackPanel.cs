@@ -11,13 +11,14 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
+using System.Xml.Linq;
 
 namespace System.Windows.Controls;
 
@@ -63,10 +64,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </exception>
     public static VirtualizationMode GetVirtualizationMode(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (VirtualizationMode)element.GetValue(VirtualizationModeProperty);
     }
@@ -85,10 +83,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </exception>
     public static void SetVirtualizationMode(DependencyObject element, VirtualizationMode value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(VirtualizationModeProperty, value);
     }
@@ -118,10 +113,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </exception>
     public static double GetScrollAmount(DependencyObject element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         return (double)element.GetValue(ScrollAmountProperty);
     }
@@ -143,10 +135,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </exception>
     public static void SetScrollAmount(DependencyObject element, double value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(ScrollAmountProperty, value);
     }
@@ -179,20 +168,14 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </exception>
     public static bool GetIsVirtualizing(DependencyObject o)
     {
-        if (o is null)
-        {
-            throw new ArgumentNullException(nameof(o));
-        }
+        ArgumentNullException.ThrowIfNull(o);
 
         return (bool)o.GetValue(IsVirtualizingProperty);
     }
 
     internal static void SetIsVirtualizing(DependencyObject o, bool value)
     {
-        if (o is null)
-        {
-            throw new ArgumentNullException(nameof(o));
-        }
+        ArgumentNullException.ThrowIfNull(o);
 
         o.SetValueInternal(IsVirtualizingPropertyKey, value);
     }

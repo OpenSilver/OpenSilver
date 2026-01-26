@@ -76,20 +76,14 @@ namespace System.Windows.Media.Imaging
         public WriteableBitmap(BitmapSource source)
             : this()
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             _ = _impl.CreateFromBitmapSourceAsync(source);
         }
 
         public static async Task<WriteableBitmap> CreateAsync(BitmapSource source)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             var bitmap = new WriteableBitmap(source);
             await bitmap.WaitToInitialize();
@@ -114,20 +108,15 @@ namespace System.Windows.Media.Imaging
         public WriteableBitmap(UIElement element, Transform transform)
             : this()
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             _ = _impl.CreateFromUIElementAsync(element, transform);
         }
 
         public static async Task<WriteableBitmap> CreateAsync(UIElement element, Transform transform)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
+
             var bitmap = new WriteableBitmap(element, transform);
             await bitmap.WaitToInitialize();
             return bitmap;
@@ -173,20 +162,14 @@ namespace System.Windows.Media.Imaging
         /// </exception>
         public void Render(UIElement element, Transform transform)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             _ = _impl.RenderUIElementAsync(element, transform, PixelWidth, PixelHeight);
         }
 
         public Task RenderAsync(UIElement element, Transform transform)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return _impl.RenderUIElementAsync(element, transform, PixelWidth, PixelHeight);
         }

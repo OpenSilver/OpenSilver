@@ -11,10 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System.Collections;
-using System.Collections.Generic;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
+using System.Collections;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace System.Windows.Data;
 
@@ -47,18 +48,9 @@ public static class BindingOperations
     /// </exception>
     public static BindingExpressionBase SetBinding(DependencyObject target, DependencyProperty dp, BindingBase binding)
     {
-        if (target is null)
-        {
-            throw new ArgumentNullException(nameof(target));
-        }
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
-        if (binding is null)
-        {
-            throw new ArgumentNullException(nameof(binding));
-        }
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(dp);
+        ArgumentNullException.ThrowIfNull(binding);
 
         var expr = binding.CreateBindingExpression(target, dp, null);
 
@@ -111,15 +103,8 @@ public static class BindingOperations
     /// </exception>
     public static BindingExpressionBase GetBindingExpressionBase(DependencyObject target, DependencyProperty dp)
     {
-        if (target is null)
-        {
-            throw new ArgumentNullException(nameof(target));
-        }
-
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(dp);
 
         if (target.GetStorage(dp.GlobalIndex) is Storage storage && storage.Entry.IsExpression)
         {
@@ -241,10 +226,7 @@ public static class BindingOperations
     /// </exception>
     public static void ClearAllBindings(DependencyObject target)
     {
-        if (target is null)
-        {
-            throw new ArgumentNullException(nameof(target));
-        }
+        ArgumentNullException.ThrowIfNull(target);
 
         LocalValueEnumerator lve = target.GetLocalValueEnumerator();
 
@@ -280,15 +262,8 @@ public static class BindingOperations
     /// </exception>
     public static void ClearBinding(DependencyObject target, DependencyProperty dp)
     {
-        if (target is null)
-        {
-            throw new ArgumentNullException(nameof(target));
-        }
-
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(dp);
 
         if (IsDataBound(target, dp))
         {
@@ -313,15 +288,8 @@ public static class BindingOperations
     /// </exception>
     public static bool IsDataBound(DependencyObject target, DependencyProperty dp)
     {
-        if (target is null)
-        {
-            throw new ArgumentNullException(nameof(target));
-        }
-
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(dp);
 
         return target.GetStorage(dp.GlobalIndex) is Storage storage &&
                storage.Entry.IsExpression &&
@@ -344,15 +312,8 @@ public static class BindingOperations
     /// </param>
     public static void EnableCollectionSynchronization(IEnumerable collection, object context, CollectionSynchronizationCallback synchronizationCallback)
     {
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
-
-        if (synchronizationCallback is null)
-        {
-            throw new ArgumentNullException(nameof(synchronizationCallback));
-        }
+        ArgumentNullException.ThrowIfNull(collection);
+        ArgumentNullException.ThrowIfNull(synchronizationCallback);
 
         ViewManager.Current.RegisterCollectionSynchronizationCallback(
             collection, context, synchronizationCallback);
@@ -370,15 +331,8 @@ public static class BindingOperations
     /// </param>
     public static void EnableCollectionSynchronization(IEnumerable collection, object lockObject)
     {
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
-
-        if (lockObject is null)
-        {
-            throw new ArgumentNullException(nameof(lockObject));
-        }
+        ArgumentNullException.ThrowIfNull(collection);
+        ArgumentNullException.ThrowIfNull(lockObject);
 
         ViewManager.Current.RegisterCollectionSynchronizationCallback(
             collection, lockObject, null);
@@ -392,10 +346,7 @@ public static class BindingOperations
     /// </param>
     public static void DisableCollectionSynchronization(IEnumerable collection)
     {
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
+        ArgumentNullException.ThrowIfNull(collection);
 
         ViewManager.Current.RegisterCollectionSynchronizationCallback(
             collection, null, null);

@@ -125,10 +125,7 @@ internal sealed class LengthConverter : TypeConverter
                                      object value,
                                      Type destinationType)
     {
-        if (destinationType == null)
-        {
-            throw new ArgumentNullException(nameof(destinationType));
-        }
+        ArgumentNullException.ThrowIfNull(destinationType);
 
         if (value is double l && destinationType == typeof(string))
         {

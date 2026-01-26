@@ -44,7 +44,9 @@ public class TemplateBindingExtension : MarkupExtension
     /// </exception>
     public TemplateBindingExtension(DependencyProperty property)
     {
-        _property = property ?? throw new ArgumentNullException(nameof(property));
+        ArgumentNullException.ThrowIfNull(property);
+
+        _property = property;
     }
 
     /// <summary>

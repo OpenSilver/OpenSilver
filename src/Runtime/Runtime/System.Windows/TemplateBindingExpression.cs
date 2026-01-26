@@ -34,15 +34,8 @@ public sealed class TemplateBindingExpression : Expression
 
     internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP)
     {
-        if (templatedParent is null)
-        {
-            throw new ArgumentNullException(nameof(templatedParent));
-        }
-
-        if (sourceDP is null)
-        {
-            throw new ArgumentNullException(nameof(sourceDP));
-        }
+        ArgumentNullException.ThrowIfNull(templatedParent);
+        ArgumentNullException.ThrowIfNull(sourceDP);
 
         if (templatedParent is not DependencyObject source)
         {

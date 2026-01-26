@@ -125,10 +125,7 @@ namespace System.Windows.Media
         /// </returns>
         public static int GetChildrenCount(UIElement reference)
         {
-            if (reference is null)
-            {
-                throw new ArgumentNullException(nameof(reference));
-            }
+            ArgumentNullException.ThrowIfNull(reference);
 
             return reference.InternalVisualChildrenCount;
         }
@@ -151,10 +148,7 @@ namespace System.Windows.Media
 
         public static DependencyObject GetChild(UIElement reference, int childIndex)
         {
-            if (reference is null)
-            {
-                throw new ArgumentNullException(nameof(reference));
-            }
+            ArgumentNullException.ThrowIfNull(reference);
 
             return reference.InternalGetVisualChild(childIndex);
         }

@@ -42,30 +42,27 @@ namespace CSHTML5.Native.Html.Printing
         /// <param name="element">An element in in the Visual Tree.</param>
         public static void SetPrintArea(UIElement element)
         {
-            if (element != null)
+            ArgumentNullException.ThrowIfNull(element);
+
+            if (!element.IsLoadedCache)
             {
-                if (element.IsLoadedCache)
-                {
-                    // Remove the class "section-to-print" from the previous print area:
-                    if (CurrentPrintArea != null && CurrentPrintArea.IsLoadedCache)
-                        OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{OpenSilver.Interop.GetVariableStringForJS(CurrentPrintArea.OuterDiv)}.classList.remove(\"section-to-print\")");
-
-                    // Add the class "section-to-print" to the new print area: (credits: https://stackoverflow.com/questions/468881/print-div-id-printarea-div-only )
-                    OpenSilver.Interop.ExecuteJavaScriptVoid(
-                        $"{OpenSilver.Interop.GetVariableStringForJS(element.OuterDiv)}.classList.add(\"section-to-print\")");
-
-                    // Remember the new print area:
-                    CurrentPrintArea = element;
-
-                    // Remember that the print is no longer the default one:
-                    IsDefaultPrintArea = false;
-                }
-                else
-                    throw new InvalidOperationException("You can only set the print area to an element that is visible on screen or that has been loaded in the Visual Tree.");
+                throw new InvalidOperationException("You can only set the print area to an element that is visible on screen or that has been loaded in the Visual Tree.");
             }
-            else
-                throw new ArgumentNullException("element");
+
+            // Remove the class "section-to-print" from the previous print area:
+            if (CurrentPrintArea != null && CurrentPrintArea.IsLoadedCache)
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{OpenSilver.Interop.GetVariableStringForJS(CurrentPrintArea.OuterDiv)}.classList.remove(\"section-to-print\")");
+
+            // Add the class "section-to-print" to the new print area: (credits: https://stackoverflow.com/questions/468881/print-div-id-printarea-div-only )
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                $"{OpenSilver.Interop.GetVariableStringForJS(element.OuterDiv)}.classList.add(\"section-to-print\")");
+
+            // Remember the new print area:
+            CurrentPrintArea = element;
+
+            // Remember that the print is no longer the default one:
+            IsDefaultPrintArea = false;
         }
 
         /// <summary>

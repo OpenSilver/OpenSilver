@@ -42,17 +42,17 @@ namespace System.Xaml.Markup
 
 		public ArrayExtension(Array elements)
 		{
-			if (elements == null)
-				throw new ArgumentNullException("elements");
-			Type = elements.GetType().GetElementType();
+			ArgumentNullException.ThrowIfNull(elements);
+
+            Type = elements.GetType().GetElementType();
 			items = new List<object>(elements.OfType<object>());
 		}
 
 		public ArrayExtension(Type arrayType)
 		{
-			if (arrayType == null)
-				throw new ArgumentNullException("arrayType");
-			Type = arrayType;
+			ArgumentNullException.ThrowIfNull(arrayType);
+
+            Type = arrayType;
 			items = new List<object>();
 		}
 

@@ -50,10 +50,8 @@ public class Canvas : Panel
     [AttachedPropertyBrowsableForChildren]
     public static double GetLeft(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (double)element.GetValue(LeftProperty);
     }
 
@@ -68,10 +66,8 @@ public class Canvas : Panel
     /// </param>
     public static void SetLeft(UIElement element, double value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(LeftProperty, value);
     }
 
@@ -98,10 +94,8 @@ public class Canvas : Panel
     [AttachedPropertyBrowsableForChildren]
     public static double GetTop(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (double)element.GetValue(TopProperty);
     }
 
@@ -116,10 +110,8 @@ public class Canvas : Panel
     /// </param>
     public static void SetTop(UIElement element, double value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(TopProperty, value);
     }
 
@@ -146,10 +138,8 @@ public class Canvas : Panel
     [AttachedPropertyBrowsableForChildren]
     public static double GetRight(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (double)element.GetValue(RightProperty);
     }
 
@@ -164,10 +154,8 @@ public class Canvas : Panel
     /// </param>
     public static void SetRight(UIElement element, double length)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(RightProperty, length);
     }
 
@@ -194,10 +182,8 @@ public class Canvas : Panel
     [AttachedPropertyBrowsableForChildren]
     public static double GetBottom(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (double)element.GetValue(BottomProperty);
     }
 
@@ -212,10 +198,8 @@ public class Canvas : Panel
     /// </param>
     public static void SetBottom(UIElement element, double length)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(BottomProperty, length);
     }
 
@@ -253,10 +237,8 @@ public class Canvas : Panel
     /// </returns>
     public static int GetZIndex(UIElement element)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         return (int)element.GetValue(ZIndexProperty);
     }
 
@@ -271,10 +253,8 @@ public class Canvas : Panel
     /// </param>
     public static void SetZIndex(UIElement element, int value)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(ZIndexProperty, value);
     }
 

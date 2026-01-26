@@ -38,7 +38,9 @@ public class DynamicResourceExtension : MarkupExtension
     /// </param>
     public DynamicResourceExtension(object resourceKey)
     {
-        _resourceKey = resourceKey ?? throw new ArgumentNullException(nameof(resourceKey));
+        ArgumentNullException.ThrowIfNull(resourceKey);
+
+        _resourceKey = resourceKey;
     }
 
     /// <summary>

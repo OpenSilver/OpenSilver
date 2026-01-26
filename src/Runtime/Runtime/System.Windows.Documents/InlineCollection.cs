@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Collections;
+using System.Xml.Linq;
 
 namespace System.Windows.Documents;
 
@@ -27,10 +28,7 @@ public class InlineCollection : TextElementCollection<Inline>, IList
 
     public void Add(string text)
     {
-        if (text is null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        ArgumentNullException.ThrowIfNull(text);
 
         Add(new Run { Text = text });
     }

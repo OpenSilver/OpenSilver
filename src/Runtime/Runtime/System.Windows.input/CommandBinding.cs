@@ -68,7 +68,9 @@ public class CommandBinding
     /// </param>
     public CommandBinding(ICommand command, ExecutedRoutedEventHandler executed, CanExecuteRoutedEventHandler canExecute)
     {
-        _command = command ?? throw new ArgumentNullException(nameof(command));
+        ArgumentNullException.ThrowIfNull(command);
+
+        _command = command;
 
         if (executed is not null)
         {

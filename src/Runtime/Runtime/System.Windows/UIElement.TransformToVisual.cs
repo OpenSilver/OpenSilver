@@ -101,10 +101,7 @@ public partial class UIElement
     /// </exception>
     public GeneralTransform TransformToDescendant(UIElement descendant)
     {
-        if (descendant is null)
-        {
-            throw new ArgumentNullException(nameof(descendant));
-        }
+        ArgumentNullException.ThrowIfNull(descendant);
 
         return new MatrixTransform(InternalTransformToDescendant(descendant));
     }
@@ -236,10 +233,7 @@ public partial class UIElement
 
     private UIElement FindCommonVisualAncestor(UIElement otherVisual)
     {
-        if (otherVisual is null)
-        {
-            throw new ArgumentNullException(nameof(otherVisual));
-        }
+        ArgumentNullException.ThrowIfNull(otherVisual);
 
         // Since we can't rely on code running in the CLR, we need to first make sure
         // that the FindCommonAncestor flag is not set. It is enought to ensure this

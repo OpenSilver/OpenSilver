@@ -44,10 +44,7 @@ internal sealed class EventRoute
     /// </param>
     public EventRoute(RoutedEvent routedEvent)
     {
-        if (routedEvent is null)
-        {
-            throw new ArgumentNullException(nameof(routedEvent));
-        }
+        ArgumentNullException.ThrowIfNull(routedEvent);
 
         RoutedEvent = routedEvent;
 
@@ -79,15 +76,8 @@ internal sealed class EventRoute
     /// </param>
     public void Add(object target, Delegate handler, bool handledEventsToo)
     {
-        if (target is null)
-        {
-            throw new ArgumentNullException(nameof(target));
-        }
-
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(handler);
 
         _routeItemList.Add(new RouteItem(target, new RoutedEventHandlerInfo(handler, handledEventsToo)));
     }
@@ -102,10 +92,7 @@ internal sealed class EventRoute
     /// </param>
     internal void InvokeHandlers(RoutedEventArgs args)
     {
-        if (args is null)
-        {
-            throw new ArgumentNullException(nameof(args));
-        }
+        ArgumentNullException.ThrowIfNull(args);
 
         if (args.Source is null)
         {

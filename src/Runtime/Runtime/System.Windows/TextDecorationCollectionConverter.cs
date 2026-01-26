@@ -101,10 +101,7 @@ public sealed class TextDecorationCollectionConverter : TypeConverter
     /// </exception>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
-        if (destinationType is null)
-        {
-            throw new ArgumentNullException(nameof(destinationType));
-        }
+        ArgumentNullException.ThrowIfNull(destinationType);
 
         if (destinationType == typeof(string))
         {
@@ -119,10 +116,7 @@ public sealed class TextDecorationCollectionConverter : TypeConverter
 
     internal static TextDecorationCollection FromString(string source)
     {
-        if (source is null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
+        ArgumentNullException.ThrowIfNull(source);
 
         switch (source.Trim().ToLower())
         {

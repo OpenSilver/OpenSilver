@@ -598,15 +598,8 @@ namespace OpenSilver.Utility
 
         public void Iterate(List<object> list, FrugalMapIterationCallback callback)
         {
-            if (callback == null)
-            {
-                throw new ArgumentNullException(nameof(callback));
-            }
-
-            if (list == null)
-            {
-                throw new ArgumentNullException(nameof(list));
-            }
+            ArgumentNullException.ThrowIfNull(callback);
+            ArgumentNullException.ThrowIfNull(list);
 
             if (_mapStore != null)
             {

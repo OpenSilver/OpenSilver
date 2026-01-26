@@ -161,10 +161,7 @@ public abstract class WeakEventManager : DispatcherObject
     /// </param>
     protected void ProtectedAddListener(object source, IWeakEventListener listener)
     {
-        if (listener is null)
-        {
-            throw new ArgumentNullException(nameof(listener));
-        }
+        ArgumentNullException.ThrowIfNull(listener);
 
         AddListener(source, listener, null);
     }
@@ -180,10 +177,7 @@ public abstract class WeakEventManager : DispatcherObject
     /// </param>
     protected void ProtectedRemoveListener(object source, IWeakEventListener listener)
     {
-        if (listener is null)
-        {
-            throw new ArgumentNullException(nameof(listener));
-        }
+        ArgumentNullException.ThrowIfNull(listener);
 
         RemoveListener(source, listener, null);
     }
@@ -199,10 +193,7 @@ public abstract class WeakEventManager : DispatcherObject
     /// </param>
     protected void ProtectedAddHandler(object source, Delegate handler)
     {
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(handler);
 
         AddListener(source, null, handler);
     }
@@ -218,10 +209,7 @@ public abstract class WeakEventManager : DispatcherObject
     /// </param>
     protected void ProtectedRemoveHandler(object source, Delegate handler)
     {
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(handler);
 
         RemoveListener(source, null, handler);
     }

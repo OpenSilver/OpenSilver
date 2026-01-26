@@ -73,10 +73,7 @@ public sealed class EventTrigger : TriggerBase
         get { return _routedEvent; }
         set
         {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             if (IsSealed)
             {

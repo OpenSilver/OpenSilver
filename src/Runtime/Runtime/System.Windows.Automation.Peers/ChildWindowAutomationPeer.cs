@@ -59,10 +59,8 @@ namespace System.Windows.Automation.Peers
         public ChildWindowAutomationPeer(ChildWindow owner)
             : base(owner)
         {
-            if (owner == null)
-            {
-                throw new ArgumentNullException(nameof(owner));
-            }
+            ArgumentNullException.ThrowIfNull(owner);
+
             this.RefreshIsTopMostProperty();
         }
 

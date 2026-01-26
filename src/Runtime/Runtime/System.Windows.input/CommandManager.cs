@@ -66,14 +66,8 @@ public sealed class CommandManager
     /// </exception>
     public static void AddPreviewExecutedHandler(UIElement element, ExecutedRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.AddHandler(PreviewExecutedEvent, handler);
     }
@@ -92,14 +86,8 @@ public sealed class CommandManager
     /// </exception>
     public static void RemovePreviewExecutedHandler(UIElement element, ExecutedRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.RemoveHandler(PreviewExecutedEvent, handler);
     }
@@ -128,14 +116,8 @@ public sealed class CommandManager
     /// </exception>
     public static void AddExecutedHandler(UIElement element, ExecutedRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.AddHandler(ExecutedEvent, handler);
     }
@@ -154,14 +136,8 @@ public sealed class CommandManager
     /// </exception>
     public static void RemoveExecutedHandler(UIElement element, ExecutedRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.RemoveHandler(ExecutedEvent, handler);
     }
@@ -190,14 +166,8 @@ public sealed class CommandManager
     /// </exception>
     public static void AddPreviewCanExecuteHandler(UIElement element, CanExecuteRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.AddHandler(PreviewCanExecuteEvent, handler);
     }
@@ -216,14 +186,8 @@ public sealed class CommandManager
     /// </exception>
     public static void RemovePreviewCanExecuteHandler(UIElement element, CanExecuteRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.RemoveHandler(PreviewCanExecuteEvent, handler);
     }
@@ -252,14 +216,8 @@ public sealed class CommandManager
     /// </exception>
     public static void AddCanExecuteHandler(UIElement element, CanExecuteRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.AddHandler(CanExecuteEvent, handler);
     }
@@ -278,14 +236,8 @@ public sealed class CommandManager
     /// </exception>
     public static void RemoveCanExecuteHandler(UIElement element, CanExecuteRoutedEventHandler handler)
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(handler);
 
         element.RemoveHandler(CanExecuteEvent, handler);
     }
@@ -304,14 +256,8 @@ public sealed class CommandManager
     /// </exception>
     public static void RegisterClassInputBinding(Type type, InputBinding inputBinding)
     {
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-        if (inputBinding is null)
-        {
-            throw new ArgumentNullException(nameof(inputBinding));
-        }
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(inputBinding);
 
         lock (_classInputBindings)
         {
@@ -344,14 +290,8 @@ public sealed class CommandManager
     /// </exception>
     public static void RegisterClassCommandBinding(Type type, CommandBinding commandBinding)
     {
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-        if (commandBinding is null)
-        {
-            throw new ArgumentNullException(nameof(commandBinding));
-        }
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(commandBinding);
 
         lock (_classCommandBindings)
         {
@@ -695,10 +635,7 @@ public sealed class CommandManager
         /// </summary>
         public static void AddHandler(CommandManager source, EventHandler handler)
         {
-            if (handler is null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
+            ArgumentNullException.ThrowIfNull(handler);
 
             CurrentManager.ProtectedAddHandler(source, handler);
         }
@@ -708,10 +645,7 @@ public sealed class CommandManager
         /// </summary>
         public static void RemoveHandler(CommandManager source, EventHandler handler)
         {
-            if (handler is null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
+            ArgumentNullException.ThrowIfNull(handler);
 
             CurrentManager.ProtectedRemoveHandler(source, handler);
         }

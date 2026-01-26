@@ -48,14 +48,8 @@ internal sealed class ResourceReferenceExpression : Expression
 
     internal override object GetValue(DependencyObject d, DependencyProperty dp)
     {
-        if (d is null)
-        {
-            throw new ArgumentNullException(nameof(d));
-        }
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(d);
+        ArgumentNullException.ThrowIfNull(dp);
 
         if (ReadInternalState(InternalState.HasCachedResourceValue))
         {

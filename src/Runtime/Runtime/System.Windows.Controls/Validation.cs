@@ -13,6 +13,7 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Data;
+using System.Xml.Linq;
 
 namespace System.Windows.Controls
 {
@@ -43,10 +44,7 @@ namespace System.Windows.Controls
         /// </param>
         public static void AddErrorHandler(UIElement element, EventHandler<ValidationErrorEventArgs> handler)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.AddHandler(ErrorEvent, handler);
         }
@@ -62,10 +60,7 @@ namespace System.Windows.Controls
         /// </param>
         public static void RemoveErrorHandler(UIElement element, EventHandler<ValidationErrorEventArgs> handler)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.RemoveHandler(ErrorEvent, handler);
         }
@@ -95,10 +90,8 @@ namespace System.Windows.Controls
         /// </exception>
         public static ReadOnlyObservableCollection<ValidationError> GetErrors(DependencyObject element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
+
             return (ReadOnlyObservableCollection<ValidationError>)element.GetValue(ErrorsProperty);
         }
 
@@ -159,10 +152,8 @@ namespace System.Windows.Controls
         /// </exception>
         public static bool GetHasError(DependencyObject element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
+
             return (bool)element.GetValue(HasErrorProperty);
         }
 
@@ -178,10 +169,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void ClearInvalid(BindingExpression bindingExpression)
         {
-            if (bindingExpression == null)
-            {
-                throw new ArgumentNullException(nameof(bindingExpression));
-            }
+            ArgumentNullException.ThrowIfNull(bindingExpression);
 
             bindingExpression.UpdateValidationError(null);
         }
@@ -202,14 +190,8 @@ namespace System.Windows.Controls
         /// </exception>
         public static void MarkInvalid(BindingExpression bindingExpression, ValidationError validationError)
         {
-            if (bindingExpression == null)
-            {
-                throw new ArgumentNullException(nameof(bindingExpression));
-            }
-            if (validationError == null)
-            {
-                throw new ArgumentNullException(nameof(validationError));
-            }
+            ArgumentNullException.ThrowIfNull(bindingExpression);
+            ArgumentNullException.ThrowIfNull(validationError);
 
             bindingExpression.UpdateValidationError(validationError);
         }

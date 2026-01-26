@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.IO;
+using System.Xml.Linq;
 
 namespace System.Windows.Resources;
 
@@ -40,7 +41,9 @@ public class StreamResourceInfo
     /// </exception>
     public StreamResourceInfo(Stream stream, string contentType)
     {
-        Stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
+
+        Stream = stream;
         ContentType = contentType;
     }
 

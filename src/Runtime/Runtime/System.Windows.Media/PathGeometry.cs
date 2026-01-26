@@ -39,10 +39,7 @@ namespace System.Windows.Media
         /// </param>
         public PathGeometry(IEnumerable<PathFigure> figures)
         {
-            if (figures is null)
-            {
-                throw new ArgumentNullException(nameof(figures));
-            }
+            ArgumentNullException.ThrowIfNull(figures);
 
             PathFigureCollection items = Figures;
             foreach (PathFigure figure in figures)
@@ -66,10 +63,7 @@ namespace System.Windows.Media
         /// </param>
         public PathGeometry(IEnumerable<PathFigure> figures, FillRule fillRule, Transform transform)
         {
-            if (figures is null)
-            {
-                throw new ArgumentNullException(nameof(figures));
-            }
+            ArgumentNullException.ThrowIfNull(figures);
 
             FillRule = fillRule;
             Transform = transform;

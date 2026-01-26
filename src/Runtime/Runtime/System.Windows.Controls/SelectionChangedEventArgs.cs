@@ -14,6 +14,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
+using System.Xml.Linq;
 
 namespace System.Windows.Controls;
 
@@ -42,20 +43,9 @@ public class SelectionChangedEventArgs : RoutedEventArgs
     /// </exception>
     public SelectionChangedEventArgs(RoutedEvent id, IList removedItems, IList addedItems)
     {
-        if (id is null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
-
-        if (removedItems is null)
-        {
-            throw new ArgumentNullException(nameof(removedItems));
-        }
-
-        if (addedItems is null)
-        {
-            throw new ArgumentNullException(nameof(addedItems));
-        }
+        ArgumentNullException.ThrowIfNull(id);
+        ArgumentNullException.ThrowIfNull(removedItems);
+        ArgumentNullException.ThrowIfNull(addedItems);
 
         RoutedEvent = id;
 
@@ -114,7 +104,9 @@ public class SelectionChangedEventArgs : RoutedEventArgs
     /// </exception>
     public SelectionChangedEventArgs(RoutedEvent id, object removedItem, object addedItem)
     {
-        RoutedEvent = id ?? throw new ArgumentNullException(nameof(id));
+        ArgumentNullException.ThrowIfNull(id);
+
+        RoutedEvent = id;
         _removedItems = removedItem is null ? [] : [removedItem];
         _addedItems = addedItem is null ? [] : [addedItem];
     }

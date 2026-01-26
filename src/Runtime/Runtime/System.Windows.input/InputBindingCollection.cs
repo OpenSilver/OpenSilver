@@ -125,10 +125,7 @@ public sealed class InputBindingCollection : IList<InputBinding>, IList
     /// </param>
     public void AddRange(ICollection collection)
     {
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
+        ArgumentNullException.ThrowIfNull(collection);
 
         if (collection.Count > 0)
         {

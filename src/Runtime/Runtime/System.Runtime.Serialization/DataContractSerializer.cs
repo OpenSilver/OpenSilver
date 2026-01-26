@@ -52,10 +52,7 @@ namespace System.Runtime.Serialization
         /// <param name="useXmlSerializerFormat"></param>
         public DataContractSerializer_CSHTML5Ver(Type type, bool useXmlSerializerFormat = false)
         {
-            if (type is null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
+            ArgumentNullException.ThrowIfNull(type);
 
             _useXmlSerializerFormat = useXmlSerializerFormat;
 
@@ -82,10 +79,7 @@ namespace System.Runtime.Serialization
         /// <param name="useXmlSerializerFormat"></param>
         public DataContractSerializer_CSHTML5Ver(Type type, IEnumerable<Type> knownTypes, bool useXmlSerializerFormat = false)
         {
-            if (type is null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
+            ArgumentNullException.ThrowIfNull(type);
 
             _knownTypes = [.. KnownTypesHelper.KnownTypes];
 

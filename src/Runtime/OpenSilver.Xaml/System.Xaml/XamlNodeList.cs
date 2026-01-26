@@ -36,18 +36,18 @@ namespace System.Xaml
 
 		public XamlNodeList(XamlSchemaContext schemaContext)
 		{
-			if (schemaContext == null)
-				throw new ArgumentNullException("schemaContext");
-			Writer = new XamlNodeListWriter(this);
+			ArgumentNullException.ThrowIfNull(schemaContext);
+
+            Writer = new XamlNodeListWriter(this);
 			SchemaContext = schemaContext;
 			nodes = new List<XamlNodeInfo>();
 		}
 
 		public XamlNodeList(XamlSchemaContext schemaContext, int size)
 		{
-			if (schemaContext == null)
-				throw new ArgumentNullException("schemaContext");
-			Writer = new XamlNodeListWriter(this);
+			ArgumentNullException.ThrowIfNull(schemaContext);
+
+            Writer = new XamlNodeListWriter(this);
 			SchemaContext = schemaContext;
 			nodes = new List<XamlNodeInfo>(size);
 		}

@@ -7,6 +7,8 @@
 // affinity to the UI thread dispatcher.
 //
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,8 +20,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Data;
+using System.Xml.Linq;
 
 namespace System.Windows.Data
 {
@@ -41,8 +42,7 @@ namespace System.Windows.Data
 
         internal CollectionView(IEnumerable collection, int moveToFirst)
         {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+            ArgumentNullException.ThrowIfNull(collection);
 
             _engine = DataBindEngine.CurrentDataBindEngine;
 
@@ -122,8 +122,7 @@ namespace System.Windows.Data
             get { return _culture; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                ArgumentNullException.ThrowIfNull(value);
 
                 if (_culture != value)
                 {
@@ -847,8 +846,7 @@ namespace System.Windows.Data
         /// </param>
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (args == null)
-                throw new ArgumentNullException(nameof(args));
+            ArgumentNullException.ThrowIfNull(args);
 
             unchecked { ++_timestamp; }    // invalidate enumerators because of a change
 
@@ -955,8 +953,7 @@ namespace System.Windows.Data
         /// </param>
         protected virtual void OnCurrentChanging(CurrentChangingEventArgs args)
         {
-            if (args == null)
-                throw new ArgumentNullException(nameof(args));
+            ArgumentNullException.ThrowIfNull(args);
 
             if (_currentChangedMonitor.Busy)
             {

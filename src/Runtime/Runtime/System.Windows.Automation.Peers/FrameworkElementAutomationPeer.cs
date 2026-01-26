@@ -35,7 +35,9 @@ namespace System.Windows.Automation.Peers
         /// </exception>
         public FrameworkElementAutomationPeer(FrameworkElement owner)
         {
-            Owner = owner ?? throw new ArgumentNullException(nameof(owner));
+            ArgumentNullException.ThrowIfNull(owner);
+
+            Owner = owner;
         }
 
         /// <summary>
@@ -69,10 +71,7 @@ namespace System.Windows.Automation.Peers
         /// </exception>
         public static AutomationPeer FromElement(UIElement element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return element.GetAutomationPeer();
         }
@@ -91,10 +90,7 @@ namespace System.Windows.Automation.Peers
         /// </exception>
         public static AutomationPeer CreatePeerForElement(UIElement element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return element.CreateAutomationPeer();
         }

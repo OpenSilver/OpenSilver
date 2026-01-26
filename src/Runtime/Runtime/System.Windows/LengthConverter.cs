@@ -154,10 +154,7 @@ namespace System.Windows
         /// </returns>
         public override bool CanConvertTo(ITypeDescriptorContext typeDescriptorContext, Type destinationType)
         {
-            if (destinationType is null)
-            {
-                throw new ArgumentNullException(nameof(destinationType));
-            }
+            ArgumentNullException.ThrowIfNull(destinationType);
 
             return destinationType == typeof(string) || destinationType.IsAssignableFrom(typeof(double));
         }
@@ -180,10 +177,7 @@ namespace System.Windows
         /// <returns>The converted value.</returns>
         public override object ConvertTo(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object value, Type destinationType)
         {
-            if (destinationType is null)
-            {
-                throw new ArgumentNullException(nameof(destinationType));
-            }
+            ArgumentNullException.ThrowIfNull(destinationType);
 
             // Convert the length to a String
             if (value is double)

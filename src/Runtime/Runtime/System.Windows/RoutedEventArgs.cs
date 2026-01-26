@@ -225,15 +225,8 @@ public class RoutedEventArgs : EventArgs
     /// </param>
     protected virtual void InvokeEventHandler(Delegate genericHandler, object genericTarget)
     {
-        if (genericHandler is null)
-        {
-            throw new ArgumentNullException(nameof(genericHandler));
-        }
-
-        if (genericTarget is null)
-        {
-            throw new ArgumentNullException(nameof(genericTarget));
-        }
+        ArgumentNullException.ThrowIfNull(genericHandler);
+        ArgumentNullException.ThrowIfNull(genericTarget);
 
         if (genericHandler is RoutedEventHandler routedEventHandler)
         {
@@ -242,7 +235,7 @@ public class RoutedEventArgs : EventArgs
         else
         {
             // Restricted Action - reflection permission required
-            genericHandler.DynamicInvoke(new object[] { genericTarget, this });
+            genericHandler.DynamicInvoke([genericTarget, this]);
         }
     }
 

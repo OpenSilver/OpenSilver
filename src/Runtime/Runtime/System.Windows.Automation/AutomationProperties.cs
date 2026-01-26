@@ -47,10 +47,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static string GetAcceleratorKey(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (!(element is UIElement uie))
             {
@@ -85,15 +82,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetAcceleratorKey(DependencyObject element, string value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            if (element is not UIElement)
-            {
-                throw new ArgumentException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(AcceleratorKeyProperty, value);
         }
@@ -125,12 +114,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static string GetAccessKey(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -163,10 +149,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetAccessKey(DependencyObject element, string value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {
@@ -204,12 +187,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static string GetAutomationId(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -242,10 +222,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetAutomationId(DependencyObject element, string value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {
@@ -283,12 +260,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static string GetHelpText(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -321,10 +295,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetHelpText(DependencyObject element, string value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {
@@ -362,12 +333,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static bool GetIsRequiredForForm(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -400,10 +368,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetIsRequiredForForm(DependencyObject element, bool value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {
@@ -441,12 +406,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static string GetItemStatus(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -479,10 +441,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetItemStatus(DependencyObject element, string value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {
@@ -520,12 +479,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static string GetItemType(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -558,10 +514,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetItemType(DependencyObject element, string value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {
@@ -599,12 +552,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static UIElement GetLabeledBy(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -641,10 +591,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetLabeledBy(DependencyObject element, UIElement value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {
@@ -682,12 +629,9 @@ namespace System.Windows.Automation
         /// </exception>
         public static string GetName(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
-            if (!(element is UIElement uie))
+            if (element is not UIElement uie)
             {
                 throw new ArgumentException(nameof(element));
             }
@@ -720,10 +664,7 @@ namespace System.Windows.Automation
         /// </exception>
         public static void SetName(DependencyObject element, string value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             if (element is not UIElement)
             {

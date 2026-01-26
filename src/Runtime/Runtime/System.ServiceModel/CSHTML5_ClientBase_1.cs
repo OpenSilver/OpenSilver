@@ -264,10 +264,7 @@ namespace System.ServiceModel
         /// </exception>
         protected CSHTML5_ClientBase(Binding binding, EndpointAddress remoteAddress)
         {
-            if (remoteAddress == null)
-            {
-                throw new ArgumentNullException("remoteAddress");
-            }
+            ArgumentNullException.ThrowIfNull(remoteAddress);
 
             INTERNAL_RemoteAddressAsString = remoteAddress.Uri.OriginalString;
 

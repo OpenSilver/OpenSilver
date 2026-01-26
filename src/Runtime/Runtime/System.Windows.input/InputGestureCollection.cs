@@ -163,10 +163,7 @@ public sealed class InputGestureCollection : IList<InputGesture>, IList
             throw new NotSupportedException(Strings.ReadOnlyInputGesturesCollection);
         }
 
-        if (inputGesture is null)
-        {
-            throw new ArgumentNullException(nameof(inputGesture));
-        }
+        ArgumentNullException.ThrowIfNull(inputGesture);
 
         _innerGestureList.Add(inputGesture);
     }
@@ -220,10 +217,7 @@ public sealed class InputGestureCollection : IList<InputGesture>, IList
             throw new NotSupportedException(Strings.ReadOnlyInputGesturesCollection);
         }
 
-        if (inputGesture is null)
-        {
-            throw new ArgumentNullException(nameof(inputGesture));
-        }
+        ArgumentNullException.ThrowIfNull(inputGesture);
 
         return _innerGestureList.Remove(inputGesture);
     }
@@ -293,10 +287,7 @@ public sealed class InputGestureCollection : IList<InputGesture>, IList
             throw new NotSupportedException(Strings.ReadOnlyInputGesturesCollection);
         }
 
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
+        ArgumentNullException.ThrowIfNull(collection);
 
         if (collection.Count > 0)
         {

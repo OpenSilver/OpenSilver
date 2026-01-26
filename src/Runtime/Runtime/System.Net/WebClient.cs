@@ -168,10 +168,8 @@ namespace OpenSilver.Compatibility
                 return netStandardWebClient.DownloadString(address);
             }
             
-            if (address == null)
-            {
-                throw new ArgumentNullException("The address parameter in DownloadString cannot be null");
-            }
+            ArgumentNullException.ThrowIfNull(address);
+
             Guid guid = Guid.NewGuid();
 
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
@@ -234,10 +232,8 @@ namespace OpenSilver.Compatibility
                 return;
             }
 
-            if (address == null)
-            {
-                throw new ArgumentNullException("The address parameter in DownloadStringAsync cannot be null");
-            }
+            ArgumentNullException.ThrowIfNull(address);
+
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
             Dictionary<string, string> headers = new Dictionary<string, string>();

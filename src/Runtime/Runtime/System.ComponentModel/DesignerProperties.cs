@@ -38,8 +38,8 @@ namespace System.ComponentModel
         /// </returns>
         public static bool GetIsInDesignMode(DependencyObject element)
         {
-            if (element == null)
-                throw new ArgumentNullException("The element parameter cannot be null");
+            ArgumentNullException.ThrowIfNull(element);
+
             return (bool)element.GetValue(IsInDesignModeProperty);
         }
         /// <summary>
@@ -50,8 +50,8 @@ namespace System.ComponentModel
         /// <param name="value">The needed System.Boolean value.</param>
         public static void SetIsInDesignMode(DependencyObject element, bool value)
         {
-            if (element == null)
-                throw new ArgumentNullException("The element parameter cannot be null");
+            ArgumentNullException.ThrowIfNull(element);
+
             element.SetValueInternal(IsInDesignModeProperty, value);
         }
         /// <summary>

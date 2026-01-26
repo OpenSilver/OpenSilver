@@ -3,15 +3,16 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Input;
-using System.Windows.Data;
 using System.Windows.Automation.Peers;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Xml.Linq;
 using SR = OpenSilver.Internal.Strings;
 
 namespace System.Windows.Controls
@@ -396,10 +397,7 @@ namespace System.Windows.Controls
         /// </param>
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (e == null)
-            {
-                throw new ArgumentNullException(nameof(e));
-            }
+            ArgumentNullException.ThrowIfNull(e);
 
             base.OnItemsChanged(e);
 

@@ -23,10 +23,7 @@ internal sealed class OpenSilverXamlSchemaContext : XamlSchemaContext
 
     public override XamlType GetXamlType(Type type)
     {
-        if (type is null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(type);
 
         return _runtimeTypes.GetOrAdd(type, CreateXamlType);
     }

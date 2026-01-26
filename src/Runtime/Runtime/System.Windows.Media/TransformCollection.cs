@@ -40,10 +40,7 @@ namespace System.Windows.Media
         /// </exception>
         public TransformCollection(IEnumerable<Transform> collection)
         {
-            if (collection is null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            ArgumentNullException.ThrowIfNull(collection);
 
             foreach (Transform item in collection)
             {

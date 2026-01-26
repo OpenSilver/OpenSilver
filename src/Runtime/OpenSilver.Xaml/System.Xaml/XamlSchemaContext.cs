@@ -290,9 +290,9 @@ namespace System.Xaml
 
 		public virtual ICollection<XamlType> GetAllXamlTypes(string xamlNamespace)
 		{
-			if (xamlNamespace == null)
-				throw new ArgumentNullException("xamlNamespace");
-			if (all_xaml_types == null)
+			ArgumentNullException.ThrowIfNull(xamlNamespace);
+
+            if (all_xaml_types == null)
 			{
 				var types = new Dictionary<string, List<XamlType>>();
 				foreach (var ass in AssembliesInScope)
@@ -309,9 +309,9 @@ namespace System.Xaml
 
 		public virtual string GetPreferredPrefix(string xmlns)
 		{
-			if (xmlns == null)
-				throw new ArgumentNullException("xmlns");
-			if (xmlns == XamlLanguage.Xaml2006Namespace)
+			ArgumentNullException.ThrowIfNull(xmlns);
+
+            if (xmlns == XamlLanguage.Xaml2006Namespace)
 				return "x";
 			if (prefixes == null)
 			{
@@ -382,10 +382,9 @@ namespace System.Xaml
 
 		public XamlType GetXamlType(XamlTypeName xamlTypeName)
 		{
-			if (xamlTypeName == null)
-				throw new ArgumentNullException(nameof(xamlTypeName));
+			ArgumentNullException.ThrowIfNull(xamlTypeName);
 
-			var n = xamlTypeName;
+            var n = xamlTypeName;
 			if (n.TypeArguments.Count == 0) // non-generic
 				return GetXamlType(n.Namespace, n.Name, null);
 
@@ -450,9 +449,9 @@ namespace System.Xaml
 
 		public virtual bool TryGetCompatibleXamlNamespace(string xamlNamespace, out string compatibleNamespace)
 		{
-			if (xamlNamespace == null)
-				throw new ArgumentNullException("xamlNamespace");
-			if (compat_nss == null)
+			ArgumentNullException.ThrowIfNull(xamlNamespace);
+
+            if (compat_nss == null)
 			{
 				compat_nss = new Dictionary<string, string>();
 				foreach (var ass in AssembliesInScope)

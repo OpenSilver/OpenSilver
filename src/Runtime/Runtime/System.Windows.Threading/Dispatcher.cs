@@ -11,16 +11,17 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using DotNetForHtml5.Core;
+using OpenSilver;
+using OpenSilver.Internal;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
-using OpenSilver;
-using OpenSilver.Internal;
+using System.Xml.Linq;
 
 namespace System.Windows.Threading;
 
@@ -276,10 +277,7 @@ public sealed class Dispatcher
     /// </exception>
     public DispatcherOperation InvokeAsync(Action a, DispatcherPriority priority = DispatcherPriority.Normal)
     {
-        if (a is null)
-        {
-            throw new ArgumentNullException(nameof(a));
-        }
+        ArgumentNullException.ThrowIfNull(a);
 
         ValidatePriority(priority);
 
@@ -307,10 +305,7 @@ public sealed class Dispatcher
     /// </returns>
     public DispatcherOperation<TResult> InvokeAsync<TResult>(Func<TResult> callback, DispatcherPriority priority = DispatcherPriority.Normal)
     {
-        if (callback is null)
-        {
-            throw new ArgumentNullException(nameof(callback));
-        }
+        ArgumentNullException.ThrowIfNull(callback);
 
         ValidatePriority(priority);
 
@@ -356,10 +351,7 @@ public sealed class Dispatcher
 
     private DispatcherOperation BeginInvokeImpl(DispatcherPriority priority, Delegate method, object args, int numArgs)
     {
-        if (method is null)
-        {
-            throw new ArgumentNullException(nameof(method));
-        }
+        ArgumentNullException.ThrowIfNull(method);
 
         ValidatePriority(priority);
 

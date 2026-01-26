@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,8 +20,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;   // IItemContainerGenerator
 using System.Windows.Media;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
+using System.Xml.Linq;
 
 namespace System.Windows.Controls
 {
@@ -520,8 +521,7 @@ namespace System.Windows.Controls
         /// </summary>
         public object ItemFromContainer(DependencyObject container)
         {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
+            ArgumentNullException.ThrowIfNull(container);
 
             object item = container.ReadLocalValue(ItemForItemContainerProperty);
 
@@ -586,10 +586,7 @@ namespace System.Windows.Controls
         /// </exception>
         public int IndexFromContainer(DependencyObject container, bool returnLocalIndex)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
+            ArgumentNullException.ThrowIfNull(container);
 
             DoLinearSearch(
                 static (state, o, d) => d == state,

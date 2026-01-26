@@ -90,10 +90,7 @@ namespace System.Windows.Controls.Primitives
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static TimeSpan GetDebounce(FrameworkElement fe)
         {
-            if (fe is null)
-            {
-                throw new ArgumentNullException(nameof(fe));
-            }
+            ArgumentNullException.ThrowIfNull(fe);
 
             return (TimeSpan?)fe.GetValue(DebounceProperty) ?? DefaultDebounceInterval;
         }
@@ -101,10 +98,7 @@ namespace System.Windows.Controls.Primitives
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static void SetDebounce(FrameworkElement fe, TimeSpan debounce)
         {
-            if (fe is null)
-            {
-                throw new ArgumentNullException(nameof(fe));
-            }
+            ArgumentNullException.ThrowIfNull(fe);
 
             fe.SetValueInternal(DebounceProperty, (TimeSpan?)debounce);
         }

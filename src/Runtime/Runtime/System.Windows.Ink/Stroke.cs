@@ -13,6 +13,7 @@
 
 using System.ComponentModel;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace System.Windows.Ink
 {
@@ -44,10 +45,8 @@ namespace System.Windows.Ink
         /// </exception>
         public Stroke(StylusPointCollection stylusPoints)
         {
-            if (stylusPoints is null)
-            {
-                throw new ArgumentNullException(nameof(stylusPoints));
-            }
+            ArgumentNullException.ThrowIfNull(stylusPoints);
+
             if (stylusPoints.InternalCount == 0)
             {
                 throw new ArgumentException(nameof(stylusPoints));
@@ -116,10 +115,7 @@ namespace System.Windows.Ink
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullException.ThrowIfNull(value);
 
                 SetValueInternal(DrawingAttributesProperty, value);
             }

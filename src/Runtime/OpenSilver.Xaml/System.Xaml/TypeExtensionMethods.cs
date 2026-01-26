@@ -50,11 +50,10 @@ namespace System.Xaml
 
 		public static bool ImplementsInterface(this Type type, Type definition)
 		{
-			if (type == null)
-				throw new ArgumentNullException("type");
-			if (definition == null)
-				throw new ArgumentNullException("definition");
-			if (type == definition)
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(definition);
+
+            if (type == definition)
 				return true;
 
 			if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == definition)

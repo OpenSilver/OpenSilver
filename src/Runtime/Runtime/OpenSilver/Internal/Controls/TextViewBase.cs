@@ -87,7 +87,8 @@ internal abstract partial class TextViewBase : FrameworkElement
     {
         Debug.Assert(host is TextBox || host is PasswordBox || host is RichTextBox);
 
-        Host = host ?? throw new ArgumentNullException(nameof(host));
+        ArgumentNullException.ThrowIfNull(host);
+        Host = host;
     }
 
     internal UIElement Host { get; }

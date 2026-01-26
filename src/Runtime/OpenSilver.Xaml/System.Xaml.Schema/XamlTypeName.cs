@@ -40,12 +40,10 @@ namespace System.Xaml.Schema
 
 		public static bool TryParse(string typeName, IXamlNamespaceResolver namespaceResolver, out XamlTypeName result)
 		{
-			if (typeName == null)
-				throw new ArgumentNullException("typeName");
-			if (namespaceResolver == null)
-				throw new ArgumentNullException("namespaceResolver");
+			ArgumentNullException.ThrowIfNull(typeName);
+			ArgumentNullException.ThrowIfNull(namespaceResolver);
 
-			result = null;
+            result = null;
 			IList<XamlTypeName> args = null;
 			int nArray = 0;
 			int idx;
@@ -115,12 +113,10 @@ namespace System.Xaml.Schema
 
 		public static bool TryParseList(string typeNameList, IXamlNamespaceResolver namespaceResolver, out IList<XamlTypeName> list)
 		{
-			if (typeNameList == null)
-				throw new ArgumentNullException("typeNameList");
-			if (namespaceResolver == null)
-				throw new ArgumentNullException("namespaceResolver");
+			ArgumentNullException.ThrowIfNull(typeNameList);
+			ArgumentNullException.ThrowIfNull(namespaceResolver);
 
-			list = null;
+            list = null;
 			int idx = 0;
 			int parens = 0;
 			XamlTypeName tn;
@@ -171,12 +167,10 @@ namespace System.Xaml.Schema
 
 		public static string ToString(IList<XamlTypeName> typeNameList, INamespacePrefixLookup prefixLookup)
 		{
-			if (typeNameList == null)
-				throw new ArgumentNullException("typeNameList");
-			if (prefixLookup == null)
-				throw new ArgumentNullException("prefixLookup");
+			ArgumentNullException.ThrowIfNull(typeNameList);
+			ArgumentNullException.ThrowIfNull(prefixLookup);
 
-			return DoToString(typeNameList, prefixLookup);
+            return DoToString(typeNameList, prefixLookup);
 		}
 
 		static string DoToString(IList<XamlTypeName> typeNameList, INamespacePrefixLookup prefixLookup)
@@ -206,9 +200,9 @@ namespace System.Xaml.Schema
 		public XamlTypeName(XamlType xamlType)
 			: this()
 		{
-			if (xamlType == null)
-				throw new ArgumentNullException("xamlType");
-			Namespace = xamlType.PreferredXamlNamespace;
+			ArgumentNullException.ThrowIfNull(xamlType);
+
+            Namespace = xamlType.PreferredXamlNamespace;
 			Name = xamlType.Name;
 			if (xamlType.TypeArguments != null && xamlType.TypeArguments.Count > 0)
 			{

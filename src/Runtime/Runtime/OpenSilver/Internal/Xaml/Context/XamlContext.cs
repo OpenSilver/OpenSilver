@@ -33,10 +33,7 @@ namespace OpenSilver.Internal.Xaml.Context
 
         internal XamlContext(XamlContext ctx)
         {
-            if (ctx == null)
-            {
-                throw new ArgumentNullException(nameof(ctx));
-            }
+            ArgumentNullException.ThrowIfNull(ctx);
 
             _stack = ctx._stack.DeepCopy();
             SavedDepth = _stack.Depth;

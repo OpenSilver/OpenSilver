@@ -20,15 +20,8 @@ internal sealed class TemplateContentLoader : XamlDeferringLoader
 {
     public override object Load(XamlReader xamlReader, IServiceProvider serviceProvider)
     {
-        if (xamlReader is null)
-        {
-            throw new ArgumentNullException(nameof(xamlReader));
-        }
-
-        if (serviceProvider is null)
-        {
-            throw new ArgumentNullException(nameof(serviceProvider));
-        }
+        ArgumentNullException.ThrowIfNull(xamlReader);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         IXamlObjectWriterFactory factory = RequireService<IXamlObjectWriterFactory>(serviceProvider);
 

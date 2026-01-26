@@ -42,10 +42,7 @@ namespace System.Windows
         [Obsolete("Use SetTextAsync(string) instead.")]
         public static void SetText(string text)
         {
-            if (text is null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
+            ArgumentNullException.ThrowIfNull(text);
 
             _impl.SetText(text);
         }
@@ -61,10 +58,7 @@ namespace System.Windows
         /// </exception>
         public static Task SetTextAsync(string text)
         {
-            if (text is null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
+            ArgumentNullException.ThrowIfNull(text);
 
             return _impl.SetTextAsync(text);
         }

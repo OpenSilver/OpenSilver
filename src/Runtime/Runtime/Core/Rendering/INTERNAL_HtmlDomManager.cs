@@ -568,11 +568,9 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         public static string ConvertToStringToUseInJavaScriptCode(object obj)
         {
-            if (obj == null)
-            {
-                throw new ArgumentNullException(nameof(obj));
-            }
-            else if (obj is string str)
+            ArgumentNullException.ThrowIfNull(obj);
+
+            if (obj is string str)
             {
                 return @"""" + EscapeStringForUseInJavaScript(str) + @"""";
             }

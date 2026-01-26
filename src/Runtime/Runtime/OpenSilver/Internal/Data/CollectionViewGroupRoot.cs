@@ -38,10 +38,7 @@ namespace OpenSilver.Internal.Data
         /// </param>
         public void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (args is null)
-            {
-                throw new ArgumentNullException(nameof(args));
-            }
+            ArgumentNullException.ThrowIfNull(args);
 
             CollectionChanged?.Invoke(this, args);
         }

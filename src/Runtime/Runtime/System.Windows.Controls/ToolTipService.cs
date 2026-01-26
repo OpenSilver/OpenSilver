@@ -79,10 +79,7 @@ namespace System.Windows.Controls
         [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static PlacementMode GetPlacement(DependencyObject element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (PlacementMode)element.GetValue(PlacementProperty);
         }
@@ -99,10 +96,7 @@ namespace System.Windows.Controls
         /// </param>
         public static void SetPlacement(DependencyObject element, PlacementMode value)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(PlacementProperty, value);
         }
@@ -129,10 +123,7 @@ namespace System.Windows.Controls
         [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static UIElement GetPlacementTarget(DependencyObject element)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (UIElement)element.GetValue(PlacementTargetProperty);
         }
@@ -149,10 +140,7 @@ namespace System.Windows.Controls
         /// </param>
         public static void SetPlacementTarget(DependencyObject element, UIElement value)
         {
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(PlacementTargetProperty, value);
         }
@@ -175,10 +163,7 @@ namespace System.Windows.Controls
         [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static object GetToolTip(DependencyObject element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return element.GetValue(ToolTipProperty);
         }
@@ -190,10 +175,7 @@ namespace System.Windows.Controls
         /// <param name="value">The value to set for tooltip content.</param>
         public static void SetToolTip(DependencyObject element, object value)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(ToolTipProperty, value);
         }

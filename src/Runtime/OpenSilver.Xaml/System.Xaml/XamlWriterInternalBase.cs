@@ -230,10 +230,9 @@ namespace System.Xaml
 
 		public void WriteNamespace(NamespaceDeclaration namespaceDeclaration)
 		{
-			if (namespaceDeclaration == null)
-				throw new ArgumentNullException("namespaceDeclaration");
+			ArgumentNullException.ThrowIfNull(namespaceDeclaration);
 
-			manager.Namespace();
+            manager.Namespace();
 
 			Namespaces.Add(namespaceDeclaration);
 			OnWriteNamespace(namespaceDeclaration);
@@ -241,10 +240,9 @@ namespace System.Xaml
 
 		public void WriteStartObject(XamlType xamlType)
 		{
-			if (ReferenceEquals(xamlType, null))
-				throw new ArgumentNullException("xamlType");
+			ArgumentNullException.ThrowIfNull(xamlType);
 
-			manager.StartObject(xamlType);
+            manager.StartObject(xamlType);
 			var cstate = new ObjectState() { Type = xamlType };
 			object_states.Push(cstate);
 
@@ -260,10 +258,9 @@ namespace System.Xaml
 
 		public void WriteStartMember(XamlMember property)
 		{
-			if (ReferenceEquals(property, null))
-				throw new ArgumentNullException("property");
+			ArgumentNullException.ThrowIfNull(property);
 
-			manager.StartMember();
+            manager.StartMember();
 			if (ReferenceEquals(property, XamlLanguage.PositionalParameters))
 				// this is an exception that indicates the state manager to accept more than values within this member.
 				manager.AcceptMultipleValues = true;
@@ -414,8 +411,7 @@ namespace System.Xaml
 			public IEnumerable<AmbientPropertyValue> GetAllAmbientValues(IEnumerable<XamlType> ceilingTypes, bool searchLiveStackOnly, IEnumerable<XamlType> types, params XamlMember[] properties)
 			{
 				// check arguments
-				if (properties == null)
-					throw new ArgumentNullException("properties");
+				ArgumentNullException.ThrowIfNull(properties);
 
 				var nonAmbientProperty = properties.FirstOrDefault(r => !r.IsAmbient);
 				if (nonAmbientProperty != null)

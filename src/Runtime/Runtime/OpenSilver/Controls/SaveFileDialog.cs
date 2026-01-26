@@ -415,10 +415,7 @@ public sealed class SaveFileDialog
 
         private async Task Write(byte[] bytes, int offset, int length)
         {
-            if (bytes is null)
-            {
-                throw new ArgumentNullException(nameof(bytes));
-            }
+            ArgumentNullException.ThrowIfNull(bytes);
 
             if (offset < 0)
             {

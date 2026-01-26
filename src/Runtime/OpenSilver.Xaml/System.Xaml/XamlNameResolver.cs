@@ -100,9 +100,9 @@ namespace System.Xaml
 
 		internal void SetNamedObject(object value, bool fullyInitialized)
 		{
-			if (value == null)
-				throw new ArgumentNullException("value");
-			unnamed.Add(new NamedObject(null, value, fullyInitialized));
+			ArgumentNullException.ThrowIfNull(value);
+
+            unnamed.Add(new NamedObject(null, value, fullyInitialized));
 		}
 
 		public string GetName(object value)

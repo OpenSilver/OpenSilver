@@ -41,14 +41,8 @@ public class EventSetter : SetterBase
     /// </param>
     public EventSetter(RoutedEvent routedEvent, Delegate handler)
     {
-        if (routedEvent is null)
-        {
-            throw new ArgumentNullException(nameof(routedEvent));
-        }
-        if (handler is null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
+        ArgumentNullException.ThrowIfNull(routedEvent);
+        ArgumentNullException.ThrowIfNull(handler);
 
         _event = routedEvent;
         _handler = handler;
@@ -68,10 +62,7 @@ public class EventSetter : SetterBase
         get { return _event; }
         set
         {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             CheckSealed();
             _event = value;
@@ -89,10 +80,7 @@ public class EventSetter : SetterBase
         get { return _handler; }
         set
         {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             CheckSealed();
             _handler = value;

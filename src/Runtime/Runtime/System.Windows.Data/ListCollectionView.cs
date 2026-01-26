@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,8 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Controls;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Data;
+using System.Xml.Linq;
 
 namespace System.Windows.Data
 {
@@ -1423,10 +1424,7 @@ namespace System.Windows.Data
         /// </exception>
         protected override void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (args is null)
-            {
-                throw new ArgumentNullException(nameof(args));
-            }
+            ArgumentNullException.ThrowIfNull(args);
 
             ValidateCollectionChangedEventArgs(args);
 

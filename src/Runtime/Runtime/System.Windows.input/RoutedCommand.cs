@@ -77,20 +77,8 @@ public class RoutedCommand : ICommand
     /// </exception>
     public RoutedCommand(string name, Type ownerType, InputGestureCollection inputGestures)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
-        if (ownerType is null)
-        {
-            throw new ArgumentNullException(nameof(ownerType));
-        }
-
-        if (name.Length == 0)
-        {
-            throw new ArgumentException(Strings.StringEmpty, nameof(name));
-        }
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentNullException.ThrowIfNull(ownerType);
 
         _name = name;
         _ownerType = ownerType;

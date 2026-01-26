@@ -170,10 +170,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
     private void CheckValidProperty(DependencyProperty property)
     {
-        if (property is null)
-        {
-            throw new ArgumentNullException(nameof(property));
-        }
+        ArgumentNullException.ThrowIfNull(property);
 
         if (property == FrameworkElement.NameProperty)
         {
@@ -192,15 +189,8 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
     internal static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
     {
-        if (targetObject is null)
-        {
-            throw new ArgumentNullException(nameof(targetObject));
-        }
-
-        if (eventArgs is null)
-        {
-            throw new ArgumentNullException(nameof(eventArgs));
-        }
+        ArgumentNullException.ThrowIfNull(targetObject);
+        ArgumentNullException.ThrowIfNull(eventArgs);
 
         if (targetObject is not Setter setter || eventArgs.Member.Name != "Value")
         {

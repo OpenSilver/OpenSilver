@@ -31,7 +31,9 @@ public sealed class AttachedPropertyBrowsableForTypeAttribute : AttachedProperty
     /// </exception>
     public AttachedPropertyBrowsableForTypeAttribute(Type targetType)
     {
-        TargetType = targetType ?? throw new ArgumentNullException(nameof(targetType));
+        ArgumentNullException.ThrowIfNull(targetType);
+
+        TargetType = targetType;
     }
 
     /// <summary>
@@ -79,14 +81,8 @@ public sealed class AttachedPropertyBrowsableForTypeAttribute : AttachedProperty
     /// </summary>
     internal override bool IsBrowsable(DependencyObject d, DependencyProperty dp)
     {
-        if (d is null)
-        {
-            throw new ArgumentNullException(nameof(d));
-        }
-        if (dp is null)
-        {
-            throw new ArgumentNullException(nameof(dp));
-        }
+        ArgumentNullException.ThrowIfNull(d);
+        ArgumentNullException.ThrowIfNull(dp);
 
         // Get the dependency object type for our target type.
         // We cannot assume the user didn't do something wrong and

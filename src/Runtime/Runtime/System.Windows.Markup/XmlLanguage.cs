@@ -63,10 +63,7 @@ public sealed class XmlLanguage
     /// </exception>
     public static XmlLanguage GetLanguage(string ietfLanguageTag)
     {
-        if (ietfLanguageTag is null)
-        {
-            throw new ArgumentNullException(nameof(ietfLanguageTag));
-        }
+        ArgumentNullException.ThrowIfNull(ietfLanguageTag);
 
         string lowercase = AsciiToLower(ietfLanguageTag); // throws on non-ascii
         return _cache.GetOrAdd(lowercase, CreateLanguage);
@@ -328,10 +325,7 @@ public sealed class XmlLanguage
     /// <exception cref="ArgumentException">tag is non-empty, but does not conform to RFC 3066.</exception>
     private static void ValidateLowerCaseTag(string ietfLanguageTag)
     {
-        if (ietfLanguageTag is null)
-        {
-            throw new ArgumentNullException(nameof(ietfLanguageTag));
-        }
+        ArgumentNullException.ThrowIfNull(ietfLanguageTag);
 
         if (ietfLanguageTag.Length > 0)
         {

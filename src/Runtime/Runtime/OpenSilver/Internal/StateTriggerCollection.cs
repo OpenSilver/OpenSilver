@@ -31,10 +31,7 @@ internal sealed class StateTriggerCollection : Collection<StateTriggerBase>
     /// <inheritdoc />
     protected override void InsertItem(int index, StateTriggerBase item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         base.InsertItem(index, item);
 
@@ -70,10 +67,7 @@ internal sealed class StateTriggerCollection : Collection<StateTriggerBase>
     /// <inheritdoc />
     protected override void SetItem(int index, StateTriggerBase item)
     {
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        ArgumentNullException.ThrowIfNull(item);
 
         StateTriggerBase oldStateTrigger = this[index];
 

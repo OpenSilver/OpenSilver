@@ -39,10 +39,7 @@ namespace System.Windows.Input
         /// </param>
         public void Add(StylusPointCollection stylusPoints)
         {
-            if (stylusPoints is null)
-            {
-                throw new ArgumentNullException(nameof(stylusPoints));
-            }
+            ArgumentNullException.ThrowIfNull(stylusPoints);
 
             foreach (StylusPoint point in stylusPoints.InternalItems)
             {

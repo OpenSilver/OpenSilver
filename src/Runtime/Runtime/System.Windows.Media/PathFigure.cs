@@ -49,10 +49,7 @@ namespace System.Windows.Media
         /// </exception>
         public PathFigure(Point start, IEnumerable<PathSegment> segments, bool closed)
         {
-            if (segments is null)
-            {
-                throw new ArgumentNullException(nameof(segments));
-            }
+            ArgumentNullException.ThrowIfNull(segments);
 
             StartPoint = start;
             IsClosed = closed;
