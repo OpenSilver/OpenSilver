@@ -97,7 +97,7 @@ public sealed class CommandConverter : TypeConverter
     {
         if (source is string stringSource)
         {
-            if (stringSource == string.Empty)
+            if (stringSource.Length == 0)
             {
                 return null; // String.Empty <==> null , (for roundtrip cases where Command property values are null)
             }

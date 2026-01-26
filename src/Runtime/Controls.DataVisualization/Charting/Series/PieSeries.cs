@@ -441,9 +441,9 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         protected override void OnDataPointIndependentValueChanged(DataPoint dataPoint, object oldValue, object newValue)
         {
-            if (_dataPointLegendItems.ContainsKey(dataPoint))
+            if (_dataPointLegendItems.TryGetValue(dataPoint, out LegendItem legendItem))
             {
-                _dataPointLegendItems[dataPoint].Content = newValue;
+                legendItem.Content = newValue;
             }
             base.OnDataPointIndependentValueChanged(dataPoint, oldValue, newValue);
         }

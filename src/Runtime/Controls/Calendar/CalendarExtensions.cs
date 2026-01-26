@@ -28,9 +28,9 @@ namespace System.Windows.Controls
         /// <returns>Inherited code: Requires comment 3.</returns>
         public static bool IsHandlerSuspended(DependencyObject obj, DependencyProperty dependencyProperty)
         {
-            if (_suspendedHandlers.ContainsKey(obj))
+            if (_suspendedHandlers.TryGetValue(obj, out Dictionary<DependencyProperty, bool> suspensions))
             {
-                return _suspendedHandlers[obj].ContainsKey(dependencyProperty);
+                return suspensions.ContainsKey(dependencyProperty);
             }
             else
             {
@@ -65,10 +65,8 @@ namespace System.Windows.Controls
         /// <param name="suspend">Inherited code: Requires comment 3.</param>
         private static void SuspendHandler(DependencyObject obj, DependencyProperty dependencyProperty, bool suspend)
         {
-            if (_suspendedHandlers.ContainsKey(obj))
+            if (_suspendedHandlers.TryGetValue(obj, out Dictionary<DependencyProperty, bool> suspensions))
             {
-                Dictionary<DependencyProperty, bool> suspensions = _suspendedHandlers[obj];
-
                 if (suspend)
                 {
                     Debug.Assert(!suspensions.ContainsKey(dependencyProperty), "Suspensions should not contain the property!");

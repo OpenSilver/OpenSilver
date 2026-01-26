@@ -326,7 +326,7 @@ namespace System.Windows.Navigation
 
             if (queryStringValues.Count > 0)
             {
-                sb = sb.Append(QueryStringDelimiter);
+                sb = sb.Append(QueryStringDelimiter[0]);
 
                 foreach (string key in queryStringValues.Keys)
                 {

@@ -867,9 +867,8 @@ namespace System.Windows.Controls
             FrameworkElement inputControl = e.OriginalSource as FrameworkElement;
             if (e != null && e.Error != null && e.Error.ErrorContent != null && inputControl != null)
             {
-                if (this._validationSummaryItemDictionary.ContainsKey(e.Error))
+                if (this._validationSummaryItemDictionary.TryGetValue(e.Error, out ValidationSummaryItem existingError))
                 {
-                    ValidationSummaryItem existingError = this._validationSummaryItemDictionary[e.Error];
                     this._errors.Remove(existingError);
                     this._validationSummaryItemDictionary.Remove(e.Error);
                 }

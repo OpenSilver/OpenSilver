@@ -194,7 +194,11 @@ namespace System.Windows.Navigation
             foreach (string identifier in this._mappedUriIdentifiers)
             {
                 string identifierWithBraces = "{" + identifier + "}";
-                string replacementValue = (uriValues.ContainsKey(identifier) ? uriValues[identifier] : String.Empty);
+                string replacementValue;
+                if (!uriValues.TryGetValue(identifier, out replacementValue))
+                {
+                    replacementValue = string.Empty;
+                }
 
                 // First check for identifiers in the base Uri, and replace them as appropriate
                 uriAfterMappingBase = uriAfterMappingBase.Replace(identifierWithBraces, replacementValue);

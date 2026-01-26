@@ -30,8 +30,8 @@ namespace OpenSilver.Diagnostics
             foreach (var assembly in assemblies)
             {
                 var attributes = Attribute.GetCustomAttributes(assembly, typeof(AssemblyMetadataAttribute))
-                    .OfType<AssemblyMetadataAttribute>().Where(a => listOfAttributeKeys.Contains(a.Key)).ToList();
-                if (!attributes.Any())
+                    .OfType<AssemblyMetadataAttribute>().Where(a => listOfAttributeKeys.Contains(a.Key)).ToArray();
+                if (attributes.Length == 0)
                 {
                     continue;
                 }

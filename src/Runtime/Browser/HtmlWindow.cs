@@ -33,30 +33,24 @@ namespace System.Windows.Browser
         /// <param name="targetFeatures"></param>
         public void Navigate(Uri navigateToUri, string target = "_self", string targetFeatures = "")
         {
-            if (navigateToUri != null && target != null && targetFeatures != null)
-            {
-                if (target != "_search")
-                {
-                    if (target == "")
-                    {
-                        target = "_self";
-                    }
+            ArgumentNullException.ThrowIfNull(navigateToUri);
+            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(targetFeatures);
 
-                    string sUri = OpenSilver.Interop.GetVariableStringForJS(navigateToUri.ToString());
-                    string sTarget = OpenSilver.Interop.GetVariableStringForJS(target);
-                    string sTargetFeatures = OpenSilver.Interop.GetVariableStringForJS(targetFeatures);
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"window.open({sUri}, {sTarget}, {sTargetFeatures})");
-                }
-                else
-                {
-                    throw new NotImplementedException("The search target is not implemented.");
-                }
-            }
-            else
+            if (target == "_search")
             {
-                throw new ArgumentNullException();
+                throw new NotImplementedException("The search target is not implemented.");
             }
 
+            if (target.Length == 0)
+            {
+                target = "_self";
+            }
+
+            string sUri = OpenSilver.Interop.GetVariableStringForJS(navigateToUri.ToString());
+            string sTarget = OpenSilver.Interop.GetVariableStringForJS(target);
+            string sTargetFeatures = OpenSilver.Interop.GetVariableStringForJS(targetFeatures);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"window.open({sUri}, {sTarget}, {sTargetFeatures})");
         }
 
         /// <summary>

@@ -107,22 +107,22 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
                 // Compute minimum
                 double minimum = 0;
-                if (mostNegative.Any())
+                if (mostNegative.Length > 0)
                 {
                     minimum = mostNegative.Min();
                 }
-                else if (leastPositive.Any())
+                else if (leastPositive.Length > 0)
                 {
                     minimum = leastPositive.Min();
                 }
 
                 // Compute maximum
                 double maximum = 0;
-                if (mostPositive.Any())
+                if (mostPositive.Length > 0)
                 {
                     maximum = mostPositive.Max();
                 }
-                else if (leastNegative.Any())
+                else if (leastNegative.Length > 0)
                 {
                     maximum = leastNegative.Max();
                 }

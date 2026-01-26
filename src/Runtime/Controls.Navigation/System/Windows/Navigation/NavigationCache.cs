@@ -34,9 +34,9 @@ namespace System.Windows.Navigation
         {
             get
             {
-                if (this._cachePages.ContainsKey(uri))
+                if (this._cachePages.TryGetValue(uri, out Page page))
                 {
-                    return this._cachePages[uri];
+                    return page;
                 }
 
                 return null;

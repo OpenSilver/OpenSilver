@@ -2672,12 +2672,11 @@ namespace System.Windows.Controls
 
             if (uiChanged)
             {
-                if (!this._fieldsDictionary.ContainsKey(contentRootElement))
+                if (!this._fieldsDictionary.TryGetValue(contentRootElement, out _fields))
                 {
-                    this._fieldsDictionary.Add(contentRootElement, new List<DataField>());
+                    this._fields = [];
+                    this._fieldsDictionary.Add(contentRootElement, this._fields);
                 }
-
-                this._fields = this._fieldsDictionary[contentRootElement];
 
                 if (contentRootElement != null)
                 {
@@ -4055,7 +4054,7 @@ namespace System.Windows.Controls
             FrameworkElement contentRootElement = null;
             uiChanged = true;
 
-            if (!newContents.ContainsKey(this.CurrentItemType))
+            if (!newContents.TryGetValue(this.CurrentItemType, out contentRootElement))
             {
                 contentRootElement = this.GetContentFromMode();
                 if (contentRootElement == this.Content)
@@ -4069,8 +4068,6 @@ namespace System.Windows.Controls
             }
             else
             {
-                contentRootElement = newContents[this.CurrentItemType];
-
                 if (newContents[this.CurrentItemType] == this._contentPresenter.Content)
                 {
                     if (swapOldAndNew)

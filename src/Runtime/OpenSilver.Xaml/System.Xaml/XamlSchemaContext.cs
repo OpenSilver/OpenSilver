@@ -69,12 +69,6 @@ namespace System.Xaml
 			InvokerOptions = settings.InvokerOptions;
 		}
 
-		~XamlSchemaContext()
-		{
-			/*if (reference_assemblies == null)
-				AppDomain.CurrentDomain.AssemblyLoad -= OnAssemblyLoaded;*/
-		}
-
 		IList<Assembly> reference_assemblies;
 		Dictionary<string, List<string>> xaml_nss;
 		Dictionary<string, string> prefixes;

@@ -879,7 +879,7 @@ namespace System.ServiceModel
 
             private static string GetEnvelopeHeaders(ICollection<MessageHeader> messageHeaders, string soapVersion)
             {
-                if (messageHeaders == null || !messageHeaders.Any())
+                if (messageHeaders == null || messageHeaders.Count == 0)
                 {
                     return "";
                 }

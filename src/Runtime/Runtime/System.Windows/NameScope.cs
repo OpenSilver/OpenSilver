@@ -74,7 +74,7 @@ public class NameScope : INameScopeDictionary
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(scopedElement);
 
-        if (name == string.Empty)
+        if (name.Length == 0)
         {
             throw new ArgumentException(Strings.NameScopeNameNotEmptyString);
         }
@@ -118,7 +118,7 @@ public class NameScope : INameScopeDictionary
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (name == string.Empty)
+        if (name.Length == 0)
         {
             throw new ArgumentException(Strings.NameScopeNameNotEmptyString);
         }

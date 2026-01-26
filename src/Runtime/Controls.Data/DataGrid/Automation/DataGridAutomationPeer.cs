@@ -621,11 +621,7 @@ namespace System.Windows.Automation.Peers
 
             if (group != null)
             {
-                if (_groupItemPeers.ContainsKey(group))
-                {
-                    peer = _groupItemPeers[group];
-                }
-                else
+                if (!_groupItemPeers.TryGetValue(group, out peer))
                 {
                     peer = new DataGridGroupItemAutomationPeer(group as CollectionViewGroup, this.OwningDataGrid);
                     _groupItemPeers.Add(group, peer);
@@ -647,11 +643,7 @@ namespace System.Windows.Automation.Peers
 
             if (item != null)
             {
-                if (_itemPeers.ContainsKey(item))
-                {
-                    peer = _itemPeers[item];
-                }
-                else
+                if (!_itemPeers.TryGetValue(item, out peer))
                 {
                     peer = new DataGridItemAutomationPeer(item, this.OwningDataGrid);
                     _itemPeers.Add(item, peer);
@@ -739,11 +731,7 @@ namespace System.Windows.Automation.Peers
                     {
                         DataGridItemAutomationPeer peer = null;
 
-                        if (oldChildren.ContainsKey(item))
-                        {
-                            peer = oldChildren[item] as DataGridItemAutomationPeer;
-                        }
-                        else
+                        if (!oldChildren.TryGetValue(item, out peer))
                         {
                             peer = new DataGridItemAutomationPeer(item, this.OwningDataGrid);
                         }
@@ -911,9 +899,9 @@ namespace System.Windows.Automation.Peers
             if (AutomationPeer.ListenerExists(AutomationEvents.SelectionItemPatternOnElementSelected) &&
                 this.OwningDataGrid.SelectedItems.Count == 1)
             {
-                if (this.OwningDataGrid.SelectedItem != null && _itemPeers.ContainsKey(this.OwningDataGrid.SelectedItem))
+                if (this.OwningDataGrid.SelectedItem != null &&
+                    _itemPeers.TryGetValue(this.OwningDataGrid.SelectedItem, out DataGridItemAutomationPeer peer))
                 {
-                    DataGridItemAutomationPeer peer = _itemPeers[this.OwningDataGrid.SelectedItem];
                     peer.RaiseAutomationEvent(AutomationEvents.SelectionItemPatternOnElementSelected);
                 }
             }
@@ -925,9 +913,8 @@ namespace System.Windows.Automation.Peers
                 {
                     for (i = 0; i < e.AddedItems.Count; i++)
                     {
-                        if (e.AddedItems[i] != null && _itemPeers.ContainsKey(e.AddedItems[i]))
+                        if (e.AddedItems[i] != null && _itemPeers.TryGetValue(e.AddedItems[i], out DataGridItemAutomationPeer peer))
                         {
-                            DataGridItemAutomationPeer peer = _itemPeers[e.AddedItems[i]];
                             peer.RaiseAutomationEvent(AutomationEvents.SelectionItemPatternOnElementAddedToSelection);
                         }
                     }
@@ -937,9 +924,8 @@ namespace System.Windows.Automation.Peers
                 {
                     for (i = 0; i < e.RemovedItems.Count; i++)
                     {
-                        if (e.RemovedItems[i] != null &&_itemPeers.ContainsKey(e.RemovedItems[i]))
+                        if (e.RemovedItems[i] != null && _itemPeers.TryGetValue(e.RemovedItems[i], out DataGridItemAutomationPeer peer))
                         {
-                            DataGridItemAutomationPeer peer = _itemPeers[e.RemovedItems[i]];
                             peer.RaiseAutomationEvent(AutomationEvents.SelectionItemPatternOnElementRemovedFromSelection);
                         }
                     }
@@ -951,18 +937,18 @@ namespace System.Windows.Automation.Peers
         {
             object group = header.RowGroupInfo.CollectionViewGroup;
             DataGridRowGroupHeaderAutomationPeer peer = DataGridRowGroupHeaderAutomationPeer.FromElement(header) as DataGridRowGroupHeaderAutomationPeer;
-            if (peer != null && group != null && _groupItemPeers.ContainsKey(group))
+            if (peer != null && group != null && _groupItemPeers.TryGetValue(group, out DataGridGroupItemAutomationPeer eventsSource))
             {
-                peer.EventsSource = _groupItemPeers[group];
+                peer.EventsSource = eventsSource;
             }
         }
 
         internal void UpdateRowPeerEventsSource(DataGridRow row)
         {
             DataGridRowAutomationPeer peer = FromElement(row) as DataGridRowAutomationPeer;
-            if (peer != null && row.DataContext != null && _itemPeers.ContainsKey(row.DataContext))
+            if (peer != null && row.DataContext != null && _itemPeers.TryGetValue(row.DataContext, out DataGridItemAutomationPeer eventsSource))
             {
-                peer.EventsSource = _itemPeers[row.DataContext];
+                peer.EventsSource = eventsSource;
             }
         }
 

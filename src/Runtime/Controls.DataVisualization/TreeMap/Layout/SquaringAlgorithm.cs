@@ -52,7 +52,7 @@ namespace System.Windows.Controls.DataVisualization
             IEnumerable<Tuple<Rect, TreeMapNode>> retVal;
 
             double area = parentNode.Area;
-            if (parentNode.Children == null || parentNode.Children.Count() == 0 || area == 0)
+            if (parentNode.Children == null || !parentNode.Children.Any() || area == 0)
             {
                 retVal = Enumerable.Empty<Tuple<Rect, TreeMapNode>>();
             }

@@ -14,7 +14,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Xml.Linq;
 
 namespace System.Windows.Input;
 
@@ -203,10 +202,10 @@ public class KeyGestureConverter : TypeConverter
         string strKey = KeyConverter.ToString(keyGesture.Key);
         Debug.Assert(strKey is not null); // KeyGesture constructor ensures that Key is defined
 
-        if (strKey != string.Empty)
+        if (!string.IsNullOrEmpty(strKey))
         {
             strBinding += ModifierKeysConverter.ToString(keyGesture.Modifiers);
-            if (strBinding != string.Empty)
+            if (!string.IsNullOrEmpty(strBinding))
             {
                 strBinding += MODIFIERS_DELIMITER;
             }

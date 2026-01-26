@@ -543,15 +543,15 @@ namespace System.Windows.Controls
         {
             if (HoveredRatingItem != null && !IsReadOnly)
             {
-                IList<RatingItem> ratingItems = GetRatingItems().ToList();
-                int indexOfItem = ratingItems.IndexOf(HoveredRatingItem);
+                var ratingItems = GetRatingItems().ToArray();
+                int indexOfItem = Array.IndexOf(ratingItems, HoveredRatingItem);
 
-                double total = ratingItems.Count();
+                double total = ratingItems.Length;
                 double filled = indexOfItem + 1;
 
                 this.DisplayValue = filled / total;
 
-                for (int cnt = 0; cnt < ratingItems.Count; cnt++)
+                for (int cnt = 0; cnt < ratingItems.Length; cnt++)
                 {
                     RatingItem ratingItem = ratingItems[cnt];
                     if (cnt <= indexOfItem && this.SelectionMode == RatingSelectionMode.Continuous)
@@ -692,13 +692,12 @@ namespace System.Windows.Controls
         {
             if (!this.IsReadOnly)
             {
-                IList<RatingItem> ratingItems = GetRatingItems().ToList();
-                IEnumerable<double> weights = ratingItems.Select(ratingItem => 1.0);
-                double total = ratingItems.Count();
-                double percent;
+                var ratingItems = GetRatingItems().ToArray();
+                double total = ratingItems.Length;
                 if (total != 0)
                 {
-                    percent = weights.Take(ratingItems.IndexOf(selectedRatingItem) + 1).Sum() / total;
+                    IEnumerable<double> weights = ratingItems.Select(ratingItem => 1.0);
+                    double percent = weights.Take(Array.IndexOf(ratingItems, selectedRatingItem) + 1).Sum() / total;
                     this.Value = percent;
                 }
             }
@@ -734,12 +733,12 @@ namespace System.Windows.Controls
         /// <param name="newValue">The new value.</param>
         protected virtual void OnRatingItemValueSelected(RatingItem ratingItem, double newValue)
         {
-            List<RatingItem> ratingItems = GetRatingItems().ToList();
-            double total = ratingItems.Count();
+            var ratingItems = GetRatingItems().ToArray();
+            double total = ratingItems.Length;
 
             double value =
                 (ratingItems
-                    .Take(ratingItems.IndexOf(ratingItem))
+                    .Take(Array.IndexOf(ratingItems, ratingItem))
                     .Count() + newValue) / total;
 
             this.Value = value;

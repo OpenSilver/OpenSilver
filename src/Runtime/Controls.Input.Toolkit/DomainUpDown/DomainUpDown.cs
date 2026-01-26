@@ -310,7 +310,7 @@ namespace System.Windows.Controls
             }
             
             // if we are at an empty collection, return -1
-            if (GetActualItems().Count() == 0)
+            if (!GetActualItems().Any())
             {
                 return -1;
             }
@@ -740,7 +740,7 @@ namespace System.Windows.Controls
         protected override void OnValueChanging(RoutedPropertyChangingEventArgs<object> e)
         {
             // value needs to be contained in the items collection.
-            if (e != null && ((e.NewValue == null && GetActualItems().Count() > 0) ||
+            if (e != null && ((e.NewValue == null && GetActualItems().Any()) ||
                 (e.NewValue != null && !GetActualItems().Contains(e.NewValue))))
             {
                 e.Cancel = true;

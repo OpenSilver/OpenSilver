@@ -7281,12 +7281,11 @@ namespace System.Windows.Controls
         private void ValidationItem_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
             INotifyDataErrorInfo indei = sender as INotifyDataErrorInfo;
-            if (this._validationItems.ContainsKey(indei))
+            if (this._validationItems.TryGetValue(indei, out string bindingPath))
             {
                 Debug.Assert(this.EditingRow != null);
 
                 // Determine the binding path.
-                string bindingPath = this._validationItems[indei];
                 if (string.IsNullOrEmpty(bindingPath))
                 {
                     bindingPath = e.PropertyName;

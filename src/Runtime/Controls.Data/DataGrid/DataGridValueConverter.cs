@@ -23,8 +23,8 @@ namespace System.Windows.Controls
         {
             if (targetType != null && targetType.IsNullableType())
             {
-                String strValue = value as String;
-                if (strValue == String.Empty)
+                string strValue = value as string;
+                if (string.IsNullOrEmpty(strValue))
                 {
                     return null;
                 }

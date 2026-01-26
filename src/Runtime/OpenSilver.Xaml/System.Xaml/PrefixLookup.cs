@@ -66,7 +66,7 @@ namespace System.Xaml
 			string prefix, s;
 			if (ns == XamlLanguage.Xaml2006Namespace)
 				prefix = "x";
-			else if (!l.Any(i => i.Prefix == String.Empty))
+			else if (!l.Any(i => string.IsNullOrEmpty(i.Prefix)))
 				prefix = String.Empty;
 			else if ((s = GetAcronym(ns)) != null && !l.Any(i => i.Prefix == s))
 				prefix = s;

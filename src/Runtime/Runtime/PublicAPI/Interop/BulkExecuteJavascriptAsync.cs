@@ -55,7 +55,7 @@ namespace OpenSilver
             javascript = javascript.Trim();
             _javascript.Append(javascript);
             if (!javascript.EndsWith(";"))
-                _javascript.Append(";");
+                _javascript.Append(';');
         }
 
         public async Task ExecuteAndDisposeAsync()

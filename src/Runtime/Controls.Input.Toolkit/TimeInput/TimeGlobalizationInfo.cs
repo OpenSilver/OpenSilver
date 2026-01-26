@@ -185,7 +185,7 @@ namespace System.Windows.Controls
                     throw new ArgumentNullException("timeFormat");
                 }
 
-                if (timeCharacters.Count() > 0)
+                if (timeCharacters.Length > 0)
                 {
                     // if timeCharacters is used, only allow those characters.
                     string filtered = new string(timeFormat.GetTimeDisplayFormat(ActualCulture)

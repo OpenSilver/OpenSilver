@@ -401,13 +401,12 @@ namespace System.Windows.Navigation
             string uriAllButFragment = UriParsingHelper.InternalUriGetAllButFragment(uri);
             Page reusedPage = null;
 
-            if (this._cacheRequiredPages.ContainsKey(uriAllButFragment))
+            if (!this._cacheRequiredPages.TryGetValue(uriAllButFragment, out reusedPage))
             {
-                reusedPage = this._cacheRequiredPages[uriAllButFragment];
-            }
-            else if (this.Cache.Contains(uriAllButFragment))
-            {
-                reusedPage = this.Cache[uriAllButFragment];
+                if (this.Cache.Contains(uriAllButFragment))
+                {
+                    reusedPage = this.Cache[uriAllButFragment];
+                }
             }
 
             // If a page was found in either cache and that page hasn't yet changed its NavigationCacheMode to Disabled,

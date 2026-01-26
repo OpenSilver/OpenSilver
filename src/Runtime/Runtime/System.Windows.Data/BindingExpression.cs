@@ -71,7 +71,7 @@ namespace System.Windows.Data
             bindExpr.SaveDefaultFlags();
 
             // Two-way Binding with an empty path makes no sense
-            if (bindExpr.IsReflective && (binding.Path.Path == string.Empty || binding.Path.Path == "."))
+            if (bindExpr.IsReflective && (string.IsNullOrEmpty(binding.Path.Path) || binding.Path.Path == "."))
             {
                 throw new InvalidOperationException(Strings.TwoWayBindingNeedsPath);
             }

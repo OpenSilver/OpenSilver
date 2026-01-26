@@ -701,12 +701,11 @@ namespace System.Windows.Controls
             // a style may never set the popup property.
             if (source.Style != null)
             {
-                if (source.Style.Setters.Where(setterbase =>
+                if (source.Style.Setters.Any(setterbase =>
                                                    {
                                                        Setter setter = setterbase as Setter;
                                                        return (setter != null && setter.Property == PopupProperty);
-                                                   })
-                                         .Count() > 0)
+                                                   }))
                 {
                     throw new ArgumentException(Resource.TimePicker_PopupSetInStyle);
                 }

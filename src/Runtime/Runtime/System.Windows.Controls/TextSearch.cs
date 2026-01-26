@@ -362,7 +362,7 @@ namespace System.Windows.Controls
                     // happen if there was no previous prefix to match against
                     if (lookForFallbackMatchToo)
                     {
-                        if (!firstItem && prefix != string.Empty)
+                        if (!firstItem && !string.IsNullOrEmpty(prefix))
                         {
                             if (itemString != null)
                             {

@@ -433,7 +433,7 @@ public abstract class DefinitionBase : DependencyObject
 
         string id = (string)value;
 
-        if (id != string.Empty)
+        if (id.Length > 0)
         {
             int i = -1;
             while (++i < id.Length)

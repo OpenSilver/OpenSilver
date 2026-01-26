@@ -352,7 +352,7 @@ namespace System.Windows.Controls
                         // use an index out of SelectedIndices if possible
                         // or fallback to finding the index in the ItemsCollection
                         IEnumerable<int> validIndices = source.SelectedIndices.Where(i => i >= 0 && i < source.Items.Count && newValue.Equals(source.Items[i]));
-                        currentIndex = validIndices.Count() > 0 ? validIndices.First() : source.Items.IndexOf(newValue);
+                        currentIndex = validIndices.Any() ? validIndices.First() : source.Items.IndexOf(newValue);
                     }
                     source.SelectedIndex = currentIndex;
                 }
@@ -1023,7 +1023,7 @@ namespace System.Windows.Controls
                             {
                                 // check that there are no indices pointing to similar
                                 // items that are still in the collection
-                                if (SelectedIndices.Count(i => i < Items.Count && Items[i].Equals(item)) == 0)
+                                if (!SelectedIndices.Any(i => i < Items.Count && Items[i].Equals(item)))
                                 {
                                     SelectedItems.Remove(item);
                                 }
@@ -1123,7 +1123,7 @@ namespace System.Windows.Controls
             if (SelectedItems.OfType<object>().Contains(item) && index != newSelectedIndex && !item.Equals(SelectedItem))
             {
                 // if there are indices still pointing to a similar item, do not remove
-                if (SelectedIndices.Count(i => i != index && i < Items.Count && Items[i].Equals(item)) == 0)
+                if (!SelectedIndices.Any(i => i != index && i < Items.Count && Items[i].Equals(item)))
                 {
                     if (_isInSelectedItemsCollectionChanged)
                     {
@@ -1498,7 +1498,7 @@ namespace System.Windows.Controls
             // see if we can find a suitable item in the selecteditems collection
             IEnumerable<int> validIndices = SelectedIndices.Where(i => i != nonCandidateIndex && (item == null || !item.Equals(Items[i])));
 
-            if (validIndices.Count() > 0)
+            if (validIndices.Any())
             {
                 return validIndices.First();
             }

@@ -50,7 +50,7 @@ internal static class XamlResources
     private static readonly GenericTheme _genericTheme = new();
     private static ResourceDictionary _defaultResources;
     private static ResourceDictionary _defaultThemeResourcesDictionary;
-    private static Dictionary<char, List<string>> _charToSimpleHighContrastNames; //this dictionary serves to link the first letter of the theme-dependent resource to the simple high contrast names that start with that letter.
+    private static Dictionary<char, string[]> _charToSimpleHighContrastNames; //this dictionary serves to link the first letter of the theme-dependent resource to the simple high contrast names that start with that letter.
 
     /// <summary>
     /// Tries to find the resourceKey in the Generic.xaml resources of the assembly. Note: the resource currently need to be defined in Project/Themes/generic.xaml
@@ -156,13 +156,13 @@ internal static class XamlResources
         if (_charToSimpleHighContrastNames == null)
         {
             //fill this dictionary:
-            _charToSimpleHighContrastNames = new Dictionary<char, List<string>>
+            _charToSimpleHighContrastNames = new Dictionary<char, string[]>
             {
-                { 'B', new List<string>() { { "Background" } } },
-                { 'F', new List<string>() { { "Foreground" } } },
-                { 'D', new List<string>() { { "Disabled" } } },
-                { 'H', new List<string>() { { "Highlight" }, { "Hyperlink" } } }, //I didn't put HighLightAlt in it because some [Simple light/dark name] start with "Alt"
-                { 'P', new List<string>() { { "PageBackground" }, { "PageText" } } }
+                { 'B', ["Background"] },
+                { 'F', ["Foreground"] },
+                { 'D', ["Disabled"] },
+                { 'H', ["Highlight", "Hyperlink"] }, //I didn't put HighLightAlt in it because some [Simple light/dark name] start with "Alt"
+                { 'P', ["PageBackground", "PageText"] }
             };
         }
 
@@ -171,8 +171,7 @@ internal static class XamlResources
 
         //find which High contrast name it uses:
         char firstLetter = resourceName[0];
-        List<string> possibleNames = _charToSimpleHighContrastNames.ContainsKey(firstLetter) ? _charToSimpleHighContrastNames[firstLetter] : null;
-        if (possibleNames == null)
+        if (!_charToSimpleHighContrastNames.TryGetValue(firstLetter, out string[] possibleNames))
         {
             return null; //the resource could not be found.
         }

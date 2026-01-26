@@ -351,7 +351,6 @@
     <Compile Include="OpenSilver\Interop.ResourceFiles.cs" />
     <Compile Include="OpenSilver\Buffers\CharArrayBuilder.cs" />
     <Compile Include="PublicAPI\Interop\JSObjectReferenceHolder.cs" />
-    <Compile Include="PublicAPI\Interop\StackTraceProvider.cs" />
     <Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
     <Compile Include="PublicAPI\Interop\JavaScriptCallback.cs" />
     <Compile Include="PublicAPI\Interop\JavaScriptCallbackHelper.cs" />

@@ -875,7 +875,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="oldDataPoints">Old inactive data points.</param>
         protected virtual void OnDataPointsChanged(IList<DataPoint> newDataPoints, IList<DataPoint> oldDataPoints)
         {
-            StaggeredStateChange(newDataPoints, newDataPoints.Count(), DataPointState.Showing);
+            StaggeredStateChange(newDataPoints, newDataPoints.Count, DataPointState.Showing);
         }
 
         /// <summary>
