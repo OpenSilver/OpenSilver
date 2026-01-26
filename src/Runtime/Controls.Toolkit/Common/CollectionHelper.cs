@@ -84,7 +84,7 @@ namespace System.Windows.Controls
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.IList`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
-                    genericListType.GetMethod("Insert").Invoke(collection, new object[] { index, item });
+                    genericListType.GetMethod("Insert").Invoke(collection, [index, item]);
                 }
                 else
                 {
@@ -111,7 +111,7 @@ namespace System.Windows.Controls
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.ICollection`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
-                    return (int)genericListType.GetProperty("Count").GetValue(collection, new object[] { });
+                    return (int)genericListType.GetProperty("Count").GetValue(collection, []);
                 }
 
                 IList list = collection as IList;
@@ -139,7 +139,7 @@ namespace System.Windows.Controls
             else
             {
                 PropertyInfo countProperty = collection.GetType().GetProperty("Count");
-                int count = (int)countProperty.GetValue(collection, new object[] { });
+                int count = (int)countProperty.GetValue(collection, []);
                 Insert(collection, count, item);
             }
         }
@@ -161,10 +161,10 @@ namespace System.Windows.Controls
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.IList`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
-                    int index = (int)genericListType.GetMethod("IndexOf").Invoke(collection, new object[] { item });
+                    int index = (int)genericListType.GetMethod("IndexOf").Invoke(collection, [item]);
                     if (index != -1)
                     {
-                        genericListType.GetMethod("RemoveAt").Invoke(collection, new object[] { index });
+                        genericListType.GetMethod("RemoveAt").Invoke(collection, [index]);
                     }
                 }
                 else
@@ -192,7 +192,7 @@ namespace System.Windows.Controls
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.IList`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
-                    genericListType.GetMethod("RemoveAt").Invoke(collection, new object[] { index });
+                    genericListType.GetMethod("RemoveAt").Invoke(collection, [index]);
                 }
                 else
                 {

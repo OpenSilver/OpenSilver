@@ -245,7 +245,7 @@ internal static class TextViewHostProvider
             _view = view;
             if (_setMethod != null)
             {
-                _setMethod.Invoke(_host, new object[1] { view });
+                _setMethod.Invoke(_host, [view]);
             }
         }
 
@@ -256,7 +256,7 @@ internal static class TextViewHostProvider
             _view = null;
             if (_setMethod != null)
             {
-                _setMethod.Invoke(_host, new object[1] { null });
+                _setMethod.Invoke(_host, [null]);
             }
         }
 

@@ -36,7 +36,7 @@ namespace System.Xaml
 			_getCompatible = compatible;
 		}
 
-		private static readonly char[] Splitter = new[] { ' ' };
+		private static readonly char[] Splitter = [' '];
 		void PushScope(string prefixes)
 		{
 			var newIgnore = new HashSet<string>(_scope.Ignore);

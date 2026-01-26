@@ -80,7 +80,7 @@ namespace System.Xaml
 		Dictionary<string, string> prefixes;
 		Dictionary<string, string> compat_nss;
 		Dictionary<string, List<XamlType>> all_xaml_types;
-		XamlType[] empty_xaml_types = new XamlType[0];
+		XamlType[] empty_xaml_types = [];
 		Dictionary<Type, XamlType> run_time_types = new Dictionary<Type, XamlType>();
 		Dictionary<Tuple<string, string>, XamlType> type_lookup = new Dictionary<Tuple<string, string>, XamlType>();
 		Dictionary<Pair, XamlDirective> xaml_directives = new Dictionary<Pair, XamlDirective>();
@@ -162,7 +162,7 @@ namespace System.Xaml
 				var assemblyType = typeof(Assembly);
 				if (assemblyType == null)
 					return null;
-				var getEntryAssembly = assemblyType.GetRuntimeMethod("GetEntryAssembly", new Type[0]);
+				var getEntryAssembly = assemblyType.GetRuntimeMethod("GetEntryAssembly", []);
 				if (getEntryAssembly == null)
 					return null;
 				var entryAssembly = getEntryAssembly.Invoke(null, null) as Assembly;
@@ -172,7 +172,7 @@ namespace System.Xaml
 				var assemblies = new List<Assembly>();
 				assemblies.Add(entryAssembly);
 
-				var getReferencedAssemblies = assemblyType.GetRuntimeMethod("GetReferencedAssemblies", new Type[0]);
+				var getReferencedAssemblies = assemblyType.GetRuntimeMethod("GetReferencedAssemblies", []);
 				if (getReferencedAssemblies != null)
 				{
 					var referencedAssemblies = getReferencedAssemblies.Invoke(entryAssembly, null) as AssemblyName[];
@@ -230,7 +230,7 @@ namespace System.Xaml
 				var installedLocation = current.GetType().GetRuntimeProperty("InstalledLocation")?.GetValue(current);
 				if (installedLocation == null)
 					return null;
-				var getFilesAsync = installedLocation.GetType().GetRuntimeMethod("GetFilesAsync", new Type[0])?.Invoke(installedLocation, null);
+				var getFilesAsync = installedLocation.GetType().GetRuntimeMethod("GetFilesAsync", [])?.Invoke(installedLocation, null);
 				if (getFilesAsync == null)
 					return null;
 
@@ -240,8 +240,8 @@ namespace System.Xaml
 				var resultType = typeof(IReadOnlyList<>).MakeGenericType(storageType);
 				var interfaceResultType = interfaceType?.MakeGenericType(resultType);
 				var getAwaiterMethod = awaiterExtensions.GetRuntimeMethods().First(m => m.Name == "GetAwaiter" && m.IsGenericMethod && m.ReturnType.GetTypeInfo().IsGenericType);
-				var awaiter = getAwaiterMethod.MakeGenericMethod(resultType).Invoke(null, new object[] { getFilesAsync });
-				var results = awaiter?.GetType().GetRuntimeMethod("GetResult", new Type[0])?.Invoke(awaiter, null);
+				var awaiter = getAwaiterMethod.MakeGenericMethod(resultType).Invoke(null, [getFilesAsync]);
+				var results = awaiter?.GetType().GetRuntimeMethod("GetResult", [])?.Invoke(awaiter, null);
 				var nameProperty = storageType.GetRuntimeProperty("Name");
 
 				var assemblies = new List<Assembly>();

@@ -72,7 +72,7 @@ namespace System.Windows.Media
                 List<GradientStop> stops = InternalItems;
                 if (stops.Count == 0)
                 {
-                    _sortedStops = Array.Empty<Stop>();
+                    _sortedStops = [];
                 }
                 else
                 {

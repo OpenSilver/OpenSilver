@@ -94,7 +94,7 @@ namespace System.Windows.Controls.Primitives
         private const byte DATAGRIDROWHEADER_stateSelectedFocusedCode = 15;
         private const byte DATAGRIDROWHEADER_stateNullCode = 255;
 
-        private static byte[] _fallbackStateMapping = new byte[] {
+        private static readonly byte[] _fallbackStateMapping = [
             DATAGRIDROWHEADER_stateNormalCode,
             DATAGRIDROWHEADER_stateNormalCurrentRowCode,
             DATAGRIDROWHEADER_stateMouseOverEditingRowFocusedCode,
@@ -111,9 +111,9 @@ namespace System.Windows.Controls.Primitives
             DATAGRIDROWHEADER_stateSelectedCurrentRowFocusedCode,
             DATAGRIDROWHEADER_stateNormalCurrentRowCode,
             DATAGRIDROWHEADER_stateNormalCode,
-        };
+        ];
 
-        private static byte[] _idealStateMapping = new byte[] {
+        private static readonly byte[] _idealStateMapping = [
             DATAGRIDROWHEADER_stateNormalCode,
             DATAGRIDROWHEADER_stateNormalCode,
             DATAGRIDROWHEADER_stateMouseOverCode,
@@ -146,12 +146,12 @@ namespace System.Windows.Controls.Primitives
             DATAGRIDROWHEADER_stateNormalEditingRowFocusedCode,
             DATAGRIDROWHEADER_stateMouseOverEditingRowCode,
             DATAGRIDROWHEADER_stateMouseOverEditingRowFocusedCode
-        };
+        ];
 
         // In SL 2, our state names had spaces.  Going forward, we are removing the spaces but still 
         // supporting the legacy state names
-        private static string[] _legacyStateNames = new string[]
-        {
+        private static readonly string[] _legacyStateNames =
+        [
             DATAGRIDROWHEADER_stateMouseOver,
             DATAGRIDROWHEADER_stateMouseOverCurrentRowLegacy,
             DATAGRIDROWHEADER_stateMouseOverEditingRowLegacy,
@@ -168,10 +168,10 @@ namespace System.Windows.Controls.Primitives
             DATAGRIDROWHEADER_stateSelectedCurrentRowLegacy,
             DATAGRIDROWHEADER_stateSelectedCurrentRowFocusedLegacy,
             DATAGRIDROWHEADER_stateSelectedFocusedLegacy
-        };
+        ];
 
-        private static string[] _stateNames = new string[]
-        {
+        private static readonly string[] _stateNames =
+        [
             DATAGRIDROWHEADER_stateMouseOver,
             DATAGRIDROWHEADER_stateMouseOverCurrentRow,
             DATAGRIDROWHEADER_stateMouseOverEditingRow,
@@ -188,7 +188,7 @@ namespace System.Windows.Controls.Primitives
             DATAGRIDROWHEADER_stateSelectedCurrentRow,
             DATAGRIDROWHEADER_stateSelectedCurrentRowFocused,
             DATAGRIDROWHEADER_stateSelectedFocused
-        };
+        ];
 
         #endregion Constants
 

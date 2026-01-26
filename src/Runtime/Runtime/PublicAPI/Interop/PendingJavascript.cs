@@ -38,7 +38,7 @@ namespace CSHTML5.Internal
         private readonly INativeMethods _nativeMethods;
         private readonly CharArrayBuilder _charArrayBuilder;
 
-        private byte[] _buffer = Array.Empty<byte>();
+        private byte[] _buffer = [];
 
         public PendingJavascript(INativeMethods nativeMethods, CharArrayBuilder buffer)
         {

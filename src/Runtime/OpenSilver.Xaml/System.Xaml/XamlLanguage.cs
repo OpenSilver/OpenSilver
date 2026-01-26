@@ -70,7 +70,7 @@ namespace System.Xaml
 			public XamlType Type { get; private set; }
 		}
 
-		static readonly XamlSchemaContext sctx = new XamlSchemaContext(new Assembly[] { typeof(XamlType).GetTypeInfo().Assembly });
+		static readonly XamlSchemaContext sctx = new XamlSchemaContext([typeof(XamlType).GetTypeInfo().Assembly]);
 
 		static XamlType XT<T>() => sctx.GetXamlType(typeof(T));
 
@@ -106,7 +106,7 @@ namespace System.Xaml
 
 			InitializingTypes = false;
 
-			AllTypes = new ReadOnlyCollection<XamlType>(new XamlType[] { Array, Boolean, Byte, Char, Decimal, Double, Int16, Int32, Int64, Member, Null, Object, Property, Reference, Single, Static, String, TimeSpan, Type, Uri, XData });
+			AllTypes = new ReadOnlyCollection<XamlType>([Array, Boolean, Byte, Char, Decimal, Double, Int16, Int32, Int64, Member, Null, Object, Property, Reference, Single, Static, String, TimeSpan, Type, Uri, XData]);
 
 			// directives
 
@@ -138,16 +138,16 @@ namespace System.Xaml
 			Uid = new XamlDirective(nss, "Uid", XT<string>(), null, AllowedMemberLocations.Attribute);
 			UnknownContent = new XamlDirective(nss, "_UnknownContent", XT<object>(), null, AllowedMemberLocations.MemberElement) { InternalIsUnknown = true };
 
-			AllDirectives = new ReadOnlyCollection<XamlDirective>(new XamlDirective[] { Arguments, AsyncRecords, Base, Class, ClassAttributes, ClassModifier, Code, ConnectionId, FactoryMethod, FieldModifier, Initialization, Items, Key, Lang, Members, Name, PositionalParameters, Space, Subclass, SynchronousMode, Shared, TypeArguments, Uid, UnknownContent });
+			AllDirectives = new ReadOnlyCollection<XamlDirective>([Arguments, AsyncRecords, Base, Class, ClassAttributes, ClassModifier, Code, ConnectionId, FactoryMethod, FieldModifier, Initialization, Items, Key, Lang, Members, Name, PositionalParameters, Space, Subclass, SynchronousMode, Shared, TypeArguments, Uid, UnknownContent]);
 
 			SpecialNames = new SpecialTypeNameList();
 		}
 
-		static readonly string[] xaml_nss = new string[] { Xaml2006Namespace };
+		static readonly string[] xaml_nss = [Xaml2006Namespace];
 
 		public static IList<string> XamlNamespaces => xaml_nss;
 
-		static readonly string[] xml_nss = new string[] { Xml1998Namespace };
+		static readonly string[] xml_nss = [Xml1998Namespace];
 
 		public static IList<string> XmlNamespaces => xml_nss;
 

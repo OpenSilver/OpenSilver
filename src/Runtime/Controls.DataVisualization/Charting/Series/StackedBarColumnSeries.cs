@@ -180,11 +180,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 {
                     Range<IComparable> range = IRangeProviderGetRange((IRangeConsumer)ActualDependentAxis);
                     double margin = ((AxisOrientation.Y == ActualDependentAxis.Orientation) ? ActualHeight : ActualWidth) / 10;
-                    return new ValueMargin[]
-                    {
+                    return
+                    [
                         new ValueMargin(range.Minimum, margin, margin),
                         new ValueMargin(range.Maximum, margin, margin),
-                    };
+                    ];
                 }
             }
             else if (valueMarginConsumer == ActualIndependentAxis)

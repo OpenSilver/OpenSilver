@@ -167,7 +167,7 @@ namespace Microsoft.Expression.Interactivity.Core
                     {
                         newValue = this.IncrementCurrentValue(propertyInfo);
                     }
-                    propertyInfo.SetValue(this.Target, newValue, new object[0]);
+                    propertyInfo.SetValue(this.Target, newValue, []);
                 }
             }
             catch (FormatException e)
@@ -238,7 +238,7 @@ namespace Microsoft.Expression.Interactivity.Core
 
             sb.Completed += (o, e) =>
             {
-                propertyInfo.SetValue(this.Target, newValue, new object[0]);
+                propertyInfo.SetValue(this.Target, newValue, []);
             };
             sb.FillBehavior = FillBehavior.Stop;
 
@@ -469,7 +469,7 @@ namespace Microsoft.Expression.Interactivity.Core
 
             if (uniqueAdditionOperation != null)
             {
-                returnValue = uniqueAdditionOperation.Invoke(null, new object[] { currentValue, convertedValue });
+                returnValue = uniqueAdditionOperation.Invoke(null, [currentValue, convertedValue]);
             }
             else
             {

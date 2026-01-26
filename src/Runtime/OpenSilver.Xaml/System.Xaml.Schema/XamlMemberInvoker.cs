@@ -116,7 +116,7 @@ namespace System.Xaml.Schema
 
 		object GetValueReflection(object instance) => UnderlyingGetter.Invoke(instance, null);
 
-		object GetValueReflectionAttachable(object instance) => UnderlyingGetter.Invoke(null, new[] { instance });
+		object GetValueReflectionAttachable(object instance) => UnderlyingGetter.Invoke(null, [instance]);
 
 		void BuildGetExpression() => getDelegate = UnderlyingGetter.BuildGetExpression();
 
@@ -176,12 +176,12 @@ namespace System.Xaml.Schema
 
 		void SetDelegateReflectionAttachable(object instance, object value)
 		{
-			UnderlyingSetter.Invoke(null, new object[] { instance, value });
+			UnderlyingSetter.Invoke(null, [instance, value]);
 		}
 
 		void SetDelegateReflection(object instance, object value)
 		{
-			UnderlyingSetter.Invoke(instance, new object[] { value });
+			UnderlyingSetter.Invoke(instance, [value]);
 		}
 
 		public virtual ShouldSerializeResult ShouldSerializeValue(object instance)

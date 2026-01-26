@@ -167,9 +167,9 @@ namespace System.Windows.Automation.Peers
             RatingItem selectedRatingItem = OwnerRating.GetRatingItems().LastOrDefault(ratingItem => ratingItem.Value > 0.0);
             if (selectedRatingItem != null)
             {
-                return new[] { ProviderFromPeer(FromElement(selectedRatingItem)) };
+                return [ProviderFromPeer(FromElement(selectedRatingItem))];
             }
-            return new IRawElementProviderSimple[] { };
+            return [];
         }
 
         /// <summary>

@@ -219,7 +219,7 @@ namespace OpenSilver.Internal.Xaml
                     Delegate handler = Delegate.CreateDelegate(parameters[1].ParameterType,
                         firstArgument,
                         methodInfo);
-                    addHandlerMethod.Invoke(null, new object[2] { target, handler });
+                    addHandlerMethod.Invoke(null, [target, handler]);
                 }
             }
             catch (Exception ex)

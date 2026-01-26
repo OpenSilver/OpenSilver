@@ -235,10 +235,10 @@ internal static class TypeHelper
                     if (parameterInfos[0].ParameterType == typeof(int))
                     {
                         int intIndex = -1;
-                        if (Int32.TryParse(stringIndex.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out intIndex))
+                        if (int.TryParse(stringIndex.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out intIndex))
                         {
                             indexer = propertyInfo;
-                            index = new object[] { intIndex };
+                            index = [intIndex];
                             break;
                         }
                     }
@@ -248,7 +248,7 @@ internal static class TypeHelper
                     if (parameterInfos[0].ParameterType == typeof(string))
                     {
                         indexer = propertyInfo;
-                        index = new object[] { stringIndex };
+                        index = [stringIndex];
                     }
                 }
             }

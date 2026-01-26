@@ -19,13 +19,13 @@ namespace System.Windows.Media.Imaging
     {
         private const int _ADLER32_BASE = 65521;
         private const int _MAXBLOCK = 0xFFFF;
-        private static readonly byte[] _HEADER = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-        private static readonly byte[] _IHDR = { (byte)'I', (byte)'H', (byte)'D', (byte)'R' };
-        private static readonly byte[] _GAMA = { (byte)'g', (byte)'A', (byte)'M', (byte)'A' };
-        private static readonly byte[] _IDAT = { (byte)'I', (byte)'D', (byte)'A', (byte)'T' };
-        private static readonly byte[] _IEND = { (byte)'I', (byte)'E', (byte)'N', (byte)'D' };
-        private static readonly byte[] _4BYTEDATA = { 0, 0, 0, 0 };
-        private static readonly byte[] _ARGB = { 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0 };
+        private static readonly byte[] _HEADER = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+        private static readonly byte[] _IHDR = [(byte)'I', (byte)'H', (byte)'D', (byte)'R'];
+        private static readonly byte[] _GAMA = [(byte)'g', (byte)'A', (byte)'M', (byte)'A'];
+        private static readonly byte[] _IDAT = [(byte)'I', (byte)'D', (byte)'A', (byte)'T'];
+        private static readonly byte[] _IEND = [(byte)'I', (byte)'E', (byte)'N', (byte)'D'];
+        private static readonly byte[] _4BYTEDATA = [0, 0, 0, 0];
+        private static readonly byte[] _ARGB = [0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0];
 
         public static MemoryStream Encode(byte[] data, int width, int height)
         {
@@ -155,7 +155,7 @@ namespace System.Windows.Media.Imaging
             WriteChunk(ms, _IDAT, dat);
 
             // Write IEND chunk
-            WriteChunk(ms, _IEND, Array.Empty<byte>());
+            WriteChunk(ms, _IEND, []);
 
             // Reset stream
             ms.Seek(0, SeekOrigin.Begin);

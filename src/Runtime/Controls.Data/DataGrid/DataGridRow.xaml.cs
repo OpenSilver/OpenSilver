@@ -120,7 +120,7 @@ namespace System.Windows.Controls
         private int? _mouseOverColumnIndex;    // 
 
         // Static arrays to handle state transitions:
-        private static byte[] _idealStateMapping = new byte[] {
+        private static readonly byte[] _idealStateMapping = [
             DATAGRIDROW_stateNormalCode,
             DATAGRIDROW_stateNormalCode,
             DATAGRIDROW_stateMouseOverCode,
@@ -137,9 +137,9 @@ namespace System.Windows.Controls
             DATAGRIDROW_stateNormalEditingFocusedCode,
             DATAGRIDROW_stateMouseOverEditingCode,
             DATAGRIDROW_stateMouseOverEditingFocusedCode
-        };
+        ];
 
-        private static byte[] _fallbackStateMapping = new byte[] {
+        private static readonly byte[] _fallbackStateMapping = [
             DATAGRIDROW_stateNormalCode, //DATAGRIDROW_stateMouseOverCode's fallback
             DATAGRIDROW_stateMouseOverEditingFocusedCode, //DATAGRIDROW_stateMouseOverEditingCode's fallback
             DATAGRIDROW_stateNormalEditingFocusedCode, //DATAGRIDROW_stateMouseOverEditingFocusedCode's fallback
@@ -150,11 +150,11 @@ namespace System.Windows.Controls
             DATAGRIDROW_stateSelectedFocusedCode, //DATAGRIDROW_stateNormalEditingFocusedCode's fallback
             DATAGRIDROW_stateSelectedFocusedCode, //DATAGRIDROW_stateSelectedCode's fallback
             DATAGRIDROW_stateNormalCode //DATAGRIDROW_stateSelectedFocusedCode's fallback
-        };
+        ];
 
         // In SL 2, our state names had spaces.  Going forward, we are removing the spaces but still 
         // supporting the legacy state names
-        private static string[] _legacyStateNames = new string[] {
+        private static readonly string[] _legacyStateNames = [
             DATAGRIDROW_stateMouseOver,
             DATAGRIDROW_stateMouseOverEditingLegacy,
             DATAGRIDROW_stateMouseOverEditingFocusedLegacy,
@@ -165,9 +165,9 @@ namespace System.Windows.Controls
             DATAGRIDROW_stateNormalEditingFocusedLegacy,
             DATAGRIDROW_stateSelectedLegacy,
             DATAGRIDROW_stateSelectedFocusedLegacy
-        };
+        ];
 
-        private static string[] _stateNames = new string[] {
+        private static readonly string[] _stateNames = [
             DATAGRIDROW_stateMouseOver,
             DATAGRIDROW_stateMouseOverEditing,
             DATAGRIDROW_stateMouseOverEditingFocused,
@@ -178,7 +178,7 @@ namespace System.Windows.Controls
             DATAGRIDROW_stateNormalEditingFocused,
             DATAGRIDROW_stateSelected,
             DATAGRIDROW_stateSelectedFocused
-        };
+        ];
 
         #endregion Data
 

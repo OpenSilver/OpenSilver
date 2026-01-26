@@ -23,7 +23,7 @@ namespace System.Windows.Media.Imaging
         private readonly IWriteableBitmapImpl _impl;
         private readonly bool _isSilverlightCompatibilityMode;
 
-        private int[] _pixels = Array.Empty<int>();
+        private int[] _pixels = [];
 
         private WriteableBitmap()
         {

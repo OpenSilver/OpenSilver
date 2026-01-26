@@ -90,7 +90,7 @@ namespace System.Windows.Controls.DataVisualization.Charting.Compatible
             {
                 // Base implementation groups by independent value; when plotting a single series in isolation, that's not desirable
                 return DataItems
-                    .Select(di => new IndependentValueGroup(di.ActualIndependentValue, new DataItem[] { di }));
+                    .Select(di => new IndependentValueGroup(di.ActualIndependentValue, [di]));
             }
         }
 

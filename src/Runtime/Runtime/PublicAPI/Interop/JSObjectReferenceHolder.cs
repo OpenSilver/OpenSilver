@@ -85,14 +85,14 @@ namespace OpenSilver.Internal
             return $"{obj.ReferenceId}-{arrayIndex}";
         }
 
-        private static string[] _ignoreFunctionNames = new[] {
+        private static readonly string[] _ignoreFunctionNames = [
             ".INTERNAL_JsObjectReferenceHolder.Add",
             ".INTERNAL_JSObjectReference..ctor",
             ".ExecuteJavaScript_Implementation",
             ".ExecuteJavaScript_GetJSObject",
             ".ExecuteJavaScript",
             ".ExecuteJavaScriptVoid",
-        };
+        ];
 
         private IReadOnlyList<FunctionDetails> NormalizeStackTrace(IReadOnlyList<FunctionDetails> stackTrace)
         {

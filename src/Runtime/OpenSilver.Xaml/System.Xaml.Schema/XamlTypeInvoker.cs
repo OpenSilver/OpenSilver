@@ -118,7 +118,7 @@ namespace System.Xaml.Schema
 				MethodInfo mi;
 				if (TryGetCache(key, out mi))
 				{
-					mi.Invoke(instance, new object[] { item });
+					mi.Invoke(instance, [item]);
 					return;
 				}
 
@@ -127,7 +127,7 @@ namespace System.Xaml.Schema
 					throw new InvalidOperationException($"The collection type '{collectionType}' does not have 'Add' method");
 				// FIXME: this method lookup should be mostly based on GetAddMethod(). At least iface method lookup must be done there.
 				cache[key] = mi;
-				mi.Invoke(instance, new object[] { item });
+				mi.Invoke(instance, [item]);
 			}
 		}
 
@@ -141,7 +141,7 @@ namespace System.Xaml.Schema
 
 			if (mode.HasFlag(XamlInvokerOptions.DeferCompile))
 			{
-				cache[key] = addDelegate = (i, v) => mi.Invoke(i, new object[] { v });
+				cache[key] = addDelegate = (i, v) => mi.Invoke(i, [v]);
 				Task.Factory.StartNew(() => cache[key] = addDelegate = mi.BuildCallExpression());
 			}
 			else
@@ -179,7 +179,7 @@ namespace System.Xaml.Schema
 				}
 				else
 				{
-					mi = collectionType.GetRuntimeMethod("Add", new Type[] { typeof(object) });
+					mi = collectionType.GetRuntimeMethod("Add", [typeof(object)]);
 					if (mi == null)
 						mi = LookupAddMethod(collectionType, typeof(IList));
 				}
@@ -212,7 +212,7 @@ namespace System.Xaml.Schema
 					throw new InvalidOperationException($"The dictionary type '{instanceType}' does not have 'Add' method");
 				if (mode.HasFlag(XamlInvokerOptions.DeferCompile))
 				{
-					cache[key] = addDelegate = (i, k, v) => mi.Invoke(i, new object[] { k, v });
+					cache[key] = addDelegate = (i, k, v) => mi.Invoke(i, [k, v]);
 					Task.Factory.StartNew(() => cache[key] = addDelegate = mi.BuildCall2Expression());
 				}
 				else
@@ -226,7 +226,7 @@ namespace System.Xaml.Schema
 				MethodInfo mi;
 				if (TryGetCache(lookupKey, out mi))
 				{
-					mi.Invoke(instance, new object[] { key, item });
+					mi.Invoke(instance, [key, item]);
 					return;
 				}
 
@@ -234,7 +234,7 @@ namespace System.Xaml.Schema
 				if (mi == null)
 					throw new InvalidOperationException($"The dictionary type '{instanceType}' does not have 'Add' method");
 				cache[lookupKey] = mi;
-				mi.Invoke(instance, new object[] { key, item });
+				mi.Invoke(instance, [key, item]);
 			}
 		}
 
@@ -249,7 +249,7 @@ namespace System.Xaml.Schema
 			}
 			else
 			{
-				mi = dictionaryType.GetRuntimeMethod("Add", new Type[] { typeof(object), typeof(object) });
+				mi = dictionaryType.GetRuntimeMethod("Add", [typeof(object), typeof(object)]);
 				if (mi == null)
 					mi = LookupAddMethod(dictionaryType, typeof(IDictionary));
 			}
@@ -304,7 +304,7 @@ namespace System.Xaml.Schema
 			MethodInfo createImmutableFromMutable;
 			// create immutable collection from List<> or Dictionary<,> using the Immutable[Type].CreateRange static method
 			if (TryGetCache(s_CreateImmutableFromMutableKey, out createImmutableFromMutable))
-				return createImmutableFromMutable.Invoke(null, new[] { instance });
+				return createImmutableFromMutable.Invoke(null, [instance]);
 
 			var ti = Type.UnderlyingType.GetTypeInfo();
 			var typeArgs = ti.GetGenericArguments();
@@ -314,21 +314,21 @@ namespace System.Xaml.Schema
 			var mi = builderType.GetRuntimeMethods().FirstOrDefault(r => r.Name == "CreateRange" && r.GetParameters().Length == 1);
 			createImmutableFromMutable = mi.MakeGenericMethod(typeArgs);
 			cache[s_CreateImmutableFromMutableKey] = createImmutableFromMutable;
-			return createImmutableFromMutable.Invoke(null, new[] { instance });
+			return createImmutableFromMutable.Invoke(null, [instance]);
 		}
 
 		public virtual MethodInfo GetAddMethod(XamlType contentType)
 		{
 			return Type == null || Type.UnderlyingType == null || Type.ItemType == null || Type.CollectionKind == XamlCollectionKind.None
 				? null
-				: Type.UnderlyingType.GetRuntimeMethod("Add", new Type[] { contentType.UnderlyingType });
+				: Type.UnderlyingType.GetRuntimeMethod("Add", [contentType.UnderlyingType]);
 		}
 
 		public virtual MethodInfo GetEnumeratorMethod()
 		{
 			return Type == null || Type.UnderlyingType == null || Type.CollectionKind == XamlCollectionKind.None
 				? null
-				: Type.UnderlyingType.GetRuntimeMethod("GetEnumerator", new Type[0]);
+				: Type.UnderlyingType.GetRuntimeMethod("GetEnumerator", []);
 		}
 
 		public virtual IEnumerator GetItems(object instance)

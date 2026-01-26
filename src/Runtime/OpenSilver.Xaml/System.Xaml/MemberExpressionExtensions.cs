@@ -33,8 +33,8 @@ namespace System.Xaml
 		static ParameterExpression s_InstanceExpression = Expression.Parameter(typeof(object), "instance");
 		static ParameterExpression s_ValueExpression = Expression.Parameter(typeof(object), "value");
 		static ParameterExpression s_KeyExpression = Expression.Parameter(typeof(object), "key");
-		static ParameterExpression[] s_ParameterExpressions1 = { s_InstanceExpression, s_ValueExpression };
-		static ParameterExpression[] s_ParameterExpressions2 = { s_InstanceExpression, s_KeyExpression, s_ValueExpression };
+		static ParameterExpression[] s_ParameterExpressions1 = [s_InstanceExpression, s_ValueExpression];
+		static ParameterExpression[] s_ParameterExpressions2 = [s_InstanceExpression, s_KeyExpression, s_ValueExpression];
 		static Type s_TargetExceptionType = typeof(Assembly).GetTypeInfo().Assembly.GetType("System.Reflection.TargetException");
 
 		static Exception TargetException(Type targetType, Type instanceType)

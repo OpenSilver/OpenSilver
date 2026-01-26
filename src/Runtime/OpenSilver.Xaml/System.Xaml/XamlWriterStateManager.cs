@@ -39,12 +39,12 @@ namespace System.Xaml
 
 		public override Exception CreateError(string msg)
 		{
-			return (Exception)Activator.CreateInstance(typeof(TError), new object[] { msg });
+			return (Exception)Activator.CreateInstance(typeof(TError), [msg]);
 		}
 
 		public override Exception CreateNamespaceError(string msg)
 		{
-			return (Exception)Activator.CreateInstance(typeof(TNSError), new object[] { msg });
+			return (Exception)Activator.CreateInstance(typeof(TNSError), [msg]);
 		}
 	}
 

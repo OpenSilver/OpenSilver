@@ -403,7 +403,7 @@ namespace System.Windows.Automation.Peers
                 if (headers != null)
                 {
                     int column = ((IGridItemProvider)this).Column;
-                    return new IRawElementProviderSimple[] { headers[column] };
+                    return [headers[column]];
                 }
             }
             return null;

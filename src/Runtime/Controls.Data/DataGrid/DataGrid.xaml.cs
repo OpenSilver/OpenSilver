@@ -7143,7 +7143,7 @@ namespace System.Windows.Controls
                         string bindingProperty = bindingPath;
 
                         // Check for nested paths.
-                        int lastIndexOfSeparator = bindingPath.LastIndexOfAny(new char[] { TypeHelper.PropertyNameSeparator, TypeHelper.LeftIndexerToken });
+                        int lastIndexOfSeparator = bindingPath.LastIndexOfAny([TypeHelper.PropertyNameSeparator, TypeHelper.LeftIndexerToken]);
                         if (lastIndexOfSeparator >= 0)
                         {
                             declaringPath = bindingPath.Substring(0, lastIndexOfSeparator);

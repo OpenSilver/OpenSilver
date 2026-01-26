@@ -299,13 +299,13 @@ namespace System.Windows.Automation.Peers
                         AutomationPeer peer = FrameworkElementAutomationPeer.CreatePeerForElement(uie);
                         if (peer != null)
                         {
-                            return new IRawElementProviderSimple[] { ProviderFromPeer(peer) };
+                            return [ProviderFromPeer(peer)];
                         }
                     }
                 }
             }
 
-            return new IRawElementProviderSimple[] { };
+            return [];
         }
     }
 }

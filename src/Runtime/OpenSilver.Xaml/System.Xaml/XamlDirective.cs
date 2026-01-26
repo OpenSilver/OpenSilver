@@ -42,7 +42,7 @@ namespace System.Xaml
 		}
 
 		public XamlDirective(string xamlNamespace, string name)
-			: this(new string[] { xamlNamespace }, name, new XamlType(typeof(object), new XamlSchemaContext(new XamlSchemaContextSettings())), null, AllowedMemberLocations.Any)
+			: this([xamlNamespace], name, new XamlType(typeof(object), new XamlSchemaContext(new XamlSchemaContextSettings())), null, AllowedMemberLocations.Any)
 		{
 			ArgumentNullException.ThrowIfNull(xamlNamespace);
 

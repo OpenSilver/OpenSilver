@@ -463,7 +463,7 @@ namespace System.Windows.Automation.Peers
                 AutomationPeer peer = FrameworkElementAutomationPeer.CreatePeerForElement(cell);
                 if (peer != null)
                 {
-                    return new IRawElementProviderSimple[] { ProviderFromPeer(peer) };
+                    return [ProviderFromPeer(peer)];
                 }
             }
             return null;

@@ -31,7 +31,7 @@ namespace System.ComponentModel
         {
             if (properties == null)
             {
-                _properties = Array.Empty<ReflectedPropertyData>();
+                _properties = [];
             }
             else
             {
@@ -49,7 +49,7 @@ namespace System.ComponentModel
             
             if (orderedProperties == null)
             {
-                _properties = Array.Empty<ReflectedPropertyData>();
+                _properties = [];
             }
             else
             {

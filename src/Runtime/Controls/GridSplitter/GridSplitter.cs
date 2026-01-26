@@ -727,7 +727,7 @@ namespace System.Windows.Controls
                 maxDelta = definition2ActualLength - definition2MinSize;
             }
 
-            return new double[] { minDelta, maxDelta };
+            return [minDelta, maxDelta];
         }
 
         /// <summary>

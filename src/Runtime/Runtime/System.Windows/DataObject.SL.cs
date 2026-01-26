@@ -204,7 +204,7 @@ namespace System.Windows
         public string[] GetFormats()
         {
             CheckIsDropMode();
-            return new string[1] { DataFormats.FileDrop };
+            return [DataFormats.FileDrop];
         }
 
         /// <summary>

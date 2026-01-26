@@ -21,23 +21,20 @@ namespace System.Windows.Controls
         /// <summary>
         /// BackingField for the TimeFormats being used.
         /// </summary>
-        private static readonly string[] _timeFormats = new[]
-                              {
-                                  "h:mm tt",
-                                  "h:mm:ss tt",
-                                  "HH:mm",
-                                  "HH:mm:ss",
-                                  "H:mm",
-                                  "H:mm:ss",
-                              };
+        private static readonly string[] _timeFormats =
+        [
+            "h:mm tt",
+            "h:mm:ss tt",
+            "HH:mm",
+            "HH:mm:ss",
+            "H:mm",
+            "H:mm:ss",
+        ];
 
         /// <summary>
         /// BackingField for the DateFormats being used.
         /// </summary>
-        private static readonly string[] _dateFormats = new[]
-                              {
-                                  "M/d/yyyy",
-                              };
+        private static readonly string[] _dateFormats = ["M/d/yyyy"];
 
         /// <summary>
         /// Determines whether this instance can convert from 

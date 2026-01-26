@@ -533,7 +533,7 @@ namespace System.Windows
             if (str is not null && str.StartsWith("rgb("))
             {
                 str = str.Substring(4, str.Length - 5);
-                string[] rgb = str.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] rgb = str.Split([','], StringSplitOptions.RemoveEmptyEntries);
                 if (rgb.Length == 3 &&
                     byte.TryParse(rgb[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out byte r) &&
                     byte.TryParse(rgb[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out byte g) &&

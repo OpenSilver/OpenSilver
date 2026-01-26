@@ -293,7 +293,7 @@ namespace System.Xaml
 
 		public XamlValueConverter<XamlDeferringLoader> DeferringLoader => deferringLoader.HasValue ? deferringLoader.Value : deferringLoader.Set(LookupDeferringLoader());
 
-		static readonly XamlMember[] empty_members = new XamlMember[0];
+		static readonly XamlMember[] empty_members = [];
 
 		public IList<XamlMember> DependsOn => LookupDependsOn() ?? empty_members;
 
@@ -419,7 +419,7 @@ namespace System.Xaml
 			return new XamlValueConverter<XamlDeferringLoader>(loaderType, null); // why is the target type null here? thought it would be the contentType.
 		}
 
-		static readonly XamlMember[] empty_list = new XamlMember[0];
+		static readonly XamlMember[] empty_list = [];
 
 		protected virtual IList<XamlMember> LookupDependsOn()
 		{

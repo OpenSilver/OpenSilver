@@ -191,11 +191,11 @@ namespace System.Windows.Automation.Peers
                 AutomationPeer peer = FrameworkElementAutomationPeer.FromElement(selectedItem);
                 if (peer != null)
                 {
-                    selection = new IRawElementProviderSimple[] { ProviderFromPeer(peer) };
+                    selection = [ProviderFromPeer(peer)];
                 }
             }
 
-            return selection ?? new IRawElementProviderSimple[] { };
+            return selection ?? [];
         }
     }
 }

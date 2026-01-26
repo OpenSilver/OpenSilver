@@ -104,7 +104,7 @@ namespace System.Xaml
 
 		string ReadUntil(char ch, bool readToEnd = false, bool skip = true, char? escape = null)
 		{
-			return ReadUntil(new[] { ch }, readToEnd, skip, escape);
+			return ReadUntil([ch], readToEnd, skip, escape);
 		}
 
 		string ReadUntil(char[] ch, bool readToEnd = false, bool skip = true, char? escape = null)
@@ -293,7 +293,7 @@ namespace System.Xaml
 				return true;
 			}
 
-			var name = ReadUntil(new[] { '=', ' ', ',' }, readToEnd: true, skip: false, escape: '\\');
+			var name = ReadUntil(['=', ' ', ','], readToEnd: true, skip: false, escape: '\\');
 			if (string.IsNullOrEmpty(name))
 				return false;
 			if (!ReadWhitespaceUntil('='))

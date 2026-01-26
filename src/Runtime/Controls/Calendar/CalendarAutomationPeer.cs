@@ -312,12 +312,12 @@ namespace System.Windows.Automation.Peers
         /// </remarks>
         int[] IMultipleViewProvider.GetSupportedViews()
         {
-            int[] supportedViews = new int[3];
-
-            supportedViews[0] = (int) CalendarMode.Month;
-            supportedViews[1] = (int) CalendarMode.Year;
-            supportedViews[2] = (int) CalendarMode.Decade;
-
+            int[] supportedViews =
+            [
+                (int) CalendarMode.Month,
+                (int) CalendarMode.Year,
+                (int) CalendarMode.Decade,
+            ];
             return supportedViews;
         }
 

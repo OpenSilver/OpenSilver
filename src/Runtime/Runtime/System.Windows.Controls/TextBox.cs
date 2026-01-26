@@ -571,17 +571,14 @@ namespace System.Windows.Controls
                     Application.Current is Application app)
                 {
                     return app.MainWindow.TextMeasurementService.MeasureBaseline(
-                        new FontProperties[1]
-                        {
-                            new FontProperties
-                            {
-                                FontStyle = (FontStyle)view.GetValue(FontStyleProperty),
-                                FontWeight = (FontWeight)view.GetValue(FontWeightProperty),
-                                FontSize = (double)view.GetValue(FontSizeProperty),
-                                LineHeight = (double)view.GetValue(LineHeightProperty),
-                                FontFamily = (FontFamily)view.GetValue(FontFamilyProperty),
-                            },
-                        });
+                        [new FontProperties
+                         {
+                             FontStyle = (FontStyle)view.GetValue(FontStyleProperty),
+                             FontWeight = (FontWeight)view.GetValue(FontWeightProperty),
+                             FontSize = (double)view.GetValue(FontSizeProperty),
+                             LineHeight = (double)view.GetValue(LineHeightProperty),
+                             FontFamily = (FontFamily)view.GetValue(FontFamilyProperty),
+                         }]);
                 }
 
                 return 0.0;

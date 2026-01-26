@@ -89,7 +89,7 @@ namespace System.Windows.Controls
                 {
                     return new LongTimeFormat();
                 }
-                else if (text.IndexOfAny(new[] { 'h', 'm', 's' }) < 0)
+                else if (text.IndexOfAny(['h', 'm', 's']) < 0)
                 {
                     string message = string.Format(
                         CultureInfo.CurrentCulture,

@@ -155,9 +155,9 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
             // Update value margins
             double heightMargin = newHeight * (3.0 / 4.0);
-            NotifyValueMarginsChanged(ActualDependentAxis, new ValueMargin[] { new ValueMargin(dataItem.ActualStackedDependentValue, heightMargin, heightMargin) });
+            NotifyValueMarginsChanged(ActualDependentAxis, [new ValueMargin(dataItem.ActualStackedDependentValue, heightMargin, heightMargin)]);
             double widthMargin = newWidth * (3.0 / 4.0);
-            NotifyValueMarginsChanged(ActualIndependentAxis, new ValueMargin[] { new ValueMargin(dataPoint.ActualIndependentValue, widthMargin, widthMargin) });
+            NotifyValueMarginsChanged(ActualIndependentAxis, [new ValueMargin(dataPoint.ActualIndependentValue, widthMargin, widthMargin)]);
         }
 
         /// <summary>
@@ -245,11 +245,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
                             0;
                     })
                     .Average() * (3.0 / 4.0);
-                return new ValueMargin[]
-                {
+                return
+                [
                     new ValueMargin(range.Minimum, margin, margin),
                     new ValueMargin(range.Maximum, margin, margin),
-                };
+                ];
             }
             else
             {

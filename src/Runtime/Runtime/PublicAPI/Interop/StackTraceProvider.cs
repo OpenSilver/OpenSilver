@@ -82,7 +82,7 @@ namespace OpenSilver.Internal
             var stack = Environment.StackTrace;
             // line 0: - the Environment.Stacktrace call
             // line 1: - this function
-            return stack.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Skip(2).Select(StackFunctionDetails).ToList();
+            return stack.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Skip(2).Select(StackFunctionDetails).ToList();
         }
 
     }

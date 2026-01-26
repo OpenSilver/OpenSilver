@@ -568,7 +568,7 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         if (cssColor.StartsWith("rgb("))
         {
-            string[] rgb = cssColor.Substring(4, cssColor.Length - 5).Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] rgb = cssColor.Substring(4, cssColor.Length - 5).Split([','], StringSplitOptions.RemoveEmptyEntries);
             if (rgb.Length == 3)
             {
                 color = Color.FromRgb(
@@ -580,7 +580,7 @@ internal sealed class RichTextBoxView : TextViewBase
         }
         else if (cssColor.StartsWith("rgba("))
         {
-            string[] rgba = cssColor.Substring(5, cssColor.Length - 6).Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] rgba = cssColor.Substring(5, cssColor.Length - 6).Split([','], StringSplitOptions.RemoveEmptyEntries);
             if (rgba.Length == 4)
             {
                 color = Color.FromArgb(
@@ -600,12 +600,12 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         if (OuterDiv is null)
         {
-            return Array.Empty<QuillDelta>();
+            return [];
         }
 
         return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}')") switch
         {
-            "" or null => Array.Empty<QuillDelta>(),
+            "" or null => [],
             string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
         };
     }
@@ -614,12 +614,12 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         if (OuterDiv is null)
         {
-            return Array.Empty<QuillDelta>();
+            return [];
         }
 
         return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}', {start.ToInvariantString()}, {length.ToInvariantString()})") switch
         {
-            "" or null => Array.Empty<QuillDelta>(),
+            "" or null => [],
             string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
         };
     }

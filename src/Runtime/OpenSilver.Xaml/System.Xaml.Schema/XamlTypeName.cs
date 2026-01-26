@@ -109,7 +109,7 @@ namespace System.Xaml.Schema
 			return list;
 		}
 
-		static readonly char[] comma_or_parens = new char[] { ',', '(', ')' };
+		static readonly char[] comma_or_parens = [',', '(', ')'];
 
 		public static bool TryParseList(string typeNameList, IXamlNamespaceResolver namespaceResolver, out IList<XamlTypeName> list)
 		{
@@ -195,7 +195,7 @@ namespace System.Xaml.Schema
 			TypeArguments = empty_type_args;
 		}
 
-		static readonly XamlTypeName[] empty_type_args = new XamlTypeName[0];
+		static readonly XamlTypeName[] empty_type_args = [];
 
 		public XamlTypeName(XamlType xamlType)
 			: this()

@@ -149,11 +149,11 @@ namespace System.Windows.Controls
                     // we only ever expect to return an array of one peer.
                     if (peer != null)
                     {
-                        return new[] { ProviderFromPeer(peer) };
+                        return [ProviderFromPeer(peer)];
                     }
                 }
             }
-            return new IRawElementProviderSimple[] { };
+            return [];
         }
 
         /// <summary>

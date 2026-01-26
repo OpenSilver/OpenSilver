@@ -79,9 +79,9 @@ namespace System.Windows.Controls
                 if (parameters[0].ParameterType == typeof(int))
                 {
                     int intIndex = -1;
-                    if (Int32.TryParse(stringIndex.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out intIndex))
+                    if (int.TryParse(stringIndex.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out intIndex))
                     {
-                        index = new object[] { intIndex };
+                        index = [intIndex];
                         return pi;
                     }
                 }
@@ -89,7 +89,7 @@ namespace System.Windows.Controls
                 // If string indexer is found save it, in case there is an int indexer.
                 if (parameters[0].ParameterType == typeof(string))
                 {
-                    index = new object[] { stringIndex };
+                    index = [stringIndex];
                     stringIndexer = pi;
                 }
             }

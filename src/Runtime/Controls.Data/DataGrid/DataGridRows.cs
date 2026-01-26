@@ -536,7 +536,7 @@ namespace System.Windows.Controls
             {
                 if (_isProgressiveLoadingInProgress)
                 {
-                    _pendingRefreshRowsArgs = new bool[] { recycleRows, clearRows };
+                    _pendingRefreshRowsArgs = [recycleRows, clearRows];
                     return;
                 }
                 // _desiredCurrentColumnIndex is used in MakeFirstDisplayedCellCurrentCell to set the

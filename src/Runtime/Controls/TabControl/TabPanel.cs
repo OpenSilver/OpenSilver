@@ -181,7 +181,7 @@ namespace System.Windows.Controls.Primitives
             Dock tabAlignment = TabAlignment;
             bool isMultiRow = NumberOfRows > 1;
             int activeRow = 0;
-            int[] solution = new int[0];
+            int[] solution = [];
             Size childOffset = new Size(0, 0);
             double[] headerSize = GetHeadersSize();
 
@@ -493,7 +493,7 @@ namespace System.Windows.Controls.Primitives
             // If everithing fit in 1 row then exit (no separators needed)
             if (currentRowIndex == 0)
             {
-                return new int[0];
+                return [];
             }
 
             // Add the last row

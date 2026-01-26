@@ -252,7 +252,7 @@ namespace System.Windows
             }
             catch
             {
-                paramsArray = Array.Empty<HTMLParam>();
+                paramsArray = [];
             }
 
             foreach (HTMLParam p in paramsArray)

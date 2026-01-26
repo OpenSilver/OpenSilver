@@ -676,7 +676,7 @@ namespace Microsoft.Expression.Interactivity.Layout
                 {
                     DoubleAnimation xScaleAnimation = new DoubleAnimation() { Duration = duration, From = xScaleFrom, To = 1.0 };
                     Storyboard.SetTarget(xScaleAnimation, child);
-                    Storyboard.SetTargetProperty(xScaleAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[0].(ScaleTransform.ScaleX)", new object[0]));
+                    Storyboard.SetTargetProperty(xScaleAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[0].(ScaleTransform.ScaleX)", []));
                     xScaleAnimation.EasingFunction = this.EaseX;
                     transitionStoryboard.Children.Add(xScaleAnimation);
                 }
@@ -685,7 +685,7 @@ namespace Microsoft.Expression.Interactivity.Layout
                 {
                     DoubleAnimation yScaleAnimation = new DoubleAnimation() { Duration = duration, From = yScaleFrom, To = 1.0 };
                     Storyboard.SetTarget(yScaleAnimation, child);
-                    Storyboard.SetTargetProperty(yScaleAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[0].(ScaleTransform.ScaleY)", new object[0]));
+                    Storyboard.SetTargetProperty(yScaleAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[0].(ScaleTransform.ScaleY)", []));
                     yScaleAnimation.EasingFunction = this.EaseY;
                     transitionStoryboard.Children.Add(yScaleAnimation);
                 }
@@ -695,7 +695,7 @@ namespace Microsoft.Expression.Interactivity.Layout
             {
                 DoubleAnimation xAnimation = new DoubleAnimation() { Duration = duration, From = xFrom, To = 0.0 };
                 Storyboard.SetTarget(xAnimation, child);
-                Storyboard.SetTargetProperty(xAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[1].(TranslateTransform.X)", new object[0]));
+                Storyboard.SetTargetProperty(xAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[1].(TranslateTransform.X)", []));
                 xAnimation.EasingFunction = this.EaseX;
                 transitionStoryboard.Children.Add(xAnimation);
             }
@@ -704,7 +704,7 @@ namespace Microsoft.Expression.Interactivity.Layout
             {
                 DoubleAnimation yAnimation = new DoubleAnimation() { Duration = duration, From = yFrom, To = 0.0 };
                 Storyboard.SetTarget(yAnimation, child);
-                Storyboard.SetTargetProperty(yAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[1].(TranslateTransform.Y)", new object[0]));
+                Storyboard.SetTargetProperty(yAnimation, new PropertyPath(prefix + "(TransformGroup.Children)[1].(TranslateTransform.Y)", []));
                 yAnimation.EasingFunction = this.EaseY;
                 transitionStoryboard.Children.Add(yAnimation);
             }

@@ -79,7 +79,7 @@ namespace Microsoft.Expression.Interactivity.Core
                             && parameters[1].ParameterType.IsAssignableFrom(parameter.GetType()))
                         {
 
-                            methodDescriptor.MethodInfo.Invoke(this.Target, new object[] { this.AssociatedObject, parameter });
+                            methodDescriptor.MethodInfo.Invoke(this.Target, [this.AssociatedObject, parameter]);
                         }
                     }
                 }

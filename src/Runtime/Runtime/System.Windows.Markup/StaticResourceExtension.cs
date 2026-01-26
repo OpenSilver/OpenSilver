@@ -126,7 +126,7 @@ public class StaticResourceExtension : MarkupExtension
         XamlMember templateResourcesProperty = templateXType.GetMember("Resources");
         XamlMember appResourcesProperty = appXType.GetMember("Resources");
 
-        XamlType[] types = new XamlType[1] { schemaContext.GetXamlType(typeof(ResourceDictionary)) };
+        XamlType[] types = [schemaContext.GetXamlType(typeof(ResourceDictionary))];
 
         var ambientValues = ambientProvider.GetAllAmbientValues(null,
                                                                 false,

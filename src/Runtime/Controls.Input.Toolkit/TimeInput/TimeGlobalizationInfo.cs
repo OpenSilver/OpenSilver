@@ -26,7 +26,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// The characters that are allowed inside a format.
         /// </summary>
-        private readonly char[] TimeChars = new[] { 'h', 'm', 's', 'H', 't' };
+        private readonly char[] TimeChars = ['h', 'm', 's', 'H', 't'];
 
         /// <summary>
         /// Gets or sets the culture used by the owning TimeInput control.
@@ -111,7 +111,7 @@ namespace System.Windows.Controls
             // the documented workaround is to add a space.
             if (transformed.Length == 1)
             {
-                transformed = new string(new[] { transformed[0], ' ' });
+                transformed = new string([transformed[0], ' ']);
             }
 
             return transformed;

@@ -49,7 +49,7 @@ namespace System.Windows.Browser
                 string url = OpenSilver.Interop.ExecuteJavaScriptString("window.location.search");
                 if (!string.IsNullOrEmpty(url))
                 {
-                    string[] parts = url.Substring(1).Split(new char[1] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] parts = url.Substring(1).Split(['&'], StringSplitOptions.RemoveEmptyEntries);
 
                     foreach (string part in parts)
                     {

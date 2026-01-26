@@ -99,17 +99,17 @@ namespace System.Xaml
 		}
 
 
-		static readonly Type[] mscorlib_types = {
+		static readonly Type[] mscorlib_types = [
 			Type.GetType("System.Collections.Generic.IList`1", false),
 			typeof(bool),
 			Type.GetType("System.Collections.ArrayList", false)
-		};
+		];
 
-		internal static readonly string[] mscorlib_assemblies = new string[] {
+		internal static readonly string[] mscorlib_assemblies = [
 			/*"System.Collections.Generic",
 			"System.Collections.NonGeneric",*/
 			"System.Private.CoreLib"
-		};
+		];
 
 		/*mscorlib_types.Where(r => r != null)
 																   .Select(r => r.GetTypeInfo().Assembly)
@@ -908,7 +908,7 @@ namespace System.Xaml
 				{
 					var ca = xm.CustomAttributeProvider.GetCustomAttribute<ConstructorArgumentAttribute>(false);
 					if (ca != null)
-						return new XamlType[] { xm.Type };
+						return [xm.Type];
 				}
 			}
 

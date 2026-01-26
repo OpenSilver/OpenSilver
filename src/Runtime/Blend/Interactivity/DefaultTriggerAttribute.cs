@@ -60,7 +60,7 @@ namespace System.Windows.Interactivity
         /// <remarks>This constructor is useful if the specifed <see cref="TriggerBase"/> has a single argument. The
         /// resulting code will be CLS compliant.</remarks>
         public DefaultTriggerAttribute(Type targetType, Type triggerType, object parameter) :
-            this(targetType, triggerType, new object[] { parameter })
+            this(targetType, triggerType, [parameter])
         {
         }
 

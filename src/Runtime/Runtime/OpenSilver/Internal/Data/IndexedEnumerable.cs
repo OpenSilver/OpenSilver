@@ -468,7 +468,7 @@ namespace OpenSilver.Internal.Data
             {
                 Type srcType = collection.GetType();
                 // try reflection for IndexOf(object)
-                MethodInfo mi = srcType.GetMethod("IndexOf", new Type[] { typeof(object) });
+                MethodInfo mi = srcType.GetMethod("IndexOf", [typeof(object)]);
                 if ((mi != null) && (mi.ReturnType == typeof(int)))
                 {
                     _reflectedIndexOf = mi;
@@ -592,7 +592,7 @@ namespace OpenSilver.Internal.Data
             {
                 try
                 {
-                    value = (int)_reflectedIndexOf.Invoke(Enumerable, new object[] { item });
+                    value = (int)_reflectedIndexOf.Invoke(Enumerable, [item]);
                     isNativeValue = true;
                 }
                 catch (MethodAccessException)
@@ -625,7 +625,7 @@ namespace OpenSilver.Internal.Data
             {
                 try
                 {
-                    value = _reflectedItemAt.GetValue(Enumerable, new object[] { index });
+                    value = _reflectedItemAt.GetValue(Enumerable, [index]);
                     isNativeValue = true;
                 }
                 catch (MethodAccessException)

@@ -124,9 +124,9 @@ namespace Microsoft.Windows
         {
             if (Data == null)
             {
-                return Array.Empty<string>();
+                return [];
             }
-            return new string[] { Data.GetType().FullName };
+            return [Data.GetType().FullName];
         }
 
         /// <summary>

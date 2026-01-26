@@ -16,9 +16,9 @@ namespace System.Windows.Controls
     {
         #region Data
 
-        private static string _starSuffix = "*";
-        private static string[] _valueInvariantUnitStrings = { "auto", "sizetocells", "sizetoheader" };
-        private static DataGridLength[] _valueInvariantDataGridLengths = { DataGridLength.Auto, DataGridLength.SizeToCells, DataGridLength.SizeToHeader };
+        private const string _starSuffix = "*";
+        private static readonly string[] _valueInvariantUnitStrings = ["auto", "sizetocells", "sizetoheader"];
+        private static readonly DataGridLength[] _valueInvariantDataGridLengths = [DataGridLength.Auto, DataGridLength.SizeToCells, DataGridLength.SizeToHeader];
 
         #endregion Data
 

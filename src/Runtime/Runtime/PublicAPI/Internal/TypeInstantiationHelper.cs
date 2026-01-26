@@ -28,7 +28,7 @@ namespace CSHTML5.Internal
         /// <returns>A new instance of the Type, initialized through the parameterless constructor.</returns>
         public static object Instantiate(Type type)
         {
-            var constructor = type.GetConstructor(new Type[] { });
+            var constructor = type.GetConstructor([]);
             if (constructor != null)
             {
                 return constructor.Invoke(null);

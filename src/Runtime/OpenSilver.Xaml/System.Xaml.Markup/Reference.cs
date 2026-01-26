@@ -53,7 +53,7 @@ namespace System.Xaml.Markup
 				throw new InvalidOperationException("serviceProvider does not implement IXamlNameResolver");
 			var ret = r.Resolve(Name);
 			if (ret == null)
-				ret = r.GetFixupToken(new string[] { Name }, true);
+				ret = r.GetFixupToken([Name], true);
 			return ret;
 		}
 	}

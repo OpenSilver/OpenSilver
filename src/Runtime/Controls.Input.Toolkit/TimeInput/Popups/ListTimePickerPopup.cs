@@ -550,7 +550,7 @@ namespace System.Windows.Controls
         /// </returns>
         internal override PopupTimeSelectionMode[] GetValidPopupTimeSelectionModes()
         {
-            return new[] { PopupTimeSelectionMode.HoursAndMinutesOnly };
+            return [PopupTimeSelectionMode.HoursAndMinutesOnly];
         }
 
         /// <summary>

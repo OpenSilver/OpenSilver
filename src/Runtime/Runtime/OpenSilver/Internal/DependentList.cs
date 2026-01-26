@@ -48,7 +48,7 @@ internal struct DependentList
 
     public void Add(Dependent dependent)
     {
-        _listStore ??= new List<Dependent>();
+        _listStore ??= [];
         _listStore.Add(dependent);
     }
 
@@ -58,7 +58,7 @@ internal struct DependentList
     {
         if (_listStore is null)
         {
-            return Array.Empty<Dependent>();
+            return [];
         }
 
         return _listStore.ToArray();

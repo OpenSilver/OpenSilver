@@ -379,7 +379,7 @@ namespace System.Windows.Navigation
             }
             else
             {
-                string[] pagePathAndNameParts = pagePathAndName.Split(new string[] { UriParsingHelper.ComponentDelimiterWithoutSlash }, StringSplitOptions.RemoveEmptyEntries);
+                string[] pagePathAndNameParts = pagePathAndName.Split([UriParsingHelper.ComponentDelimiterWithoutSlash], StringSplitOptions.RemoveEmptyEntries);
                 if (pagePathAndNameParts.Length != 2)
                 {
                     throw new InvalidOperationException(Resource.PageResourceContentLoader_InvalidComponentSyntax);
