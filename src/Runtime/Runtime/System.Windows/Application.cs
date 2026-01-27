@@ -503,8 +503,12 @@ namespace System.Windows
                 Window.Current = _mainWindow = value;
 
                 _mainWindow.AttachToDomElement(_rootDiv);
+
+                MainWindowReady?.Invoke(this, EventArgs.Empty);
             }
         }
+
+        internal event EventHandler MainWindowReady;
 
         internal INTERNAL_HtmlDomElementReference GetRootDiv() => _rootDiv;
 

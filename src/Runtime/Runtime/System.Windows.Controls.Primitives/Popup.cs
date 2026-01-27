@@ -259,7 +259,7 @@ namespace System.Windows.Controls.Primitives
                 nameof(IsOpen), 
                 typeof(bool), 
                 typeof(Popup), 
-                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsOpenChanged));
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsOpenChanged, CoerceIsOpen));
 
         private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -287,6 +287,27 @@ namespace System.Windows.Controls.Primitives
                 popup.Unloaded -= new RoutedEventHandler(CloseOnUnloaded);
                 popup.IsVisibleChanged -= new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);
             }
+        }
+
+        private static object CoerceIsOpen(DependencyObject d, object value)
+        {
+            if ((bool)value && Application.Current.MainWindow is null)
+            {
+                var popup = (Popup)d;
+                popup.DeferOpenUntilMainWindowReady();
+                return BooleanBoxes.FalseBox;
+            }
+
+            return value;
+        }
+
+        private void DeferOpenUntilMainWindowReady() => Application.Current.MainWindowReady += OpenOnMainWindowReady;
+
+        private void OpenOnMainWindowReady(object sender, EventArgs e)
+        {
+            ((Application)sender).MainWindowReady -= OpenOnMainWindowReady;
+
+            CoerceValue(IsOpenProperty);
         }
 
         private static void CloseOnUnloaded(object sender, RoutedEventArgs e)

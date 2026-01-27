@@ -228,7 +228,12 @@ internal sealed class PopupRoot : FrameworkElement
     // tree, "Popup.ParentWindow" should be populated. Otherwise, we use the default
     // window (MainWindow) to display the popup.
     private Window GetParentWindow()
-        => _popup.PlacementTarget?.ParentWindow ?? _popup.ParentWindow ?? Application.Current.MainWindow;
+    {
+        Window window = _popup.PlacementTarget?.ParentWindow;
+        window ??= _popup.ParentWindow;
+        window ??= Application.Current.MainWindow;
+        return window;
+    }
 }
 
 internal sealed class TransformLayer : FrameworkElement
