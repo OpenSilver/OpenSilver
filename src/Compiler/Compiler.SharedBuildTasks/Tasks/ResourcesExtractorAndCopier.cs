@@ -222,24 +222,24 @@ public sealed class ResourcesExtractorAndCopier : MSTask
         return false;
     }
 
-    private static void SaveDictionary(Dictionary<string, string> dictionary, string filePath)
+    private static void SaveDictionary(ConcurrentDictionary<string, string> dictionary, string filePath)
     {
-        var serializer = new DataContractJsonSerializer(typeof(Dictionary<string, string>));
+        var serializer = new DataContractJsonSerializer(typeof(ConcurrentDictionary<string, string>));
         using var xmlWriter = JsonReaderWriterFactory.CreateJsonWriter(new FileStream(filePath, FileMode.Create), Encoding.UTF8, true, true);
         serializer.WriteObject(xmlWriter, dictionary);
     }
 
-    private static Dictionary<string, string> LoadDictionary(string filePath)
+    private static ConcurrentDictionary<string, string> LoadDictionary(string filePath)
     {
         if (!File.Exists(filePath))
         {
             // File doesn't exist, so return an empty dictionary
-            return new Dictionary<string, string>();
+            return new ConcurrentDictionary<string, string>();
         }
 
-        var serializer = new DataContractJsonSerializer(typeof(Dictionary<string, string>));
+        var serializer = new DataContractJsonSerializer(typeof(ConcurrentDictionary<string, string>));
         using var stream = new FileStream(filePath, FileMode.Open);
-        return (Dictionary<string, string>)serializer.ReadObject(stream);
+        return (ConcurrentDictionary<string, string>)serializer.ReadObject(stream)!;
     }
 
     private ITaskItem[] ExtractResources(MonoCecilAssemblyStorage storage)
@@ -304,7 +304,7 @@ public sealed class ResourcesExtractorAndCopier : MSTask
         }
     }
 
-    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, ConcurrentBag<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
+    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, ConcurrentBag<ITaskItem> copiedResources, ConcurrentDictionary<string, string> resourcesHashDict)
     {
         string assemblyName = asm.Name.Name;
 
@@ -375,7 +375,7 @@ public sealed class ResourcesExtractorAndCopier : MSTask
         }
     }
 
-    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, ConcurrentBag<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
+    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, ConcurrentBag<ITaskItem> copiedResources, ConcurrentDictionary<string, string> resourcesHashDict)
     {
         if (GetResourceManifest(asm) is not EmbeddedResource manifest)
         {
