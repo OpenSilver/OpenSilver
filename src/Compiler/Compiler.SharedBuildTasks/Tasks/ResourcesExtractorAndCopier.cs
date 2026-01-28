@@ -234,17 +234,17 @@ public sealed class ResourcesExtractorAndCopier : MSTask
         if (!File.Exists(filePath))
         {
             // File doesn't exist, so return an empty dictionary
-            return new ConcurrentDictionary<string, string>();
+            return [];
         }
 
         var serializer = new DataContractJsonSerializer(typeof(ConcurrentDictionary<string, string>));
         using var stream = new FileStream(filePath, FileMode.Open);
-        return (ConcurrentDictionary<string, string>)serializer.ReadObject(stream)!;
+        return (ConcurrentDictionary<string, string>)serializer.ReadObject(stream) ?? [];
     }
 
     private ITaskItem[] ExtractResources(MonoCecilAssemblyStorage storage)
     {
-        ConcurrentBag<ITaskItem> copiedResources = new();
+        ConcurrentBag<ITaskItem> copiedResources = [];
 
         var resourcesHashFileName = Path.Combine(BaseIntermediateOutputPath, ResourcesCopierHashDictFile);
         var resourcesHashDict = LoadDictionary(resourcesHashFileName);
