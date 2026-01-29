@@ -11,11 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Collections;
 using System.ComponentModel;
-using System.Windows.Markup;
+using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
@@ -26,8 +27,7 @@ namespace System.Windows
     /// <summary>
     /// Represents an application window.
     /// </summary>
-    [ContentProperty(nameof(Content))]
-    public class Window : FrameworkElement, IResizeObserverListener
+    public class Window : ContentControl, IResizeObserverListener
     {
         static Window()
         {
@@ -207,7 +207,7 @@ namespace System.Windows
         /// <summary>
         /// Identifies the <see cref="Content"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ContentProperty =
+        public static readonly new DependencyProperty ContentProperty =
             DependencyProperty.Register(
                 nameof(Content),
                 typeof(FrameworkElement),
@@ -217,7 +217,7 @@ namespace System.Windows
         /// <summary>
         /// Gets or sets the content of the <see cref="Window"/>.
         /// </summary>
-        public FrameworkElement Content
+        public new FrameworkElement Content
         {
             get => (FrameworkElement)GetValue(ContentProperty);
             set => SetValueInternal(ContentProperty, value);
@@ -259,7 +259,7 @@ namespace System.Windows
             // Not needed in HTML.
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        internal new object CreateDomElementInternal(object parentRef, bool isKeyboardFocusable, out object domElementWhereToPlaceChildren)
         {
             throw new InvalidOperationException("'CreateDomElement' should not be called for the Window object.");
         }
@@ -291,9 +291,28 @@ namespace System.Windows
         #endregion
 
         [OpenSilver.NotImplemented]
+        public bool AllowsTransparency { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public ImageSource Icon { get; set; }
+
+        [OpenSilver.NotImplemented]
         public bool IsActive { get; private set; }
+
         [OpenSilver.NotImplemented]
         public new bool IsVisible { get; private set; }
+
+        [OpenSilver.NotImplemented]
+        public bool ShowActivated { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public bool ShowInTaskbar { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public bool Topmost { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public WindowStartupLocation WindowStartupLocation { get; set; }
 
         [OpenSilver.NotImplemented]
         public WindowStyle WindowStyle { get; set; }
@@ -335,7 +354,7 @@ namespace System.Windows
         [OpenSilver.NotImplemented]
         public void Show()
         {
-        
+
         }
 
         [OpenSilver.NotImplemented]
