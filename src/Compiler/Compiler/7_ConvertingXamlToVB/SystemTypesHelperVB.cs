@@ -26,21 +26,21 @@ namespace OpenSilver.Compiler
         private static readonly Dictionary<(string Namespace, string Type), string> _supportIntrinsicTypesDefaultValues =
             new(16, StringTupleComparer.Instance)
             {
-                [("System", "Double")] = "0D",
+                [("System", "Double")] = "0R",
                 [("System", "Single")] = "0F",
                 [("System", "TimeSpan")] = "New Global.System.TimeSpan()",
                 [("System", "String")] = "",
                 [("System", "Boolean")] = "false",
                 [("System", "Byte")] = "CByte(0)",
-                [("System", "Int16")] = "CShort(0)",
-                [("System", "Int32")] = "0",
+                [("System", "Int16")] = "0S",
+                [("System", "Int32")] = "0I",
                 [("System", "Int64")] = "0L",
-                [("System", "UInt16")] = "CUShort(0)",
-                [("System", "UInt32")] = "CUInt(0)",
+                [("System", "UInt16")] = "0US",
+                [("System", "UInt32")] = "0UI",
                 [("System", "UInt64")] = "0UL",
                 [("System", "SByte")] = "CSByte(0)",
                 [("System", "Char")] = "Chr(0)",
-                [("System", "Decimal")] = "CDec(0)",
+                [("System", "Decimal")] = "0D",
                 [("System", "Object")] = "\"\"",
             };
 
@@ -90,17 +90,17 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "Global.System.Double.NaN";
+                    return "Double.NaN";
 
                 case "infinity":
                 case "+infinity":
-                    return "Global.System.Double.PositiveInfinity";
+                    return "Double.PositiveInfinity";
 
                 case "-infinity":
-                    return "Global.System.Double.NegativeInfinity";
+                    return "Double.NegativeInfinity";
             }
 
-            if (value.EndsWith("d"))
+            if (value.EndsWith("r"))
             {
                 value = value.Substring(0, value.Length - 1);
             }
@@ -115,7 +115,7 @@ namespace OpenSilver.Compiler
                 value = "0";
             }
 
-            return $"{value}D";
+            return $"{value}R";
         }
 
         public override string ConvertToSingle(string source)
@@ -127,14 +127,14 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "Global.System.Single.NaN";
+                    return "Single.NaN";
 
                 case "infinity":
                 case "+infinity":
-                    return "Global.System.Single.PositiveInfinity";
+                    return "Single.PositiveInfinity";
 
                 case "-infinity":
-                    return "Global.System.Single.NegativeInfinity";                    
+                    return "Single.NegativeInfinity";                    
             }
 
             if (value.EndsWith("f"))
@@ -208,7 +208,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "int16")];
             }
 
-            return $"CShort({value})";
+            if (value.EndsWith("S", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            return $"{value}S";
         }
 
         public override string ConvertToInt32(string source)
@@ -220,7 +225,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "int32")];
             }
 
-            return value;
+            if (value.EndsWith("I", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            return $"{value}I";
         }
 
         public override string ConvertToInt64(string source)
@@ -230,6 +240,11 @@ namespace OpenSilver.Compiler
             if (value.Length == 0)
             {
                 return _supportIntrinsicTypesDefaultValues[("system", "int64")];
+            }
+
+            if (value.EndsWith("L", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 1);
             }
 
             return $"{value}L";
@@ -244,7 +259,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "uint16")];
             }
 
-            return $"CUShort({value})";
+            if (source.EndsWith("US", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 2);
+            }
+
+            return $"{value}US";
         }
 
         public override string ConvertToUInt32(string source)
@@ -256,7 +276,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "uint32")];
             }
 
-            return $"CUInt({value})";
+            if (source.EndsWith("UI", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 2);
+            }
+
+            return $"{value}UI";
         }
 
         public override string ConvertToUInt64(string source)
@@ -266,6 +291,11 @@ namespace OpenSilver.Compiler
             if (value.Length == 0)
             {
                 return _supportIntrinsicTypesDefaultValues[("system", "uint64")];
+            }
+
+            if (source.EndsWith("UL", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 2);
             }
 
             return $"{value}UL";
@@ -295,9 +325,9 @@ namespace OpenSilver.Compiler
 
         public override string ConvertToDecimal(string source)
         {
-            string value = source.ToLower();
+            string value = source.Trim();
 
-            if (value.EndsWith("m"))
+            if (value.EndsWith("D", StringComparison.OrdinalIgnoreCase))
             {
                 value = value.Substring(0, value.Length - 1);
             }
@@ -312,7 +342,7 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "decimal")];
             }
 
-            return $"CDec({value})";
+            return $"{value}D";
         }
 
         public override string ConvertToObject(string source)

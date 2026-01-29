@@ -31,16 +31,16 @@ namespace OpenSilver.Compiler
                 [("System", "TimeSpan")] = "new global.System.TimeSpan()",
                 [("System", "String")] = "",
                 [("System", "Boolean")] = "false",
-                [("System", "Byte")] = "byte(0)",
-                [("System", "Int16")] = "int16(0)",
+                [("System", "Byte")] = "0uy",
+                [("System", "Int16")] = "0s",
                 [("System", "Int32")] = "0",
-                [("System", "Int64")] = "int64(0)",
-                [("System", "UInt16")] = "uint16(0)",
-                [("System", "UInt32")] = "uint32(0)",
-                [("System", "UInt64")] = "uint64(0)",
-                [("System", "SByte")] = "sbyte(0)",
+                [("System", "Int64")] = "0L",
+                [("System", "UInt16")] = "0us",
+                [("System", "UInt32")] = "0u",
+                [("System", "UInt64")] = "0UL",
+                [("System", "SByte")] = "0y",
                 [("System", "Char")] = "char(0)",
-                [("System", "Decimal")] = "decimal(0)",
+                [("System", "Decimal")] = "0M",
                 [("System", "Object")] = "\"\"",
             };
 
@@ -200,7 +200,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "byte")];
             }
 
-            return $"byte({value})";
+            if (value.EndsWith("uy", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 2);
+            }
+
+            return $"{value}uy";
         }
 
         public override string ConvertToInt16(string source)
@@ -212,7 +217,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "int16")];
             }
 
-            return $"int16({value})";
+            if (value.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            return $"{value}s";
         }
 
         public override string ConvertToInt32(string source)
@@ -236,7 +246,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "int64")];
             }
 
-            return $"int64({value})";
+            if (value.EndsWith("L", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            return $"{value}L";
         }
 
         public override string ConvertToUInt16(string source)
@@ -248,7 +263,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "uint16")];
             }
 
-            return $"uint16({value})";
+            if (value.EndsWith("us", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 2);
+            }
+
+            return $"{value}us";
         }
 
         public override string ConvertToUInt32(string source)
@@ -260,7 +280,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "uint32")];
             }
 
-            return $"uint32({value})";
+            if (value.EndsWith("u", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            return $"{value}u";
         }
 
         public override string ConvertToUInt64(string source)
@@ -272,7 +297,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "uint64")];
             }
 
-            return $"uint64({value})";
+            if (value.EndsWith("UL", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 2);
+            }
+
+            return $"{value}UL";
         }
 
         public override string ConvertToSByte(string source)
@@ -284,7 +314,12 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "sbyte")];
             }
 
-            return $"sbyte({value})";
+            if (value.EndsWith("y", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            return $"{value}y";
         }
 
         public override string ConvertToChar(string source)
@@ -301,7 +336,7 @@ namespace OpenSilver.Compiler
         {
             string value = source.ToLower();
 
-            if (value.EndsWith("m"))
+            if (value.EndsWith("M", StringComparison.OrdinalIgnoreCase))
             {
                 value = value.Substring(0, value.Length - 1);
             }
@@ -316,7 +351,7 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "decimal")];
             }
 
-            return $"decimal({value})";
+            return $"{value}M";
         }
 
         public override string ConvertToObject(string source)

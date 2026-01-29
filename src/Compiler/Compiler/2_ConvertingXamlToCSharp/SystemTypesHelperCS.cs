@@ -31,15 +31,15 @@ namespace OpenSilver.Compiler
                 [("System", "TimeSpan")] = "new global::System.TimeSpan()",
                 [("System", "String")] = "",
                 [("System", "Boolean")] = "false",
-                [("System", "Byte")] = "(global::System.Byte)0",
-                [("System", "Int16")] = "(global::System.Int16)0",
+                [("System", "Byte")] = "(byte)0",
+                [("System", "Int16")] = "(short)0",
                 [("System", "Int32")] = "0",
                 [("System", "Int64")] = "0L",
-                [("System", "UInt16")] = "(global::System.UInt16)0",
+                [("System", "UInt16")] = "(ushort)0",
                 [("System", "UInt32")] = "0U",
                 [("System", "UInt64")] = "0UL",
-                [("System", "SByte")] = "(global::System.SByte)0",
-                [("System", "Char")] = "(global::System.Char)0",
+                [("System", "SByte")] = "(sbyte)0",
+                [("System", "Char")] = "(char)0",
                 [("System", "Decimal")] = "0M",
                 [("System", "Object")] = "\"\"",
             };
@@ -90,14 +90,14 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "global::System.Double.NaN";
+                    return "double.NaN";
 
                 case "infinity":
                 case "+infinity":
-                    return "global::System.Double.PositiveInfinity";
+                    return "double.PositiveInfinity";
 
                 case "-infinity":
-                    return "global::System.Double.NegativeInfinity";
+                    return "double.NegativeInfinity";
             }
 
             if (value.EndsWith("d"))
@@ -127,14 +127,14 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "global::System.Single.NaN";
+                    return "float.NaN";
 
                 case "infinity":
                 case "+infinity":
-                    return "global::System.Single.PositiveInfinity";
+                    return "float.PositiveInfinity";
 
                 case "-infinity":
-                    return "global::System.Single.NegativeInfinity";                    
+                    return "float.NegativeInfinity";                    
             }
 
             if (value.EndsWith("f"))
@@ -199,7 +199,7 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "byte")];
             }
 
-            return $"(global::System.Byte){value}";
+            return $"(byte){value}";
         }
 
         public override string ConvertToInt16(string source)
@@ -211,7 +211,7 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "int16")];
             }
 
-            return $"(global::System.Int16){value}";
+            return $"(short){value}";
         }
 
         public override string ConvertToInt32(string source)
@@ -247,7 +247,7 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "uint16")];
             }
 
-            return $"(global::System.UInt16){value}";
+            return $"(ushort){value}";
         }
 
         public override string ConvertToUInt32(string source)
@@ -283,7 +283,7 @@ namespace OpenSilver.Compiler
                 return _supportIntrinsicTypesDefaultValues[("system", "sbyte")];
             }
 
-            return $"(global::System.SByte){value}";
+            return $"(sbyte){value}";
         }
 
         public override string ConvertToChar(string source)
@@ -298,9 +298,9 @@ namespace OpenSilver.Compiler
 
         public override string ConvertToDecimal(string source)
         {
-            string value = source.ToLower();
+            string value = source.Trim();
 
-            if (value.EndsWith("m"))
+            if (value.EndsWith("M", StringComparison.OrdinalIgnoreCase))
             {
                 value = value.Substring(0, value.Length - 1);
             }
