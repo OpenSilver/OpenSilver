@@ -99,9 +99,9 @@ public sealed class RowDefinitionCollection : PresentationFrameworkCollection<Ro
     {
         VerifyWriteAccess();
 
-        foreach (RowDefinition column in InternalItems)
+        foreach (RowDefinition row in InternalItems)
         {
-            PrivateDisconnectChild(column);
+            PrivateDisconnectChild(row);
         }
 
         ClearInternal();

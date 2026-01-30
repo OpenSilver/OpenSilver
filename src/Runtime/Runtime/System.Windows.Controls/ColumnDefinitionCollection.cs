@@ -49,7 +49,7 @@ public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection
 
             if (_owner is null)
             {
-                if (value.RowDefinitions.Count > 0)
+                if (value.ColumnDefinitions.Count > 0)
                 {
                     throw new ArgumentException(
                         string.Format(Strings.GridCollection_InOtherCollection, nameof(Grid), nameof(ColumnDefinitionCollection)));
