@@ -28,6 +28,7 @@ internal sealed class TriggerStorage
     private readonly Dictionary<TriggerBase, TriggerState> _triggerStates = new();
     private readonly Dictionary<DependencyProperty, List<TriggerBase>> _propertyTriggerMap = new();
     private readonly Dictionary<TriggerBase, List<DataTriggerBindingHelper>> _dataTriggerHelpers = new();
+    private readonly Dictionary<EventTrigger, RoutedEventHandler> _eventTriggerHandlers = new();
     private bool _isProcessingTriggers;
 
     internal TriggerStorage(FrameworkElement element, Style style)
@@ -78,8 +79,8 @@ internal sealed class TriggerStorage
                 SetupMultiDataTrigger(multiDataTrigger);
                 break;
 
-            case EventTrigger:
-                // EventTriggers are handled differently (via routed events)
+            case EventTrigger eventTrigger:
+                SetupEventTrigger(eventTrigger);
                 break;
         }
     }
@@ -141,6 +142,27 @@ internal sealed class TriggerStorage
                 SetupDataTriggerBinding(trigger, condition.Binding);
             }
         }
+    }
+
+    private void SetupEventTrigger(EventTrigger trigger)
+    {
+        if (trigger.RoutedEvent is null)
+        {
+            return;
+        }
+
+        // Create a handler that invokes the trigger's actions
+        RoutedEventHandler handler = (sender, e) =>
+        {
+            // Invoke all actions of the EventTrigger
+            foreach (TriggerAction action in trigger.Actions)
+            {
+                action.Invoke((IInternalFrameworkElement)_element);
+            }
+        };
+
+        _eventTriggerHandlers[trigger] = handler;
+        _element.AddHandler(trigger.RoutedEvent, handler, false);
     }
 
     private void SetupDataTriggerBinding(TriggerBase trigger, BindingBase bindingBase)
@@ -450,9 +472,19 @@ internal sealed class TriggerStorage
             }
         }
 
+        // Remove event trigger handlers
+        foreach (var kvp in _eventTriggerHandlers)
+        {
+            if (kvp.Key.RoutedEvent is not null)
+            {
+                _element.RemoveHandler(kvp.Key.RoutedEvent, kvp.Value);
+            }
+        }
+
         _triggerStates.Clear();
         _propertyTriggerMap.Clear();
         _dataTriggerHelpers.Clear();
+        _eventTriggerHandlers.Clear();
     }
 
     /// <summary>
