@@ -186,6 +186,7 @@ public sealed class Trigger : TriggerBase
 
     /// <summary>
     /// Compares two values for equality, handling null and UnsetValue appropriately.
+    /// Also handles type conversion when the types don't match (e.g., comparing string "True" with boolean true).
     /// </summary>
     internal static bool Match(object currentValue, object triggerValue)
     {
@@ -205,7 +206,24 @@ public sealed class Trigger : TriggerBase
             return false;
         }
 
-        // Use Equals for comparison
+        // If types match, use direct comparison
+        if (triggerValue.GetType() == currentValue.GetType())
+        {
+            return triggerValue.Equals(currentValue);
+        }
+
+        // Try to convert triggerValue to currentValue's type for comparison
+        // This handles cases like DataTrigger where binding returns bool but Value is string "True"
+        if (triggerValue is string stringValue)
+        {
+            object convertedTriggerValue = ConvertStringToPropertyType(stringValue, currentValue.GetType());
+            if (convertedTriggerValue is not null && convertedTriggerValue.GetType() == currentValue.GetType())
+            {
+                return convertedTriggerValue.Equals(currentValue);
+            }
+        }
+
+        // Fallback: use Equals for comparison
         return triggerValue.Equals(currentValue);
     }
 }
