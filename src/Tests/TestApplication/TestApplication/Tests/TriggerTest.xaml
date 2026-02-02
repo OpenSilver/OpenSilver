@@ -81,7 +81,7 @@
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsMouseOver" Value="True"/>
-                        <Condition Property="IsFocused" Value="True"/>
+                        <Condition Property="IsEnabled" Value="True"/>
                     </MultiTrigger.Conditions>
                     <Setter Property="Background" Value="LightGreen"/>
                     <Setter Property="BorderBrush" Value="Green"/>
@@ -315,7 +315,7 @@
         <!-- SECTION 10: ATTACHED PROPERTY TRIGGERS -->
         <!-- ============================================================ -->
 
-        <Style x:Key="AttachedPropertyTriggerStyle" TargetType="TextBlock">
+        <Style x:Key="AttachedPropertyTriggerStyle" TargetType="Border">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Margin" Value="2"/>
@@ -380,10 +380,10 @@
             <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
                 <StackPanel>
                     <TextBlock Text="3. MultiTrigger (AND Logic)" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="TextBox turns green only when BOTH MouseOver AND Focused:" 
+                    <TextBlock Text="TextBox turns green only when BOTH MouseOver AND IsEnabled (todo: replaced 'IsEnabled' with 'IsFocused' when supported by OpenSilver):" 
                              TextWrapping="Wrap" Margin="0,0,0,5"/>
                     <TextBox Style="{StaticResource MultiTriggerStyle}" 
-                           Text="Hover AND focus to see green background" Width="350" HorizontalAlignment="Left"/>
+                           Text="Hover to see green background" Width="350" HorizontalAlignment="Left"/>
                 </StackPanel>
             </Border>
 
@@ -484,7 +484,7 @@
             <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
                 <StackPanel>
                     <TextBlock Text="10. Trigger on Attached Property" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="TextBlocks colored based on Grid.Row attached property:" 
+                    <TextBlock Text="Borders colored based on Grid.Row attached property:" 
                              TextWrapping="Wrap" Margin="0,0,0,5"/>
                     <Grid Width="300" HorizontalAlignment="Left">
                         <Grid.RowDefinitions>
@@ -492,9 +492,15 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="Row 0 - Light Blue" Style="{StaticResource AttachedPropertyTriggerStyle}"/>
-                        <TextBlock Grid.Row="1" Text="Row 1 - Light Green" Style="{StaticResource AttachedPropertyTriggerStyle}"/>
-                        <TextBlock Grid.Row="2" Text="Row 2 - Light Coral" Style="{StaticResource AttachedPropertyTriggerStyle}"/>
+                        <Border Grid.Row="0" Style="{StaticResource AttachedPropertyTriggerStyle}">
+                            <TextBlock Text="Row 0 - Light Blue"/>
+                        </Border>
+                        <Border Grid.Row="1" Style="{StaticResource AttachedPropertyTriggerStyle}">
+                            <TextBlock Text="Row 1 - Light Green"/>
+                        </Border>
+                        <Border Grid.Row="2" Style="{StaticResource AttachedPropertyTriggerStyle}">
+                            <TextBlock Text="Row 2 - Light Coral"/>
+                        </Border>
                     </Grid>
                 </StackPanel>
             </Border>
