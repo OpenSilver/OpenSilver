@@ -359,6 +359,7 @@ namespace System.Windows
         internal void SetTemplatedParent(WeakReference<DependencyObject> templatedParent) => _templatedParentRef = templatedParent;
 
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
+        private TemplateTriggerStorage _templateTriggerStorage; // Storage for template triggers
 
         // Note: TemplateChild is an UIElement in WPF.
         internal virtual FrameworkElement TemplateChild
@@ -368,13 +369,57 @@ namespace System.Windows
             {
                 if (_templateChild != value)
                 {
+                    // Cleanup existing template trigger storage
+                    CleanupTemplateTriggerStorage();
+
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_templateChild, this);
                     RemoveVisualChild(_templateChild);
                     _templateChild = value;
                     AddVisualChild(_templateChild);
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
+
+                    // Initialize template trigger storage for the new template
+                    InitializeTemplateTriggerStorage();
                 }
             }
+        }
+
+        private void InitializeTemplateTriggerStorage()
+        {
+            if (_templateChild is null || TemplateInternal is not FrameworkTemplate template)
+            {
+                return;
+            }
+
+            bool hasTriggers = template switch
+            {
+                Controls.ControlTemplate ct => ct.HasTriggers,
+                DataTemplate dt => dt.HasTriggers,
+                _ => false
+            };
+
+            if (hasTriggers)
+            {
+                _templateTriggerStorage = new TemplateTriggerStorage(this, template);
+                _templateTriggerStorage.Initialize();
+            }
+        }
+
+        private void CleanupTemplateTriggerStorage()
+        {
+            if (_templateTriggerStorage is not null)
+            {
+                _templateTriggerStorage.Cleanup();
+                _templateTriggerStorage = null;
+            }
+        }
+
+        /// <summary>
+        /// Notifies the template trigger storage of a property change.
+        /// </summary>
+        internal void NotifyTemplateTriggerPropertyChanged(DependencyProperty dp)
+        {
+            _templateTriggerStorage?.OnPropertyChanged(dp);
         }
 
         /// <summary>
@@ -998,8 +1043,18 @@ namespace System.Windows
         {
             base.OnPropertyChanged(e);
 
-            // Notify trigger storage of property changes
+            // Notify style trigger storage of property changes
             StyleHelper.OnPropertyChanged(this, e.Property);
+
+            // Notify template trigger storage of property changes (for this element as templated parent)
+            _templateTriggerStorage?.OnPropertyChanged(e.Property);
+
+            // Notify the templated parent's template trigger storage about property changes
+            // (for SourceName triggers that reference this element)
+            if (TemplatedParent is FrameworkElement templatedParent)
+            {
+                templatedParent._templateTriggerStorage?.OnSourceElementPropertyChanged(this, e.Property);
+            }
 
             if (e.Metadata is FrameworkPropertyMetadata metadata)
             {

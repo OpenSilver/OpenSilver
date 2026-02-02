@@ -12,29 +12,67 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Markup;
 using System.Windows.Media.Animation;
 using OpenSilver.Internal;
 
 namespace System.Windows;
 
 /// <summary>
-/// Stores per-instance trigger state for a FrameworkElement.
+/// Stores per-instance trigger state for a FrameworkElement with a template.
+/// This class handles triggers defined in ControlTemplate and DataTemplate.
 /// </summary>
-internal sealed class TriggerStorage
+internal sealed class TemplateTriggerStorage
 {
-    private readonly FrameworkElement _element;
-    private readonly Style _style;
+    private readonly FrameworkElement _templatedParent;
+    private readonly FrameworkTemplate _template;
+    private readonly INameScope _nameScope;
     private readonly Dictionary<TriggerBase, TriggerState> _triggerStates = new();
     private readonly Dictionary<DependencyProperty, List<TriggerBase>> _propertyTriggerMap = new();
     private readonly Dictionary<TriggerBase, List<DataTriggerBindingHelper>> _dataTriggerHelpers = new();
-    private readonly Dictionary<EventTrigger, RoutedEventHandler> _eventTriggerHandlers = new();
+    private readonly Dictionary<EventTrigger, (RoutedEventHandler Handler, FrameworkElement Source)> _eventTriggerHandlers = new();
+    // Maps source elements (when SourceName is used) to property triggers
+    private readonly Dictionary<DependencyObject, Dictionary<DependencyProperty, List<TriggerBase>>> _sourceElementTriggerMap = new();
+    // Stores the resolved source element for each trigger with SourceName
+    private readonly Dictionary<TriggerBase, DependencyObject> _triggerSourceElements = new();
     private bool _isProcessingTriggers;
 
-    internal TriggerStorage(FrameworkElement element, Style style)
+    internal TemplateTriggerStorage(FrameworkElement templatedParent, FrameworkTemplate template)
     {
-        _element = element;
-        _style = style;
+        _templatedParent = templatedParent;
+        _template = template;
+        _nameScope = FrameworkTemplate.GetTemplateNameScope(templatedParent);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this template has triggers.
+    /// </summary>
+    private bool HasTriggers
+    {
+        get
+        {
+            return _template switch
+            {
+                ControlTemplate ct => ct.HasTriggers,
+                DataTemplate dt => dt.HasTriggers,
+                _ => false
+            };
+        }
+    }
+
+    /// <summary>
+    /// Gets the triggers collection from the template.
+    /// </summary>
+    private StyleTriggerCollection GetTriggers()
+    {
+        return _template switch
+        {
+            ControlTemplate ct => ct.Triggers,
+            DataTemplate dt => dt.Triggers,
+            _ => null
+        };
     }
 
     /// <summary>
@@ -42,13 +80,18 @@ internal sealed class TriggerStorage
     /// </summary>
     internal void Initialize()
     {
-        if (!_style.HasTriggers)
+        if (!HasTriggers)
         {
             return;
         }
 
-        // Include triggers from base styles in the chain
-        foreach (TriggerBase trigger in _style.GetAllTriggers())
+        var triggers = GetTriggers();
+        if (triggers is null)
+        {
+            return;
+        }
+
+        foreach (TriggerBase trigger in triggers)
         {
             SetupTrigger(trigger);
         }
@@ -59,6 +102,9 @@ internal sealed class TriggerStorage
 
     private void SetupTrigger(TriggerBase trigger)
     {
+        // Ensure the trigger is sealed (performs validation and type conversions)
+        trigger.Seal();
+
         // Initialize state to false (inactive)
         _triggerStates[trigger] = new TriggerState();
 
@@ -93,14 +139,63 @@ internal sealed class TriggerStorage
             return;
         }
 
-        // Register for property changes on the source element
         DependencyProperty dp = trigger.Property;
-        if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
+
+        // Check if this trigger has a SourceName
+        if (!string.IsNullOrEmpty(trigger.SourceName))
+        {
+            // Resolve the source element by name
+            DependencyObject sourceElement = ResolveNamedElement(trigger.SourceName);
+            if (sourceElement is not null)
+            {
+                _triggerSourceElements[trigger] = sourceElement;
+                RegisterSourceElementTrigger(sourceElement, dp, trigger);
+            }
+        }
+        else
+        {
+            // Listen to property changes on the templated parent
+            if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
+            {
+                triggers = new List<TriggerBase>();
+                _propertyTriggerMap[dp] = triggers;
+            }
+            triggers.Add(trigger);
+        }
+    }
+
+    private void RegisterSourceElementTrigger(DependencyObject sourceElement, DependencyProperty dp, TriggerBase trigger)
+    {
+        if (!_sourceElementTriggerMap.TryGetValue(sourceElement, out var propMap))
+        {
+            propMap = new Dictionary<DependencyProperty, List<TriggerBase>>();
+            _sourceElementTriggerMap[sourceElement] = propMap;
+        }
+
+        if (!propMap.TryGetValue(dp, out var triggers))
         {
             triggers = new List<TriggerBase>();
-            _propertyTriggerMap[dp] = triggers;
+            propMap[dp] = triggers;
         }
-        triggers.Add(trigger);
+
+        if (!triggers.Contains(trigger))
+        {
+            triggers.Add(trigger);
+        }
+    }
+
+    /// <summary>
+    /// Resolves a named element from the template's name scope.
+    /// If name is null/empty, returns the templated parent.
+    /// </summary>
+    private DependencyObject ResolveNamedElement(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return _templatedParent;
+        }
+
+        return _nameScope?.FindName(name) as DependencyObject;
     }
 
     private void SetupDataTrigger(DataTrigger trigger)
@@ -110,7 +205,6 @@ internal sealed class TriggerStorage
             return;
         }
 
-        // Create a binding to monitor the data value
         SetupDataTriggerBinding(trigger, trigger.Binding);
     }
 
@@ -121,14 +215,27 @@ internal sealed class TriggerStorage
             if (condition.Property is not null)
             {
                 DependencyProperty dp = condition.Property;
-                if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
+
+                // Check if this condition has a SourceName
+                if (!string.IsNullOrEmpty(condition.SourceName))
                 {
-                    triggers = new List<TriggerBase>();
-                    _propertyTriggerMap[dp] = triggers;
+                    DependencyObject sourceElement = ResolveNamedElement(condition.SourceName);
+                    if (sourceElement is not null)
+                    {
+                        RegisterSourceElementTrigger(sourceElement, dp, trigger);
+                    }
                 }
-                if (!triggers.Contains(trigger))
+                else
                 {
-                    triggers.Add(trigger);
+                    if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
+                    {
+                        triggers = new List<TriggerBase>();
+                        _propertyTriggerMap[dp] = triggers;
+                    }
+                    if (!triggers.Contains(trigger))
+                    {
+                        triggers.Add(trigger);
+                    }
                 }
             }
         }
@@ -155,33 +262,43 @@ internal sealed class TriggerStorage
         // Create a handler that invokes the trigger's actions
         RoutedEventHandler handler = (sender, e) =>
         {
-            // Invoke all actions of the EventTrigger
             foreach (TriggerAction action in trigger.Actions)
             {
-                action.Invoke((IInternalFrameworkElement)_element);
+                action.Invoke((IInternalFrameworkElement)_templatedParent);
             }
         };
 
-        _eventTriggerHandlers[trigger] = handler;
-        _element.AddHandler(trigger.RoutedEvent, handler, false);
+        // Resolve the source element (defaults to templated parent if SourceName is not set)
+        FrameworkElement sourceElement;
+        if (!string.IsNullOrEmpty(trigger.SourceName))
+        {
+            sourceElement = ResolveNamedElement(trigger.SourceName) as FrameworkElement;
+            if (sourceElement is null)
+            {
+                return; // Source element not found
+            }
+        }
+        else
+        {
+            sourceElement = _templatedParent;
+        }
+
+        _eventTriggerHandlers[trigger] = (handler, sourceElement);
+        sourceElement.AddHandler(trigger.RoutedEvent, handler, false);
     }
 
     private void SetupDataTriggerBinding(TriggerBase trigger, BindingBase bindingBase)
     {
-        // Create a helper to receive the binding value
-        var helper = new DataTriggerBindingHelper(this, trigger, _element);
+        var helper = new DataTriggerBindingHelper(this, trigger, _templatedParent);
 
         if (bindingBase is Binding binding)
         {
-            // Clone the binding and set up the listener
-            // We need to copy relevant properties from the original binding
             var listenerBinding = new Binding
             {
                 Path = binding.Path,
                 Mode = BindingMode.OneWay,
             };
 
-            // Copy source-related properties if they're set
             if (binding.Source is not null)
             {
                 listenerBinding.Source = binding.Source;
@@ -195,10 +312,9 @@ internal sealed class TriggerStorage
                 listenerBinding.ElementName = binding.ElementName;
             }
 
-            // Create binding expression and apply it to the helper
             BindingExpression expr = (BindingExpression)listenerBinding.CreateBindingExpression(
-                helper, 
-                DataTriggerBindingHelper.ValueProperty, 
+                helper,
+                DataTriggerBindingHelper.ValueProperty,
                 null);
 
             helper.SetValue(DataTriggerBindingHelper.ValueProperty, expr);
@@ -213,7 +329,7 @@ internal sealed class TriggerStorage
     }
 
     /// <summary>
-    /// Called when a dependency property value changes on the element.
+    /// Called when a dependency property value changes on the templated parent.
     /// </summary>
     internal void OnPropertyChanged(DependencyProperty dp)
     {
@@ -232,8 +348,25 @@ internal sealed class TriggerStorage
     }
 
     /// <summary>
-    /// Called when a data trigger binding value changes.
+    /// Called when a dependency property value changes on a source element (used for SourceName triggers).
     /// </summary>
+    internal void OnSourceElementPropertyChanged(DependencyObject sourceElement, DependencyProperty dp)
+    {
+        if (_isProcessingTriggers)
+        {
+            return;
+        }
+
+        if (_sourceElementTriggerMap.TryGetValue(sourceElement, out var propMap) &&
+            propMap.TryGetValue(dp, out List<TriggerBase> triggers))
+        {
+            foreach (TriggerBase trigger in triggers)
+            {
+                EvaluateTrigger(trigger);
+            }
+        }
+    }
+
     internal void OnDataTriggerValueChanged(TriggerBase trigger)
     {
         if (_isProcessingTriggers)
@@ -244,12 +377,15 @@ internal sealed class TriggerStorage
         EvaluateTrigger(trigger);
     }
 
-    /// <summary>
-    /// Evaluates all triggers and applies their setters as needed.
-    /// </summary>
     private void EvaluateAllTriggers()
     {
-        if (!_style.HasTriggers)
+        if (!HasTriggers)
+        {
+            return;
+        }
+
+        var triggers = GetTriggers();
+        if (triggers is null)
         {
             return;
         }
@@ -257,7 +393,7 @@ internal sealed class TriggerStorage
         _isProcessingTriggers = true;
         try
         {
-            foreach (TriggerBase trigger in _style.GetAllTriggers())
+            foreach (TriggerBase trigger in triggers)
             {
                 EvaluateTrigger(trigger);
             }
@@ -268,9 +404,6 @@ internal sealed class TriggerStorage
         }
     }
 
-    /// <summary>
-    /// Evaluates a single trigger and applies/unapplies its setters.
-    /// </summary>
     private void EvaluateTrigger(TriggerBase trigger)
     {
         if (!_triggerStates.TryGetValue(trigger, out TriggerState state))
@@ -287,31 +420,30 @@ internal sealed class TriggerStorage
 
             if (isActive)
             {
-                // Apply trigger setters
                 ApplyTriggerSetters(trigger);
                 InvokeEnterActions(trigger);
             }
             else
             {
-                // Remove trigger setters
                 UnapplyTriggerSetters(trigger);
                 InvokeExitActions(trigger);
             }
         }
     }
 
-    /// <summary>
-    /// Evaluates whether a trigger's condition(s) are met.
-    /// </summary>
     private bool EvaluateTriggerCondition(TriggerBase trigger)
     {
         switch (trigger)
         {
             case Trigger propertyTrigger:
-                return propertyTrigger.Evaluate(_element);
+                // Use the source element if SourceName was specified, otherwise use templated parent
+                DependencyObject sourceElement = _triggerSourceElements.TryGetValue(trigger, out var src)
+                    ? src
+                    : _templatedParent;
+                return propertyTrigger.Evaluate(sourceElement);
 
             case MultiTrigger multiTrigger:
-                return multiTrigger.Evaluate(_element);
+                return EvaluateMultiTrigger(multiTrigger);
 
             case DataTrigger dataTrigger:
                 return EvaluateDataTrigger(dataTrigger);
@@ -322,6 +454,35 @@ internal sealed class TriggerStorage
             default:
                 return false;
         }
+    }
+
+    private bool EvaluateMultiTrigger(MultiTrigger trigger)
+    {
+        foreach (Condition condition in trigger.Conditions)
+        {
+            if (condition.Property is null)
+            {
+                return false;
+            }
+
+            // Resolve the source element for this condition
+            DependencyObject sourceElement = !string.IsNullOrEmpty(condition.SourceName)
+                ? ResolveNamedElement(condition.SourceName)
+                : _templatedParent;
+
+            if (sourceElement is null)
+            {
+                return false;
+            }
+
+            object currentValue = sourceElement.GetValue(condition.Property);
+            if (!Trigger.Match(currentValue, condition.Value))
+            {
+                return false;
+            }
+        }
+
+        return trigger.Conditions.Count > 0;
     }
 
     private bool EvaluateDataTrigger(DataTrigger trigger)
@@ -361,9 +522,6 @@ internal sealed class TriggerStorage
         return trigger.Conditions.Count > 0;
     }
 
-    /// <summary>
-    /// Applies the setters of an active trigger.
-    /// </summary>
     private void ApplyTriggerSetters(TriggerBase trigger)
     {
         SetterBaseCollection setters = GetTriggerSetters(trigger);
@@ -376,12 +534,19 @@ internal sealed class TriggerStorage
         {
             if (setterBase is Setter setter && setter.Property is not null)
             {
+                // Resolve the target element
+                DependencyObject target = ResolveNamedElement(setter.TargetName);
+                if (target is null)
+                {
+                    continue;
+                }
+
                 object value = setter.ValueInternal;
 
                 // Handle BindingBase values
                 if (value is BindingBase bindingBase)
                 {
-                    value = bindingBase.CreateBindingExpression(_element, setter.Property, null);
+                    value = bindingBase.CreateBindingExpression(target, setter.Property, null);
                 }
                 // Handle DynamicResourceExtension
                 else if (value is DynamicResourceExtension dynamicResource)
@@ -390,14 +555,11 @@ internal sealed class TriggerStorage
                         throw new InvalidOperationException(Strings.MarkupExtensionResourceKey));
                 }
 
-                _element.SetTriggerValue(setter.Property, value);
+                target.SetTriggerValue(setter.Property, value);
             }
         }
     }
 
-    /// <summary>
-    /// Removes the setters of an inactive trigger.
-    /// </summary>
     private void UnapplyTriggerSetters(TriggerBase trigger)
     {
         SetterBaseCollection setters = GetTriggerSetters(trigger);
@@ -410,10 +572,17 @@ internal sealed class TriggerStorage
         {
             if (setterBase is Setter setter && setter.Property is not null)
             {
-                _element.ClearTriggerValue(setter.Property);
+                DependencyObject target = ResolveNamedElement(setter.TargetName);
+                if (target is null)
+                {
+                    continue;
+                }
+
+                target.ClearTriggerValue(setter.Property);
             }
         }
     }
+
 
     private static SetterBaseCollection GetTriggerSetters(TriggerBase trigger)
     {
@@ -438,7 +607,7 @@ internal sealed class TriggerStorage
         {
             if (action is BeginStoryboard beginStoryboard)
             {
-                beginStoryboard.Storyboard?.Begin(_element);
+                beginStoryboard.Storyboard?.Begin(_templatedParent);
             }
         }
     }
@@ -454,14 +623,11 @@ internal sealed class TriggerStorage
         {
             if (action is BeginStoryboard beginStoryboard)
             {
-                beginStoryboard.Storyboard?.Begin(_element);
+                beginStoryboard.Storyboard?.Begin(_templatedParent);
             }
         }
     }
 
-    /// <summary>
-    /// Cleans up trigger tracking when the style is removed.
-    /// </summary>
     internal void Cleanup()
     {
         // Unapply all active triggers
@@ -478,7 +644,7 @@ internal sealed class TriggerStorage
         {
             if (kvp.Key.RoutedEvent is not null)
             {
-                _element.RemoveHandler(kvp.Key.RoutedEvent, kvp.Value);
+                kvp.Value.Source.RemoveHandler(kvp.Key.RoutedEvent, kvp.Value.Handler);
             }
         }
 
@@ -486,23 +652,18 @@ internal sealed class TriggerStorage
         _propertyTriggerMap.Clear();
         _dataTriggerHelpers.Clear();
         _eventTriggerHandlers.Clear();
+        _sourceElementTriggerMap.Clear();
+        _triggerSourceElements.Clear();
     }
 
-    /// <summary>
-    /// Stores the state of a single trigger.
-    /// </summary>
     private sealed class TriggerState
     {
         public bool IsActive { get; set; }
     }
 
-    /// <summary>
-    /// Helper class to receive data trigger binding values.
-    /// This class inherits from FrameworkElement to properly participate in DataContext inheritance.
-    /// </summary>
     private sealed class DataTriggerBindingHelper : FrameworkElement
     {
-        private readonly TriggerStorage _storage;
+        private readonly TemplateTriggerStorage _storage;
         private readonly TriggerBase _trigger;
 
         public static readonly DependencyProperty ValueProperty =
@@ -512,12 +673,11 @@ internal sealed class TriggerStorage
                 typeof(DataTriggerBindingHelper),
                 new PropertyMetadata(null, OnValueChanged));
 
-        public DataTriggerBindingHelper(TriggerStorage storage, TriggerBase trigger, FrameworkElement element)
+        public DataTriggerBindingHelper(TemplateTriggerStorage storage, TriggerBase trigger, FrameworkElement element)
         {
             _storage = storage;
             _trigger = trigger;
 
-            // Bind our DataContext to the element's DataContext so bindings work correctly
             var dcBinding = new Binding
             {
                 Source = element,

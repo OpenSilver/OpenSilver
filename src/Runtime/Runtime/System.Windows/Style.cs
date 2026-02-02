@@ -182,9 +182,39 @@ public class Style : DependencyObject, ISealable
     }
 
     /// <summary>
-    /// Gets a value indicating whether this style has any triggers.
+    /// Gets a value indicating whether this style has any triggers (including base styles).
     /// </summary>
-    internal bool HasTriggers => _triggers is not null && _triggers.Count > 0;
+    internal bool HasTriggers => (_triggers is not null && _triggers.Count > 0) || (_basedOn is not null && _basedOn.HasTriggers);
+
+    /// <summary>
+    /// Gets a value indicating whether this style (excluding base styles) has any triggers.
+    /// </summary>
+    internal bool HasOwnTriggers => _triggers is not null && _triggers.Count > 0;
+
+    /// <summary>
+    /// Gets all triggers from this style and all base styles in the chain.
+    /// Triggers from derived styles come last (higher priority).
+    /// </summary>
+    internal IEnumerable<TriggerBase> GetAllTriggers()
+    {
+        // First yield triggers from base styles (lower priority)
+        if (_basedOn is not null)
+        {
+            foreach (var trigger in _basedOn.GetAllTriggers())
+            {
+                yield return trigger;
+            }
+        }
+
+        // Then yield triggers from this style (higher priority)
+        if (_triggers is not null)
+        {
+            foreach (var trigger in _triggers)
+            {
+                yield return trigger;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets the collection of resources that can be used within the scope of this style.

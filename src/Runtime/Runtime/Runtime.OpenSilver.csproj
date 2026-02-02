@@ -1110,6 +1110,7 @@
     <Compile Include="System.Windows\TriggerBase.cs" />
     <Compile Include="System.Windows\TriggerCollection.cs" />
     <Compile Include="System.Windows\TriggerStorage.cs" />
+    <Compile Include="System.Windows\TemplateTriggerStorage.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\VisualTransition.cs" />
     <Compile Include="System.Windows\WindowCollection.cs" />
     <Compile Include="System.Windows\WindowStyle.cs" />
