@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Xaml.Markup;
@@ -227,6 +228,13 @@ public sealed class Condition
                 throw new InvalidOperationException(string.Format(Strings.NullPropertyIllegal, "Condition.Property"));
             }
 
+            // Convert string value to proper type if needed (for compiler-generated code that couldn't
+            // resolve the value at compile time because the service provider wasn't available)
+            if (_value is string stringValue && _property.PropertyType != typeof(string))
+            {
+                _value = ConvertStringToPropertyType(stringValue, _property.PropertyType);
+            }
+
             if (_value != DependencyProperty.UnsetValue && !_property.IsValidValue(_value))
             {
                 throw new InvalidOperationException(string.Format(Strings.InvalidPropertyValue, _value, _property.Name));
@@ -243,6 +251,21 @@ public sealed class Condition
 
         // Freeze the condition value
         StyleHelper.SealIfSealable(_value);
+    }
+
+    /// <summary>
+    /// Converts a string value to the specified property type using the appropriate type converter.
+    /// </summary>
+    private static object ConvertStringToPropertyType(string value, Type targetType)
+    {
+        var converter = TypeConverterHelper.GetConverter(targetType);
+        if (converter is not null && converter.CanConvertFrom(typeof(string)))
+        {
+            return converter.ConvertFromInvariantString(value);
+        }
+
+        // Fallback: return the original string if no converter is available
+        return value;
     }
 
     private void CheckSealed()

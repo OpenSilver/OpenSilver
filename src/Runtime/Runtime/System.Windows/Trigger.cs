@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using OpenSilver.Internal;
@@ -132,6 +133,13 @@ public sealed class Trigger : TriggerBase
             throw new InvalidOperationException(string.Format(Strings.NullPropertyIllegal, "Trigger.Property"));
         }
 
+        // Convert string value to proper type if needed (for compiler-generated code that couldn't
+        // resolve the value at compile time because the service provider wasn't available)
+        if (_value is string stringValue && _property.PropertyType != typeof(string))
+        {
+            _value = ConvertStringToPropertyType(stringValue, _property.PropertyType);
+        }
+
         // Validate that the value is appropriate for the property
         if (_value != DependencyProperty.UnsetValue && !_property.IsValidValue(_value))
         {
@@ -145,6 +153,21 @@ public sealed class Trigger : TriggerBase
         _setters?.Seal();
 
         base.Seal();
+    }
+
+    /// <summary>
+    /// Converts a string value to the specified property type using the appropriate type converter.
+    /// </summary>
+    private static object ConvertStringToPropertyType(string value, Type targetType)
+    {
+        var converter = TypeConverterHelper.GetConverter(targetType);
+        if (converter is not null && converter.CanConvertFrom(typeof(string)))
+        {
+            return converter.ConvertFromInvariantString(value);
+        }
+
+        // Fallback: return the original string if no converter is available
+        return value;
     }
 
     /// <summary>

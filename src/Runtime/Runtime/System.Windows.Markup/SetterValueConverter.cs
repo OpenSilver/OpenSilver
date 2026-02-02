@@ -74,8 +74,14 @@ namespace System.Windows.Markup
         internal static object ResolveValue(ITypeDescriptorContext serviceProvider,
             DependencyProperty property, CultureInfo culture, object source)
         {
-            ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(source);
+
+            // If no service provider, we can't resolve the value contextually.
+            // Return the source as-is; conversion will happen at runtime during sealing.
+            if (serviceProvider is null)
+            {
+                return source;
+            }
 
             // Only need to type convert strings
             if (source is not string)
