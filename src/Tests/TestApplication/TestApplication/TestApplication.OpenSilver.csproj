@@ -108,6 +108,9 @@
     <Compile Include="Tests\ContextMenuTest.xaml.cs">
       <DependentUpon>ContextMenuTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\MenuTest.xaml.cs">
+      <DependentUpon>MenuTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\CursorTest.xaml.cs">
       <DependentUpon>CursorTest.xaml</DependentUpon>
     </Compile>
@@ -381,6 +384,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="Tests\ContextMenuTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Tests\MenuTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
