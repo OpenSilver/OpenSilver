@@ -656,16 +656,16 @@ namespace GlobalResource
                                             string value;
                                             if (elementType == $"global.{KnownNamespaces.SystemWindows}.Setter")
                                             {
-                                                //we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
-                                                if (element.Parent is null || element.Parent.Parent is null || element.Parent.Parent.Name.LocalName != "Style")
+                                                // Find the containing Style element (Setters can be in Style.Setters or inside triggers in Style.Triggers)
+                                                if (!TryGetContainingStyleForSetter(element, out XElement styleElement))
                                                 {
-                                                    throw new XamlParseException("'<Setter />' tags can only be declared inside a '<Style />'.", element);
+                                                    throw new XamlParseException("'<Setter />' tags can only be declared inside a '<Style />' or a trigger.", element);
                                                 }
 
                                                 if (attributeName == "Property")
                                                 {
                                                     // Style setter property:
-                                                    value = GenerateCodeForSetterProperty(element.Parent.Parent, attribute, attributeValue); //todo: support attached properties used in a Setter
+                                                    value = GenerateCodeForSetterProperty(styleElement, attribute, attributeValue);
                                                 }
                                                 else if (attributeName == "Value")
                                                 {
@@ -676,11 +676,6 @@ namespace GlobalResource
 
                                                     bool isSetterForAttachedProperty = property.Value.Contains('.');
                                                     XName name = GetCSharpXNameFromTargetTypeOrAttachedPropertyString(element, isSetterForAttachedProperty);
-                                                    //string str = GetCSharpFullTypeNameFromTargetTypeString(styleNode, reflectionOnSeparateAppDomain);
-                                                    //string[] s = {"::"};
-                                                    //string[] splittedStr = str.Split(s, StringSplitOptions.RemoveEmptyEntries);
-                                                    //string[] splittedTypeName = splittedStr[splittedStr.Length - 1].Split('.');
-                                                    //XName typeName = XName.Get(splittedTypeName[splittedTypeName.Length - 1], splittedStr[0]); 
                                                     string propertyName = isSetterForAttachedProperty ? property.Value.Split('.')[1] : property.Value;
                                                     value = GenerateCodeForInstantiatingAttributeValue(name,
                                                         propertyName,
@@ -689,10 +684,26 @@ namespace GlobalResource
                                                         element,
                                                         property);
                                                 }
+                                                else if (attributeName == "TargetName")
+                                                {
+                                                    // TargetName is used in triggers to target a named element in a template
+                                                    value = _settings.SystemTypes.ConvertToString(attributeValue);
+                                                }
                                                 else
                                                 {
-                                                    throw new XamlParseException("The '<Setter />' element cannot have attributes other than 'Property' and 'Value'.", element);
+                                                    throw new XamlParseException("The '<Setter />' element cannot have attributes other than 'Property', 'Value', and 'TargetName'.", element);
                                                 }
+                                            }
+                                            else if ((elementType == $"global.{KnownNamespaces.SystemWindows}.Trigger"
+                                                || elementType == $"global.{KnownNamespaces.SystemWindows}.Condition")
+                                                && attributeName == "Property")
+                                            {
+                                                // Trigger.Property and Condition.Property: generate DependencyProperty reference
+                                                if (!TryGetContainingStyleForSetter(element, out XElement styleElement))
+                                                {
+                                                    throw new XamlParseException("Trigger/Condition must be inside a Style.", element);
+                                                }
+                                                value = GenerateCodeForSetterProperty(styleElement, attribute, attributeValue);
                                             }
                                             else if (elementType == $"global.{KnownNamespaces.SystemWindowsData}.Binding"
                                                 && memberName == "Path")
@@ -1590,6 +1601,31 @@ namespace GlobalResource
                 return $"{elementType}.{dependencyPropertyName}";
             }
 
+            /// <summary>
+            /// Tries to find the containing Style, ControlTemplate, or DataTemplate element for a Setter or Trigger.
+            /// Setters can be inside Style.Setters directly, or inside triggers in Style.Triggers, ControlTemplate.Triggers, or DataTemplate.Triggers.
+            /// </summary>
+            private static bool TryGetContainingStyleForSetter(XElement setterElement, out XElement styleElement)
+            {
+                styleElement = null;
+
+                // Walk up the tree to find the Style, ControlTemplate, or DataTemplate element
+                XElement current = setterElement.Parent;
+                while (current != null)
+                {
+                    string localName = current.Name.LocalName;
+                    if (localName == "Style" || localName == "ControlTemplate" || localName == "DataTemplate")
+                    {
+                        styleElement = current;
+                        return true;
+                    }
+
+                    current = current.Parent;
+                }
+
+                return false;
+            }
+
             private XName GetCSharpXNameFromTargetTypeOrAttachedPropertyString(XElement setterElement, bool isAttachedProperty)
             {
                 string namespaceName;
@@ -1608,7 +1644,11 @@ namespace GlobalResource
                 }
                 else
                 {
-                    currentXElement = setterElement.Parent.Parent;
+                    // Find the containing Style element for TargetType lookup
+                    if (!TryGetContainingStyleForSetter(setterElement, out currentXElement))
+                    {
+                        throw new XamlParseException("Setter must be inside a Style.", setterElement);
+                    }
                     attributeToLookAt = currentXElement.Attribute("TargetType");
                     if (attributeToLookAt == null)
                     {
