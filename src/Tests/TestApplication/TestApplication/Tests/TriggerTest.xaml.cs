@@ -1,55 +1,35 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Navigation;
 
 namespace TestApplication.Tests
 {
     public partial class TriggerTest : Page
     {
-        // ViewModels for various DataTrigger tests
         private BooleanTriggerViewModel _booleanViewModel;
-        private StatusTriggerViewModel _statusViewModel;
-        private QuantityTriggerViewModel _quantityViewModel;
         private MultiConditionViewModel _multiConditionViewModel;
-        private EnterExitViewModel _enterExitViewModel;
 
         public TriggerTest()
         {
             InitializeComponent();
-
-            // Initialize ViewModels
             InitializeViewModels();
-
-            // Setup data bindings
             SetupDataBindings();
-
-            // Apply programmatic trigger style
             ApplyProgrammaticTriggerStyle();
         }
 
         private void InitializeViewModels()
         {
             _booleanViewModel = new BooleanTriggerViewModel { IsActive = true };
-            _statusViewModel = new StatusTriggerViewModel { Status = "Pending" };
-            _quantityViewModel = new QuantityTriggerViewModel { Quantity = 10 };
             _multiConditionViewModel = new MultiConditionViewModel { IsActive = false, IsPremium = false };
-            _enterExitViewModel = new EnterExitViewModel { IsActive = false };
         }
 
         private void SetupDataBindings()
         {
-            // Bind DataTrigger test panels
             BooleanDataTriggerPanel.DataContext = _booleanViewModel;
-            StatusDataTriggerPanel.DataContext = _statusViewModel;
-            QuantityDataTriggerPanel.DataContext = _quantityViewModel;
             MultiDataTriggerPanel.DataContext = _multiConditionViewModel;
-            EnterExitActionsPanel.DataContext = _enterExitViewModel;
 
             // Setup Person list for DataTemplate triggers
             var people = new ObservableCollection<PersonViewModel>
@@ -60,17 +40,6 @@ namespace TestApplication.Tests
                 new PersonViewModel { Name = "Diana Prince", Age = 30, Status = "Premium Inactive", IsActive = false, IsPremium = true },
             };
             PersonList.ItemsSource = people;
-
-            // Setup Status list for DataTemplate string triggers
-            var statuses = new ObservableCollection<StatusViewModel>
-            {
-                new StatusViewModel { Status = "Pending" },
-                new StatusViewModel { Status = "Approved" },
-                new StatusViewModel { Status = "Rejected" },
-                new StatusViewModel { Status = "Pending" },
-                new StatusViewModel { Status = "Approved" },
-            };
-            StatusList.ItemsSource = statuses;
         }
 
         private void ApplyProgrammaticTriggerStyle()
@@ -103,58 +72,13 @@ namespace TestApplication.Tests
             pressedTrigger.Setters.Add(new Setter(Control.ForegroundProperty, new SolidColorBrush(Colors.White)));
             style.Triggers.Add(pressedTrigger);
 
-            // Apply the style
             ProgrammaticTriggerButton.Style = style;
         }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-        }
-
-        #region Boolean DataTrigger Event Handlers
 
         private void ToggleIsActive_Click(object sender, RoutedEventArgs e)
         {
             _booleanViewModel.IsActive = !_booleanViewModel.IsActive;
         }
-
-        #endregion
-
-        #region Status DataTrigger Event Handlers
-
-        private void SetStatusPending_Click(object sender, RoutedEventArgs e)
-        {
-            _statusViewModel.Status = "Pending";
-        }
-
-        private void SetStatusApproved_Click(object sender, RoutedEventArgs e)
-        {
-            _statusViewModel.Status = "Approved";
-        }
-
-        private void SetStatusRejected_Click(object sender, RoutedEventArgs e)
-        {
-            _statusViewModel.Status = "Rejected";
-        }
-
-        #endregion
-
-        #region Quantity DataTrigger Event Handlers
-
-        private void SetQuantityZero_Click(object sender, RoutedEventArgs e)
-        {
-            _quantityViewModel.Quantity = 0;
-        }
-
-        private void SetQuantityTen_Click(object sender, RoutedEventArgs e)
-        {
-            _quantityViewModel.Quantity = 10;
-        }
-
-        #endregion
-
-        #region MultiDataTrigger Event Handlers
 
         private void ToggleMultiIsActive_Click(object sender, RoutedEventArgs e)
         {
@@ -165,17 +89,6 @@ namespace TestApplication.Tests
         {
             _multiConditionViewModel.IsPremium = !_multiConditionViewModel.IsPremium;
         }
-
-        #endregion
-
-        #region EnterExit Actions Event Handlers
-
-        private void ToggleEnterExitIsActive_Click(object sender, RoutedEventArgs e)
-        {
-            _enterExitViewModel.IsActive = !_enterExitViewModel.IsActive;
-        }
-
-        #endregion
     }
 
     #region ViewModels
@@ -196,62 +109,6 @@ namespace TestApplication.Tests
                 {
                     _isActive = value;
                     OnPropertyChanged(nameof(IsActive));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    /// <summary>
-    /// ViewModel for string-based DataTrigger tests
-    /// </summary>
-    public class StatusTriggerViewModel : INotifyPropertyChanged
-    {
-        private string _status;
-
-        public string Status
-        {
-            get => _status;
-            set
-            {
-                if (_status != value)
-                {
-                    _status = value;
-                    OnPropertyChanged(nameof(Status));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    /// <summary>
-    /// ViewModel for numeric DataTrigger tests
-    /// </summary>
-    public class QuantityTriggerViewModel : INotifyPropertyChanged
-    {
-        private int _quantity;
-
-        public int Quantity
-        {
-            get => _quantity;
-            set
-            {
-                if (_quantity != value)
-                {
-                    _quantity = value;
-                    OnPropertyChanged(nameof(Quantity));
                 }
             }
         }
@@ -294,34 +151,6 @@ namespace TestApplication.Tests
                 {
                     _isPremium = value;
                     OnPropertyChanged(nameof(IsPremium));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    /// <summary>
-    /// ViewModel for EnterActions/ExitActions tests
-    /// </summary>
-    public class EnterExitViewModel : INotifyPropertyChanged
-    {
-        private bool _isActive;
-
-        public bool IsActive
-        {
-            get => _isActive;
-            set
-            {
-                if (_isActive != value)
-                {
-                    _isActive = value;
-                    OnPropertyChanged(nameof(IsActive));
                 }
             }
         }
@@ -406,34 +235,6 @@ namespace TestApplication.Tests
                 {
                     _isPremium = value;
                     OnPropertyChanged(nameof(IsPremium));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    /// <summary>
-    /// Simple ViewModel for Status string-based triggers in DataTemplate
-    /// </summary>
-    public class StatusViewModel : INotifyPropertyChanged
-    {
-        private string _status;
-
-        public string Status
-        {
-            get => _status;
-            set
-            {
-                if (_status != value)
-                {
-                    _status = value;
-                    OnPropertyChanged(nameof(Status));
                 }
             }
         }
