@@ -1,0 +1,980 @@
+<sdk:Page x:Class="TestApplication.Tests.TriggerTest"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+          xmlns:local="clr-namespace:TestApplication.Tests"
+          mc:Ignorable="d"
+          d:DesignHeight="2000" d:DesignWidth="800">
+
+    <sdk:Page.Resources>
+        <!-- ============================================================ -->
+        <!-- SECTION 1: BASIC PROPERTY TRIGGERS IN STYLES -->
+        <!-- ============================================================ -->
+        
+        <!-- Style with IsMouseOver trigger -->
+        <Style x:Key="MouseOverTriggerStyle" TargetType="Border">
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="LightBlue"/>
+                    <Setter Property="BorderBrush" Value="Blue"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with IsFocused trigger for TextBox -->
+        <Style x:Key="FocusTriggerStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="Background" Value="LightYellow"/>
+                    <Setter Property="BorderBrush" Value="Orange"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with IsEnabled trigger -->
+        <Style x:Key="EnabledTriggerStyle" TargetType="Button">
+            <Setter Property="Background" Value="LightGreen"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="LightGray"/>
+                    <Setter Property="Foreground" Value="DarkGray"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with IsChecked trigger for CheckBox -->
+        <Style x:Key="CheckedTriggerStyle" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="Green"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="{x:Null}">
+                    <Setter Property="Foreground" Value="Orange"/>
+                    <Setter Property="FontStyle" Value="Italic"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with IsPressed trigger for Button -->
+        <Style x:Key="PressedTriggerStyle" TargetType="Button">
+            <Setter Property="Background" Value="SteelBlue"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="CornflowerBlue"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="DarkBlue"/>
+                    <Setter Property="FontSize" Value="13"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 2: DATA TRIGGERS -->
+        <!-- ============================================================ -->
+
+        <!-- Style with DataTrigger -->
+        <Style x:Key="DataTriggerStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter Property="Background" Value="LightGreen"/>
+                    <Setter Property="BorderBrush" Value="Green"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                    <Setter Property="Background" Value="LightCoral"/>
+                    <Setter Property="BorderBrush" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with DataTrigger comparing to string value -->
+        <Style x:Key="StatusDataTriggerStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Padding" Value="5"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="Pending">
+                    <Setter Property="Foreground" Value="Orange"/>
+                    <Setter Property="FontStyle" Value="Italic"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Approved">
+                    <Setter Property="Foreground" Value="Green"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Rejected">
+                    <Setter Property="Foreground" Value="Red"/>
+                    <Setter Property="TextDecorations" Value="Strikethrough"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with DataTrigger using numeric comparison -->
+        <Style x:Key="QuantityDataTriggerStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Green"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Quantity}" Value="0">
+                    <Setter Property="Foreground" Value="Red"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 3: MULTI-TRIGGERS (AND logic) -->
+        <!-- ============================================================ -->
+
+        <!-- Style with MultiTrigger -->
+        <Style x:Key="MultiTriggerStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <!-- Trigger only when BOTH conditions are true -->
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                        <Condition Property="IsFocused" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="LightGreen"/>
+                    <Setter Property="BorderBrush" Value="Green"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 4: MULTI-DATA TRIGGERS -->
+        <!-- ============================================================ -->
+
+        <!-- Style with MultiDataTrigger -->
+        <Style x:Key="MultiDataTriggerStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsActive}" Value="True"/>
+                        <Condition Binding="{Binding IsPremium}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="Gold"/>
+                    <Setter Property="BorderBrush" Value="DarkGoldenrod"/>
+                    <Setter Property="BorderThickness" Value="3"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 5: EVENT TRIGGERS WITH ANIMATIONS -->
+        <!-- ============================================================ -->
+
+        <!-- Style with EventTrigger for MouseEnter animation -->
+        <Style x:Key="EventTriggerAnimationStyle" TargetType="Border">
+            <Setter Property="Background" Value="LightBlue"/>
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                           To="1.1" Duration="0:0:0.2"/>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                           To="1.1" Duration="0:0:0.2"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                           To="1" Duration="0:0:0.2"/>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                           To="1" Duration="0:0:0.2"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with EventTrigger for Loaded event -->
+        <Style x:Key="LoadedAnimationStyle" TargetType="Border">
+            <Setter Property="Background" Value="LightCoral"/>
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                           From="0" To="1" Duration="0:0:1"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 6: CONTROL TEMPLATE WITH TRIGGERS -->
+        <!-- ============================================================ -->
+
+        <!-- Custom Button ControlTemplate with Triggers -->
+        <ControlTemplate x:Key="CustomButtonTemplate" TargetType="Button">
+            <Border x:Name="border" 
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Padding="{TemplateBinding Padding}"
+                    CornerRadius="5">
+                <ContentPresenter HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="border" Property="Background" Value="LightSkyBlue"/>
+                    <Setter TargetName="border" Property="BorderBrush" Value="DeepSkyBlue"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter TargetName="border" Property="Background" Value="SteelBlue"/>
+                    <Setter TargetName="border" Property="BorderBrush" Value="DarkBlue"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="border" Property="Background" Value="LightGray"/>
+                    <Setter TargetName="border" Property="BorderBrush" Value="Gray"/>
+                    <Setter Property="Foreground" Value="DarkGray"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Custom CheckBox ControlTemplate with Triggers -->
+        <ControlTemplate x:Key="CustomCheckBoxTemplate" TargetType="CheckBox">
+            <StackPanel Orientation="Horizontal">
+                <Border x:Name="checkBorder" 
+                        Width="20" Height="20" 
+                        Background="White"
+                        BorderBrush="Gray" 
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Margin="0,0,5,0">
+                    <TextBlock x:Name="checkMark" 
+                             Text="✓" 
+                             FontSize="14"
+                             FontWeight="Bold"
+                             Foreground="Green"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             Visibility="Collapsed"/>
+                </Border>
+                <ContentPresenter VerticalAlignment="Center"/>
+            </StackPanel>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="checkMark" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="checkBorder" Property="Background" Value="LightGreen"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="{x:Null}">
+                    <Setter TargetName="checkMark" Property="Text" Value="■"/>
+                    <Setter TargetName="checkMark" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="checkBorder" Property="Background" Value="LightYellow"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="checkBorder" Property="BorderBrush" Value="Blue"/>
+                    <Setter TargetName="checkBorder" Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Custom TextBox ControlTemplate with Triggers -->
+        <ControlTemplate x:Key="CustomTextBoxTemplate" TargetType="TextBox">
+            <Border x:Name="border"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="3">
+                <ScrollViewer x:Name="PART_ContentHost" Margin="2"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter TargetName="border" Property="BorderBrush" Value="Blue"/>
+                    <Setter TargetName="border" Property="BorderThickness" Value="2"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="border" Property="BorderBrush" Value="CornflowerBlue"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsFocused" Value="True"/>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter TargetName="border" Property="Background" Value="LightYellow"/>
+                </MultiTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- ControlTemplate with SourceName - monitors a DIFFERENT element's property -->
+        <ControlTemplate x:Key="SourceNameTriggerTemplate" TargetType="ContentControl">
+            <Border x:Name="outerBorder" Background="White" BorderBrush="Gray" BorderThickness="1" Padding="10">
+                <StackPanel>
+                    <TextBox x:Name="inputBox" Text="Type here..." Margin="0,0,0,5"/>
+                    <TextBlock x:Name="statusText" Text="TextBox is not focused" Foreground="Gray"/>
+                </StackPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+                <!-- SourceName specifies WHICH element's property to monitor -->
+                <!-- TargetName specifies WHERE to apply the setters -->
+                <Trigger SourceName="inputBox" Property="IsFocused" Value="True">
+                    <Setter TargetName="statusText" Property="Text" Value="TextBox is focused!"/>
+                    <Setter TargetName="statusText" Property="Foreground" Value="Green"/>
+                    <Setter TargetName="statusText" Property="FontWeight" Value="Bold"/>
+                    <Setter TargetName="outerBorder" Property="BorderBrush" Value="Green"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Style with Trigger on Attached Property -->
+        <Style x:Key="AttachedPropertyTriggerStyle" TargetType="TextBlock">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="2"/>
+            <Style.Triggers>
+                <!-- Trigger on Grid.Row attached property -->
+                <Trigger Property="Grid.Row" Value="0">
+                    <Setter Property="Background" Value="LightBlue"/>
+                </Trigger>
+                <Trigger Property="Grid.Row" Value="1">
+                    <Setter Property="Background" Value="LightGreen"/>
+                </Trigger>
+                <Trigger Property="Grid.Row" Value="2">
+                    <Setter Property="Background" Value="LightCoral"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 7: DATA TEMPLATE WITH TRIGGERS -->
+        <!-- ============================================================ -->
+
+        <!-- DataTemplate with Triggers for Person items -->
+        <DataTemplate x:Key="PersonItemTemplate">
+            <Border x:Name="personBorder" 
+                    Background="White" 
+                    BorderBrush="Gray" 
+                    BorderThickness="1" 
+                    Padding="10" 
+                    Margin="2"
+                    CornerRadius="5">
+                <StackPanel>
+                    <TextBlock x:Name="nameText" Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
+                    <TextBlock x:Name="ageText" Text="{Binding Age, StringFormat='Age: {0}'}" FontSize="12"/>
+                    <TextBlock x:Name="statusText" Text="{Binding Status}" FontSize="11" FontStyle="Italic"/>
+                </StackPanel>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter TargetName="personBorder" Property="Background" Value="LightGreen"/>
+                    <Setter TargetName="personBorder" Property="BorderBrush" Value="Green"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                    <Setter TargetName="personBorder" Property="Background" Value="LightGray"/>
+                    <Setter TargetName="nameText" Property="Foreground" Value="DarkGray"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsPremium}" Value="True">
+                    <Setter TargetName="personBorder" Property="BorderBrush" Value="Gold"/>
+                    <Setter TargetName="personBorder" Property="BorderThickness" Value="2"/>
+                </DataTrigger>
+                <!-- MultiDataTrigger in DataTemplate -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsActive}" Value="True"/>
+                        <Condition Binding="{Binding IsPremium}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="personBorder" Property="Background" Value="Gold"/>
+                    <Setter TargetName="nameText" Property="Foreground" Value="DarkRed"/>
+                </MultiDataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- DataTemplate with Trigger using string comparison -->
+        <DataTemplate x:Key="StatusItemTemplate">
+            <Border x:Name="statusBorder" Padding="8" Margin="2" CornerRadius="3">
+                <TextBlock x:Name="statusTextBlock" Text="{Binding Status}" FontSize="12"/>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="Pending">
+                    <Setter TargetName="statusBorder" Property="Background" Value="LightYellow"/>
+                    <Setter TargetName="statusTextBlock" Property="Foreground" Value="Orange"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Approved">
+                    <Setter TargetName="statusBorder" Property="Background" Value="LightGreen"/>
+                    <Setter TargetName="statusTextBlock" Property="Foreground" Value="DarkGreen"/>
+                    <Setter TargetName="statusTextBlock" Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Rejected">
+                    <Setter TargetName="statusBorder" Property="Background" Value="LightCoral"/>
+                    <Setter TargetName="statusTextBlock" Property="Foreground" Value="DarkRed"/>
+                    <Setter TargetName="statusTextBlock" Property="TextDecorations" Value="Strikethrough"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 8: ENTER/EXIT ACTIONS -->
+        <!-- ============================================================ -->
+
+        <!-- Style with EnterActions and ExitActions -->
+        <Style x:Key="EnterExitActionsStyle" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="LightGray"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                               To="1" Duration="0:0:0.3"/>
+                                <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                              To="LightBlue" Duration="0:0:0.3"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                               To="0.7" Duration="0:0:0.3"/>
+                                <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                              To="LightGray" Duration="0:0:0.3"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style with DataTrigger EnterActions and ExitActions -->
+        <Style x:Key="DataTriggerEnterExitStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Opacity" Value="0.5"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                               To="1" Duration="0:0:0.5"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                               To="0.5" Duration="0:0:0.5"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 9: TRIGGERS WITH RELATIVE SOURCE BINDING -->
+        <!-- ============================================================ -->
+
+        <Style x:Key="RelativeSourceTriggerStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <!-- Trigger based on parent's property -->
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Border}}" Value="True">
+                    <Setter Property="Foreground" Value="Blue"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 10: TRIGGERS IN IMPLICIT STYLES -->
+        <!-- ============================================================ -->
+
+        <!-- Implicit style for ListBoxItem with triggers -->
+        <Style x:Key="ListBoxItemTriggerStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="LightBlue"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="CornflowerBlue"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="True"/>
+                        <Condition Property="IsMouseOver" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="SteelBlue"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+    </sdk:Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
+            <TextBlock Text="WPF Triggers Test Page" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+            <TextBlock Text="This page tests various trigger scenarios from basic to advanced." 
+                     TextWrapping="Wrap" Margin="0,0,0,20"/>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 1: BASIC PROPERTY TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="1. Basic Property Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    
+                    <!-- 1.1 IsMouseOver Trigger -->
+                    <TextBlock Text="1.1 IsMouseOver Trigger:" FontWeight="SemiBold" Margin="0,5,0,5"/>
+                    <Border Style="{StaticResource MouseOverTriggerStyle}">
+                        <TextBlock Text="Hover over this border to see the trigger effect"/>
+                    </Border>
+
+                    <!-- 1.2 IsFocused Trigger -->
+                    <TextBlock Text="1.2 IsFocused Trigger:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <TextBox Style="{StaticResource FocusTriggerStyle}" 
+                           Text="Click to focus - background changes to yellow" Width="350" HorizontalAlignment="Left"/>
+
+                    <!-- 1.3 IsEnabled Trigger -->
+                    <TextBlock Text="1.3 IsEnabled Trigger:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource EnabledTriggerStyle}" Content="Enabled Button" IsEnabled="True"/>
+                        <Button Style="{StaticResource EnabledTriggerStyle}" Content="Disabled Button" IsEnabled="False"/>
+                    </StackPanel>
+
+                    <!-- 1.4 IsChecked Trigger -->
+                    <TextBlock Text="1.4 IsChecked Trigger (including null state):" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Style="{StaticResource CheckedTriggerStyle}" Content="Check me" IsChecked="False"/>
+                        <CheckBox Style="{StaticResource CheckedTriggerStyle}" Content="I'm checked" IsChecked="True" Margin="20,0,0,0"/>
+                        <CheckBox Style="{StaticResource CheckedTriggerStyle}" Content="Indeterminate" IsChecked="{x:Null}" IsThreeState="True" Margin="20,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- 1.5 IsPressed Trigger -->
+                    <TextBlock Text="1.5 IsPressed and IsMouseOver Triggers (multiple triggers):" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <Button Style="{StaticResource PressedTriggerStyle}" Content="Hover and Press Me" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 2: DATA TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="2. Data Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    
+                    <!-- 2.1 Boolean DataTrigger -->
+                    <TextBlock Text="2.1 Boolean DataTrigger:" FontWeight="SemiBold" Margin="0,5,0,5"/>
+                    <StackPanel x:Name="BooleanDataTriggerPanel">
+                        <Border Style="{StaticResource DataTriggerStyle}">
+                            <StackPanel>
+                                <TextBlock Text="This border changes based on IsActive property"/>
+                                <TextBlock Text="{Binding IsActive, StringFormat='IsActive: {0}'}"/>
+                            </StackPanel>
+                        </Border>
+                        <Button Content="Toggle IsActive" Click="ToggleIsActive_Click" 
+                              HorizontalAlignment="Left" Margin="5" Padding="10,5"/>
+                    </StackPanel>
+
+                    <!-- 2.2 String DataTrigger -->
+                    <TextBlock Text="2.2 String Value DataTrigger:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <StackPanel x:Name="StatusDataTriggerPanel">
+                        <TextBlock Style="{StaticResource StatusDataTriggerStyle}" 
+                                 Text="{Binding Status, StringFormat='Status: {0}'}"/>
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <Button Content="Pending" Click="SetStatusPending_Click" Margin="0,0,5,0" Padding="10,5"/>
+                            <Button Content="Approved" Click="SetStatusApproved_Click" Margin="0,0,5,0" Padding="10,5"/>
+                            <Button Content="Rejected" Click="SetStatusRejected_Click" Padding="10,5"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- 2.3 Numeric DataTrigger -->
+                    <TextBlock Text="2.3 Numeric Value DataTrigger (Zero check):" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <StackPanel x:Name="QuantityDataTriggerPanel">
+                        <TextBlock Style="{StaticResource QuantityDataTriggerStyle}" 
+                                 Text="{Binding Quantity, StringFormat='Quantity: {0}'}"/>
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <Button Content="Set to 0" Click="SetQuantityZero_Click" Margin="0,0,5,0" Padding="10,5"/>
+                            <Button Content="Set to 10" Click="SetQuantityTen_Click" Padding="10,5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 3: MULTI-TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="3. MultiTrigger (AND Logic)" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="TextBox turns green only when BOTH MouseOver AND Focused:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <TextBox Style="{StaticResource MultiTriggerStyle}" 
+                           Text="Hover AND focus to see green background" Width="350" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 4: MULTI-DATA TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="4. MultiDataTrigger" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="Border turns gold only when BOTH IsActive AND IsPremium are true:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <StackPanel x:Name="MultiDataTriggerPanel">
+                        <Border Style="{StaticResource MultiDataTriggerStyle}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding IsActive, StringFormat='IsActive: {0}'}"/>
+                                <TextBlock Text="{Binding IsPremium, StringFormat='IsPremium: {0}'}"/>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <Button Content="Toggle IsActive" Click="ToggleMultiIsActive_Click" Margin="0,0,5,0" Padding="10,5"/>
+                            <Button Content="Toggle IsPremium" Click="ToggleMultiIsPremium_Click" Padding="10,5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 5: EVENT TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="5. Event Triggers with Animations" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    
+                    <!-- 5.1 MouseEnter/MouseLeave Animation -->
+                    <TextBlock Text="5.1 Scale animation on MouseEnter/MouseLeave:" FontWeight="SemiBold" Margin="0,5,0,5"/>
+                    <Border Style="{StaticResource EventTriggerAnimationStyle}">
+                        <TextBlock Text="Hover to scale up" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <!-- 5.2 Loaded Animation -->
+                    <TextBlock Text="5.2 Fade-in animation on Loaded event:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <Border Style="{StaticResource LoadedAnimationStyle}">
+                        <TextBlock Text="This faded in when loaded" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <!-- 5.3 Button Click Animation -->
+                    <TextBlock Text="5.3 Button with Click event trigger:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <Button x:Name="AnimatedButton" Content="Click Me for Animation" 
+                          HorizontalAlignment="Left" Padding="15,8">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                       From="1" To="0.3" Duration="0:0:0.1"
+                                                       AutoReverse="True"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 6: CONTROL TEMPLATES WITH TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="6. ControlTemplate Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    
+                    <!-- 6.1 Custom Button Template -->
+                    <TextBlock Text="6.1 Custom Button with ControlTemplate triggers:" FontWeight="SemiBold" Margin="0,5,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Template="{StaticResource CustomButtonTemplate}" 
+                              Content="Custom Button" 
+                              Background="LightGray" BorderBrush="Gray" BorderThickness="1"
+                              Padding="15,8" Margin="5"/>
+                        <Button Template="{StaticResource CustomButtonTemplate}" 
+                              Content="Disabled Custom" 
+                              Background="LightGray" BorderBrush="Gray" BorderThickness="1"
+                              Padding="15,8" Margin="5" IsEnabled="False"/>
+                    </StackPanel>
+
+                    <!-- 6.2 Custom CheckBox Template -->
+                    <TextBlock Text="6.2 Custom CheckBox with ControlTemplate triggers:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Template="{StaticResource CustomCheckBoxTemplate}" Content="Custom CheckBox" Margin="5"/>
+                        <CheckBox Template="{StaticResource CustomCheckBoxTemplate}" Content="Checked" IsChecked="True" Margin="20,5,5,5"/>
+                        <CheckBox Template="{StaticResource CustomCheckBoxTemplate}" Content="Indeterminate" IsChecked="{x:Null}" IsThreeState="True" Margin="20,5,5,5"/>
+                    </StackPanel>
+
+                    <!-- 6.3 Custom TextBox Template with MultiTrigger -->
+                    <TextBlock Text="6.3 Custom TextBox with MultiTrigger in ControlTemplate:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <TextBox Template="{StaticResource CustomTextBoxTemplate}"
+                           Text="Focus AND hover for yellow background"
+                           Background="White" BorderBrush="Gray" BorderThickness="1"
+                           Width="350" HorizontalAlignment="Left" Padding="5"/>
+
+                    <!-- 6.4 SourceName Trigger - monitors one element, applies to another -->
+                    <TextBlock Text="6.4 Trigger with SourceName (monitors TextBox, updates TextBlock):" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <ContentControl Template="{StaticResource SourceNameTriggerTemplate}" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 7: DATA TEMPLATES WITH TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="7. DataTemplate Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    
+                    <!-- 7.1 ItemsControl with DataTemplate triggers -->
+                    <TextBlock Text="7.1 Person list with DataTemplate triggers (active = green, premium = gold border):" 
+                             FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,5,0,5"/>
+                    <ItemsControl x:Name="PersonList" ItemTemplate="{StaticResource PersonItemTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <!-- 7.2 ListBox with Status DataTemplate -->
+                    <TextBlock Text="7.2 Status items with string-based DataTriggers:" 
+                             FontWeight="SemiBold" Margin="0,15,0,5"/>
+                    <ItemsControl x:Name="StatusList" ItemTemplate="{StaticResource StatusItemTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 8: ENTER/EXIT ACTIONS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="8. Trigger EnterActions and ExitActions" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    
+                    <!-- 8.1 Property Trigger with EnterActions/ExitActions -->
+                    <TextBlock Text="8.1 Property Trigger with animated enter/exit:" FontWeight="SemiBold" Margin="0,5,0,5"/>
+                    <Border Style="{StaticResource EnterExitActionsStyle}">
+                        <TextBlock Text="Hover for animated transition" 
+                                 VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <!-- 8.2 DataTrigger with EnterActions/ExitActions -->
+                    <TextBlock Text="8.2 DataTrigger with animated enter/exit:" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <StackPanel x:Name="EnterExitActionsPanel">
+                        <Border Style="{StaticResource DataTriggerEnterExitStyle}">
+                            <TextBlock Text="{Binding IsActive, StringFormat='IsActive: {0} (opacity animates on change)'}"/>
+                        </Border>
+                        <Button Content="Toggle IsActive" Click="ToggleEnterExitIsActive_Click" 
+                              HorizontalAlignment="Left" Margin="5" Padding="10,5"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 9: RELATIVE SOURCE IN TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="9. RelativeSource in DataTrigger Binding" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="Text turns blue when parent Border is hovered:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <Border Background="LightGray" Padding="20" Margin="5">
+                        <TextBlock Style="{StaticResource RelativeSourceTriggerStyle}"
+                                 Text="Hover anywhere on the gray border"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 10: LISTBOX WITH ITEM TRIGGERS -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="10. ListBoxItem Triggers (Selection, Hover)" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="ListBox with triggers for IsSelected, IsMouseOver, and MultiTrigger:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <ListBox Width="300" HorizontalAlignment="Left" ItemContainerStyle="{StaticResource ListBoxItemTriggerStyle}">
+                        <ListBoxItem Content="Item 1 - Click to select"/>
+                        <ListBoxItem Content="Item 2 - Hover to see blue"/>
+                        <ListBoxItem Content="Item 3 - Selected + Hover = Steel Blue"/>
+                        <ListBoxItem Content="Item 4"/>
+                        <ListBoxItem Content="Item 5"/>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 11: TRIGGERS IN STYLE BASED ON ANOTHER STYLE -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="11. Style Inheritance with Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <StackPanel.Resources>
+                        <!-- Base style with triggers -->
+                        <Style x:Key="BaseButtonStyle" TargetType="Button">
+                            <Setter Property="Background" Value="LightGray"/>
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="Margin" Value="5"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="LightBlue"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                        <!-- Derived style that adds more triggers -->
+                        <Style x:Key="DerivedButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Style.Triggers>
+                                <!-- This trigger adds to the base style's triggers -->
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="SteelBlue"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="Base style button (hover = light blue):" Margin="0,0,0,5"/>
+                    <Button Style="{StaticResource BaseButtonStyle}" Content="Base Style Button" HorizontalAlignment="Left"/>
+                    <TextBlock Text="Derived style button (hover = light blue, pressed = steel blue):" Margin="0,10,0,5"/>
+                    <Button Style="{StaticResource DerivedButtonStyle}" Content="Derived Style Button" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 12: TRIGGERS WITH SETTER.VALUE AS COMPLEX OBJECT -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="12. Triggers with Complex Setter Values" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <StackPanel.Resources>
+                        <Style x:Key="GradientTriggerStyle" TargetType="Border">
+                            <Setter Property="Background" Value="LightGray"/>
+                            <Setter Property="Width" Value="200"/>
+                            <Setter Property="Height" Value="60"/>
+                            <Setter Property="Margin" Value="5"/>
+                            <Setter Property="CornerRadius" Value="5"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="LightBlue" Offset="0"/>
+                                                <GradientStop Color="LightGreen" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="Border that changes to gradient on hover:" Margin="0,0,0,5"/>
+                    <Border Style="{StaticResource GradientTriggerStyle}">
+                        <TextBlock Text="Hover for gradient" 
+                                 VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 13: TRIGGER ON ATTACHED PROPERTY -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="13. Trigger on Attached Property" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="TextBlocks colored based on their Grid.Row attached property value:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <Grid Width="300" HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Row 0 - Light Blue" Style="{StaticResource AttachedPropertyTriggerStyle}"/>
+                        <TextBlock Grid.Row="1" Text="Row 1 - Light Green" Style="{StaticResource AttachedPropertyTriggerStyle}"/>
+                        <TextBlock Grid.Row="2" Text="Row 2 - Light Coral" Style="{StaticResource AttachedPropertyTriggerStyle}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 14: PROGRAMMATIC TRIGGER TEST -->
+            <!-- ============================================================ -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="14. Programmatically Created Style with Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="Button with style and triggers created in code-behind:" Margin="0,0,0,5"/>
+                    <Button x:Name="ProgrammaticTriggerButton" Content="Programmatic Triggers" 
+                          HorizontalAlignment="Left" Padding="15,8"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</sdk:Page>
