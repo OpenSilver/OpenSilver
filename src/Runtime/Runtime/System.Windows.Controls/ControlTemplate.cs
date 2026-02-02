@@ -19,6 +19,7 @@ namespace System.Windows.Controls
     public sealed class ControlTemplate : FrameworkTemplate
     {
         private Type _targetType;
+        private StyleTriggerCollection _triggers;
 
         /// <summary>
         /// Initializes a new instance of the ControlTemplate class.
@@ -33,5 +34,34 @@ namespace System.Windows.Controls
             get => _targetType;
             set { CheckSealed(); _targetType = value; }
         }
+
+        /// <summary>
+        /// Gets a collection of <see cref="TriggerBase"/> objects that apply property changes
+        /// or perform actions based on specified conditions.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="TriggerBase"/> objects. The default is an empty collection.
+        /// </returns>
+        public StyleTriggerCollection Triggers
+        {
+            get
+            {
+                if (_triggers is null)
+                {
+                    _triggers = new StyleTriggerCollection();
+                    
+                    if (IsSealed())
+                    {
+                        _triggers.Seal();
+                    }
+                }
+                return _triggers;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this template has any triggers.
+        /// </summary>
+        internal bool HasTriggers => _triggers is not null && _triggers.Count > 0;
     }
 }

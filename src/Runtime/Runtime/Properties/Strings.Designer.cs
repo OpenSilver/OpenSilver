@@ -592,6 +592,33 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A Condition cannot have both Property and Binding set..
+        /// </summary>
+        internal static string ConditionCannotUseBothPropertyAndBinding {
+            get {
+                return ResourceManager.GetString("ConditionCannotUseBothPropertyAndBinding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition values of type Expression are not supported..
+        /// </summary>
+        internal static string ConditionValueOfExpressionNotSupported {
+            get {
+                return ResourceManager.GetString("ConditionValueOfExpressionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition values of type '{0}' are not supported..
+        /// </summary>
+        internal static string ConditionValueOfMarkupExtensionNotSupported {
+            get {
+                return ResourceManager.GetString("ConditionValueOfMarkupExtensionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CollectionViewType property can only be set during initialization..
         /// </summary>
         internal static string CollectionViewTypeIsInitOnly {

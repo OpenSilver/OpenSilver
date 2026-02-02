@@ -294,6 +294,15 @@
   <data name="CollectionView_WrongType" xml:space="preserve">
     <value>Le type '{0}' n'est pas un type CollectionView.</value>
   </data>
+  <data name="ConditionCannotUseBothPropertyAndBinding" xml:space="preserve">
+    <value>Une Condition ne peut pas avoir à la fois Property et Binding définis.</value>
+  </data>
+  <data name="ConditionValueOfExpressionNotSupported" xml:space="preserve">
+    <value>Les valeurs de condition de type Expression ne sont pas prises en charge.</value>
+  </data>
+  <data name="ConditionValueOfMarkupExtensionNotSupported" xml:space="preserve">
+    <value>Les valeurs de condition de type '{0}' ne sont pas prises en charge.</value>
+  </data>
   <data name="CompatibilityPreferencesSealed" xml:space="preserve">
     <value>Impossible de changer la propriété '{0}'. La classe '{1}' est sealed.</value>
   </data>

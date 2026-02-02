@@ -28,6 +28,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
 {
     private DependencyProperty _property;
     private object _value;
+    private string _targetName;
 
     private object _unresolvedValue = null;
     private ITypeDescriptorContext _serviceProvider = null;
@@ -107,6 +108,35 @@ public sealed class Setter : SetterBase, ISupportInitialize
             _value = value;
         }
     }
+
+    /// <summary>
+    /// Gets or sets the name of the element to which this <see cref="Setter"/> applies.
+    /// </summary>
+    /// <returns>
+    /// The name of the element. The default is null.
+    /// </returns>
+    /// <remarks>
+    /// You can set this property to the name of any element within the scope of where the setter
+    /// collection (the collection that this setter is part of) is applied. This is typically a
+    /// named element that is within the template that contains this setter. This property is
+    /// used in templates and is not typically used in styles.
+    /// </remarks>
+    [DefaultValue(null)]
+    [Ambient]
+    public string TargetName
+    {
+        get => _targetName;
+        set
+        {
+            CheckSealed();
+            _targetName = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets the internal value, which may be a MarkupExtension.
+    /// </summary>
+    internal object ValueInternal => _value;
 
     /// <summary>
     /// Seals this setter

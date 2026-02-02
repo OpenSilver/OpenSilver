@@ -29,6 +29,7 @@ public class Style : DependencyObject, ISealable
 {
     private bool _sealed;
     private SetterBaseCollection _setters;
+    private StyleTriggerCollection _triggers;
     private Type _targetType;
     private Style _basedOn;
     private ResourceDictionary _resources;
@@ -155,6 +156,37 @@ public class Style : DependencyObject, ISealable
     }
 
     /// <summary>
+    /// Gets a collection of <see cref="TriggerBase"/> objects that apply property values
+    /// based on specified conditions.
+    /// </summary>
+    /// <returns>
+    /// A collection of <see cref="TriggerBase"/> objects. The default is an empty collection.
+    /// </returns>
+    public StyleTriggerCollection Triggers
+    {
+        get
+        {
+            if (_triggers == null)
+            {
+                _triggers = new StyleTriggerCollection();
+
+                // If the style has been sealed prior to this the newly
+                // created collection also needs to be sealed
+                if (_sealed)
+                {
+                    _triggers.Seal();
+                }
+            }
+            return _triggers;
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this style has any triggers.
+    /// </summary>
+    internal bool HasTriggers => _triggers is not null && _triggers.Count > 0;
+
+    /// <summary>
     /// Gets or sets the collection of resources that can be used within the scope of this style.
     /// </summary>
     /// <returns>
@@ -245,6 +277,9 @@ public class Style : DependencyObject, ISealable
 
         // Seal setters
         _setters?.Seal();
+
+        // Seal triggers
+        _triggers?.Seal();
 
         //
         // Build shared tables

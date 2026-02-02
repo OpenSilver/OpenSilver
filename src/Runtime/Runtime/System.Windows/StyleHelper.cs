@@ -45,7 +45,18 @@ namespace System.Windows
 
             styleCache = newStyle;
 
-            UpdateInstanceData(fe, oldStyle, fe.HasLocalStyle ? newStyle : fe.ImplicitStyle, _setLocalStyleValueDelegate);
+            Style effectiveStyle = fe.HasLocalStyle ? newStyle : fe.ImplicitStyle;
+            
+            // Cleanup old trigger storage (always try, as it might have been from implicit style)
+            CleanupTriggerStorage(fe);
+
+            UpdateInstanceData(fe, oldStyle, effectiveStyle, _setLocalStyleValueDelegate);
+
+            // Initialize triggers for the new style
+            if (effectiveStyle?.HasTriggers == true)
+            {
+                InitializeTriggerStorage(fe, effectiveStyle);
+            }
         }
 
         //
@@ -93,7 +104,16 @@ namespace System.Windows
             // Local style takes priority over an implicit style.
             if (!fe.HasLocalStyle)
             {
+                // Cleanup old trigger storage (from old implicit style)
+                CleanupTriggerStorage(fe);
+
                 UpdateInstanceData(fe, oldStyle, newStyle, _setLocalStyleValueDelegate);
+
+                // Initialize triggers for the new implicit style
+                if (newStyle?.HasTriggers == true)
+                {
+                    InitializeTriggerStorage(fe, newStyle);
+                }
             }
         }
 
@@ -207,5 +227,34 @@ namespace System.Windows
             dp != FrameworkElement.OverridesDefaultStyleProperty &&
             dp != Control.TemplateProperty &&
             dp != ContentPresenter.TemplateProperty;
+
+        // Trigger storage management
+        internal static readonly UncommonField<TriggerStorage> TriggerStorageField = new();
+
+        private static void InitializeTriggerStorage(FrameworkElement fe, Style style)
+        {
+            var storage = new TriggerStorage(fe, style);
+            TriggerStorageField.SetValue(fe, storage);
+            storage.Initialize();
+        }
+
+        private static void CleanupTriggerStorage(FrameworkElement fe)
+        {
+            var storage = TriggerStorageField.GetValue(fe);
+            if (storage is not null)
+            {
+                storage.Cleanup();
+                TriggerStorageField.ClearValue(fe);
+            }
+        }
+
+        /// <summary>
+        /// Called when a dependency property value changes on an element that may have style triggers.
+        /// </summary>
+        internal static void OnPropertyChanged(FrameworkElement fe, DependencyProperty dp)
+        {
+            var storage = TriggerStorageField.GetValue(fe);
+            storage?.OnPropertyChanged(dp);
+        }
     }
 }

@@ -998,6 +998,9 @@ namespace System.Windows
         {
             base.OnPropertyChanged(e);
 
+            // Notify trigger storage of property changes
+            StyleHelper.OnPropertyChanged(this, e.Property);
+
             if (e.Metadata is FrameworkPropertyMetadata metadata)
             {
                 bool affectsParentMeasure = metadata.AffectsParentMeasure;
