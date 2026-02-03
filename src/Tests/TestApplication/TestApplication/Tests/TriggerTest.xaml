@@ -391,32 +391,7 @@
         </Style>
 
         <!-- ============================================================ -->
-        <!-- SECTION 9: STYLE INHERITANCE WITH TRIGGERS -->
-        <!-- ============================================================ -->
-
-        <Style x:Key="BaseButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="LightGray"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="Margin" Value="5"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="Red"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="DerivedButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Style.Triggers>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="Green"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- ============================================================ -->
-        <!-- SECTION 10: ATTACHED PROPERTY TRIGGERS -->
+        <!-- SECTION 9: ATTACHED PROPERTY TRIGGERS -->
         <!-- ============================================================ -->
 
         <Style x:Key="AttachedPropertyTriggerStyle" TargetType="Border">
@@ -591,21 +566,10 @@
                 </StackPanel>
             </Border>
 
-            <!-- SECTION 9: STYLE INHERITANCE -->
+            <!-- SECTION 9: ATTACHED PROPERTY TRIGGERS -->
             <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
                 <StackPanel>
-                    <TextBlock Text="9. Style BasedOn with Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="Base style (on hover: background=red):" Margin="0,0,0,5"/>
-                    <Button Style="{StaticResource BaseButtonStyle}" Content="Base Style" HorizontalAlignment="Left"/>
-                    <TextBlock Text="Derived style inherits base trigger + adds pressed trigger (background=green, foreground=white):" Margin="0,10,0,5"/>
-                    <Button Style="{StaticResource DerivedButtonStyle}" Content="Derived Style" HorizontalAlignment="Left"/>
-                </StackPanel>
-            </Border>
-
-            <!-- SECTION 10: ATTACHED PROPERTY TRIGGERS -->
-            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
-                <StackPanel>
-                    <TextBlock Text="10. Trigger on Attached Property" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="9. Trigger on Attached Property" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
                     <TextBlock Text="Borders colored based on Grid.Row attached property:" 
                              TextWrapping="Wrap" Margin="0,0,0,5"/>
                     <Grid Width="300" HorizontalAlignment="Left">
@@ -627,10 +591,10 @@
                 </StackPanel>
             </Border>
 
-            <!-- SECTION 11: PROGRAMMATIC TRIGGERS -->
+            <!-- SECTION 10: PROGRAMMATIC TRIGGERS -->
             <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
                 <StackPanel>
-                    <TextBlock Text="11. Programmatic Style with Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="10. Programmatic Style with Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
                     <TextBlock Text="Button with style and triggers created in code-behind:" Margin="0,0,0,5"/>
                     <Button x:Name="ProgrammaticTriggerButton" Content="Programmatic Triggers" 
                           HorizontalAlignment="Left" Padding="15,8"/>

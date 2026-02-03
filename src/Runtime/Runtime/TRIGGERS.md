@@ -146,9 +146,8 @@ Test cases are located in:
 | 6.4 EventTrigger.SourceName | Event on inner element triggers animation | ✅ Working |
 | 7. DataTemplate Triggers | `DataTrigger` and `MultiDataTrigger` with `TargetName` in ItemsControl | ✅ Working |
 | 8. EnterActions/ExitActions | Animated transitions on trigger activation | ✅ Working |
-| 9. Style Inheritance | `BasedOn` styles with triggers | ✅ Working |
-| 10. Attached Property Triggers | `Grid.Row` trigger | ✅ Working |
-| 11. Programmatic Triggers | Code-behind style/trigger creation | ✅ Working |
+| 9. Attached Property Triggers | `Grid.Row` trigger | ✅ Working |
+| 10. Programmatic Triggers | Code-behind style/trigger creation | ✅ Working |
 
 ## Known Limitations
 
@@ -166,7 +165,6 @@ The `IsFocused` property is not available in OpenSilver on `FrameworkElement`. U
 
 - Re-evaluate other active triggers when one deactivates (for overlapping setters)
 - Lighter-weight `DataTriggerBindingHelper` implementation
-- Support for `IsFocused` property
 
 ## Maintainer Notes
 
