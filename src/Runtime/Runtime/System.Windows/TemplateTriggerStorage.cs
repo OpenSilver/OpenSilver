@@ -555,7 +555,8 @@ internal sealed class TemplateTriggerStorage
                         throw new InvalidOperationException(Strings.MarkupExtensionResourceKey));
                 }
 
-                target.SetTriggerValue(setter.Property, value);
+                // Use ParentTemplateTrigger precedence - can override local values
+                target.SetParentTemplateTriggerValue(setter.Property, value);
             }
         }
     }
@@ -578,7 +579,7 @@ internal sealed class TemplateTriggerStorage
                     continue;
                 }
 
-                target.ClearTriggerValue(setter.Property);
+                target.ClearParentTemplateTriggerValue(setter.Property);
             }
         }
     }

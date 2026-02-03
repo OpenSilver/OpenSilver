@@ -71,6 +71,12 @@ internal sealed class Storage
         set => (_uncommonFields ??= new()).StyleTriggerValue = value;
     }
 
+    internal object ParentTemplateTriggerValue
+    {
+        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.ParentTemplateTriggerValue;
+        set => (_uncommonFields ??= new()).ParentTemplateTriggerValue = value;
+    }
+
     internal object ThemeStyleValue
     {
         get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.ThemeStyleValue;
@@ -85,6 +91,12 @@ internal sealed class Storage
 
     internal (object effectiveValue, BaseValueSourceInternal kind) GetValue()
     {
+        // Check ParentTemplateTrigger first (highest precedence)
+        if (_uncommonFields is not null && _uncommonFields.ParentTemplateTriggerValue != DependencyProperty.UnsetValue)
+        {
+            return (_uncommonFields.ParentTemplateTriggerValue, BaseValueSourceInternal.ParentTemplateTrigger);
+        }
+
         if (LocalValue != DependencyProperty.UnsetValue)
         {
             return (LocalValue, BaseValueSourceInternal.Local);
@@ -120,6 +132,7 @@ internal sealed class Storage
         {
             LocalStyleValue = DependencyProperty.UnsetValue;
             StyleTriggerValue = DependencyProperty.UnsetValue;
+            ParentTemplateTriggerValue = DependencyProperty.UnsetValue;
             ThemeStyleValue = DependencyProperty.UnsetValue;
             InheritedValue = DependencyProperty.UnsetValue;
         }
@@ -127,6 +140,7 @@ internal sealed class Storage
         internal TimelineClock Clock;
         internal object LocalStyleValue;
         internal object StyleTriggerValue;
+        internal object ParentTemplateTriggerValue;
         internal object ThemeStyleValue;
         internal object InheritedValue;
     }

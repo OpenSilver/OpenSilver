@@ -204,8 +204,16 @@ internal enum FullValueSource : short
 }
 
 // Note that these enum values are arranged in the reverse order of
-// precendence for these sources. Local value has highest
+// precedence for these sources. ParentTemplateTrigger has highest
 // precedence and Default value has the least.
+// 
+// In WPF, template-set values (like Background="White" in a DataTemplate)
+// are stored as ParentTemplate values, not Local values. Template triggers
+// (ParentTemplateTrigger) can override ParentTemplate values.
+// 
+// In OpenSilver, for simplicity, we use Local for template-set values but
+// add ParentTemplateTrigger with even higher precedence so template triggers
+// can still override them.
 internal enum BaseValueSourceInternal : short
 {
     Default = 1,
@@ -213,4 +221,5 @@ internal enum BaseValueSourceInternal : short
     ThemeStyle = 3,
     Style = 5,
     Local = 11,
+    ParentTemplateTrigger = 12,  // Template triggers with TargetName can override local values
 }

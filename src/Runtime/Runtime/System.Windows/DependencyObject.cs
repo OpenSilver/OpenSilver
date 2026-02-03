@@ -737,6 +737,41 @@ namespace System.Windows
             }
         }
 
+        internal void SetParentTemplateTriggerValue(DependencyProperty dp, object value)
+        {
+            Debug.Assert(dp != null);
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                ClearParentTemplateTriggerValue(dp);
+            }
+            else
+            {
+                Storage storage = GetOrCreateStorage(dp, metadata);
+                DependencyObjectStore.SetParentTemplateTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata,
+                    value);
+            }
+        }
+
+        internal void ClearParentTemplateTriggerValue(DependencyProperty dp)
+        {
+            Debug.Assert(dp != null);
+
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                DependencyObjectStore.ClearParentTemplateTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata);
+            }
+        }
+
         internal void SetThemeStyleValue(DependencyProperty dp, object value)
         {
             Debug.Assert(dp != null);

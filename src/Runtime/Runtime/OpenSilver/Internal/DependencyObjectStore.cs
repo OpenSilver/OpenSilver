@@ -381,6 +381,88 @@ internal static class DependencyObjectStore
             OperationType.Unknown);
     }
 
+    internal static void SetParentTemplateTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        object newValue)
+    {
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
+
+        storage.ParentTemplateTriggerValue = newValue;
+
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
+
+        // ParentTemplateTrigger has highest precedence - always apply
+        if (oldEntry.IsExpression)
+        {
+            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
+            currentExpr.OnDetach(d, dp);
+        }
+
+        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, newValue, BaseValueSourceInternal.ParentTemplateTrigger);
+
+        if (oldEntry.IsAnimated)
+        {
+            newEntry.SetAnimatedValue(oldEntry.ModifiedValue.AnimatedValue);
+            newEntry.IsAnimatedOverLocal = oldEntry.IsAnimatedOverLocal;
+        }
+
+        UpdateEffectiveValue(storage,
+            d,
+            dp,
+            metadata,
+            ref oldEntry,
+            ref newEntry,
+            false,
+            OperationType.Unknown);
+    }
+
+    internal static void ClearParentTemplateTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata)
+    {
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
+
+        storage.ParentTemplateTriggerValue = DependencyProperty.UnsetValue;
+
+        if (oldEntry.BaseValueSourceInternal > BaseValueSourceInternal.ParentTemplateTrigger)
+        {
+            return;
+        }
+
+        if (oldEntry.IsExpression)
+        {
+            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
+            currentExpr.OnDetach(d, dp);
+        }
+
+        (object effectiveValue, BaseValueSourceInternal effectiveValueKind) = ComputeEffectiveBaseValue(
+            storage, d, dp, metadata);
+
+        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, effectiveValue, effectiveValueKind);
+
+        if (oldEntry.IsAnimated)
+        {
+            newEntry.SetAnimatedValue(oldEntry.ModifiedValue.AnimatedValue);
+            newEntry.IsAnimatedOverLocal = oldEntry.IsAnimatedOverLocal;
+        }
+
+        UpdateEffectiveValue(storage,
+            d,
+            dp,
+            metadata,
+            ref oldEntry,
+            ref newEntry,
+            true,
+            OperationType.Unknown);
+    }
+
     internal static void SetThemeStyleValue(
         Storage storage,
         DependencyObject d,

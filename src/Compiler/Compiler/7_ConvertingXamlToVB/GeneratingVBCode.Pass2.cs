@@ -597,7 +597,7 @@ namespace OpenSilver.Compiler
                                                 if (attributeName == "Property")
                                                 {
                                                     // Style setter property:
-                                                    value = GenerateCodeForSetterProperty(styleElement, attribute, attributeValue);
+                                                    value = GenerateCodeForSetterProperty(styleElement, attribute, attributeValue, element);
                                                 }
                                                 else if (attributeName == "Value")
                                                 {
@@ -607,7 +607,28 @@ namespace OpenSilver.Compiler
                                                     }
 
                                                     bool isSetterForAttachedProperty = property.Value.Contains('.');
-                                                    XName name = GetCSharpXNameFromTargetTypeOrAttachedPropertyString(element, isSetterForAttachedProperty);
+                                                    XName name;
+                                                    
+                                                    // Check if this Setter has a TargetName (used in templates to target a named element)
+                                                    string targetName = element.Attribute("TargetName")?.Value;
+                                                    if (!string.IsNullOrEmpty(targetName) && !isSetterForAttachedProperty)
+                                                    {
+                                                        // For Setter with TargetName, resolve the type from the named element
+                                                        if (TryGetNamedElementXName(styleElement, targetName, out name))
+                                                        {
+                                                            // Successfully resolved type from named element
+                                                        }
+                                                        else
+                                                        {
+                                                            // Fallback to original behavior
+                                                            name = GetCSharpXNameFromTargetTypeOrAttachedPropertyString(element, isSetterForAttachedProperty);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        name = GetCSharpXNameFromTargetTypeOrAttachedPropertyString(element, isSetterForAttachedProperty);
+                                                    }
+                                                    
                                                     string propertyName = isSetterForAttachedProperty ? property.Value.Split('.')[1] : property.Value;
                                                     value = GenerateCodeForInstantiatingAttributeValue(name,
                                                         propertyName,
@@ -1465,6 +1486,11 @@ namespace OpenSilver.Compiler
 
             private string GenerateCodeForSetterProperty(XElement styleElement, XAttribute propertyAttribute, string attributeValue)
             {
+                return GenerateCodeForSetterProperty(styleElement, propertyAttribute, attributeValue, null);
+            }
+
+            private string GenerateCodeForSetterProperty(XElement styleElement, XAttribute propertyAttribute, string attributeValue, XElement setterElement)
+            {
                 bool isAttachedProperty = attributeValue.Contains(".");
                 string elementType, dependencyPropertyName;
                 bool hasNamespace;
@@ -1503,10 +1529,192 @@ namespace OpenSilver.Compiler
                 }
                 else
                 {
-                    elementType = GetCSharpFullTypeNameFromTargetTypeString(styleElement);
+                    // Check if this is a Setter with TargetName in a template
+                    string targetName = setterElement?.Attribute("TargetName")?.Value;
+                    bool isTemplate = GeneratingCode.IsControlTemplate(styleElement, _settings.AssemblyName) ||
+                                      GeneratingCode.IsDataTemplate(styleElement, _settings.AssemblyName);
+
+                    if (!string.IsNullOrEmpty(targetName) && isTemplate)
+                    {
+                        // Try to find the named element's type in the template content
+                        if (TryGetNamedElementType(styleElement, targetName, propertyAttribute, out elementType))
+                        {
+                            // Successfully resolved the type from the named element
+                        }
+                        else
+                        {
+                            // If we have a TargetName but couldn't find the element, throw a helpful error
+                            throw new XamlParseException(
+                                $"Cannot find element '{targetName}' in template. Ensure the element has x:Name=\"{targetName}\" defined.",
+                                propertyAttribute);
+                        }
+                    }
+                    else
+                    {
+                        elementType = GetCSharpFullTypeNameFromTargetTypeString(styleElement);
+                    }
                     dependencyPropertyName = attributeValue + "Property"; //todo: handle the case where the DependencyProperty name is not the name of the property followed by "Property" (at least improve the error message)
                 }
                 return $"{elementType}.{dependencyPropertyName}";
+            }
+
+            /// <summary>
+            /// Tries to find a named element in a template, returning its XName.
+            /// Used for Setter.Value type resolution.
+            /// </summary>
+            private bool TryGetNamedElementXName(XElement templateElement, string targetName, out XName name)
+            {
+                name = null;
+                
+                XElement namedElement = TryFindNamedElementInTemplate(templateElement, targetName);
+                if (namedElement == null)
+                {
+                    return false;
+                }
+                
+                name = namedElement.Name;
+                return true;
+            }
+
+            /// <summary>
+            /// Tries to find a named element in a template, returning its C# type string.
+            /// Used for Setter.Property type resolution.
+            /// </summary>
+            private bool TryGetNamedElementType(XElement templateElement, string targetName, IXmlLineInfo lineInfo, out string elementType)
+            {
+                elementType = null;
+
+                XElement namedElement = TryFindNamedElementInTemplate(templateElement, targetName);
+                if (namedElement == null)
+                {
+                    return false;
+                }
+
+                // Get the type of the found element
+                GetClrNamespaceAndLocalName(
+                    namedElement.Name,
+                    out string namespaceNameForElement,
+                    out string localTypeName,
+                    out string assemblyName);
+
+                elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
+                    namespaceNameForElement,
+                    localTypeName,
+                    assemblyName,
+                    lineInfo,
+                    ifTypeNotFoundTryGuessing: false);
+
+                return elementType != null;
+            }
+
+            /// <summary>
+            /// Finds a named element within a template's content.
+            /// </summary>
+            /// <returns>The named element, or null if not found or not a template.</returns>
+            private XElement TryFindNamedElementInTemplate(XElement templateElement, string targetName)
+            {
+                bool isControlTemplate = GeneratingCode.IsControlTemplate(templateElement, _settings.AssemblyName);
+                bool isDataTemplate = GeneratingCode.IsDataTemplate(templateElement, _settings.AssemblyName);
+                
+                if (!isControlTemplate && !isDataTemplate)
+                {
+                    return null;
+                }
+
+                // Find the template content - it can be:
+                // 1. A direct child element (not a property element)
+                // 2. Inside a .Template property element (e.g., ControlTemplate.Template, DataTemplate.Template)
+                XElement templateContent = null;
+                
+                foreach (XElement child in templateElement.Elements())
+                {
+                    string localName = child.Name.LocalName;
+                    
+                    // Check if it's a .Template property element that contains the template content
+                    if (localName.EndsWith(".Template"))
+                    {
+                        templateContent = child.Elements().FirstOrDefault(e => !e.Name.LocalName.Contains('.'));
+                        if (templateContent != null)
+                            break;
+                    }
+                    // Or it could be a direct child (not a property element)
+                    else if (!localName.Contains('.'))
+                    {
+                        templateContent = child;
+                        break;
+                    }
+                }
+
+                if (templateContent == null)
+                {
+                    return null;
+                }
+
+                // Search for the element with the matching x:Name or Name
+                return FindNamedElement(templateContent, targetName);
+            }
+
+            /// <summary>
+            /// Recursively searches for an element with the specified x:Name or Name attribute.
+            /// </summary>
+            private static XElement FindNamedElement(XElement root, string name)
+            {
+                // Check if this element has the name we're looking for
+                // Try multiple ways to find the name (x:Name, Name, or via the helper methods)
+                string elementName = null;
+                
+                // Try x:Name first (most common)
+                XAttribute xNameAttr = root.Attribute(GeneratingCode.xNamespace + "Name");
+                if (xNameAttr != null)
+                {
+                    elementName = xNameAttr.Value;
+                }
+                else
+                {
+                    // Try plain Name attribute
+                    XAttribute nameAttr = root.Attribute("Name");
+                    if (nameAttr != null && string.IsNullOrEmpty(nameAttr.Name.NamespaceName))
+                    {
+                        elementName = nameAttr.Value;
+                    }
+                }
+
+                if (elementName == name)
+                {
+                    return root;
+                }
+
+                // Recursively search children
+                foreach (XElement child in root.Elements())
+                {
+                    string localName = child.Name.LocalName;
+                    
+                    // Property elements (like Border.Child, Grid.Children) may contain child elements
+                    // We need to search inside them too
+                    if (localName.Contains('.'))
+                    {
+                        // Search inside property elements for actual child content
+                        foreach (XElement propChild in child.Elements())
+                        {
+                            XElement found = FindNamedElement(propChild, name);
+                            if (found != null)
+                            {
+                                return found;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Regular element - search directly
+                        XElement found = FindNamedElement(child, name);
+                        if (found != null)
+                        {
+                            return found;
+                        }
+                    }
+                }
+
+                return null;
             }
 
             /// <summary>

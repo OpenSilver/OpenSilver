@@ -321,15 +321,12 @@
                     Margin="2"
                     CornerRadius="5">
                 <StackPanel>
-                    <TextBlock Text="TEST NOT SUPPORTED IN OPENSILVER YET" FontWeight="Bold" FontSize="14" Foreground="Red"/>
                     <TextBlock x:Name="nameText" Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
                     <TextBlock x:Name="ageText" Text="{Binding Age, StringFormat='Age: {0}'}" FontSize="12"/>
                     <TextBlock x:Name="statusText" Text="{Binding Status}" FontSize="11" FontStyle="Italic"/>
                 </StackPanel>
             </Border>
-            <!-- NOTE: Commented out because SourceName and TargetName with properties not on TargetType require -->
-            <!-- more complex compiler support and are deferred to a future implementation. -->
-            <!--<DataTemplate.Triggers>
+            <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                     <Setter TargetName="personBorder" Property="Background" Value="LightGreen"/>
                     <Setter TargetName="personBorder" Property="BorderBrush" Value="Green"/>
@@ -350,7 +347,7 @@
                     <Setter TargetName="personBorder" Property="Background" Value="Gold"/>
                     <Setter TargetName="nameText" Property="Foreground" Value="DarkRed"/>
                 </MultiDataTrigger>
-            </DataTemplate.Triggers>-->
+            </DataTemplate.Triggers>
         </DataTemplate>
 
         <!-- ============================================================ -->
@@ -572,17 +569,13 @@
                     <TextBlock Text="7. DataTemplate Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
                     <TextBlock Text="Person list with DataTemplate triggers (active=green, premium=gold border, both=gold bg):" 
                              FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                    <TextBlock Text="TEST NOT SUPPORTED IN OPENSILVER YET" FontWeight="Bold" FontSize="14" Foreground="Red"/>
-                    <ItemsControl x:Name="PersonList"/>
-                    <!-- NOTE: Commented out because SourceName and TargetName with properties not on TargetType -->
-                    <!-- require more complex compiler support and are deferred. -->
-                    <!--<ItemsControl x:Name="PersonList" ItemTemplate="{StaticResource PersonItemTemplate}">
+                    <ItemsControl x:Name="PersonList" ItemTemplate="{StaticResource PersonItemTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-                    </ItemsControl>-->
+                    </ItemsControl>
                 </StackPanel>
             </Border>
 
