@@ -108,6 +108,10 @@ internal sealed class TemplateTriggerStorage
         // Initialize state to false (inactive)
         _triggerStates[trigger] = new TriggerState();
 
+        // Set up name resolvers for any storyboards in the trigger's actions
+        // This must be done once so storyboards can find named elements in the template
+        SetupTriggerStoryboards(trigger);
+
         switch (trigger)
         {
             case Trigger propertyTrigger:
@@ -129,6 +133,48 @@ internal sealed class TemplateTriggerStorage
             case EventTrigger eventTrigger:
                 SetupEventTrigger(eventTrigger);
                 break;
+        }
+    }
+
+    /// <summary>
+    /// Sets up name resolvers for all storyboards in the trigger's actions.
+    /// </summary>
+    private void SetupTriggerStoryboards(TriggerBase trigger)
+    {
+        // Handle EventTrigger.Actions
+        if (trigger is EventTrigger eventTrigger)
+        {
+            foreach (TriggerAction action in eventTrigger.Actions)
+            {
+                if (action is BeginStoryboard beginStoryboard && beginStoryboard.Storyboard is Storyboard storyboard)
+                {
+                    SetupStoryboardNameResolver(storyboard);
+                }
+            }
+        }
+
+        // Handle EnterActions
+        if (trigger.HasEnterActions)
+        {
+            foreach (TriggerAction action in trigger.EnterActions)
+            {
+                if (action is BeginStoryboard beginStoryboard && beginStoryboard.Storyboard is Storyboard storyboard)
+                {
+                    SetupStoryboardNameResolver(storyboard);
+                }
+            }
+        }
+
+        // Handle ExitActions
+        if (trigger.HasExitActions)
+        {
+            foreach (TriggerAction action in trigger.ExitActions)
+            {
+                if (action is BeginStoryboard beginStoryboard && beginStoryboard.Storyboard is Storyboard storyboard)
+                {
+                    SetupStoryboardNameResolver(storyboard);
+                }
+            }
         }
     }
 
@@ -584,7 +630,6 @@ internal sealed class TemplateTriggerStorage
         }
     }
 
-
     private static SetterBaseCollection GetTriggerSetters(TriggerBase trigger)
     {
         return trigger switch
@@ -625,6 +670,29 @@ internal sealed class TemplateTriggerStorage
             if (action is BeginStoryboard beginStoryboard)
             {
                 beginStoryboard.Storyboard?.Begin(_templatedParent);
+            }
+        }
+    }
+
+    private void SetupStoryboardNameResolver(Storyboard storyboard)
+    {
+        // Create a name resolver that uses the template's name scope
+        if (_templatedParent.TemplateChild is IInternalFrameworkElement templateRoot)
+        {
+            var nameResolver = new TemplateNameResolver(templateRoot);
+            SetNameResolverRecursive(storyboard, nameResolver);
+        }
+    }
+
+    private static void SetNameResolverRecursive(Timeline timeline, INameResolver nameResolver)
+    {
+        timeline.NameResolver = nameResolver;
+        
+        if (timeline is Storyboard storyboard)
+        {
+            foreach (Timeline child in storyboard.Children)
+            {
+                SetNameResolverRecursive(child, nameResolver);
             }
         }
     }

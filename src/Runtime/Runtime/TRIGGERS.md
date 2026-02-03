@@ -78,20 +78,6 @@ The compiler now supports resolving `Setter.Property` against the actual element
 - `src/Compiler/Compiler/2_ConvertingXamlToCSharp/GeneratingCSharpCode.Pass2.cs`: `TryGetNamedElementType()`, `FindNamedElement()`
 - Same pattern in `GeneratingFSCode.Pass2.cs` and `GeneratingVBCode.Pass2.cs`
 
-## Known Limitations
-
-### Runtime Limitations
-
-#### 1. Multiple Triggers Setting the Same Property
-
-When multiple triggers are active and set the same property, the last-applied value wins. When one trigger becomes inactive, its value is cleared **without** checking if another active trigger should provide a value.
-
-**Impact**: In rare edge cases where multiple triggers set the same property, deactivating one trigger may leave the property without a value even if another trigger is still active.
-
-#### 2. Missing IsFocused Property
-
-The `IsFocused` property is not available in OpenSilver on `FrameworkElement`. Use alternative properties like `IsEnabled` or handle focus through other means.
-
 ## Architecture
 
 ### Key Classes
@@ -157,46 +143,24 @@ Test cases are located in:
 | 6.1 ControlTemplate with TargetName | Button template with hover/pressed states | ✅ Working |
 | 6.2 Trigger.SourceName | Monitors inner element, changes other elements | ✅ Working |
 | 6.3 Condition.SourceName | MultiTrigger with SourceName conditions | ✅ Working |
-| 6.4 EventTrigger.SourceName | Event on inner element triggers animation | ⚠️ Partial (click throws exception) |
+| 6.4 EventTrigger.SourceName | Event on inner element triggers animation | ✅ Working |
 | 7. DataTemplate Triggers | `DataTrigger` and `MultiDataTrigger` with `TargetName` in ItemsControl | ✅ Working |
 | 8. EnterActions/ExitActions | Animated transitions on trigger activation | ✅ Working |
 | 9. Style Inheritance | `BasedOn` styles with triggers | ✅ Working |
 | 10. Attached Property Triggers | `Grid.Row` trigger | ✅ Working |
 | 11. Programmatic Triggers | Code-behind style/trigger creation | ✅ Working |
 
-## Known Issues
+## Known Limitations
 
-### Storyboard.TargetName in Template EventTriggers (Section 6.4)
+### Multiple Triggers Setting the Same Property
 
-**Status**: Unresolved - requires further investigation
+When multiple triggers are active and set the same property, the last-applied value wins. When one trigger becomes inactive, its value is cleared **without** checking if another active trigger should provide a value.
 
-**Symptom**: When clicking in section 6.4, the EventTrigger fires but the Storyboard fails with a name resolution error.
+**Impact**: In rare edge cases where multiple triggers set the same property, deactivating one trigger may leave the property without a value even if another trigger is still active.
 
-**Error**:
-```
-System.InvalidOperationException: 'animatedArea' name cannot be found in the name scope of 'System.Windows.Controls.Border'.
-   at System.Windows.Media.Animation.Storyboard.ResolveTargetName(...)
-```
+### Missing IsFocused Property
 
-**What's working**:
-- Template property triggers (sections 6.1, 6.2, 6.3) now work correctly after the `ParentTemplateTrigger` precedence fix
-- EventTrigger in templates DOES fire (the click handler executes)
-- `TemplateTriggerStorage.ResolveNamedElement()` finds elements correctly
-
-**What's NOT working**:
-- `Storyboard.TargetName` resolution fails when the Storyboard is invoked via `BeginStoryboard` in a template trigger
-- The Storyboard is passed `_templatedParent` but needs the template's name scope to resolve names
-
-**Root cause**: 
-The `InvokeEnterActions()` and `InvokeExitActions()` methods in `TemplateTriggerStorage` call `beginStoryboard.Storyboard?.Begin(_templatedParent)`. The `_templatedParent` is the control itself (e.g., a `Control`), not the template content. When the Storyboard tries to resolve `TargetName`, it uses the wrong name scope.
-
-**Attempted fix**:
-Changed to `beginStoryboard.Storyboard?.Begin(_templatedParent.TemplateChild ?? _templatedParent)` but this still fails because `TemplateChild` (a `Border` in this case) also doesn't have the correct name scope.
-
-**Recommended next steps**:
-1. Investigate how WPF passes the correct name scope to Storyboards in template triggers
-2. Check if `FrameworkTemplate.GetTemplateNameScope()` can be used to get the correct scope
-3. May need to modify `Storyboard.Begin()` to accept an `INameScope` parameter or find the scope differently
+The `IsFocused` property is not available in OpenSilver on `FrameworkElement`. Use alternative properties like `IsEnabled` or handle focus through other means.
 
 ## Potential Future Enhancements
 
