@@ -184,26 +184,128 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
-        <!-- ControlTemplate with SourceName - monitors a DIFFERENT element's property -->
-        <!-- NOTE: Commented out because SourceName and TargetName with properties not on TargetType require -->
-        <!-- more complex compiler support and are deferred to a future implementation. -->
-        <ControlTemplate x:Key="SourceNameTriggerTemplate" TargetType="ContentControl">
-            <Border x:Name="outerBorder" Background="White" BorderBrush="Gray" BorderThickness="1" Padding="10">
+        <!-- ControlTemplate demonstrating Trigger.SourceName -->
+        <!-- SourceName monitors a DIFFERENT element's property than the templated parent -->
+        <!-- Uses properties (IsMouseOver, Background) that exist on Control, so compiler can resolve them -->
+        <ControlTemplate x:Key="SourceNameTriggerTemplate" TargetType="Control">
+            <Border x:Name="rootBorder" 
+                    Background="{TemplateBinding Background}" 
+                    BorderBrush="{TemplateBinding BorderBrush}" 
+                    BorderThickness="2" 
+                    Padding="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- This is the element we MONITOR with SourceName -->
+                    <Border x:Name="hoverZone" 
+                            Grid.Row="0"
+                            Background="LightGray" 
+                            Padding="15" 
+                            Margin="0,0,0,5">
+                        <TextBlock Text="Hover over THIS area" HorizontalAlignment="Center"/>
+                    </Border>
+                    
+                    <!-- This is the element we CHANGE with TargetName -->
+                    <Border x:Name="statusArea" 
+                            Grid.Row="1"
+                            Background="White" 
+                            Padding="10">
+                        <TextBlock Text="Status indicator changes when hovering above" HorizontalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <!-- SourceName="hoverZone" means we monitor hoverZone's IsMouseOver -->
+                <!-- TargetName="statusArea" means we change statusArea's properties -->
+                <!-- TargetName="rootBorder" means we change rootBorder's properties -->
+                <Trigger SourceName="hoverZone" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="statusArea" Property="Background" Value="LightGreen"/>
+                    <Setter TargetName="rootBorder" Property="BorderBrush" Value="Green"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- ControlTemplate demonstrating Condition.SourceName in MultiTrigger -->
+        <ControlTemplate x:Key="ConditionSourceNameTemplate" TargetType="Control">
+            <Border x:Name="rootBorder" 
+                    Background="{TemplateBinding Background}" 
+                    BorderBrush="{TemplateBinding BorderBrush}" 
+                    BorderThickness="2" 
+                    Padding="10">
                 <StackPanel>
-                    <TextBox x:Name="inputBox" Text="Type here..." Margin="0,0,0,5"/>
-                    <TextBlock x:Name="statusText" Text="TextBox is not focused" Foreground="Gray"/>
+                    <Border x:Name="zone1" Background="LightGray" Padding="10" Margin="2">
+                        <TextBlock Text="Zone 1 (hover here)" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border x:Name="zone2" Background="LightGray" Padding="10" Margin="2">
+                        <TextBlock Text="Zone 2 (hover here)" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border x:Name="resultArea" Background="White" Padding="10" Margin="2">
+                        <TextBlock Text="Turns gold when Zone 1 OR Zone 2 is hovered" HorizontalAlignment="Center"/>
+                    </Border>
                 </StackPanel>
             </Border>
-            <!--<ControlTemplate.Triggers>
-                <!- - SourceName specifies WHICH element's property to monitor - ->
-                <!- - TargetName specifies WHERE to apply the setters - ->
-                <Trigger SourceName="inputBox" Property="IsFocused" Value="True">
-                    <Setter TargetName="statusText" Property="Text" Value="TextBox is focused!"/>
-                    <Setter TargetName="statusText" Property="Foreground" Value="Green"/>
-                    <Setter TargetName="statusText" Property="FontWeight" Value="Bold"/>
-                    <Setter TargetName="outerBorder" Property="BorderBrush" Value="Green"/>
-                </Trigger>
-            </ControlTemplate.Triggers>-->
+            <ControlTemplate.Triggers>
+                <!-- MultiTrigger with Condition.SourceName monitoring zone1 -->
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition SourceName="zone1" Property="IsMouseOver" Value="True"/>
+                        <Condition Property="IsEnabled" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter TargetName="resultArea" Property="Background" Value="Gold"/>
+                    <Setter TargetName="zone1" Property="Background" Value="LightGreen"/>
+                </MultiTrigger>
+                <!-- MultiTrigger with Condition.SourceName monitoring zone2 -->
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition SourceName="zone2" Property="IsMouseOver" Value="True"/>
+                        <Condition Property="IsEnabled" Value="True"/>
+                    </MultiTrigger.Conditions>
+                    <Setter TargetName="resultArea" Property="Background" Value="Gold"/>
+                    <Setter TargetName="zone2" Property="Background" Value="LightGreen"/>
+                </MultiTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- ControlTemplate demonstrating EventTrigger.SourceName -->
+        <ControlTemplate x:Key="EventTriggerSourceNameTemplate" TargetType="Control">
+            <Border x:Name="rootBorder" 
+                    Background="{TemplateBinding Background}" 
+                    BorderBrush="Gray" 
+                    BorderThickness="1" 
+                    Padding="10">
+                <StackPanel>
+                    <Border x:Name="clickZone" Background="LightBlue" Padding="15" Margin="0,0,0,5">
+                        <TextBlock Text="Click THIS area to trigger animation below" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border x:Name="animatedArea" 
+                            Background="LightGray" 
+                            Padding="15"
+                            RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                        </Border.RenderTransform>
+                        <TextBlock Text="I animate when you click above" HorizontalAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+                <!-- EventTrigger with SourceName listens to clickZone's MouseLeftButtonDown -->
+                <EventTrigger SourceName="clickZone" RoutedEvent="MouseLeftButtonDown">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="animatedArea"
+                                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                           To="1.2" Duration="0:0:0.15" AutoReverse="True"/>
+                            <DoubleAnimation Storyboard.TargetName="animatedArea"
+                                           Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                           To="1.2" Duration="0:0:0.15" AutoReverse="True"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </ControlTemplate.Triggers>
         </ControlTemplate>
 
         <!-- ============================================================ -->
@@ -441,9 +543,26 @@
                               Padding="15,8" Margin="5" IsEnabled="False"/>
                     </StackPanel>
 
-                    <TextBlock Text="6.2 Trigger with SourceName (monitors TextBox, updates TextBlock):" FontWeight="SemiBold" Margin="0,10,0,5"/>
-                    <TextBlock Text="TEST NOT SUPPORTED IN OPENSILVER YET" FontWeight="Bold" FontSize="14" Foreground="Red"/>
-                    <!--<ContentControl Template="{StaticResource SourceNameTriggerTemplate}" HorizontalAlignment="Left"/>-->
+                    <TextBlock Text="6.2 Trigger.SourceName (monitors inner element, changes other elements):" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                    <TextBlock Text="Hover over the gray 'hoverZone' - the status area turns green and border turns green:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <Control Template="{StaticResource SourceNameTriggerTemplate}" 
+                           Background="White" BorderBrush="Gray"
+                           HorizontalAlignment="Left" Width="350"/>
+
+                    <TextBlock Text="6.3 Condition.SourceName in MultiTrigger:" FontWeight="SemiBold" Margin="0,15,0,5"/>
+                    <TextBlock Text="Hover Zone 1 OR Zone 2 - that zone turns green and result area turns gold:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <Control Template="{StaticResource ConditionSourceNameTemplate}" 
+                           Background="White" BorderBrush="Gray"
+                           HorizontalAlignment="Left" Width="350"/>
+
+                    <TextBlock Text="6.4 EventTrigger.SourceName:" FontWeight="SemiBold" Margin="0,15,0,5"/>
+                    <TextBlock Text="Click the blue 'clickZone' - the area below animates (scales up then back):" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <Control Template="{StaticResource EventTriggerSourceNameTemplate}" 
+                           Background="White"
+                           HorizontalAlignment="Left" Width="350"/>
                 </StackPanel>
             </Border>
 
