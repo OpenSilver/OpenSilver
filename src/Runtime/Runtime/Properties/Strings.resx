@@ -1304,4 +1304,10 @@
   <data name="ZoomText" xml:space="preserve">
     <value>Zoom</value>
   </data>
+  <data name="WindowMustBeRoot" xml:space="preserve">
+    <value>Window must be the root of the tree. Cannot add Window as a child of UIElement.</value>
+  </data>
+  <data name="WindowContentMustBeFrameworkElement" xml:space="preserve">
+    <value>The Content property of a Window must be a FrameworkElement.</value>
+  </data>
 </root>
