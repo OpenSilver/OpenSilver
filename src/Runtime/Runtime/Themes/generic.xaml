@@ -133,6 +133,22 @@
         </Setter>
     </Style>
 
+    <Style TargetType="Window">
+        <Setter Property="Background"
+                Value="{x:Static media:Brushes.Transparent}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="Window">
+                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}">
+                        <controls:ContentPresenter />
+                    </controls:Border>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  ItemsControl  -->
     <Style TargetType="controls:ItemsControl">
         <Setter Property="Template">

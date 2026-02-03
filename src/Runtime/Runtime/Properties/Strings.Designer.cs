@@ -3580,6 +3580,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Content property of a Window must be a FrameworkElement..
+        /// </summary>
+        internal static string WindowContentMustBeFrameworkElement {
+            get {
+                return ResourceManager.GetString("WindowContentMustBeFrameworkElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Window must be the root of the tree. Cannot add Window as a child of UIElement..
+        /// </summary>
+        internal static string WindowMustBeRoot {
+            get {
+                return ResourceManager.GetString("WindowMustBeRoot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There is no registered CultureInfo with the IetfLanguageTag &apos;{0}&apos;..
         /// </summary>
         internal static string XmlLangGetCultureFailure {
