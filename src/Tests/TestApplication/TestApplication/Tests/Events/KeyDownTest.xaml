@@ -19,6 +19,15 @@
         <Button x:Name="button1" Content="Clear" Width="100" Height="50" Margin="0,20,0,0"/>
 
         <TextBlock Name="blockMsg" Margin="0,100,0,0" Foreground="Orange"/>
+
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,20,0,0">
+            <TextBlock Text="Tab order:"/>
+            <TextBox Width="200" TabIndex="0" Text="TabIndex=0"/>
+            <StackPanel>
+                <TextBox Width="200" TabIndex="1" Text="TabIndex=1 inside a nested StackPanel"/>
+            </StackPanel>
+            <TextBox Width="200" TabIndex="2" Text="TabIndex=2"/>
+        </StackPanel>
     </StackPanel>
 
 </sdk:Page>
