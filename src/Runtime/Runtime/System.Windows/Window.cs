@@ -104,12 +104,6 @@ public class Window : ContentControl, IResizeObserverListener
 
         TextMeasurementService = new TextMeasurementService(this);
 
-        // Attach the window content, if any:
-        if (Content is FrameworkElement content)
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(content, this);
-        }
-
         // Raise the "Loaded" event:
         RaiseLoadedEvent();
 
@@ -171,7 +165,7 @@ public class Window : ContentControl, IResizeObserverListener
 
     private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (e.NewValue is not null && e.NewValue is not FrameworkElement)
+        if (e.NewValue is not null and not FrameworkElement)
         {
             throw new InvalidOperationException(Strings.WindowContentMustBeFrameworkElement);
         }
