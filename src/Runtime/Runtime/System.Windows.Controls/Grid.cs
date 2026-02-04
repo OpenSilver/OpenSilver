@@ -514,7 +514,7 @@ public class Grid : Panel, IBorderElement
         }
     }
 
-    internal int ColumnDefinitionsCount => _data?.ColumnDefinitions.Count ?? 0;
+    internal int ColumnDefinitionsCount => _data?.ColumnDefinitions?.Count ?? 0;
 
     /// <summary>
     /// Gets a <see cref="RowDefinitionCollection"/> defined on this instance of <see cref="Grid"/>.
@@ -561,7 +561,7 @@ public class Grid : Panel, IBorderElement
         }
     }
 
-    internal int RowDefinitionsCount => _data?.RowDefinitions.Count ?? 0;
+    internal int RowDefinitionsCount => _data?.RowDefinitions?.Count ?? 0;
 
     public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
     {
