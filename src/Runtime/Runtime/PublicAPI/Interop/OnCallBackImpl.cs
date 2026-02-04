@@ -15,6 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 using CSHTML5.Types;
 using DotNetForHtml5.Core;
 
@@ -87,7 +89,15 @@ namespace CSHTML5.Internal
 
         private static object DelegateDynamicInvoke(Delegate d, params object[] args)
         {
-            return d.DynamicInvoke(args);
+            try
+            {
+                return d.DynamicInvoke(args);
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw; // Unreachable, but required by compiler
+            }
         }
 
         private bool TryOptimizationForCommonTypes(Delegate callback, out object result)
