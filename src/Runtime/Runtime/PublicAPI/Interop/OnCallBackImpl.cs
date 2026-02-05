@@ -18,193 +18,183 @@ using System.Linq;
 using CSHTML5.Types;
 using DotNetForHtml5.Core;
 
-namespace CSHTML5.Internal
+namespace CSHTML5.Internal;
+
+internal static class OnCallBackImpl
 {
-    internal sealed class OnCallBackImpl
+    public static void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
     {
-        private OnCallBackImpl()
+        string errorMessage = OpenSilver.Interop.ExecuteJavaScriptString($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][0]");
+        int indexOfNextUnmodifiedJSCallInList = OpenSilver.Interop.ExecuteJavaScriptInt32($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][1]");
+
+        if (OpenSilver.Interop.IsRunningInTheSimulator)
         {
+            // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
+            INTERNAL_Simulator.WebControlDispatcherBeginInvoke(() => ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList));
         }
-
-        public static OnCallBackImpl Instance { get; } = new OnCallBackImpl();
-
-        public void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
+        else
         {
-            Action action = () =>
-            {
-                string errorMessage = OpenSilver.Interop.ExecuteJavaScriptString($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][0]");
-                int indexOfNextUnmodifiedJSCallInList = OpenSilver.Interop.ExecuteJavaScriptInt32($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][1]");
-                ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
-            };
+            ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
+        }
+    }
 
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
-                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(action);
-            }
-            else
-            {
+    private static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
+    {
+        string javascript = OpenSilver.Interop.GetJavaScript(indexOfCallInList);
+
+        if (OpenSilver.Interop.IsRunningInTheSimulator)
+        {
+            INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, javascript);
+        }
+        else
+        {
+            string message =
+                $"""
+                Error in the following javascript code:
+
+                {javascript}
+
+                ----- Error: -----
+
+                {errorMessage}
+                """;
+
+            Console.WriteLine(message);
+        }
+    }
+
+    //---------------------------------------------------------------------------------------
+    // This code follows the architecture drawn by DotNetBrowser
+    // (cf https://dotnetbrowser.support.teamdev.com/support/solutions/articles/9000109868-calling-javascript-from-net)
+    // For an example of implementation, go to INTERNAL_InteropImplementation.cs and
+    // ExecuteJavaScript_Implementation method, in the first "if".
+    //---------------------------------------------------------------------------------------
+
+    public static object OnCallbackFromJavaScript(
+        Delegate callback,
+        string idWhereCallbackArgsAreStored,
+        object callbackArgsObject)
+    {
+        return CallMethod(callback, idWhereCallbackArgsAreStored, callbackArgsObject);
+    }
+
+    internal static bool IsCommonType(Delegate d) => d is Action || d is Func<object>;
+
+    private static bool TryOptimizationForCommonTypes(Delegate callback, out object result)
+    {
+        switch (callback)
+        {
+            case Action action:
                 action();
+                result = null;
+                return true;
+
+            case Func<object> func:
+                result = func();
+                return true;
+
+            default:
+                Debug.Assert(!IsCommonType(callback));
+                result = null;
+                return false;
+        }
+    }
+
+    private static object CallMethod(Delegate callback, string idWhereCallbackArgsAreStored, object callbackArgs)
+    {
+        Debug.Assert(callback is not null);
+
+        if (TryOptimizationForCommonTypes(callback, out object simpleResult))
+        {
+            return simpleResult;
+        }
+
+        Type callbackType = callback.GetType();
+        Type[] callbackGenericArgs = null;
+        if (callbackType.IsGenericType)
+        {
+            callbackGenericArgs = callbackType.GetGenericArguments();
+            callbackType = callbackType.GetGenericTypeDefinition();
+        }
+
+        object[] arguments = null;
+        IReadOnlyList<IDisposable> extraJsObjects = null;
+        try
+        {
+            int argumentCount = 0;
+            if (callbackType == typeof(Action<>) || callbackType == typeof(Func<,>))
+                argumentCount = 1;
+            else if (callbackType == typeof(Action<,>) || callbackType == typeof(Func<,,>))
+                argumentCount = 2;
+            else if (callbackType == typeof(Action<,,>) || callbackType == typeof(Func<,,,>))
+                argumentCount = 3;
+            else if (callbackType == typeof(Action<,,,>) || callbackType == typeof(Func<,,,,>))
+                argumentCount = 4;
+            else if (callbackType == typeof(Action<,,,,>) || callbackType == typeof(Func<,,,,,>))
+                argumentCount = 5;
+            else if (callbackType == typeof(Action<,,,,,>) || callbackType == typeof(Func<,,,,,,>))
+                argumentCount = 6;
+            else if (callbackType == typeof(Action<,,,,,,>) || callbackType == typeof(Func<,,,,,,,>))
+                argumentCount = 7;
+            else if (callbackType == typeof(Action<,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,>))
+                argumentCount = 8;
+            else if (callbackType == typeof(Action<,,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,,>))
+                argumentCount = 9;
+
+            (arguments, extraJsObjects) = MakeArgumentsForCallback(argumentCount, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs);
+            return callback.DynamicInvoke(arguments);
+        }
+        finally
+        {
+            if (arguments != null)
+            {
+                foreach (var arg in arguments.OfType<IDisposable>())
+                {
+                    arg.Dispose();
+                }
+            }
+            if (extraJsObjects != null)
+            {
+                foreach (IDisposable arg in extraJsObjects)
+                {
+                    arg.Dispose();
+                }
             }
         }
 
-        private static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
-        {
-            string javascript = OpenSilver.Interop.GetJavaScript(indexOfCallInList);
+        throw new Exception($"Callback type not supported: '{callbackType.FullName}'");
+    }
 
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
+    private static (object[], IReadOnlyList<IDisposable>) MakeArgumentsForCallback(
+        int count,
+        string idWhereCallbackArgsAreStored,
+        object callbackArgs,
+        Type[] callbackGenericArgs)
+    {
+        var result = new object[count];
+        List<IDisposable> extraJsObjects = null;
+
+        for (int i = 0; i < count; i++)
+        {
+            var arg = new JSObjectRef(callbackArgs, idWhereCallbackArgsAreStored, i);
+
+            if (callbackGenericArgs != null
+                && i < callbackGenericArgs.Length
+                && callbackGenericArgs[i] != typeof(object)
+                && (callbackGenericArgs[i].IsPrimitive || callbackGenericArgs[i] == typeof(string)))
             {
-                INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, javascript);
+                // Attempt to cast from JS object to the desired primitive or string type. This is useful for example
+                // when passing an Action<string> to an Interop.ExecuteJavaScript so as to not get an exception that says
+                // that it cannot cast the JS object into string (when running in the Simulator only):
+                result[i] = Convert.ChangeType(arg, callbackGenericArgs[i]);
+                extraJsObjects ??= [];
+                extraJsObjects.Add(arg);
             }
             else
             {
-                string message = string.Format(@"Error in the following javascript code:
-
-{0}
-
------ Error: -----
-
-{1}
-", javascript, errorMessage);
-                Console.WriteLine(message);
+                result[i] = arg;
             }
         }
-
-        //---------------------------------------------------------------------------------------
-        // This code follows the architecture drawn by DotNetBrowser
-        // (cf https://dotnetbrowser.support.teamdev.com/support/solutions/articles/9000109868-calling-javascript-from-net)
-        // For an example of implementation, go to INTERNAL_InteropImplementation.cs and
-        // ExecuteJavaScript_Implementation method, in the first "if".
-        //---------------------------------------------------------------------------------------
-
-        public object OnCallbackFromJavaScript(
-            Delegate callback,
-            string idWhereCallbackArgsAreStored,
-            object callbackArgsObject)
-        {
-            return CallMethod(callback, idWhereCallbackArgsAreStored, callbackArgsObject);
-        }
-
-        private static object DelegateDynamicInvoke(Delegate d, params object[] args)
-        {
-            return d.DynamicInvoke(args);
-        }
-
-        private bool TryOptimizationForCommonTypes(Delegate callback, out object result)
-        {
-            switch (callback)
-            {
-                case Action action:
-                    action();
-                    result = null;
-                    return true;
-
-                case Func<object> func:
-                    result = func();
-                    return true;
-
-                default:
-                    result = null;
-                    return false;
-            }
-        }
-
-        private object CallMethod(Delegate callback, string idWhereCallbackArgsAreStored, object callbackArgs)
-        {
-            Debug.Assert(callback is not null);
-
-            if (TryOptimizationForCommonTypes(callback, out object simpleResult))
-            {
-                return simpleResult;
-            }
-
-            Type callbackType = callback.GetType();
-            Type[] callbackGenericArgs = null;
-            if (callbackType.IsGenericType)
-            {
-                callbackGenericArgs = callbackType.GetGenericArguments();
-                callbackType = callbackType.GetGenericTypeDefinition();
-            }
-
-            object[] arguments = null;
-            IReadOnlyList<IDisposable> extraJsObjects = null;
-            try
-            {
-                int argumentCount = 0;
-                if (callbackType == typeof(Action<>) || callbackType == typeof(Func<,>))
-                    argumentCount = 1;
-                else if (callbackType == typeof(Action<,>) || callbackType == typeof(Func<,,>))
-                    argumentCount = 2;
-                else if (callbackType == typeof(Action<,,>) || callbackType == typeof(Func<,,,>))
-                    argumentCount = 3;
-                else if (callbackType == typeof(Action<,,,>) || callbackType == typeof(Func<,,,,>))
-                    argumentCount = 4;
-                else if (callbackType == typeof(Action<,,,,>) || callbackType == typeof(Func<,,,,,>))
-                    argumentCount = 5;
-                else if (callbackType == typeof(Action<,,,,,>) || callbackType == typeof(Func<,,,,,,>))
-                    argumentCount = 6;
-                else if (callbackType == typeof(Action<,,,,,,>) || callbackType == typeof(Func<,,,,,,,>))
-                    argumentCount = 7;
-                else if (callbackType == typeof(Action<,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,>))
-                    argumentCount = 8;
-                else if (callbackType == typeof(Action<,,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,,>))
-                    argumentCount = 9;
-
-                (arguments, extraJsObjects) = MakeArgumentsForCallback(argumentCount, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs);
-                return DelegateDynamicInvoke(callback, arguments);
-            }
-            finally
-            {
-                if (arguments != null)
-                {
-                    foreach (var arg in arguments.OfType<IDisposable>())
-                    {
-                        arg.Dispose();
-                    }
-                }
-                if (extraJsObjects != null)
-                {
-                    foreach (IDisposable arg in extraJsObjects)
-                    {
-                        arg.Dispose();
-                    }
-                }
-            }
-
-            throw new Exception($"Callback type not supported: '{callbackType.FullName}'");
-        }
-
-        private static (object[], IReadOnlyList<IDisposable>) MakeArgumentsForCallback(
-            int count,
-            string idWhereCallbackArgsAreStored,
-            object callbackArgs,
-            Type[] callbackGenericArgs)
-        {
-            var result = new object[count];
-            List<IDisposable> extraJsObjects = null;
-
-            for (int i = 0; i < count; i++)
-            {
-                var arg = new JSObjectRef(callbackArgs, idWhereCallbackArgsAreStored, i);
-
-                if (callbackGenericArgs != null
-                    && i < callbackGenericArgs.Length
-                    && callbackGenericArgs[i] != typeof(object)
-                    && (callbackGenericArgs[i].IsPrimitive || callbackGenericArgs[i] == typeof(string)))
-                {
-                    // Attempt to cast from JS object to the desired primitive or string type. This is useful for example
-                    // when passing an Action<string> to an Interop.ExecuteJavaScript so as to not get an exception that says
-                    // that it cannot cast the JS object into string (when running in the Simulator only):
-                    result[i] = Convert.ChangeType(arg, callbackGenericArgs[i]);
-                    extraJsObjects ??= new();
-                    extraJsObjects.Add(arg);
-                }
-                else
-                {
-                    result[i] = arg;
-                }
-            }
-            return (result, extraJsObjects);
-        }
+        return (result, extraJsObjects);
     }
 }

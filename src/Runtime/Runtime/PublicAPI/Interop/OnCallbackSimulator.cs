@@ -13,7 +13,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Windows;
 using DotNetForHtml5.Core;
 
 namespace CSHTML5.Internal
@@ -29,7 +28,7 @@ namespace CSHTML5.Internal
 
         public void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
         {
-            OnCallBackImpl.Instance.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
+            OnCallBackImpl.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
         }
 
         public object OnCallbackFromJavaScript(

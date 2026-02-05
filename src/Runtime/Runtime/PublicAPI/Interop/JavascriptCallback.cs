@@ -13,6 +13,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -28,12 +29,14 @@ namespace CSHTML5.Internal
         private readonly int _id;
         private readonly Delegate _callback;
         private readonly bool _handleExceptions;
+        private readonly bool _unwrapExceptions;
 
         private JavaScriptCallback(Delegate callback, bool handleExceptions)
         {
             Debug.Assert(callback != null);
             _callback = callback;
             _handleExceptions = handleExceptions;
+            _unwrapExceptions = handleExceptions && !OnCallBackImpl.IsCommonType(callback);
             _id = _store.Add(this);
         }
 
@@ -74,7 +77,7 @@ namespace CSHTML5.Internal
             }
             catch (Exception ex)
             {
-                bool handled = Application.CallHandleException(ex);
+                bool handled = Application.CallHandleException(UnwrapException(ex));
 
                 if (!handled)
                 {
@@ -89,8 +92,17 @@ namespace CSHTML5.Internal
             return null;
         }
 
+        private Exception UnwrapException(Exception ex)
+        {
+            if (_unwrapExceptions && ex is TargetInvocationException tie && tie.InnerException is not null)
+            {
+                return tie.InnerException;
+            }
+            return ex;
+        }
+
         private object InvokeImpl(string idWhereCallbackArgsAreStored, object callbackArgs)
-            => OnCallBackImpl.Instance.OnCallbackFromJavaScript(_callback, idWhereCallbackArgsAreStored, callbackArgs);
+            => OnCallBackImpl.OnCallbackFromJavaScript(_callback, idWhereCallbackArgsAreStored, callbackArgs);
 
         private object LegacyInvoke(string idWhereCallbackArgsAreStored, object callbackArgs)
         {

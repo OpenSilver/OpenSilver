@@ -13,7 +13,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Windows;
 using Microsoft.JSInterop;
 
 namespace CSHTML5.Internal
@@ -29,7 +28,7 @@ namespace CSHTML5.Internal
         [JSInvokable]
         public static void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
         {
-            OnCallBackImpl.Instance.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
+            OnCallBackImpl.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
         }
 
         // This method can be removed later. Now it is used for easier migration from old opensilver.js to new one
