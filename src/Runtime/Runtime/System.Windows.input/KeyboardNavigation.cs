@@ -704,10 +704,7 @@ public sealed class KeyboardNavigation
         return false;
     }
 
-    private bool IsGroup(DependencyObject e)
-    {
-        return true;
-    }
+    private bool IsGroup(DependencyObject e) => GetKeyNavigationMode(e) != KeyboardNavigationMode.Local;
 
     private KeyboardNavigationMode GetKeyNavigationMode(DependencyObject e)
     {
