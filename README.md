@@ -39,16 +39,27 @@ OpenSilver is like **WPF, but cross-platform and evolved**. It brings the produc
 
 ![OpenSilver is like WPF but cross-platform and evolved](images/OpenSilver-like-WPF.png)
 
+Visit the [Gallery](https://opensilver.net/gallery) to see real-world applications built with OpenSilver.
+
+### How It Works
+
+OpenSilver is **not** an emulator or a wrapper. It is a complete reimplementation of the WPF/Silverlight API from scratch, using modern .NET, WebAssembly, and the browser's DOM.
+
+Unlike canvas-based rendering approaches, OpenSilver renders XAML using **real HTML elements**: `TextBox` becomes `<div contenteditable>`, `MediaElement` becomes `<video>`, hyperlinks become `<a href>`, and so on.
+
+This DOM-based approach unlocks native browser behaviors: Ctrl+F search, text selection, screen readers, right-click context menus, SEO indexing, browser translation, copy/paste, mobile long-press, browser extensions, and regulatory accessibility compliance.
+
 ---
 
-## Why Choose OpenSilver?
+## Features
 
-### For New Projects
+### - For New Projects Creation:
 
 | Feature | Description |
 |---------|-------------|
 | **Multi-Language Support** | Write in C#, VB.NET, or F#. OpenSilver is one of the very few solutions that lets you build web apps with VB.NET + XAML or F# + XAML |
 | **True Cross-Platform** | Single codebase compiles to Web, Android, iOS, Windows, macOS, and Linux |
+| **DOM-Based Rendering** | XAML renders to real HTML elements, enabling native browser behaviors: accessibility, SEO, Ctrl+F, text selection, screen readers, browser translation, and more |
 | **Full .NET Ecosystem** | Reference any .NET NuGet package. Use familiar libraries and patterns |
 | **JavaScript Interop** | Easily call any JavaScript library when needed. Works on all target platforms |
 | **Blazor Integration** | Mix XAML and Razor in the same project. Use Blazor components inline in XAML files. Access component libraries from DevExpress, Syncfusion, Radzen, Blazorise, MudBlazor, and more |
@@ -56,7 +67,7 @@ OpenSilver is like **WPF, but cross-platform and evolved**. It brings the produc
 
 ![Drag-and-drop XAML designer in VS Code on macOS](images/OpenSilver-VS-Code-XAML-designer-macOS.jpg)
 
-### For Migration Projects
+### - For Migration Projects:
 
 OpenSilver provides a proven path to modernize legacy applications:
 
@@ -107,7 +118,7 @@ The Showcase is also available as a native app:
 **Prerequisites:**
 - Visual Studio 2022 or newer (including VS 2026) with the `ASP.NET and web development` and `.NET desktop development` workloads
 - To target mobile/desktop platforms, install the `.NET Multi-platform App UI development` workload (Not required if you target only the Web)
-- .NET 7.0 SDK or later
+- .NET 8.0 SDK or later
 
 **Installation:**
 
@@ -121,13 +132,13 @@ The Showcase is also available as a native app:
 
 **Important:** When using MAUI Hybrid, use a short project name (e.g., "MyApp") and place your solution folder close to the root directory (e.g., `C:\MyApp\`) to avoid path length limitations.
 
-**Tip:** After creating your project, open the NuGet Package Manager and check "Include prerelease" to see the latest package versions.
+**Tip:** If you want to use the very latest iteration of OpenSilver rather than the latest stable release, open the NuGet Package Manager and check "Include prerelease". Preview packages are automatically built for each commit on the `develop` branch and published to a [MyGet feed](https://www.myget.org/F/opensilver/api/v3/index.json). This feed is already configured in the `nuget.config` file next to your `.sln`, but if preview packages don't appear, select the MyGet feed from the package source dropdown in the top-right of the NuGet Package Manager. [Learn more](https://doc.opensilver.net/documentation/how-to-topics/get-latest-preview-version.html)
 
 ### Option 2: Visual Studio Code (Windows, macOS, Linux)
 
 **Prerequisites:**
 - VS Code with the OpenSilver extension
-- .NET 7.0 SDK or later
+- .NET 8.0 SDK or later
 
 **Installation:**
 
@@ -241,17 +252,17 @@ End Namespace
 
 ---
 
-## Expand Your App
+## Options to Expand Your App
 
-### Use .NET NuGet Packages
+### Option 1: Use .NET NuGet Packages
 
-Reference any compatible .NET Standard or .NET library:
+Any non-UI NuGet package works directly, unless it uses APIs unavailable in .NET for WebAssembly. Since OpenSilver and Blazor WASM share the same .NET for WebAssembly stack, any non-UI package that works in Blazor WebAssembly will work in OpenSilver too.
 
 ```xml
 <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 ```
 
-### Call JavaScript Libraries
+### Option 2: Call JavaScript Libraries
 
 Easy interop with the entire JavaScript ecosystem:
 
@@ -262,7 +273,9 @@ Interop.ExecuteJavaScript("alert('Hello from C#!')");
 
 ![Examples of JavaScript libraries imported into OpenSilver](images/OpenSilverShowcase-JS-libraries.jpg)
 
-### Mix XAML and Blazor (OpenSilver 3.3+)
+Learn more: [Interop Overview](https://doc.opensilver.net/documentation/general/javascript-interop-and-libraries.html) · [In-Depth Guide](https://doc.opensilver.net/documentation/in-depth-topics/call-javascript-from-csharp.html) · [Interop Samples](https://opensilvershowcase.com/#/Interop_Samples) · [JS Libraries Samples](https://opensilvershowcase.com/#/JS_Libs)
+
+### Option 3: Mix XAML and Blazor (OpenSilver 3.3+)
 
 ![XAML and Razor files can be put in the same project](images/XAML-and-Blazor-in-same-project.png)
 
@@ -309,14 +322,15 @@ Learn more: [OpenSilver + Blazor Documentation](https://doc.opensilver.net/docum
 
 ## ⚡ Performance Tips
 
-For best performance in production:
+**Understanding performance modes:** Debug mode is the slowest mode and not representative of production performance. Release mode is ~30% faster. Publishing (to IIS, to a local folder, or to a server) is ~3x faster than Debug. Publishing with AOT enabled is ~2x faster than without AOT, meaning ~6x faster than Debug overall.
+
+![Performance comparison across different modes](images/OpenSilver-3-2-performance-comparison.jpg)
 
 | Tip | Description |
 |-----|-------------|
 | **Enable AOT Compilation** | Ahead-of-Time compilation improves speed by up to 6x. Not enabled by default due to longer compile times, but recommended for production. |
 | **Use Virtualization** | Enable virtualization for lists, comboboxes, and treeviews with many items. |
 | **Enable IIS Compression** | Significantly reduces initial loading time when publishing. |
-| **Configure Trimming** | Fine-tune trimming settings to reduce app size. Note: configure trimming to avoid breaking .NET serialization reliant on Reflection. |
 | **Lazy-Load Assemblies** | Consider lazy-loading large referenced assemblies to improve startup time. |
 
 ---
@@ -325,6 +339,7 @@ For best performance in production:
 
 ### Debugging
 
+- **Debugging is slow?** Use the Simulator for the best debugging experience in Visual Studio
 - **Breakpoints not hit?** Try disabling "Enable Just My Code" (Tools > Options > Debugging > General > uncheck "Enable Just My Code")
 - **Debugging issues?** Try disabling code optimization (right-click project > Properties > Build > uncheck "Optimize code")
 
@@ -342,15 +357,10 @@ For best performance in production:
 
 - For REST calls, use `HttpClient` instead of `WebClient`
 - Configure CORS and the SameSite attribute for cross-domain calls
-- For applications using RIA Services (like the "Business Application" template), refer to the [Business Applications documentation](https://doc.opensilver.net/documentation/general/business-applications.html)
+- For applications using RIA Services (like the "Business Application" template), refer to the [Business Applications documentation](https://doc.opensilver.net/documentation/general/business-app.html)
 
 For more troubleshooting tips, see the [documentation](https://doc.opensilver.net) or [contact us](https://opensilver.net/contact).
 
----
-
-## 🏢 Who Uses OpenSilver?
-
-OpenSilver is trusted by enterprises worldwide to modernize mission-critical applications and build new cross-platform solutions. Visit our [Gallery](https://opensilver.net/gallery) to see real-world applications built with OpenSilver.
 
 ---
 
@@ -387,11 +397,7 @@ Want to contribute or customize OpenSilver? Follow these steps to build from sou
    update-compiler.bat
    ```
 
-4. **Clean Build Folders**
-   
-   Delete any existing `bin` and `obj` folders. They can cause issues when building with the batch files.
-
-5. **Build the NuGet Package**
+4. **Build the NuGet Package**
    
    Open the **Developer Command Prompt for VS 2022** (not the standard Command Prompt) and navigate to the `build` folder:
    ```bash
@@ -400,7 +406,7 @@ Want to contribute or customize OpenSilver? Follow these steps to build from sou
    ```
    When prompted, enter a version identifier (e.g., `2026-01-30`).
 
-6. **Use Your Custom Build**
+5. **Use Your Custom Build**
    
    The built NuGet packages will be in `build/output/OpenSilver/`. To use them in your projects:
    - Add a [local NuGet source](https://stackoverflow.com/a/55167481/17088417) pointing to that folder
@@ -417,13 +423,13 @@ Want to contribute or customize OpenSilver? Follow these steps to build from sou
   C:\Users\YOUR_USER_NAME\.nuget\packages\opensilver\VERSION\lib\netstandard2.0\
   ```
 
-- **Simulator package:** There is also a separate batch file for building the Simulator package when needed.
+- **Other packages:** There are also separate batch files for building the Simulator, WebAssembly, MAUI Hybrid, and other packages as needed.
 
 ### Troubleshooting
 
 - **Compilation errors:** A Visual Studio workload may need to be installed. Open `OpenSilver.sln` in Visual Studio to check for missing components.
 - **Command Prompt issues:** Make sure you use the "Developer Command Prompt for VS 2022" (not the standard Command Prompt). Some paths in the batch files are relative to the current directory.
-- **Still having issues?** [Contact the OpenSilver team](https://opensilver.net/contact.aspx)
+- **Still having issues?** [Open an Issue on GitHub](https://github.com/OpenSilver/OpenSilver/issues) or [Contact the OpenSilver team](https://opensilver.net/contact.aspx)
 
 ### Repository Structure
 
