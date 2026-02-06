@@ -223,11 +223,16 @@ This example uses C#, but **VB.NET** and **F#** work equally well with XAML. See
 
 ## Performance Tips
 
-Debug mode is not representative of production performance. Publishing is ~3x faster than Debug, and enabling AOT compilation doubles that again (~6x faster than Debug). For best results in production, also enable IIS compression, virtualization for large lists/comboboxes/treeviews, lazy-loading of large assemblies, and configure trimming to reduce app size. [Learn more](https://doc.opensilver.net/documentation/in-depth-topics/performance-improvement.html)
+Debug mode is not representative of production performance. Here is a benchmark rendering 30,000 XAML UI elements (OpenSilver 3.2):
 
-<p align="center">
-  <img src="images/OpenSilver-3-2-performance-comparison.jpg" alt="Performance comparison across different modes" width="350"/>
-</p>
+| Mode | Time | vs. Debug |
+|------|-----:|-----------|
+| Debug (from VS) | 2,150 ms | baseline |
+| Release (from VS) | 1,630 ms | 1.3x faster |
+| Published | 760 ms | 2.8x faster |
+| Published + AOT | 360 ms | 6x faster |
+
+For best results in production, publish with AOT enabled. Other common optimizations include enabling virtualization for large lists/comboboxes/treeviews, using IIS compression, lazy-loading large assemblies, and trimming to reduce the app size. [Learn more](https://doc.opensilver.net/documentation/in-depth-topics/performance-improvement.html)
 
 ---
 
