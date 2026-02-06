@@ -31,17 +31,17 @@
 
 - [What is OpenSilver?](#what-is-opensilver)
 - [Features](#features)
-- [Try OpenSilver Without Installing Anything](#-try-opensilver-without-installing-anything)
-- [Migrating from WPF, Silverlight, or LightSwitch?](#-migrating-from-wpf-silverlight-or-lightswitch)
-- [Create Your First OpenSilver App](#-create-your-first-opensilver-app)
+- [Try OpenSilver Without Installing Anything](#try-opensilver-without-installing-anything)
+- [Migrating from WPF, Silverlight, or LightSwitch?](#migrating-from-wpf-silverlight-or-lightswitch)
+- [Create Your First OpenSilver App](#create-your-first-opensilver-app)
 - [Code Sample](#code-sample)
-- [Performance Tips](#-performance-tips)
-- [Documentation and Resources](#-documentation-and-resources)
-- [Building from Source](#-building-from-source)
-- [Contributing](#-contributing)
-- [Related Repositories](#-related-repositories)
-- [License](#-license)
-- [Get in Touch](#-get-in-touch)
+- [Performance Tips](#performance-tips)
+- [Documentation and Resources](#documentation-and-resources)
+- [Building from Source](#building-from-source)
+- [Contributing](#contributing)
+- [Related Repositories](#related-repositories)
+- [License](#license)
+- [Get in Touch](#get-in-touch)
 
 ---
 
@@ -86,7 +86,7 @@ This DOM-based approach unlocks native browser behaviors: Ctrl+F search, text se
 
 ---
 
-## 🌐 Try OpenSilver Without Installing Anything
+## Try OpenSilver Without Installing Anything
 
 **[XAML.io](https://xaml.io):** Write and run C#/XAML code directly in your browser. No installation required. Perfect for quick experiments, learning, and sharing code snippets.
 
@@ -106,7 +106,7 @@ Visit the [Gallery](https://opensilver.net/gallery) to see real-world applicatio
 
 ---
 
-## 🔄 Migrating from WPF, Silverlight, or LightSwitch?
+## Migrating from WPF, Silverlight, or LightSwitch?
 
 Because OpenSilver implements a subset of the WPF API, it provides a realistic path to bring existing applications to the web and mobile without a full rewrite:
 
@@ -121,7 +121,7 @@ We offer free migration assessments. [Let's talk about your project](https://ope
 
 ---
 
-## 📦 Create Your First OpenSilver App
+## Create Your First OpenSilver App
 
 ### Visual Studio (Windows)
 
@@ -221,7 +221,7 @@ This example uses C#, but **VB.NET** and **F#** work equally well with XAML. See
 
 ---
 
-## ⚡ Performance Tips
+## Performance Tips
 
 Debug mode is not representative of production performance. Publishing is ~3x faster than Debug, and enabling AOT compilation doubles that again (~6x faster than Debug). For best results in production, also enable IIS compression, virtualization for large lists/comboboxes/treeviews, lazy-loading of large assemblies, and configure trimming to reduce app size. [Learn more](https://doc.opensilver.net/documentation/in-depth-topics/performance-improvement.html)
 
@@ -231,7 +231,7 @@ Debug mode is not representative of production performance. Publishing is ~3x fa
 
 ---
 
-## 📖 Documentation and Resources
+## Documentation and Resources
 
 | Resource | Description |
 |----------|-------------|
@@ -242,7 +242,7 @@ Debug mode is not representative of production performance. Publishing is ~3x fa
 
 ---
 
-## 🛠️ Building from Source
+## Building from Source
 
 Want to contribute or customize OpenSilver? See **[BUILDING.md](BUILDING.md)** for full instructions on cloning, building, and using custom NuGet packages.
 
@@ -250,7 +250,7 @@ The extensions for VS and VS Code can also built from source: [github.com/OpenSi
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! Whether it's fixing bugs, improving documentation, or adding new features, every contribution helps make OpenSilver better.
 
@@ -262,7 +262,7 @@ Missing a WPF feature? [Request it on GitHub](https://github.com/OpenSilver/Open
 
 ---
 
-## 🔗 Related Repositories
+## Related Repositories
 
 | Repository | Description |
 |------------|-------------|
@@ -272,7 +272,7 @@ Missing a WPF feature? [Request it on GitHub](https://github.com/OpenSilver/Open
 
 ---
 
-## 📜 License
+## License
 
 OpenSilver is **free and open source**, released under the **[MIT License](LICENSE.txt)**.
 
@@ -280,7 +280,7 @@ You can use OpenSilver in commercial projects without any licensing fees. While 
 
 ---
 
-## 💬 Get in Touch
+## Get in Touch
 
 | | |
 |--|--|
