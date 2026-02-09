@@ -31,6 +31,7 @@
 
 - [What is OpenSilver?](#what-is-opensilver)
 - [Features](#features)
+- [How It Works](#how-it-works)
 - [Try OpenSilver Without Installing Anything](#try-opensilver-without-installing-anything)
 - [Migrating from WPF, Silverlight, or LightSwitch?](#migrating-from-wpf-silverlight-or-lightswitch)
 - [Create Your First OpenSilver App](#create-your-first-opensilver-app)
@@ -50,7 +51,7 @@
 **OpenSilver** is a modern, open-source framework for building cross-platform applications using **C#**, **VB.NET**, or **F#** combined with **XAML**. Write your code once and deploy to:
 
 - **Web** (via WebAssembly)
-- **Android**, **iOS**, **Windows**, **macOS** (via .NET MAUI Hybrid)
+- **Android**, **iOS**, **Windows**, **macOS** (via .NET MAUI-OpenSilver Hybrid)
 - **Linux** (via Photino)
 
 OpenSilver is like **WPF, but cross-platform and evolved**. It brings the productivity of XAML and the power of .NET to every major platform.
@@ -58,14 +59,6 @@ OpenSilver is like **WPF, but cross-platform and evolved**. It brings the produc
 <p align="center">
   <img src="images/OpenSilver-like-WPF.png" alt="OpenSilver is like WPF but cross-platform and evolved" width="600"/>
 </p>
-
-### How It Works
-
-OpenSilver is **not** an emulator or a wrapper. It is a complete reimplementation of the WPF/Silverlight API from scratch, using modern .NET, WebAssembly, and the browser's DOM.
-
-Unlike canvas-based rendering approaches, OpenSilver renders XAML using **real HTML elements**: `TextBox` becomes `<textarea>`, `MediaElement` becomes `<video>`, `PasswordBox` becomes `<input type="password">`, `Image` becomes `<img>`, and so on.
-
-This DOM-based approach unlocks native browser behaviors: Ctrl+F search, text selection, screen readers, right-click context menus, SEO indexing, browser translation, copy/paste, mobile long-press, browser extensions, and regulatory accessibility compliance.
 
 ---
 
@@ -82,6 +75,20 @@ This DOM-based approach unlocks native browser behaviors: Ctrl+F search, text se
 
 <p align="center">
   <img src="images/OpenSilver-VS-Code-XAML-designer-macOS.jpg" alt="Drag-and-drop XAML designer in VS Code on macOS" width="900"/>
+</p>
+
+---
+
+## How It Works
+
+OpenSilver is **not** an emulator, a wrapper, or an Electron-style bundled browser. It is a complete reimplementation of the WPF/Silverlight API from scratch, using modern .NET, WebAssembly, and the browser's DOM.
+
+**On the Web,** your C# code compiles to WebAssembly. Unlike canvas-based rendering approaches, XAML is rendered at runtime using **real HTML elements**: `TextBox` becomes `<textarea>`, `MediaElement` becomes `<video>`, `PasswordBox` becomes `<input type="password">`, `Image` becomes `<img>`, and so on. This unlocks native browser behaviors like Ctrl+F search, text selection (to copy text), screen readers, SEO indexing, browser translation, mobile long-press, UI automated testing, and accessibility compliance. The compiled app is a set of static files (WebAssembly, JS, index.html...) that can be hosted anywhere: Azure, AWS, GitHub Pages, or any basic web server. No special server technology is required.
+
+**On desktop and mobile** (via MAUI-OpenSilver Hybrid or Photino), the UI is still rendered as HTML/CSS, but C# runs as **native .NET** instead of WebAssembly. This preserves full compatibility with JS libraries and Blazor components (because the UI is still HTML/CSS), while adding native performance and direct access to platform APIs (because the runtime is native .NET).
+
+<p align="center">
+  <img src="images/OpenSilver-compilation-targets.png" alt="OpenSilver compilation targets" width="700"/>
 </p>
 
 ---
@@ -170,10 +177,6 @@ Visit [XAML.io](https://xaml.io), create your project in the browser, then click
 | **MyApp.MauiHybrid** | Entry point for Android, iOS, Windows, macOS (via .NET MAUI) |
 | **MyApp.Photino** | Entry point for Linux desktop (via Photino) |
 | **MyApp.Simulator** | Entry point for the Simulator, which provides the best debugging experience (faster startup, better exception reporting, full .NET debugging features such as move execution point, etc.) |
-
-<p align="center">
-  <img src="images/OpenSilver-compilation-targets.png" alt="OpenSilver compilation targets" width="800"/>
-</p>
 
 ---
 
