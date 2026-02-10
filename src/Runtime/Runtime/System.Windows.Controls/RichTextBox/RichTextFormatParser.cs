@@ -28,15 +28,13 @@ internal static class RichTextXamlParser
         var document = new XmlDocument();
         document.LoadXml(xaml);
 
-        return ParseInternal(document.SelectSingleNode("*"));
+        return ParseInternal(document.FirstChild);
     }
 
     private static IEnumerable<Block> ParseInternal(XmlNode node)
     {
-        if (node is XmlElement)
+        if (ProcessNode(node) is Block currentNode)
         {
-            var currentNode = ProcessNode(node);
-
             if (node.HasChildNodes)
             {
                 if (currentNode is Section section)
@@ -48,25 +46,18 @@ internal static class RichTextXamlParser
                 }
                 else if (currentNode is Paragraph paragraph)
                 {
-                    foreach (XmlNode item in node.ChildNodes)
-                    {
-                        var inline = ProcessNodeInline(item);
-                        if (inline != null)
-                        {
-                            paragraph.Inlines.Add(inline);
-                        }
-                    }
+                    ProcessNodeInlines(node, paragraph.Inlines);
                 }
             }
 
             yield return currentNode;
+        }
 
-            if (node.NextSibling != null)
+        if (node.NextSibling is not null)
+        {
+            foreach (var sibling in ParseInternal(node.NextSibling))
             {
-                foreach (var sibling in ParseInternal(node.NextSibling))
-                {
-                    yield return sibling;
-                }
+                yield return sibling;
             }
         }
     }
@@ -81,6 +72,7 @@ internal static class RichTextXamlParser
                 SetProperties(element, node);
                 return element;
             }
+
             if (node.Name == nameof(Paragraph))
             {
                 var element = new Paragraph();
@@ -90,6 +82,17 @@ internal static class RichTextXamlParser
         }
 
         return null;
+    }
+
+    private static void ProcessNodeInlines(XmlNode node, InlineCollection inlines)
+    {
+        for (XmlNode child = node.FirstChild; child is not null; child = child.NextSibling)
+        {
+            if (ProcessNodeInline(child) is Inline inline)
+            {
+                inlines.Add(inline);
+            }
+        }
     }
 
     private static Inline ProcessNodeInline(XmlNode node)
@@ -113,35 +116,35 @@ internal static class RichTextXamlParser
             {
                 var element = new Span();
                 SetProperties(element, node);
-                ProcessChildInlines(element, node);
+                ProcessNodeInlines(node, element.Inlines);
                 return element;
             }
             if (node.Name == nameof(Bold))
             {
                 var element = new Bold();
                 SetProperties(element, node);
-                ProcessChildInlines(element, node);
+                ProcessNodeInlines(node, element.Inlines);
                 return element;
             }
             if (node.Name == nameof(Italic))
             {
                 var element = new Italic();
                 SetProperties(element, node);
-                ProcessChildInlines(element, node);
+                ProcessNodeInlines(node, element.Inlines);
                 return element;
             }
             if (node.Name == nameof(Underline))
             {
                 var element = new Underline();
                 SetProperties(element, node);
-                ProcessChildInlines(element, node);
+                ProcessNodeInlines(node, element.Inlines);
                 return element;
             }
             if (node.Name == nameof(Hyperlink))
             {
                 var element = new Hyperlink();
                 SetProperties(element, node);
-                ProcessChildInlines(element, node);
+                ProcessNodeInlines(node, element.Inlines);
                 return element;
             }
             if (node.Name == nameof(InlineImageContainer))
@@ -157,24 +160,13 @@ internal static class RichTextXamlParser
                 return element;
             }
         }
-        else if (node.NodeType == XmlNodeType.Text)
+        else if (node.NodeType == XmlNodeType.Text ||
+                 node.NodeType == XmlNodeType.SignificantWhitespace)
         {
-            return new Run { Text = node.InnerText };
+            return new Run { Text = node.Value };
         }
 
         return null;
-    }
-
-    private static void ProcessChildInlines(Span element, XmlNode node)
-    {
-        foreach (XmlNode item in node.ChildNodes)
-        {
-            var inline = ProcessNodeInline(item);
-            if (inline != null)
-            {
-                element.Inlines.Add(inline);
-            }
-        }
     }
 
     private static void SetProperties(TextElement element, XmlNode node)

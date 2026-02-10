@@ -11,21 +11,21 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal.Media;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Web;
-using System.Windows.Documents;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -40,6 +40,8 @@ internal sealed class RichTextBoxView : TextViewBase
     internal const string LineHeightName = "lineheight";
     internal const string TextAlignmentName = "align";
     internal const string TextDecorationName = "decoration";
+
+    private static readonly string[] _newLineSeparators = ["\r\n", "\n", "\r"];
 
     private static JsonSerializerOptions SerializerOptions { get; } =
         new JsonSerializerOptions
@@ -642,7 +644,9 @@ internal sealed class RichTextBoxView : TextViewBase
             return;
         }
 
-        QuillDelta[] deltas = GetDeltas(Host.InternalBlocks).ToArray();
+        var deltas = new QuillDeltaBuilder()
+            .AddBlocks(Host.InternalBlocks)
+            .GetDeltas();
 
         Interop.ExecuteJavaScriptVoid(
             $"document.richTextViewManager.setContents('{OuterDiv.UniqueIdentifier}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
@@ -657,132 +661,16 @@ internal sealed class RichTextBoxView : TextViewBase
             return;
         }
 
-        QuillDelta[] deltas = GetDeltas(start, length, element).ToArray();
+        var deltas = new QuillDeltaBuilder()
+            .Retain(start)
+            .Delete(length)
+            .Add(element)
+            .GetDeltas();
 
         Interop.ExecuteJavaScriptVoid(
             $"document.richTextViewManager.updateContents('{OuterDiv.UniqueIdentifier}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
 
         OnContentChanged(true);
-
-        static IEnumerable<QuillDelta> GetDeltas(int start, int length, TextElement element)
-        {
-            yield return new QuillDelta { Retain = start, };
-            if (length > 0)
-            {
-                yield return new QuillDelta { Delete = length, };
-            }
-
-            switch (element)
-            {
-                case Inline inline:
-                    foreach (QuillDelta delta in RichTextBoxView.GetDeltas(inline))
-                    {
-                        yield return delta;
-                    }
-                    break;
-
-                case Block block:
-                    foreach (QuillDelta delta in RichTextBoxView.GetDeltas(block))
-                    {
-                        yield return delta;
-                    }
-                    break;
-            }
-        }
-    }
-
-    private static IEnumerable<QuillDelta> GetDeltas(BlockCollection blocks)
-    {
-        foreach (Block block in blocks.InternalItems)
-        {
-            foreach (QuillDelta delta in GetDeltas(block))
-            {
-                yield return delta;
-            }
-        }
-    }
-
-    private static IEnumerable<QuillDelta> GetDeltas(InlineCollection inlines)
-    {
-        foreach (Inline inline in inlines.InternalItems)
-        {
-            foreach (QuillDelta delta in GetDeltas(inline))
-            {
-                yield return delta;
-            }
-        }
-    }
-
-    private static IEnumerable<QuillDelta> GetDeltas(Block block)
-    {
-        return block switch
-        {
-            Section section when section.Blocks.InternalCount > 0 => GetDeltas(section.Blocks),
-            Section section => GetDeltas(section.Blocks).Append(CloseBlock(section)),
-            Paragraph paragraph => GetDeltas(paragraph.Inlines).Append(CloseBlock(paragraph)),
-            _ => Enumerable.Empty<QuillDelta>(),
-        };
-
-        static QuillDelta CloseBlock(Block block)
-        {
-            return new QuillDelta
-            {
-                Text = "\n",
-                Attributes = new QuillRangeFormat
-                {
-                    TextAlignment = FontProperties.ToCssTextAlignment(block.TextAlignment),
-                    LineHeight = FontProperties.ToCssLineHeight(block.LineHeight),
-                },
-            };
-        }
-    }
-
-    private static IEnumerable<QuillDelta> GetDeltas(Inline inline)
-    {
-        switch (inline)
-        {
-            case Run run when !string.IsNullOrEmpty(run.Text):
-                yield return new QuillDelta
-                {
-                    Text = run.Text,
-                    Attributes = new QuillRangeFormat
-                    {
-                        FontFamily = FontProperties.ToCssFontFamily(run.FontFamily),
-                        FontWeight = FontProperties.ToCssFontWeight(run.FontWeight),
-                        FontStyle = FontProperties.ToCssFontStyle(run.FontStyle),
-                        FontSize = FontProperties.ToCssPxFontSize(run.FontSize),
-                        Foreground = (run.Foreground as SolidColorBrush)?.ToHtmlString(),
-                        CharacterSpacing = FontProperties.ToCssLetterSpacing(run.CharacterSpacing),
-                        TextDecorations = FontProperties.ToCssTextDecoration(run.TextDecorations),
-                    },
-                };
-                break;
-
-            case Span span:
-                foreach (QuillDelta delta in GetDeltas(span.Inlines))
-                {
-                    yield return delta;
-                }
-                break;
-
-            case LineBreak:
-                yield return new QuillDelta { Text = "\n" };
-                break;
-
-            case InlineImageContainer image:
-                yield return new QuillDelta
-                {
-                    Image = new QuillImage { ImageData = image.GetImageData() },
-                    Attributes = new QuillRangeFormat
-                    {
-                        Width = double.IsNaN(image.Width) ? string.Empty : image.Width.ToInvariantString(),
-                        Height = double.IsNaN(image.Height) ? string.Empty : image.Height.ToInvariantString(),
-                        OriginalSource = image.GetOriginalSource(),
-                        ObjectFit = InlineImageContainer.ConvertStretch(image.Stretch),
-                    },
-                };
-                break;
-        }
     }
 
     internal void ProcessKeyDown(KeyEventArgs e)
@@ -858,5 +746,174 @@ internal sealed class RichTextBoxView : TextViewBase
             Host.InvalidateModel();
         }
         Host.OnContentChanged();
+    }
+
+    private ref struct QuillDeltaBuilder
+    {
+        private readonly List<QuillDelta> _builder;
+        private QuillRangeFormat? _format;
+
+        public QuillDeltaBuilder()
+        {
+            _builder = [];
+        }
+
+        public readonly List<QuillDelta> GetDeltas() => _builder;
+
+        public QuillDeltaBuilder Retain(int offset)
+        {
+            _builder.Add(new QuillDelta { Retain = offset });
+            return this;
+        }
+
+        public QuillDeltaBuilder Delete(int length)
+        {
+            if (length > 0)
+            {
+                _builder.Add(new QuillDelta { Delete = length });
+            }
+            return this;
+        }
+
+        public QuillDeltaBuilder Add(TextElement element)
+        {
+            switch (element)
+            {
+                case Inline inline:
+                    _format = GetBlockFormat(inline);
+                    AddInline(inline);
+                    break;
+
+                case Block block:
+                    _format = GetBlockFormat(block);
+                    AddBlock(block);
+                    break;
+            }
+
+            return this;
+        }
+
+        public QuillDeltaBuilder AddBlocks(BlockCollection blocks)
+        {
+            foreach (Block block in blocks.InternalItems)
+            {
+                (QuillRangeFormat? oldFormat, _format) = (_format, GetBlockFormat(block));
+                AddBlock(block);
+                _format = oldFormat;
+            }
+
+            return this;
+        }
+
+        private void AddBlock(Block block)
+        {
+            switch (block)
+            {
+                case Section section:
+                    if (section.Blocks.InternalCount > 0)
+                    {
+                        AddBlocks(section.Blocks);
+                        break;
+                    }
+                    _builder.Add(EndOfParagraph());
+                    break;
+
+                case Paragraph paragraph:
+                    AddInlines(paragraph.Inlines);
+                    _builder.Add(EndOfParagraph());
+                    break;
+            }
+        }
+
+        private void AddInlines(InlineCollection inlines)
+        {
+            foreach (Inline inline in inlines.InternalItems)
+            {
+                AddInline(inline);
+            }
+        }
+
+        private void AddInline(Inline inline)
+        {
+            switch (inline)
+            {
+                case Run run when !string.IsNullOrEmpty(run.Text):
+                    string[] lines = run.Text.Split(_newLineSeparators, StringSplitOptions.None);
+
+                    if (!string.IsNullOrEmpty(lines[0]))
+                    {
+                        _builder.Add(GetTextDelta(lines[0], run));
+                    }
+
+                    for (int i = 1; i < lines.Length; i++)
+                    {
+                        _builder.Add(EndOfParagraph());
+
+                        if (!string.IsNullOrEmpty(lines[i]))
+                        {
+                            _builder.Add(GetTextDelta(lines[i], run));
+                        }
+                    }
+                    break;
+
+                case Span span:
+                    AddInlines(span.Inlines);
+                    break;
+
+                case LineBreak:
+                    _builder.Add(EndOfParagraph());
+                    break;
+
+                case InlineImageContainer image:
+                    _builder.Add(new QuillDelta
+                    {
+                        Image = new QuillImage { ImageData = image.GetImageData() },
+                        Attributes = new QuillRangeFormat
+                        {
+                            Width = double.IsNaN(image.Width) ? string.Empty : image.Width.ToInvariantString(),
+                            Height = double.IsNaN(image.Height) ? string.Empty : image.Height.ToInvariantString(),
+                            OriginalSource = image.GetOriginalSource(),
+                            ObjectFit = InlineImageContainer.ConvertStretch(image.Stretch),
+                        },
+                    });
+                    break;
+            }
+        }
+
+        private QuillDelta EndOfParagraph()
+        {
+            return new QuillDelta
+            {
+                Text = "\n",
+                Attributes = _format,
+            };
+        }
+
+        private static QuillRangeFormat? GetBlockFormat(TextElement textElement)
+        {
+            return new QuillRangeFormat
+            {
+                TextAlignment = FontProperties.ToCssTextAlignment(Block.GetTextAlignment(textElement)),
+                LineHeight = FontProperties.ToCssLineHeight(Block.GetLineHeight(textElement)),
+            };
+        }
+
+        private static QuillDelta GetTextDelta(string text, Run run)
+        {
+            return new QuillDelta
+            {
+                Text = text,
+                Attributes = new QuillRangeFormat
+                {
+                    FontFamily = FontProperties.ToCssFontFamily(run.FontFamily),
+                    FontWeight = FontProperties.ToCssFontWeight(run.FontWeight),
+                    FontStyle = FontProperties.ToCssFontStyle(run.FontStyle),
+                    FontSize = FontProperties.ToCssPxFontSize(run.FontSize),
+                    Foreground = (run.Foreground as SolidColorBrush)?.ToHtmlString(),
+                    CharacterSpacing = FontProperties.ToCssLetterSpacing(run.CharacterSpacing),
+                    TextDecorations = FontProperties.ToCssTextDecoration(run.TextDecorations),
+                },
+            };
+        }
     }
 }
