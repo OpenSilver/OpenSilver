@@ -37,7 +37,12 @@ namespace System.Windows.Markup
             var textReader = new StringReader(xaml);
 
             var xamlReader = new XamlXmlReader(textReader, SharedXamlContext);
-            var xamlWriter = new XamlObjectWriter(xamlReader.SchemaContext);
+            var nameScope = new NameScope();
+            var xamlWriter = new XamlObjectWriter(xamlReader.SchemaContext, new XamlObjectWriterSettings
+            {
+                ExternalNameScope = nameScope,
+                RegisterNamesOnExternalNamescope = true,
+            });
 
             if (xamlReader.NodeType == XamlNodeType.None)
             {
@@ -56,6 +61,21 @@ namespace System.Windows.Markup
                 }
                 xamlWriter.WriteNode(xamlReader);
                 xamlReader.Read();
+            }
+
+            if (xamlWriter.Result is FrameworkElement rootElement)
+            {
+                if (NameScope.GetNameScope(rootElement) is INameScope rootNameScope)
+                {
+                    foreach (var pair in nameScope)
+                    {
+                        rootNameScope.RegisterName(pair.Key, pair.Value);
+                    }
+                }
+                else
+                {
+                    NameScope.SetNameScope(rootElement, nameScope);
+                }
             }
 
             return xamlWriter.Result;

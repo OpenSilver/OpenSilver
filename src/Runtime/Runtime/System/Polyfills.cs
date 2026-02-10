@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace System
@@ -20,6 +21,7 @@ namespace System
     {
         extension(ArgumentNullException)
         {
+            [DebuggerStepThrough]
             public static void ThrowIfNull(object argument, [CallerArgumentExpression(nameof(argument))] string paramName = null)
             {
                 if (argument is null)
@@ -31,6 +33,7 @@ namespace System
 
         extension(ArgumentException)
         {
+            [DebuggerStepThrough]
             public static void ThrowIfNullOrEmpty(string argument, [CallerArgumentExpression(nameof(argument))] string paramName = null)
             {
                 if (string.IsNullOrEmpty(argument))
