@@ -156,39 +156,6 @@ namespace System.Windows.Controls
         internal bool IgnorePropertyChange { get; set; }
 
         #region public bool HasItems
-        /// <summary>
-        /// Gets a value indicating whether this
-        /// <see cref="TreeViewItem" /> contains
-        /// items.
-        /// </summary>
-        /// <value>
-        /// True if this <see cref="TreeViewItem" />
-        /// contains items; otherwise, false. The default is false.
-        /// </value>
-        public new bool HasItems
-        {
-            get { return (bool)GetValue(HasItemsProperty); }
-            private set { SetValue(HasItemsPropertyKey, value); }
-        }
-
-        private static readonly DependencyPropertyKey HasItemsPropertyKey =
-            DependencyProperty.RegisterReadOnly(
-                nameof(HasItems),
-                typeof(bool),
-                typeof(TreeViewItem),
-                new PropertyMetadata(BooleanBoxes.FalseBox, OnHasItemsPropertyChanged));
-
-        /// <summary>
-        /// Identifies the
-        /// <see cref="TreeViewItem.HasItems" />
-        /// dependency property.
-        /// </summary>
-        /// <value>
-        /// The identifier for the
-        /// <see cref="TreeViewItem.HasItems" />
-        /// dependency property.
-        /// </value>
-        public static readonly DependencyProperty HasItemsProperty = HasItemsPropertyKey.DependencyProperty;
 
         /// <summary>
         /// HasItemsProperty property changed handler.
@@ -562,6 +529,7 @@ namespace System.Windows.Controls
         static TreeViewItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeViewItem), new PropertyMetadata(typeof(TreeViewItem)));
+            HasItemsPropertyKey.OverrideMetadata(typeof(TreeViewItem), new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, OnHasItemsPropertyChanged));
         }
 
         /// <summary>
@@ -805,7 +773,6 @@ namespace System.Windows.Controls
             ArgumentNullException.ThrowIfNull(e);
 
             base.OnItemsChanged(e);
-            HasItems = Items.Count > 0;
 
             // Associate any TreeViewItems with their parent
             if (e.NewItems != null)

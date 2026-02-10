@@ -532,14 +532,6 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        /// <summary>
-        /// Gets whether the <see cref="Selector"/> contains items.
-        /// </summary>
-        protected new bool HasItems
-        {
-            get { return ItemsSource != null || base.HasItems; }
-        }
-
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
             base.OnItemsSourceChanged(oldValue, newValue);

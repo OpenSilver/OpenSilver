@@ -52,6 +52,7 @@ namespace System.Windows.Controls
 
             SetModelParent(value);
             AddInternal(value);
+            ((DependencyObject)_modelParent).SetValueInternal(ItemsControl.HasItemsPropertyKey, true);
 
             _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, InternalCount - 1);
         }
@@ -83,6 +84,7 @@ namespace System.Windows.Controls
             }
 
             ClearInternal();
+            ((DependencyObject)_modelParent).ClearValue(ItemsControl.HasItemsPropertyKey);
 
             _collectionChanged.OnCollectionReset();
         }
@@ -98,6 +100,7 @@ namespace System.Windows.Controls
 
             SetModelParent(value);
             InsertInternal(index, value);
+            ((DependencyObject)_modelParent).SetValueInternal(ItemsControl.HasItemsPropertyKey, true);
 
             _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, index);
         }
@@ -114,6 +117,10 @@ namespace System.Windows.Controls
             object removedItem = GetItemInternal(index);
             ClearModelParent(removedItem);
             RemoveAtInternal(index);
+            if (Count == 0)
+            {
+                ((DependencyObject)_modelParent).ClearValue(ItemsControl.HasItemsPropertyKey);
+            }
 
             _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
         }

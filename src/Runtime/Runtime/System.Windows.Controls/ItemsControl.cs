@@ -788,10 +788,25 @@ namespace System.Windows.Controls
 
         internal Panel ItemsHost { get; set; }
 
-        internal bool HasItems
-        {
-            get { return this._items != null && this._items.Count > 0; }
-        }
+        internal static readonly DependencyPropertyKey HasItemsPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(HasItems),
+                typeof(bool),
+                typeof(ItemsControl),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Identifies the <see cref="HasItems"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty HasItemsProperty = HasItemsPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that indicates whether the <see cref="ItemsControl"/> contains items.
+        /// </summary>
+        /// <returns>
+        /// true if the items count is greater than 0; otherwise, false. The default is false.
+        /// </returns>
+        public bool HasItems => (bool)GetValue(HasItemsProperty);
 
         private static ControlTemplate DefaultTemplate { get; } =
             new ControlTemplate
@@ -1100,6 +1115,7 @@ namespace System.Windows.Controls
 
         private void OnItemCollectionChanged2(object sender, NotifyCollectionChangedEventArgs e)
         {
+            this.SetValue(HasItemsPropertyKey, _items.Count > 0);
             this.OnItemsChanged(e);
         }
 
