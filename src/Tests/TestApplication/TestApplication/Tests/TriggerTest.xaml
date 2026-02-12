@@ -625,11 +625,34 @@
             <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
                 <StackPanel>
                     <TextBlock Text="11. Default (Theme) Style Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="Custom control whose default style (in Themes/generic.xaml) has an IsMouseOver trigger:" 
+                    
+                    <TextBlock Text="11.1 Theme style triggers only (no explicit style):" FontWeight="SemiBold" Margin="0,5,0,5"/>
+                    <TextBlock Text="Theme style has IsMouseOver trigger: Background→Yellow, BorderBrush→Orange" 
                              TextWrapping="Wrap" Margin="0,0,0,5"/>
                     <TextBlock Text="• Default: LightGray background, gray border" Margin="10,0,0,2"/>
-                    <TextBlock Text="• Hover: Yellow background, orange border" Margin="10,0,0,2"/>
+                    <TextBlock Text="• Hover: Yellow background, orange border" Margin="10,0,0,5"/>
                     <local:TriggerTestControl HorizontalAlignment="Left" Width="300"/>
+
+                    <TextBlock Text="11.2 Theme style trigger + explicit style trigger on same property:" FontWeight="SemiBold" Margin="0,15,0,5"/>
+                    <TextBlock Text="Theme trigger: on hover: Background→Yellow, BorderBrush→Orange" 
+                             TextWrapping="Wrap" Margin="0,0,0,2"/>
+                    <TextBlock Text="Explicit style trigger: Background→Cyan on hover (should win over theme's Yellow)" 
+                             TextWrapping="Wrap" Margin="0,0,0,2"/>
+                    <TextBlock Text="Explicit style trigger does NOT set BorderBrush, so theme trigger's Orange should apply" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <TextBlock Text="• Default: LightGray background, gray border" Margin="10,0,0,2"/>
+                    <TextBlock Text="• Hover: Cyan background (explicit wins), orange border (theme applies)" Margin="10,0,0,5"/>
+                    <local:TriggerTestControl HorizontalAlignment="Left" Width="300">
+                        <local:TriggerTestControl.Style>
+                            <Style TargetType="local:TriggerTestControl">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="Cyan"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </local:TriggerTestControl.Style>
+                    </local:TriggerTestControl>
                 </StackPanel>
             </Border>
 
