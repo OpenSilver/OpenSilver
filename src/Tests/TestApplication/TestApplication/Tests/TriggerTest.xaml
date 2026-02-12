@@ -153,6 +153,22 @@
         </Style>
 
         <!-- ============================================================ -->
+        <!-- SECTION 10: Simple template for programmatic trigger test -->
+        <!-- ============================================================ -->
+        
+        <!-- Simple template that directly shows Background property without gradient overlays -->
+        <ControlTemplate x:Key="SimpleButtonTemplate" TargetType="Button">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Padding="{TemplateBinding Padding}"
+                    CornerRadius="4">
+                <ContentPresenter HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"/>
+            </Border>
+        </ControlTemplate>
+
+        <!-- ============================================================ -->
         <!-- SECTION 6: CONTROL TEMPLATE TRIGGERS -->
         <!-- ============================================================ -->
 
@@ -595,9 +611,12 @@
             <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
                 <StackPanel>
                     <TextBlock Text="10. Programmatic Style with Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <TextBlock Text="Button with style and triggers created in code-behind:" Margin="0,0,0,5"/>
+                    <TextBlock Text="Button with style and triggers created entirely in code-behind:" Margin="0,0,0,5"/>
+                    <TextBlock Text="• Default: LightGray background, black text" Margin="10,0,0,2"/>
+                    <TextBlock Text="• Hover: Yellow background, orange border/text" Margin="10,0,0,2"/>
+                    <TextBlock Text="• Pressed: Orange background, red border, white text" Margin="10,0,0,5"/>
                     <Button x:Name="ProgrammaticTriggerButton" Content="Programmatic Triggers" 
-                          HorizontalAlignment="Left" Padding="15,8"/>
+                          HorizontalAlignment="Left"/>
                 </StackPanel>
             </Border>
 

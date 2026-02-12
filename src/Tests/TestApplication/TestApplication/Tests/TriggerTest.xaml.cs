@@ -47,28 +47,39 @@ namespace TestApplication.Tests
             // Create a style with triggers programmatically
             Style style = new Style(typeof(Button));
 
-            // Set default values (using the declaring class for each property)
+            // Use a simple template that directly shows Background property
+            // The default Button template has gradient overlays that obscure Background changes
+            var simpleTemplate = (ControlTemplate)Resources["SimpleButtonTemplate"];
+            style.Setters.Add(new Setter(Control.TemplateProperty, simpleTemplate));
+
+            // Set default values (using distinctive colors)
             style.Setters.Add(new Setter(Control.BackgroundProperty, new SolidColorBrush(Colors.LightGray)));
             style.Setters.Add(new Setter(Control.ForegroundProperty, new SolidColorBrush(Colors.Black)));
+            style.Setters.Add(new Setter(Control.BorderBrushProperty, new SolidColorBrush(Colors.Gray)));
+            style.Setters.Add(new Setter(Control.BorderThicknessProperty, new Thickness(1)));
             style.Setters.Add(new Setter(Control.PaddingProperty, new Thickness(15, 8, 15, 8)));
 
             // Create IsMouseOver trigger (IsMouseOverProperty is defined on UIElement)
+            // Uses bright yellow to clearly show the trigger is working
             Trigger mouseOverTrigger = new Trigger
             {
                 Property = UIElement.IsMouseOverProperty,
                 Value = true
             };
-            mouseOverTrigger.Setters.Add(new Setter(Control.BackgroundProperty, new SolidColorBrush(Colors.LightBlue)));
-            mouseOverTrigger.Setters.Add(new Setter(Control.ForegroundProperty, new SolidColorBrush(Colors.DarkBlue)));
+            mouseOverTrigger.Setters.Add(new Setter(Control.BackgroundProperty, new SolidColorBrush(Colors.Yellow)));
+            mouseOverTrigger.Setters.Add(new Setter(Control.BorderBrushProperty, new SolidColorBrush(Colors.Orange)));
+            mouseOverTrigger.Setters.Add(new Setter(Control.ForegroundProperty, new SolidColorBrush(Colors.DarkOrange)));
             style.Triggers.Add(mouseOverTrigger);
 
             // Create IsPressed trigger (IsPressedProperty is defined on ButtonBase)
+            // Uses orange/red to clearly show pressed state
             Trigger pressedTrigger = new Trigger
             {
                 Property = ButtonBase.IsPressedProperty,
                 Value = true
             };
-            pressedTrigger.Setters.Add(new Setter(Control.BackgroundProperty, new SolidColorBrush(Colors.SteelBlue)));
+            pressedTrigger.Setters.Add(new Setter(Control.BackgroundProperty, new SolidColorBrush(Colors.Orange)));
+            pressedTrigger.Setters.Add(new Setter(Control.BorderBrushProperty, new SolidColorBrush(Colors.Red)));
             pressedTrigger.Setters.Add(new Setter(Control.ForegroundProperty, new SolidColorBrush(Colors.White)));
             style.Triggers.Add(pressedTrigger);
 
