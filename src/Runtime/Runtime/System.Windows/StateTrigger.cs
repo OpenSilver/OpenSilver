@@ -56,8 +56,16 @@ public sealed class StateTrigger : StateTriggerBase
     protected override void OnAttached()
     {
         base.OnAttached();
-        UpdateState(IsActive);
+        UpdateState(IsActive, true);
     }
 
-    private void UpdateState(bool isActive) => SetActive(isActive);
+    private void UpdateState(bool isActive, bool knownAttached = false)
+    {
+        if (!knownAttached && !IsAttached)
+        {
+            return;
+        }
+
+        SetActive(isActive);
+    }
 }
