@@ -294,7 +294,7 @@ internal sealed class TriggerStorage
     }
 
     /// <summary>
-    /// Evaluates a single trigger and applies/unapplies its setters.
+    /// Evaluates a single trigger and resolves property values as needed.
     /// </summary>
     private void EvaluateTrigger(TriggerBase trigger)
     {
@@ -303,21 +303,28 @@ internal sealed class TriggerStorage
 
         if (isActive != wasActive)
         {
+            // Update active state first, so ResolveAffectedProperties sees the correct state
             if (isActive)
             {
                 _activeTriggers ??= new HashSet<TriggerBase>();
                 _activeTriggers.Add(trigger);
-
-                // Apply trigger setters
-                ApplyTriggerSetters(trigger);
-                InvokeEnterActions(trigger);
             }
             else
             {
                 _activeTriggers?.Remove(trigger);
+            }
 
-                // Remove trigger setters
-                UnapplyTriggerSetters(trigger);
+            // Re-resolve the correct value for each property this trigger affects.
+            // This handles both activation and deactivation correctly, respecting
+            // trigger priority (last defined wins) in both directions.
+            ResolveAffectedProperties(trigger);
+
+            if (isActive)
+            {
+                InvokeEnterActions(trigger);
+            }
+            else
+            {
                 InvokeExitActions(trigger);
             }
         }
@@ -388,9 +395,16 @@ internal sealed class TriggerStorage
     }
 
     /// <summary>
-    /// Applies the setters of an active trigger.
+    /// For each property affected by the given trigger, resolves the correct winning value
+    /// by walking all triggers in definition order (last active match wins).
     /// </summary>
-    private void ApplyTriggerSetters(TriggerBase trigger)
+    /// <remarks>
+    /// This single method handles both trigger activation and deactivation correctly.
+    /// It must be called AFTER updating <see cref="_activeTriggers"/> so it sees the
+    /// current state. By always resolving from scratch, it naturally respects trigger
+    /// priority (last defined wins) regardless of which trigger changed.
+    /// </remarks>
+    private void ResolveAffectedProperties(TriggerBase trigger)
     {
         SetterBaseCollection setters = GetTriggerSetters(trigger);
         if (setters is null)
@@ -402,43 +416,75 @@ internal sealed class TriggerStorage
         {
             if (setterBase is Setter setter && setter.Property is not null)
             {
-                object value = setter.ValueInternal;
+                DependencyProperty dp = setter.Property;
 
-                // Handle BindingBase values
-                if (value is BindingBase bindingBase)
+                if (TryFindWinningTriggerValue(dp, out object winningValue))
                 {
-                    value = bindingBase.CreateBindingExpression(_element, setter.Property, null);
+                    _element.SetTriggerValue(dp, ResolveSetterValue(winningValue, dp, _element));
                 }
-                // Handle DynamicResourceExtension
-                else if (value is DynamicResourceExtension dynamicResource)
+                else
                 {
-                    value = new ResourceReferenceExpression(dynamicResource.ResourceKey ??
-                        throw new InvalidOperationException(Strings.MarkupExtensionResourceKey));
+                    _element.ClearTriggerValue(dp);
                 }
-
-                _element.SetTriggerValue(setter.Property, value);
             }
         }
     }
 
     /// <summary>
-    /// Removes the setters of an inactive trigger.
+    /// Finds the value from the highest-priority active trigger that sets the given property.
+    /// Triggers are walked in definition order; the last active match wins.
     /// </summary>
-    private void UnapplyTriggerSetters(TriggerBase trigger)
+    private bool TryFindWinningTriggerValue(DependencyProperty dp, out object value)
     {
-        SetterBaseCollection setters = GetTriggerSetters(trigger);
-        if (setters is null)
+        value = null;
+        bool found = false;
+
+        if (_activeTriggers is null)
         {
-            return;
+            return false;
         }
 
-        foreach (SetterBase setterBase in setters)
+        foreach (TriggerBase candidateTrigger in _style.GetAllTriggers())
         {
-            if (setterBase is Setter setter && setter.Property is not null)
+            if (!_activeTriggers.Contains(candidateTrigger))
             {
-                _element.ClearTriggerValue(setter.Property);
+                continue;
+            }
+
+            SetterBaseCollection setters = GetTriggerSetters(candidateTrigger);
+            if (setters is not null)
+            {
+                foreach (SetterBase setterBase in setters)
+                {
+                    if (setterBase is Setter setter && setter.Property == dp)
+                    {
+                        value = setter.ValueInternal;
+                        found = true;
+                        // Don't break - a later trigger in definition order takes precedence
+                    }
+                }
             }
         }
+
+        return found;
+    }
+
+    /// <summary>
+    /// Resolves a setter's value, converting BindingBase and DynamicResourceExtension
+    /// to their runtime representations.
+    /// </summary>
+    private static object ResolveSetterValue(object value, DependencyProperty dp, DependencyObject target)
+    {
+        if (value is BindingBase bindingBase)
+        {
+            return bindingBase.CreateBindingExpression(target, dp, null);
+        }
+        if (value is DynamicResourceExtension dynamicResource)
+        {
+            return new ResourceReferenceExpression(dynamicResource.ResourceKey ??
+                throw new InvalidOperationException(Strings.MarkupExtensionResourceKey));
+        }
+        return value;
     }
 
     private static SetterBaseCollection GetTriggerSetters(TriggerBase trigger)
@@ -490,12 +536,22 @@ internal sealed class TriggerStorage
     /// </summary>
     internal void Cleanup()
     {
-        // Unapply all active triggers
+        // Clear all properties set by active triggers
         if (_activeTriggers is not null)
         {
             foreach (TriggerBase trigger in _activeTriggers)
             {
-                UnapplyTriggerSetters(trigger);
+                SetterBaseCollection setters = GetTriggerSetters(trigger);
+                if (setters is not null)
+                {
+                    foreach (SetterBase setterBase in setters)
+                    {
+                        if (setterBase is Setter setter && setter.Property is not null)
+                        {
+                            _element.ClearTriggerValue(setter.Property);
+                        }
+                    }
+                }
             }
             _activeTriggers.Clear();
         }

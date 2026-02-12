@@ -479,6 +479,9 @@ internal sealed class TemplateTriggerStorage
         }
     }
 
+    /// <summary>
+    /// Evaluates a single trigger and resolves property values as needed.
+    /// </summary>
     private void EvaluateTrigger(TriggerBase trigger)
     {
         bool isActive = EvaluateTriggerCondition(trigger);
@@ -486,19 +489,28 @@ internal sealed class TemplateTriggerStorage
 
         if (isActive != wasActive)
         {
+            // Update active state first, so ResolveAffectedProperties sees the correct state
             if (isActive)
             {
                 _activeTriggers ??= new HashSet<TriggerBase>();
                 _activeTriggers.Add(trigger);
-
-                ApplyTriggerSetters(trigger);
-                InvokeEnterActions(trigger);
             }
             else
             {
                 _activeTriggers?.Remove(trigger);
+            }
 
-                UnapplyTriggerSetters(trigger);
+            // Re-resolve the correct value for each property this trigger affects.
+            // This handles both activation and deactivation correctly, respecting
+            // trigger priority (last defined wins) in both directions.
+            ResolveAffectedProperties(trigger);
+
+            if (isActive)
+            {
+                InvokeEnterActions(trigger);
+            }
+            else
+            {
                 InvokeExitActions(trigger);
             }
         }
@@ -598,7 +610,17 @@ internal sealed class TemplateTriggerStorage
         return trigger.Conditions.Count > 0;
     }
 
-    private void ApplyTriggerSetters(TriggerBase trigger)
+    /// <summary>
+    /// For each property/target affected by the given trigger, resolves the correct winning
+    /// value by walking all triggers in definition order (last active match wins).
+    /// </summary>
+    /// <remarks>
+    /// This single method handles both trigger activation and deactivation correctly.
+    /// It must be called AFTER updating <see cref="_activeTriggers"/> so it sees the
+    /// current state. By always resolving from scratch, it naturally respects trigger
+    /// priority (last defined wins) regardless of which trigger changed.
+    /// </remarks>
+    private void ResolveAffectedProperties(TriggerBase trigger)
     {
         SetterBaseCollection setters = GetTriggerSetters(trigger);
         if (setters is null)
@@ -610,54 +632,86 @@ internal sealed class TemplateTriggerStorage
         {
             if (setterBase is Setter setter && setter.Property is not null)
             {
-                // Resolve the target element
                 DependencyObject target = ResolveNamedElement(setter.TargetName);
                 if (target is null)
                 {
                     continue;
                 }
 
-                object value = setter.ValueInternal;
+                DependencyProperty dp = setter.Property;
 
-                // Handle BindingBase values
-                if (value is BindingBase bindingBase)
+                if (TryFindWinningTriggerValue(dp, setter.TargetName, out object winningValue))
                 {
-                    value = bindingBase.CreateBindingExpression(target, setter.Property, null);
+                    target.SetParentTemplateTriggerValue(dp, ResolveSetterValue(winningValue, dp, target));
                 }
-                // Handle DynamicResourceExtension
-                else if (value is DynamicResourceExtension dynamicResource)
+                else
                 {
-                    value = new ResourceReferenceExpression(dynamicResource.ResourceKey ??
-                        throw new InvalidOperationException(Strings.MarkupExtensionResourceKey));
+                    target.ClearParentTemplateTriggerValue(dp);
                 }
-
-                // Use ParentTemplateTrigger precedence - can override local values
-                target.SetParentTemplateTriggerValue(setter.Property, value);
             }
         }
     }
 
-    private void UnapplyTriggerSetters(TriggerBase trigger)
+    /// <summary>
+    /// Finds the value from the highest-priority active trigger that sets the given
+    /// property on the given target. Triggers are walked in definition order; the last
+    /// active match wins. Both property and target name must match.
+    /// </summary>
+    private bool TryFindWinningTriggerValue(DependencyProperty dp, string targetName, out object value)
     {
-        SetterBaseCollection setters = GetTriggerSetters(trigger);
-        if (setters is null)
+        value = null;
+        bool found = false;
+
+        if (_activeTriggers is null)
         {
-            return;
+            return false;
         }
 
-        foreach (SetterBase setterBase in setters)
+        var triggers = GetTriggers();
+        if (triggers is null)
         {
-            if (setterBase is Setter setter && setter.Property is not null)
-            {
-                DependencyObject target = ResolveNamedElement(setter.TargetName);
-                if (target is null)
-                {
-                    continue;
-                }
+            return false;
+        }
 
-                target.ClearParentTemplateTriggerValue(setter.Property);
+        foreach (TriggerBase candidateTrigger in triggers)
+        {
+            if (!_activeTriggers.Contains(candidateTrigger))
+            {
+                continue;
+            }
+
+            SetterBaseCollection setters = GetTriggerSetters(candidateTrigger);
+            if (setters is not null)
+            {
+                foreach (SetterBase setterBase in setters)
+                {
+                    if (setterBase is Setter setter &&
+                        setter.Property == dp &&
+                        string.Equals(setter.TargetName, targetName, StringComparison.Ordinal))
+                    {
+                        value = setter.ValueInternal;
+                        found = true;
+                        // Don't break - a later trigger in definition order takes precedence
+                    }
+                }
             }
         }
+
+        return found;
+    }
+
+    private static object ResolveSetterValue(object value, DependencyProperty dp, DependencyObject target)
+    {
+        if (value is BindingBase bindingBase)
+        {
+            return bindingBase.CreateBindingExpression(target, dp, null);
+        }
+        if (value is DynamicResourceExtension dynamicResource)
+        {
+            return new ResourceReferenceExpression(dynamicResource.ResourceKey ??
+                throw new InvalidOperationException(Strings.MarkupExtensionResourceKey));
+        }
+        return value;
     }
 
     private static SetterBaseCollection GetTriggerSetters(TriggerBase trigger)
@@ -729,12 +783,23 @@ internal sealed class TemplateTriggerStorage
 
     internal void Cleanup()
     {
-        // Unapply all active triggers
+        // Clear all properties set by active triggers
         if (_activeTriggers is not null)
         {
             foreach (TriggerBase trigger in _activeTriggers)
             {
-                UnapplyTriggerSetters(trigger);
+                SetterBaseCollection setters = GetTriggerSetters(trigger);
+                if (setters is not null)
+                {
+                    foreach (SetterBase setterBase in setters)
+                    {
+                        if (setterBase is Setter setter && setter.Property is not null)
+                        {
+                            DependencyObject target = ResolveNamedElement(setter.TargetName);
+                            target?.ClearParentTemplateTriggerValue(setter.Property);
+                        }
+                    }
+                }
             }
             _activeTriggers.Clear();
         }
