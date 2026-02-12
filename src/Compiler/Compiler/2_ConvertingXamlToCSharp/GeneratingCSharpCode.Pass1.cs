@@ -109,17 +109,20 @@ namespace OpenSilver.Compiler
                         new List<string>());
 
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass("",
+                    string partialClass = GeneratePartialClass(_reader.Document.Root,
+                                                               string.Empty,
                                                                initializeComponentMethod,
                                                                new ComponentConnectorBuilderCS().ToString(),
                                                                resultingFieldsForNamedElements,
                                                                className,
                                                                namespaceStringIfAny,
-                                                               baseType);
+                                                               baseType,
+                                                               _sourceFile);
 
                     string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
 
                     string factoryClass = GenerateFactoryClass(
+                        _reader.Document.Root,
                         componentTypeFullName,
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
@@ -128,7 +131,8 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"global::{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,
-                        _fileNameWithPathRelativeToProjectRoot);
+                        _fileNameWithPathRelativeToProjectRoot,
+                        _sourceFile);
 
                     string finalCode = $@"
 {factoryClass}
@@ -139,6 +143,7 @@ namespace OpenSilver.Compiler
                 else
                 {
                     string finalCode = GenerateFactoryClass(
+                        _reader.Document.Root,
                         baseType,
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
@@ -147,7 +152,8 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"global::{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,
-                        _fileNameWithPathRelativeToProjectRoot);
+                        _fileNameWithPathRelativeToProjectRoot,
+                        _sourceFile);
 
                     return finalCode;
                 }

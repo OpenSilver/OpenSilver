@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using OpenSilver.Internal;
 
@@ -210,18 +211,24 @@ namespace OpenSilver.Compiler
         }
 
         private static string GeneratePartialClass(
+            IXmlLineInfo rootLineInfo,
             string additionalConstructors,
             string initializeComponentMethod,
             string connectMethod,
             List<string> fieldsForNamedElements,
             string className,
             string namespaceStringIfAny,
-            string baseType)
+            string baseType,
+            string sourceFile)
         {
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
             string classCodeFilled = $@"
-public partial class {className} : {baseType}, {IComponentConnectorClass}
+public partial class {className} :
+#line ({rootLineInfo.LineNumber}, {rootLineInfo.LinePosition}) - ({rootLineInfo.LineNumber}, {rootLineInfo.LinePosition}) 65536 ""{sourceFile}""
+    {baseType},
+#line default
+    {IComponentConnectorClass}
 {{
 
 #pragma warning disable 169, 649, 0628 // Prevents warning CS0169 ('field ... is never used'), CS0649 ('field ... is never assigned to, and will always have its default value null'), and CS0628 ('member : new protected member declared in sealed class')
@@ -306,6 +313,7 @@ namespace {namespaceStringIfAny}
         }
 
         private static string GenerateFactoryClass(
+            IXmlLineInfo rootLineInfo,
             string componentTypeFullName,
             string baseTypeFullName,
             string componentParamName,
@@ -314,7 +322,8 @@ namespace {namespaceStringIfAny}
             IEnumerable<string> additionalMethods,
             string uiElementFullyQualifiedTypeName,
             string assemblyName,
-            string fileNameWithPathRelativeToProjectRoot)
+            string fileNameWithPathRelativeToProjectRoot,
+            string sourceFile)
         {
             string absoluteSourceUri =
                     fileNameWithPathRelativeToProjectRoot.Contains(';') ?
@@ -322,6 +331,7 @@ namespace {namespaceStringIfAny}
                     "/" + assemblyName + ";component/" + fileNameWithPathRelativeToProjectRoot;
 
             string factoryName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
+            string lineDirective = $"({rootLineInfo.LineNumber}, {rootLineInfo.LinePosition}) - ({rootLineInfo.LineNumber}, {rootLineInfo.LinePosition}) 65536 \"{sourceFile}\"";
 
             string finalCode = $@"
 //------------------------------------------------------------------------------
@@ -338,7 +348,13 @@ namespace {namespaceStringIfAny}
 /// </summary>
 [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>, {IXamlComponentLoaderClass}<{baseTypeFullName}>
+public sealed class {factoryName} :
+#line {lineDirective}
+    {IXamlComponentFactoryClass}<{componentTypeFullName}>,
+#line default
+#line {lineDirective}
+    {IXamlComponentLoaderClass}<{baseTypeFullName}>
+#line default
 {{
     /// <summary>
     /// Instantiate
@@ -349,7 +365,9 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
         return CreateComponentImpl();
     }}
 
+#line {lineDirective}
     {componentTypeFullName} {IXamlComponentFactoryClass}<{componentTypeFullName}>.CreateComponent()
+#line default
     {{
         return CreateComponentImpl();
     }}
@@ -359,17 +377,23 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
         return CreateComponentImpl();
     }}
 
+#line {lineDirective}
     void {IXamlComponentLoaderClass}<{baseTypeFullName}>.LoadComponent({baseTypeFullName} component)
+#line default
     {{
         LoadComponentImpl(component);
     }}
 
     void {IXamlComponentLoaderClass}.LoadComponent(object component)
     {{
+#line {lineDirective}
         LoadComponentImpl(({baseTypeFullName})component);
+#line default
     }}
 
+#line {lineDirective}
     private static void LoadComponentImpl({baseTypeFullName} {componentParamName})
+#line default
     {{
         if ((object){componentParamName} is {uiElementFullyQualifiedTypeName})
         {{
@@ -379,7 +403,9 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
         {loadComponentImpl}
     }}
 
+#line {lineDirective}
     private static {componentTypeFullName} CreateComponentImpl()
+#line default
     {{
         {createComponentImpl}
     }}
