@@ -21,14 +21,30 @@ namespace System.Windows;
 /// <summary>
 /// Stores per-instance trigger state for a FrameworkElement.
 /// </summary>
+/// <remarks>
+/// Memory optimization notes:
+/// - Dictionaries are lazily initialized to avoid allocations when not needed
+/// - Uses HashSet for active triggers instead of Dictionary with TriggerState objects
+/// - Most styles only use property triggers, so DataTrigger/EventTrigger storage is often unused
+/// </remarks>
 internal sealed class TriggerStorage
 {
     private readonly FrameworkElement _element;
     private readonly Style _style;
-    private readonly Dictionary<TriggerBase, TriggerState> _triggerStates = new();
-    private readonly Dictionary<DependencyProperty, List<TriggerBase>> _propertyTriggerMap = new();
-    private readonly Dictionary<TriggerBase, List<DataTriggerBindingHelper>> _dataTriggerHelpers = new();
-    private readonly Dictionary<EventTrigger, RoutedEventHandler> _eventTriggerHandlers = new();
+
+    // Active triggers set - uses HashSet instead of Dictionary<TriggerBase, TriggerState>
+    // to eliminate TriggerState object allocations (~24 bytes saved per trigger)
+    private HashSet<TriggerBase> _activeTriggers;
+
+    // Lazily initialized - only allocated when property triggers exist
+    private Dictionary<DependencyProperty, List<TriggerBase>> _propertyTriggerMap;
+
+    // Lazily initialized - only allocated when DataTriggers exist
+    private Dictionary<TriggerBase, List<DataTriggerBindingHelper>> _dataTriggerHelpers;
+
+    // Lazily initialized - only allocated when EventTriggers exist
+    private Dictionary<EventTrigger, RoutedEventHandler> _eventTriggerHandlers;
+
     private bool _isProcessingTriggers;
 
     internal TriggerStorage(FrameworkElement element, Style style)
@@ -59,9 +75,6 @@ internal sealed class TriggerStorage
 
     private void SetupTrigger(TriggerBase trigger)
     {
-        // Initialize state to false (inactive)
-        _triggerStates[trigger] = new TriggerState();
-
         switch (trigger)
         {
             case Trigger propertyTrigger:
@@ -95,6 +108,8 @@ internal sealed class TriggerStorage
 
         // Register for property changes on the source element
         DependencyProperty dp = trigger.Property;
+        _propertyTriggerMap ??= new Dictionary<DependencyProperty, List<TriggerBase>>();
+        
         if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
         {
             triggers = new List<TriggerBase>();
@@ -121,6 +136,8 @@ internal sealed class TriggerStorage
             if (condition.Property is not null)
             {
                 DependencyProperty dp = condition.Property;
+                _propertyTriggerMap ??= new Dictionary<DependencyProperty, List<TriggerBase>>();
+                
                 if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
                 {
                     triggers = new List<TriggerBase>();
@@ -162,13 +179,17 @@ internal sealed class TriggerStorage
             }
         };
 
+        _eventTriggerHandlers ??= new Dictionary<EventTrigger, RoutedEventHandler>();
         _eventTriggerHandlers[trigger] = handler;
         _element.AddHandler(trigger.RoutedEvent, handler, false);
     }
 
     private void SetupDataTriggerBinding(TriggerBase trigger, BindingBase bindingBase)
     {
-        // Create a helper to receive the binding value
+        // Note: DataTriggerBindingHelper inherits from FrameworkElement which has significant
+        // memory overhead (~500+ bytes). This is necessary because the binding system requires
+        // a FrameworkElement for proper DataContext resolution. Future optimization could
+        // create a lighter-weight binding listener mechanism.
         var helper = new DataTriggerBindingHelper(this, trigger, _element);
 
         if (bindingBase is Binding binding)
@@ -203,6 +224,7 @@ internal sealed class TriggerStorage
 
             helper.SetValue(DataTriggerBindingHelper.ValueProperty, expr);
 
+            _dataTriggerHelpers ??= new Dictionary<TriggerBase, List<DataTriggerBindingHelper>>();
             if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
             {
                 helpers = new List<DataTriggerBindingHelper>();
@@ -222,7 +244,8 @@ internal sealed class TriggerStorage
             return;
         }
 
-        if (_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
+        if (_propertyTriggerMap is not null && 
+            _propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
         {
             foreach (TriggerBase trigger in triggers)
             {
@@ -273,26 +296,24 @@ internal sealed class TriggerStorage
     /// </summary>
     private void EvaluateTrigger(TriggerBase trigger)
     {
-        if (!_triggerStates.TryGetValue(trigger, out TriggerState state))
-        {
-            return;
-        }
-
         bool isActive = EvaluateTriggerCondition(trigger);
-        bool wasActive = state.IsActive;
+        bool wasActive = _activeTriggers?.Contains(trigger) ?? false;
 
         if (isActive != wasActive)
         {
-            state.IsActive = isActive;
-
             if (isActive)
             {
+                _activeTriggers ??= new HashSet<TriggerBase>();
+                _activeTriggers.Add(trigger);
+
                 // Apply trigger setters
                 ApplyTriggerSetters(trigger);
                 InvokeEnterActions(trigger);
             }
             else
             {
+                _activeTriggers?.Remove(trigger);
+
                 // Remove trigger setters
                 UnapplyTriggerSetters(trigger);
                 InvokeExitActions(trigger);
@@ -326,7 +347,9 @@ internal sealed class TriggerStorage
 
     private bool EvaluateDataTrigger(DataTrigger trigger)
     {
-        if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers) || helpers.Count == 0)
+        if (_dataTriggerHelpers is null ||
+            !_dataTriggerHelpers.TryGetValue(trigger, out var helpers) || 
+            helpers.Count == 0)
         {
             return false;
         }
@@ -337,7 +360,8 @@ internal sealed class TriggerStorage
 
     private bool EvaluateMultiDataTrigger(MultiDataTrigger trigger)
     {
-        if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
+        if (_dataTriggerHelpers is null ||
+            !_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
         {
             return false;
         }
@@ -465,41 +489,42 @@ internal sealed class TriggerStorage
     internal void Cleanup()
     {
         // Unapply all active triggers
-        foreach (var kvp in _triggerStates)
+        if (_activeTriggers is not null)
         {
-            if (kvp.Value.IsActive)
+            foreach (TriggerBase trigger in _activeTriggers)
             {
-                UnapplyTriggerSetters(kvp.Key);
+                UnapplyTriggerSetters(trigger);
             }
+            _activeTriggers.Clear();
         }
 
         // Remove event trigger handlers
-        foreach (var kvp in _eventTriggerHandlers)
+        if (_eventTriggerHandlers is not null)
         {
-            if (kvp.Key.RoutedEvent is not null)
+            foreach (var kvp in _eventTriggerHandlers)
             {
-                _element.RemoveHandler(kvp.Key.RoutedEvent, kvp.Value);
+                if (kvp.Key.RoutedEvent is not null)
+                {
+                    _element.RemoveHandler(kvp.Key.RoutedEvent, kvp.Value);
+                }
             }
+            _eventTriggerHandlers.Clear();
         }
 
-        _triggerStates.Clear();
-        _propertyTriggerMap.Clear();
-        _dataTriggerHelpers.Clear();
-        _eventTriggerHandlers.Clear();
-    }
-
-    /// <summary>
-    /// Stores the state of a single trigger.
-    /// </summary>
-    private sealed class TriggerState
-    {
-        public bool IsActive { get; set; }
+        _propertyTriggerMap?.Clear();
+        _dataTriggerHelpers?.Clear();
     }
 
     /// <summary>
     /// Helper class to receive data trigger binding values.
-    /// This class inherits from FrameworkElement to properly participate in DataContext inheritance.
+    /// This class inherits from FrameworkElement to properly participate in DataContext inheritance
+    /// and binding resolution.
     /// </summary>
+    /// <remarks>
+    /// Memory consideration: FrameworkElement has significant overhead (~500+ bytes per instance).
+    /// This is required because the binding system uses FrameworkElement.FindMentor for DataContext
+    /// resolution. A lighter-weight approach would require changes to the binding infrastructure.
+    /// </remarks>
     private sealed class DataTriggerBindingHelper : FrameworkElement
     {
         private readonly TriggerStorage _storage;

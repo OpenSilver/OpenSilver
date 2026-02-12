@@ -24,19 +24,38 @@ namespace System.Windows;
 /// Stores per-instance trigger state for a FrameworkElement with a template.
 /// This class handles triggers defined in ControlTemplate and DataTemplate.
 /// </summary>
+/// <remarks>
+/// Memory optimization notes:
+/// - Dictionaries are lazily initialized to avoid allocations when not needed
+/// - Uses HashSet for active triggers instead of Dictionary with TriggerState objects
+/// - SourceName-related maps are only allocated when SourceName is used (uncommon)
+/// </remarks>
 internal sealed class TemplateTriggerStorage
 {
     private readonly FrameworkElement _templatedParent;
     private readonly FrameworkTemplate _template;
     private readonly INameScope _nameScope;
-    private readonly Dictionary<TriggerBase, TriggerState> _triggerStates = new();
-    private readonly Dictionary<DependencyProperty, List<TriggerBase>> _propertyTriggerMap = new();
-    private readonly Dictionary<TriggerBase, List<DataTriggerBindingHelper>> _dataTriggerHelpers = new();
-    private readonly Dictionary<EventTrigger, (RoutedEventHandler Handler, FrameworkElement Source)> _eventTriggerHandlers = new();
-    // Maps source elements (when SourceName is used) to property triggers
-    private readonly Dictionary<DependencyObject, Dictionary<DependencyProperty, List<TriggerBase>>> _sourceElementTriggerMap = new();
+
+    // Active triggers set - uses HashSet instead of Dictionary<TriggerBase, TriggerState>
+    private HashSet<TriggerBase> _activeTriggers;
+
+    // Lazily initialized - only allocated when property triggers exist (without SourceName)
+    private Dictionary<DependencyProperty, List<TriggerBase>> _propertyTriggerMap;
+
+    // Lazily initialized - only allocated when DataTriggers exist
+    private Dictionary<TriggerBase, List<DataTriggerBindingHelper>> _dataTriggerHelpers;
+
+    // Lazily initialized - only allocated when EventTriggers exist
+    private Dictionary<EventTrigger, (RoutedEventHandler Handler, FrameworkElement Source)> _eventTriggerHandlers;
+
+    // Lazily initialized - only allocated when SourceName is used (uncommon)
+    // Maps source elements to property triggers
+    private Dictionary<DependencyObject, Dictionary<DependencyProperty, List<TriggerBase>>> _sourceElementTriggerMap;
+
+    // Lazily initialized - only allocated when SourceName is used (uncommon)
     // Stores the resolved source element for each trigger with SourceName
-    private readonly Dictionary<TriggerBase, DependencyObject> _triggerSourceElements = new();
+    private Dictionary<TriggerBase, DependencyObject> _triggerSourceElements;
+
     private bool _isProcessingTriggers;
 
     internal TemplateTriggerStorage(FrameworkElement templatedParent, FrameworkTemplate template)
@@ -104,9 +123,6 @@ internal sealed class TemplateTriggerStorage
     {
         // Ensure the trigger is sealed (performs validation and type conversions)
         trigger.Seal();
-
-        // Initialize state to false (inactive)
-        _triggerStates[trigger] = new TriggerState();
 
         // Set up name resolvers for any storyboards in the trigger's actions
         // This must be done once so storyboards can find named elements in the template
@@ -194,6 +210,7 @@ internal sealed class TemplateTriggerStorage
             DependencyObject sourceElement = ResolveNamedElement(trigger.SourceName);
             if (sourceElement is not null)
             {
+                _triggerSourceElements ??= new Dictionary<TriggerBase, DependencyObject>();
                 _triggerSourceElements[trigger] = sourceElement;
                 RegisterSourceElementTrigger(sourceElement, dp, trigger);
             }
@@ -201,6 +218,7 @@ internal sealed class TemplateTriggerStorage
         else
         {
             // Listen to property changes on the templated parent
+            _propertyTriggerMap ??= new Dictionary<DependencyProperty, List<TriggerBase>>();
             if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
             {
                 triggers = new List<TriggerBase>();
@@ -212,6 +230,8 @@ internal sealed class TemplateTriggerStorage
 
     private void RegisterSourceElementTrigger(DependencyObject sourceElement, DependencyProperty dp, TriggerBase trigger)
     {
+        _sourceElementTriggerMap ??= new Dictionary<DependencyObject, Dictionary<DependencyProperty, List<TriggerBase>>>();
+        
         if (!_sourceElementTriggerMap.TryGetValue(sourceElement, out var propMap))
         {
             propMap = new Dictionary<DependencyProperty, List<TriggerBase>>();
@@ -273,6 +293,7 @@ internal sealed class TemplateTriggerStorage
                 }
                 else
                 {
+                    _propertyTriggerMap ??= new Dictionary<DependencyProperty, List<TriggerBase>>();
                     if (!_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
                     {
                         triggers = new List<TriggerBase>();
@@ -329,12 +350,15 @@ internal sealed class TemplateTriggerStorage
             sourceElement = _templatedParent;
         }
 
+        _eventTriggerHandlers ??= new Dictionary<EventTrigger, (RoutedEventHandler, FrameworkElement)>();
         _eventTriggerHandlers[trigger] = (handler, sourceElement);
         sourceElement.AddHandler(trigger.RoutedEvent, handler, false);
     }
 
     private void SetupDataTriggerBinding(TriggerBase trigger, BindingBase bindingBase)
     {
+        // Note: DataTriggerBindingHelper inherits from FrameworkElement which has significant
+        // memory overhead. See remarks on the class for details.
         var helper = new DataTriggerBindingHelper(this, trigger, _templatedParent);
 
         if (bindingBase is Binding binding)
@@ -365,6 +389,7 @@ internal sealed class TemplateTriggerStorage
 
             helper.SetValue(DataTriggerBindingHelper.ValueProperty, expr);
 
+            _dataTriggerHelpers ??= new Dictionary<TriggerBase, List<DataTriggerBindingHelper>>();
             if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
             {
                 helpers = new List<DataTriggerBindingHelper>();
@@ -384,7 +409,8 @@ internal sealed class TemplateTriggerStorage
             return;
         }
 
-        if (_propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
+        if (_propertyTriggerMap is not null &&
+            _propertyTriggerMap.TryGetValue(dp, out List<TriggerBase> triggers))
         {
             foreach (TriggerBase trigger in triggers)
             {
@@ -403,7 +429,8 @@ internal sealed class TemplateTriggerStorage
             return;
         }
 
-        if (_sourceElementTriggerMap.TryGetValue(sourceElement, out var propMap) &&
+        if (_sourceElementTriggerMap is not null &&
+            _sourceElementTriggerMap.TryGetValue(sourceElement, out var propMap) &&
             propMap.TryGetValue(dp, out List<TriggerBase> triggers))
         {
             foreach (TriggerBase trigger in triggers)
@@ -452,25 +479,23 @@ internal sealed class TemplateTriggerStorage
 
     private void EvaluateTrigger(TriggerBase trigger)
     {
-        if (!_triggerStates.TryGetValue(trigger, out TriggerState state))
-        {
-            return;
-        }
-
         bool isActive = EvaluateTriggerCondition(trigger);
-        bool wasActive = state.IsActive;
+        bool wasActive = _activeTriggers?.Contains(trigger) ?? false;
 
         if (isActive != wasActive)
         {
-            state.IsActive = isActive;
-
             if (isActive)
             {
+                _activeTriggers ??= new HashSet<TriggerBase>();
+                _activeTriggers.Add(trigger);
+
                 ApplyTriggerSetters(trigger);
                 InvokeEnterActions(trigger);
             }
             else
             {
+                _activeTriggers?.Remove(trigger);
+
                 UnapplyTriggerSetters(trigger);
                 InvokeExitActions(trigger);
             }
@@ -483,7 +508,7 @@ internal sealed class TemplateTriggerStorage
         {
             case Trigger propertyTrigger:
                 // Use the source element if SourceName was specified, otherwise use templated parent
-                DependencyObject sourceElement = _triggerSourceElements.TryGetValue(trigger, out var src)
+                DependencyObject sourceElement = _triggerSourceElements?.TryGetValue(trigger, out var src) == true
                     ? src
                     : _templatedParent;
                 return propertyTrigger.Evaluate(sourceElement);
@@ -533,7 +558,9 @@ internal sealed class TemplateTriggerStorage
 
     private bool EvaluateDataTrigger(DataTrigger trigger)
     {
-        if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers) || helpers.Count == 0)
+        if (_dataTriggerHelpers is null ||
+            !_dataTriggerHelpers.TryGetValue(trigger, out var helpers) || 
+            helpers.Count == 0)
         {
             return false;
         }
@@ -544,7 +571,8 @@ internal sealed class TemplateTriggerStorage
 
     private bool EvaluateMultiDataTrigger(MultiDataTrigger trigger)
     {
-        if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
+        if (_dataTriggerHelpers is null ||
+            !_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
         {
             return false;
         }
@@ -700,36 +728,42 @@ internal sealed class TemplateTriggerStorage
     internal void Cleanup()
     {
         // Unapply all active triggers
-        foreach (var kvp in _triggerStates)
+        if (_activeTriggers is not null)
         {
-            if (kvp.Value.IsActive)
+            foreach (TriggerBase trigger in _activeTriggers)
             {
-                UnapplyTriggerSetters(kvp.Key);
+                UnapplyTriggerSetters(trigger);
             }
+            _activeTriggers.Clear();
         }
 
         // Remove event trigger handlers
-        foreach (var kvp in _eventTriggerHandlers)
+        if (_eventTriggerHandlers is not null)
         {
-            if (kvp.Key.RoutedEvent is not null)
+            foreach (var kvp in _eventTriggerHandlers)
             {
-                kvp.Value.Source.RemoveHandler(kvp.Key.RoutedEvent, kvp.Value.Handler);
+                if (kvp.Key.RoutedEvent is not null)
+                {
+                    kvp.Value.Source.RemoveHandler(kvp.Key.RoutedEvent, kvp.Value.Handler);
+                }
             }
+            _eventTriggerHandlers.Clear();
         }
 
-        _triggerStates.Clear();
-        _propertyTriggerMap.Clear();
-        _dataTriggerHelpers.Clear();
-        _eventTriggerHandlers.Clear();
-        _sourceElementTriggerMap.Clear();
-        _triggerSourceElements.Clear();
+        _propertyTriggerMap?.Clear();
+        _dataTriggerHelpers?.Clear();
+        _sourceElementTriggerMap?.Clear();
+        _triggerSourceElements?.Clear();
     }
 
-    private sealed class TriggerState
-    {
-        public bool IsActive { get; set; }
-    }
-
+    /// <summary>
+    /// Helper class to receive data trigger binding values.
+    /// </summary>
+    /// <remarks>
+    /// Memory consideration: FrameworkElement has significant overhead (~500+ bytes per instance).
+    /// This is required because the binding system uses FrameworkElement.FindMentor for DataContext
+    /// resolution. A lighter-weight approach would require changes to the binding infrastructure.
+    /// </remarks>
     private sealed class DataTriggerBindingHelper : FrameworkElement
     {
         private readonly TemplateTriggerStorage _storage;
