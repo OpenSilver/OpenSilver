@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
@@ -292,6 +292,7 @@
     <Compile Include="Tests\TriggerTest.xaml.cs">
       <DependentUpon>TriggerTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\TriggerTestControl.cs" />
     <Compile Include="Tests\TwoTextBoxesHorizontallyTest.xaml.cs">
       <DependentUpon>TwoTextBoxesHorizontallyTest.xaml</DependentUpon>
     </Compile>
@@ -626,6 +627,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Page Include="Themes\generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Content Include="Tests\TwoTextBoxesHorizontallyTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

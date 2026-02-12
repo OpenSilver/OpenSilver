@@ -3,6 +3,7 @@
           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:local="clr-namespace:TestApplication.Tests"
           mc:Ignorable="d"
           d:DesignHeight="1500" d:DesignWidth="800">
 
@@ -617,6 +618,18 @@
                     <TextBlock Text="• Pressed: Orange background, red border, white text" Margin="10,0,0,5"/>
                     <Button x:Name="ProgrammaticTriggerButton" Content="Programmatic Triggers" 
                           HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+
+            <!-- SECTION 11: DEFAULT (THEME) STYLE TRIGGERS -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="11. Default (Theme) Style Triggers" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Text="Custom control whose default style (in Themes/generic.xaml) has an IsMouseOver trigger:" 
+                             TextWrapping="Wrap" Margin="0,0,0,5"/>
+                    <TextBlock Text="• Default: LightGray background, gray border" Margin="10,0,0,2"/>
+                    <TextBlock Text="• Hover: Yellow background, orange border" Margin="10,0,0,2"/>
+                    <local:TriggerTestControl HorizontalAlignment="Left" Width="300"/>
                 </StackPanel>
             </Border>
 
