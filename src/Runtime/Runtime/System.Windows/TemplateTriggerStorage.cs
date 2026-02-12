@@ -357,46 +357,48 @@ internal sealed class TemplateTriggerStorage
 
     private void SetupDataTriggerBinding(TriggerBase trigger, BindingBase bindingBase)
     {
+        if (bindingBase is not Binding binding)
+        {
+            return;
+        }
+
         // Note: DataTriggerBindingHelper inherits from FrameworkElement which has significant
         // memory overhead. See remarks on the class for details.
         var helper = new DataTriggerBindingHelper(this, trigger, _templatedParent);
 
-        if (bindingBase is Binding binding)
+        var listenerBinding = new Binding
         {
-            var listenerBinding = new Binding
-            {
-                Path = binding.Path,
-                Mode = BindingMode.OneWay,
-            };
+            Path = binding.Path,
+            Mode = BindingMode.OneWay,
+        };
 
-            if (binding.Source is not null)
-            {
-                listenerBinding.Source = binding.Source;
-            }
-            if (binding.RelativeSource is not null)
-            {
-                listenerBinding.RelativeSource = binding.RelativeSource;
-            }
-            if (!string.IsNullOrEmpty(binding.ElementName))
-            {
-                listenerBinding.ElementName = binding.ElementName;
-            }
-
-            BindingExpression expr = (BindingExpression)listenerBinding.CreateBindingExpression(
-                helper,
-                DataTriggerBindingHelper.ValueProperty,
-                null);
-
-            helper.SetValue(DataTriggerBindingHelper.ValueProperty, expr);
-
-            _dataTriggerHelpers ??= new Dictionary<TriggerBase, List<DataTriggerBindingHelper>>();
-            if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
-            {
-                helpers = new List<DataTriggerBindingHelper>();
-                _dataTriggerHelpers[trigger] = helpers;
-            }
-            helpers.Add(helper);
+        if (binding.Source is not null)
+        {
+            listenerBinding.Source = binding.Source;
         }
+        if (binding.RelativeSource is not null)
+        {
+            listenerBinding.RelativeSource = binding.RelativeSource;
+        }
+        if (!string.IsNullOrEmpty(binding.ElementName))
+        {
+            listenerBinding.ElementName = binding.ElementName;
+        }
+
+        BindingExpression expr = (BindingExpression)listenerBinding.CreateBindingExpression(
+            helper,
+            DataTriggerBindingHelper.ValueProperty,
+            null);
+
+        helper.SetValue(DataTriggerBindingHelper.ValueProperty, expr);
+
+        _dataTriggerHelpers ??= new Dictionary<TriggerBase, List<DataTriggerBindingHelper>>();
+        if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
+        {
+            helpers = new List<DataTriggerBindingHelper>();
+            _dataTriggerHelpers[trigger] = helpers;
+        }
+        helpers.Add(helper);
     }
 
     /// <summary>

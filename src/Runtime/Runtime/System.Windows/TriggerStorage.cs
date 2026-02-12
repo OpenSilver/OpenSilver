@@ -186,52 +186,54 @@ internal sealed class TriggerStorage
 
     private void SetupDataTriggerBinding(TriggerBase trigger, BindingBase bindingBase)
     {
+        if (bindingBase is not Binding binding)
+        {
+            return;
+        }
+
         // Note: DataTriggerBindingHelper inherits from FrameworkElement which has significant
         // memory overhead (~500+ bytes). This is necessary because the binding system requires
         // a FrameworkElement for proper DataContext resolution. Future optimization could
         // create a lighter-weight binding listener mechanism.
         var helper = new DataTriggerBindingHelper(this, trigger, _element);
 
-        if (bindingBase is Binding binding)
+        // Clone the binding and set up the listener
+        // We need to copy relevant properties from the original binding
+        var listenerBinding = new Binding
         {
-            // Clone the binding and set up the listener
-            // We need to copy relevant properties from the original binding
-            var listenerBinding = new Binding
-            {
-                Path = binding.Path,
-                Mode = BindingMode.OneWay,
-            };
+            Path = binding.Path,
+            Mode = BindingMode.OneWay,
+        };
 
-            // Copy source-related properties if they're set
-            if (binding.Source is not null)
-            {
-                listenerBinding.Source = binding.Source;
-            }
-            if (binding.RelativeSource is not null)
-            {
-                listenerBinding.RelativeSource = binding.RelativeSource;
-            }
-            if (!string.IsNullOrEmpty(binding.ElementName))
-            {
-                listenerBinding.ElementName = binding.ElementName;
-            }
-
-            // Create binding expression and apply it to the helper
-            BindingExpression expr = (BindingExpression)listenerBinding.CreateBindingExpression(
-                helper, 
-                DataTriggerBindingHelper.ValueProperty, 
-                null);
-
-            helper.SetValue(DataTriggerBindingHelper.ValueProperty, expr);
-
-            _dataTriggerHelpers ??= new Dictionary<TriggerBase, List<DataTriggerBindingHelper>>();
-            if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
-            {
-                helpers = new List<DataTriggerBindingHelper>();
-                _dataTriggerHelpers[trigger] = helpers;
-            }
-            helpers.Add(helper);
+        // Copy source-related properties if they're set
+        if (binding.Source is not null)
+        {
+            listenerBinding.Source = binding.Source;
         }
+        if (binding.RelativeSource is not null)
+        {
+            listenerBinding.RelativeSource = binding.RelativeSource;
+        }
+        if (!string.IsNullOrEmpty(binding.ElementName))
+        {
+            listenerBinding.ElementName = binding.ElementName;
+        }
+
+        // Create binding expression and apply it to the helper
+        BindingExpression expr = (BindingExpression)listenerBinding.CreateBindingExpression(
+            helper,
+            DataTriggerBindingHelper.ValueProperty,
+            null);
+
+        helper.SetValue(DataTriggerBindingHelper.ValueProperty, expr);
+
+        _dataTriggerHelpers ??= new Dictionary<TriggerBase, List<DataTriggerBindingHelper>>();
+        if (!_dataTriggerHelpers.TryGetValue(trigger, out var helpers))
+        {
+            helpers = new List<DataTriggerBindingHelper>();
+            _dataTriggerHelpers[trigger] = helpers;
+        }
+        helpers.Add(helper);
     }
 
     /// <summary>
