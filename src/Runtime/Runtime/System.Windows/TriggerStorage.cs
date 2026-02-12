@@ -31,6 +31,7 @@ internal sealed class TriggerStorage
 {
     private readonly FrameworkElement _element;
     private readonly Style _style;
+    private readonly bool _isThemeStyle;
 
     // Active triggers set - uses HashSet instead of Dictionary<TriggerBase, TriggerState>
     // to eliminate TriggerState object allocations (~24 bytes saved per trigger)
@@ -47,10 +48,11 @@ internal sealed class TriggerStorage
 
     private bool _isProcessingTriggers;
 
-    internal TriggerStorage(FrameworkElement element, Style style)
+    internal TriggerStorage(FrameworkElement element, Style style, bool isThemeStyle = false)
     {
         _element = element;
         _style = style;
+        _isThemeStyle = isThemeStyle;
     }
 
     /// <summary>
@@ -420,11 +422,11 @@ internal sealed class TriggerStorage
 
                 if (TryFindWinningTriggerValue(dp, out object winningValue))
                 {
-                    _element.SetTriggerValue(dp, ResolveSetterValue(winningValue, dp, _element));
+                    SetTriggerValue(dp, ResolveSetterValue(winningValue, dp, _element));
                 }
                 else
                 {
-                    _element.ClearTriggerValue(dp);
+                    ClearTriggerValue(dp);
                 }
             }
         }
@@ -485,6 +487,22 @@ internal sealed class TriggerStorage
                 throw new InvalidOperationException(Strings.MarkupExtensionResourceKey));
         }
         return value;
+    }
+
+    private void SetTriggerValue(DependencyProperty dp, object value)
+    {
+        if (_isThemeStyle)
+            _element.SetThemeStyleTriggerValue(dp, value);
+        else
+            _element.SetTriggerValue(dp, value);
+    }
+
+    private void ClearTriggerValue(DependencyProperty dp)
+    {
+        if (_isThemeStyle)
+            _element.ClearThemeStyleTriggerValue(dp);
+        else
+            _element.ClearTriggerValue(dp);
     }
 
     private static SetterBaseCollection GetTriggerSetters(TriggerBase trigger)
@@ -548,7 +566,7 @@ internal sealed class TriggerStorage
                     {
                         if (setterBase is Setter setter && setter.Property is not null)
                         {
-                            _element.ClearTriggerValue(setter.Property);
+                            ClearTriggerValue(setter.Property);
                         }
                     }
                 }

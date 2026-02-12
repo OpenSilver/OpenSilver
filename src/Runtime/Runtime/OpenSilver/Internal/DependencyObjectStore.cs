@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -349,6 +349,93 @@ internal static class DependencyObjectStore
         storage.StyleTriggerValue = DependencyProperty.UnsetValue;
 
         if (oldEntry.BaseValueSourceInternal > BaseValueSourceInternal.Style)
+        {
+            return;
+        }
+
+        if (oldEntry.IsExpression)
+        {
+            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
+            currentExpr.OnDetach(d, dp);
+        }
+
+        (object effectiveValue, BaseValueSourceInternal effectiveValueKind) = ComputeEffectiveBaseValue(
+            storage, d, dp, metadata);
+
+        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, effectiveValue, effectiveValueKind);
+
+        if (oldEntry.IsAnimated)
+        {
+            newEntry.SetAnimatedValue(oldEntry.ModifiedValue.AnimatedValue);
+            newEntry.IsAnimatedOverLocal = oldEntry.IsAnimatedOverLocal;
+        }
+
+        UpdateEffectiveValue(storage,
+            d,
+            dp,
+            metadata,
+            ref oldEntry,
+            ref newEntry,
+            true,
+            OperationType.Unknown);
+    }
+
+    internal static void SetThemeStyleTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        object newValue)
+    {
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
+
+        storage.ThemeStyleTriggerValue = newValue;
+
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
+
+        // Theme style trigger values override theme style setters but not style values
+        if (BaseValueSourceInternal.ThemeStyleTrigger < oldEntry.BaseValueSourceInternal)
+        {
+            return;
+        }
+
+        if (oldEntry.IsExpression)
+        {
+            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
+            currentExpr.OnDetach(d, dp);
+        }
+
+        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, newValue, BaseValueSourceInternal.ThemeStyleTrigger);
+
+        if (oldEntry.IsAnimated)
+        {
+            newEntry.SetAnimatedValue(oldEntry.ModifiedValue.AnimatedValue);
+            newEntry.IsAnimatedOverLocal = oldEntry.IsAnimatedOverLocal;
+        }
+
+        UpdateEffectiveValue(storage,
+            d,
+            dp,
+            metadata,
+            ref oldEntry,
+            ref newEntry,
+            false,
+            OperationType.Unknown);
+    }
+
+    internal static void ClearThemeStyleTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata)
+    {
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
+
+        storage.ThemeStyleTriggerValue = DependencyProperty.UnsetValue;
+
+        if (oldEntry.BaseValueSourceInternal > BaseValueSourceInternal.ThemeStyleTrigger)
         {
             return;
         }

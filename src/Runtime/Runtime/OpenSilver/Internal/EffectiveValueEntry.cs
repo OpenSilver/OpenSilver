@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -219,6 +219,7 @@ internal enum BaseValueSourceInternal : short
     Default = 1,
     Inherited = 2,
     ThemeStyle = 3,
+    ThemeStyleTrigger = 4,  // Theme style triggers override theme style setters
     Style = 5,
     Local = 11,
     ParentTemplateTrigger = 12,  // Template triggers with TargetName can override local values

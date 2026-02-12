@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -77,6 +77,12 @@ internal sealed class Storage
         set => (_uncommonFields ??= new()).ParentTemplateTriggerValue = value;
     }
 
+    internal object ThemeStyleTriggerValue
+    {
+        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.ThemeStyleTriggerValue;
+        set => (_uncommonFields ??= new()).ThemeStyleTriggerValue = value;
+    }
+
     internal object ThemeStyleValue
     {
         get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.ThemeStyleValue;
@@ -113,6 +119,10 @@ internal sealed class Storage
             {
                 return (_uncommonFields.LocalStyleValue, BaseValueSourceInternal.Style);
             }
+            else if (_uncommonFields.ThemeStyleTriggerValue != DependencyProperty.UnsetValue)
+            {
+                return (_uncommonFields.ThemeStyleTriggerValue, BaseValueSourceInternal.ThemeStyleTrigger);
+            }
             else if (_uncommonFields.ThemeStyleValue != DependencyProperty.UnsetValue)
             {
                 return (_uncommonFields.ThemeStyleValue, BaseValueSourceInternal.ThemeStyle);
@@ -133,6 +143,7 @@ internal sealed class Storage
             LocalStyleValue = DependencyProperty.UnsetValue;
             StyleTriggerValue = DependencyProperty.UnsetValue;
             ParentTemplateTriggerValue = DependencyProperty.UnsetValue;
+            ThemeStyleTriggerValue = DependencyProperty.UnsetValue;
             ThemeStyleValue = DependencyProperty.UnsetValue;
             InheritedValue = DependencyProperty.UnsetValue;
         }
@@ -141,6 +152,7 @@ internal sealed class Storage
         internal object LocalStyleValue;
         internal object StyleTriggerValue;
         internal object ParentTemplateTriggerValue;
+        internal object ThemeStyleTriggerValue;
         internal object ThemeStyleValue;
         internal object InheritedValue;
     }

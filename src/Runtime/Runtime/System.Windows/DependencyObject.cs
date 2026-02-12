@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -731,6 +731,41 @@ namespace System.Windows
             {
                 PropertyMetadata metadata = SetupPropertyChange(dp);
                 DependencyObjectStore.ClearStyleTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata);
+            }
+        }
+
+        internal void SetThemeStyleTriggerValue(DependencyProperty dp, object value)
+        {
+            Debug.Assert(dp != null);
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                ClearThemeStyleTriggerValue(dp);
+            }
+            else
+            {
+                Storage storage = GetOrCreateStorage(dp, metadata);
+                DependencyObjectStore.SetThemeStyleTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata,
+                    value);
+            }
+        }
+
+        internal void ClearThemeStyleTriggerValue(DependencyProperty dp)
+        {
+            Debug.Assert(dp != null);
+
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                DependencyObjectStore.ClearThemeStyleTriggerValue(storage,
                     this,
                     dp,
                     metadata);

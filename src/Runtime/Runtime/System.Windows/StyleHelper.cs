@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -83,7 +83,16 @@ namespace System.Windows
 
             themeStyleCache = newStyle;
 
+            // Cleanup old theme style trigger storage
+            CleanupThemeStyleTriggerStorage(fe);
+
             UpdateInstanceData(fe, oldStyle, newStyle, _setThemeStyleValueDelegate);
+
+            // Initialize triggers for the new theme style
+            if (newStyle?.HasTriggers == true)
+            {
+                InitializeThemeStyleTriggerStorage(fe, newStyle);
+            }
         }
 
         internal static void UpdateImplicitStyleCache(FrameworkElement fe, Style oldStyle, Style newStyle, ref Style implicitStyleCache)
@@ -228,8 +237,11 @@ namespace System.Windows
             dp != Control.TemplateProperty &&
             dp != ContentPresenter.TemplateProperty;
 
-        // Trigger storage management
+        // Trigger storage management for explicit/implicit styles
         internal static readonly UncommonField<TriggerStorage> TriggerStorageField = new();
+
+        // Trigger storage management for theme (default) styles
+        internal static readonly UncommonField<TriggerStorage> ThemeStyleTriggerStorageField = new();
 
         private static void InitializeTriggerStorage(FrameworkElement fe, Style style)
         {
@@ -248,13 +260,30 @@ namespace System.Windows
             }
         }
 
+        private static void InitializeThemeStyleTriggerStorage(FrameworkElement fe, Style style)
+        {
+            var storage = new TriggerStorage(fe, style, isThemeStyle: true);
+            ThemeStyleTriggerStorageField.SetValue(fe, storage);
+            storage.Initialize();
+        }
+
+        private static void CleanupThemeStyleTriggerStorage(FrameworkElement fe)
+        {
+            var storage = ThemeStyleTriggerStorageField.GetValue(fe);
+            if (storage is not null)
+            {
+                storage.Cleanup();
+                ThemeStyleTriggerStorageField.ClearValue(fe);
+            }
+        }
+
         /// <summary>
         /// Called when a dependency property value changes on an element that may have style triggers.
         /// </summary>
         internal static void OnPropertyChanged(FrameworkElement fe, DependencyProperty dp)
         {
-            var storage = TriggerStorageField.GetValue(fe);
-            storage?.OnPropertyChanged(dp);
+            TriggerStorageField.GetValue(fe)?.OnPropertyChanged(dp);
+            ThemeStyleTriggerStorageField.GetValue(fe)?.OnPropertyChanged(dp);
         }
     }
 }
