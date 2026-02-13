@@ -31,7 +31,7 @@
             <Setter.Value>
                 <Style TargetType="ProgressBar">
                     <Setter Property="IsIndeterminate"
-                            Value="True" />
+                            Value="{Binding IsBusy, RelativeSource={RelativeSource TemplatedParent}}" />
                     <Setter Property="Height"
                             Value="15" />
                     <Setter Property="Margin"
