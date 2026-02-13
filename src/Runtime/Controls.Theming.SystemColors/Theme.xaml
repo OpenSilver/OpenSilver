@@ -10582,7 +10582,7 @@
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
                                         <ProgressBar Grid.Row="1"
-                                                     IsIndeterminate="True"
+                                                     IsIndeterminate="{TemplateBinding IsBusy}"
                                                      Height="10"
                                                      Margin="12,0,15,12">
                                             <ProgressBar.Style>
