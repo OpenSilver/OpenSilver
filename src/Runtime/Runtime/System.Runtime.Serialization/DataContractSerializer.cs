@@ -30,7 +30,7 @@ namespace System.Runtime.Serialization
         private static readonly XmlReaderSettings DefaultXmlReaderSettings = new()
         {
             CheckCharacters = false,
-            IgnoreWhitespace = true,
+            IgnoreWhitespace = false,
         };
 
         private static readonly XmlWriterSettings DefaultXmlWriterSettings = new()
