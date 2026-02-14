@@ -46,7 +46,7 @@ public class StaticResourceExtension : MarkupExtension
     /// Gets or sets the key value passed by this static resource reference. They key is used to return 
     /// the object matching that key in resource dictionaries.
     /// </summary>
-    public string ResourceKey { get; set; }
+    public object ResourceKey { get; set; }
 
     /// <summary>
     /// Returns the object found in a resource dictionary, where the object to find is identified by the 
