@@ -18,6 +18,7 @@ using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
+using OpenSilver;
 
 namespace System.Windows.Shapes
 {
@@ -721,12 +722,10 @@ namespace System.Windows.Shapes
             return double.IsNaN(size.Width) || double.IsNaN(size.Height) || size.IsEmpty;
         }
 
-        public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal sealed override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            domElementWhereToPlaceChildren = null;
-            (var outerDiv, SvgElement, DefsElement) = INTERNAL_HtmlDomManager.CreateShapeElementAndAppendIt(
-                (INTERNAL_HtmlDomElementReference)parentRef, this);
-
+            (var outerDiv, SvgElement, DefsElement) = INTERNAL_HtmlDomManager.CreateShapeElementAndAppendIt(parent, this);
             return outerDiv;
         }
 
@@ -734,22 +733,22 @@ namespace System.Windows.Shapes
         {
             base.INTERNAL_OnDetachedFromVisualTree();
             INTERNAL_HtmlDomManager.RemoveFromGlobalStore(SvgElement);
-            SvgElement = null;
-            DefsElement = null;
+            SvgElement = default;
+            DefsElement = default;
             _fillBrush = null;
             _strokeBrush = null;
         }
 
         internal void SetSvgAttribute(string attribute, string value)
         {
-            Debug.Assert(SvgElement is not null);
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(SvgElement, attribute, value);
+            Debug.Assert(SvgElement.IsConnected);
+            SvgElement.SetAttribute(attribute, value);
         }
 
         internal void RemoveSvgAttribute(string attribute)
         {
-            Debug.Assert(SvgElement is not null);
-            INTERNAL_HtmlDomManager.RemoveAttribute(SvgElement, attribute);
+            Debug.Assert(SvgElement.IsConnected);
+            SvgElement.RemoveAttribute(attribute);
         }
 
         internal void SetFillRuleAttribute(FillRule fillRule)
@@ -763,14 +762,12 @@ namespace System.Windows.Shapes
             SetSvgAttribute("fill-rule", value);
         }
 
-        internal static Rect GetBBox(INTERNAL_HtmlDomElementReference svgElement)
+        internal static Rect GetBBox(HtmlElementReference svgElement)
         {
-            if (svgElement is not null)
+            if (svgElement.IsConnected)
             {
-                string sDiv = OpenSilver.Interop.GetVariableStringForJS(svgElement);
-
                 SVGRect bbox = JsonSerializer.Deserialize<SVGRect>(
-                    OpenSilver.Interop.ExecuteJavaScriptString($"document.getBBox({sDiv})"));
+                    OpenSilver.Interop.ExecuteJavaScriptString($"document.getBBox('{svgElement.Uid}')"));
                 return new Rect(bbox.X, bbox.Y, bbox.Width, bbox.Height);
             }
 
@@ -778,7 +775,7 @@ namespace System.Windows.Shapes
         }
 
         internal sealed override void SetPointerEvents(bool hitTestable) =>
-            SvgElement.Style.pointerEvents = hitTestable ? "auto" : "none";
+            SvgElement.SetCssStyleProperty(CssPropertyNames.PointerEvents, hitTestable ? "auto" : "none");
 
         internal virtual string SvgTagName => "path";
 
@@ -786,9 +783,9 @@ namespace System.Windows.Shapes
 
         internal Matrix? StretchMatrix { get; private set; }
 
-        internal INTERNAL_HtmlDomElementReference SvgElement { get; private set; }
+        internal HtmlElementReference SvgElement { get; private set; }
 
-        internal INTERNAL_HtmlDomElementReference DefsElement { get; private set; }
+        internal HtmlElementReference DefsElement { get; private set; }
 
         private ISvgBrush _fillBrush;
         private ISvgBrush _strokeBrush;

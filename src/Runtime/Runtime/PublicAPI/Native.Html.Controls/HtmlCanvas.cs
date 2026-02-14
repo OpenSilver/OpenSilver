@@ -11,13 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Windows.Markup;
-using System.Windows;
-using System.Windows.Input;
 using CSHTML5.Internal;
 using CSHTML5.Native.Html.Input;
+using OpenSilver;
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Markup;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -45,7 +46,7 @@ namespace CSHTML5.Native.Html.Controls
     [ContentProperty("Children")]
     public class HtmlCanvas : FrameworkElement
     {
-        private object _jsCanvas;
+        private HtmlElementReference _jsCanvas;
         private object _jsContext2d;
         private ElementStyle _currentDrawingStyle;
 
@@ -302,22 +303,22 @@ namespace CSHTML5.Native.Html.Controls
             this.Height = Height;
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
             //------------------
             // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
             //------------------
 
-            domElementWhereToPlaceChildren = null;
-            object div1 = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("canvas", parentRef, this, false);
+            var div1 = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("canvas", parent, this, false);
 
             // Use the div2 as the js canvas object
-            this._jsCanvas = div1;
-            this._jsContext2d = OpenSilver.Interop.ExecuteJavaScriptAsync(
-                $"{OpenSilver.Interop.GetVariableStringForJS(_jsCanvas)}.getContext('2d')");
+            _jsCanvas = div1;
+            _jsContext2d = OpenSilver.Interop.ExecuteJavaScriptAsync(
+                $"document.getElementById('{_jsCanvas.Uid}').getContext('2d')");
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"{OpenSilver.Interop.GetVariableStringForJS(_jsCanvas)}.onselectstart = function() {{ return false; }}");
+                $"document.addListener('{_jsCanvas.Uid}', 'selectstart', function (e) {{ e.preventDefault(); }})");
 
             return div1;
         }
@@ -329,11 +330,14 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (this.IsLoaded)
             {
-                string canvas = OpenSilver.Interop.GetVariableStringForJS(_jsCanvas);
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"""
-                    {canvas}.width = {canvas}.scrollWidth;
-                    {canvas}.height = {canvas}.scrollHeight;
+                    $$"""
+                    (function () {
+                      const cvs = document.getElementById('{{_jsCanvas.Uid}}');
+                      if (!cvs) return;
+                      cvs.width = cvs.scrollWidth;
+                      cvs.height = cvs.scrollHeight;
+                    })();
                     """);
 
                 foreach (HtmlCanvasElement elem in this.Children)

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Media;
@@ -69,8 +70,19 @@ namespace System.Windows.Controls
         /// </summary>
         public TextBox() { }
 
-        internal sealed override INTERNAL_HtmlDomElementReference GetFocusTarget()
-            => _textViewHost?.View?.OuterDiv ?? base.GetFocusTarget();
+        internal sealed override HtmlElementReference GetFocusTarget()
+        {
+            if (_textViewHost?.View is TextBoxView view)
+            {
+                var target = view.OuterDiv;
+                if (target.IsConnected)
+                {
+                    return target;
+                }
+            }
+
+            return base.GetFocusTarget();
+        }
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -265,7 +277,7 @@ namespace System.Windows.Controls
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        ((TextBox)d).OuterDiv.Style.setProperty(
+                        ((TextBox)d).OuterDiv.SetCssStyleProperty(
                             "--selection-color",
                             newValue switch
                             {
@@ -299,7 +311,7 @@ namespace System.Windows.Controls
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        ((TextBox)d).OuterDiv.Style.setProperty(
+                        ((TextBox)d).OuterDiv.SetCssStyleProperty(
                             "--selection-bg-color",
                             newValue switch
                             {

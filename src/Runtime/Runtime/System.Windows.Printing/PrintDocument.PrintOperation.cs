@@ -219,18 +219,19 @@ namespace System.Windows.Printing
                 // Add 'print-section' class for elements we want to print
                 foreach (UIElement e in _elements)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid(
-                        $"{OpenSilver.Interop.GetVariableStringForJS(e.OuterDiv)}.classList.add(\"print-section\")");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.addClass('{e.OuterDiv.Uid}', 'print-section')");
                 }
             }
 
             private void RemovePrintSection()
             {
                 // Remove 'print-section' class for elements we want to print
-                foreach (UIElement e in _elements.Where(x => x.OuterDiv != null))
+                foreach (UIElement e in _elements)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid(
-                        $"{OpenSilver.Interop.GetVariableStringForJS(e.OuterDiv)}.classList.remove(\"print-section\")");
+                    if (e.OuterDiv.IsConnected)
+                    {
+                        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.removeClass('{e.OuterDiv.Uid}', 'print-section')");
+                    }
                 }
             }
 
@@ -278,8 +279,7 @@ namespace System.Windows.Printing
                     {
                         foreach (UIElement el in unloadedElements)
                         {
-                            OpenSilver.Interop.ExecuteJavaScriptVoid(
-                                $"{OpenSilver.Interop.GetVariableStringForJS(el.OuterDiv)}.classList.add(\"print-section\")");
+                            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.addClass('{el.OuterDiv.Uid}', 'print-section')");
                         }
 
                         _printJSCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(() =>

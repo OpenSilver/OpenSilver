@@ -11,11 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System.Threading.Tasks;
-using System.Windows.Shapes;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
+using System.Threading.Tasks;
+using System.Windows.Shapes;
 
 namespace System.Windows.Media;
 
@@ -140,8 +141,8 @@ public sealed class ImageBrush : TileBrush
     private sealed class SvgPattern : ISvgBrush
     {
         private readonly ImageBrush _imageBrush;
-        private readonly INTERNAL_HtmlDomElementReference _pattern;
-        private readonly INTERNAL_HtmlDomElementReference _image;
+        private readonly HtmlElementReference _pattern;
+        private readonly HtmlElementReference _image;
         private readonly WeakEventToken _weakTransformChangedEventToken;
         private readonly WeakEventToken _weakSizeChangedEventToken;
 
@@ -150,10 +151,10 @@ public sealed class ImageBrush : TileBrush
             _imageBrush = imageBrush;
             _pattern = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(shape.DefsElement, "pattern");
             _image = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(_pattern, "image");
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern, "x", "0");
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern, "y", "0");
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern, "width", "100%");
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern, "height", "100%");
+            _pattern.SetAttribute("x", "0");
+            _pattern.SetAttribute("y", "0");
+            _pattern.SetAttribute("width", "100%");
+            _pattern.SetAttribute("height", "100%");
 
             DrawPattern(shape);
 
@@ -172,7 +173,7 @@ public sealed class ImageBrush : TileBrush
                 static (handler, source) => source.SizeChanged += new SizeChangedEventHandler(handler));
         }
 
-        public string GetBrush(Shape shape) => $"url(#{_pattern.UniqueIdentifier})";
+        public string GetBrush(Shape shape) => $"url(#{_pattern.Uid})";
 
         public void DestroyBrush(Shape shape)
         {
@@ -189,13 +190,11 @@ public sealed class ImageBrush : TileBrush
 
             if (transform is null || Transform.IsIdentityTransform(transform))
             {
-                INTERNAL_HtmlDomManager.RemoveAttribute(_pattern, "patternTransform");
+                _pattern.RemoveAttribute("patternTransform");
             }
             else
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern,
-                    "patternTransform",
-                    MatrixTransform.MatrixToHtmlString(transform.Matrix));
+                _pattern.SetAttribute("patternTransform", MatrixTransform.MatrixToHtmlString(transform.Matrix));
             }
         }
 
@@ -217,19 +216,19 @@ public sealed class ImageBrush : TileBrush
                     return;
                 }
 
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_image, "href", vTask.Result);
+                _image.SetAttribute("href", vTask.Result);
             }
             else
             {
-                INTERNAL_HtmlDomManager.RemoveAttribute(_image, "href");
+                _image.RemoveAttribute("href");
             }
 
             if (_imageBrush.Transform is Transform t && !Transform.IsIdentityTransform(t))
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern, "patternTransform", MatrixTransform.MatrixToHtmlString(t.Matrix));
+                _pattern.SetAttribute("patternTransform", MatrixTransform.MatrixToHtmlString(t.Matrix));
             }
 
-            _image.Style.opacity = Math.Round(_imageBrush.Opacity, 2).ToInvariantString();
+            _image.SetCssStyleProperty(CssPropertyNames.Opacity, Math.Round(_imageBrush.Opacity, 2).ToInvariantString());
 
             SetPreserveAspectRatio(shape);
         }
@@ -265,10 +264,10 @@ public sealed class ImageBrush : TileBrush
 
             if (stretch == Stretch.UniformToFill)
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern, "preserveAspectRatio", preserveAspectRatio);
+                _pattern.SetAttribute("preserveAspectRatio", preserveAspectRatio);
             }
 
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(_image, "preserveAspectRatio", preserveAspectRatio);
+            _image.SetAttribute("preserveAspectRatio", preserveAspectRatio);
 
             if (stretch == Stretch.None)
             {
@@ -276,17 +275,17 @@ public sealed class ImageBrush : TileBrush
             }
             else
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_image, "width", "100%");
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_image, "height", "100%");
-                INTERNAL_HtmlDomManager.RemoveAttribute(_pattern, "viewBox");
+                _image.SetAttribute("width", "100%");
+                _image.SetAttribute("height", "100%");
+                _pattern.RemoveAttribute("viewBox");
             }
         }
 
         private void SetNaturalSize(Shape shape)
         {
-            string shapeId = shape.OuterDiv.UniqueIdentifier;
-            string patternId = _pattern.UniqueIdentifier;
-            string imageId = _image.UniqueIdentifier;
+            string shapeId = shape.OuterDiv.Uid;
+            string patternId = _pattern.Uid;
+            string imageId = _image.Uid;
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setSvgPatternNaturalSize('{patternId}', '{imageId}', '{shapeId}', {(int)_imageBrush.AlignmentX}, {(int)_imageBrush.AlignmentY})");

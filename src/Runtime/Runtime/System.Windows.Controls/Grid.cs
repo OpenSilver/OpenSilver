@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
@@ -563,10 +564,10 @@ public class Grid : Panel, IBorderElement
 
     internal int RowDefinitionsCount => _data?.RowDefinitions?.Count ?? 0;
 
-    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        domElementWhereToPlaceChildren = null;
-        return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parentRef, this);
+        return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parent, this);
     }
 
     /// <summary>

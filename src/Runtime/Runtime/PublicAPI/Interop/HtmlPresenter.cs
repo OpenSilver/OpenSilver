@@ -11,6 +11,9 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -18,15 +21,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
     [ContentProperty(nameof(Html))]
     public class HtmlPresenter : FrameworkElement, IResizeObserverListener
     {
-        private INTERNAL_HtmlDomElementReference _jsDiv;
+        private HtmlElementReference _jsDiv;
         private IDisposable _resizeObserver;
 
         static HtmlPresenter()
@@ -54,16 +55,9 @@ namespace CSHTML5.Native.Html.Controls
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var htmlPresenter = (HtmlPresenter)d;
-                        string sDiv = OpenSilver.Interop.GetVariableStringForJS(htmlPresenter._jsDiv);
-                        string sContent = OpenSilver.Interop.GetVariableStringForJS((string)newValue ?? string.Empty);
-                        if (htmlPresenter.IsUsingShadowDOM)
-                        {
-                            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.shadowRoot.innerHTML = {sContent}");
-                        }
-                        else
-                        {
-                            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.innerHTML = {sContent}");
-                        }
+                        var sContent = OpenSilver.Interop.GetVariableStringForJS((string)newValue ?? string.Empty);
+                        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                            $"document.htmlPresenterHelpers.setHtml('{htmlPresenter._jsDiv.Uid}', {sContent})");
                     },
                 });
         
@@ -95,12 +89,12 @@ namespace CSHTML5.Native.Html.Controls
 
         private static void SetScrollMode(HtmlPresenter htmlPresenter, ScrollMode mode)
         {
-            htmlPresenter.OuterDiv.Style.overflow = mode switch
+            htmlPresenter.OuterDiv.SetCssStyleProperty(CssPropertyNames.Overflow, mode switch
             {
                 ScrollMode.Enabled => "scroll",
                 ScrollMode.Auto => "auto",
                 _ => "hidden",
-            };
+            });
         }
 
         /// <summary>
@@ -146,8 +140,6 @@ namespace CSHTML5.Native.Html.Controls
             set => SetValue(UseShadowDomProperty, value);
         }
 
-        internal bool IsUsingShadowDOM { get; private set; }
-
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object DomElement
@@ -156,23 +148,9 @@ namespace CSHTML5.Native.Html.Controls
             {
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    if (_jsDiv is not null)
+                    if (_jsDiv.IsConnected)
                     {
-                        string sDiv = OpenSilver.Interop.GetVariableStringForJS(_jsDiv);
-                        if (IsUsingShadowDOM)
-                        {
-                            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.shadowRoot && {sDiv}.shadowRoot.hasChildNodes()"))
-                            {
-                                return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.shadowRoot.firstChild");
-                            }
-                        }
-                        else
-                        {
-                            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.hasChildNodes()"))
-                            {
-                                return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.firstChild");
-                            }
-                        }
+                        return OpenSilver.Interop.ExecuteJavaScriptAsync($"document.htmlPresenterHelpers.getDomElement('{_jsDiv.Uid}')");
                     }
                 }
 
@@ -180,13 +158,10 @@ namespace CSHTML5.Native.Html.Controls
             }
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            domElementWhereToPlaceChildren = null;
-            IsUsingShadowDOM = UseShadowDom;
-            (var outerDiv, _jsDiv) = INTERNAL_HtmlDomManager.CreateHtmlPresenterElementAndAppendIt(
-                (INTERNAL_HtmlDomElementReference)parentRef, this);
-
+            (var outerDiv, _jsDiv) = INTERNAL_HtmlDomManager.CreateHtmlPresenterElementAndAppendIt(parent, this);
             return outerDiv;
         }
 
@@ -206,8 +181,7 @@ namespace CSHTML5.Native.Html.Controls
             _resizeObserver?.Dispose();
             _resizeObserver = null;
 
-            _jsDiv = null;
-            IsUsingShadowDOM = false;
+            _jsDiv = default;
         }
 
         /// <inheritdoc />
@@ -220,9 +194,8 @@ namespace CSHTML5.Native.Html.Controls
 
             if (ScrollMode != ScrollMode.Disabled)
             {
-                string sElement = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
                 string sArgs = OpenSilver.Interop.GetVariableStringForJS(e.UIEventArg);
-                if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onWheelNative({sElement}, {sArgs})"))
+                if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onWheelNative('{OuterDiv.Uid}', {sArgs})"))
                 {
                     e.Handled = true;
                     e.Cancellable = false;
@@ -240,26 +213,38 @@ namespace CSHTML5.Native.Html.Controls
         {
             base.OnKeyDown(e);
 
-            string sElement = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
             string sArgs = OpenSilver.Interop.GetVariableStringForJS(e.UIEventArg);
-            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onKeyDownNative({sElement}, {sArgs})"))
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onKeyDownNative('{OuterDiv.Uid}', {sArgs})"))
             {
                 e.Handled = true;
                 e.Cancellable = false;
             }
         }
 
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size availableSize)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                Size size = INTERNAL_HtmlDomManager.GetBoundingClientSize(_jsDiv);
+                Size size = MeasureNative(_jsDiv);
                 return new Size(Math.Min(availableSize.Width, size.Width), Math.Min(availableSize.Height, size.Height));
             }
 
             return new Size();
         }
 
+        private static Size MeasureNative(HtmlElementReference element)
+        {
+            if (element.IsConnected)
+            {
+                return Size.Parse(OpenSilver.Interop.ExecuteJavaScriptString(
+                    $"document.htmlPresenterHelpers.measureNative('{element.Uid}')"));
+            }
+
+            return new Size();
+        }
+
+        /// <inheritdoc />
         protected override Size ArrangeOverride(Size finalSize) => finalSize;
 
         internal sealed override bool EnablePointerEventsCore => true;

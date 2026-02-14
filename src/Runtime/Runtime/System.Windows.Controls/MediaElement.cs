@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -31,7 +32,7 @@ namespace System.Windows.Controls
         // If not, find a way to know which one it currently is.
         private static readonly HashSet<string> SupportedAudioTypes = new() { "mp3", "ogg" };
 
-        private INTERNAL_HtmlDomElementReference _mediaElement;
+        private HtmlElementReference _mediaElement;
         private JavaScriptCallback _mediaOpenedCallback;
         private JavaScriptCallback _mediaEndedCallback;
         private JavaScriptCallback _mediaFailedCallback;
@@ -83,15 +84,15 @@ namespace System.Windows.Controls
         {
             Debug.Assert(INTERNAL_VisualTreeManager.IsElementInVisualTree(this));
 
-            if (_mediaElement != null)
+            if (_mediaElement.IsConnected)
             {
                 if (value)
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_mediaElement, attributeName, "true");
+                    _mediaElement.SetAttribute(attributeName, "true");
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.RemoveAttribute(_mediaElement, attributeName);
+                    _mediaElement.RemoveAttribute(attributeName);
                 }
             }
         }
@@ -220,11 +221,9 @@ namespace System.Windows.Controls
 
         private void SetMediaSource(Uri source)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _mediaElement != null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _mediaElement.IsConnected)
             {
-                string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
-                INTERNAL_HtmlDomManager.RemoveAttribute(_mediaElement, "src");
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.load()");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.mediaElementHelpers.resetSource('{_mediaElement.Uid}')");
             }
 
             CreateMediaElement(OuterDiv, source);
@@ -255,9 +254,9 @@ namespace System.Windows.Controls
 
         private void SetVolumeProperty(double volume)
         {
-            if (_mediaElement != null)
+            if (_mediaElement.IsConnected)
             {
-                INTERNAL_HtmlDomManager.SetDomElementProperty(_mediaElement, "volume", volume);
+                _mediaElement.SetProperty("volume", volume);
             }
         }
 
@@ -297,11 +296,11 @@ namespace System.Windows.Controls
         /// </returns>
         public MediaCanPlayResponse CanPlayType(string type)
         {
-            if (_mediaElement != null)
+            if (_mediaElement.IsConnected)
             {
-                string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
                 string sType = OpenSilver.Interop.GetVariableStringForJS(type);
-                string canPlay = OpenSilver.Interop.ExecuteJavaScriptString($"{sElement}.canPlayType({sType})");
+                string canPlay = OpenSilver.Interop.ExecuteJavaScriptString(
+                    $"document.mediaElementHelpers.canPlayType('{_mediaElement.Uid}', {sType})");
                 return ToMediaCanPlayResponse(canPlay);
             }
 
@@ -323,10 +322,9 @@ namespace System.Windows.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                if (_mediaElement != null)
+                if (_mediaElement.IsConnected)
                 {
-                    string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.pause()");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.mediaElementHelpers.pause('{_mediaElement.Uid}')");
                 }
             }
         }
@@ -338,10 +336,9 @@ namespace System.Windows.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                if (_mediaElement != null)
+                if (_mediaElement.IsConnected)
                 {
-                    string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.play()");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.mediaElementHelpers.play('{_mediaElement.Uid}')");
                 }
             }
         }
@@ -353,10 +350,9 @@ namespace System.Windows.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                if (_mediaElement != null)
+                if (_mediaElement.IsConnected)
                 {
-                    string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.pause(); {sElement}.currentTime = 0");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.mediaElementHelpers.stop('{_mediaElement.Uid}')");
                 }
             }
         }
@@ -366,18 +362,18 @@ namespace System.Windows.Controls
             base.INTERNAL_OnDetachedFromVisualTree();
 
             UnregisterEvent();
-            _mediaElement = null;
+            _mediaElement = default;
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            domElementWhereToPlaceChildren = null;
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, false);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this, false);
             CreateMediaElement(outerDiv, Source);
             return outerDiv;
         }
 
-        private void CreateMediaElement(INTERNAL_HtmlDomElementReference parentRef, Uri source)
+        private void CreateMediaElement(HtmlElementReference parent, Uri source)
         {
             string absoluteURI = string.Empty;
 
@@ -395,7 +391,7 @@ namespace System.Windows.Controls
                     {
                         // note: I chose to use IsAudioOnly here because using e.oldValue would make
                         // it recreate the video tag when it was already a video tag.
-                        if (IsAudioOnly || _mediaElement == null)
+                        if (IsAudioOnly || !_mediaElement.IsConnected)
                         {
                             tagName = "video";
                             IsAudioOnly = false;
@@ -405,7 +401,7 @@ namespace System.Windows.Controls
                     {
                         // note: I chose to use IsAudioOnly here because using e.oldValue would make
                         // it recreate the audio tag when it was already a audio tag.
-                        if (!IsAudioOnly || _mediaElement == null)
+                        if (!IsAudioOnly || !_mediaElement.IsConnected)
                         {
                             tagName = "audio";
                             IsAudioOnly = true;
@@ -414,19 +410,19 @@ namespace System.Windows.Controls
 
                     if (!string.IsNullOrEmpty(tagName))
                     {
-                        if (_mediaElement != null)
+                        if (_mediaElement.IsConnected)
                         {
                             UnregisterEvent();
                             INTERNAL_HtmlDomManager.RemoveFromDom(_mediaElement);
-                            _mediaElement = null;
+                            _mediaElement = default;
                         }
 
-                        _mediaElement = CreateHTMLMediaElement(tagName, parentRef);
+                        _mediaElement = CreateHTMLMediaElement(tagName, parent);
 
                         if (!IsAudioOnly)
                         {
-                            _mediaElement.Style.width = "100%";
-                            _mediaElement.Style.height = "100%";
+                            _mediaElement.SetCssStyleProperty(CssPropertyNames.Width, "100%");
+                            _mediaElement.SetCssStyleProperty(CssPropertyNames.Height, "100%");
                         }
 
                         Refresh();
@@ -434,29 +430,30 @@ namespace System.Windows.Controls
                 }
             }
 
-            if (_mediaElement != null && !string.IsNullOrEmpty(absoluteURI))
+            if (_mediaElement.IsConnected && !string.IsNullOrEmpty(absoluteURI))
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_mediaElement, "src", absoluteURI, true);
+                _mediaElement.SetAttribute("src", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(absoluteURI));
             }
         }
 
-        private INTERNAL_HtmlDomElementReference CreateHTMLMediaElement(string tagName, INTERNAL_HtmlDomElementReference parent)
+        private HtmlElementReference CreateHTMLMediaElement(string tagName, HtmlElementReference parent)
         {
             var mediaElement = INTERNAL_HtmlDomManager.AppendDomElement(tagName, parent, this);
 
-            string sElement = OpenSilver.Interop.GetVariableStringForJS(mediaElement);
-
             _mediaOpenedCallback = JavaScriptCallback.Create(OnMediaOpened);
             string mediaOpenedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaOpenedCallback);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.addEventListener('loadedmetadata', function(e) {{ {mediaOpenedCallback}(); }})");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.addListener('{mediaElement.Uid}', 'loadedmetadata', function (e) {{ {mediaOpenedCallback}(); }}))");
 
             _mediaEndedCallback = JavaScriptCallback.Create(OnMediaEnded);
             string mediaEndedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaEndedCallback);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.addEventListener('ended', function(e) {{ {mediaEndedCallback}(); }})");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.addListener('{mediaElement.Uid}', 'ended', function (e) {{ {mediaEndedCallback}(); }}))");
 
             _mediaFailedCallback = JavaScriptCallback.Create(OnMediaFailed);
             string mediaFailedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaFailedCallback);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.addEventListener('error', function(e) {{ {mediaFailedCallback}(); }})");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.addListener('{mediaElement.Uid}', 'error', function (e) {{ {mediaFailedCallback}(); }}))");
 
             return mediaElement;
         }

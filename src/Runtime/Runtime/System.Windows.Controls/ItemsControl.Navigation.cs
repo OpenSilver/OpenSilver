@@ -473,10 +473,9 @@ public partial class ItemsControl
     private void ScrollIntoViewNative(int index)
     {
         if (ItemContainerGenerator.ContainerFromIndex(index) is UIElement container
-            && container.OuterDiv != null)
+            && container.OuterDiv.IsConnected)
         {
-            string sDomElement = OpenSilver.Interop.GetVariableStringForJS(container.OuterDiv);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDomElement}.scrollIntoView({{ block: 'nearest' }})");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.scrollToVisual('{container.OuterDiv.Uid}')");
         }
     }
 }

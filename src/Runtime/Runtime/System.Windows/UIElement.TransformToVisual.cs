@@ -15,6 +15,7 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using System.Diagnostics;
+using System.Text.Json;
 using System.Windows.Media;
 
 namespace System.Windows;
@@ -188,15 +189,11 @@ public partial class UIElement
             return Matrix.Identity;
         }
 
-        string sOuterDivOfControl = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
-        string sOuterDivOfReferenceVisual = OpenSilver.Interop.GetVariableStringForJS(otherVisual.OuterDiv);
+        Vector offets = Vector.Parse(
+            OpenSilver.Interop.ExecuteJavaScriptString(
+                $"document.transformToVisual('{OuterDiv.Uid}', '{otherVisual.OuterDiv.Uid}')"));
 
-        double offsetLeft = OpenSilver.Interop.ExecuteJavaScriptDouble(
-            $"{sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left");
-        double offsetTop = OpenSilver.Interop.ExecuteJavaScriptDouble(
-            $"{sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top");
-
-        return new Matrix(1, 0, 0, 1, offsetLeft, offsetTop);
+        return new Matrix(1, 0, 0, 1, offets.X, offets.Y);
     }
 
     private void SetVisualFlagsToRoot(VisualFlags flag, bool value)

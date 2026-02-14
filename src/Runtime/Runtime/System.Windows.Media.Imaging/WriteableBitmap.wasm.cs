@@ -77,7 +77,7 @@ namespace System.Windows.Media.Imaging
                 Action<int, int, int> onSucess,
                 Action<string> onError)
             {
-                if (element.OuterDiv is null)
+                if (!element.OuterDiv.IsConnected)
                 {
                     return Task.CompletedTask;
                 }
@@ -86,7 +86,7 @@ namespace System.Windows.Media.Imaging
 
                 OpenSilver.Interop.JavaScriptRuntime.Flush();
                 OpenSilver.Interop.NativeMethods.WriteableBitmap_RenderUIElement(
-                    element.OuterDiv.UniqueIdentifier,
+                    element.OuterDiv.Uid,
                     width,
                     height,
                     transform is null ? string.Empty : MatrixTransform.MatrixToHtmlString(transform.Matrix),

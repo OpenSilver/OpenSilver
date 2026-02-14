@@ -24,6 +24,9 @@
     <Compile Include="Core\Main\CopyOnWriteList.cs" />
     <Compile Include="OpenSilver\Controls\SaveFileDialog.cs" />
     <Compile Include="OpenSilver\Features.cs" />
+    <Compile Include="OpenSilver\HtmlElementReference.cs" />
+    <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
+    <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
     <Compile Include="OpenSilver\OpenSilverCompatibilityPreferences.cs" />
     <Compile Include="OpenSilver\Internal\Commands\CommandHelpers.cs" />
     <Compile Include="OpenSilver\Internal\CommandLibraryHelper.cs" />
@@ -741,9 +744,7 @@
     <Compile Include="Core\Other\ServiceProvider.cs" />
     <Compile Include="Core\Other\LaunchActivatedEventArgs.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
-    <Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
-    <Compile Include="Core\Rendering\INTERNAL_HtmlDomStyleReference.cs" />
     <Compile Include="Core\Rendering\INTERNAL_VisualTreeManager.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs.cs" />

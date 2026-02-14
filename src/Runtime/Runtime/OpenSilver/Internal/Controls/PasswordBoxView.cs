@@ -28,10 +28,10 @@ internal sealed class PasswordBoxView : TextViewBase
 
     internal new PasswordBox Host => (PasswordBox)base.Host;
 
-    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        domElementWhereToPlaceChildren = null;
-        return INTERNAL_HtmlDomManager.CreatePasswordBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
+        return INTERNAL_HtmlDomManager.CreatePasswordBoxViewDomElementAndAppendIt(parent, this);
     }
 
     protected internal override void INTERNAL_OnAttachedToVisualTree()
@@ -57,7 +57,7 @@ internal sealed class PasswordBoxView : TextViewBase
         int pwdLength = Host.Password.Length;
 
         return ParentWindow.TextMeasurementService.MeasureView(
-            OuterDiv.UniqueIdentifier,
+            OuterDiv.Uid,
             "pre",
             string.Empty,
             constraint.Width,
@@ -66,31 +66,30 @@ internal sealed class PasswordBoxView : TextViewBase
 
     internal void SelectNative()
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            string sElement = Interop.GetVariableStringForJS(OuterDiv);
-            Interop.ExecuteJavaScriptVoid($"{sElement}.select()");
+            Interop.ExecuteJavaScriptVoid($"document.textviewManager.select('{OuterDiv.Uid}')");
         }
     }
 
     internal void OnMaxLengthChanged(int maxLength)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             if (maxLength > 0)
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxLength", maxLength);
+                OuterDiv.SetAttribute("maxlength", maxLength);
             }
             else
             {
-                INTERNAL_HtmlDomManager.RemoveAttribute(OuterDiv, "maxlength");
+                OuterDiv.RemoveAttribute("maxlength");
             }
         }
     }
 
     internal void SetCaretBrush(Brush brush)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             this.SetCaretColor(brush);
         }
@@ -98,11 +97,10 @@ internal sealed class PasswordBoxView : TextViewBase
 
     internal void SetPasswordNative(string text)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            string sElement = Interop.GetVariableStringForJS(OuterDiv);
             Interop.ExecuteJavaScriptVoid(
-                $"{sElement}.value = \"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\"");
+                $"document.setProp('{OuterDiv.Uid}','value',\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\")");
 
             InvalidateMeasure();
         }
@@ -110,10 +108,9 @@ internal sealed class PasswordBoxView : TextViewBase
 
     private string GetPassword()
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            string sElement = Interop.GetVariableStringForJS(OuterDiv);
-            return Interop.ExecuteJavaScriptString($"{sElement}.value") ?? string.Empty;
+            return Interop.ExecuteJavaScriptString($"document.getProp('{OuterDiv.Uid}','value')") ?? string.Empty;
         }
 
         return string.Empty;
@@ -127,7 +124,7 @@ internal sealed class PasswordBoxView : TextViewBase
         int maxLength = host.MaxLength;
         if (maxLength > 0)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxlength", maxLength);
+            OuterDiv.SetAttribute("maxlength", maxLength);
         }
         SetPasswordNative(host.Password);
     }

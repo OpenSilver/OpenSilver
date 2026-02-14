@@ -14,6 +14,7 @@
 using System.Windows.Navigation;
 using CSHTML5;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -25,7 +26,7 @@ namespace System.Windows.Controls
     /// </summary>
     public partial class WebBrowser : FrameworkElement
     {
-        private INTERNAL_HtmlDomElementReference _iFrame;
+        private HtmlElementReference _iFrame;
         private string _htmlString;
         private JavaScriptCallback _jsCallbackOnIframeLoaded;
 
@@ -36,38 +37,35 @@ namespace System.Windows.Controls
 
         internal sealed override bool EnablePointerEventsCore => true;
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            domElementWhereToPlaceChildren = null;
-
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, false);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this, false);
 
             _iFrame = INTERNAL_HtmlDomManager.AppendDomElement("iframe", outerDiv, this);
-            _iFrame.Style.width = "100%";
-            _iFrame.Style.height = "100%";
-            _iFrame.Style.border = "none";
+            _iFrame.SetCssStyleProperty(CssPropertyNames.Width, "100%");
+            _iFrame.SetCssStyleProperty(CssPropertyNames.Height, "100%");
+            _iFrame.SetCssStyleProperty(CssPropertyNames.Border, "none");
 
             DisposeJsCallbacks();
             _jsCallbackOnIframeLoaded = JavaScriptCallback.Create(OnIframeLoad);
+            var sLoadedCallback = OpenSilver.Interop.GetVariableStringForJS(_jsCallbackOnIframeLoaded);
 
-            string sIFrame = OpenSilver.Interop.GetVariableStringForJS(_iFrame);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"{sIFrame}.onload = {OpenSilver.Interop.GetVariableStringForJS(_jsCallbackOnIframeLoaded)}");
+                $"document.addListener('{_iFrame.Uid}', 'load', function (e) {{ {sLoadedCallback}(); }}))");
 
             var source = this.SourceUri;
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"{sIFrame}.src = {OpenSilver.Interop.GetVariableStringForJS(source.OriginalString)}");
+                _iFrame.SetProperty("src", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(source.OriginalString));
             }
             else if (_htmlString != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)}");
+                _iFrame.SetProperty("srcdoc", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(_htmlString));
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sIFrame}.src = 'about:blank'");
+                _iFrame.SetProperty("src", "about:blank");
             }
 
             return outerDiv;
@@ -102,11 +100,11 @@ namespace System.Windows.Controls
                         if (source != null && !string.IsNullOrEmpty(source.OriginalString))
                         {
                             string uri = INTERNAL_UriHelper.ConvertToHtml5Path(source.OriginalString, null);
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(webView._iFrame, "src", uri, true);
+                            webView._iFrame.SetAttribute("src", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(uri));
                         }
                         else
                         {
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(webView._iFrame, "src", "about:blank");
+                            webView._iFrame.SetAttribute("src", "about:blank");
                         }
                     },
                 });
@@ -133,15 +131,13 @@ namespace System.Windows.Controls
 
             if (IsLoaded) // Note: if not loaded, we will set the HTML later when adding the control to the visual tree.
             {
-                string sIFrame = OpenSilver.Interop.GetVariableStringForJS(_iFrame);
                 if (_htmlString != null)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                        $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)}");
+                    _iFrame.SetProperty("srcdoc", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(_htmlString));
                 }
                 else
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sIFrame}.src = 'about:blank'");
+                    _iFrame.SetProperty("src", "about:blank");
                 }
             }
         }

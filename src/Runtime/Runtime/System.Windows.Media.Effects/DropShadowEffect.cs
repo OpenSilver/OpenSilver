@@ -13,6 +13,7 @@
 
 using System.Windows.Controls;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows.Media.Effects
@@ -156,8 +157,6 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = renderTarget.OuterDiv.Style;
-
                 double x = Math.Round(Math.Cos(Direction * Math.PI / 180d) * ShadowDepth, 2);
                 double y = Math.Round(-(Math.Sin(Direction * Math.PI / 180d) * ShadowDepth), 2);
                 Color color = Color.FromRgb(Color.R, Color.G, Color.B);
@@ -166,11 +165,11 @@ namespace System.Windows.Media.Effects
 
                 if (renderTarget is TextBlock)
                 {
-                    domStyle.textShadow = shadowString;
+                    renderTarget.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextShadow, shadowString);
                 }
                 else
                 {
-                    domStyle.boxShadow = shadowString;
+                    renderTarget.OuterDiv.SetCssStyleProperty(CssPropertyNames.BoxShadow, shadowString);
                 }
             }
         }
@@ -179,14 +178,13 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = renderTarget.OuterDiv.Style;
                 if (renderTarget is TextBlock)
                 {
-                    domStyle.textShadow = string.Empty;
+                    renderTarget.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextShadow, string.Empty);
                 }
                 else
                 {
-                    domStyle.boxShadow = string.Empty;
+                    renderTarget.OuterDiv.SetCssStyleProperty(CssPropertyNames.BoxShadow, string.Empty);
                 }
             }
         }

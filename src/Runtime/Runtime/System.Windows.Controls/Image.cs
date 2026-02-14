@@ -18,6 +18,7 @@ using System.Windows.Automation.Peers;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
+using OpenSilver;
 
 namespace System.Windows.Controls
 {
@@ -38,7 +39,7 @@ namespace System.Windows.Controls
     /// </example>
     public sealed class Image : FrameworkElement
     {
-        private INTERNAL_HtmlDomElementReference _imageDiv;
+        private HtmlElementReference _imageDiv;
         private Size _naturalSize;
         private WeakEventToken _weakEventToken;
 
@@ -131,14 +132,14 @@ namespace System.Windows.Controls
         {
             Image img = (Image)d;
 
-            img._imageDiv.Style.objectFit = (Stretch)newValue switch
+            img._imageDiv.SetCssStyleProperty(CssPropertyNames.ObjectFit, (Stretch)newValue switch
             {
                 Stretch.None => "none",
                 Stretch.Fill => "fill",
                 Stretch.Uniform => "contain",
                 Stretch.UniformToFill => "cover",
                 _ => string.Empty,
-            };
+            });
 
             img.SetObjectPosition();
         }
@@ -153,12 +154,12 @@ namespace System.Windows.Controls
         /// </summary>
         public event EventHandler<RoutedEventArgs> ImageOpened;
 
-        internal INTERNAL_HtmlDomElementReference ImageDiv => _imageDiv;
+        internal HtmlElementReference ImageDiv => _imageDiv;
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            domElementWhereToPlaceChildren = null;
-            (var outerDiv, _imageDiv) = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
+            (var outerDiv, _imageDiv) = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt(parent, this);
             return outerDiv;
         }
 
@@ -200,7 +201,7 @@ namespace System.Windows.Controls
 
         private void SetObjectPosition()
         {
-            if (_imageDiv == null) return;
+            if (!_imageDiv.IsConnected) return;
 
             string hPos, vPos;
 
@@ -233,7 +234,7 @@ namespace System.Windows.Controls
                     break;
             }
 
-            _imageDiv.Style.objectPosition = $"{hPos} {vPos}";
+            _imageDiv.SetCssStyleProperty(CssPropertyNames.ObjectPosition, $"{hPos} {vPos}");
         }
 
         private void OnSourceChanged(object sender, EventArgs e)
@@ -248,20 +249,26 @@ namespace System.Windows.Controls
 
         private void RefreshSource()
         {
-            Debug.Assert(_imageDiv is not null);
+            Debug.Assert(_imageDiv.IsConnected);
 
             if (Source is ImageSource source)
             {
                 var task = source.GetDataStringAsync(this);
                 if (task.IsCompletedSuccessfully)
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", task.Result ?? string.Empty, true);
+                    string value = task.Result;
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        value = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(value);
+                    }
+
+                    _imageDiv.SetAttribute("src", value ?? string.Empty);
                 }
             }
             else
             {
-                INTERNAL_HtmlDomManager.RemoveAttribute(_imageDiv, "src");
-                _imageDiv.Style.display = "none";
+                _imageDiv.RemoveAttribute("src");
+                _imageDiv.SetCssStyleProperty(CssPropertyNames.Display, "none");
 
                 InvalidateMeasure();
             }

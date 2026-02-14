@@ -13,7 +13,6 @@
 
 using System.Linq;
 using System.Windows.Browser.Internal;
-using CSHTML5.Internal;
 
 namespace System.Windows.Browser
 {
@@ -83,9 +82,9 @@ namespace System.Windows.Browser
             {
                 if (_plugin is null)
                 {
-                    if (Application.Current?.GetRootDiv() is INTERNAL_HtmlDomElementReference root)
+                    if (Application.Current?.GetRootDiv() is { IsConnected: true } root)
                     {
-                        _plugin = Document.GetElementById(root.UniqueIdentifier);
+                        _plugin = Document.GetElementById(root.Uid);
                     }
                 }
 

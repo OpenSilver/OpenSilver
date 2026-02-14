@@ -149,7 +149,7 @@ namespace CSHTML5.Internal
             // Reset all visual-tree related information:
             element.IsConnectedToLiveTree = false;
             element.IsUnloading = false;
-            element.OuterDiv = null;
+            element.OuterDiv = default;
             element.VisualChildrenInformation = null;
             element.IsRenderingSuspended = false;
             element.ParentWindow = null;
@@ -222,7 +222,7 @@ namespace CSHTML5.Internal
             child.ParentWindow = parent.ParentWindow;
 
             // Create and append the DOM structure of the Child:
-            var outerDomElement = (INTERNAL_HtmlDomElementReference)child.CreateDomElement(parent.OuterDiv, out _);
+            var outerDomElement = child.CreateDomElement(parent.OuterDiv);
 
             // For debugging purposes (to better read the output html), add a class to the outer DIV
             // that tells us the corresponding type of the element (Border, StackPanel, etc.):

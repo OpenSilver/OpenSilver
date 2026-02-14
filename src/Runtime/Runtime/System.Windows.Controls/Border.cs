@@ -11,13 +11,14 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows.Markup;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls
 {
@@ -412,10 +413,10 @@ namespace System.Windows.Controls
             return CornerRadius.IsValid(cr, false, false, false, false);
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            domElementWhereToPlaceChildren = null;
-            return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parentRef, this);
+            return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parent, this);
         }
     }
 }

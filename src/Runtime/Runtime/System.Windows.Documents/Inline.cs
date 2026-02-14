@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver;
 
 namespace System.Windows.Documents;
 
@@ -88,9 +89,9 @@ public abstract class Inline : TextElement
     // support the following usage: TextBlock1.Inlines.Add("test");
     public static implicit operator Inline(string s) => new Run() { Text = s };
 
-    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        domElementWhereToPlaceChildren = null;
-        return INTERNAL_HtmlDomManager.CreateInlineDomElementAndAppendIt(parentRef, this);
+        return INTERNAL_HtmlDomManager.CreateInlineDomElementAndAppendIt(parent, this);
     }
 }

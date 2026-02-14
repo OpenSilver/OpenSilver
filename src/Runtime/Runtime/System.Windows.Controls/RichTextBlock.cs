@@ -18,6 +18,7 @@ using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
+using OpenSilver;
 
 namespace System.Windows.Controls
 {
@@ -450,10 +451,10 @@ namespace System.Windows.Controls
             }
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            domElementWhereToPlaceChildren = null;
-            return INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this);
+            return INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parent, this);
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
@@ -476,7 +477,7 @@ namespace System.Windows.Controls
             bool wrap = TextWrapping == TextWrapping.Wrap;
 
             Size textSize = ParentWindow.TextMeasurementService.MeasureView(
-                OuterDiv.UniqueIdentifier,
+                OuterDiv.Uid,
                 wrap ? "pre-wrap" : "pre",
                 wrap ? "break-word" : string.Empty,
                 wrap ? Math.Max(0, availableSize.Width - paddingWidth) : double.PositiveInfinity,

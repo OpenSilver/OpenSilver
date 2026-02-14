@@ -38,7 +38,7 @@ namespace System.Windows
     {
         private static readonly Dictionary<string, string> _resourcesCache = new(StringComparer.OrdinalIgnoreCase);
 
-        private readonly INTERNAL_HtmlDomElementReference _rootDiv;
+        private readonly HtmlElementReference _rootDiv;
         private readonly ApplicationLifetimeObjectsCollection _lifetimeObjects = [];
 
         private Window _mainWindow;
@@ -246,9 +246,8 @@ namespace System.Windows
             HTMLParam[] paramsArray;
             try
             {
-                string sElement = OpenSilver.Interop.GetVariableStringForJS(_rootDiv);
                 paramsArray = JsonSerializer.Deserialize<HTMLParam[]>(
-                    OpenSilver.Interop.ExecuteJavaScriptString($"document.getAppParams({sElement})"));
+                    OpenSilver.Interop.ExecuteJavaScriptString($"document.getAppParams('{_rootDiv.Uid}')"));
             }
             catch
             {
@@ -510,7 +509,7 @@ namespace System.Windows
 
         internal event EventHandler MainWindowReady;
 
-        internal INTERNAL_HtmlDomElementReference GetRootDiv() => _rootDiv;
+        internal HtmlElementReference GetRootDiv() => _rootDiv;
 
         /// <summary>
         /// Returns a string that contains the content of the file that is located at the

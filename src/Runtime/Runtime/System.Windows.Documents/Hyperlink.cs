@@ -11,15 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
-using System.Windows.Controls.Primitives;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Commands;
 using OpenSilver.Internal.Media;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace System.Windows.Documents;
 
@@ -168,7 +169,7 @@ public sealed class Hyperlink : Span, ICommandSource
                         _ => string.Empty,
                     };
 
-                    hyperlink.OuterDiv.Style.setProperty(MouseOverForegroundVariable, color);
+                    hyperlink.OuterDiv.SetCssStyleProperty(MouseOverForegroundVariable, color);
                 },
             });
 
@@ -202,7 +203,7 @@ public sealed class Hyperlink : Span, ICommandSource
 
                     Hyperlink hyperlink = (Hyperlink)d;
                     string value = FontProperties.ToCssTextDecoration((TextDecorationCollection)newValue);
-                    hyperlink.OuterDiv.Style.setProperty(MouseOverTextDecorationsVariable, value);
+                    hyperlink.OuterDiv.SetCssStyleProperty(MouseOverTextDecorationsVariable, value);
                 },
             });
 
@@ -276,10 +277,9 @@ public sealed class Hyperlink : Span, ICommandSource
 
         _clickCallback = JavaScriptCallback.Create(OnClickNative);
 
-        string sDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
         string sClickCallback = OpenSilver.Interop.GetVariableStringForJS(_clickCallback);
         OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"{sDiv}.addEventListener('click', function (e) {{ {sClickCallback}(); }})");
+            $"document.addListener('{OuterDiv.Uid}', 'click', function (e) {{ {sClickCallback}(); }}))");
     }
 
     public override void INTERNAL_DetachFromDomEvents()

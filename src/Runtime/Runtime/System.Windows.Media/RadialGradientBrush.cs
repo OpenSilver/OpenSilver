@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
 using OpenSilver.Internal.Media.Animation;
@@ -211,7 +212,7 @@ namespace System.Windows.Media
         private sealed class SvgRadialGradient : ISvgBrush
         {
             private readonly RadialGradientBrush _radialGradient;
-            private readonly INTERNAL_HtmlDomElementReference _gradientRef;
+            private readonly HtmlElementReference _gradientRef;
             private readonly WeakEventToken _weakEventToken;
 
             public SvgRadialGradient(Shape shape, RadialGradientBrush rgb)
@@ -228,7 +229,7 @@ namespace System.Windows.Media
                     static (handler, source) => source.TransformChanged += new EventHandler(handler));
             }
 
-            public string GetBrush(Shape shape) => $"url(#{_gradientRef.UniqueIdentifier})";
+            public string GetBrush(Shape shape) => $"url(#{_gradientRef.Uid})";
 
             public void RenderBrush(Shape shape) => DrawRadialGradient();
 
@@ -244,13 +245,11 @@ namespace System.Windows.Media
 
                 if (transform is null || Transform.IsIdentityTransform(transform))
                 {
-                    INTERNAL_HtmlDomManager.RemoveAttribute(_gradientRef, "gradientTransform");
+                    _gradientRef.RemoveAttribute("gradientTransform");
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef,
-                        "gradientTransform",
-                        MatrixTransform.MatrixToHtmlString(transform.Matrix));
+                    _gradientRef.SetAttribute("gradientTransform", MatrixTransform.MatrixToHtmlString(transform.Matrix));
                 }
             }
 
@@ -272,7 +271,7 @@ namespace System.Windows.Media
                     .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
 
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.drawSvgRadialGradient('{_gradientRef.UniqueIdentifier}',{cx},{cy},{r},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
+                    $"document.drawSvgRadialGradient('{_gradientRef.Uid}',{cx},{cy},{r},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
             }
         }
     }

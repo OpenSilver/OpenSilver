@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -1470,7 +1471,7 @@ namespace System.Windows
 
         #endregion
 
-        internal virtual INTERNAL_HtmlDomElementReference GetFocusTarget() => OuterDiv;
+        internal virtual HtmlElementReference GetFocusTarget() => OuterDiv;
 
         public virtual void INTERNAL_AttachToDomEvents() { }
 

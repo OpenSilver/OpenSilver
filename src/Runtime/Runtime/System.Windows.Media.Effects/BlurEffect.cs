@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows.Media.Effects
@@ -64,12 +65,10 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = renderTarget.OuterDiv.Style;
-
                 // This gets a result very similar to Silverlight. Using the Radius directly
                 // makes the element much more blurry than Silverlight.
                 double cssRadius = Math.Min(Math.Floor(Math.Max(Radius, 0) / 2.0), 6.0);
-                domStyle.filter = $"blur({cssRadius.ToInvariantString()}px)";
+                renderTarget.OuterDiv.SetCssStyleProperty(CssPropertyNames.Filter, $"blur({cssRadius.ToInvariantString()}px)");
             }
         }
 
@@ -77,8 +76,7 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = renderTarget.OuterDiv.Style;
-                domStyle.filter = string.Empty;
+                renderTarget.OuterDiv.SetCssStyleProperty(CssPropertyNames.Filter, string.Empty);
             }
         }
     }

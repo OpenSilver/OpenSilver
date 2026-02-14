@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal.Controls.Primitives;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls.Primitives;
 
 namespace System.Windows.Controls.Primitives;
 
@@ -103,11 +104,16 @@ internal sealed class PopupRoot : FrameworkElement
 
     internal void PutPopupInFront()
     {
-        if (OuterDiv is null) return;
+        if (!OuterDiv.IsConnected) return;
 
-        string parentDiv = OpenSilver.Interop.GetVariableStringForJS(ParentWindow.RootDomElement);
-        string popupDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
-        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{parentDiv}.appendChild({popupDiv})");
+        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+            $$"""
+            (function () {
+              const popup = document.getElementById('{{OuterDiv.Uid}}');
+              const window = document.getElementById('{{ParentWindow.RootDomElement.Uid}}');
+              if (popup && window) window.appendChild(popup);
+            })();
+            """);
     }
 
     private static void OnMouseMove(object sender, MouseEventArgs e) => PopupService.UpdateMousePosition(e);
@@ -126,9 +132,6 @@ internal sealed class PopupRoot : FrameworkElement
         return _transformLayer;
     }
 
-    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren) =>
-        throw new InvalidOperationException("'CreateDomElement' should not be called for the PopupRoot object.");
-
     protected override Size MeasureOverride(Size availableSize)
     {
         _transformLayer.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -140,6 +143,10 @@ internal sealed class PopupRoot : FrameworkElement
         _transformLayer.Arrange(new Rect(finalSize));
         return finalSize;
     }
+
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent) =>
+        throw new InvalidOperationException("'CreateDomElement' should not be called for the PopupRoot object.");
 
     private void SetLayoutBindings()
     {

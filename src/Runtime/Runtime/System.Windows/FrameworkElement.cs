@@ -430,21 +430,15 @@ namespace System.Windows
 
         internal bool IsLoadedInResourceDictionary { get; set; }
 
-        /// <summary>
-        /// Provides a base implementation for creating the dom elements designed to represent an instance of a FrameworkElement and defines the place where its child(ren) will be added.
-        /// </summary>
-        /// <param name="parentRef">The parent of the FrameworkElement</param>
-        /// <param name="domElementWhereToPlaceChildren">The dom element where the FrameworkElement's children will be added.</param>
-        /// <returns>The "root" dom element of the FrameworkElement.</returns>
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <inheritdoc />
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            return CreateDomElementInternal(parentRef, false, out domElementWhereToPlaceChildren);
+            return CreateDomElementInternal(parent, false);
         }
 
-        internal object CreateDomElementInternal(object parentRef, bool isKeyboardFocusable, out object domElementWhereToPlaceChildren)
+        internal HtmlElementReference CreateDomElementInternal(HtmlElementReference parent, bool isKeyboardFocusable)
         {
-            domElementWhereToPlaceChildren = null;
-            return INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, isKeyboardFocusable);
+            return INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this, isKeyboardFocusable);
         }
 
         // Internal helper so the FrameworkElement could see the
@@ -707,11 +701,11 @@ namespace System.Windows
             {
                 if (isEnabled)
                 {
-                    INTERNAL_HtmlDomManager.RemoveAttribute(OuterDiv, "disabled");
+                    OuterDiv.RemoveAttribute("disabled");
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "disabled", string.Empty);
+                    OuterDiv.SetAttribute("disabled", string.Empty);
                 }
             }
         }
@@ -839,8 +833,13 @@ namespace System.Windows
                     {
                         if (Features.DOM.AssignName && d is FrameworkElement fe)
                         {
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                                fe.OuterDiv, "dataId", (string)newValue ?? string.Empty, true);
+                            string name = (string)newValue;
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                name = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(name);
+                            }
+
+                            fe.OuterDiv.SetAttribute("dataId", name ?? string.Empty);
                         }
                     },
                 });

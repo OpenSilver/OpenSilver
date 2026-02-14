@@ -453,7 +453,8 @@ public static partial class Interop
         return $"\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(s)}\"";
     }
 
-    internal static string GetVariableStringForJS(IJavaScriptConvertible jsObject)
+    internal static string GetVariableStringForJS<T>(T jsObject)
+        where T : IJavaScriptConvertible
     {
         Debug.Assert(jsObject is not null);
         return jsObject.ToJavaScriptString();
@@ -477,7 +478,7 @@ public static partial class Interop
     /// </summary>
     /// <param name="element"></param>
     /// <returns></returns>
-    public static object GetDiv(UIElement element)
+    public static HtmlElementReference GetDiv(UIElement element)
     {
         return element.OuterDiv;
     }

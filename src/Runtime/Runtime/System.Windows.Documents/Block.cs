@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
+using System.Windows.Media;
 
 namespace System.Windows.Documents;
 
@@ -358,9 +359,9 @@ public abstract class Block : TextElement
         return true;
     }
 
-    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        domElementWhereToPlaceChildren = null;
-        return INTERNAL_HtmlDomManager.CreateBlockDomElementAndAppendIt(parentRef, this);
+        return INTERNAL_HtmlDomManager.CreateBlockDomElementAndAppendIt(parent, this);
     }
 }

@@ -26,7 +26,7 @@ internal interface IResizeObserverListener
 
 internal static class ResizeObserver
 {
-    private static readonly Dictionary<string, WeakListenerList> _listeners = new();
+    private static readonly Dictionary<string, WeakListenerList> _listeners = [];
 
     static ResizeObserver()
     {
@@ -54,19 +54,19 @@ internal static class ResizeObserver
         }
     }
 
-    public static IDisposable Observe(INTERNAL_HtmlDomElementReference element, IResizeObserverListener listener)
+    public static IDisposable Observe(HtmlElementReference element, IResizeObserverListener listener)
     {
-        Debug.Assert(element is not null && !string.IsNullOrEmpty(element.UniqueIdentifier));
+        Debug.Assert(element.IsConnected && !string.IsNullOrEmpty(element.Uid));
 
         lock (_listeners)
         {
-            string id = element.UniqueIdentifier;
+            string id = element.Uid;
 
             if (!_listeners.TryGetValue(id, out WeakListenerList listeners))
             {
                 listeners = new(id);
                 _listeners[id] = listeners;
-                Interop.ExecuteJavaScriptVoidAsync($"document.resizeManager.observe({Interop.GetVariableStringForJS(element)})");
+                Interop.ExecuteJavaScriptVoidAsync($"document.resizeManager.observe('{element.Uid}')");
             }
 
             LinkedListNode<WeakListener> weakListener = listeners.AddLast(new WeakListener(listener));

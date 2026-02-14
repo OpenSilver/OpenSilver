@@ -103,7 +103,7 @@ namespace System.Windows.Shapes
 
             if (e.AffectsFillRule)
             {
-                if (SvgElement is not null)
+                if (SvgElement.IsConnected)
                 {
                     SetFillRuleAttribute(((Geometry)sender).GetFillRule());
                 }

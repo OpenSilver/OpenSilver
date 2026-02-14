@@ -16,7 +16,6 @@ using OpenSilver.Internal.Media;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json;
 using System.Web;
 using System.Windows;
@@ -79,10 +78,10 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal bool IsReadOnly => !IsEnabled || Host.IsReadOnly;
 
-    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        domElementWhereToPlaceChildren = null;
-        return INTERNAL_HtmlDomManager.CreateRichTextBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
+        return INTERNAL_HtmlDomManager.CreateRichTextBoxViewDomElementAndAppendIt(parent, this);
     }
 
     protected internal sealed override void INTERNAL_OnAttachedToVisualTree()
@@ -103,7 +102,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
         Host.Synchronize();
 
-        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.deleteView('{OuterDiv.UniqueIdentifier}')");
+        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.deleteView('{OuterDiv.Uid}')");
     }
 
     private void SetProperties()
@@ -121,7 +120,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
         SetAcceptsReturn(host.AcceptsReturn);
         SetAcceptsTab(host.AcceptsTab);
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "spellcheck", host.IsSpellCheckEnabled);
+        OuterDiv.SetAttribute("spellcheck", host.IsSpellCheckEnabled);
 
         SetContentsFromBlocks();
     }
@@ -131,7 +130,7 @@ internal sealed class RichTextBoxView : TextViewBase
         double maxWidth = double.IsPositiveInfinity(constraint.Width) ? -1 : constraint.Width;
         double maxHeight = double.IsPositiveInfinity(constraint.Height) ? -1 : constraint.Height;
         string size = Interop.ExecuteJavaScriptString(
-            $"document.richTextViewManager.measureView('{OuterDiv.UniqueIdentifier}', {maxWidth.ToInvariantString()}, {maxHeight.ToInvariantString()})");
+            $"document.richTextViewManager.measureView('{OuterDiv.Uid}', {maxWidth.ToInvariantString()}, {maxHeight.ToInvariantString()})");
 
         int i = size.IndexOf('|');
         string w = size.Substring(0, i);
@@ -149,7 +148,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal void InvalidateUI()
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
@@ -164,56 +163,56 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal string GetSelectedText()
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return string.Empty;
         }
 
-        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getSelectedText('{OuterDiv.UniqueIdentifier}')");
+        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getSelectedText('{OuterDiv.Uid}')");
     }
 
     internal int GetContentLength()
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return 0;
         }
 
-        return Interop.ExecuteJavaScriptInt32($"document.richTextViewManager.getContentLength('{OuterDiv.UniqueIdentifier}')");
+        return Interop.ExecuteJavaScriptInt32($"document.richTextViewManager.getContentLength('{OuterDiv.Uid}')");
     }
 
     internal void SetSelectedText(string text)
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.setSelectedText('{OuterDiv.UniqueIdentifier}', {HttpUtility.JavaScriptStringEncode(text, true)})");
+            $"document.richTextViewManager.setSelectedText('{OuterDiv.Uid}', {HttpUtility.JavaScriptStringEncode(text, true)})");
 
         OnContentChanged(true);
     }
 
     internal void SelectAll()
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
 
-        Interop.ExecuteJavaScriptVoid($"document.richTextViewManager.selectAll('{OuterDiv.UniqueIdentifier}')");
+        Interop.ExecuteJavaScriptVoid($"document.richTextViewManager.selectAll('{OuterDiv.Uid}')");
     }
 
     internal void Select(int start, int length)
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.select('{OuterDiv.UniqueIdentifier}', {start.ToInvariantString()}, {length.ToInvariantString()})");
+            $"document.richTextViewManager.select('{OuterDiv.Uid}', {start.ToInvariantString()}, {length.ToInvariantString()})");
     }
 
     internal object GetFormat(DependencyProperty dp)
@@ -332,13 +331,13 @@ internal sealed class RichTextBoxView : TextViewBase
 
     private string GetFormatNative(string propertyName)
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return null;
         }
 
         return Interop.ExecuteJavaScriptString(
-            $"document.richTextViewManager.getFormat('{OuterDiv.UniqueIdentifier}', '{propertyName}')");
+            $"document.richTextViewManager.getFormat('{OuterDiv.Uid}', '{propertyName}')");
     }
 
     internal void Format(DependencyProperty dp, object value)
@@ -407,13 +406,13 @@ internal sealed class RichTextBoxView : TextViewBase
 
     private void FormatNative(string property, string value)
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.format('{OuterDiv.UniqueIdentifier}', '{property}', {HttpUtility.JavaScriptStringEncode(value, true)})");
+            $"document.richTextViewManager.format('{OuterDiv.Uid}', '{property}', {HttpUtility.JavaScriptStringEncode(value, true)})");
 
         OnContentChanged(true);
     }
@@ -600,12 +599,12 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal QuillDelta[] GetContents()
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return [];
         }
 
-        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}')") switch
+        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.Uid}')") switch
         {
             "" or null => [],
             string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
@@ -614,12 +613,12 @@ internal sealed class RichTextBoxView : TextViewBase
 
     private QuillDelta[] GetContents(int start, int length)
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return [];
         }
 
-        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}', {start.ToInvariantString()}, {length.ToInvariantString()})") switch
+        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.Uid}', {start.ToInvariantString()}, {length.ToInvariantString()})") switch
         {
             "" or null => [],
             string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
@@ -628,18 +627,18 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal void SetEnable(bool value)
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.enable('{OuterDiv.UniqueIdentifier}', {(value ? "true" : "false")})");
+            $"document.richTextViewManager.enable('{OuterDiv.Uid}', {(value ? "true" : "false")})");
     }
 
     internal void SetContentsFromBlocks()
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
@@ -649,14 +648,14 @@ internal sealed class RichTextBoxView : TextViewBase
             .GetDeltas();
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.setContents('{OuterDiv.UniqueIdentifier}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
+            $"document.richTextViewManager.setContents('{OuterDiv.Uid}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
 
         OnContentChanged(false);
     }
 
     internal void UpdateContentsFromTextElement(TextElement element, int start, int length)
     {
-        if (OuterDiv is null)
+        if (!OuterDiv.IsConnected)
         {
             return;
         }
@@ -668,14 +667,14 @@ internal sealed class RichTextBoxView : TextViewBase
             .GetDeltas();
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.updateContents('{OuterDiv.UniqueIdentifier}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
+            $"document.richTextViewManager.updateContents('{OuterDiv.Uid}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
 
         OnContentChanged(true);
     }
 
     internal void ProcessKeyDown(KeyEventArgs e)
     {
-        if (OuterDiv is null) return;
+        if (!OuterDiv.IsConnected) return;
 
         if (RichTextViewManager.Instance.OnKeyDown(this, e))
         {
@@ -694,15 +693,15 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal void OnIsSpellCheckEnabledChanged(bool isSpellCheckEnabled)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "spellcheck", isSpellCheckEnabled);
+            OuterDiv.SetAttribute("spellcheck", isSpellCheckEnabled);
         }
     }
 
     internal void OnTextWrappingChanged(TextWrapping textWrapping)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             this.SetTextWrapping(textWrapping);
         }
@@ -710,7 +709,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal void SetCaretBrush(Brush brush)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             this.SetCaretColor(brush);
         }
@@ -718,25 +717,25 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal void OnAcceptsReturnChanged(bool acceptsReturn)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             SetAcceptsReturn(acceptsReturn);
         }
     }
 
     private void SetAcceptsReturn(bool value) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.setAcceptsReturn('{OuterDiv.UniqueIdentifier}', '{(value ? "true" : "false")}')");
+        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.setAcceptsReturn('{OuterDiv.Uid}', '{(value ? "true" : "false")}')");
 
     internal void OnAcceptsTabChanged(bool acceptsTab)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             SetAcceptsTab(acceptsTab);
         }
     }
 
     private void SetAcceptsTab(bool value) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.setAcceptsTab('{OuterDiv.UniqueIdentifier}', '{(value ? "true" : "false")}')");
+        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.setAcceptsTab('{OuterDiv.Uid}', '{(value ? "true" : "false")}')");
 
     private void OnContentChanged(bool invalidateModel)
     {

@@ -139,7 +139,7 @@ namespace System.Windows
         /// </remarks>
         public void Measure(Size availableSize)
         {
-            if (OuterDiv == null)
+            if (!OuterDiv.IsConnected)
             {
                 if (MeasureRequest != null)
                     LayoutManager.Current.MeasureQueue.Remove(this);
@@ -311,7 +311,7 @@ namespace System.Windows
         /// </remarks>
         public void Arrange(Rect finalRect)
         {
-            if (OuterDiv == null)
+            if (!OuterDiv.IsConnected)
             {
                 if (ArrangeRequest != null)
                     LayoutManager.Current.ArrangeQueue.Remove(this);
@@ -663,7 +663,7 @@ namespace System.Windows
         {
             if (!BypassLayoutPolicies)
             {
-                INTERNAL_HtmlDomManager.ArrangeNative(OuterDiv.Style, VisualOffset, RenderSize, LayoutClip);
+                INTERNAL_HtmlDomManager.ArrangeNative(OuterDiv.Uid, VisualOffset, RenderSize, LayoutClip);
             }
         }
 

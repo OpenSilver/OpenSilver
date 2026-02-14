@@ -11,11 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using CSHTML5.Internal;
-using OpenSilver.Internal;
 
 namespace System.Windows.Input;
 
@@ -129,28 +127,5 @@ public class MouseEventArgs : InputEventArgs
         }
 
         return new Point(0.0, 0.0);
-    }
-
-    [Obsolete(Helper.ObsoleteMemberMessage)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    protected internal void SetPointerAbsolutePosition(object jsEventArg, Window window)
-    {
-        string sEvent = OpenSilver.Interop.GetVariableStringForJS(jsEventArg);
-        IsTouchEvent = OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.pointerType === 'touch'", false);
-        _pointerAbsoluteX = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sEvent}.pageX", false);
-        _pointerAbsoluteY = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sEvent}.pageY", false);
-
-        //---------------------------------------
-        // Adjust the absolute coordinates to take into account the fact that the XAML Window is not necessary un the top-left corner of the HTML page:
-        //---------------------------------------
-        if (window != null)
-        {
-            // Get the XAML Window root position relative to the page and substracts it
-            string sElement = OpenSilver.Interop.GetVariableStringForJS(window.OuterDiv);
-            _pointerAbsoluteX -= OpenSilver.Interop.ExecuteJavaScriptDouble(
-                $"{sElement}.getBoundingClientRect().left - document.body.getBoundingClientRect().left", false);
-            _pointerAbsoluteY -= OpenSilver.Interop.ExecuteJavaScriptDouble(
-                $"{sElement}.getBoundingClientRect().top - document.body.getBoundingClientRect().top", false);
-        }
     }
 }

@@ -12,7 +12,8 @@
 *
 \*====================================================================================*/
 
-document.getAppParams = function (element) {
+document.getAppParams = function (id) {
+    const element = document.getElementById(id);
     if (element) {
         return JSON.stringify(
             Array.from(
@@ -43,20 +44,6 @@ document.addToPerformanceCounters = function (name, initialTime) {
     }
     counter.time += elapsedTime;
     counter.count += 1;
-};
-
-document.interopErrors = {};
-
-document.getElementByIdSafe = function (id) {
-    let element = document.getElementById(id);
-    if (element == null) {
-        element = document.createElement("div");
-        if (!document.interopErrors[id]) {
-            document.interopErrors[id] = 0;
-        }
-        document.interopErrors[id]++;
-    }
-    return element;
 };
 
 document.createElementSafe = function (tagName, id, parent, index) {
@@ -205,13 +192,15 @@ document.createImageManager = function (loadCallback, errorCallback) {
             element.appendChild(img);
             parent.appendChild(element);
         },
-        getNaturalWidth: function (img) {
+        getNaturalWidth: function (id) {
+            const img = document.getElementById(id);
             if (img) {
                 return img.naturalWidth;
             }
             return 0.0;
         },
-        getNaturalHeight: function (img) {
+        getNaturalHeight: function (id) {
+            const img = document.getElementById(id);
             if (img) {
                 return img.naturalHeight;
             }
@@ -412,7 +401,8 @@ document.arrangeEllipse = function (id, rx, ry, penThickness) {
     }
 };
 
-document.getBBox = function (svgElement) {
+document.getBBox = function (id) {
+    const svgElement = document.getElementById(id);
     if (svgElement && svgElement instanceof SVGElement) {
         const bbox = svgElement.getBBox();
         return JSON.stringify({ X: bbox.x, Y: bbox.y, Width: bbox.width, Height: bbox.height, });
@@ -420,14 +410,7 @@ document.getBBox = function (svgElement) {
     return '{}';
 };
 
-document.setCSS = function (id, cssPropertyName, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.style[cssPropertyName] = value;
-    }
-};
-
-document.setCSSProperty = function (id, propertyName, value, priority) {
+document.setCSS = function (id, propertyName, value, priority) {
     const element = document.getElementById(id);
     if (element) {
         element.style.setProperty(propertyName, value, priority);
@@ -452,6 +435,55 @@ document.setProp = function (id, propertyName, value) {
     const element = document.getElementById(id);
     if (element) {
         element[propertyName] = value;
+    }
+};
+
+document.getProp = function (id, propertyName) {
+    const element = document.getElementById(id);
+    if (element) {
+        return element[propertyName];
+    }
+    return undefined;
+};
+
+document.addClass = function (id, className) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.classList.add(className);
+    }
+};
+
+document.removeClass = function (id, className) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.classList.remove(className);
+    }
+};
+
+document.addListener = function (id, eventName, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener(eventName, handler);
+    }
+};
+
+document.transformToVisual = function (id, relativeToId) {
+    const element = document.getElementById(id);
+    const relativeTo = document.getElementById(relativeToId);
+    if (element && relativeTo) {
+        const elementBounds = element.getBoundingClientRect();
+        const relativeToBounds = relativeTo.getBoundingClientRect();
+        const x = elementBounds.left - relativeToBounds.left;
+        const y = elementBounds.top - relativeToBounds.top;
+        return `${x},${y}`;
+    }
+    return '0,0';
+};
+
+document.scrollToVisual = function (id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.scrollIntoView({ block: 'nearest' });
     }
 };
 
@@ -647,7 +679,10 @@ document.createInputManager = function (callback, pointerCallback) {
     initDom();
 
     document.inputManager = {
-        registerRoot: function (root) {
+        registerRoot: function (rootId) {
+            const root = document.getElementById(rootId);
+            if (!root) return;
+
             // Make sure the root div is keyboard focusable, so that we can tab into the app.
             root.tabIndex = Math.max(root.tabIndex, 0);
 
@@ -776,9 +811,12 @@ document.createInputManager = function (callback, pointerCallback) {
         getModifiers: function () {
             return _modifiers;
         },
-        capturePointer: function (element) {
-            _pointerCapture = element;
-            document.body.classList.add('opensilver-pointer-captured');
+        capturePointer: function (id) {
+            const element = document.getElementById(id);
+            if (element) {
+                _pointerCapture = element;
+                document.body.classList.add('opensilver-pointer-captured');
+            }
         },
         releasePointerCapture: function () {
             _pointerCapture = null;
@@ -787,8 +825,8 @@ document.createInputManager = function (callback, pointerCallback) {
         suppressContextMenu: function (value) {
             _suppressContextMenu = value;
         },
-        focus: function (element) {
-            return FocusManager.focus(element);
+        focus: function (id) {
+            return FocusManager.focus(document.getElementById(id));
         },
     };
 };
@@ -874,7 +912,8 @@ document.arrange = function (id, left, top, width, height, clip, clipLeft, clipT
     }
 };
 
-document.attachMeasurementService = function (owner) {
+document.attachMeasurementService = function (ownerId) {
+    const owner = document.getElementById(ownerId);
     if (!owner || owner._measurementService) return;
 
     const htmlMeasurer = document.createElement('div');
@@ -977,12 +1016,6 @@ document.measureBaseline = function (measurerId, ...fonts) {
         return owner._measurementService.measureBaseline(fonts);
     }
     return 0.0;
-};
-
-window.ViewInteropErrors = function () {
-    for (var key in document.interopErrors) {
-        console.log(`Unable to find element with id '${key}' (${document.interopErrors[key]} time(s)).`);
-    }
 };
 
 window.ViewProfilerResults = function () {
@@ -1215,7 +1248,10 @@ document.createTextviewManager = function (inputCallback, scrollCallback, select
 
             parent.appendChild(view);
         },
-        onKeyDownNative: function (view, e) {
+        onKeyDownNative: function (id, e) {
+            const view = document.getElementById(id);
+            if (!view) return false;
+
             switch (e.key.toLowerCase()) {
                 case 'arrowleft':
                 case 'arrowright':
@@ -1248,7 +1284,8 @@ document.createTextviewManager = function (inputCallback, scrollCallback, select
                     return false;
             }
         },
-        handleKeyDownFromSimulator: function (view) {
+        handleKeyDownFromSimulator: function (id) {
+            const view = document.getElementById(id);
             if (!view) return;
             view.addEventListener('keydown', function (e) {
                 const acceptsReturn = this.getAttribute('data-acceptsreturn');
@@ -1305,35 +1342,53 @@ document.createTextviewManager = function (inputCallback, scrollCallback, select
                 }
             }, false);
         },
-        getSelectionStart: function (view) {
+        getSelectionStart: function (id) {
+            const view = document.getElementById(id);
             if (view) {
                 return view.selectionStart;
             }
             return 0;
         },
-        setSelectionStart: function (view, start) {
+        setSelectionStart: function (id, start) {
+            const view = document.getElementById(id);
             if (view) {
                 view.setSelectionRange(start, start + view.selectionEnd - view.selectionStart, 'forward');
             }
         },
-        getSelectionLength: function (view) {
+        getSelectionLength: function (id) {
+            const view = document.getElementById(id);
             if (view) {
                 return view.selectionEnd - view.selectionStart;
             }
             return 0;
         },
-        setSelectionLength: function (view, length) {
+        setSelectionLength: function (id, length) {
+            const view = document.getElementById(id);
             if (view) {
                 view.setSelectionRange(view.selectionStart, view.selectionStart + length, 'forward');
             }
         },
-        getSelectedText: function (view) {
+        setSelectionRange: function (id, start, end) {
+            const view = document.getElementById(id);
+            if (view) {
+                view.setSelectionRange(start, end);
+            }
+        },
+        select: function (id) {
+            const view = document.getElementById(id);
+            if (view) {
+                view.select();
+            }
+        },
+        getSelectedText: function (id) {
+            const view = document.getElementById(id);
             if (view) {
                 return view.value.substring(view.selectionStart, view.selectionEnd);
             }
             return '';
         },
-        setSelectedText: function (view, text) {
+        setSelectedText: function (id, text) {
+            const view = document.getElementById(id);
             if (view) {
                 view.setRangeText(text, view.selectionStart, view.selectionEnd, 'end');
             }
@@ -1715,7 +1770,10 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
 
             return size;
         },
-        onKeyDownNative: function (view, e) {
+        onKeyDownNative: function (id, e) {
+            const view = document.getElementById(id);
+            if (!view) return false;
+
             const ql = Quill.find(view);
             if (!ql) return false;
 
@@ -1860,7 +1918,33 @@ document.htmlPresenterHelpers = (function () {
             view.appendChild(content);
             parent.appendChild(view);
         },
-        onKeyDownNative: function (view, e) {
+        setHtml: function (id, html) {
+            const view = document.getElementById(id);
+            if (view) {
+                if (view.shadowRoot) {
+                    view.shadowRoot.innerHTML = html;
+                } else {
+                    view.innerHTML = html;
+                }
+            }
+        },
+        getDomElement: function (id) {
+            const view = document.getElementById(id);
+            if (view) {
+                if (view.shadowRoot) {
+                    if (view.shadowRoot.hasChildNodes()) {
+                        return view.shadowRoot.firstChild;
+                    }
+                } else {
+                    if (view.hasChildNodes()) {
+                        return view.firstChild;
+                    }
+                }
+            }
+            return undefined;
+        },
+        onKeyDownNative: function (id, e) {
+            const view = document.getElementById(id);
             if (!view || !e) return false;
 
             switch (e.key) {
@@ -1880,7 +1964,8 @@ document.htmlPresenterHelpers = (function () {
 
             return false;
         },
-        onWheelNative: function (view, e) {
+        onWheelNative: function (id, e) {
+            const view = document.getElementById(id);
             if (!view || !e || e.deltaY === 0) return false;
 
             if (e.deltaY > 0) {
@@ -1897,7 +1982,55 @@ document.htmlPresenterHelpers = (function () {
                 }
             }
         },
+        measureNative: function (id) {
+            const view = document.getElementById(id);
+            if (view) {
+                const bounds = view.getBoundingClientRect();
+                const width = Math.round(bounds.width * 1000) / 1000;
+                const height = Math.round(bounds.height * 1000) / 1000;
+                return `${width},${height}`;
+            }
+            return '0,0';
+        }
     };
+})();
+
+document.mediaElementHelpers = (function () {
+    return {
+        play: function (id) {
+            const media = document.getElementById(id);
+            if (media) {
+                media.play();
+            }
+        },
+        pause: function (id) {
+            const media = document.getElementById(id);
+            if (media) {
+                media.pause();
+            }
+        },
+        stop: function (id) {
+            const media = document.getElementById(id);
+            if (media) {
+                media.pause();
+                media.currentTime = 0;
+            }
+        },
+        canPlayType: function (id, type) {
+            const media = document.getElementById(id);
+            if (media) {
+                return media.canPlayType(type);
+            }
+            return '';
+        },
+        resetSource: function (id) {
+            const media = document.getElementById(id);
+            if (media) {
+                media.removeAttribute('src');
+                media.load();
+            }
+        }
+    }
 })();
 
 document.createUIDispatcher = function (callback) {
@@ -1945,7 +2078,8 @@ document.createResizeManager = (function (onresizeCallback) {
     }
 
     document.resizeManager = {
-        observe: function (element) {
+        observe: function (id) {
+            const element = document.getElementById(id);
             if (element && element.id) {
                 _observedElements.set(element.id, element);
                 _observer.observe(element);

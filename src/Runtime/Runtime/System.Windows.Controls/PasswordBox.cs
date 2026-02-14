@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal.Controls;
 using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls
 {
@@ -54,8 +55,19 @@ namespace System.Windows.Controls
         /// </summary>
         public PasswordBox() { }
 
-        internal sealed override INTERNAL_HtmlDomElementReference GetFocusTarget()
-            => _textViewHost?.View?.OuterDiv ?? base.GetFocusTarget();
+        internal sealed override HtmlElementReference GetFocusTarget()
+        {
+            if (_textViewHost?.View is PasswordBoxView view)
+            {
+                var target = view.OuterDiv;
+                if (target.IsConnected)
+                {
+                    return target;
+                }
+            }
+
+            return base.GetFocusTarget();
+        }
 
         /// <summary>
         /// Identifies the <see cref="PasswordChar"/> dependency property.
@@ -140,7 +152,7 @@ namespace System.Windows.Controls
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        ((PasswordBox)d).OuterDiv.Style.setProperty(
+                        ((PasswordBox)d).OuterDiv.SetCssStyleProperty(
                             "--selection-bg-color",
                             newValue switch
                             {
@@ -172,7 +184,7 @@ namespace System.Windows.Controls
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        ((PasswordBox)d).OuterDiv.Style.setProperty(
+                        ((PasswordBox)d).OuterDiv.SetCssStyleProperty(
                             "--selection-color",
                             newValue switch
                             {

@@ -39,11 +39,10 @@ internal sealed class ImageManager
 
     public Size GetNaturalSize(Image image)
     {
-        Debug.Assert(image is not null && image.ImageDiv is not null);
+        Debug.Assert(image is not null && image.ImageDiv.IsConnected);
 
-        string sElement = Interop.GetVariableStringForJS(image.ImageDiv);
-        double width = Interop.ExecuteJavaScriptDouble($"document.imgManager.getNaturalWidth({sElement})");
-        double height = Interop.ExecuteJavaScriptDouble($"document.imgManager.getNaturalHeight({sElement})");
+        double width = Interop.ExecuteJavaScriptDouble($"document.imgManager.getNaturalWidth('{image.ImageDiv.Uid}')");
+        double height = Interop.ExecuteJavaScriptDouble($"document.imgManager.getNaturalHeight('{image.ImageDiv.Uid}')");
         return new Size(width, height);
     }
 

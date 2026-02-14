@@ -11,11 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Input;
-using System.ComponentModel;
-using System.Windows.Media;
-using System.Windows.Documents;
+using OpenSilver;
 using OpenSilver.Internal;
+using System.ComponentModel;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace System.Windows.Controls;
 
@@ -609,9 +610,10 @@ public partial class Control : FrameworkElement, IInternalControl
         }
     }
 
-    public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    /// <inheritdoc />
+    protected internal sealed override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        return CreateDomElementInternal(parentRef, true, out domElementWhereToPlaceChildren);
+        return CreateDomElementInternal(parent, true);
     }
 
     /// <summary>

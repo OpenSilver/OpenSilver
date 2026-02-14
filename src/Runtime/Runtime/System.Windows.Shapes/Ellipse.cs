@@ -122,7 +122,7 @@ namespace System.Windows.Shapes
             ry = Math.Round(ry, 2);
             penThickness = Math.Round(penThickness, 2);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.arrangeEllipse('{SvgElement.UniqueIdentifier}',{rx.ToInvariantString()},{ry.ToInvariantString()},{penThickness.ToInvariantString()})");
+                $"document.arrangeEllipse('{SvgElement.Uid}',{rx.ToInvariantString()},{ry.ToInvariantString()},{penThickness.ToInvariantString()})");
         }
 
         internal sealed override Size GetNaturalSize()

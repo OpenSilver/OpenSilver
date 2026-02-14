@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
 using OpenSilver.Internal.Media.Animation;
@@ -526,7 +527,7 @@ namespace System.Windows.Media
         private sealed class SvgLinearGradient : ISvgBrush
         {
             private readonly LinearGradientBrush _linearGradient;
-            private readonly INTERNAL_HtmlDomElementReference _gradientRef;
+            private readonly HtmlElementReference _gradientRef;
             private readonly WeakEventToken _weakEventToken;
 
             public SvgLinearGradient(Shape shape, LinearGradientBrush lgb)
@@ -543,7 +544,7 @@ namespace System.Windows.Media
                     static (handler, source) => source.TransformChanged += new EventHandler(handler));
             }
 
-            public string GetBrush(Shape shape) => $"url(#{_gradientRef.UniqueIdentifier})";
+            public string GetBrush(Shape shape) => $"url(#{_gradientRef.Uid})";
 
             public void RenderBrush(Shape shape) => DrawLinearGradient();
 
@@ -559,13 +560,11 @@ namespace System.Windows.Media
 
                 if (transform is null || Transform.IsIdentityTransform(transform))
                 {
-                    INTERNAL_HtmlDomManager.RemoveAttribute(_gradientRef, "gradientTransform");
+                    _gradientRef.RemoveAttribute("gradientTransform");
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef,
-                        "gradientTransform",
-                        MatrixTransform.MatrixToHtmlString(transform.Matrix));
+                    _gradientRef.SetAttribute("gradientTransform", MatrixTransform.MatrixToHtmlString(transform.Matrix));
                 }
             }
 
@@ -588,7 +587,7 @@ namespace System.Windows.Media
                     .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
 
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.drawSvgLinearGradient('{_gradientRef.UniqueIdentifier}',{x1},{y1},{x2},{y2},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
+                    $"document.drawSvgLinearGradient('{_gradientRef.Uid}',{x1},{y1},{x2},{y2},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
             }
         }
     }

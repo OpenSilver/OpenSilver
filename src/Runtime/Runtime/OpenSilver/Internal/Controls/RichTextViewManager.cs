@@ -42,12 +42,11 @@ internal sealed class RichTextViewManager
 
     public bool OnKeyDown(RichTextBoxView richTextBoxView, KeyEventArgs e)
     {
-        Debug.Assert(richTextBoxView is not null && richTextBoxView.OuterDiv is not null);
+        Debug.Assert(richTextBoxView is not null && richTextBoxView.OuterDiv.IsConnected);
         Debug.Assert(e is not null);
 
-        string sElement = Interop.GetVariableStringForJS(richTextBoxView.OuterDiv);
         string sArgs = Interop.GetVariableStringForJS(e.UIEventArg);
-        return Interop.ExecuteJavaScriptBoolean($"document.richTextViewManager.onKeyDownNative({sElement}, {sArgs})");
+        return Interop.ExecuteJavaScriptBoolean($"document.richTextViewManager.onKeyDownNative('{richTextBoxView.OuterDiv}', {sArgs})");
     }
 
     private static void OnSelectionChangedNative(string id, int start, int length)
@@ -72,9 +71,8 @@ internal sealed class RichTextViewManager
         {
             if (!view.IsScrollClient) return;
 
-            string sDiv = Interop.GetVariableStringForJS(view.OuterDiv);
-            double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft");
-            double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop");
+            double scrollLeft = Interop.ExecuteJavaScriptDouble($"document.getProp('{view.OuterDiv.Uid}','scrollLeft')");
+            double scrollTop = Interop.ExecuteJavaScriptDouble($"document.getProp('{view.OuterDiv.Uid}','scrollTop')");
 
             view.UpdateOffsets(new Vector(scrollLeft, scrollTop));
         }

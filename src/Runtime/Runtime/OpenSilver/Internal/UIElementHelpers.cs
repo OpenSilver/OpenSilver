@@ -27,67 +27,66 @@ internal static class UIElementHelpers
 {
     internal static void SetCharacterSpacing(this UIElement uie, int cSpacing)
     {
-        uie.OuterDiv.Style.letterSpacing = FontProperties.ToCssLetterSpacing(cSpacing);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.LetterSpacing, FontProperties.ToCssLetterSpacing(cSpacing));
     }
 
     internal static void SetFontFamily(this UIElement uie, FontFamily font)
     {
-        uie.OuterDiv.Style.fontFamily = FontProperties.ToCssFontFamily(font);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.FontFamily, FontProperties.ToCssFontFamily(font));
     }
 
     internal static void SetFontStyle(this UIElement uie, FontStyle fontStyle)
     {
-        uie.OuterDiv.Style.fontStyle = FontProperties.ToCssFontStyle(fontStyle);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.FontStyle, FontProperties.ToCssFontStyle(fontStyle));
     }
 
     internal static void SetFontWeight(this UIElement uie, FontWeight fontWeight)
     {
-        uie.OuterDiv.Style.fontWeight = FontProperties.ToCssFontWeight(fontWeight);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.FontWeight, FontProperties.ToCssFontWeight(fontWeight));
     }
 
     internal static void SetForeground(this UIElement uie, Brush oldForeground, Brush newForeground)
     {
-        var style = uie.OuterDiv.Style;
         switch ((oldForeground, newForeground))
         {
             case (GradientBrush, SolidColorBrush scb):
-                style.backgroundImage = string.Empty;
-                style.backgroundClip = string.Empty;
-                style.color = scb.ToHtmlString();
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundImage, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundClip, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Color, scb.ToHtmlString());
                 break;
 
             case (_, SolidColorBrush scb):
-                style.color = scb.ToHtmlString();
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Color, scb.ToHtmlString());
                 break;
 
             case (GradientBrush, LinearGradientBrush lgb):
-                style.backgroundImage = lgb.ToHtmlString(uie);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundImage, lgb.ToHtmlString(uie));
                 break;
 
             case (_, LinearGradientBrush lgb):
-                style.backgroundImage = lgb.ToHtmlString(uie);
-                style.color = "transparent";
-                style.backgroundClip = "text";
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundImage, lgb.ToHtmlString(uie));
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Color, "transparent");
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundClip, "text");
                 break;
 
             case (GradientBrush, RadialGradientBrush rgb):
-                style.backgroundImage = rgb.ToHtmlString(uie);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundImage, rgb.ToHtmlString(uie));
                 break;
 
             case (_, RadialGradientBrush rgb):
-                style.backgroundImage = rgb.ToHtmlString(uie);
-                style.color = "transparent";
-                style.backgroundClip = "text";
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundImage, rgb.ToHtmlString(uie));
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Color, "transparent");
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundClip, "text");
                 break;
 
             case (SolidColorBrush, null):
-                style.color = string.Empty;
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Color, string.Empty);
                 break;
 
             case (GradientBrush, null):
-                style.backgroundImage = string.Empty;
-                style.backgroundClip = string.Empty;
-                style.color = string.Empty;
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundImage, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BackgroundClip, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Color, string.Empty);
                 break;
 
             default:
@@ -116,53 +115,54 @@ internal static class UIElementHelpers
                 break;
         }
 
-        uie.OuterDiv.Style.background = background;
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Background, background);
     }
 
     internal static void SetLineHeight(this UIElement uie, double lineHeight)
     {
-        uie.OuterDiv.Style.lineHeight = FontProperties.ToCssLineHeight(lineHeight);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.LineHeight, FontProperties.ToCssLineHeight(lineHeight));
     }
 
     internal static void SetLineStackingStrategy(this UIElement uie, LineStackingStrategy strategy)
     {
         const string LineStackingStrategyProperty = "--line-stacking-strategy";
-        uie.OuterDiv.Style.setProperty(LineStackingStrategyProperty, FontProperties.ToCssLineStackingStrategy(strategy));
+        uie.OuterDiv.SetCssStyleProperty(LineStackingStrategyProperty, FontProperties.ToCssLineStackingStrategy(strategy));
     }
 
     internal static void SetPadding(this UIElement uie, Thickness padding)
     {
-        uie.OuterDiv.Style.padding = CollapseThicknessHelper(padding);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Padding, CollapseThicknessHelper(padding));
     }
 
     internal static void SetMargin(this UIElement uie, Thickness margin)
     {
-        uie.OuterDiv.Style.margin = CollapseThicknessHelper(margin);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Margin, CollapseThicknessHelper(margin));
     }
 
     internal static void SetTextAlignment(this UIElement uie, TextAlignment textAlignment)
     {
-        uie.OuterDiv.Style.textAlign = FontProperties.ToCssTextAlignment(textAlignment);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextAlign, FontProperties.ToCssTextAlignment(textAlignment));
     }
 
     internal static void SetTextDecorations(this UIElement uie, TextDecorationCollection tdc)
     {
-        uie.OuterDiv.Style.textDecoration = FontProperties.ToCssTextDecoration(tdc);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextDecoration, FontProperties.ToCssTextDecoration(tdc));
     }
 
     internal static void SetTextTrimming(this UIElement uie, TextTrimming textTrimming)
     {
-        uie.OuterDiv.Style.overflow = textTrimming switch
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Overflow, textTrimming switch
         {
             TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "clip",
             _ => string.Empty,
-        };
+        });
     }
 
     internal static void SetTextWrapping(this UIElement uie, TextWrapping textWrapping)
     {
-        var style = uie.OuterDiv.Style;
-        (style.whiteSpace, style.overflowWrap) = ToCssTextWrapping(textWrapping);
+        (string whiteSpace, string overflowWrap) = ToCssTextWrapping(textWrapping);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.WhiteSpace, whiteSpace);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.OverflowWrap, overflowWrap);
     }
 
     internal static (string WhiteSpace, string OverflowWrap) ToCssTextWrapping(TextWrapping textWrapping) =>
@@ -174,31 +174,27 @@ internal static class UIElementHelpers
 
     internal static void SetFontSize(this UIElement uie, double fontSize)
     {
-        uie.OuterDiv.Style.fontSize = FontProperties.ToCssPxFontSize(fontSize);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.FontSize, FontProperties.ToCssPxFontSize(fontSize));
     }
 
     internal static void SetTextSelection(this UIElement uie, bool enabled)
     {
-        uie.OuterDiv.Style.userSelect = enabled ? "text" : "none";
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.UserSelect, enabled ? "text" : "none");
     }
 
     internal static void SetInnerText(this UIElement uie, string text)
     {
-        INTERNAL_HtmlDomManager.SetDomElementProperty(uie.OuterDiv,
-            "innerText",
-            INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text));
+        uie.OuterDiv.SetProperty("innerText", INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text));
     }
 
     internal static void SetDirection(this UIElement uie, FlowDirection flowDirection)
     {
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(uie.OuterDiv,
-            "dir",
-            flowDirection == FlowDirection.LeftToRight ? "ltr" : "rtl");
+        uie.OuterDiv.SetAttribute("dir", flowDirection == FlowDirection.LeftToRight ? "ltr" : "rtl");
     }
 
     internal static void SetOpacity(this UIElement uie, double opacity)
     {
-        uie.OuterDiv.Style.opacity = Math.Round(opacity, 2).ToInvariantString();
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Opacity, Math.Round(opacity, 2).ToInvariantString());
     }
 
     internal static void SetMaskImage(this UIElement uie, Brush mask)
@@ -234,83 +230,83 @@ internal static class UIElementHelpers
                 break;
         }
 
-        uie.OuterDiv.Style.maskImage = maskImage;
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.MaskImage, maskImage);
     }
 
     internal static void SetOutline(this UIElement uie, bool enable)
     {
         // Every UIElement has a css class that sets 'outline' to 'none'. 'revert' will
         // roll back that change so that 'outline' can be set to the default computed value.
-        if (uie.GetFocusTarget() is INTERNAL_HtmlDomElementReference focusTarget)
+        HtmlElementReference focusTarget = uie.GetFocusTarget();
+        if (focusTarget.IsConnected)
         {
-            focusTarget.Style.outline = enable ? "revert" : "none";
+            focusTarget.SetCssStyleProperty(CssPropertyNames.Outline, enable ? "revert" : "none");
         }
     }
 
     internal static void SetTransform(this UIElement uie, Transform transform)
     {
-        uie.OuterDiv.Style.transform = transform switch
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Transform, transform switch
         {
             Transform when !Transform.IsIdentityTransform(transform) => MatrixTransform.MatrixToHtmlString(transform.Matrix),
             _ => string.Empty,
-        };
+        });
     }
 
     internal static void SetZIndex(this UIElement uie, int value)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.zIndex = value.ToInvariantString();
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.ZIndex, value.ToInvariantString());
     }
 
     internal static void SetCursor(this UIElement uie, Cursor cursor)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.cursor = cursor?.ToHtmlString() ?? string.Empty;
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Cursor, cursor?.ToHtmlString() ?? string.Empty);
     }
 
     internal static void SetBorderRadius(this UIElement uie, CornerRadius radius)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.borderRadius = CollapseCornerRadiusHelper(radius);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderRadius, CollapseCornerRadiusHelper(radius));
     }
 
     internal static void SetBorderWidth(this UIElement uie, Thickness width)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.borderWidth = CollapseThicknessHelper(width);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderWidth, CollapseThicknessHelper(width));
     }
 
     internal static void SetBorderColor(this UIElement uie, Brush oldBrush, Brush newBrush)
     {
-        var cssStyle = uie.OuterDiv.Style;
         switch (oldBrush, newBrush)
         {
             case (GradientBrush, SolidColorBrush solid):
-                cssStyle.borderImageSource = string.Empty;
-                cssStyle.borderImageSlice = string.Empty;
-                cssStyle.borderColor = solid.ToHtmlString();
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSource, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSlice, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderColor, solid.ToHtmlString());
                 break;
 
             case (_, SolidColorBrush solid):
-                cssStyle.borderColor = solid.ToHtmlString();
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderColor, solid.ToHtmlString());
                 break;
 
             case (_, LinearGradientBrush linear):
-                cssStyle.borderColor = string.Empty;
-                cssStyle.borderImageSource = linear.ToHtmlString(uie);
-                cssStyle.borderImageSlice = "1";
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderColor, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSource, linear.ToHtmlString(uie));
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSlice, "1");
                 break;
 
             case (_, RadialGradientBrush radial):
-                cssStyle.borderColor = string.Empty;
-                cssStyle.borderImageSource = radial.ToHtmlString(uie);
-                cssStyle.borderImageSlice = "1";
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderColor, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSource, radial.ToHtmlString(uie));
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSlice, "1");
                 break;
 
             case (_, null):
-                cssStyle.borderColor = "transparent";
-                cssStyle.borderImageSource = string.Empty;
-                cssStyle.borderImageSlice = string.Empty;
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderColor, "transparent");
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSource, string.Empty);
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSlice, string.Empty);
                 break;
 
             default:
@@ -323,27 +319,27 @@ internal static class UIElementHelpers
     internal static void SetClipPath(this UIElement uie, Geometry geometry)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.clipPath = geometry switch
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.ClipPath, geometry switch
         {
             Geometry => $"path(\"{geometry.ToPathData(CultureInfo.InvariantCulture)}\")",
             _ => string.Empty,
-        };
+        });
     }
 
     internal static void SetTouchAction(this UIElement uie, string value)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.touchAction = value;
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.TouchAction, value);
     }
 
     internal static void SetCaretColor(this UIElement uie, Brush brush)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.caretColor = brush switch
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.CaretColor, brush switch
         {
             SolidColorBrush scb => scb.ToHtmlString(),
             _ => string.Empty,
-        };
+        });
     }
 
     internal static void InvalidateMeasureOnFontFamilyChanged(UIElement uie, FontFamily font)

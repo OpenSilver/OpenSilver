@@ -24,6 +24,7 @@ using System.Windows.Shapes;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using HtmlPresenter = CSHTML5.Native.Html.Controls.HtmlPresenter;
+using OpenSilver;
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
 {
@@ -69,32 +70,30 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store.Add(uid2, wr);
         }
 
-        internal static void RemoveFromGlobalStore(INTERNAL_HtmlDomElementReference htmlDomElRef)
+        internal static void RemoveFromGlobalStore(HtmlElementReference element)
         {
-            if (htmlDomElRef == null)
+            if (element.IsConnected)
             {
-                return;
+                _store.Remove(element.Uid);
             }
-
-            _store.Remove(htmlDomElRef.UniqueIdentifier);
         }
 
-        internal static void RemoveFromDom(INTERNAL_HtmlDomElementReference htmlDomElRef)
+        internal static void RemoveFromDom(HtmlElementReference element)
         {
             if (SyncRenderingWithLayout)
             {
-                LayoutManager.Current.UIRenderer.RemoveRootComponent(htmlDomElRef);
+                LayoutManager.Current.UIRenderer.RemoveRootComponent(element);
             }
             else
             {
-                RemoveNodeNative(htmlDomElRef);
+                RemoveNodeNative(element);
             }
 
-            RemoveFromGlobalStore(htmlDomElRef);
+            RemoveFromGlobalStore(element);
         }
 
-        internal static void RemoveNodeNative(INTERNAL_HtmlDomElementReference element) =>
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.detachView('{element.UniqueIdentifier}')");
+        internal static void RemoveNodeNative(HtmlElementReference element) =>
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.detachView('{element.Uid}')");
 
         private static object _window;
 
@@ -105,165 +104,83 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static INTERNAL_HtmlDomStyleReference GetFrameworkElementOuterStyleForModification(UIElement element)
-            => element.OuterDiv.Style;
+        public static HtmlElementStyleReference GetFrameworkElementOuterStyleForModification(UIElement element)
+            => new(element.OuterDiv.Uid);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static INTERNAL_HtmlDomStyleReference GetDomElementStyleForModification(object domElementRef)
-            => ((INTERNAL_HtmlDomElementReference)domElementRef).Style;
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static INTERNAL_HtmlDomStyleReference CreateDomElementAppendItAndGetStyle(
-            string domElementTag,
-            object parentRef,
-            UIElement associatedUIElement,
-            out object newElementRef)
+        internal static void AddCSSClass(HtmlElementReference element, string className)
         {
-            var element = AppendDomElement(domElementTag, parentRef, associatedUIElement);
-            newElementRef = element;
-            return element.Style;
+            Debug.Assert(element.IsConnected);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.addClass('{element.Uid}','{className}')");
         }
 
-        internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, double value)
-            => SetDomElementPropertyImpl(element, propertyName, value.ToInvariantString());
-
-        internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, string value, bool escape = false)
-            => SetDomElementPropertyImpl(element, propertyName, $"\"{(escape ? EscapeStringForUseInJavaScript(value) : value)}\"");
-
-        private static void SetDomElementPropertyImpl(INTERNAL_HtmlDomElementReference element, string propertyName, string value)
-            => OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setProp('{element.UniqueIdentifier}','{propertyName}',{value})");
-
-        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, double value)
-            => SetDomElementAttributeImpl(domElementRef, attributeName, value.ToInvariantString());
-
-        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, int value)
-            => SetDomElementAttributeImpl(domElementRef, attributeName, value.ToInvariantString());
-
-        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, bool value)
-            => SetDomElementAttributeImpl(domElementRef, attributeName, value ? "true" : "false");
-
-        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, string value, bool escape = false)
-            => SetDomElementAttributeImpl(domElementRef, attributeName, $"\"{(escape ? EscapeStringForUseInJavaScript(value) : value)}\"");
-
-        private static void SetDomElementAttributeImpl(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, string value)
-            => OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setAttr('{domElementRef.UniqueIdentifier}','{attributeName}',{value})");
-
-        internal static void AddCSSClass(INTERNAL_HtmlDomElementReference domElementRef, string className)
+        internal static void RemoveCSSClass(HtmlElementReference element, string className)
         {
-            Debug.Assert(domElementRef is not null);
-
-            string sDiv = OpenSilver.Interop.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.classList.add('{className}')");
+            Debug.Assert(element.IsConnected);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.removeClass('{element.Uid}','{className}')");
         }
 
-        internal static void RemoveCSSClass(INTERNAL_HtmlDomElementReference domElementRef, string className)
+        internal static void SetVisibility(HtmlElementReference element, Visibility visibility)
         {
-            Debug.Assert(domElementRef is not null);
-
-            string sDiv = OpenSilver.Interop.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.classList.remove('{className}')");
-        }
-
-        internal static void SetVisibility(INTERNAL_HtmlDomElementReference element, Visibility visibility)
-        {
-            Debug.Assert(element is not null);
-
             switch (visibility)
             {
                 case Visibility.Visible:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setVisible('{element.UniqueIdentifier}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setVisible('{element.Uid}')");
                     break;
 
                 case Visibility.Hidden:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setHidden('{element.UniqueIdentifier}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setHidden('{element.Uid}')");
                     break;
 
                 case Visibility.Collapsed:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setCollapsed('{element.UniqueIdentifier}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setCollapsed('{element.Uid}')");
                     break;
             }
         }
 
-        internal static void RemoveAttribute(INTERNAL_HtmlDomElementReference element, string attributeName) =>
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.unsetAttr('{element.UniqueIdentifier}','{attributeName}')");
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static object CreateDomElementAndAppendIt(
-            string domElementTag,
-            object parentRef,
-            UIElement associatedUIElement,
-            int index = -1)
-        {
-            return AppendDomElement(domElementTag, parentRef, associatedUIElement, index);
-        }
-
-        internal static INTERNAL_HtmlDomElementReference AppendDomElement(
+        internal static HtmlElementReference AppendDomElement(
             string tagName,
-            object parentRef,
+            HtmlElementReference parent,
             UIElement uie,
             int index = -1)
         {
             string uid = NewId();
 
-            if (parentRef is INTERNAL_HtmlDomElementReference parent)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createElementSafe('{tagName}', '{uid}', '{parent.UniqueIdentifier}', {index.ToInvariantString()})");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createElementSafe('{tagName}', '{uid}', {sParentRef}, {index.ToInvariantString()})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createElementSafe('{tagName}', '{uid}', '{parent.Uid}', {index.ToInvariantString()})");
 
             AddToGlobalStore(uid, uie);
 
             return new(uid);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateDomLayoutElementAndAppendIt(
-            string tagName, object parentRef, UIElement uie, bool isKeyboardFocusable)
+        internal static HtmlElementReference CreateDomLayoutElementAndAppendIt(
+            string tagName, HtmlElementReference parent, UIElement uie, bool isKeyboardFocusable)
         {
             string uid = NewId();
 
-            if (parentRef is INTERNAL_HtmlDomElementReference parent)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createLayout('{tagName}','{uid}','{parent.UniqueIdentifier}'{(isKeyboardFocusable ? ",true" : string.Empty)})");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createLayout('{tagName}','{uid}',{sParentRef}{(isKeyboardFocusable ? ",true" : string.Empty)})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createLayout('{tagName}','{uid}','{parent.Uid}'{(isKeyboardFocusable ? ",true" : string.Empty)})");
 
             AddToGlobalStore(uid, uie);
 
             return new(uid);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateWindowDomElementAndAppendIt(Window window)
+        internal static HtmlElementReference CreateWindowDomElementAndAppendIt(Window window)
         {
             Debug.Assert(window is not null);
 
             string uid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createWindow('{uid}', '{window.RootDomElement.UniqueIdentifier}')");
+                $"document.createWindow('{uid}', '{window.RootDomElement.Uid}')");
 
             AddToGlobalStore(uid, window);
 
             return new(uid);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
+        internal static HtmlElementReference CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
         {
             Debug.Assert(popupRoot != null);
 
@@ -271,148 +188,102 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string sPointerEvents = popupRoot.Popup.StayOpen ? "none" : "auto";
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createPopupRoot('{uid}','{popupRoot.ParentWindow.RootDomElement.UniqueIdentifier}','{sPointerEvents}')");
+                $"document.createPopupRoot('{uid}','{popupRoot.ParentWindow.RootDomElement.Uid}','{sPointerEvents}')");
 
             AddToGlobalStore(uid, popupRoot);
 
             return new(uid);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateTextBlockDomElementAndAppendIt(object parentRef, UIElement associatedUIElement)
+        internal static HtmlElementReference CreateTextBlockDomElementAndAppendIt(HtmlElementReference parent, UIElement textBlock)
         {
 #if PERFSTAT
             Performance.Counter("CreateTextBlockDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            if (parentRef is INTERNAL_HtmlDomElementReference parent)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createTextBlock('{uniqueIdentifier}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $@"document.createTextBlock('{uniqueIdentifier}',{sParentRef})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createTextBlock('{uniqueIdentifier}','{parent.Uid}')");
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            AddToGlobalStore(uniqueIdentifier, textBlock);
 
             return new(uniqueIdentifier);
         }
 
-        internal static (INTERNAL_HtmlDomElementReference OuterDiv, INTERNAL_HtmlDomElementReference Image) CreateImageDomElementAndAppendIt(
-            INTERNAL_HtmlDomElementReference parent, Image image)
+        internal static (HtmlElementReference OuterDiv, HtmlElementReference Image) CreateImageDomElementAndAppendIt(
+            HtmlElementReference parent, Image image)
         {
-            Debug.Assert(parent is not null);
             Debug.Assert(image is not null);
 
             string uid = NewId();
             string imgUid = NewId();
 
-            ImageManager.Instance.CreateImage(uid, imgUid, parent.UniqueIdentifier);
+            ImageManager.Instance.CreateImage(uid, imgUid, parent.Uid);
 
             AddToGlobalStore(uid, imgUid, image);
 
             return (new(uid), new(imgUid));
         }
 
-        internal static (INTERNAL_HtmlDomElementReference OuterDiv, INTERNAL_HtmlDomElementReference Canvas) CreateInkPresenterDomElementAndAppendIt(
-            object parentRef, InkPresenter inkPresenter)
+        internal static (HtmlElementReference OuterDiv, HtmlElementReference Canvas) CreateInkPresenterDomElementAndAppendIt(
+            HtmlElementReference parent, InkPresenter inkPresenter)
         {
-            Debug.Assert(parentRef is not null);
+            Debug.Assert(parent.IsConnected);
             Debug.Assert(inkPresenter is not null);
 
             string uid = NewId();
             string canvasUid = NewId();
 
-            if (parentRef is INTERNAL_HtmlDomElementReference parent)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createInkPresenter('{uid}','{canvasUid}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $@"document.createInkPresenter('{uid}','{canvasUid}',{sParentRef})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createInkPresenter('{uid}','{canvasUid}','{parent.Uid}')");
 
             AddToGlobalStore(uid, canvasUid, inkPresenter);
 
             return (new(uid), new(canvasUid));
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateInlineDomElementAndAppendIt(object parentRef, TextElement textElement)
+        internal static HtmlElementReference CreateInlineDomElementAndAppendIt(HtmlElementReference parent, Inline inline)
         {
             string uniqueIdentifier = NewId();
 
-            if (parentRef is INTERNAL_HtmlDomElementReference parent)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createInline('{textElement.TagName}','{uniqueIdentifier}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createInline('{textElement.TagName}','{uniqueIdentifier}',{sParentRef})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createInline('{inline.TagName}','{uniqueIdentifier}','{parent.Uid}')");
 
-            AddToGlobalStore(uniqueIdentifier, textElement);
+            AddToGlobalStore(uniqueIdentifier, inline);
 
             return new(uniqueIdentifier);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateBlockDomElementAndAppendIt(object parentRef, TextElement textElement)
+        internal static HtmlElementReference CreateBlockDomElementAndAppendIt(HtmlElementReference parent, Block block)
         {
             string uniqueIdentifier = NewId();
 
-            if (parentRef is INTERNAL_HtmlDomElementReference parent)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createBlock('{textElement.TagName}','{uniqueIdentifier}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createBlock('{textElement.TagName}','{uniqueIdentifier}',{sParentRef})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createBlock('{block.TagName}','{uniqueIdentifier}','{parent.Uid}')");
 
-            AddToGlobalStore(uniqueIdentifier, textElement);
+            AddToGlobalStore(uniqueIdentifier, block);
 
             return new(uniqueIdentifier);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateBorderDomElementAndAppendIt(object parentRef, UIElement border)
+        internal static HtmlElementReference CreateBorderDomElementAndAppendIt(HtmlElementReference parent, UIElement border)
         {
             Debug.Assert(border is IBorderElement);
 
             string uniqueIdentifier = NewId();
 
-            if (parentRef is INTERNAL_HtmlDomElementReference parent)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createBorder('{uniqueIdentifier}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createBorder('{uniqueIdentifier}',{sParentRef})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createBorder('{uniqueIdentifier}','{parent.Uid}')");
 
             AddToGlobalStore(uniqueIdentifier, border);
 
             return new(uniqueIdentifier);
         }
 
-        internal static (INTERNAL_HtmlDomElementReference SvgElement, INTERNAL_HtmlDomElementReference SvgShape, INTERNAL_HtmlDomElementReference SvgDefs)
-            CreateShapeElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, Shape shape)
+        internal static (HtmlElementReference SvgElement, HtmlElementReference SvgShape, HtmlElementReference SvgDefs)
+            CreateShapeElementAndAppendIt(HtmlElementReference parent, Shape shape)
         {
-            Debug.Assert(parent is not null);
+            Debug.Assert(parent.IsConnected);
             Debug.Assert(shape is not null);
 
             string svgUid = NewId();
@@ -420,86 +291,85 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string defsUid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createShape('{shape.SvgTagName}','{svgUid}','{shapeUid}','{defsUid}','{parent.UniqueIdentifier}')");
+                $"document.createShape('{shape.SvgTagName}','{svgUid}','{shapeUid}','{defsUid}','{parent.Uid}')");
 
             AddToGlobalStore(svgUid, shapeUid, shape);
 
             return (new(svgUid), new(shapeUid), new(defsUid));
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateSvgElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, string tagName)
+        internal static HtmlElementReference CreateSvgElementAndAppendIt(HtmlElementReference parent, string tagName)
         {
             string uid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createSvg('{uid}','{parent.UniqueIdentifier}','{tagName}')");
+                $"document.createSvg('{uid}','{parent.Uid}','{tagName}')");
 
             return new(uid);
         }
 
-        internal static (INTERNAL_HtmlDomElementReference PresenterElement, INTERNAL_HtmlDomElementReference ContentElement)
-            CreateHtmlPresenterElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, HtmlPresenter htmlPresenter)
+        internal static (HtmlElementReference PresenterElement, HtmlElementReference ContentElement)
+            CreateHtmlPresenterElementAndAppendIt(HtmlElementReference parent, HtmlPresenter htmlPresenter)
         {
-            Debug.Assert(parent is not null);
+            Debug.Assert(parent.IsConnected);
             Debug.Assert(htmlPresenter is not null);
 
             string id = NewId();
             string contentId = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.htmlPresenterHelpers.createView('{id}','{contentId}','{parent.UniqueIdentifier}',{(htmlPresenter.IsUsingShadowDOM ? "true" : "false")})");
+                $"document.htmlPresenterHelpers.createView('{id}','{contentId}','{parent.Uid}',{(htmlPresenter.UseShadowDom ? "true" : "false")})");
 
             AddToGlobalStore(id, htmlPresenter);
 
             return (new(id), new(contentId));
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateTextBoxViewDomElementAndAppendIt(
-            INTERNAL_HtmlDomElementReference parent,
+        internal static HtmlElementReference CreateTextBoxViewDomElementAndAppendIt(
+            HtmlElementReference parent,
             TextBoxView textBoxView)
         {
-            Debug.Assert(parent is not null);
+            Debug.Assert(parent.IsConnected);
             Debug.Assert(textBoxView is not null);
 
             string uid = NewId();
 
-            TextViewManager.Instance.CreateTextView(uid, parent.UniqueIdentifier);
+            TextViewManager.Instance.CreateTextView(uid, parent.Uid);
             
             AddToGlobalStore(uid, textBoxView);
 
             return new(uid);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreatePasswordBoxViewDomElementAndAppendIt(
-            INTERNAL_HtmlDomElementReference parent,
+        internal static HtmlElementReference CreatePasswordBoxViewDomElementAndAppendIt(
+            HtmlElementReference parent,
             PasswordBoxView passwordBoxView)
         {
-            Debug.Assert(parent is not null);
             Debug.Assert(passwordBoxView is not null);
 
             string uid = NewId();
 
-            TextViewManager.Instance.CreatePasswordView(uid, parent.UniqueIdentifier);
+            TextViewManager.Instance.CreatePasswordView(uid, parent.Uid);
             
             AddToGlobalStore(uid, passwordBoxView);
 
             return new(uid);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateRichTextBoxViewDomElementAndAppendIt(
-            INTERNAL_HtmlDomElementReference parent,
+        internal static HtmlElementReference CreateRichTextBoxViewDomElementAndAppendIt(
+            HtmlElementReference parent,
             RichTextBoxView richTextBoxView)
         {
-            Debug.Assert(parent is not null);
+            Debug.Assert(parent.IsConnected);
             Debug.Assert(richTextBoxView is not null);
 
             string uid = NewId();
 
-            RichTextViewManager.Instance.CreateView(uid, parent.UniqueIdentifier);
+            RichTextViewManager.Instance.CreateView(uid, parent.Uid);
 
             AddToGlobalStore(uid, richTextBoxView);
 
-            return new INTERNAL_HtmlDomElementReference(uid);
+            return new(uid);
         }
 
         private static string NewId() => $"id{_idGenerator.NewId()}";
@@ -640,7 +510,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return OpenSilver.Interop.IsNull(jsObject) || OpenSilver.Interop.IsUndefined(jsObject);
         }
 
-        internal static void ArrangeNative(INTERNAL_HtmlDomStyleReference style, Vector offset, Size size, Rect? clip)
+        internal static void ArrangeNative(string htmlId, Vector offset, Size size, Rect? clip)
         {
             string left = Math.Round(offset.X, 2).ToInvariantString();
             string top = Math.Round(offset.Y, 2).ToInvariantString();
@@ -656,30 +526,13 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 string clipBottom = Math.Round(clipRect.Bottom, 2).ToInvariantString();
 
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.arrange('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})");
+                    $"document.arrange('{htmlId}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})");
             }
             else
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.arrange('{style.Uid}',{left},{top},{width},{height})");
+                    $"document.arrange('{htmlId}',{left},{top},{width},{height})");
             }
-        }
-
-        internal static Size GetBoundingClientSize(INTERNAL_HtmlDomElementReference domRef)
-        {
-            if (domRef is not null)
-            {
-                string sElement = OpenSilver.Interop.GetVariableStringForJS(domRef);
-
-                double width = OpenSilver.Interop.ExecuteJavaScriptGetResult<double>(
-                    $"Math.round({sElement}.getBoundingClientRect().width * 1000) / 1000");
-                double height = OpenSilver.Interop.ExecuteJavaScriptGetResult<double>(
-                    $"Math.round({sElement}.getBoundingClientRect().height * 1000) / 1000");
-
-                return new Size(width, height);
-            }
-
-            return new Size();
         }
     }
 }

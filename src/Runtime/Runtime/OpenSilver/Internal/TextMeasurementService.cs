@@ -38,10 +38,9 @@ internal sealed class TextMeasurementService
 
     private void AttachMeasurementService(Window owner)
     {
-        Debug.Assert(owner.OuterDiv is not null);
+        Debug.Assert(owner.OuterDiv.IsConnected);
 
-        string sOwner = Interop.GetVariableStringForJS(owner.OuterDiv);
-        Interop.ExecuteJavaScriptVoid($"document.attachMeasurementService({sOwner})");
+        Interop.ExecuteJavaScriptVoid($"document.attachMeasurementService('{owner.OuterDiv.Uid}')");
     }
 
     public Size MeasureView(string id,
@@ -54,7 +53,7 @@ internal sealed class TextMeasurementService
             ? string.Empty : $"{maxWidth.ToInvariantString()}px";
 
         string strTextSize = Interop.ExecuteJavaScriptString(
-            $"document.measureTextView('{_window.OuterDiv.UniqueIdentifier}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
+            $"document.measureTextView('{_window.OuterDiv.Uid}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
 
         int index = strTextSize.IndexOf('|');
         if (index > -1)
@@ -75,7 +74,7 @@ internal sealed class TextMeasurementService
         string innerHTML = BuildInnerHtml(textblock);
 
         string size = Interop.ExecuteJavaScriptString(
-            $"document.measureTextBlock('{_window.OuterDiv.UniqueIdentifier}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
+            $"document.measureTextBlock('{_window.OuterDiv.Uid}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
             false);
 
         int index = size.IndexOf('|');
@@ -132,6 +131,6 @@ internal sealed class TextMeasurementService
         }
 
         return Interop.ExecuteJavaScriptDouble(
-            $"document.measureBaseline('{_window.OuterDiv.UniqueIdentifier}',{StringBuilderCache.GetStringAndRelease(builder)})", false);
+            $"document.measureBaseline('{_window.OuterDiv.Uid}',{StringBuilderCache.GetStringAndRelease(builder)})", false);
     }
 }

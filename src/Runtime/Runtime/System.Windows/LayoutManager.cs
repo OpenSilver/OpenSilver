@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Threading;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -692,11 +693,10 @@ namespace System.Windows
 
     internal sealed class UIRenderer
     {
-        private readonly Queue<INTERNAL_HtmlDomElementReference> _disposeQueue = new();
+        private readonly Queue<HtmlElementReference> _disposeQueue = new();
 
-        public void RemoveRootComponent(INTERNAL_HtmlDomElementReference element)
+        public void RemoveRootComponent(HtmlElementReference element)
         {
-            Debug.Assert(element is not null);
             _disposeQueue.Enqueue(element);
         }
 

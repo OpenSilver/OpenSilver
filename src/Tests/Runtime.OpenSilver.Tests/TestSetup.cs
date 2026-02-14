@@ -19,7 +19,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using OpenSilver;
 using System;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -52,29 +51,22 @@ namespace Runtime.OpenSilver.Tests
                 return e.Result;
             }
 
-            // Mocks Simulator portion of UIElement.TransformToVisual
-            if (Regex.IsMatch(param, @".+?\.getBoundingClientRect\(\)\.left - .+?\.getBoundingClientRect\(\)\.left") ||
-                Regex.IsMatch(param, @".+?\.getBoundingClientRect\(\)\.top - .+?\.getBoundingClientRect\(\)\.top"))
-            {
-                return 0;
-            }
-
-            if (Regex.IsMatch(param, @"document\.inputManager\.focus\(document\.getElementByIdSafe\(""([^""]*)""\)\)"))
+            if (Regex.IsMatch(param, @"document\.inputManager\.focus\('([^""]*)'\)"))
             {
                 return true;
             }
 
-            if (Regex.IsMatch(param, @"document\.getElementByIdSafe\(""([^""]*)""\)\.offsetWidth"))
+            if (Regex.IsMatch(param, @"document\.getProp\('([^""]*)', 'offsetWidth'\)"))
             {
                 return 0;
             }
 
-            if (Regex.IsMatch(param, @"document\.getElementByIdSafe\(""([^""]*)""\)\.offsetHeight"))
+            if (Regex.IsMatch(param, @"document\.getProp\('([^""]*)', 'offsetHeight'\)"))
             {
                 return 0;
             }
 
-            if (Regex.IsMatch(param, @"document\.getBBox\(document\.getElementByIdSafe\(""([^""]*)""\)\)"))
+            if (Regex.IsMatch(param, @"document\.getBBox\('([^""]*)'\)"))
             {
                 return JsonDocument.Parse("{\"x\":0,\"y\":0,\"width\":0,\"height\":0}").RootElement;
             }

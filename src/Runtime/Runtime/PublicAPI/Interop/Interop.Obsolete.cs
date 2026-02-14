@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,7 +132,7 @@ namespace CSHTML5
         /// </summary>
         /// <param name="frameworkElement"></param>
         /// <returns></returns>
-        public static object GetDiv(FrameworkElement frameworkElement)
+        public static HtmlElementReference GetDiv(FrameworkElement frameworkElement)
         {
             return OpenSilver.Interop.GetDiv(frameworkElement);
         }

@@ -20,6 +20,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver;
 
 namespace System.Windows
 {
@@ -295,7 +296,7 @@ namespace System.Windows
         internal virtual void OnParentWindowChanged(Window window) { }
 
         // This is the main DIV of the HTML representation of the control
-        internal INTERNAL_HtmlDomElementReference OuterDiv { get; set; }
+        internal HtmlElementReference OuterDiv { get; set; }
         internal HashSet<UIElement> VisualChildrenInformation { get; set; }
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
 
@@ -468,10 +469,9 @@ namespace System.Windows
         /// <summary>
         /// When overriden, creates the dom elements designed to represent an instance of an UIElement and defines the place where its child(ren) will be added.
         /// </summary>
-        /// <param name="parentRef">The parent of the UIElement</param>
-        /// <param name="domElementWhereToPlaceChildren">The dom element where the UIElement's children will be added.</param>
+        /// <param name="parent">The parent of the UIElement</param>
         /// <returns>The "root" dom element of the UIElement.</returns>
-        public abstract object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren);
+        protected internal abstract HtmlElementReference CreateDomElement(HtmlElementReference parent);
 
         #region IsEnabled
 
@@ -1225,7 +1225,7 @@ namespace System.Windows
         internal virtual bool EnablePointerEventsCore => false;
 
         internal virtual void SetPointerEvents(bool hitTestable) =>
-            OuterDiv.Style.pointerEvents = hitTestable ? "auto" : "none";
+            OuterDiv.SetCssStyleProperty(CssPropertyNames.PointerEvents, hitTestable ? "auto" : "none");
 
         private static readonly ReadOnlyPropertyMetadata _isHitTestableMetadata =
             new(BooleanBoxes.FalseBox, GetIsHitTestable)

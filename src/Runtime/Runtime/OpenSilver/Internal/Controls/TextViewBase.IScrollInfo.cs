@@ -157,9 +157,9 @@ internal partial class TextViewBase : IScrollInfo
         if (!IsScrollClient) return;
         if (!_scrollData.CanHorizontallyScroll) return;
 
-        if (OuterDiv is not null)
+        if (OuterDiv.IsConnected)
         {
-            INTERNAL_HtmlDomManager.SetDomElementProperty(OuterDiv, "scrollLeft", offset);
+            OuterDiv.SetProperty("scrollLeft", offset);
         }
     }
 
@@ -168,9 +168,9 @@ internal partial class TextViewBase : IScrollInfo
         if (!IsScrollClient) return;
         if (!_scrollData.CanVerticallyScroll) return;
 
-        if (OuterDiv is not null)
+        if (OuterDiv.IsConnected)
         {
-            INTERNAL_HtmlDomManager.SetDomElementProperty(OuterDiv, "scrollTop", offset);
+            OuterDiv.SetProperty("scrollTop", offset);
         }
     }
 

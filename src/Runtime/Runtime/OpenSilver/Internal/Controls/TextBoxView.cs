@@ -46,10 +46,10 @@ internal sealed class TextBoxView : TextViewBase
 
     internal new TextBox Host => (TextBox)base.Host;
 
-    public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    /// <inheritdoc />
+    protected internal sealed override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        domElementWhereToPlaceChildren = null;
-        return INTERNAL_HtmlDomManager.CreateTextBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
+        return INTERNAL_HtmlDomManager.CreateTextBoxViewDomElementAndAppendIt(parent, this);
     }
 
     protected sealed internal override void INTERNAL_OnAttachedToVisualTree()
@@ -74,11 +74,10 @@ internal sealed class TextBoxView : TextViewBase
 
     internal void SetTextNative(string text)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            string sElement = Interop.GetVariableStringForJS(OuterDiv);
             Interop.ExecuteJavaScriptVoid(
-                $"{sElement}.value = \"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\"");
+                $"document.setProp('{OuterDiv.Uid}','value',\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\")");
 
             InvalidateMeasure();
         }
@@ -94,27 +93,26 @@ internal sealed class TextBoxView : TextViewBase
 
         if (host.IsReadOnly)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "readonly", string.Empty);
+            OuterDiv.SetAttribute("readonly", string.Empty);
         }
 
         int maxlength = host.MaxLength;
         if (maxlength > 0)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxlength", maxlength);
+            OuterDiv.SetAttribute("maxlength", maxlength);
         }
 
         // Disable spell check
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "spellcheck", host.IsSpellCheckEnabled);
+        OuterDiv.SetAttribute("spellcheck", host.IsSpellCheckEnabled);
 
         // Set the "data-accepts-return" property (that we have invented) so that the
         // "KeyDown" and "Paste" JavaScript events can retrieve this value:
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "data-acceptsreturn", host.AcceptsReturn);
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "data-acceptstab", host.AcceptsTab);
+        OuterDiv.SetAttribute("data-acceptsreturn", host.AcceptsReturn);
+        OuterDiv.SetAttribute("data-acceptstab", host.AcceptsTab);
 
         if (Interop.IsRunningInTheSimulator)
         {
-            string sElement = Interop.GetVariableStringForJS(OuterDiv);
-            Interop.ExecuteJavaScriptVoidAsync($"document.textviewManager.handleKeyDownFromSimulator({sElement})");
+            Interop.ExecuteJavaScriptVoidAsync($"document.textviewManager.handleKeyDownFromSimulator('{OuterDiv.Uid}')");
         }
 
         SetTextNative(host.Text);
@@ -122,7 +120,7 @@ internal sealed class TextBoxView : TextViewBase
 
     internal void ProcessKeyDown(KeyEventArgs e)
     {
-        if (OuterDiv is null) return;
+        if (!OuterDiv.IsConnected) return;
 
         if (TextViewManager.Instance.OnKeyDown(this, e))
         {
@@ -133,17 +131,17 @@ internal sealed class TextBoxView : TextViewBase
 
     internal void OnAcceptsReturnChanged(bool acceptsReturn)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv != null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             // Set the "data-accepts-return" property (that we have invented)
             // so that the "keydown" JavaScript event can retrieve this value:
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "data-acceptsreturn", acceptsReturn);
+            OuterDiv.SetAttribute("data-acceptsreturn", acceptsReturn);
         }
     }
 
     internal void OnTextWrappingChanged(TextWrapping textWrapping)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv != null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             this.SetTextWrapping(textWrapping);
         }
@@ -151,22 +149,22 @@ internal sealed class TextBoxView : TextViewBase
 
     internal void OnMaxLengthChanged(int maxLength)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv != null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             if (maxLength > 0)
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxlength", maxLength);
+                OuterDiv.SetAttribute("maxlength", maxLength);
             }
             else
             {
-                INTERNAL_HtmlDomManager.RemoveAttribute(OuterDiv, "maxlength");
+                OuterDiv.RemoveAttribute("maxlength");
             }
         }
     }
 
     internal void OnTextDecorationsChanged(TextDecorationCollection tdc)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             this.SetTextDecorations(tdc);
         }
@@ -174,30 +172,30 @@ internal sealed class TextBoxView : TextViewBase
 
     internal void OnIsReadOnlyChanged(bool isReadOnly)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv != null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             if (isReadOnly)
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "readonly", string.Empty);
+                OuterDiv.SetAttribute("readonly", string.Empty);
             }
             else
             {
-                INTERNAL_HtmlDomManager.RemoveAttribute(OuterDiv, "readonly");
+                OuterDiv.RemoveAttribute("readonly");
             }
         }
     }
 
     internal void OnIsSpellCheckEnabledChanged(bool isSpellCheckEnabled)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv != null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "spellcheck", isSpellCheckEnabled);
+            OuterDiv.SetAttribute("spellcheck", isSpellCheckEnabled);
         }
     }
 
     internal void SetCaretBrush(Brush brush)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             this.SetCaretColor(brush);
         }
@@ -207,7 +205,7 @@ internal sealed class TextBoxView : TextViewBase
     {
         get
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
                 return TextViewManager.Instance.GetSelectionStart(this);
             }
@@ -216,7 +214,7 @@ internal sealed class TextBoxView : TextViewBase
         }
         set
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
                 TextViewManager.Instance.SetSelectionStart(this, value);
             }
@@ -227,7 +225,7 @@ internal sealed class TextBoxView : TextViewBase
     {
         get
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
                 return TextViewManager.Instance.GetSelectionLength(this);
             }
@@ -236,7 +234,7 @@ internal sealed class TextBoxView : TextViewBase
         }
         set
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
                 TextViewManager.Instance.SetSelectionLength(this, value);
             }
@@ -247,7 +245,7 @@ internal sealed class TextBoxView : TextViewBase
     {
         get
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
                 return TextViewManager.Instance.GetSelectedText(this);
             }
@@ -256,7 +254,7 @@ internal sealed class TextBoxView : TextViewBase
         }
         set
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
                 TextViewManager.Instance.SetSelectedText(this, value);
                 
@@ -268,20 +266,18 @@ internal sealed class TextBoxView : TextViewBase
 
     internal void SetSelectionRange(int start, int end)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            string sElement = Interop.GetVariableStringForJS(OuterDiv);
             Interop.ExecuteJavaScriptVoid(
-                $"{sElement}.setSelectionRange({start.ToInvariantString()}, {end.ToInvariantString()})");
+                $"document.textviewManager.setSelectionRange('{OuterDiv.Uid}', {start.ToInvariantString()}, {end.ToInvariantString()})");
         }
     }
 
     private string GetText()
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            string sElement = Interop.GetVariableStringForJS(OuterDiv);
-            return Interop.ExecuteJavaScriptString($"{sElement}.value") ?? string.Empty;
+            return Interop.ExecuteJavaScriptString($"document.getProp('{OuterDiv.Uid}','value')") ?? string.Empty;
         }
 
         return string.Empty;
@@ -290,7 +286,7 @@ internal sealed class TextBoxView : TextViewBase
     protected sealed override Size MeasureContent(Size constraint)
     {
         return ParentWindow.TextMeasurementService.MeasureView(
-            OuterDiv.UniqueIdentifier,
+            OuterDiv.Uid,
             Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
             Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
             constraint.Width,

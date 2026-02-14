@@ -11,6 +11,11 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
+using OpenSilver.Internal.Controls.Primitives;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -18,10 +23,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
-using OpenSilver.Internal.Controls.Primitives;
 
 namespace System.Windows;
 
@@ -66,15 +67,15 @@ public class Window : ContentControl, IResizeObserverListener
     /// </summary>
     public static Window Current { get; set; }
 
-    internal INTERNAL_HtmlDomElementReference RootDomElement { get; private set; }
+    internal HtmlElementReference RootDomElement { get; private set; }
 
     /// <summary>
     /// Set the DOM element that will host the window. This can be set only to new windows. The MainWindow looks for a DIV that has the ID "cshtml5-root" or "opensilver-root".
     /// </summary>
     /// <param name="rootDomElement">The DOM element that will host the window</param>
-    public void AttachToDomElement(INTERNAL_HtmlDomElementReference rootDomElement)
+    public void AttachToDomElement(HtmlElementReference rootDomElement)
     {
-        if (OuterDiv != null || RootDomElement != null)
+        if (OuterDiv.IsConnected || RootDomElement.IsConnected)
         {
             throw new InvalidOperationException("The method 'Window.AttachToDomElement' can be called only once.");
         }
@@ -87,8 +88,8 @@ public class Window : ContentControl, IResizeObserverListener
         ParentWindow = this;
 
         // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
-        RootDomElement.Style.display = "grid";
-        RootDomElement.Style.overflow = "clip";
+        RootDomElement.SetCssStyleProperty(CssPropertyNames.Display, "grid");
+        RootDomElement.SetCssStyleProperty(CssPropertyNames.Overflow, "clip");
 
         // Create the DIV that will correspond to the root of the window visual tree:
         OuterDiv = INTERNAL_HtmlDomManager.CreateWindowDomElementAndAppendIt(this);
@@ -137,11 +138,10 @@ public class Window : ContentControl, IResizeObserverListener
     {
         get
         {
-            if (OuterDiv is not null)
+            if (OuterDiv.IsConnected)
             {
-                string sDiv = OpenSilver.Interop.GetVariableStringForJS(RootDomElement);
-                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDiv}.offsetWidth");
-                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDiv}.offsetHeight");
+                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"document.getProp('{RootDomElement.Uid}', 'offsetWidth')");
+                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"document.getProp('{RootDomElement.Uid}', 'offsetHeight')");
                 return new Rect(0, 0, width, height);
             }
 

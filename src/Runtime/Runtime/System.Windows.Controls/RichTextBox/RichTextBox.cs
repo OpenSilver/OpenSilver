@@ -11,16 +11,17 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Windows.Markup;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -71,8 +72,19 @@ namespace System.Windows.Controls
 
         internal RichTextBoxView View => _textViewHost?.View;
 
-        internal sealed override INTERNAL_HtmlDomElementReference GetFocusTarget()
-            => _textViewHost?.View?.OuterDiv ?? base.GetFocusTarget();
+        internal sealed override HtmlElementReference GetFocusTarget()
+        {
+            if (_textViewHost?.View is RichTextBoxView view)
+            {
+                var target = view.OuterDiv;
+                if (target.IsConnected)
+                {
+                    return target;
+                }
+            }
+
+            return base.GetFocusTarget();
+        }
 
         /// <summary>
         /// Occurs when the content changes in a <see cref="RichTextBox"/>.

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal.Controls.Primitives;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -144,10 +145,9 @@ internal sealed class InputManager
     /// </summary>
     public static InputManager Current { get; } = new InputManager();
 
-    internal void RegisterRoot(INTERNAL_HtmlDomElementReference element)
+    internal void RegisterRoot(HtmlElementReference element)
     {
-        string sElement = OpenSilver.Interop.GetVariableStringForJS(element);
-        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.registerRoot({sElement})");
+        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.registerRoot('{element.Uid}')");
     }
 
     internal ModifierKeys GetKeyboardModifiers()
@@ -159,12 +159,11 @@ internal sealed class InputManager
     {
         Debug.Assert(uie is not null);
 
-        if (Pointer.Captured is null && _mouseLeftDown && uie.OuterDiv is { } outerDiv)
+        if (Pointer.Captured is null && _mouseLeftDown && uie.OuterDiv is { IsConnected: true } outerDiv)
         {
             Pointer.Captured = uie;
 
-            string sDiv = OpenSilver.Interop.GetVariableStringForJS(outerDiv);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.capturePointer({sDiv})");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.capturePointer('{outerDiv.Uid}')");
 
             using (_eventQueue.DisableProcessing())
             {
@@ -208,7 +207,8 @@ internal sealed class InputManager
             return true;
         }
 
-        if (uie.GetFocusTarget() is INTERNAL_HtmlDomElementReference target)
+        HtmlElementReference target = uie.GetFocusTarget();
+        if (target.IsConnected)
         {
             if (SetFocusNative(target))
             {
@@ -233,24 +233,24 @@ internal sealed class InputManager
         return false;
     }
 
-    internal static bool SetFocusNative(INTERNAL_HtmlDomElementReference domElement)
+    internal static bool SetFocusNative(HtmlElementReference element)
     {
-        string sDiv = OpenSilver.Interop.GetVariableStringForJS(domElement);
-        return OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.inputManager.focus({sDiv})");
+        return OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.inputManager.focus('{element.Uid}')");
     }
 
     internal static void ClearTabIndex(UIElement uie)
     {
-        if (uie.GetFocusTarget() is INTERNAL_HtmlDomElementReference domElement)
+        HtmlElementReference element = uie.GetFocusTarget();
+        if (element.IsConnected)
         {
             switch (uie)
             {
                 case TextBox or PasswordBox:
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(domElement, "tabindex", "-1");
+                    element.SetAttribute("tabindex", "-1");
                     break;
 
                 default:
-                    INTERNAL_HtmlDomManager.RemoveAttribute(domElement, "tabindex");
+                    element.RemoveAttribute("tabindex");
                     break;
             }
         }
