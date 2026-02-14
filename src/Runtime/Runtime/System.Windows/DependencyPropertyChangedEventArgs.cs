@@ -11,78 +11,75 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Provides data for a <see cref="PropertyChangedCallback"/> implementation.
+/// </summary>
+public readonly struct DependencyPropertyChangedEventArgs
 {
+    internal DependencyPropertyChangedEventArgs(
+        object oldValue,
+        object newValue,
+        DependencyProperty property,
+        PropertyMetadata metadata)
+    {
+        OldValue = oldValue;
+        NewValue = newValue;
+        Property = property;
+        Metadata = metadata;
+        OperationType = OperationType.Unknown;
+    }
+
+    internal DependencyPropertyChangedEventArgs(
+        object oldValue,
+        object newValue,
+        DependencyProperty property,
+        PropertyMetadata metadata,
+        OperationType operationType)
+    {
+        OldValue = oldValue;
+        NewValue = newValue;
+        Property = property;
+        Metadata = metadata;
+        OperationType = operationType;
+    }
+
     /// <summary>
-    /// Provides data for a <see cref="PropertyChangedCallback"/> implementation.
+    /// Gets the value of the property before the change.
     /// </summary>
-    public sealed class DependencyPropertyChangedEventArgs
-    {
-        internal DependencyPropertyChangedEventArgs(
-            object oldValue,
-            object newValue,
-            DependencyProperty property,
-            PropertyMetadata metadata)
-        {
-            OldValue = oldValue;
-            NewValue = newValue;
-            Property = property;
-            Metadata = metadata;
-            OperationType = OperationType.Unknown;
-        }
+    /// <returns>
+    /// The property value before the change.
+    /// </returns>
+    public object OldValue { get; }
 
-        internal DependencyPropertyChangedEventArgs(
-            object oldValue,
-            object newValue,
-            DependencyProperty property,
-            PropertyMetadata metadata,
-            OperationType operationType)
-        {
-            OldValue = oldValue;
-            NewValue = newValue;
-            Property = property;
-            Metadata = metadata;
-            OperationType = operationType;
-        }
+    /// <summary>
+    /// Gets the value of the property after the change.
+    /// </summary>
+    /// <returns>
+    /// The property value after the change.
+    /// </returns>
+    public object NewValue { get; }
 
-        public DependencyPropertyChangedEventArgs() { }
+    /// <summary>
+    /// Gets the identifier for the dependency property where the value change occurred.
+    /// </summary>
+    /// <returns>
+    /// The identifier field of the dependency property where the value change occurred.
+    /// </returns>
+    public DependencyProperty Property { get; }
 
-        /// <summary>
-        /// Gets the value of the property before the change.
-        /// </summary>
-        /// <returns>
-        /// The property value before the change.
-        /// </returns>
-        public object OldValue { get; }
+    /// <summary>
+    /// Metadata for the property
+    /// </summary>
+    internal PropertyMetadata Metadata { get; }
 
-        /// <summary>
-        /// Gets the value of the property after the change.
-        /// </summary>
-        /// <returns>
-        /// The property value after the change.
-        /// </returns>
-        public object NewValue { get; }
+    internal OperationType OperationType { get; }
+}
 
-        /// <summary>
-        /// Gets the identifier for the dependency property where the value change occurred.
-        /// </summary>
-        /// <returns>
-        /// The identifier field of the dependency property where the value change occurred.
-        /// </returns>
-        public DependencyProperty Property { get; }
-
-        /// <summary>
-        /// Metadata for the property
-        /// </summary>
-        internal PropertyMetadata Metadata { get; }
-
-        internal OperationType OperationType { get; }
-    }
-
-    internal enum OperationType : byte
-    {
-        Unknown = 0,
-        Inherit = 1,
-        ChangeMutableDefaultValue = 2,
-    }
+internal enum OperationType : byte
+{
+    Unknown = 0,
+    Inherit = 1,
+    ChangeMutableDefaultValue = 2,
 }
