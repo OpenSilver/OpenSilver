@@ -55,8 +55,8 @@ ECHO.
 
 COPY "%SRC_DIR%\Runtime\Scripts\cshtml5.css" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
 COPY "%SRC_DIR%\Runtime\Scripts\cshtml5.js" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
-COPY "%SRC_DIR%\Runtime\Scripts\FileSaver.min.js" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
-COPY "%SRC_DIR%\Runtime\Scripts\OpenSilver.js" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
+COPY "%SRC_DIR%\Runtime\Scripts\filesaver.min.js" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
+COPY "%SRC_DIR%\Runtime\Scripts\opensilver.js" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
 COPY "%SRC_DIR%\Runtime\Scripts\quill.core.css" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
 COPY "%SRC_DIR%\Runtime\Scripts\quill.min.js" "%SIMULATOR_DIR%\contentFiles\any\any\js_css"
 COPY "%SRC_DIR%\Simulator\Simulator\simulator_root_opensilver.html" "%SIMULATOR_DIR%\contentFiles\any\any\simulator_root.html"

@@ -55,9 +55,9 @@ ECHO %ESC%[95mCopying JS and CSS files.%ESC%[0m
 ECHO.
 
 COPY "%SRC_DIR%\Runtime\Scripts\cshtml5.js" "%WASM_DIR%\content\js"
-COPY "%SRC_DIR%\Runtime\Scripts\FileSaver.min.js" "%WASM_DIR%\content\js"
-COPY "%SRC_DIR%\Runtime\Scripts\htmlToImage.js" "%WASM_DIR%\content\js"
-COPY "%SRC_DIR%\Runtime\Scripts\OpenSilver.js" "%WASM_DIR%\content\js"
+COPY "%SRC_DIR%\Runtime\Scripts\filesaver.min.js" "%WASM_DIR%\content\js"
+COPY "%SRC_DIR%\Runtime\Scripts\html-to-image.js" "%WASM_DIR%\content\js"
+COPY "%SRC_DIR%\Runtime\Scripts\opensilver.js" "%WASM_DIR%\content\js"
 COPY "%SRC_DIR%\Runtime\Scripts\quill.min.js" "%WASM_DIR%\content\js"
 COPY "%SRC_DIR%\Runtime\Scripts\cshtml5.css" "%WASM_DIR%\content\css"
 COPY "%SRC_DIR%\Runtime\Scripts\quill.core.css" "%WASM_DIR%\content\css"
