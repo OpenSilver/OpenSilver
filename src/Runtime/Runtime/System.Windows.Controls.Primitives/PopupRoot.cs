@@ -14,7 +14,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -129,68 +128,7 @@ internal sealed class PopupRoot : FrameworkElement
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
         base.OnMouseLeftButtonDown(e);
-        ClosePopupsOnOutsideClick();
-    }
 
-    protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
-    {
-        base.OnMouseRightButtonDown(e);
-        
-        // Close any open popups first
-        ClosePopupsOnOutsideClick();
-        
-        // After closing the popup, we need to find the element at the mouse position
-        // and trigger its context menu, since the right-click was intercepted by PopupRoot
-        TriggerContextMenuAtPosition(e);
-    }
-
-    /// <summary>
-    /// Finds the element at the mouse position and triggers its context menu.
-    /// This is needed because when a popup is open, right-clicks are intercepted
-    /// by the PopupRoot and don't reach the elements below.
-    /// </summary>
-    private void TriggerContextMenuAtPosition(MouseButtonEventArgs e)
-    {
-        Point mousePosition = e.GetPosition(null);
-        
-        // Update the mouse position for context menu positioning
-        OpenSilver.Internal.Controls.Primitives.PopupService.OnMouseEvent(e);
-        
-        // Find elements at the mouse position (this will search the main visual tree,
-        // not the popup we just closed)
-        Window window = ParentWindow ?? Application.Current?.MainWindow;
-        if (window is null) return;
-        
-        var elements = Media.VisualTreeHelper.FindElementsInHostCoordinates(mousePosition, window);
-        
-        // Find the first element (or its ancestors) that has a context menu
-        foreach (UIElement element in elements)
-        {
-            // Walk up the visual tree to find an element with a context menu
-            DependencyObject current = element;
-            while (current is not null)
-            {
-                if (current is FrameworkElement fe)
-                {
-                    ContextMenu contextMenu = ContextMenuService.GetContextMenu(fe);
-                    if (contextMenu is not null)
-                    {
-                        // Found a context menu, open it
-                        contextMenu.IsOpen = true;
-                        e.Handled = true;
-                        return;
-                    }
-                }
-                current = Media.VisualTreeHelper.GetParent(current);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Closes popups that should be closed when clicking outside of them.
-    /// </summary>
-    private void ClosePopupsOnOutsideClick()
-    {
         // Note: If a popup has StayOpen=True, the value of "StayOpen" of its parents is ignored.
         // In other words, the parents of a popup that has StayOpen=True will always stay open
         // regardless of the value of their "StayOpen" property.
