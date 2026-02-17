@@ -148,6 +148,7 @@
     <Compile Include="System.Windows.Controls\ChildWindow.cs" />
     <Compile Include="System.Windows.Controls\ContextMenu.cs" />
     <Compile Include="System.Windows.Controls\ContextMenuService.cs" />
+    <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\DataTemplateSelector.cs" />
     <Compile Include="System.Windows.Controls\HeaderedItemsControl.cs" />
     <Compile Include="System.Windows.Controls\InteractionHelper.cs" />

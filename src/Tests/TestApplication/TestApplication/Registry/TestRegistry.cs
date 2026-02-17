@@ -15,6 +15,7 @@ namespace TestApplication
             Tests.Add(new Test("Right Click", "Right Click"));
             Tests.Add(new Test("ToolTip", "ToolTip"));
             Tests.Add(new Test("ContextMenu", "ContextMenu"));
+            Tests.Add(new Test("Menu", "Menu"));
             Tests.Add(new Test("DateTime", "DateTime"));
             Tests.Add(new Test("DatePicker", "DatePicker"));
             Tests.Add(new Test("ItemsControl", "ItemsControl"));

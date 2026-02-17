@@ -345,7 +345,7 @@ public class ContextMenu : MenuBase
     /// <summary>
     /// Called when a child MenuItem is clicked.
     /// </summary>
-    internal void ChildMenuItemClicked() => ClosePopup();
+    internal override void ChildMenuItemClicked() => ClosePopup();
 
     /// <summary>
     /// Opens the Popup.

@@ -4130,6 +4130,37 @@
         </Setter>
     </Style>
 
+    <!--  controls:Menu  -->
+    <Style TargetType="controls:Menu">
+        <Setter Property="Background"
+                Value="#FFF0F0F0" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="BorderBrush"
+                Value="{x:Static media:Brushes.Transparent}" />
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <controls:ItemsPanelTemplate>
+                    <controls:StackPanel Orientation="Horizontal" />
+                </controls:ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="controls:Menu">
+                    <controls:Border BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                     Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                     Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}">
+                        <controls:ItemsPresenter />
+                    </controls:Border>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  controls:MenuItem  -->
     <Style TargetType="controls:MenuItem">
         <Setter Property="Background"
@@ -4151,6 +4182,18 @@
                                                                    animation:Storyboard.TargetName="Presenter"
                                                                    animation:Storyboard.TargetProperty="Opacity"
                                                                    To="0.5" />
+                                    </animation:Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Highlighted">
+                                    <animation:Storyboard>
+                                        <animation:DoubleAnimation Duration="0"
+                                                                   animation:Storyboard.TargetName="Bg"
+                                                                   animation:Storyboard.TargetProperty="Opacity"
+                                                                   To="1" />
+                                        <animation:ColorAnimation Duration="0"
+                                                                  animation:Storyboard.TargetName="InnerBorder"
+                                                                  animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                                  To="#40FFFFFF" />
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -4204,7 +4247,7 @@
                                 <controls:ColumnDefinition Width="*" />
                                 <!--<controls:ColumnDefinition Width="37"/>
                             <controls:ColumnDefinition Width="Auto"/>-->
-                                <controls:ColumnDefinition Width="17" />
+                                <controls:ColumnDefinition Width="Auto" />
                             </controls:Grid.ColumnDefinitions>
                             <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
                                                        ContentTemplate="{markup:Null}"
@@ -4238,7 +4281,44 @@
                             Text="{TemplateBinding InputGestureText}"
                             Margin="{TemplateBinding Padding}"
                             controls:Grid.Column="4"/>-->
+                            <!-- Submenu arrow indicator -->
+                            <shapes:Path x:Name="PART_Arrow"
+                                         controls:Grid.Column="3"
+                                         Margin="4,0,6,0"
+                                         VerticalAlignment="Center"
+                                         Fill="#FF333333"
+                                         Data="M 0 0 L 4 3.5 L 0 7 Z" />
                         </controls:Grid>
+                        <!-- Submenu Popup -->
+                        <primitives:Popup x:Name="PART_Popup"
+                                          Placement="Right"
+                                          StaysWithinScreenBounds="True">
+                            <controls:Border Background="#FFF5F5F5"
+                                             BorderBrush="#FF959595"
+                                             BorderThickness="1"
+                                             CornerRadius="2">
+                                <controls:Border.Effect>
+                                    <effects:DropShadowEffect Color="LightGray"
+                                                              ShadowDepth="3" />
+                                </controls:Border.Effect>
+                                <controls:Grid>
+                                    <controls:Border CornerRadius="2"
+                                                     Background="#FFF1F1F1"
+                                                     Width="28"
+                                                     Margin="2"
+                                                     HorizontalAlignment="Left" />
+                                    <controls:Border Background="#FFE2E3E3"
+                                                     Width="1"
+                                                     Margin="30,2,0,2"
+                                                     HorizontalAlignment="Left" />
+                                    <controls:Border Background="{x:Static media:Brushes.White}"
+                                                     Width="1"
+                                                     Margin="31,2,0,2"
+                                                     HorizontalAlignment="Left" />
+                                    <controls:ItemsPresenter Margin="2" />
+                                </controls:Grid>
+                            </controls:Border>
+                        </primitives:Popup>
                     </controls:Grid>
                 </controls:ControlTemplate>
             </Setter.Value>
