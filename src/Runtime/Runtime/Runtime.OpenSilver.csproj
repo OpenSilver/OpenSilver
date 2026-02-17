@@ -395,12 +395,12 @@
     <Compile Include="System.Windows.Automation\DockPatternIdentifiers.cs" />
     <Compile Include="OpenSilver\Internal\Controls\Primitives\PopupService.cs" />
     <Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
-    <Compile Include="System.Windows.Controls.Primitives\Selector.Navigation.cs" />
     <Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
     <Compile Include="System.Windows.Controls.Primitives\UniformGrid.cs" />
     <Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
     <Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
     <Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
+    <Compile Include="System.Windows.Controls\ItemsControl.Navigation.cs" />
     <Compile Include="System.Windows.Controls\RichTextBlock.NotImplemented.cs" />
     <Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillContentParser.cs" />
     <Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDelta.cs" />

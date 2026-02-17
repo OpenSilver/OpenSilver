@@ -129,7 +129,7 @@ namespace System.Windows.Controls
             this.IsFocused = true;
             this.UpdateVisualStates();
 
-            ParentSelector?.NotifyListItemGotFocus(this);
+            ParentSelector?.NotifyItemGotFocus(this);
         }
 
         protected override void OnLostFocus(RoutedEventArgs e)
@@ -139,7 +139,7 @@ namespace System.Windows.Controls
             this.IsFocused = false;
             this.UpdateVisualStates();
 
-            ParentSelector?.NotifyListItemLostFocus(this);
+            ParentSelector?.NotifyItemLostFocus(this);
         }
 
         internal ListBox ParentListBox

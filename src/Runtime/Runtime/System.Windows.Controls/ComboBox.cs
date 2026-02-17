@@ -495,7 +495,7 @@ namespace System.Windows.Controls
             ItemInfo infoToSelect = null;
             if (commitSelection)
             {
-                infoToSelect = ItemInfoFromIndex(FocusedIndex);
+                infoToSelect = FocusedInfo;
             }
 
             IsDropDownOpen = openDropDown;

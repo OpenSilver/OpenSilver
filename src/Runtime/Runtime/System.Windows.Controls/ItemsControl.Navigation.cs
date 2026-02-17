@@ -12,17 +12,16 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
-using System.Windows.Media;
 using System.Windows.Input;
+using System.Windows.Media;
 
-namespace System.Windows.Controls.Primitives;
+namespace System.Windows.Controls;
 
-public partial class Selector
+public partial class ItemsControl
 {
-    /// <summary> 
-    /// Tracks the index of the focused element.
-    /// </summary>
-    private int _focusedIndex = -1;
+    private ItemInfo _focusedInfo;
+
+    internal virtual ScrollViewer ScrollHost => null;
 
     /// <summary>
     /// The item corresponding to the UI container which has focus.
@@ -32,9 +31,11 @@ public partial class Selector
     /// was focused.  When it scrolls back into view (and focus is
     /// still on the ItemsControl) we'll focus it.
     /// </summary>
-    internal int FocusedIndex => _focusedIndex;
+    internal ItemInfo FocusedInfo => _focusedInfo;
 
-    internal override bool FocusItem(ItemInfo info)
+    private int FocusedIndex => _focusedInfo?.Index ?? -1;
+
+    internal virtual bool FocusItem(ItemInfo info)
     {
         if (info.Index == -1 || info.Index >= Items.Count)
         {
@@ -42,7 +43,7 @@ public partial class Selector
         }
 
         ScrollIntoViewImpl(info.Index);
-        
+
         return FocusItemInternal(info.Index);
     }
 
@@ -51,33 +52,25 @@ public partial class Selector
         bool focused = false;
         if (index >= 0 && index < Items.Count)
         {
-            _focusedIndex = index;
-            if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem listBoxItem)
+            _focusedInfo = ItemInfoFromIndex(index);
+            if (_focusedInfo.Container is UIElement container)
             {
-                focused = listBoxItem.Focus();
+                focused = container.Focus();
             }
         }
         return focused;
     }
 
-    /// <summary> 
-    /// Called by ListBoxItem instances when they get focus
-    /// </summary> 
-    /// <param name="listBoxItemNewFocus">ListBoxItem that got focus</param>
-    internal void NotifyListItemGotFocus(ListBoxItem listBoxItemNewFocus)
+    internal void NotifyItemGotFocus(UIElement newFocus)
     {
         // Track the focused index 
-        _focusedIndex = ItemContainerGenerator.IndexFromContainer(listBoxItemNewFocus);
+        _focusedInfo = ItemInfoFromContainer(newFocus);
     }
 
-    /// <summary>
-    /// Called by ListBoxItem instances when they lose focus 
-    /// </summary>
-    /// <param name="listBoxItemOldFocus">ListBoxItem that lost focus</param>
-    internal void NotifyListItemLostFocus(ListBoxItem listBoxItemOldFocus)
+    internal void NotifyItemLostFocus(UIElement oldFocus)
     {
         // Stop tracking state
-        _focusedIndex = -1;
+        _focusedInfo = null;
     }
 
     /// <summary>
@@ -97,14 +90,17 @@ public partial class Selector
     {
         return ItemsHost is null || ItemsHost.LogicalOrientation == Orientation.Vertical;
     }
-    
+
+    internal void NavigateToItem(object item, int elementIndex)
+        => FocusItem(NewItemInfo(item, ItemContainerGenerator.ContainerFromItem(item), elementIndex));
+
     internal int NavigateToStart()
     {
         int newFocusedIndex = -1;
         if (Items.Count > 0)
         {
             newFocusedIndex = 0;
-            if (newFocusedIndex != _focusedIndex)
+            if (newFocusedIndex != FocusedIndex)
             {
                 ScrollIntoViewImpl(newFocusedIndex);
                 ScrollHost?.UpdateLayout();
@@ -120,7 +116,7 @@ public partial class Selector
         if (Items.Count > 0)
         {
             newFocusedIndex = Items.Count - 1;
-            if (newFocusedIndex != _focusedIndex)
+            if (newFocusedIndex != FocusedIndex)
             {
                 ScrollIntoViewImpl(newFocusedIndex);
                 ScrollHost?.UpdateLayout();
@@ -138,23 +134,24 @@ public partial class Selector
     /// <remarks>Similar to WPF's corresponding ItemsControl method.</remarks>
     internal int NavigateByPage(bool forward)
     {
+        int focusedIndex = FocusedIndex;
         int newFocusedIndex = -1;
         // Get it visible to start with
-        if (_focusedIndex != -1 && !IsOnCurrentPage(_focusedIndex))
+        if (focusedIndex != -1 && !IsOnCurrentPage(focusedIndex))
         {
-            ScrollIntoViewImpl(_focusedIndex);
+            ScrollIntoViewImpl(focusedIndex);
             ScrollHost?.UpdateLayout();
         }
         // Inlined implementation of NavigateByPageInternal
-        if (_focusedIndex == -1)
+        if (focusedIndex == -1)
         {
             // Select something
-            newFocusedIndex = GetFirstItemOnCurrentPage(_focusedIndex, forward);
+            newFocusedIndex = GetFirstItemOnCurrentPage(focusedIndex, forward);
         }
         else
         {
-            int firstItemOnCurrentPage = GetFirstItemOnCurrentPage(_focusedIndex, forward);
-            if (firstItemOnCurrentPage != _focusedIndex)
+            int firstItemOnCurrentPage = GetFirstItemOnCurrentPage(focusedIndex, forward);
+            if (firstItemOnCurrentPage != focusedIndex)
             {
                 // Select the "edge" element 
                 newFocusedIndex = firstItemOnCurrentPage;
@@ -180,7 +177,7 @@ public partial class Selector
                     scrollHost.UpdateLayout();
                 }
                 // Select the "edge" element
-                newFocusedIndex = GetFirstItemOnCurrentPage(_focusedIndex, forward);
+                newFocusedIndex = GetFirstItemOnCurrentPage(focusedIndex, forward);
             }
         }
         return newFocusedIndex;
@@ -188,24 +185,25 @@ public partial class Selector
 
     internal int NavigateByLine(bool forward)
     {
+        int focusedIndex = FocusedIndex;
         int newFocusedIndex = -1;
         // Get it visible to start with
-        if (_focusedIndex != -1 && !IsOnCurrentPage(_focusedIndex))
+        if (focusedIndex != -1 && !IsOnCurrentPage(focusedIndex))
         {
-            ScrollIntoViewImpl(_focusedIndex);
+            ScrollIntoViewImpl(focusedIndex);
             ScrollHost?.UpdateLayout();
         }
 
         if (forward)
         {
             int count = Items.Count;
-            if (_focusedIndex < count)
-                newFocusedIndex = GetNextSelectableIndex(_focusedIndex + 1, 1, count);
+            if (focusedIndex < count)
+                newFocusedIndex = GetNextSelectableIndex(focusedIndex + 1, 1, count);
         }
         else
         {
-            if (_focusedIndex >= 0)
-                newFocusedIndex = GetNextSelectableIndex(_focusedIndex - 1, -1, -1);
+            if (focusedIndex >= 0)
+                newFocusedIndex = GetNextSelectableIndex(focusedIndex - 1, -1, -1);
         }
 
         if (newFocusedIndex != -1 && ScrollHost != null)
@@ -232,29 +230,29 @@ public partial class Selector
     /// </summary>
     /// <param name="index">The index.</param> 
     /// <param name="itemsHostRect">Rect for the item host element.</param>
-    /// <param name="listBoxItemRect">Rect for the ListBoxItem element.</param>
+    /// <param name="containerRect">Rect for the container element.</param>
     /// <returns>True if the item is visible; false otherwise.</returns> 
     /// <remarks>Similar to WPF's corresponding ItemsControl method.</remarks>
-    private bool IsOnCurrentPage(int index, out Rect itemsHostRect, out Rect listBoxItemRect)
+    private bool IsOnCurrentPage(int index, out Rect itemsHostRect, out Rect containerRect)
     {
         // Get Rect for item host element 
         FrameworkElement viewport = GetViewportElement();
         if (viewport == null)
         {
             itemsHostRect = Rect.Empty;
-            listBoxItemRect = Rect.Empty;
+            containerRect = Rect.Empty;
             return false;
         }
         itemsHostRect = new Rect(new Point(), new Point(viewport.ActualWidth, viewport.ActualHeight));
 
-        if (ItemContainerGenerator.ContainerFromIndex(index) is not ListBoxItem listBoxItem || !listBoxItem.IsConnectedToLiveTree)
+        if (ItemContainerGenerator.ContainerFromIndex(index) is not UIElement container || !container.IsConnectedToLiveTree)
         {
-            listBoxItemRect = Rect.Empty;
+            containerRect = Rect.Empty;
             return false;
         }
 
-        Size listBoxItemSize = new Size(listBoxItem.ActualWidth, listBoxItem.ActualHeight);
-        listBoxItemRect = new Rect(new Point(), listBoxItemSize);
+        Size containerSize = container.RenderSize;
+        containerRect = new Rect(new Point(), containerSize);
 
         // Adjust Rect to account for padding 
         Control itemsHostControl = viewport as Control;
@@ -267,19 +265,19 @@ public partial class Selector
                 itemsHostRect.Width - padding.Left - padding.Right,
                 itemsHostRect.Height - padding.Top - padding.Bottom);
         }
-        // Get relative Rect for ListBoxItem 
-        GeneralTransform generalTransform = listBoxItem.TransformToVisual(viewport);
+        // Get relative Rect for container 
+        GeneralTransform generalTransform = container.TransformToVisual(viewport);
         if (generalTransform != null)
         {
-            listBoxItemRect = new Rect(
+            containerRect = new Rect(
                 generalTransform.Transform(new Point()),
-                generalTransform.Transform(new Point(listBoxItemSize.Width, listBoxItemSize.Height)));
+                generalTransform.Transform(new Point(containerSize.Width, containerSize.Height)));
         }
 
         // Return result
         return (IsVerticalOrientation() ?
-            (itemsHostRect.Top <= listBoxItemRect.Top) && (listBoxItemRect.Bottom <= itemsHostRect.Bottom) :
-            (itemsHostRect.Left <= listBoxItemRect.Left) && (listBoxItemRect.Right <= itemsHostRect.Right));
+            (itemsHostRect.Top <= containerRect.Top) && (containerRect.Bottom <= itemsHostRect.Bottom) :
+            (itemsHostRect.Left <= containerRect.Left) && (containerRect.Right <= itemsHostRect.Right));
     }
 
     /// <summary> 
@@ -387,7 +385,7 @@ public partial class Selector
             // we've selected. This will force the virtualizing panel to rerender the required
             // elements.
             bool virtualizing = VirtualizingStackPanel.GetIsVirtualizing(this);
-            if (!IsOnCurrentPage(index, out Rect itemsHostRect, out Rect listBoxItemRect))
+            if (!IsOnCurrentPage(index, out Rect itemsHostRect, out Rect containerRect))
             {
                 if (IsVerticalOrientation())
                 {
@@ -407,14 +405,14 @@ public partial class Selector
                     {
                         // Scroll into view vertically (first make the right bound visible, then the left)                    
                         double verticalDelta = 0;
-                        if (itemsHostRect.Bottom < listBoxItemRect.Bottom)
+                        if (itemsHostRect.Bottom < containerRect.Bottom)
                         {
-                            verticalDelta = listBoxItemRect.Bottom - itemsHostRect.Bottom;
+                            verticalDelta = containerRect.Bottom - itemsHostRect.Bottom;
                             verticalOffset += verticalDelta;
                         }
-                        if (listBoxItemRect.Top - verticalDelta < itemsHostRect.Top)
+                        if (containerRect.Top - verticalDelta < itemsHostRect.Top)
                         {
-                            verticalOffset -= itemsHostRect.Top - (listBoxItemRect.Top - verticalDelta);
+                            verticalOffset -= itemsHostRect.Top - (containerRect.Top - verticalDelta);
                         }
                         scrollHost.ScrollToVerticalOffset(verticalOffset);
                     }
@@ -437,14 +435,14 @@ public partial class Selector
                     {
                         // Scroll into view horizontally (first make the bottom bound visible, then the top) 
                         double horizontalDelta = 0;
-                        if (itemsHostRect.Right < listBoxItemRect.Right)
+                        if (itemsHostRect.Right < containerRect.Right)
                         {
-                            horizontalDelta = listBoxItemRect.Right - itemsHostRect.Right;
+                            horizontalDelta = containerRect.Right - itemsHostRect.Right;
                             horizontalOffset += horizontalDelta;
                         }
-                        if (listBoxItemRect.Left - horizontalDelta < itemsHostRect.Left)
+                        if (containerRect.Left - horizontalDelta < itemsHostRect.Left)
                         {
-                            horizontalOffset -= itemsHostRect.Left - (listBoxItemRect.Left - horizontalDelta);
+                            horizontalOffset -= itemsHostRect.Left - (containerRect.Left - horizontalDelta);
                         }
                         scrollHost.ScrollToHorizontalOffset(horizontalOffset);
                     }
@@ -456,7 +454,7 @@ public partial class Selector
 
     private void ScrollIntoViewNative(int index)
     {
-        if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
+        if (ItemContainerGenerator.ContainerFromIndex(index) is UIElement container
             && container.OuterDiv != null)
         {
             string sDomElement = OpenSilver.Interop.GetVariableStringForJS(container.OuterDiv);

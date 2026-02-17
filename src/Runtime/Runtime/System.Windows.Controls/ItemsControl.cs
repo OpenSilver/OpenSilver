@@ -17,7 +17,6 @@ using OpenSilver.Internal.Xaml.Context;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -710,10 +709,6 @@ namespace System.Windows.Controls
 
         #endregion IGeneratorHost
 
-        #region Public Methods
-
-        #endregion Public Methods
-
         #region Protected Methods
 
         [Obsolete(Helper.ObsoleteMemberMessage + "Use ItemsControl.OnItemsPanelChanged instead.", true)]
@@ -737,6 +732,7 @@ namespace System.Windows.Controls
         /// </summary>
         internal virtual void AdjustItemInfoOverride(NotifyCollectionChangedEventArgs e)
         {
+            AdjustItemInfo(e, _focusedInfo);
         }
 
         #endregion Protected Methods
@@ -1115,14 +1111,16 @@ namespace System.Windows.Controls
 
         private void OnItemCollectionChanged2(object sender, NotifyCollectionChangedEventArgs e)
         {
-            this.SetValue(HasItemsPropertyKey, _items.Count > 0);
-            this.OnItemsChanged(e);
+            SetValue(HasItemsPropertyKey, _items.Count > 0);
+
+            // If the focused item is removed, drop our reference to it.
+            if (_focusedInfo is not null && _focusedInfo.Index < 0)
+            {
+                _focusedInfo = null;
+            }
+
+            OnItemsChanged(e);
         }
-
-        internal void NavigateToItem(object item, int elementIndex)
-            => FocusItem(NewItemInfo(item, ItemContainerGenerator.ContainerFromItem(item), elementIndex));
-
-        internal virtual bool FocusItem(ItemInfo info) => false;
 
         #endregion Internal Methods
 
@@ -1244,17 +1242,17 @@ namespace System.Windows.Controls
         /// </returns>
         public static ItemsControl ItemsControlFromItemContainer(DependencyObject container)
         {
-            UIElement ui = container as UIElement;
-            if (ui == null)
+            if (container is not UIElement ui)
+            {
                 return null;
+            }
 
             // ui appeared in items collection
-            ItemsControl ic = (ui as FrameworkElement)?.Parent as ItemsControl;
-            if (ic != null)
+            if (LogicalTreeHelper.GetParent(ui) is ItemsControl ic)
             {
                 // this is the right ItemsControl as long as the item
                 // is (or is eligible to be) its own container
-                IGeneratorHost host = ic as IGeneratorHost;
+                IGeneratorHost host = ic;
                 if (host.IsItemItsOwnContainer(ui))
                     return ic;
                 else

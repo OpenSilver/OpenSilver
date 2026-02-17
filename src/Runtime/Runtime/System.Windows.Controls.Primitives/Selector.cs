@@ -733,8 +733,6 @@ namespace System.Windows.Controls.Primitives
         /// <param name="e">The arguments for the event.</param>
         protected virtual void OnSelectionChanged(SelectionChangedEventArgs e) => RaiseEvent(e);
 
-        internal virtual ScrollViewer ScrollHost { get; }
-
         internal SelectionChanger SelectionChange { get; }
 
         internal ObservableCollection<object> SelectedItemsImpl { get; }
