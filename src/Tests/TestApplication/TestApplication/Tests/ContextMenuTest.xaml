@@ -20,9 +20,100 @@
         <Border CornerRadius="5" Background="#E3F2FD" Padding="15" Margin="5" HorizontalAlignment="Center" MinWidth="280">
             <Border.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Cut" Click="MenuItem_Click"/>
-                    <MenuItem Header="Copy" Click="MenuItem_Click"/>
-                    <MenuItem Header="Paste" Click="MenuItem_Click"/>
+                    <MenuItem Header="File">
+                        <MenuItem Header="New">
+                            <MenuItem Header="Project..."
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="File..."
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="From Template">
+                                <MenuItem Header="Empty Project"
+                                          Click="MenuItem_Click" />
+                                <MenuItem Header="Console App"
+                                          Click="MenuItem_Click" />
+                                <MenuItem Header="Web App"
+                                          Click="MenuItem_Click" />
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Header="Open">
+                            <MenuItem Header="File..."
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Folder..."
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Recent">
+                                <MenuItem Header="Project1.sln"
+                                          Click="MenuItem_Click" />
+                                <MenuItem Header="Document.txt"
+                                          Click="MenuItem_Click" />
+                                <MenuItem Header="Notes.md"
+                                          Click="MenuItem_Click" />
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Header="Save"
+                                  Click="MenuItem_Click" />
+                        <MenuItem Header="Save As..."
+                                  Click="MenuItem_Click" />
+                        <Separator />
+                        <MenuItem Header="Exit"
+                                  Click="MenuItem_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Edit">
+                        <MenuItem Header="Undo"
+                                  Click="MenuItem_Click" />
+                        <MenuItem Header="Redo"
+                                  Click="MenuItem_Click" />
+                        <Separator />
+                        <MenuItem Header="Cut"
+                                  Click="MenuItem_Click" />
+                        <MenuItem Header="Copy"
+                                  Click="MenuItem_Click" />
+                        <MenuItem Header="Paste">
+                            <MenuItem Header="Paste"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Paste Special..."
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Paste as Path"
+                                      Click="MenuItem_Click" />
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Find and Replace">
+                            <MenuItem Header="Quick Find"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Quick Replace"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Find in Files"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Replace in Files"
+                                      Click="MenuItem_Click" />
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="View">
+                        <MenuItem Header="Zoom">
+                            <MenuItem Header="Zoom In"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Zoom Out"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Reset Zoom"
+                                      Click="MenuItem_Click" />
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Full Screen"
+                                  Click="MenuItem_Click" />
+                        <MenuItem Header="Toolbars">
+                            <MenuItem Header="Standard"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Debug"
+                                      Click="MenuItem_Click" />
+                            <MenuItem Header="Source Control"
+                                      Click="MenuItem_Click" />
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Help">
+                        <MenuItem Header="Documentation"
+                                  Click="MenuItem_Click" />
+                        <MenuItem Header="About"
+                                  Click="MenuItem_Click" />
+                    </MenuItem>
                 </ContextMenu>
             </Border.ContextMenu>
             <TextBlock Text="Right-click for simple menu" TextAlignment="Center"/>

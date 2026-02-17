@@ -3,6 +3,8 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Controls
 {
     /// <summary>
@@ -14,6 +16,7 @@ namespace System.Windows.Controls
         static Separator()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Separator), new PropertyMetadata(typeof(Separator)));
+            IsEnabledProperty.OverrideMetadata(typeof(Separator), new PropertyMetadata(BooleanBoxes.FalseBox));
         }
 
         /// <summary>

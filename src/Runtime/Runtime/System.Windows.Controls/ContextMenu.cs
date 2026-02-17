@@ -15,23 +15,10 @@ namespace System.Windows.Controls;
 /// <summary>
 /// Represents a pop-up menu that enables a control to expose functionality that is specific to the context of the control.
 /// </summary>
-/// <QualityBand>Preview</QualityBand>
 public class ContextMenu : MenuBase
 {
-    /// <summary>
-    /// Stores a reference to the object that owns the ContextMenu.
-    /// </summary>
     private FrameworkElement _owner;
-
-    /// <summary>
-    /// Stores a reference to the current Popup.
-    /// </summary>
     private Popup _popup;
-
-    /// <summary>
-    /// Stores a value indicating whether the IsOpen property is being updated by ContextMenu.
-    /// </summary>
-    private bool _settingIsOpen;
 
     static ContextMenu()
     {
@@ -41,7 +28,10 @@ public class ContextMenu : MenuBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ContextMenu"/> class.
     /// </summary>
-    public ContextMenu() { }
+    public ContextMenu()
+    {
+        MenuModeChanged += new EventHandler(OnIsMenuModeChanged);
+    }
 
     /// <summary>
     /// Identifies the <see cref="HorizontalOffset"/> dependency property.
@@ -63,18 +53,9 @@ public class ContextMenu : MenuBase
         set => SetValueInternal(HorizontalOffsetProperty, value);
     }
 
-    /// <summary>
-    /// Handles changes to the HorizontalOffset DependencyProperty.
-    /// </summary>
-    /// <param name="o">DependencyObject that changed.</param>
-    /// <param name="e">Event data for the DependencyPropertyChangedEvent.</param>
     private static void OnHorizontalOffsetChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
     {
-        var contextMenu = (ContextMenu)o;
-        if (contextMenu._popup is not null)
-        {
-            contextMenu._popup.HorizontalOffset = (double)e.NewValue;
-        }
+        ((ContextMenu)o)._popup?.HorizontalOffset = (double)e.NewValue;
     }
 
     /// <summary>
@@ -97,18 +78,9 @@ public class ContextMenu : MenuBase
         set => SetValueInternal(VerticalOffsetProperty, value);
     }
 
-    /// <summary>
-    /// Handles changes to the VerticalOffset DependencyProperty.
-    /// </summary>
-    /// <param name="o">DependencyObject that changed.</param>
-    /// <param name="e">Event data for the DependencyPropertyChangedEvent.</param>
     private static void OnVerticalOffsetChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
     {
-        var contextMenu = (ContextMenu)o;
-        if (contextMenu._popup is not null)
-        {
-            contextMenu._popup.VerticalOffset = (double)e.NewValue;
-        }
+        ((ContextMenu)o)._popup?.VerticalOffset = (double)e.NewValue;
     }
 
     /// <summary>
@@ -133,7 +105,7 @@ public class ContextMenu : MenuBase
     {
         get
         {
-            if (_owner is not null && !_owner.HasDefaultValue(ToolTipService.PlacementProperty))
+            if (_owner is not null && !_owner.HasDefaultValue(ContextMenuService.PlacementProperty))
             {
                 return ContextMenuService.GetPlacement(_owner);
             }
@@ -184,32 +156,27 @@ public class ContextMenu : MenuBase
             new PropertyMetadata(BooleanBoxes.FalseBox, OnIsOpenChanged));
 
     /// <summary>
-    /// Gets or sets a value indicating whether the ContextMenu is visible.
+    /// Gets or sets a value that indicates whether the <see cref="ContextMenu"/> is visible.
     /// </summary>
+    /// <returns>
+    /// true if the <see cref="ContextMenu"/> is visible; otherwise, false. The default is false.
+    /// </returns>
     public bool IsOpen
     {
         get => (bool)GetValue(IsOpenProperty);
         set => SetValueInternal(IsOpenProperty, value);
     }
 
-    /// <summary>
-    /// Handles changes to the IsOpen DependencyProperty.
-    /// </summary>
-    /// <param name="o">DependencyObject that changed.</param>
-    /// <param name="e">Event data for the DependencyPropertyChangedEvent.</param>
     private static void OnIsOpenChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
     {
         var contextMenu = (ContextMenu)o;
-        if (!contextMenu._settingIsOpen)
+        if ((bool)e.NewValue)
         {
-            if ((bool)e.NewValue)
-            {
-                contextMenu.OpenPopup();
-            }
-            else
-            {
-                contextMenu.ClosePopup();
-            }
+            contextMenu.OpenPopup();
+        }
+        else
+        {
+            contextMenu.ClosePopup();
         }
     }
 
@@ -236,51 +203,46 @@ public class ContextMenu : MenuBase
     }
 
     /// <summary>
-    /// Occurs when a particular instance of a ContextMenu opens.
+    /// Occurs when a particular instance of a <see cref="ContextMenu"/> opens.
     /// </summary>
     public event RoutedEventHandler Opened;
 
     /// <summary>
-    /// Called when the Opened event occurs.
+    /// Called when the <see cref="Opened"/> event occurs.
     /// </summary>
-    /// <param name="e">Event arguments.</param>
+    /// <param name="e">
+    /// The event data for the <see cref="Opened"/> event.
+    /// </param>
     protected virtual void OnOpened(RoutedEventArgs e) => Opened?.Invoke(this, e);
 
     /// <summary>
-    /// Occurs when a particular instance of a ContextMenu closes.
+    /// Occurs when a particular instance of a <see cref="ContextMenu"/> closes.
     /// </summary>
     public event RoutedEventHandler Closed;
 
     /// <summary>
-    /// Called when the Closed event occurs.
+    /// Called when the <see cref="Closed"/> event occurs.
     /// </summary>
-    /// <param name="e">Event arguments.</param>
+    /// <param name="e">
+    /// The event data for the <see cref="Closed"/> event.
+    /// </param>
     protected virtual void OnClosed(RoutedEventArgs e) => Closed?.Invoke(this, e);
 
-    /// <summary>
-    /// Called when the left mouse button is pressed.
-    /// </summary>
-    /// <param name="e">The event data for the MouseLeftButtonDown event.</param>
+    /// <inheritdoc />
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
         e.Handled = true;
         base.OnMouseLeftButtonDown(e);
     }
 
-    /// <summary>
-    /// Called when the right mouse button is pressed.
-    /// </summary>
-    /// <param name="e">The event data for the MouseRightButtonDown event.</param>
+    /// <inheritdoc />
     protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
     {
         e.Handled = true;
         base.OnMouseRightButtonDown(e);
     }
 
-    /// <summary>
-    /// Responds to the KeyDown event.
-    /// </summary>
-    /// <param name="e">The event data for the KeyDown event.</param>
+    /// <inheritdoc />
     protected override void OnKeyDown(KeyEventArgs e)
     {
         switch (e.Key)
@@ -294,7 +256,7 @@ public class ContextMenu : MenuBase
                 e.Handled = true;
                 break;
             case Key.Escape:
-                ClosePopup();
+                SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.FalseBox);
                 e.Handled = true;
                 break;
                 // case Key.Apps: // Key.Apps not defined by Silverlight 4
@@ -302,28 +264,31 @@ public class ContextMenu : MenuBase
         base.OnKeyDown(e);
     }
 
-    /// <summary>
-    /// Handles the MouseRightButtonDown event for the owning element.
-    /// </summary>
-    /// <param name="sender">Source of the event.</param>
-    /// <param name="e">Event arguments.</param>
+    private void OnIsMenuModeChanged(object sender, EventArgs e)
+    {
+        if (IsMenuMode)
+        {
+            Focus();
+        }
+        else
+        {
+            SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.FalseBox);
+        }
+    }
+
     private void HandleOwnerMouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
         PopupService.UpdateMousePosition(e);
 
-        OpenPopup();
+        SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.TrueBox);
         e.Handled = true;
     }
 
-    /// <summary>
-    /// Sets focus to the next item in the ContextMenu.
-    /// </summary>
-    /// <param name="down">True to move the focus down; false to move it up.</param>
     private void FocusNextItem(bool down)
     {
         int count = Items.Count;
         int startingIndex = down ? -1 : count;
-        if (FocusManager.GetFocusedElement() is MenuItem focusedMenuItem && this == focusedMenuItem.ParentMenuBase)
+        if (FocusManager.GetFocusedElement() is MenuItem focusedMenuItem && this == focusedMenuItem.LogicalParent)
         {
             startingIndex = ItemContainerGenerator.IndexFromContainer(focusedMenuItem);
         }
@@ -342,14 +307,6 @@ public class ContextMenu : MenuBase
         while (index != startingIndex);
     }
 
-    /// <summary>
-    /// Called when a child MenuItem is clicked.
-    /// </summary>
-    internal override void ChildMenuItemClicked() => ClosePopup();
-
-    /// <summary>
-    /// Opens the Popup.
-    /// </summary>
     private void OpenPopup()
     {
         if (_popup is null)
@@ -361,6 +318,8 @@ public class ContextMenu : MenuBase
                 StayOpen = false,
             };
 
+            _popup.Opened += new EventHandler(OnPopupOpened);
+            _popup.Closed += new EventHandler(OnPopupClosed);
             _popup.OutsideClick += new EventHandler<CancelEventArgs>(OnOutsideClick);
 
             if (ReadLocalValue(DataContextProperty) == DependencyProperty.UnsetValue)
@@ -381,37 +340,27 @@ public class ContextMenu : MenuBase
         }
 
         _popup.IsOpen = true;
-        Focus();
+    }
 
-        // Update IsOpen
-        _settingIsOpen = true;
-        IsOpen = true;
-        _settingIsOpen = false;
+    private void ClosePopup() => _popup?.IsOpen = false;
+
+    private void OnPopupOpened(object sender, EventArgs e)
+    {
+        IsMenuMode = true;
 
         OnOpened(new RoutedEventArgs());
+    }
+
+    private void OnPopupClosed(object sender, EventArgs e)
+    {
+        IsMenuMode = false;
+
+        OnClosed(new RoutedEventArgs());
     }
 
     private void OnOutsideClick(object sender, CancelEventArgs e)
     {
         e.Cancel = true;
-        ClosePopup();
-    }
-
-    /// <summary>
-    /// Closes the Popup.
-    /// </summary>
-    private void ClosePopup()
-    {
-        if (_popup is not null)
-        {
-            _popup.IsOpen = false;
-        }
-
-        // Update IsOpen
-        _settingIsOpen = true;
-        IsOpen = false;
-        _settingIsOpen = false;
-
-        OnClosed(new RoutedEventArgs());
+        SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.FalseBox);
     }
 }

@@ -4184,18 +4184,6 @@
                                                                    To="0.5" />
                                     </animation:Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="Highlighted">
-                                    <animation:Storyboard>
-                                        <animation:DoubleAnimation Duration="0"
-                                                                   animation:Storyboard.TargetName="Bg"
-                                                                   animation:Storyboard.TargetProperty="Opacity"
-                                                                   To="1" />
-                                        <animation:ColorAnimation Duration="0"
-                                                                  animation:Storyboard.TargetName="InnerBorder"
-                                                                  animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
-                                                                  To="#40FFFFFF" />
-                                    </animation:Storyboard>
-                                </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="FocusStates">
                                 <VisualState x:Name="Unfocused" />
@@ -4209,6 +4197,20 @@
                                                                   animation:Storyboard.TargetName="InnerBorder"
                                                                   animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
                                                                   To="#40FFFFFF" />
+                                    </animation:Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup>
+                                <VisualState>
+                                    <VisualState.StateTriggers>
+                                        <StateTrigger IsActive="{data:Binding HasItems, RelativeSource={data:RelativeSource Mode=TemplatedParent}}" />
+                                    </VisualState.StateTriggers>
+                                    <animation:Storyboard>
+                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="Arrow"
+                                                                                 animation:Storyboard.TargetProperty="Visibility">
+                                            <animation:DiscreteObjectKeyFrame KeyTime="0"
+                                                                              Value="Visible" />
+                                        </animation:ObjectAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -4246,7 +4248,7 @@
                                 <controls:ColumnDefinition Width="4" />
                                 <controls:ColumnDefinition Width="*" />
                                 <!--<controls:ColumnDefinition Width="37"/>
-                            <controls:ColumnDefinition Width="Auto"/>-->
+                        <controls:ColumnDefinition Width="Auto"/>-->
                                 <controls:ColumnDefinition Width="Auto" />
                             </controls:Grid.ColumnDefinitions>
                             <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
@@ -4255,44 +4257,46 @@
                                                        Margin="1"
                                                        VerticalAlignment="Center" />
                             <!--<controls:Border
-                            BorderThickness="1"
-                            CornerRadius="3"
-                            BorderBrush="#FFCDD3E6"
-                            Background="#FFE6EFF4"
-                            x:Name="GlyphPanel"
-                            Width="22"
-                            Height="22"
-                            Margin="1"
-                            Visibility="Collapsed">
-                            <shapes:Path
-                                Data="M0,5.1L1.7,5.2 3.4,7.1 8,0.4 9.2,0 3.3,10.8z"
-                                Fill="#FF0C12A1"
-                                x:Name="Glyph"
-                                Width="9"
-                                Height="11"
-                                FlowDirection="LeftToRight"/>
-                        </controls:Border>-->
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        BorderBrush="#FFCDD3E6"
+                        Background="#FFE6EFF4"
+                        x:Name="GlyphPanel"
+                        Width="22"
+                        Height="22"
+                        Margin="1"
+                        Visibility="Collapsed">
+                        <shapes:Path
+                            Data="M0,5.1L1.7,5.2 3.4,7.1 8,0.4 9.2,0 3.3,10.8z"
+                            Fill="#FF0C12A1"
+                            x:Name="Glyph"
+                            Width="9"
+                            Height="11"
+                            FlowDirection="LeftToRight"/>
+                    </controls:Border>-->
                             <controls:ContentPresenter x:Name="Presenter"
                                                        Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
                                                        ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
                                                        Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                        controls:Grid.Column="2" />
                             <!--<controls:TextBlock
-                            Text="{TemplateBinding InputGestureText}"
-                            Margin="{TemplateBinding Padding}"
-                            controls:Grid.Column="4"/>-->
+                        Text="{TemplateBinding InputGestureText}"
+                        Margin="{TemplateBinding Padding}"
+                        controls:Grid.Column="4"/>-->
                             <!-- Submenu arrow indicator -->
-                            <shapes:Path x:Name="PART_Arrow"
+                            <shapes:Path x:Name="Arrow"
                                          controls:Grid.Column="3"
                                          Margin="4,0,6,0"
                                          VerticalAlignment="Center"
                                          Fill="#FF333333"
-                                         Data="M 0 0 L 4 3.5 L 0 7 Z" />
+                                         Data="M 0 0 L 4 3.5 L 0 7 Z"
+                                         Visibility="Collapsed" />
                         </controls:Grid>
                         <!-- Submenu Popup -->
                         <primitives:Popup x:Name="PART_Popup"
                                           Placement="Right"
-                                          StaysWithinScreenBounds="True">
+                                          StaysWithinScreenBounds="True"
+                                          IsOpen="{TemplateBinding Property={x:Static controls:MenuItem.IsSubmenuOpenProperty}}">
                             <controls:Border Background="#FFF5F5F5"
                                              BorderBrush="#FF959595"
                                              BorderThickness="1"

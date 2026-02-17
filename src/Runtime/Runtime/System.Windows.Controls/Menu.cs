@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Windows.Controls.Primitives;
@@ -11,7 +11,7 @@ namespace System.Windows.Controls;
 /// Represents a Windows menu control that enables you to hierarchically organize elements 
 /// associated with commands and event handlers.
 /// </summary>
-[StyleTypedProperty(Property = "ItemContainerStyle", StyleTargetType = typeof(MenuItem))]
+[StyleTypedProperty(Property = nameof(ItemContainerStyle), StyleTargetType = typeof(MenuItem))]
 public class Menu : MenuBase
 {
     static Menu()
@@ -22,13 +22,12 @@ public class Menu : MenuBase
     /// <summary>
     /// Initializes a new instance of the <see cref="Menu"/> class.
     /// </summary>
-    public Menu()
-    {
-    }
+    public Menu() { }
 
     /// <summary>
     /// Identifies the <see cref="IsMainMenu"/> dependency property.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty IsMainMenuProperty =
         DependencyProperty.Register(
             nameof(IsMainMenu),
@@ -47,6 +46,7 @@ public class Menu : MenuBase
     /// If there are multiple <see cref="Menu"/> controls on a page, menus that should not receive 
     /// ALT or F10 key notifications should set this property to <c>false</c>.
     /// </remarks>
+    [OpenSilver.NotImplemented]
     public bool IsMainMenu
     {
         get => (bool)GetValue(IsMainMenuProperty);
@@ -70,6 +70,7 @@ public class Menu : MenuBase
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
+
         if (e.Handled)
         {
             return;
@@ -79,60 +80,32 @@ public class Menu : MenuBase
         {
             case Key.Up:
             case Key.Down:
-                FocusNextItem(e.Key == Key.Down);
-                e.Handled = true;
+                if (CurrentSelection is not null)
+                {
+                    // Only for non vertical layout Up/Down open the submenu
+                    Panel itemsHost = ItemsHost;
+                    bool isVertical = itemsHost is not null && itemsHost.HasLogicalOrientation && itemsHost.LogicalOrientation == Orientation.Vertical;
+                    if (!isVertical)
+                    {
+                        CurrentSelection.OpenSubmenuWithKeyboard();
+                        e.Handled = true;
+                    }
+                }
                 break;
             case Key.Left:
             case Key.Right:
-                FocusNextItem(e.Key == Key.Right);
-                e.Handled = true;
-                break;
-            case Key.Escape:
-                // Clear focus from menu
-                e.Handled = true;
-                break;
-        }
-    }
-
-    /// <summary>
-    /// Sets focus to the next item in the Menu.
-    /// </summary>
-    /// <param name="forward">True to move the focus forward; false to move it backward.</param>
-    private void FocusNextItem(bool forward)
-    {
-        int count = Items.Count;
-        if (count == 0)
-        {
-            return;
-        }
-
-        int startingIndex = forward ? -1 : count;
-        if (FocusManager.GetFocusedElement() is MenuItem focusedMenuItem && this == focusedMenuItem.ParentMenuBase)
-        {
-            startingIndex = ItemContainerGenerator.IndexFromContainer(focusedMenuItem);
-        }
-
-        int index = startingIndex;
-        do
-        {
-            index = (index + count + (forward ? 1 : -1)) % count;
-            if (ItemContainerGenerator.ContainerFromIndex(index) is MenuItem container)
-            {
-                if (container.IsEnabled && container.Focus())
+                if (CurrentSelection is not null)
                 {
-                    break;
+                    // Only for vertical layout Left/Right open the submenu
+                    Panel itemsHost = ItemsHost;
+                    bool isVertical = itemsHost is not null && itemsHost.HasLogicalOrientation && itemsHost.LogicalOrientation == Orientation.Vertical;
+                    if (isVertical)
+                    {
+                        CurrentSelection.OpenSubmenuWithKeyboard();
+                        e.Handled = true;
+                    }
                 }
-            }
+                break;
         }
-        while (index != startingIndex);
-    }
-
-    /// <summary>
-    /// Called when a child <see cref="MenuItem"/> is clicked.
-    /// </summary>
-    internal override void ChildMenuItemClicked()
-    {
-        // Close all submenus and exit menu mode
-        base.ChildMenuItemClicked();
     }
 }

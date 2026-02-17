@@ -3,959 +3,1421 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Collections.Specialized;
-using System.Windows.Input;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Commands;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Defines the different roles that a <see cref="MenuItem"/> can have.
+/// </summary>
+public enum MenuItemRole
 {
     /// <summary>
-    /// Represents a selectable item inside a Menu or ContextMenu.
+    /// Top-level menu item that can invoke commands.
     /// </summary>
-    /// <QualityBand>Preview</QualityBand>
-    [TemplateVisualState(Name = "Normal", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "Disabled", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "Highlighted", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "Unfocused", GroupName = "FocusStates")]
-    [TemplateVisualState(Name = "Focused", GroupName = "FocusStates")]
-    [TemplatePart(Name = SubMenuPopupPartName, Type = typeof(Popup))]
-    [TemplatePart(Name = SubMenuArrowPartName, Type = typeof(UIElement))]
-    [StyleTypedProperty(Property = "ItemContainerStyle", StyleTargetType = typeof(MenuItem))]
-    public class MenuItem : HeaderedItemsControl // , ICommandSource // ICommandSource not defined by Silverlight 4
+    TopLevelItem,
+
+    /// <summary>
+    /// Header for top-level menus.
+    /// </summary>
+    TopLevelHeader,
+
+    /// <summary>
+    /// Menu item in a submenu that can invoke commands.
+    /// </summary>
+    SubmenuItem,
+
+    /// <summary>
+    /// Header for a submenu.
+    /// </summary>
+    SubmenuHeader,
+}
+
+/// <summary>
+/// Represents a selectable item inside a <see cref="Menu"/> or <see cref="ContextMenu"/>.
+/// </summary>
+/// <QualityBand>Preview</QualityBand>
+[TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+[TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+[TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+[TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+[TemplatePart(Name = SubMenuPopupPartName, Type = typeof(Popup))]
+[StyleTypedProperty(Property = nameof(ItemContainerStyle), StyleTargetType = typeof(MenuItem))]
+public class MenuItem : HeaderedItemsControl, ICommandSource
+{
+    private const string SubMenuPopupPartName = "PART_Popup";
+
+    private Popup _submenuPopup;
+    private PopupRoot _submenuPopupRoot;
+    private MenuItem _currentSelection;
+    private bool _isFocused;
+    private bool _canExecute = true;
+    private CanExecuteChangedWeakEventListener _canExecuteChangedListener;
+    private DispatcherTimer _openHierarchyTimer;
+
+    static MenuItem()
     {
-        private const string SubMenuPopupPartName = "PART_Popup";
-        private const string SubMenuArrowPartName = "PART_Arrow";
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(MenuItem), new PropertyMetadata(typeof(MenuItem)));
+        EventManager.RegisterClassHandler<MenuItem>(MenuBase.IsSelectedChangedEvent, new RoutedPropertyChangedEventHandler<bool>(OnIsSelectedChanged));
+    }
 
-        /// <summary>
-        /// Occurs when a MenuItem is clicked.
-        /// </summary>
-        public event RoutedEventHandler Click;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MenuItem"/> class.
+    /// </summary>
+    public MenuItem() { }
 
-        /// <summary>
-        /// Stores a value indicating whether this element has logical focus.
-        /// </summary>
-        private bool _isFocused;
+    /// <summary>
+    /// Identifies the <see cref="Click"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent ClickEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(Click),
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MenuItem));
 
-        /// <summary>
-        /// Reference to the submenu popup.
-        /// </summary>
-        private Popup _submenuPopup;
+    /// <summary>
+    /// Occurs when a <see cref="MenuItem"/> is clicked.
+    /// </summary>
+    public event RoutedEventHandler Click
+    {
+        add => AddHandler(ClickEvent, value);
+        remove => RemoveHandler(ClickEvent, value);
+    }
 
-        /// <summary>
-        /// Reference to the submenu arrow indicator.
-        /// </summary>
-        private UIElement _submenuArrow;
+    /// <summary>
+    /// Identifies the <see cref="SubmenuOpened"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent SubmenuOpenedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(SubmenuOpened),
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MenuItem));
 
-        /// <summary>
-        /// Reference to the popup root used for global input handling.
-        /// </summary>
-        private PopupRoot _submenuPopupRoot;
+    /// <summary>
+    /// Occurs when the state of the <see cref="IsSubmenuOpen"/> property changes to true.
+    /// </summary>
+    public event RoutedEventHandler SubmenuOpened
+    {
+        add => AddHandler(SubmenuOpenedEvent, value);
+        remove => RemoveHandler(SubmenuOpenedEvent, value);
+    }
 
-        /// <summary>
-        /// Gets or sets a reference to the MenuBase parent (for top-level items).
-        /// </summary>
-        internal MenuBase ParentMenuBase { get; set; }
+    /// <summary>
+    /// Identifies the <see cref="SubmenuClosed"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent SubmenuClosedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(SubmenuClosed),
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MenuItem));
 
-        /// <summary>
-        /// Gets or sets a reference to the parent MenuItem (for nested items).
-        /// </summary>
-        internal MenuItem ParentMenuItem { get; set; }
+    /// <summary>
+    /// Occurs when the state of the <see cref="IsSubmenuOpen"/> property changes to false.
+    /// </summary>
+    public event RoutedEventHandler SubmenuClosed
+    {
+        add => AddHandler(SubmenuClosedEvent, value);
+        remove => RemoveHandler(SubmenuClosedEvent, value);
+    }
 
-        /// <summary>
-        /// Gets a value indicating whether this is a top-level menu item (direct child of Menu).
-        /// </summary>
-        private bool IsTopLevel => ParentMenuBase is Menu;
+    /// <summary>
+    /// Identifies the <see cref="StaysOpenOnClick"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty StaysOpenOnClickProperty =
+        DependencyProperty.Register(
+            nameof(StaysOpenOnClick),
+            typeof(bool),
+            typeof(MenuItem),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
 
-        /// <summary>
-        /// Gets the root MenuBase for this menu item.
-        /// </summary>
-        private MenuBase RootMenuBase
+    /// <summary>
+    /// Gets or sets a value that indicates that the submenu in which this <see cref="MenuItem"/> 
+    /// is located should not close when this item is clicked.
+    /// </summary>
+    /// <returns>
+    /// true if the submenu in which this <see cref="MenuItem"/> is located should not close when this 
+    /// item is clicked; otherwise, false. The default is false.
+    /// </returns>
+    public bool StaysOpenOnClick
+    {
+        get => (bool)GetValue(StaysOpenOnClickProperty);
+        set => SetValueInternal(StaysOpenOnClickProperty, value);
+    }
+
+    private static readonly DependencyPropertyKey RolePropertyKey =
+        DependencyProperty.RegisterReadOnly(
+            nameof(Role),
+            typeof(MenuItemRole),
+            typeof(MenuItem),
+            new PropertyMetadata(MenuItemRole.TopLevelItem, OnRoleChanged));
+
+    /// <summary>
+    /// Identifies the <see cref="Role"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty RoleProperty = RolePropertyKey.DependencyProperty;
+
+    /// <summary>
+    /// Gets a value that indicates the role of a <see cref="MenuItem"/>.
+    /// </summary>
+    /// <returns>
+    /// One of the <see cref="MenuItemRole"/> values. The default is <see cref="MenuItemRole.TopLevelItem"/>.
+    /// </returns>
+    public MenuItemRole Role => (MenuItemRole)GetValue(RoleProperty);
+
+    private static void OnRoleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var menuItem = (MenuItem)d;
+
+        if (menuItem._submenuPopup is null)
         {
-            get
+            return;
+        }
+
+        if (IsTopLevelRole((MenuItemRole)e.OldValue) != IsTopLevelRole((MenuItemRole)e.NewValue))
+        {
+            menuItem.ConfigurePopupForRole();
+        }
+    }
+
+    private void UpdateRole()
+    {
+        MenuItemRole type;
+
+        if (HasItems)
+        {
+            if (LogicalParent is Menu)
             {
-                MenuBase root = ParentMenuBase;
-                MenuItem current = this;
-                while (current != null)
-                {
-                    if (current.ParentMenuBase != null)
-                    {
-                        root = current.ParentMenuBase;
-                    }
-                    current = current.ParentMenuItem;
-                }
-                return root;
+                type = MenuItemRole.TopLevelHeader;
+            }
+            else
+            {
+                type = MenuItemRole.SubmenuHeader;
+            }
+        }
+        else
+        {
+            if (LogicalParent is Menu)
+            {
+                type = MenuItemRole.TopLevelItem;
+            }
+            else
+            {
+                type = MenuItemRole.SubmenuItem;
             }
         }
 
-        /// <summary>
-        /// Gets or sets the command associated with the menu item.
-        /// </summary>
-        public ICommand Command
-        {
-            get { return (ICommand)GetValue(CommandProperty); }
-            set { SetValue(CommandProperty, value); }
-        }
+        SetValueInternal(RolePropertyKey, type);
+    }
 
-        /// <summary>
-        /// Identifies the Command dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
-            "Command",
+    /// <summary>
+    /// Identifies the <see cref="Command"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty CommandProperty =
+        DependencyProperty.Register(
+            nameof(Command),
             typeof(ICommand),
             typeof(MenuItem),
             new PropertyMetadata(null, OnCommandChanged));
 
-        /// <summary>
-        /// Handles changes to the Command DependencyProperty.
-        /// </summary>
-        /// <param name="o">DependencyObject that changed.</param>
-        /// <param name="e">Event data for the DependencyPropertyChangedEvent.</param>
-        private static void OnCommandChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            ((MenuItem)o).OnCommandChanged((ICommand)e.OldValue, (ICommand)e.NewValue);
-        }
+    /// <summary>
+    /// Gets or sets the command associated with the menu item.
+    /// </summary>
+    /// <returns>
+    /// The command associated with the <see cref="MenuItem"/>. The default is null.
+    /// </returns>
+    public ICommand Command
+    {
+        get => (ICommand)GetValue(CommandProperty);
+        set => SetValueInternal(CommandProperty, value);
+    }
 
-        /// <summary>
-        /// Handles changes to the Command property.
-        /// </summary>
-        /// <param name="oldValue">Old value.</param>
-        /// <param name="newValue">New value.</param>
-        private void OnCommandChanged(ICommand oldValue, ICommand newValue)
-        {
-            if (null != oldValue)
-            {
-                oldValue.CanExecuteChanged -= HandleCanExecuteChanged;
-            }
-            if (null != newValue)
-            {
-                newValue.CanExecuteChanged += HandleCanExecuteChanged;
-            }
-            UpdateIsEnabled();
-        }
+    private static void OnCommandChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    {
+        ((MenuItem)o).OnCommandChanged((ICommand)e.NewValue);
+    }
 
-        /// <summary>
-        /// Gets or sets the parameter to pass to the Command property of a MenuItem.
-        /// </summary>
-        public object CommandParameter
-        {
-            get { return (object)GetValue(CommandParameterProperty); }
-            set { SetValue(CommandParameterProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the CommandParameter dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(
-            "CommandParameter",
+    /// <summary>
+    /// Identifies the <see cref="CommandParameter"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty CommandParameterProperty =
+        DependencyProperty.Register(
+            nameof(CommandParameter),
             typeof(object),
             typeof(MenuItem),
             new PropertyMetadata(null, OnCommandParameterChanged));
 
-        /// <summary>
-        /// Handles changes to the CommandParameter DependencyProperty.
-        /// </summary>
-        /// <param name="o">DependencyObject that changed.</param>
-        /// <param name="e">Event data for the DependencyPropertyChangedEvent.</param>
-        private static void OnCommandParameterChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            ((MenuItem)o).UpdateIsEnabled();
-        }
+    /// <summary>
+    /// Gets or sets the parameter to pass to the <see cref="Command"/> property of a <see cref="MenuItem"/>.
+    /// </summary>
+    /// <returns>
+    /// The parameter to pass to the <see cref="Command"/> property of a <see cref="MenuItem"/>. The default is null.
+    /// </returns>
+    public object CommandParameter
+    {
+        get => GetValue(CommandParameterProperty);
+        set => SetValueInternal(CommandParameterProperty, value);
+    }
 
-        /// <summary>
-        /// Gets or sets the icon that appears in a MenuItem.
-        /// </summary>
-        public object Icon
-        {
-            get { return GetValue(IconProperty); }
-            set { SetValue(IconProperty, value); }
-        }
+    private static void OnCommandParameterChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    {
+        ((MenuItem)o).UpdateCanExecute();
+    }
 
-        /// <summary>
-        /// Identifies the Icon dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
-            "Icon",
+    /// <summary>
+    /// Identifies the <see cref="CommandTarget"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty CommandTargetProperty =
+        DependencyProperty.Register(
+            nameof(CommandTarget),
+            typeof(IInputElement),
+            typeof(MenuItem),
+            new PropertyMetadata((object)null));
+
+    /// <summary>
+    /// Gets or sets the target element on which to raise the specified command.
+    /// </summary>
+    /// <returns>
+    /// The element on which to raise the specified command. The default is null.
+    /// </returns>
+    public IInputElement CommandTarget
+    {
+        get => (IInputElement)GetValue(CommandTargetProperty);
+        set => SetValueInternal(CommandTargetProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="Icon"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IconProperty =
+        DependencyProperty.Register(
+            nameof(Icon),
             typeof(object),
             typeof(MenuItem),
-            new PropertyMetadata(null));
+            new PropertyMetadata((object)null));
 
-        /// <summary>
-        /// Identifies the <see cref="IsSubmenuOpen"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IsSubmenuOpenProperty = DependencyProperty.Register(
+    /// <summary>
+    /// Gets or sets the icon that appears in a <see cref="MenuItem"/>.
+    /// </summary>
+    /// <returns>
+    /// The icon that appears in a <see cref="MenuItem"/>. The default value is null.
+    /// </returns>
+    public object Icon
+    {
+        get => GetValue(IconProperty);
+        set => SetValueInternal(IconProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="IsSubmenuOpen"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsSubmenuOpenProperty =
+        DependencyProperty.Register(
             nameof(IsSubmenuOpen),
             typeof(bool),
             typeof(MenuItem),
             new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSubmenuOpenChanged));
 
-        /// <summary>
-        /// Gets or sets a value that indicates whether the submenu of the <see cref="MenuItem"/> is open.
-        /// </summary>
-        public bool IsSubmenuOpen
-        {
-            get => (bool)GetValue(IsSubmenuOpenProperty);
-            set => SetValueInternal(IsSubmenuOpenProperty, value);
-        }
+    /// <summary>
+    /// Gets or sets a value that indicates whether the submenu of the <see cref="MenuItem"/> is open.
+    /// </summary>
+    /// <returns>
+    /// true if the submenu of the <see cref="MenuItem"/> is open; otherwise, false. The default is false.
+    /// </returns>
+    public bool IsSubmenuOpen
+    {
+        get => (bool)GetValue(IsSubmenuOpenProperty);
+        set => SetValueInternal(IsSubmenuOpenProperty, value);
+    }
 
-        private static void OnIsSubmenuOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var menuItem = (MenuItem)d;
-            bool isOpen = (bool)e.NewValue;
+    private static void OnIsSubmenuOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var menuItem = (MenuItem)d;
 
-            if (menuItem._submenuPopup != null)
+        menuItem.StopOpenHierarchyTimer();
+
+        // When opening, clear any current selection in the submenu
+        if ((bool)e.NewValue)
+        {
+            // When menuitem's submenu opens, it should be selected.
+            menuItem.SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.TrueBox);
+
+            if (menuItem.Role == MenuItemRole.TopLevelHeader)
             {
-                menuItem._submenuPopup.IsOpen = isOpen;
+                menuItem.SetMenuMode(true);
             }
 
-            // When opening, clear any current selection in the submenu
-            if (isOpen)
+            menuItem.CurrentSelection = null;
+
+            menuItem.OnSubmenuOpened(new RoutedEventArgs(SubmenuOpenedEvent, menuItem));
+        }
+        else
+        {
+            if (menuItem.CurrentSelection is MenuItem selectedMenuItem)
             {
-                menuItem.CurrentSelection = null;
+                // We're about to close the submenu -- if focus is within
+                // the subtree, we need to take it back so that Focus isn't
+                // left in an orphaned tree.
+                if (selectedMenuItem._isFocused)
+                {
+                    menuItem.Focus();
+                }
+
+                if (selectedMenuItem.IsSubmenuOpen)
+                {
+                    selectedMenuItem.SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.FalseBox);
+                }
             }
 
-            menuItem.ChangeVisualState(true);
+            menuItem.CurrentSelection = null;
+
+            // No Popup in the style so fire closed now
+            if (menuItem._submenuPopup is null)
+            {
+                menuItem.OnSubmenuClosed(new RoutedEventArgs(SubmenuClosedEvent, menuItem));
+            }
         }
 
-        /// <summary>
-        /// Identifies the <see cref="IsHighlighted"/> dependency property.
-        /// </summary>
-        internal static readonly DependencyProperty IsHighlightedProperty = DependencyProperty.Register(
+        menuItem.ChangeVisualState(true);
+    }
+
+    private static readonly DependencyPropertyKey IsHighlightedPropertyKey =
+        DependencyProperty.RegisterReadOnly(
             nameof(IsHighlighted),
             typeof(bool),
             typeof(MenuItem),
             new PropertyMetadata(BooleanBoxes.FalseBox, OnIsHighlightedChanged));
 
-        /// <summary>
-        /// Gets or sets whether this menu item is highlighted.
-        /// </summary>
-        internal bool IsHighlighted
-        {
-            get => (bool)GetValue(IsHighlightedProperty);
-            set => SetValueInternal(IsHighlightedProperty, value);
-        }
+    /// <summary>
+    /// Identifies the <see cref="IsHighlighted"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsHighlightedProperty = IsHighlightedPropertyKey.DependencyProperty;
 
-        private static void OnIsHighlightedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((MenuItem)d).ChangeVisualState(true);
-        }
+    /// <summary>
+    /// Gets a value that indicates whether a <see cref="MenuItem"/> is highlighted.
+    /// </summary>
+    /// <returns>
+    /// true if a <see cref="MenuItem"/> is highlighted; otherwise, false. The default is false.
+    /// </returns>
+    public bool IsHighlighted
+    {
+        get => (bool)GetValue(IsHighlightedProperty);
+        protected set => SetValueInternal(IsHighlightedPropertyKey, value);
+    }
 
-        /// <summary>
-        /// Currently selected child item in this submenu.
-        /// </summary>
-        private MenuItem _currentSelection;
+    private static void OnIsHighlightedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((MenuItem)d).ChangeVisualState(true);
+    }
 
-        /// <summary>
-        /// Gets or sets the currently selected child MenuItem.
-        /// </summary>
-        internal MenuItem CurrentSelection
+    /// <summary>
+    /// Identifies the <see cref="IsSelected"/> dependency property.
+    /// </summary>
+    internal static readonly DependencyProperty IsSelectedProperty =
+        SelectorItem.IsSelectedProperty.AddOwner(
+            typeof(MenuItem),
+            new FrameworkPropertyMetadata(
+                BooleanBoxes.FalseBox,
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                OnIsSelectedChanged));
+
+    internal bool IsSelected
+    {
+        get => (bool)GetValue(IsSelectedProperty);
+        set => SetValueInternal(IsSelectedProperty, value);
+    }
+
+    private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        MenuItem menuItem = (MenuItem)d;
+        // When IsSelected changes, IsHighlighted should reflect IsSelected
+        // Note: it is okay for IsHighlighted and IsSelected to be different.
+        //       Selection and highlight will separate when mousing around in
+        //       a submenu when any timers are active.  Until you hover long
+        //       enough and your selection is "committed", selection and highlight
+        //       can disagree.
+        menuItem.SetValueInternal(IsHighlightedPropertyKey, e.NewValue);
+
+        // If IsSelected is changing to false, make sure to close
+        // our submenu before doing anything.
+        if ((bool)e.OldValue)
         {
-            get => _currentSelection;
-            set
+            if (menuItem.IsSubmenuOpen)
             {
-                if (_currentSelection != value)
+                menuItem.SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.FalseBox);
+            }
+
+            // Also stop any timers immediately when we become deselected.
+            menuItem.StopOpenHierarchyTimer();
+        }
+
+        menuItem.RaiseEvent(new RoutedPropertyChangedEventArgs<bool>((bool)e.OldValue, (bool)e.NewValue, MenuBase.IsSelectedChangedEvent));
+    }
+
+    /// <summary>
+    ///     Called when IsSelected changed on this element or any descendant.
+    /// </summary>
+    private static void OnIsSelectedChanged(object sender, RoutedPropertyChangedEventArgs<bool> e)
+    {
+        // If IsSelected changed on a child of the MenuItem, change CurrentSelection
+        // to the element that sent the event and handle the event.
+        if (sender == e.OriginalSource)
+        {
+            return;
+        }
+
+        if (e.OriginalSource is not MenuItem source)
+        {
+            return;
+        }
+
+        MenuItem menuItem = (MenuItem)sender;
+
+        if (e.NewValue)
+        {
+            // If the MenuItem is selected and it's a new item that's a child of ours,
+            // change the CurrentSelection.
+            if (menuItem.CurrentSelection != source && source.LogicalParent == menuItem)
+            {
+                if (menuItem.CurrentSelection != null && menuItem.CurrentSelection.IsSubmenuOpen)
                 {
-                    if (_currentSelection != null)
-                    {
-                        _currentSelection.IsHighlighted = false;
-                    }
-                    _currentSelection = value;
-                    if (_currentSelection != null)
-                    {
-                        _currentSelection.IsHighlighted = true;
-                    }
+                    menuItem.CurrentSelection.SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.FalseBox);
+                }
+
+                menuItem.CurrentSelection = source;
+            }
+        }
+        else
+        {
+            // If the item is no longer selected
+            // If the MenuItem has been deselected and it's the CurrentSelection,
+            // set our CurrentSelection to null.
+            if (menuItem.CurrentSelection == source)
+            {
+                menuItem.CurrentSelection = null;
+            }
+        }
+
+        // Mark the event as handled as long as it came from a MenuItem underneath us
+        // even if we didn't necessarily do anything.
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// Gets a value that indicates whether or not the <see cref="MenuItem"/> is enabled.
+    /// </summary>
+    /// <returns>
+    /// true if the <see cref="MenuItem"/> is enabled; otherwise, false.
+    /// </returns>
+    protected override bool IsEnabledCore => base.IsEnabledCore && CanExecute;
+
+    /// <inheritdoc />
+    public override void OnApplyTemplate()
+    {
+        // Unhook from old popup
+        if (_submenuPopup is not null)
+        {
+            _submenuPopup.Opened -= new EventHandler(OnSubmenuOpened);
+            _submenuPopup.Closed -= new EventHandler(OnSubmenuClosed);
+            _submenuPopup.OutsideClick -= new EventHandler<CancelEventArgs>(OnSubmenuOutsideClick);
+        }
+
+        DetachPopupRootHandlers();
+
+        base.OnApplyTemplate();
+
+        // Get the popup from template
+        _submenuPopup = GetTemplateChild(SubMenuPopupPartName) as Popup;
+
+        if (_submenuPopup is not null)
+        {
+            _submenuPopup.PlacementTarget = this;
+            _submenuPopup.Opened += new EventHandler(OnSubmenuOpened);
+            _submenuPopup.Closed += new EventHandler(OnSubmenuClosed);
+            ConfigurePopupForRole();
+        }
+
+        ChangeVisualState(false);
+    }
+
+    /// <inheritdoc />
+    protected override void OnGotFocus(RoutedEventArgs e)
+    {
+        base.OnGotFocus(e);
+
+        _isFocused = true;
+        if (!IsSelected)
+        {
+            SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.TrueBox);
+        }
+
+        ChangeVisualState(true);
+        ItemsControlFromItemContainer(this)?.NotifyItemGotFocus(this);
+    }
+
+    /// <inheritdoc />
+    protected override void OnLostFocus(RoutedEventArgs e)
+    {
+        base.OnLostFocus(e);
+
+        _isFocused = false;
+        if (!IsSubmenuOpen && IsSelected)
+        {
+            SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.FalseBox);
+        }
+
+        ChangeVisualState(true);
+        ItemsControlFromItemContainer(this)?.NotifyItemLostFocus(this);
+    }
+
+    /// <inheritdoc />
+    protected override void OnMouseEnter(MouseEventArgs e)
+    {
+        base.OnMouseEnter(e);
+
+        MenuItemRole role = Role;
+
+        if (role == MenuItemRole.TopLevelItem || role == MenuItemRole.TopLevelHeader)
+        {
+            if (IsInMenuMode)
+            {
+                // When mousing over a top-level hierarchy, it should open immediately.
+                if (!IsSubmenuOpen)
+                {
+                    OpenHierarchy();
+                }
+            }
+            else
+            {
+                if (IsMouseOver != IsSelected)
+                {
+                    SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.Box(IsMouseOver));
                 }
             }
         }
-
-        static MenuItem()
+        else
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(MenuItem), new PropertyMetadata(typeof(MenuItem)));
-        }
+            MenuItem sibling = CurrentSibling;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MenuItem"/> class.
-        /// </summary>
-        public MenuItem()
-        {
-            UpdateIsEnabled();
-        }
-
-        /// <summary>
-        /// Called when the template's tree is generated.
-        /// </summary>
-        public override void OnApplyTemplate()
-        {
-            // Unhook from old popup
-            if (_submenuPopup != null)
+            if (sibling is not null && sibling.IsSubmenuOpen)
             {
-                _submenuPopup.Opened -= OnSubmenuOpened;
-                _submenuPopup.Closed -= OnSubmenuClosed;
-                _submenuPopup.OutsideClick -= OnSubmenuOutsideClick;
-            }
-            DetachPopupRootHandlers();
-
-            base.OnApplyTemplate();
-
-            // Get the popup from template
-            _submenuPopup = GetTemplateChild(SubMenuPopupPartName) as Popup;
-
-            if (_submenuPopup != null)
-            {
-                _submenuPopup.PlacementTarget = this;
-                // Top-level items open below, submenu items open to the right
-                _submenuPopup.Placement = IsTopLevel ? PlacementMode.Bottom : PlacementMode.Right;
-                // StayOpen = false so popup root can capture input for outside-click detection.
-                _submenuPopup.StayOpen = false;
-                _submenuPopup.Opened += OnSubmenuOpened;
-                _submenuPopup.Closed += OnSubmenuClosed;
-                _submenuPopup.OutsideClick += OnSubmenuOutsideClick;
+                sibling.SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.FalseBox);
             }
 
-            // Get the arrow from template and update visibility
-            _submenuArrow = GetTemplateChild(SubMenuArrowPartName) as UIElement;
-            UpdateSubmenuArrowVisibility();
-
-            ChangeVisualState(false);
-        }
-
-        /// <summary>
-        /// Updates the visibility of the submenu arrow based on whether this item has children.
-        /// </summary>
-        private void UpdateSubmenuArrowVisibility()
-        {
-            if (_submenuArrow != null)
+            if (!IsSubmenuOpen)
             {
-                _submenuArrow.Visibility = HasItems ? Visibility.Visible : Visibility.Collapsed;
+                FocusOrSelect();
+            }
+            else
+            {
+                Debug.Assert(IsSelected, "When IsSubmenuOpen = true, IsSelected should be true as well");
+
+                IsHighlighted = true;
+            }
+
+            if (!IsSelected || !IsSubmenuOpen)
+            {
+                StartOpenHierarchyTimer();
             }
         }
+    }
 
-        private void OnSubmenuOpened(object sender, EventArgs e)
+    /// <inheritdoc />
+    protected override void OnMouseLeave(MouseEventArgs e)
+    {
+        base.OnMouseLeave(e);
+
+        StopOpenHierarchyTimer();
+
+        MenuItemRole role = Role;
+
+        if (role == MenuItemRole.TopLevelHeader || role == MenuItemRole.TopLevelItem)
+        {
+            if (!IsInMenuMode && IsMouseOver != IsSelected)
+            {
+                SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.Box(IsMouseOver));
+            }
+        }
+        else
         {
             if (!IsSubmenuOpen)
             {
-                IsSubmenuOpen = true;
-            }
-
-            AttachPopupRootHandlers();
-        }
-
-        private void OnSubmenuClosed(object sender, EventArgs e)
-        {
-            if (IsSubmenuOpen)
-            {
-                IsSubmenuOpen = false;
-            }
-
-            DetachPopupRootHandlers();
-        }
-
-        private void AttachPopupRootHandlers()
-        {
-            if (_submenuPopup is null)
-            {
-                return;
-            }
-
-            PopupRoot root = _submenuPopup.PopupRoot;
-            if (root is null || root == _submenuPopupRoot)
-            {
-                return;
-            }
-
-            DetachPopupRootHandlers();
-            _submenuPopupRoot = root;
-            _submenuPopupRoot.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPopupRootPreviewMouseDown), true);
-            _submenuPopupRoot.AddHandler(UIElement.PreviewMouseRightButtonDownEvent, new MouseButtonEventHandler(OnPopupRootPreviewMouseDown), true);
-            _submenuPopupRoot.MouseMove += OnPopupRootMouseMove;
-        }
-
-        private void DetachPopupRootHandlers()
-        {
-            if (_submenuPopupRoot is null)
-            {
-                return;
-            }
-
-            _submenuPopupRoot.RemoveHandler(UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPopupRootPreviewMouseDown));
-            _submenuPopupRoot.RemoveHandler(UIElement.PreviewMouseRightButtonDownEvent, new MouseButtonEventHandler(OnPopupRootPreviewMouseDown));
-            _submenuPopupRoot.MouseMove -= OnPopupRootMouseMove;
-            _submenuPopupRoot = null;
-        }
-
-        private void OnSubmenuOutsideClick(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            // When clicking outside a submenu, close the entire menu hierarchy.
-            // If the last click was inside the menu hierarchy, suppress outside-click closing.
-            MenuBase root = RootMenuBase;
-            if (root != null && root.SuppressOutsideClickClose)
-            {
-                e.Cancel = true;
-                return;
-            }
-
-            e.Cancel = true; // Prevent default popup close behavior
-            CloseAllMenus();
-
-            if (root != null)
-            {
-                root.SuppressOutsideClickClose = false;
-            }
-        }
-
-        private void OnPopupRootPreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            MenuBase root = RootMenuBase;
-            if (root is null)
-            {
-                return;
-            }
-
-            Point point = e.GetPosition(null);
-            if (TryGetMenuItemAtPoint(point, out MenuItem target, out MenuBase hitRoot) && hitRoot == root)
-            {
-                root.SuppressOutsideClickClose = true;
-
-                // If menu is already open, allow switching top-level menus on click
-                if (root is Menu menu && menu.IsMenuMode && target != null && target.IsTopLevel)
+                if (IsSelected)
                 {
-                    OpenMenuItemOnHover(target);
-                }
-            }
-            else
-            {
-                root.SuppressOutsideClickClose = false;
-            }
-        }
-
-        private void OnPopupRootMouseMove(object sender, MouseEventArgs e)
-        {
-            MenuBase root = RootMenuBase;
-            if (root is null)
-            {
-                return;
-            }
-
-            bool allowHoverOpen = root.IsMenuMode || root is ContextMenu;
-            if (!allowHoverOpen)
-            {
-                return;
-            }
-
-            Point point = e.GetPosition(null);
-            if (TryGetMenuItemAtPoint(point, out MenuItem target, out MenuBase hitRoot) && hitRoot == root)
-            {
-                OpenMenuItemOnHover(target);
-            }
-        }
-
-        private static bool TryGetMenuItemAtPoint(Point point, out MenuItem menuItem, out MenuBase root)
-        {
-            menuItem = null;
-            root = null;
-
-            Window window = Window.Current ?? Application.Current?.MainWindow;
-            if (window is null)
-            {
-                return false;
-            }
-
-            foreach (UIElement element in VisualTreeHelper.FindElementsInHostCoordinates(point, window))
-            {
-                DependencyObject current = element;
-                while (current != null)
-                {
-                    if (current is MenuItem mi)
-                    {
-                        menuItem = mi;
-                        root = mi.RootMenuBase;
-                        return true;
-                    }
-
-                    if (root is null && current is MenuBase mb)
-                    {
-                        root = mb;
-                    }
-
-                    current = VisualTreeHelper.GetParent(current);
-                }
-            }
-
-            return false;
-        }
-
-        private void OpenMenuItemOnHover(MenuItem target)
-        {
-            if (target is null || !target.IsEnabled)
-            {
-                return;
-            }
-
-            if (target.ParentMenuItem != null)
-            {
-                // Only open if parent submenu is already open
-                if (!target.ParentMenuItem.IsSubmenuOpen)
-                {
-                    return;
-                }
-
-                target.CloseSiblingSubmenus();
-                target.ParentMenuItem.CurrentSelection = target;
-
-                if (target.HasItems)
-                {
-                    target.IsSubmenuOpen = true;
-                }
-                return;
-            }
-
-            if (target.ParentMenuBase != null)
-            {
-                // Top-level in Menu or ContextMenu
-                if (target.ParentMenuBase is Menu menu && !menu.IsMenuMode)
-                {
-                    return;
-                }
-
-                target.CloseSiblingSubmenus();
-                target.ParentMenuBase.CurrentSelection = target;
-
-                if (target.HasItems)
-                {
-                    target.IsSubmenuOpen = true;
-                    if (target.ParentMenuBase is Menu menuBase && !menuBase.IsMenuMode)
-                    {
-                        menuBase.EnterMenuMode();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Invoked whenever an unhandled GotFocus event reaches this element in its route.
-        /// </summary>
-        /// <param name="e">A RoutedEventArgs that contains event data.</param>
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-            _isFocused = true;
-            ChangeVisualState(true);
-        }
-
-        /// <summary>
-        /// Raises the LostFocus routed event by using the event data that is provided.
-        /// </summary>
-        /// <param name="e">A RoutedEventArgs that contains event data.</param>
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            base.OnLostFocus(e);
-            _isFocused = false;
-            ChangeVisualState(true);
-        }
-
-        /// <summary>
-        /// Called whenever the mouse enters a MenuItem.
-        /// </summary>
-        /// <param name="e">The event data for the MouseEnter event.</param>
-        protected override void OnMouseEnter(MouseEventArgs e)
-        {
-            base.OnMouseEnter(e);
-
-            if (IsTopLevel)
-            {
-                // Top-level item
-                MenuBase menu = ParentMenuBase;
-                if (menu != null)
-                {
-                    // Check if we should open on hover:
-                    // 1. Menu is in menu mode (OpenOnMouseEnter or IsMenuMode)
-                    // 2. OR any sibling has its submenu open (user moved from one menu to another)
-                    bool shouldOpenOnHover = menu.OpenOnMouseEnter || menu.IsMenuMode || HasSiblingSubmenuOpen();
-
-                    if (shouldOpenOnHover)
-                    {
-                        // Menu mode: hovering opens this item and closes siblings
-                        CloseSiblingSubmenus();
-                        menu.CurrentSelection = this;
-
-                        if (HasItems)
-                        {
-                            IsSubmenuOpen = true;
-                            // Ensure menu mode is active
-                            if (!menu.IsMenuMode)
-                            {
-                                menu.EnterMenuMode();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Not in menu mode: just highlight
-                        menu.CurrentSelection = this;
-                    }
-                }
-            }
-            else
-            {
-                // Submenu item: highlight and open if has children
-                MenuItem parentItem = ParentMenuItem;
-                if (parentItem != null)
-                {
-                    // Close siblings
-                    CloseSiblingSubmenus();
-                    parentItem.CurrentSelection = this;
-
-                    // Open submenu on hover for nested items
-                    if (HasItems)
-                    {
-                        IsSubmenuOpen = true;
-                    }
-                }
-                else if (ParentMenuBase != null)
-                {
-                    // Direct child of MenuBase (ContextMenu)
-                    CloseSiblingSubmenus();
-                    ParentMenuBase.CurrentSelection = this;
-
-                    if (HasItems)
-                    {
-                        IsSubmenuOpen = true;
-                    }
-                }
-            }
-
-            ChangeVisualState(true);
-        }
-
-        /// <summary>
-        /// Checks if any sibling menu item has its submenu open.
-        /// </summary>
-        private bool HasSiblingSubmenuOpen()
-        {
-            ItemsControl parent = ParentMenuItem as ItemsControl ?? ParentMenuBase as ItemsControl;
-            if (parent != null)
-            {
-                foreach (object item in parent.Items)
-                {
-                    MenuItem sibling = parent.ItemContainerGenerator.ContainerFromItem(item) as MenuItem;
-                    if (sibling == null)
-                    {
-                        sibling = item as MenuItem;
-                    }
-                    if (sibling != null && sibling != this && sibling.IsSubmenuOpen)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Closes submenus of sibling menu items.
-        /// </summary>
-        private void CloseSiblingSubmenus()
-        {
-            // Get the parent that contains this item and its siblings
-            ItemsControl parent = ParentMenuItem as ItemsControl ?? ParentMenuBase as ItemsControl;
-            if (parent != null)
-            {
-                foreach (object item in parent.Items)
-                {
-                    MenuItem sibling = parent.ItemContainerGenerator.ContainerFromItem(item) as MenuItem;
-                    if (sibling == null)
-                    {
-                        sibling = item as MenuItem;
-                    }
-                    if (sibling != null && sibling != this && sibling.IsSubmenuOpen)
-                    {
-                        sibling.IsSubmenuOpen = false;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Called whenever the mouse leaves a MenuItem.
-        /// </summary>
-        /// <param name="e">The event data for the MouseLeave event.</param>
-        protected override void OnMouseLeave(MouseEventArgs e)
-        {
-            base.OnMouseLeave(e);
-
-            // Don't deselect if mouse is moving to our submenu
-            if (IsSubmenuOpen && _submenuPopup != null)
-            {
-                // Keep highlighted while submenu is open
-                return;
-            }
-
-            // If not in menu mode and this is a top-level item without open submenu, deselect
-            if (IsTopLevel && ParentMenuBase != null && !ParentMenuBase.IsMenuMode && !IsSubmenuOpen)
-            {
-                if (ParentMenuBase.CurrentSelection == this)
-                {
-                    ParentMenuBase.CurrentSelection = null;
-                }
-            }
-
-            ChangeVisualState(true);
-        }
-
-        /// <summary>
-        /// Called when the left mouse button is pressed.
-        /// </summary>
-        /// <param name="e">The event data for the MouseLeftButtonDown event.</param>
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
-            if (!e.Handled)
-            {
-                e.Handled = true;
-                HandleClick();
-            }
-            base.OnMouseLeftButtonDown(e);
-        }
-
-        /// <summary>
-        /// Called when the right mouse button is pressed.
-        /// </summary>
-        /// <param name="e">The event data for the MouseRightButtonDown event.</param>
-        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
-        {
-            if (!e.Handled && !HasItems)
-            {
-                e.Handled = true;
-                HandleClick();
-            }
-            base.OnMouseRightButtonDown(e);
-        }
-
-        /// <summary>
-        /// Handles click/activation of this menu item.
-        /// </summary>
-        private void HandleClick()
-        {
-            if (HasItems)
-            {
-                // Has children: toggle submenu
-                if (IsTopLevel)
-                {
-                    MenuBase menu = ParentMenuBase;
-                    if (menu != null)
-                    {
-                        if (!IsSubmenuOpen)
-                        {
-                            // Open and enter menu mode
-                            IsSubmenuOpen = true;
-                            menu.EnterMenuMode();
-                        }
-                        else
-                        {
-                            // Close and exit menu mode
-                            IsSubmenuOpen = false;
-                            menu.ExitMenuMode();
-                        }
-                    }
+                    SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.FalseBox);
                 }
                 else
                 {
-                    // Nested submenu header
-                    IsSubmenuOpen = !IsSubmenuOpen;
+                    IsHighlighted = false;
                 }
             }
-            else
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+    {
+        if (!e.Handled)
+        {
+            e.Handled = true;
+            HandleClick();
+        }
+        base.OnMouseLeftButtonDown(e);
+    }
+
+    /// <inheritdoc />
+    protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+    {
+        if (!e.Handled)
+        {
+            e.Handled = true;
+
+            if (InsideContextMenu)
             {
-                // Leaf item: execute click and close menus
-                OnClick();
+                HandleClick();
+            }
+        }
+        base.OnMouseRightButtonDown(e);
+    }
+
+    /// <inheritdoc />
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+
+        if (e.Handled)
+        {
+            return;
+        }
+
+        bool handled = false;
+
+        Key key = e.Key;
+        MenuItemRole role = Role;
+
+        // In Right to Left mode we switch Right and Left keys
+        if (FlowDirection == FlowDirection.RightToLeft)
+        {
+            if (key == Key.Right)
+            {
+                key = Key.Left;
+            }
+            else if (key == Key.Left)
+            {
+                key = Key.Right;
             }
         }
 
-        /// <summary>
-        /// Responds to the KeyDown event.
-        /// </summary>
-        /// <param name="e">The event data for the KeyDown event.</param>
-        protected override void OnKeyDown(KeyEventArgs e)
+        switch (key)
         {
-            if (!e.Handled)
-            {
-                switch (e.Key)
+            case Key.Enter:
+            case Key.Space:
+                if (role == MenuItemRole.SubmenuItem || role == MenuItemRole.TopLevelItem)
                 {
-                    case Key.Enter:
-                    case Key.Space:
-                        HandleClick();
-                        e.Handled = true;
-                        break;
-
-                    case Key.Right:
-                        if (HasItems && !IsSubmenuOpen)
-                        {
-                            IsSubmenuOpen = true;
-                            e.Handled = true;
-                        }
-                        break;
-
-                    case Key.Left:
-                        if (IsSubmenuOpen)
-                        {
-                            IsSubmenuOpen = false;
-                            e.Handled = true;
-                        }
-                        break;
-
-                    case Key.Escape:
-                        if (IsSubmenuOpen)
-                        {
-                            IsSubmenuOpen = false;
-                            e.Handled = true;
-                        }
-                        else if (IsTopLevel && ParentMenuBase != null)
-                        {
-                            ParentMenuBase.ExitMenuMode();
-                            e.Handled = true;
-                        }
-                        break;
+                    Debug.Assert(IsHighlighted, "MenuItem got Key.Enter but was not highlighted -- focus did not follow highlight?");
+                    ClickItem();
+                    handled = true;
                 }
-            }
-            base.OnKeyDown(e);
-        }
-
-        /// <summary>
-        /// Determines whether the specified item is, or is eligible to be, its own item container.
-        /// </summary>
-        protected override bool IsItemItsOwnContainerOverride(object item)
-        {
-            return item is MenuItem || item is Separator;
-        }
-
-        /// <summary>
-        /// Creates or identifies the element used to display the specified item.
-        /// </summary>
-        protected override DependencyObject GetContainerForItemOverride()
-        {
-            return new MenuItem();
-        }
-
-        /// <summary>
-        /// Prepares the specified element to display the specified item.
-        /// </summary>
-        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
-        {
-            base.PrepareContainerForItemOverride(element, item);
-
-            if (element is MenuItem menuItem)
-            {
-                // Set parent reference for nested items
-                menuItem.ParentMenuItem = this;
-
-                if (menuItem != item)
+                else if (role == MenuItemRole.TopLevelHeader)
                 {
-                    DataTemplate itemTemplate = ItemTemplate;
-                    Style itemContainerStyle = ItemContainerStyle;
+                    // should this and the next one fire click events as well?
+                    OpenSubmenuWithKeyboard();
+                    handled = true;
+                }
+                else if (role == MenuItemRole.SubmenuHeader && !IsSubmenuOpen)
+                {
+                    OpenSubmenuWithKeyboard();
+                    handled = true;
+                }
+                break;
 
-                    if (itemTemplate != null)
-                    {
-                        menuItem.SetValue(HeaderedItemsControl.ItemTemplateProperty, itemTemplate);
-                    }
-                    if (itemContainerStyle != null && menuItem.ReadLocalValue(StyleProperty) == DependencyProperty.UnsetValue)
-                    {
-                        menuItem.SetValue(StyleProperty, itemContainerStyle);
-                    }
+            case Key.Right:
+                if (role == MenuItemRole.SubmenuHeader && !IsSubmenuOpen)
+                {
+                    OpenSubmenuWithKeyboard();
+                    handled = true;
+                }
+                break;
 
-                    if (menuItem.ReadLocalValue(HeaderProperty) == DependencyProperty.UnsetValue)
+            case Key.Down:
+                if ((role == MenuItemRole.TopLevelHeader || role == MenuItemRole.SubmenuHeader) && IsSubmenuOpen && CurrentSelection is null)
+                {
+                    FocusItemInternal(NavigateToStart());
+                    handled = true;
+                }
+                break;
+
+            case Key.Up:
+                if ((role == MenuItemRole.TopLevelHeader || role == MenuItemRole.SubmenuHeader) && IsSubmenuOpen && CurrentSelection is null)
+                {
+                    FocusItemInternal(NavigateToEnd());
+                    handled = true;
+                }
+                break;
+
+            case Key.Left:
+            case Key.Escape:
+                if (role == MenuItemRole.SubmenuHeader || role == MenuItemRole.SubmenuItem)
+                {
+                    if (IsSubmenuOpen)
                     {
-                        menuItem.Header = item;
+                        SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.FalseBox);
+                        handled = true;
                     }
+                }
+                break;
+        }
+
+        if (!handled)
+        {
+            handled = MenuItemNavigate(e);
+        }
+
+        if (handled)
+        {
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>
+    /// Determines whether the specified item is, or is eligible to be, its own item container.
+    /// </summary>
+    protected override bool IsItemItsOwnContainerOverride(object item)
+    {
+        return item is MenuItem || item is Separator;
+    }
+
+    /// <summary>
+    /// Creates or identifies the element used to display the specified item.
+    /// </summary>
+    protected override DependencyObject GetContainerForItemOverride()
+    {
+        return new MenuItem();
+    }
+
+    /// <summary>
+    /// Used to determine whether to apply a style to the item container.
+    /// </summary>
+    /// <param name="container">
+    /// Container to which the style will be applied.
+    /// </param>
+    /// <param name="item">
+    /// Item to which the container belongs.
+    /// </param>
+    /// <returns>
+    /// true if the <see cref="MenuItem"/> is not a <see cref="Separator"/>; otherwise, false.
+    /// </returns>
+    protected override bool ShouldApplyItemContainerStyle(DependencyObject container, object item)
+    {
+        if (item is Separator)
+        {
+            return false;
+        }
+
+        return base.ShouldApplyItemContainerStyle(container, item);
+    }
+
+    /// <summary>
+    /// Prepares the specified element to display the specified item.
+    /// </summary>
+    protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+    {
+        base.PrepareContainerForItemOverride(element, item);
+
+        if (element is MenuItem menuItem)
+        {
+            if (menuItem != item)
+            {
+                DataTemplate itemTemplate = ItemTemplate;
+                Style itemContainerStyle = ItemContainerStyle;
+
+                if (itemTemplate != null)
+                {
+                    menuItem.SetValueInternal(HeaderedItemsControl.ItemTemplateProperty, itemTemplate);
+                }
+                if (itemContainerStyle != null && menuItem.ReadLocalValue(StyleProperty) == DependencyProperty.UnsetValue)
+                {
+                    menuItem.SetValueInternal(StyleProperty, itemContainerStyle);
+                }
+
+                if (menuItem.ReadLocalValue(HeaderProperty) == DependencyProperty.UnsetValue)
+                {
+                    menuItem.Header = item;
                 }
             }
         }
+    }
 
-        /// <summary>
-        /// Called when the Items property changes.
-        /// </summary>
-        /// <param name="e">The event data for the ItemsChanged event.</param>
-        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+    /// <inheritdoc />
+    protected internal override void OnVisualParentChanged(DependencyObject oldParent)
+    {
+        base.OnVisualParentChanged(oldParent);
+        UpdateRole();
+    }
+
+    /// <inheritdoc />
+    protected override void OnInitialized(EventArgs e)
+    {
+        base.OnInitialized(e);
+        UpdateRole();
+    }
+
+    /// <inheritdoc />
+    protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+    {
+        UpdateRole();
+        base.OnItemsChanged(e);
+        ChangeVisualState(true);
+    }
+
+    /// <summary>
+    /// Called when a <see cref="MenuItem"/> is clicked and raises a <see cref="Click"/> event.
+    /// </summary>
+    protected virtual void OnClick()
+    {
+        if (!_isFocused)
         {
-            base.OnItemsChanged(e);
-            UpdateSubmenuArrowVisibility();
-            ChangeVisualState(true);
+            FocusOrSelect();
         }
 
-        /// <summary>
-        /// Called when a MenuItem is clicked and raises a Click event.
-        /// </summary>
-        protected virtual void OnClick()
+        if (RootMenuBase is MenuBase parentMenuBase)
         {
-            // Close all parent menus
-            CloseAllMenus();
+            parentMenuBase.OnMenuItemPreviewClick(this);
+        }
 
-            // Raise Click event
-            Click?.Invoke(this, new RoutedEventArgs());
+        // Raise Click event
+        RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
-            // Execute command
-            if (Command != null && Command.CanExecute(CommandParameter))
+        // Execute command
+        CommandHelpers.ExecuteCommandSource(this);
+    }
+
+    /// <summary>
+    /// Called when the submenu of a <see cref="MenuItem"/> is opened.
+    /// </summary>
+    /// <param name="e">
+    /// The event data for the <see cref="SubmenuOpened"/> event.
+    /// </param>
+    protected virtual void OnSubmenuOpened(RoutedEventArgs e) => RaiseEvent(e);
+
+    /// <summary>
+    /// Called when the submenu of a <see cref="MenuItem"/> is closed.
+    /// </summary>
+    /// <param name="e">
+    /// The event data for the <see cref="SubmenuClosed"/> event.
+    /// </param>
+    protected virtual void OnSubmenuClosed(RoutedEventArgs e) => RaiseEvent(e);
+
+    /// <summary>
+    /// Changes to the correct visual state(s) for the control.
+    /// </summary>
+    /// <param name="useTransitions">True to use transitions; otherwise false.</param>
+    protected virtual void ChangeVisualState(bool useTransitions)
+    {
+        if (!IsEnabled)
+        {
+            VisualStateManager.GoToState(this, VisualStates.StateDisabled, useTransitions);
+        }
+        else
+        {
+            VisualStateManager.GoToState(this, VisualStates.StateNormal, useTransitions);
+        }
+
+        if ((_isFocused || IsHighlighted || IsSubmenuOpen) && IsEnabled)
+        {
+            VisualStateManager.GoToState(this, VisualStates.StateFocused, useTransitions);
+        }
+        else
+        {
+            VisualStateManager.GoToState(this, VisualStates.StateUnfocused, useTransitions);
+        }
+    }
+
+    internal DependencyObject LogicalParent
+    {
+        get
+        {
+            if (Parent is not null)
             {
-                Command.Execute(CommandParameter);
+                return Parent;
+            }
+
+            return ItemsControlFromItemContainer(this);
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this is a top-level menu item (direct child of Menu).
+    /// </summary>
+    private bool IsTopLevel => IsTopLevelRole(Role);
+
+    private bool InsideContextMenu => RootMenuBase is ContextMenu;
+
+    private static bool IsTopLevelRole(MenuItemRole role) => role == MenuItemRole.TopLevelHeader || role == MenuItemRole.TopLevelItem;
+
+    /// <summary>
+    /// Gets the root MenuBase for this menu item.
+    /// </summary>
+    private MenuBase RootMenuBase
+    {
+        get
+        {
+            return LogicalParent switch
+            {
+                MenuBase parentMenuBase => parentMenuBase,
+                MenuItem parentMenuItem => parentMenuItem.RootMenuBase,
+                _ => null,
+            };
+        }
+    }
+
+    private MenuItem CurrentSelection
+    {
+        get => _currentSelection;
+        set
+        {
+            if (_currentSelection != value)
+            {
+                _currentSelection?.SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.FalseBox);
+                _currentSelection = value;
+                _currentSelection?.SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.TrueBox);
+            }
+        }
+    }
+
+    private MenuItem CurrentSibling
+    {
+        get
+        {
+            MenuItem sibling = LogicalParent switch
+            {
+                MenuItem menuItemParent => menuItemParent.CurrentSelection,
+                MenuBase menuParent => menuParent.CurrentSelection,
+                _ => null
+            };
+
+            if (sibling == this)
+            {
+                sibling = null;
+            }
+
+            return sibling;
+        }
+    }
+
+    private bool IsInMenuMode
+    {
+        get
+        {
+            if (LogicalParent is MenuBase parentMenu)
+            {
+                return parentMenu.IsMenuMode;
+            }
+
+            return false;
+        }
+    }
+
+    internal void OpenSubmenuWithKeyboard()
+    {
+        if (OpenMenu())
+        {
+            int index = NavigateToStart();
+            if (index >= 0 && index < Items.Count)
+            {
+                FocusItemInternal(index);
+            }
+        }
+    }
+
+    private bool OpenMenu()
+    {
+        if (!IsSubmenuOpen)
+        {
+            // Verify that the parent of the MenuItem is valid;
+            if (ItemsControlFromItemContainer(this) is not ItemsControl owner)
+            {
+                owner = VisualTreeHelper.GetParent(this) as ItemsControl;
+            }
+
+            if (owner is not null && (owner is MenuItem || owner is MenuBase))
+            {
+                // Parent must be MenuItem or MenuBase in order for menus to open.
+                // Otherwise, odd behavior will occur.
+                SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.TrueBox);
+                return true; // The value was actually changed
             }
         }
 
-        /// <summary>
-        /// Closes all menus up to the root.
-        /// </summary>
-        private void CloseAllMenus()
+        return false;
+    }
+
+    private bool MenuItemNavigate(KeyEventArgs e)
+    {
+        if (ItemsControlFromItemContainer(this) is not ItemsControl parent)
         {
-            // Find root menu and exit menu mode
-            MenuBase root = RootMenuBase;
-            if (root != null)
+            return false;
+        }
+
+        Key key = e.Key;
+
+        // In Right to Left mode we switch Right and Left keys
+        if (parent.FlowDirection == FlowDirection.RightToLeft)
+        {
+            if (key == Key.Right)
             {
-                root.ChildMenuItemClicked();
+                key = Key.Left;
+            }
+            else if (key == Key.Left)
+            {
+                key = Key.Right;
             }
         }
 
-        private void HandleCanExecuteChanged(object sender, EventArgs e)
+        bool isVertical = parent.IsVerticalOrientation();
+
+        if ((isVertical && (key == Key.Down || key == Key.Up)) || (!isVertical && (key == Key.Left || key == Key.Right)))
         {
-            UpdateIsEnabled();
+            if (parent.HasItems)
+            {
+                MenuItem currentSelection = GetCurrentSelection(parent);
+                int newFocusIndex = parent.NavigateByLine(currentSelection, key == Key.Down || key == Key.Right);
+                MenuItem newSelection = newFocusIndex == -1 ? null : parent.ItemContainerGenerator.ContainerFromIndex(newFocusIndex) as MenuItem;
+
+                if (newSelection is not null && currentSelection != newSelection)
+                {
+                    parent.FocusItemInternal(newFocusIndex);
+                }
+
+                return true;
+            }
         }
 
-        /// <summary>
-        /// Updates the IsEnabled property.
-        /// </summary>
-        /// <remarks>
-        /// WPF overrides the local value of IsEnabled according to ICommand, so Silverlight does, too.
-        /// </remarks>
-        private void UpdateIsEnabled()
+        if (parent is MenuItem parentItem)
         {
-            IsEnabled = (null == Command) || Command.CanExecute(CommandParameter);
-            ChangeVisualState(true);
-        }
-
-        /// <summary>
-        /// Changes to the correct visual state(s) for the control.
-        /// </summary>
-        /// <param name="useTransitions">True to use transitions; otherwise false.</param>
-        protected virtual void ChangeVisualState(bool useTransitions)
-        {
-            if (!IsEnabled)
+            if (key == Key.Escape || (isVertical && key == Key.Left && !parentItem.IsTopLevel))
             {
-                VisualStateManager.GoToState(this, "Disabled", useTransitions);
-            }
-            else if (IsHighlighted || IsSubmenuOpen)
-            {
-                VisualStateManager.GoToState(this, "Highlighted", useTransitions);
-            }
-            else
-            {
-                VisualStateManager.GoToState(this, "Normal", useTransitions);
+                if (parentItem.IsSubmenuOpen)
+                {
+                    parent.SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.FalseBox);
+                    return true;
+                }
             }
 
-            if (_isFocused && IsEnabled)
+            return parentItem.MenuItemNavigate(e);
+        }
+
+        return false;
+
+        static MenuItem GetCurrentSelection(ItemsControl itemsControl)
+        {
+            return itemsControl switch
             {
-                VisualStateManager.GoToState(this, "Focused", useTransitions);
-            }
-            else
+                MenuItem menuItem => menuItem.CurrentSelection,
+                MenuBase menuBase => menuBase.CurrentSelection,
+                _ => null,
+            };
+        }
+    }
+
+    private void ConfigurePopupForRole()
+    {
+        Debug.Assert(_submenuPopup is not null);
+
+        if (IsTopLevel)
+        {
+            _submenuPopup.StayOpen = false;
+            _submenuPopup.Placement = PlacementMode.Bottom;
+            _submenuPopup.OutsideClick += new EventHandler<CancelEventArgs>(OnSubmenuOutsideClick);
+        }
+        else
+        {
+            _submenuPopup.StayOpen = true;
+            _submenuPopup.Placement = PlacementMode.Right;
+            _submenuPopup.OutsideClick -= new EventHandler<CancelEventArgs>(OnSubmenuOutsideClick);
+        }
+    }
+
+    private void FocusOrSelect()
+    {
+        if (!_isFocused)
+        {
+            Focus();
+        }
+
+        if (!IsSelected)
+        {
+            // If it's already focused, make sure it's also selected.
+            SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.TrueBox);
+        }
+
+        // If the item is selected we should ensure that it's highlighted.
+        if (IsSelected && !IsHighlighted)
+        {
+            IsHighlighted = true;
+        }
+    }
+
+    private void StartOpenHierarchyTimer()
+    {
+        if (_openHierarchyTimer is null)
+        {
+            _openHierarchyTimer = new DispatcherTimer();
+            _openHierarchyTimer.Interval = TimeSpan.FromMilliseconds(400);
+            _openHierarchyTimer.Tick += new EventHandler(OnOpenTimerTick);
+        }
+
+        _openHierarchyTimer.Start();
+    }
+
+    private void StopOpenHierarchyTimer() => _openHierarchyTimer?.Stop();
+
+    private void OnOpenTimerTick(object sender, EventArgs e)
+    {
+        StopOpenHierarchyTimer();
+        OpenHierarchy();
+    }
+
+    private void OpenHierarchy()
+    {
+        FocusOrSelect();
+
+        MenuItemRole role = Role;
+        if (role == MenuItemRole.TopLevelHeader || role == MenuItemRole.SubmenuHeader)
+        {
+            OpenMenu();
+        }
+    }
+
+    private void OnSubmenuOpened(object sender, EventArgs e)
+    {
+        if (!IsSubmenuOpen)
+        {
+            SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.TrueBox);
+        }
+
+        if (IsTopLevel)
+        {
+            AttachPopupRootHandlers();
+        }
+    }
+
+    private void OnSubmenuClosed(object sender, EventArgs e)
+    {
+        if (IsSubmenuOpen)
+        {
+            SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.FalseBox);
+        }
+
+        DetachPopupRootHandlers();
+
+        OnSubmenuClosed(new RoutedEventArgs(SubmenuClosedEvent, this));
+    }
+
+    private void OnSubmenuOutsideClick(object sender, CancelEventArgs e)
+    {
+        e.Cancel = true;
+        SetMenuMode(false);
+    }
+
+    private void AttachPopupRootHandlers()
+    {
+        DetachPopupRootHandlers();
+
+        if (_submenuPopup is not null)
+        {
+            _submenuPopupRoot = _submenuPopup.PopupRoot;
+            _submenuPopupRoot?.AddHandler(MouseMoveEvent, new MouseEventHandler(OnPopupRootMouseMove), true);
+        }
+    }
+
+    private void DetachPopupRootHandlers()
+    {
+        _submenuPopupRoot?.RemoveHandler(MouseMoveEvent, new MouseEventHandler(OnPopupRootMouseMove));
+        _submenuPopupRoot = null;
+    }
+
+    private void OnPopupRootMouseMove(object sender, MouseEventArgs e)
+    {
+        Debug.Assert(IsTopLevel);
+
+        if (LogicalParent is not Menu root)
+        {
+            return;
+        }
+
+        bool allowHoverOpen = root.IsMenuMode;
+        if (!allowHoverOpen)
+        {
+            return;
+        }
+
+        if (TryGetRootMenuItemAtPoint(e.GetPosition(null), out MenuItem menuItem) && menuItem.LogicalParent == root)
+        {
+            menuItem.OpenHierarchy();
+        }
+    }
+
+    private static bool TryGetRootMenuItemAtPoint(Point point, out MenuItem menuItem)
+    {
+        menuItem = null;
+
+        Window window = Window.Current ?? Application.Current?.MainWindow;
+        if (window is null)
+        {
+            return false;
+        }
+
+        foreach (UIElement element in VisualTreeHelper.FindElementsInHostCoordinates(point, window))
+        {
+            DependencyObject current = element;
+            while (current != null)
             {
-                VisualStateManager.GoToState(this, "Unfocused", useTransitions);
+                if (current is MenuItem mi)
+                {
+                    menuItem = mi;
+                    return true;
+                }
+
+                current = VisualTreeHelper.GetParent(current);
             }
         }
+
+        return false;
+    }
+
+    private void SetMenuMode(bool menuMode)
+    {
+        Debug.Assert(IsTopLevel, "MenuItem was not top-level");
+
+        if (LogicalParent is MenuBase parentMenu)
+        {
+            parentMenu.IsMenuMode = menuMode;
+        }
+    }
+
+    private void HandleClick()
+    {
+        MenuItemRole role = Role;
+
+        if (role == MenuItemRole.TopLevelHeader || role == MenuItemRole.SubmenuHeader)
+        {
+            ClickHeader();
+        }
+        else
+        {
+            ClickItem();
+        }
+    }
+
+    private void ClickHeader()
+    {
+        if (!_isFocused)
+        {
+            FocusOrSelect();
+        }
+
+        if (IsSubmenuOpen)
+        {
+            if (Role == MenuItemRole.TopLevelHeader)
+            {
+                SetMenuMode(false);
+            }
+        }
+        else
+        {
+            SetCurrentValueInternal(IsSubmenuOpenProperty, BooleanBoxes.TrueBox);
+        }
+    }
+
+    private void ClickItem()
+    {
+        try
+        {
+            OnClick();
+        }
+        finally
+        {
+            // When you click a top-level item, we need to exit menu mode.
+            if (Role == MenuItemRole.TopLevelItem && !StaysOpenOnClick)
+            {
+                SetMenuMode(false);
+            }
+        }
+    }
+
+    private void OnCommandChanged(ICommand newCommand)
+    {
+        if (_canExecuteChangedListener is not null)
+        {
+            _canExecuteChangedListener.Detach();
+            _canExecuteChangedListener = null;
+        }
+
+        if (newCommand is not null)
+        {
+            _canExecuteChangedListener = new CanExecuteChangedWeakEventListener(this, newCommand);
+        }
+
+        UpdateCanExecute();
+    }
+
+    private void OnCanExecuteChanged(object sender, EventArgs e) => UpdateCanExecute();
+
+    private void UpdateCanExecute()
+    {
+        if (Command is not null)
+        {
+            CanExecute = CommandHelpers.CanExecuteCommandSource(this);
+        }
+        else
+        {
+            CanExecute = true;
+        }
+    }
+
+    private bool CanExecute
+    {
+        get => _canExecute;
+        set
+        {
+            if (_canExecute != value)
+            {
+                _canExecute = value;
+                CoerceValue(IsEnabledProperty);
+            }
+        }
+    }
+
+    private sealed class CanExecuteChangedWeakEventListener
+    {
+        private readonly WeakEventToken _listener;
+        private EventHandler _handler;
+
+        public CanExecuteChangedWeakEventListener(MenuItem menuItem, ICommand command)
+        {
+            _listener = WeakEvent.Subscribe<MenuItem, ICommand, EventArgs>(
+                menuItem,
+                command,
+                static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
+                (handler, source) => source.CanExecuteChanged -= _handler,
+                (handler, source) =>
+                {
+                    _handler = new EventHandler(handler);
+                    source.CanExecuteChanged += _handler;
+                });
+        }
+
+        public void Detach() => _listener.Dispose();
     }
 }

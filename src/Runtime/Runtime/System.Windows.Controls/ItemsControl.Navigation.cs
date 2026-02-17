@@ -183,34 +183,52 @@ public partial class ItemsControl
         return newFocusedIndex;
     }
 
-    internal int NavigateByLine(bool forward)
+    internal int NavigateByLine(UIElement startingElement, bool forward)
     {
-        int focusedIndex = FocusedIndex;
-        int newFocusedIndex = -1;
-        // Get it visible to start with
-        if (focusedIndex != -1 && !IsOnCurrentPage(focusedIndex))
+        int startIndex = ItemContainerGenerator.IndexFromContainer(startingElement);
+        if (startIndex == -1)
         {
-            ScrollIntoViewImpl(focusedIndex);
+            return -1;
+        }
+
+        return NavigateByLineInternal(startIndex, forward);
+    }
+
+    internal int NavigateByLine(bool forward) => NavigateByLineInternal(FocusedIndex, forward);
+
+    private int NavigateByLineInternal(int startIndex, bool forward)
+    {
+        int newFocusedIndex = -1;
+
+        // Get it visible to start with
+        if (startIndex != -1 && !IsOnCurrentPage(startIndex))
+        {
+            ScrollIntoViewImpl(startIndex);
             ScrollHost?.UpdateLayout();
         }
 
         if (forward)
         {
             int count = Items.Count;
-            if (focusedIndex < count)
-                newFocusedIndex = GetNextSelectableIndex(focusedIndex + 1, 1, count);
+            if (startIndex < count)
+            {
+                newFocusedIndex = GetNextSelectableIndex(startIndex + 1, 1, count);
+            }
         }
         else
         {
-            if (focusedIndex >= 0)
-                newFocusedIndex = GetNextSelectableIndex(focusedIndex - 1, -1, -1);
+            if (startIndex >= 0)
+            {
+                newFocusedIndex = GetNextSelectableIndex(startIndex - 1, -1, -1);
+            }
         }
 
-        if (newFocusedIndex != -1 && ScrollHost != null)
+        if (newFocusedIndex != -1 && ScrollHost is ScrollViewer scrollHost)
         {
             ScrollIntoViewImpl(newFocusedIndex);
-            ScrollHost.UpdateLayout();
+            scrollHost.UpdateLayout();
         }
+
         return newFocusedIndex;
     }
 
