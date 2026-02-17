@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal.Controls.Primitives;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CSHTML5.Internal;
 
 namespace System.Windows.Input;
 
@@ -417,14 +418,17 @@ internal sealed class InputManager
             case EVENTS.POINTER_LEFT_DOWN:
                 _mouseLeftDown = true;
                 RefreshClickCount(MouseButton.Left, Environment.TickCount, new Point());
+                PopupService.HandleMouseButton();
                 break;
 
             case EVENTS.POINTER_RIGHT_DOWN:
                 RefreshClickCount(MouseButton.Right, Environment.TickCount, new Point());
+                PopupService.HandleMouseButton();
                 break;
 
             case EVENTS.POINTER_MIDDLE_DOWN:
                 RefreshClickCount(MouseButton.Middle, Environment.TickCount, new Point());
+                PopupService.HandleMouseButton();
                 break;
 
             case EVENTS.POINTER_LEFT_UP:

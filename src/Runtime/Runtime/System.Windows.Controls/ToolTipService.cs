@@ -289,7 +289,7 @@ namespace System.Windows.Controls
 
         private static void OnOwnerMouseEnter(object sender, MouseEventArgs e)
         {
-            PopupService.OnMouseEvent(e);
+            PopupService.UpdateMousePosition(e);
 
             OnOwnerMouseEnterInternal(sender, e.OriginalSource);
         }

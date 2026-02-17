@@ -309,7 +309,7 @@ public class ContextMenu : MenuBase
     /// <param name="e">Event arguments.</param>
     private void HandleOwnerMouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        PopupService.OnMouseEvent(e);
+        PopupService.UpdateMousePosition(e);
 
         OpenPopup();
         e.Handled = true;

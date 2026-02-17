@@ -231,7 +231,7 @@ namespace OpenSilver.Simulator.XamlInspection
                 yield return opensilver::System.Windows.Window.Current;
             }
 
-            foreach (var popupRoot in opensilver::System.Windows.Controls.Primitives.PopupRoot.GetActivePopupRoots())
+            foreach (var popupRoot in opensilver::OpenSilver.Internal.Controls.Primitives.PopupService.ActivePopups)
             {
                 yield return popupRoot;
             }

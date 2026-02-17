@@ -861,7 +861,26 @@ namespace System.Windows.Controls.Primitives
 
         public event EventHandler ClosedDueToOutsideClick;
 
-        internal void CloseFromAnOutsideClick()
+        internal event EventHandler<CancelEventArgs> OutsideClick;
+
+        internal void OnOutsideClick(bool isClosing)
+        {
+            bool cancelled = false;
+
+            if (OutsideClick is EventHandler<CancelEventArgs> handler)
+            {
+                var args = new CancelEventArgs();
+                handler(this, args);
+                cancelled = args.Cancel;
+            }
+
+            if (!cancelled && isClosing)
+            {
+                CloseFromAnOutsideClick();
+            }
+        }
+
+        private void CloseFromAnOutsideClick()
         {
             ClosedDueToOutsideClick?.Invoke(this, EventArgs.Empty);
 
@@ -870,10 +889,6 @@ namespace System.Windows.Controls.Primitives
                 SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.FalseBox);
             }
         }
-
-        internal event EventHandler<CancelEventArgs> OutsideClick;
-
-        internal void OnOutsideClick(CancelEventArgs args) => OutsideClick?.Invoke(this, args);
 
         public bool StayOpen { get; set; } = true;
 

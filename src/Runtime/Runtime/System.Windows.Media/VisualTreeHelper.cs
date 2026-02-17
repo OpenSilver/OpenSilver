@@ -20,6 +20,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Controls.Primitives;
 
 namespace System.Windows.Media
 {
@@ -299,7 +300,7 @@ namespace System.Windows.Media
 
             if (window is not null)
             {
-                foreach (PopupRoot root in PopupRoot.GetActivePopupRoots())
+                foreach (PopupRoot root in PopupService.ActivePopups)
                 {
                     if (root.ParentWindow == window &&
                         root.Popup.IsOpen &&

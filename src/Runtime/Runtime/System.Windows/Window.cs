@@ -15,6 +15,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
@@ -34,6 +35,8 @@ public class Window : ContentControl, IResizeObserverListener
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
         KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
         EventManager.RegisterClassHandler<Window>(GotFocusEvent, new RoutedEventHandler(OnGotFocus), true);
+        EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseMoveEvent, new MouseEventHandler(OnMouseMove), true);
+        EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
     }
 
     private IDisposable _resizeObserver;
@@ -49,8 +52,6 @@ public class Window : ContentControl, IResizeObserverListener
         {
             app.Windows.Add(this);
         }
-
-        PopupService.TrackMousePosition(this);
     }
 
     ~Window() => _resizeObserver?.Dispose();
@@ -111,6 +112,10 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     private static void OnGotFocus(object sender, RoutedEventArgs e) => Current = (Window)sender;
+
+    private static void OnMouseMove(object sender, MouseEventArgs e) => PopupService.UpdateMousePosition(e);
+
+    private static void OnMouseDown(object sender, MouseEventArgs e) => PopupService.HandleMouseButton();
 
     #region Bounds and SizeChanged event
 

@@ -11,26 +11,25 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Controls.Primitives;
 
 namespace System.Windows.Controls.Primitives;
 
 internal sealed class PopupRoot : FrameworkElement
 {
-    private static readonly HashSet<PopupRoot> _popupRoots = [];
-
     private readonly Popup _popup;
     private readonly TransformLayer _transformLayer;
 
     static PopupRoot()
     {
         KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(PopupRoot), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
+        EventManager.RegisterClassHandler<PopupRoot>(Mouse.PreviewMouseMoveEvent, new MouseEventHandler(OnMouseMove), true);
+        EventManager.RegisterClassHandler<PopupRoot>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
     }
 
     internal PopupRoot(Popup popup)
@@ -47,8 +46,6 @@ internal sealed class PopupRoot : FrameworkElement
         SetLayoutBindings();
     }
 
-    internal static IEnumerable<PopupRoot> GetActivePopupRoots() => _popupRoots;
-
     internal UIElement Child
     {
         get => _transformLayer.Child;
@@ -61,7 +58,7 @@ internal sealed class PopupRoot : FrameworkElement
 
     internal void Show()
     {
-        if (!_popupRoots.Add(this))
+        if (!PopupService.ActivePopups.Add(this))
         {
             return;
         }
@@ -83,7 +80,7 @@ internal sealed class PopupRoot : FrameworkElement
 
     internal void Close()
     {
-        if (!_popupRoots.Remove(this))
+        if (!PopupService.ActivePopups.Remove(this))
         {
             return;
         }
@@ -113,6 +110,10 @@ internal sealed class PopupRoot : FrameworkElement
         OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{parentDiv}.appendChild({popupDiv})");
     }
 
+    private static void OnMouseMove(object sender, MouseEventArgs e) => PopupService.UpdateMousePosition(e);
+
+    private static void OnMouseDown(object sender, MouseEventArgs e) => PopupService.HandleMouseButton();
+
     protected override int VisualChildrenCount => 1;
 
     protected override UIElement GetVisualChild(int index)
@@ -125,67 +126,20 @@ internal sealed class PopupRoot : FrameworkElement
         return _transformLayer;
     }
 
-    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    {
-        base.OnMouseLeftButtonDown(e);
-
-        // Note: If a popup has StayOpen=True, the value of "StayOpen" of its parents is ignored.
-        // In other words, the parents of a popup that has StayOpen=True will always stay open
-        // regardless of the value of their "StayOpen" property.
-
-        var listOfPopupThatMustBeClosed = new HashSet<Popup>();
-        var popupRootList = new List<PopupRoot>();
-
-        foreach (PopupRoot root in GetActivePopupRoots())
-        {
-            popupRootList.Add(root);
-
-            if (root._popup != null)
-            {
-                listOfPopupThatMustBeClosed.Add(root._popup);
-            }
-        }
-
-        // We determine which popup needs to stay open after this click
-        foreach (PopupRoot popupRoot in popupRootList)
-        {
-            if (popupRoot._popup != null)
-            {
-                // We must prevent all the parents of a popup to be closed when:
-                // - this popup is set to StayOpen
-                // - or the click happend in this popup
-
-                Popup popup = popupRoot._popup;
-
-                if (popup.StayOpen)
-                {
-                    do
-                    {
-                        if (!listOfPopupThatMustBeClosed.Contains(popup))
-                            break;
-
-                        listOfPopupThatMustBeClosed.Remove(popup);
-
-                        popup = popup.ParentPopup;
-
-                    } while (popup != null);
-                }
-            }
-        }
-
-        foreach (Popup popup in listOfPopupThatMustBeClosed)
-        {
-            var args = new CancelEventArgs();
-            popup.OnOutsideClick(args);
-            if (!args.Cancel)
-            {
-                popup.CloseFromAnOutsideClick();
-            }
-        }
-    }
-
     public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren) =>
         throw new InvalidOperationException("'CreateDomElement' should not be called for the PopupRoot object.");
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        _transformLayer.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        return _transformLayer.DesiredSize;
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        _transformLayer.Arrange(new Rect(finalSize));
+        return finalSize;
+    }
 
     private void SetLayoutBindings()
     {
@@ -201,18 +155,6 @@ internal sealed class PopupRoot : FrameworkElement
             new Binding(Popup.VerticalContentAlignmentProperty) { Source = _popup });
         _transformLayer.SetBinding(FlowDirectionProperty,
             new Binding(FlowDirectionProperty) { Source = _popup });
-    }
-
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        _transformLayer.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        return _transformLayer.DesiredSize;
-    }
-
-    protected override Size ArrangeOverride(Size finalSize)
-    {
-        _transformLayer.Arrange(new Rect(finalSize));
-        return finalSize;
     }
 
     private void SetLayoutSize()
@@ -234,103 +176,103 @@ internal sealed class PopupRoot : FrameworkElement
         window ??= Application.Current.MainWindow;
         return window;
     }
-}
 
-internal sealed class TransformLayer : FrameworkElement
-{
-    static TransformLayer()
+    private sealed class TransformLayer : FrameworkElement
     {
-        RenderTransformProperty.OverrideMetadata(
-            typeof(TransformLayer),
-            new PropertyMetadata(Media.Transform.Identity, null, CoerceRenderTransform));
-
-        RenderTransformOriginProperty.OverrideMetadata(
-            typeof(TransformLayer),
-            new PropertyMetadata(new Point(0, 0), null, CoerceRenderTransformOrigin));
-    }
-
-    private readonly TransformGroup _renderTransform;
-    private readonly MatrixTransform _translateTransform;
-    private readonly MatrixTransform _transform;
-    private UIElement _child;
-
-    public TransformLayer()
-    {
-        _renderTransform = new TransformGroup();
-        _renderTransform.CanBeInheritanceContext = false;
-        _renderTransform.Children.CanBeInheritanceContext = false;
-
-        _translateTransform = new MatrixTransform();
-        _transform = new MatrixTransform();
-
-        _renderTransform.Children.Add(_transform);
-        _renderTransform.Children.Add(_translateTransform);
-
-        CoerceValue(RenderTransformProperty);
-    }
-
-    public UIElement Child
-    {
-        get => _child;
-        set
+        static TransformLayer()
         {
-            if (_child == value) return;
+            RenderTransformProperty.OverrideMetadata(
+                typeof(TransformLayer),
+                new PropertyMetadata(Media.Transform.Identity, null, CoerceRenderTransform));
 
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-            RemoveVisualChild(_child);
-
-            _child = value;
-
-            AddVisualChild(_child);
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
-
-            InvalidateMeasure();
-        }
-    }
-
-    protected override int VisualChildrenCount => _child is null ? 0 : 1;
-
-    protected override UIElement GetVisualChild(int index)
-    {
-        if (_child is not UIElement child || index != 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
+            RenderTransformOriginProperty.OverrideMetadata(
+                typeof(TransformLayer),
+                new PropertyMetadata(new Point(0, 0), null, CoerceRenderTransformOrigin));
         }
 
-        return child;
-    }
+        private readonly TransformGroup _renderTransform;
+        private readonly MatrixTransform _translateTransform;
+        private readonly MatrixTransform _transform;
+        private UIElement _child;
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
-    {
-        base.INTERNAL_OnAttachedToVisualTree();
-        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-    }
-
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        if (_child is UIElement child)
+        public TransformLayer()
         {
-            child.Measure(availableSize);
-            return child.DesiredSize;
+            _renderTransform = new TransformGroup();
+            _renderTransform.CanBeInheritanceContext = false;
+            _renderTransform.Children.CanBeInheritanceContext = false;
+
+            _translateTransform = new MatrixTransform();
+            _transform = new MatrixTransform();
+
+            _renderTransform.Children.Add(_transform);
+            _renderTransform.Children.Add(_translateTransform);
+
+            CoerceValue(RenderTransformProperty);
         }
-        return new Size();
+
+        public UIElement Child
+        {
+            get => _child;
+            set
+            {
+                if (_child == value) return;
+
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+                RemoveVisualChild(_child);
+
+                _child = value;
+
+                AddVisualChild(_child);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
+
+                InvalidateMeasure();
+            }
+        }
+
+        protected override int VisualChildrenCount => _child is null ? 0 : 1;
+
+        protected override UIElement GetVisualChild(int index)
+        {
+            if (_child is not UIElement child || index != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return child;
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (_child is UIElement child)
+            {
+                child.Measure(availableSize);
+                return child.DesiredSize;
+            }
+            return new Size();
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            _child?.Arrange(new Rect(finalSize));
+            return finalSize;
+        }
+
+        internal Matrix Transform
+        {
+            get => _transform.Matrix;
+            set => _transform.Matrix = value;
+        }
+
+        internal void SetPosition(double x, double y) => _translateTransform.Matrix = Matrix.CreateTranslation(x, y);
+
+        private static object CoerceRenderTransform(DependencyObject d, object value) => ((TransformLayer)d)._renderTransform;
+
+        private static object CoerceRenderTransformOrigin(DependencyObject d, object value) => new Point(0, 0);
     }
-
-    protected override Size ArrangeOverride(Size finalSize)
-    {
-        _child?.Arrange(new Rect(finalSize));
-        return finalSize;
-    }
-
-    internal Matrix Transform
-    {
-        get => _transform.Matrix;
-        set => _transform.Matrix = value;
-    }
-
-    internal void SetPosition(double x, double y) => _translateTransform.Matrix = Matrix.CreateTranslation(x, y);
-
-    private static object CoerceRenderTransform(DependencyObject d, object value) => ((TransformLayer)d)._renderTransform;
-
-    private static object CoerceRenderTransformOrigin(DependencyObject d, object value) => new Point(0, 0);
 }

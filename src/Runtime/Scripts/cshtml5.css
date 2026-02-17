@@ -47,6 +47,7 @@ body {
 
 .opensilver-root-element {
     touch-action: none; /* prevents the browser from cancelling pointermove events */
+    pointer-events: auto;
 }
 
 .uielement-collapsed {
