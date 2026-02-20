@@ -59,7 +59,6 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     private PopupRoot _submenuPopupRoot;
     private MenuItem _currentSelection;
     private bool _isFocused;
-    private bool _canExecute = true;
     private CanExecuteChangedWeakEventListener _canExecuteChangedListener;
     private DispatcherTimer _openHierarchyTimer;
 
@@ -1388,12 +1387,12 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
 
     private bool CanExecute
     {
-        get => _canExecute;
+        get => !ReadControlFlag(ControlFlags.CommandDisabled);
         set
         {
-            if (_canExecute != value)
+            if (value != CanExecute)
             {
-                _canExecute = value;
+                WriteControlFlag(ControlFlags.CommandDisabled, !value);
                 CoerceValue(IsEnabledProperty);
             }
         }

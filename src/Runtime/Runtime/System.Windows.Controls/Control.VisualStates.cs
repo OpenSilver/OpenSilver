@@ -11,227 +11,253 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.ObjectModel;
+using OpenSilver.Internal;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace System.Windows.Controls
-{
-    public partial class Control : FrameworkElement
-    {
-        private VisualStateUpdater _visualStatesUpdater;
-        private bool _handleCommonVisualStates = false;
-        private bool _isInvalid;
-        private bool _isFocused;
+namespace System.Windows.Controls;
 
-        /// <summary>
-        /// Derived classes can set this flag to True in their constructor in order to 
-        /// disable the "GoToState" calls of this class related to PointerOver/Pressed/Disabled, 
-        /// and handle them by themselves. An example is the ToggleButton control, which 
-        /// contains states such as "CheckedPressed", "CheckedPointerOver", etc.
-        /// The default value is false.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected bool EnableBaseControlHandlingOfVisualStates
+public partial class Control : FrameworkElement
+{
+    private static readonly UncommonField<VisualStateUpdater> VisualStatesUpdaterField = new();
+
+    private bool HandleCommonVisualStates
+    {
+        get => ReadControlFlag(ControlFlags.HandleCommonVisualStates);
+        set => WriteControlFlag(ControlFlags.HandleCommonVisualStates, value);
+    }
+
+    private bool HasVisualStateUpdater
+    {
+        get => ReadControlFlag(ControlFlags.HasVisualStateUpdater);
+        set => WriteControlFlag(ControlFlags.HasVisualStateUpdater, value);
+    }
+
+    private bool IsInvalid
+    {
+        get => ReadControlFlag(ControlFlags.Invalid);
+        set => WriteControlFlag(ControlFlags.Invalid, value);
+    }
+
+    /// <summary>
+    /// Derived classes can set this flag to True in their constructor in order to 
+    /// disable the "GoToState" calls of this class related to PointerOver/Pressed/Disabled, 
+    /// and handle them by themselves. An example is the ToggleButton control, which 
+    /// contains states such as "CheckedPressed", "CheckedPointerOver", etc.
+    /// The default value is false.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    protected bool EnableBaseControlHandlingOfVisualStates
+    {
+        get => HandleCommonVisualStates;
+        set
         {
-            get => _handleCommonVisualStates;
-            set
+            if (HandleCommonVisualStates != value)
             {
-                if (_handleCommonVisualStates != value)
+                HandleCommonVisualStates = value;
+                if (!value)
                 {
-                    _handleCommonVisualStates = value;
-                    if (!value)
+                    if (HasVisualStateUpdater)
                     {
-                        _visualStatesUpdater?.Dispose();
-                        _visualStatesUpdater = null;
+                        var visualStatesUpdater = VisualStatesUpdaterField.GetValue(this);
+                        visualStatesUpdater.Dispose();
+                        VisualStatesUpdaterField.ClearValue(this);
+                        HasVisualStateUpdater = false;
                     }
                 }
             }
         }
+    }
 
-        internal void ShowValidationError()
+    internal void ShowValidationError()
+    {
+        IsInvalid = true;
+        UpdateValidationState();
+    }
+
+    internal void HideValidationError()
+    {
+        IsInvalid = false;
+        UpdateValidationState();
+    }
+
+    private void UpdateValidationState()
+    {
+        if (IsInvalid)
         {
-            _isInvalid = true;
-            UpdateValidationState();
+            VisualStateManager.GoToState(this, IsFocused ? VisualStates.StateInvalidFocused : VisualStates.StateInvalidUnfocused, true);
+        }
+        else
+        {
+            VisualStateManager.GoToState(this, VisualStates.StateValid, true);
+        }
+    }
+
+    internal virtual void UpdateVisualStates(bool useTransitions)
+    {
+        if (HasVisualStateUpdater)
+        {
+            var visualStateUpdater = VisualStatesUpdaterField.GetValue(this);
+            visualStateUpdater.UpdateVisualStates(useTransitions);
+        }
+    }
+
+    internal void UpdateVisualStates() => UpdateVisualStates(true);
+
+    internal static void OnVisualStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Control)d).UpdateVisualStates();
+    }
+
+    private sealed class VisualStateUpdater
+    {
+        private readonly Control _owner;
+        private bool _isPressed = false;
+        private bool _isFocused = false;
+
+        public VisualStateUpdater(Control owner)
+        {
+            Debug.Assert(owner != null);
+            _owner = owner;
+
+            ConnectToOwner();
         }
 
-        internal void HideValidationError()
+        private void ConnectToOwner()
         {
-            _isInvalid = false;
-            UpdateValidationState();
-        }
+            _owner.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
 
-        private void UpdateValidationState()
-        {
-            if (_isInvalid)
+            if (_owner.StateGroupsRoot is not FrameworkElement stateGroupsRoot)
             {
-                VisualStateManager.GoToState(this, _isFocused ? VisualStates.StateInvalidFocused : VisualStates.StateInvalidUnfocused, true);
+                return;
+            }
+
+            if (VisualStateManager.GetVisualStateGroupsInternal(stateGroupsRoot) is var groups)
+            {
+                bool hasMouseOverState = false;
+                bool hasPressedState = false;
+                bool hasFocusedState = false;
+
+                foreach (VisualStateGroup group in groups)
+                {
+                    foreach (VisualState state in group.States)
+                    {
+                        if (state.Name == VisualStates.StateMouseOver)
+                        {
+                            hasMouseOverState = true;
+                        }
+                        else if (state.Name == VisualStates.StatePressed)
+                        {
+                            hasPressedState = true;
+                        }
+                        else if (state.Name == VisualStates.StateFocused)
+                        {
+                            hasFocusedState = true;
+                        }
+                    }
+                }
+
+                if (hasMouseOverState)
+                {
+                    _owner.MouseEnter += new MouseEventHandler(OnMouseEnter);
+                    _owner.MouseLeave += new MouseEventHandler(OnMouseLeave);
+                }
+
+                if (hasPressedState)
+                {
+                    _owner.MouseLeftButtonDown += new MouseButtonEventHandler(OnMouseLeftButtonDown);
+                    _owner.MouseLeftButtonUp += new MouseButtonEventHandler(OnMouseLeftButtonUp);
+                }
+
+                if (hasFocusedState)
+                {
+                    _owner.GotFocus += new RoutedEventHandler(OnGotFocus);
+                    _owner.LostFocus += new RoutedEventHandler(OnLostFocus);
+                }
+            }
+        }
+
+        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            UpdateVisualStates(false);
+        }
+
+        private void OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            UpdateVisualStates(false);
+        }
+
+        private void OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            UpdateVisualStates(false);
+        }
+
+        private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _isPressed = true;
+            UpdateVisualStates(false);
+        }
+
+        private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isPressed = false;
+            UpdateVisualStates(false);
+        }
+
+        private void OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            _isFocused = true;
+            UpdateFocusState(false);
+        }
+
+        private void OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            _isFocused = false;
+            UpdateFocusState(false);
+        }
+
+        public void UpdateVisualStates(bool useTransitions)
+        {
+            if (!_owner.IsEnabled)
+            {
+                VisualStateManager.GoToState(_owner, VisualStates.StateDisabled, useTransitions);
+            }
+            else if (_isPressed)
+            {
+                VisualStateManager.GoToState(_owner, VisualStates.StatePressed, useTransitions);
+            }
+            else if (_owner.IsMouseOver)
+            {
+                VisualStateManager.GoToState(_owner, VisualStates.StateMouseOver, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateValid, true);
+                VisualStateManager.GoToState(_owner, VisualStates.StateNormal, useTransitions);
             }
         }
 
-        internal virtual void UpdateVisualStates(bool useTransitions) => _visualStatesUpdater?.UpdateVisualStates(true);
-
-        internal void UpdateVisualStates() => UpdateVisualStates(true);
-
-        internal static void OnVisualStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void UpdateFocusState(bool useTransitions)
         {
-            ((Control)d).UpdateVisualStates();
+            if (_isFocused)
+            {
+                VisualStateManager.GoToState(_owner, VisualStates.StateFocused, useTransitions);
+            }
+            else
+            {
+                VisualStateManager.GoToState(_owner, VisualStates.StateUnfocused, useTransitions);
+            }
         }
 
-        private sealed class VisualStateUpdater
+        public void Dispose()
         {
-            private readonly Control _owner;
-            private bool _isPressed = false;
-            private bool _isFocused = false;
-
-            public VisualStateUpdater(Control owner)
-            {
-                Debug.Assert(owner != null);
-                _owner = owner;
-
-                ConnectToOwner();
-            }
-
-            private void ConnectToOwner()
-            {              
-                _owner.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-
-                if (_owner.StateGroupsRoot is not FrameworkElement stateGroupsRoot)
-                {
-                    return;
-                }
-
-                if (VisualStateManager.GetVisualStateGroupsInternal(stateGroupsRoot) is var groups)
-                {
-                    bool hasMouseOverState = false;
-                    bool hasPressedState = false;
-                    bool hasFocusedState = false;
-
-                    foreach (VisualStateGroup group in groups)
-                    {
-                        foreach (VisualState state in group.States)
-                        {
-                            if (state.Name == VisualStates.StateMouseOver)
-                            {
-                                hasMouseOverState = true;
-                            }
-                            else if (state.Name == VisualStates.StatePressed)
-                            {
-                                hasPressedState = true;
-                            }
-                            else if (state.Name == VisualStates.StateFocused)
-                            {
-                                hasFocusedState = true;
-                            }
-                        }
-                    }
-
-                    if (hasMouseOverState)
-                    {
-                        _owner.MouseEnter += new MouseEventHandler(OnMouseEnter);
-                        _owner.MouseLeave += new MouseEventHandler(OnMouseLeave);
-                    }
-
-                    if (hasPressedState)
-                    {
-                        _owner.MouseLeftButtonDown += new MouseButtonEventHandler(OnMouseLeftButtonDown);
-                        _owner.MouseLeftButtonUp += new MouseButtonEventHandler(OnMouseLeftButtonUp);
-                    }
-
-                    if (hasFocusedState)
-                    {
-                        _owner.GotFocus += new RoutedEventHandler(OnGotFocus);
-                        _owner.LostFocus += new RoutedEventHandler(OnLostFocus);
-                    }
-                }
-            }
-
-            private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
-            {
-                UpdateVisualStates(false);
-            }
-
-            private void OnMouseEnter(object sender, MouseEventArgs e)
-            {
-                UpdateVisualStates(false);
-            }
-
-            private void OnMouseLeave(object sender, MouseEventArgs e)
-            {
-                UpdateVisualStates(false);
-            }
-
-            private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-            {
-                _isPressed = true;
-                UpdateVisualStates(false);
-            }
-
-            private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-            {
-                _isPressed = false;
-                UpdateVisualStates(false);
-            }
-
-            private void OnGotFocus(object sender, RoutedEventArgs e)
-            {
-                _isFocused = true;
-                UpdateFocusState(false);
-            }
-
-            private void OnLostFocus(object sender, RoutedEventArgs e)
-            {
-                _isFocused = false;
-                UpdateFocusState(false);
-            }
-
-            public void UpdateVisualStates(bool useTransitions)
-            {
-                if (!_owner.IsEnabled)
-                {
-                    VisualStateManager.GoToState(_owner, VisualStates.StateDisabled, useTransitions);
-                }
-                else if (_isPressed)
-                {
-                    VisualStateManager.GoToState(_owner, VisualStates.StatePressed, useTransitions);
-                }
-                else if (_owner.IsMouseOver)
-                {
-                    VisualStateManager.GoToState(_owner, VisualStates.StateMouseOver, useTransitions);
-                }
-                else
-                {
-                    VisualStateManager.GoToState(_owner, VisualStates.StateNormal, useTransitions);
-                }
-            }
-
-            private void UpdateFocusState(bool useTransitions)
-            {
-                if (_isFocused)
-                {
-                    VisualStateManager.GoToState(_owner, VisualStates.StateFocused, useTransitions);
-                }
-                else
-                {
-                    VisualStateManager.GoToState(_owner, VisualStates.StateUnfocused, useTransitions);
-                }
-            }
-
-            public void Dispose()
-            {
-                _owner.MouseEnter -= new MouseEventHandler(OnMouseEnter);
-                _owner.MouseLeave -= new MouseEventHandler(OnMouseLeave);
-                _owner.MouseLeftButtonDown -= new MouseButtonEventHandler(OnMouseLeftButtonDown);
-                _owner.MouseLeftButtonUp -= new MouseButtonEventHandler(OnMouseLeftButtonUp);
-                _owner.IsEnabledChanged -= new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-                _owner.GotFocus -= new RoutedEventHandler(OnGotFocus);
-                _owner.LostFocus -= new RoutedEventHandler(OnLostFocus);
-            }
+            _owner.MouseEnter -= new MouseEventHandler(OnMouseEnter);
+            _owner.MouseLeave -= new MouseEventHandler(OnMouseLeave);
+            _owner.MouseLeftButtonDown -= new MouseButtonEventHandler(OnMouseLeftButtonDown);
+            _owner.MouseLeftButtonUp -= new MouseButtonEventHandler(OnMouseLeftButtonUp);
+            _owner.IsEnabledChanged -= new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
+            _owner.GotFocus -= new RoutedEventHandler(OnGotFocus);
+            _owner.LostFocus -= new RoutedEventHandler(OnLostFocus);
         }
     }
 }

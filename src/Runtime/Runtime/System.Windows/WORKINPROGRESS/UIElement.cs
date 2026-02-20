@@ -147,18 +147,86 @@ namespace System.Windows
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void OnManipulationCompleted(ManipulationCompletedEventArgs e) { }
 
-        [OpenSilver.NotImplemented]
-        public event DragEventHandler DragEnter;
-		
-		[OpenSilver.NotImplemented]
-		public event DragEventHandler DragLeave;
-		
-		[OpenSilver.NotImplemented]
-		public event DragEventHandler Drop;
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly RoutedEvent DragEnterEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(DragEnter),
+                RoutingStrategy.Bubble,
+                typeof(DragEventHandler),
+                typeof(UIElement));
 
         [OpenSilver.NotImplemented]
-        public event DragEventHandler DragOver;
-        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public event DragEventHandler DragEnter
+        {
+            add => AddHandler(DragEnterEvent, value);
+            remove => RemoveHandler(DragEnterEvent, value);
+        }
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual void OnDragEnter(DragEventArgs e) { }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly RoutedEvent DragLeaveEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(DragLeave),
+                RoutingStrategy.Bubble,
+                typeof(DragEventHandler),
+                typeof(UIElement));
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+		public event DragEventHandler DragLeave
+        {
+            add => AddHandler(DragLeaveEvent, value);
+            remove => RemoveHandler(DragLeaveEvent, value);
+        }
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual void OnDragLeave(DragEventArgs e) { }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly RoutedEvent DropEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(Drop),
+                RoutingStrategy.Bubble,
+                typeof(DragEventHandler),
+                typeof(UIElement));
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+		public event DragEventHandler Drop
+        {
+            add => AddHandler(DropEvent, value);
+            remove => RemoveHandler(DropEvent, value);
+        }
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual void OnDrop(DragEventArgs e) { }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly RoutedEvent DragOverEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(DragOver),
+                RoutingStrategy.Bubble,
+                typeof(DragEventHandler),
+                typeof(UIElement));
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public event DragEventHandler DragOver
+        {
+            add => AddHandler(DragOverEvent, value);
+            remove => RemoveHandler(DragOverEvent, value);
+        }
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual void OnDragOver(DragEventArgs e) { }
+
         /// <summary>
         /// Gets or sets a value that indicates that rendered 
         /// content should be cached when possible.
@@ -172,7 +240,7 @@ namespace System.Windows
         /// processing unit (GPU), if available. The default is null, 
         /// which does not enable a cached composition mode. 
         /// </returns>
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public CacheMode CacheMode
         {
             get { return (CacheMode)GetValue(CacheModeProperty); }

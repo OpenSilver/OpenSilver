@@ -11,58 +11,62 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
 
-namespace System.Windows
+namespace System.Windows;
+
+public partial class UIElement
 {
-    public partial class UIElement
+    private static readonly UncommonField<AutomationPeer> AutomationPeerField = new();
+
+    /// <summary>
+    /// When implemented in a derived class, returns class-specific <see cref="AutomationPeer"/>
+    /// implementations for the Silverlight automation infrastructure.
+    /// </summary>
+    /// <returns>
+    /// The class-specific <see cref="AutomationPeer"/> subclass to
+    /// return.
+    /// </returns>
+    protected virtual AutomationPeer OnCreateAutomationPeer() => null;
+
+    private bool HasAutomationPeer
     {
-        private AutomationPeer _peer;
-
-        /// <summary>
-        /// When implemented in a derived class, returns class-specific <see cref="AutomationPeer"/>
-        /// implementations for the Silverlight automation infrastructure.
-        /// </summary>
-        /// <returns>
-        /// The class-specific <see cref="AutomationPeer"/> subclass to
-        /// return.
-        /// </returns>
-        protected virtual AutomationPeer OnCreateAutomationPeer() => null;
-
-        internal bool HasAutomationPeer
-        {
-            get => ReadFlag(CoreFlags.HasAutomationPeer);
-            set => WriteFlag(CoreFlags.HasAutomationPeer, value);
-        }
-
-        /// <summary>
-        /// Called by the Automation infrastructure or Control author
-        /// to make sure the AutomationPeer is created. The element may
-        /// create AP or return null, depending on OnCreateAutomationPeer override.
-        /// </summary>
-        internal AutomationPeer CreateAutomationPeer()
-        {
-            AutomationPeer ap = _peer;
-
-            if (ap is null)
-            {
-                ap = OnCreateAutomationPeer();
-
-                if (ap != null)
-                {
-                    _peer = ap;
-                    HasAutomationPeer = true;
-                }
-            }
-
-            return ap;
-        }
-
-        /// <summary>
-        /// Returns AutomationPeer if one exists.
-        /// The AutomationPeer may not exist if not yet created by Automation infrastructure
-        /// or if this element is not supposed to have one.
-        /// </summary>
-        internal AutomationPeer GetAutomationPeer() => _peer;
+        get => ReadFlag(CoreFlags.HasAutomationPeer);
+        set => WriteFlag(CoreFlags.HasAutomationPeer, value);
     }
+
+    /// <summary>
+    /// Called by the Automation infrastructure or Control author
+    /// to make sure the AutomationPeer is created. The element may
+    /// create AP or return null, depending on OnCreateAutomationPeer override.
+    /// </summary>
+    internal AutomationPeer CreateAutomationPeer()
+    {
+        AutomationPeer ap;
+
+        if (HasAutomationPeer)
+        {
+            ap = AutomationPeerField.GetValue(this);
+        }
+        else
+        {
+            ap = OnCreateAutomationPeer();
+
+            if (ap is not null)
+            {
+                AutomationPeerField.SetValue(this, ap);
+                HasAutomationPeer = true;
+            }
+        }
+
+        return ap;
+    }
+
+    /// <summary>
+    /// Returns AutomationPeer if one exists.
+    /// The AutomationPeer may not exist if not yet created by Automation infrastructure
+    /// or if this element is not supposed to have one.
+    /// </summary>
+    internal AutomationPeer GetAutomationPeer() => HasAutomationPeer ? AutomationPeerField.GetValue(this) : null;
 }

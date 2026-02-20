@@ -25,9 +25,7 @@ namespace System.Windows.Controls.Primitives
     public class ButtonBase : ContentControl, ICommandSource
     {
         private CanExecuteChangedWeakEventListener _canExecuteChangedListener;
-        private bool _commandDisabled;
         private bool _isMouseCaptured;
-        private bool _isSpaceKeyDown;
         private bool _isMouseLeftButtonDown;
         private Point _mousePosition;
         private bool _suspendStateChanges;
@@ -295,7 +293,7 @@ namespace System.Windows.Controls.Primitives
                 {
                     IsPressed = false;
                     ReleaseMouseCaptureInternal();
-                    _isSpaceKeyDown = false;
+                    IsSpaceKeyDown = false;
                 }
             }
             finally
@@ -345,9 +343,9 @@ namespace System.Windows.Controls.Primitives
                 {
                     // Ignore the SPACE key if we already have the mouse 
                     // captured or if it had been pressed previously.
-                    if (!_isMouseCaptured && !_isSpaceKeyDown)
+                    if (!_isMouseCaptured && !IsSpaceKeyDown)
                     {
-                        _isSpaceKeyDown = true;
+                        IsSpaceKeyDown = true;
                         IsPressed = true;
                         CaptureMouseInternal();
 
@@ -362,7 +360,7 @@ namespace System.Windows.Controls.Primitives
                 // The ENTER key forces a click
                 else if (key == Key.Enter && (bool)GetValue(KeyboardNavigation.AcceptsReturnProperty))
                 {
-                    _isSpaceKeyDown = false;
+                    IsSpaceKeyDown = false;
                     IsPressed = false;
                     ReleaseMouseCaptureInternal();
 
@@ -371,10 +369,10 @@ namespace System.Windows.Controls.Primitives
                     handled = true;
                 }
                 // Any other keys pressed are irrelevant 
-                else if (_isSpaceKeyDown)
+                else if (IsSpaceKeyDown)
                 {
                     IsPressed = false;
-                    _isSpaceKeyDown = false;
+                    IsSpaceKeyDown = false;
                     ReleaseMouseCaptureInternal();
                 }
             }
@@ -415,7 +413,7 @@ namespace System.Windows.Controls.Primitives
             // or if any other key than SPACE was released. 
             if (IsEnabled && ClickMode != ClickMode.Hover && key == Key.Space)
             {
-                _isSpaceKeyDown = false;
+                IsSpaceKeyDown = false;
 
                 if (!_isMouseLeftButtonDown)
                 {
@@ -548,12 +546,12 @@ namespace System.Windows.Controls.Primitives
             }
 
             e.Handled = true;
-            if (!_isSpaceKeyDown && IsPressed && ClickMode == ClickMode.Release)
+            if (!IsSpaceKeyDown && IsPressed && ClickMode == ClickMode.Release)
             {
                 OnClick();
             }
 
-            if (!_isSpaceKeyDown)
+            if (!IsSpaceKeyDown)
             {
                 ReleaseMouseCaptureInternal();
                 IsPressed = false;
@@ -581,7 +579,7 @@ namespace System.Windows.Controls.Primitives
                 IsEnabled &&
                 ClickMode != ClickMode.Hover &&
                 _isMouseCaptured &&
-                !_isSpaceKeyDown)
+                !IsSpaceKeyDown)
             {
                 IsPressed = IsValidMousePosition();
             }
@@ -597,15 +595,21 @@ namespace System.Windows.Controls.Primitives
 
         private bool CanExecute
         {
-            get => !_commandDisabled;
+            get => !ReadControlFlag(ControlFlags.CommandDisabled);
             set
             {
                 if (value != CanExecute)
                 {
-                    _commandDisabled = !value;
+                    WriteControlFlag(ControlFlags.CommandDisabled, !value);
                     CoerceValue(IsEnabledProperty);
                 }
             }
+        }
+
+        private bool IsSpaceKeyDown
+        {
+            get => ReadControlFlag(ControlFlags.IsSpaceKeyDown);
+            set => WriteControlFlag(ControlFlags.IsSpaceKeyDown, value);
         }
 
         /// <summary>
@@ -694,7 +698,7 @@ namespace System.Windows.Controls.Primitives
                 {
                     button.IsPressed = false;
                     button._isMouseCaptured = false;
-                    button._isSpaceKeyDown = false;
+                    button.IsSpaceKeyDown = false;
                     button._isMouseLeftButtonDown = false;
                 }
             }

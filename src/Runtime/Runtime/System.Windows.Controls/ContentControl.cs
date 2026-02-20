@@ -180,7 +180,11 @@ namespace System.Windows.Controls
         /// <summary>
         ///    Indicates whether Content should be a logical child or not.
         /// </summary>
-        internal bool ContentIsNotLogical { get; set; }
+        internal bool ContentIsNotLogical
+        {
+            get => ReadControlFlag(ControlFlags.ContentIsNotLogical);
+            set => WriteControlFlag(ControlFlags.ContentIsNotLogical, value);
+        }
 
         /// <summary>
         /// Gets an enumerator to the content control's logical child elements.

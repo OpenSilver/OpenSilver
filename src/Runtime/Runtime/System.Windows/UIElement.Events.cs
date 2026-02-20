@@ -52,6 +52,7 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(TextInputUpdateEvent, new TextCompositionEventHandler(OnTextInputUpdateThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TappedEvent, new TappedEventHandler(OnTappedThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Keyboard.PreviewKeyDownEvent, new KeyEventHandler(OnPreviewKeyDownThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Keyboard.KeyDownEvent, new KeyEventHandler(OnKeyDownThunk), false);
@@ -59,6 +60,10 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Keyboard.KeyUpEvent, new KeyEventHandler(OnKeyUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk), false);
             EventManager.RegisterClassHandler<UIElement>(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(DragEnterEvent, new DragEventHandler(OnDragEnterThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(DragLeaveEvent, new DragEventHandler(OnDragLeaveThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(DropEvent, new DragEventHandler(OnDropThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(DragOverEvent, new DragEventHandler(OnDragOverThunk), false);
             EventManager.RegisterClassHandler<UIElement>(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(OnPreviewExecutedThunk), false);
             EventManager.RegisterClassHandler<UIElement>(CommandManager.ExecutedEvent, new ExecutedRoutedEventHandler(OnExecutedThunk), false);
             EventManager.RegisterClassHandler<UIElement>(CommandManager.PreviewCanExecuteEvent, new CanExecuteRoutedEventHandler(OnPreviewCanExecuteThunk), false);
@@ -164,6 +169,8 @@ namespace System.Windows
 
         private static void OnTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInput(e);
 
+        private static void OnTextInputUpdateThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInputUpdate(e);
+
         private static void OnTappedThunk(object sender, TappedRoutedEventArgs e) => ((UIElement)sender).OnTapped(e);
 
         private static void OnPreviewKeyDownThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnPreviewKeyDown(e);
@@ -191,6 +198,14 @@ namespace System.Windows
         private static void OnGotMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnGotMouseCapture(e);
 
         private static void OnLostMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnLostMouseCapture(e);
+
+        private static void OnDragEnterThunk(object sender, DragEventArgs e) => ((UIElement)sender).OnDragEnter(e);
+
+        private static void OnDragLeaveThunk(object sender, DragEventArgs e) => ((UIElement)sender).OnDragLeave(e);
+
+        private static void OnDropThunk(object sender, DragEventArgs e) => ((UIElement)sender).OnDrop(e);
+
+        private static void OnDragOverThunk(object sender, DragEventArgs e) => ((UIElement)sender).OnDragOver(e);
 
         private static void OnPreviewExecutedThunk(object sender, ExecutedRoutedEventArgs e)
         {
@@ -1133,6 +1148,15 @@ namespace System.Windows
             add => AddHandler(TextInputUpdateEvent, value, false);
             remove => RemoveHandler(TextInputUpdateEvent, value);
         }
+
+        /// <summary>
+        /// Called before the <see cref="TextInputUpdate"/> event occurs.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="TextCompositionEventArgs"/> that contains the event data
+        /// </param>
+        [OpenSilver.NotImplemented]
+        protected virtual void OnTextInputUpdate(TextCompositionEventArgs e) { }
 
         #endregion
 
