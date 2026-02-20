@@ -341,7 +341,7 @@ public sealed class Hyperlink : Span, ICommandSource
     {
         string sUri = OpenSilver.Interop.GetVariableStringForJS(navigateUri.ToString());
         string sTarget = OpenSilver.Interop.GetVariableStringForJS(target);
-        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"window.open({sUri}, {sTarget})");
+        OpenSilver.Interop.ExecuteJavaScriptVoid($"window.open({sUri}, {sTarget})");
     }
 
     private static bool TryInternalNavigate(DependencyObject d, Uri navigateUri, string target)

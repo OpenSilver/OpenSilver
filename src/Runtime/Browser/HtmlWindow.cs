@@ -50,7 +50,7 @@ namespace System.Windows.Browser
             string sUri = OpenSilver.Interop.GetVariableStringForJS(navigateToUri.ToString());
             string sTarget = OpenSilver.Interop.GetVariableStringForJS(target);
             string sTargetFeatures = OpenSilver.Interop.GetVariableStringForJS(targetFeatures);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"window.open({sUri}, {sTarget}, {sTargetFeatures})");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"window.open({sUri}, {sTarget}, {sTargetFeatures})");
         }
 
         /// <summary>
