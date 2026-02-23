@@ -1,15 +1,28 @@
-﻿using System.Threading.Tasks;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace OpenSilver.Analyzers.Test
+namespace OpenSilver.CodeAnalysis.Tests;
+
+[TestClass]
+public class NotImplementedUnitTest : CSharpAnalyzerVerifier<NotImplementedAnalyzer, DefaultVerifier>
 {
-    [TestClass]
-    public class NotImplementedUnitTest : CSharpAnalyzerVerifier<NotImplementedAnalyzer, DefaultVerifier>
-    {
-        private const string NotImplementedAttribute = @"
+    private const string NotImplementedAttribute =
+        """
         namespace OpenSilver
         {
             using System;
@@ -19,22 +32,24 @@ namespace OpenSilver.Analyzers.Test
             {
                 public NotImplementedAttribute() { }
             }
-        }";
-
-        [TestMethod]
-        public async Task When_Empty()
-        {
-            var source = @"" + NotImplementedAttribute;
-
-            await VerifyAnalyzerAsync(source);
         }
+        """;
 
-        #region Member access (SyntaxKind.ObjectCreationExpression)
+    [TestMethod]
+    public async Task When_Empty()
+    {
+        var source = NotImplementedAttribute;
 
-        [TestMethod]
-        public async Task When_Accessing_Not_Implemented_Assembly()
-        {
-            var source = @"
+        await VerifyAnalyzerAsync(source);
+    }
+
+    #region Member access (SyntaxKind.ObjectCreationExpression)
+
+    [TestMethod]
+    public async Task When_Accessing_Not_Implemented_Assembly()
+    {
+        var source =
+            """
             [assembly: OpenSilver.NotImplemented]
             namespace OpenSilver
             {
@@ -56,19 +71,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("TestProject, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("TestProject, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Implemented_Member()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Implemented_Member()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 using System;
@@ -103,17 +119,18 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            await VerifyAnalyzerAsync(source);
-        }
+        await VerifyAnalyzerAsync(source);
+    }
 
-        #region Method
+    #region Method
 
-        [TestMethod]
-        public async Task When_Accessing_Not_Implemented_Method()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Not_Implemented_Method()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class
@@ -135,19 +152,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class.TestMethod()")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class.TestMethod()")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Override_Method_And_Base_Implementation_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Override_Method_And_Base_Implementation_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public abstract class BaseClass 
@@ -179,25 +197,26 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestMethod()")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestMethod()")
-                .WithLocation(1);
-            var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestMethod()")
-                .WithLocation(2);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestMethod()")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestMethod()")
+            .WithLocation(1);
+        var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestMethod()")
+            .WithLocation(2);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Method_In_Not_Implemented_Type()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Method_In_Not_Implemented_Type()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -219,22 +238,23 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(1);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(1);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Method_In_Type_With_Not_Implemented_Base_Type()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Method_In_Type_With_Not_Implemented_Base_Type()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -258,29 +278,30 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(1);
-            var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(2);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(1);
+        var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(2);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
+    }
 
-        #endregion Method
+    #endregion Method
 
-        #region Property
+    #region Property
 
-        [TestMethod]
-        public async Task When_Accessing_Not_Implemented_Property()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Not_Implemented_Property()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class
@@ -302,19 +323,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class.TestProperty")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class.TestProperty")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Override_Property_And_Base_Implementation_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Override_Property_And_Base_Implementation_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public abstract class BaseClass 
@@ -358,28 +380,29 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestProperty")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestProperty")
-                .WithLocation(1);
-            var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestProperty")
-                .WithLocation(2);
-            var expected4 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestProperty")
-                .WithLocation(3);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestProperty")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestProperty")
+            .WithLocation(1);
+        var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestProperty")
+            .WithLocation(2);
+        var expected4 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestProperty")
+            .WithLocation(3);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2, expected3, expected4);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2, expected3, expected4);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Property_In_Not_Implemented_Type()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Property_In_Not_Implemented_Type()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -407,25 +430,26 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(1);
-            var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(2);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(1);
+        var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(2);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Property_In_Type_With_Not_Implemented_Base_Type()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Property_In_Type_With_Not_Implemented_Base_Type()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -449,29 +473,30 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(1);
-            var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(2);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(1);
+        var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(2);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
+    }
 
-        #endregion Property
+    #endregion Property
 
-        #region Event
+    #region Event
 
-        [TestMethod]
-        public async Task When_Accessing_Not_Implemented_Event()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Not_Implemented_Event()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 using System;
@@ -495,19 +520,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class.TestEvent")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class.TestEvent")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Override_Event_And_Base_Implementation_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Override_Event_And_Base_Implementation_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 using System;
@@ -542,19 +568,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass.TestEvent")
-                .WithLocation(0);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass.TestEvent")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected1);
-        }
+        await VerifyAnalyzerAsync(source, expected1);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Event_In_Not_Implemented_Type()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Event_In_Not_Implemented_Type()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 using System;
@@ -578,22 +605,23 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(1);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(1);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2);
+    }
 
-        [TestMethod]
-        public async Task When_Accessing_Event_In_Type_With_Not_Implemented_Base_Type()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Accessing_Event_In_Type_With_Not_Implemented_Base_Type()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 using System;
@@ -619,31 +647,32 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(1);
-            var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(2);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(1);
+        var expected3 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(2);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2, expected3);
+    }
 
-        #endregion Event
+    #endregion Event
 
-        #endregion Member access (SyntaxKind.ObjectCreationExpression)
+    #endregion Member access (SyntaxKind.ObjectCreationExpression)
 
-        #region Object creation (SyntaxKind.ObjectCreationExpression)
+    #region Object creation (SyntaxKind.ObjectCreationExpression)
 
-        [TestMethod]
-        public async Task When_Not_Implemented_Assembly()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Not_Implemented_Assembly()
+    {
+        var source =
+            """
             [assembly: OpenSilver.NotImplemented]
             namespace OpenSilver
             {
@@ -665,19 +694,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("TestProject, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("TestProject, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Constructor_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Constructor_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class 
@@ -699,19 +729,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class.Class(int)")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class.Class(int)")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Constructor_And_Type_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Constructor_And_Type_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -730,19 +761,20 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Constructor_And_Base_Type_Is_Not_Implemented()
-        {
-            var source = @"            
+    [TestMethod]
+    public async Task When_Constructor_And_Base_Type_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -763,26 +795,27 @@ namespace OpenSilver.Analyzers.Test
                     }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(0);
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(1);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(0);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(1);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2);
-        }
+        await VerifyAnalyzerAsync(source, expected1, expected2);
+    }
 
-        #endregion Object creation (SyntaxKind.ObjectCreationExpression)        
+    #endregion Object creation (SyntaxKind.ObjectCreationExpression)        
 
-        #region Method Declaration (SyntaxKind.MethodDeclaration)
+    #region Method Declaration (SyntaxKind.MethodDeclaration)
 
-        [TestMethod]
-        public async Task When_Method_Is_Not_An_Override()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Method_Is_Not_An_Override()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class { }
@@ -797,15 +830,16 @@ namespace OpenSilver.Analyzers.Test
                     public int TestMethod() { return 1; }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            await VerifyAnalyzerAsync(source);
-        }
+        await VerifyAnalyzerAsync(source);
+    }
 
-        [TestMethod]
-        public async Task When_Method_Is_An_Override_And_Base_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Method_Is_An_Override_And_Base_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class
@@ -824,23 +858,24 @@ namespace OpenSilver.Analyzers.Test
                     public override int {|#0:TestMethod|#0}() { return 1; }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class.TestMethod()")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class.TestMethod()")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        #endregion Method Declaration (SyntaxKind.MethodDeclaration)
+    #endregion Method Declaration (SyntaxKind.MethodDeclaration)
 
-        #region Property Declaration (SyntaxKind.PropertyDeclaration)
+    #region Property Declaration (SyntaxKind.PropertyDeclaration)
 
-        [TestMethod]
-        public async Task When_Property_Is_Not_An_Override()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Property_Is_Not_An_Override()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class { }
@@ -855,15 +890,16 @@ namespace OpenSilver.Analyzers.Test
                     public int TestProperty { get; set; }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            await VerifyAnalyzerAsync(source);
-        }
+        await VerifyAnalyzerAsync(source);
+    }
 
-        [TestMethod]
-        public async Task When_Property_Is_An_Override_And_Base_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Property_Is_An_Override_And_Base_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class
@@ -882,23 +918,24 @@ namespace OpenSilver.Analyzers.Test
                     public override int {|#0:TestProperty|#0} { get; set; }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class.TestProperty")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class.TestProperty")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        #endregion Property Declaration (SyntaxKind.PropertyDeclaration)
+    #endregion Property Declaration (SyntaxKind.PropertyDeclaration)
 
-        #region Event Declaration (SyntaxKind.EventDeclaration)
+    #region Event Declaration (SyntaxKind.EventDeclaration)
 
-        [TestMethod]
-        public async Task When_Event_Is_Not_An_Override()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Event_Is_Not_An_Override()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 public class Class { }
@@ -908,21 +945,22 @@ namespace OpenSilver.Analyzers.Test
             {
                 using System;
                 using OpenSilver;
-                
+
                 public class MyClass : Class
                 {
                     public event EventHandler TestEvent;
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            await VerifyAnalyzerAsync(source);
-        }
+        await VerifyAnalyzerAsync(source);
+    }
 
-        [TestMethod]
-        public async Task When_Event_Is_An_Override_And_Base_Is_Not_Implemented_And_Uses_Event_Field_Syntax()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Event_Is_An_Override_And_Base_Is_Not_Implemented_And_Uses_Event_Field_Syntax()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 using System;
@@ -944,15 +982,16 @@ namespace OpenSilver.Analyzers.Test
                     public override event EventHandler TestEvent;
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            await VerifyAnalyzerAsync(source);
-        }
+        await VerifyAnalyzerAsync(source);
+    }
 
-        [TestMethod]
-        public async Task When_Event_Is_An_Override_And_Base_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Event_Is_An_Override_And_Base_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 using System;
@@ -974,23 +1013,24 @@ namespace OpenSilver.Analyzers.Test
                     public override event EventHandler {|#0:TestEvent|#0} { add { } remove { } }
                 }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class.TestEvent")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class.TestEvent")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        #endregion Event Declaration (SyntaxKind.EventDeclaration)
+    #endregion Event Declaration (SyntaxKind.EventDeclaration)
 
-        #region Base type (SyntaxKind.SimpleBaseType)
+    #region Base type (SyntaxKind.SimpleBaseType)
 
-        [TestMethod]
-        public async Task When_Base_Class_Declaration_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Base_Class_Declaration_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -1003,19 +1043,20 @@ namespace OpenSilver.Analyzers.Test
 
                 public class DerivedClass : {|#0:Class|#0} { }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.Class")
-                .WithLocation(0);
+        var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.Class")
+            .WithLocation(0);
 
-            await VerifyAnalyzerAsync(source, expected);
-        }
+        await VerifyAnalyzerAsync(source, expected);
+    }
 
-        [TestMethod]
-        public async Task When_Base_Base_Class_Declaration_Is_Not_Implemented()
-        {
-            var source = @"
+    [TestMethod]
+    public async Task When_Base_Base_Class_Declaration_Is_Not_Implemented()
+    {
+        var source =
+            """
             namespace OpenSilver
             {
                 [NotImplemented]
@@ -1030,19 +1071,18 @@ namespace OpenSilver.Analyzers.Test
 
                 public class DerivedClass : {|#1:Class|#1} { }
             }
-            " + NotImplementedAttribute;
+            """ + NotImplementedAttribute;
 
-            var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(0);
+        var expected1 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(0);
 
-            var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
-                .WithArguments("OpenSilver.BaseClass")
-                .WithLocation(1);
+        var expected2 = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+            .WithArguments("OpenSilver.BaseClass")
+            .WithLocation(1);
 
-            await VerifyAnalyzerAsync(source, expected1, expected2);
-        }
-
-        #endregion Base type (SyntaxKind.SimpleBaseType)
+        await VerifyAnalyzerAsync(source, expected1, expected2);
     }
+
+    #endregion Base type (SyntaxKind.SimpleBaseType)
 }

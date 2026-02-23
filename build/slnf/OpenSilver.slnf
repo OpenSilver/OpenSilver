@@ -2,8 +2,9 @@
   "solution": {
     "path": "..\\..\\src\\OpenSilver.sln",
     "projects": [
-      "Analyzers\\NotImplemented.Tests\\NotImplemented.Analyzer.Tests.csproj",
-      "Analyzers\\NotImplemented\\NotImplemented.Analyzer.csproj",
+      "Analyzers\\OpenSilver.Analyzers.Tests\\OpenSilver.Analyzers.Tests.csproj",
+      "Analyzers\\OpenSilver.Analyzers\\OpenSilver.Analyzers.csproj",
+      "Analyzers\\OpenSilver.CodeFixes\\OpenSilver.CodeFixes.csproj",
       "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
       "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",
       "Runtime\\Controls.Data.Input\\Controls.Data.Input.OpenSilver.csproj",

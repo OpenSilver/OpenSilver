@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>OpenSilver.Analyzers</AssemblyName>
-    <RootNamespace>OpenSilver.Analyzers</RootNamespace>
+    <RootNamespace>OpenSilver.CodeAnalysis</RootNamespace>
     <IsPackable>false</IsPackable>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>

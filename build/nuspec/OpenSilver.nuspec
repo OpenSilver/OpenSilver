@@ -76,7 +76,8 @@
     <file src="../../src/Compiler/Compiler/bin/$Configuration$/netstandard2.0/OpenSilver.Compiler.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.$OpenSilverBuildUUID$.dll" />
 
     <!-- OpenSilver analyzers -->
-    <file src="../../src/Analyzers/NotImplemented/bin/$Configuration$/netstandard2.0/OpenSilver.Analyzers.dll" target="analyzers/dotnet/cs/OpenSilver.Analyzers.dll" />
+    <file src="../../src/Analyzers/OpenSilver.Analyzers/bin/$Configuration$/netstandard2.0/OpenSilver.Analyzers.dll" target="analyzers/dotnet/cs/OpenSilver.Analyzers.dll" />
+    <file src="../../src/Analyzers/OpenSilver.CodeFixes/bin/$Configuration$/netstandard2.0/OpenSilver.CodeFixes.dll" target="analyzers/dotnet/cs/OpenSilver.CodeFixes.dll" />
 
     <!-- OpenSilver icon -->
     <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
