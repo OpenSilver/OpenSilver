@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "..\\..\\src\\OpenSilver.sln",
+    "path": "..\\..\\src\\OpenSilver.slnx",
     "projects": [
       "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",
       "Runtime\\Controls.Data.Input\\Controls.Data.Input.OpenSilver.csproj",

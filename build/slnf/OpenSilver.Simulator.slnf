@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "..\\..\\src\\OpenSilver.sln",
+    "path": "..\\..\\src\\OpenSilver.slnx",
     "projects": [
       "Compiler\\Compiler.SharedBuildTasks\\Compiler.SharedBuildTasks.OpenSilver.csproj",
       "Runtime\\Runtime\\Runtime.OpenSilver.csproj",

@@ -46,7 +46,7 @@ jobs:
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash
       - name: Verify Building of OpenSilver Solution Release Configuration
-        run: msbuild src/OpenSilver.sln -p:Configuration=Release -clp:ErrorsOnly -restore
+        run: msbuild src/OpenSilver.slnx -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Run Compiler Tests Release Configuration
         run: dotnet test src/Compiler/Tests/Compiler.Tests/bin/Release/net10.0/Compiler.Tests.dll
       - name: Run Runtime Tests Release Configuration

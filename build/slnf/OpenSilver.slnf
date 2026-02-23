@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "..\\..\\src\\OpenSilver.sln",
+    "path": "..\\..\\src\\OpenSilver.slnx",
     "projects": [
       "Analyzers\\OpenSilver.Analyzers.Tests\\OpenSilver.Analyzers.Tests.csproj",
       "Analyzers\\OpenSilver.Analyzers\\OpenSilver.Analyzers.csproj",

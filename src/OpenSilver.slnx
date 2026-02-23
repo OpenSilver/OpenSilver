@@ -1,0 +1,133 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path="../.github/workflows/build-opensilver-package.yml" />
+    <File Path="../.github/workflows/build-theme-packages.yml" />
+    <File Path="../.github/workflows/validate-prs.yml" />
+  </Folder>
+  <Folder Name="/build/">
+    <File Path="../build/build-nuget-package-OpenSilver.bat" />
+    <File Path="../build/build-nuget-package-OpenSilver.MauiHybrid.bat" />
+    <File Path="../build/build-nuget-package-OpenSilver.Photino.bat" />
+    <File Path="../build/build-nuget-package-OpenSilver.Simulator.bat" />
+    <File Path="../build/build-nuget-package-OpenSilver.Wasm.bat" />
+    <File Path="../build/Build_Themes.bat" />
+    <File Path="../build/update-compiler.bat" />
+    <File Path="../build/update-nuget-packages.bat" />
+    <File Path="../build/update-simulator.bat" />
+    <File Path="../build/update-wasm.bat" />
+    <File Path="../build/version_info.txt" />
+  </Folder>
+  <Folder Name="/build/nuspec/">
+    <File Path="../build/nuspec/OpenSilver.MauiHybrid.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Photino.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Simulator.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.BubbleCreme.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.BureauBlack.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.BureauBlue.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.ExpressionDark.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.ExpressionLight.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.RainierOrange.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.RainierPurple.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.ShinyBlue.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.ShinyRed.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.SystemColors.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.TwilightBlue.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.Theme.WhistlerBlue.nuspec" />
+    <File Path="../build/nuspec/OpenSilver.WebAssembly.nuspec" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="Directory.Build.props" />
+    <File Path="NuGet.config" />
+  </Folder>
+  <Folder Name="/src/Compiler/">
+    <Project Path="Compiler/Compiler.SharedBuildTasks/Compiler.SharedBuildTasks.OpenSilver.csproj" />
+    <Project Path="Compiler/Compiler/Compiler.OpenSilver.csproj" />
+  </Folder>
+  <Folder Name="/src/Compiler/Tests/">
+    <Project Path="Compiler/Tests/Compiler.Tests/Compiler.Tests.csproj" />
+    <Project Path="Compiler/Tests/Experimental/Experimental.csproj" />
+  </Folder>
+  <Folder Name="/src/Maui/">
+    <Project Path="Maui/Hybrid/OpenSilver.MauiHybrid.csproj" />
+  </Folder>
+  <Folder Name="/src/Photino/">
+    <Project Path="Photino/OpenSilver.Photino/OpenSilver.Photino.csproj" />
+  </Folder>
+  <Folder Name="/src/Runtime/">
+    <File Path="Runtime/Directory.Build.props" />
+    <Project Path="Runtime/Browser/Browser.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Data.Input/Controls.Data.Input.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Data.Toolkit/Controls.Data.Toolkit.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Data/Controls.Data.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.DataVisualization/Controls.DataVisualization.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Input.Toolkit/Controls.Input.Toolkit.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Input/Controls.Input.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Layout.Toolkit/Controls.Layout.Toolkit.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Navigation/Controls.Navigation.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.BubbleCreme/Controls.Theming.BubbleCreme.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.BureauBlack/Controls.Theming.BureauBlack.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.BureauBlue/Controls.Theming.BureauBlue.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.ExpressionDark/Controls.Theming.ExpressionDark.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.ExpressionLight/Controls.Theming.ExpressionLight.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.RainierOrange/Controls.Theming.RainierOrange.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.RainierPurple/Controls.Theming.RainierPurple.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.ShinyBlue/Controls.Theming.ShinyBlue.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.ShinyRed/Controls.Theming.ShinyRed.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.SystemColors/Controls.Theming.SystemColors.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.Toolkit/Controls.Theming.Toolkit.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.TwilightBlue/Controls.Theming.TwilightBlue.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Theming.WhistlerBlue/Controls.Theming.WhistlerBlue.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls.Toolkit/Controls.Toolkit.OpenSilver.csproj" />
+    <Project Path="Runtime/Controls/Controls.OpenSilver.csproj" />
+    <Project Path="Runtime/Data/Data.OpenSilver.csproj" />
+    <Project Path="Runtime/DataForm.Toolkit/DataForm.Toolkit.OpenSilver.csproj" />
+    <Project Path="Runtime/Runtime/Runtime.OpenSilver.csproj" />
+  </Folder>
+  <Folder Name="/src/Runtime/Analyzers/">
+    <Project Path="Analyzers/OpenSilver.Analyzers.Tests/OpenSilver.Analyzers.Tests.csproj" />
+    <Project Path="Analyzers/OpenSilver.Analyzers/OpenSilver.Analyzers.csproj" />
+    <Project Path="Analyzers/OpenSilver.CodeFixes/OpenSilver.CodeFixes.csproj" />
+  </Folder>
+  <Folder Name="/src/Runtime/Blend/">
+    <Project Path="Runtime/Blend/Effects/Expression.Effects.OpenSilver.csproj" />
+    <Project Path="Runtime/Blend/Interactions/Expression.Interactions.OpenSilver.csproj" />
+    <Project Path="Runtime/Blend/Interactivity/Interactivity.OpenSilver.csproj" />
+  </Folder>
+  <Folder Name="/src/Runtime/MEF/">
+    <Project Path="Runtime/MEF/System.ComponentModel.Composition.Initialization/System.ComponentModel.Composition.Initialization.csproj" />
+  </Folder>
+  <Folder Name="/src/Runtime/Scripts/">
+    <File Path="Runtime/Scripts/cshtml5.css" />
+    <File Path="Runtime/Scripts/cshtml5.js" />
+    <File Path="Runtime/Scripts/filesaver.min.js" />
+    <File Path="Runtime/Scripts/html-to-image.js" />
+    <File Path="Runtime/Scripts/opensilver.js" />
+    <File Path="Runtime/Scripts/quill.core.css" />
+    <File Path="Runtime/Scripts/quill.min.js" />
+  </Folder>
+  <Folder Name="/src/Simulator/">
+    <Project Path="Simulator/Simulator/Simulator.OpenSilver.csproj" />
+  </Folder>
+  <Folder Name="/src/Targets/">
+    <File Path="Targets/OpenSilver.Common.targets" />
+    <File Path="Targets/OpenSilver.GenerateAssemblyInfo.targets" />
+    <File Path="Targets/OpenSilver.MauiHybrid.targets" />
+    <File Path="Targets/OpenSilver.Photino.targets" />
+    <File Path="Targets/OpenSilver.Simulator.targets" />
+    <File Path="Targets/OpenSilver.targets" />
+    <File Path="Targets/OpenSilver.WebAssembly.targets" />
+  </Folder>
+  <Folder Name="/src/Tests/">
+    <Project Path="Tests/Runtime.OpenSilver.Tests/Runtime.OpenSilver.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/Tests/TestApplication/">
+    <File Path="Tests/TestApplication/Directory.Build.props" />
+    <Project Path="Tests/TestApplication/TestApplication.OpenSilver.Browser/TestApplication.OpenSilver.Browser.csproj" />
+    <Project Path="Tests/TestApplication/TestApplication.OpenSilver.Simulator/TestApplication.OpenSilver.Simulator.csproj" />
+    <Project Path="Tests/TestApplication/TestApplication/TestApplication.OpenSilver.csproj" />
+  </Folder>
+  <Folder Name="/src/WebAssembly/">
+    <Project Path="WebAssembly/OpenSilver.WebAssembly/OpenSilver.WebAssembly.csproj" />
+  </Folder>
+</Solution>
