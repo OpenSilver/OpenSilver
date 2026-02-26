@@ -40,7 +40,7 @@ internal sealed class TextMeasurementService
     {
         Debug.Assert(owner.OuterDiv.IsConnected);
 
-        Interop.ExecuteJavaScriptVoid($"document.attachMeasurementService('{owner.OuterDiv.Uid}')");
+        Interop.ExecuteJavaScriptVoid($"osjs.attachMeasurementService('{owner.OuterDiv.Uid}')");
     }
 
     public Size MeasureView(string id,
@@ -53,7 +53,7 @@ internal sealed class TextMeasurementService
             ? string.Empty : $"{maxWidth.ToInvariantString()}px";
 
         string strTextSize = Interop.ExecuteJavaScriptString(
-            $"document.measureTextView('{_window.OuterDiv.Uid}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
+            $"osjs.measureTextView('{_window.OuterDiv.Uid}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
 
         int index = strTextSize.IndexOf('|');
         if (index > -1)
@@ -74,7 +74,7 @@ internal sealed class TextMeasurementService
         string innerHTML = BuildInnerHtml(textblock);
 
         string size = Interop.ExecuteJavaScriptString(
-            $"document.measureTextBlock('{_window.OuterDiv.Uid}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
+            $"osjs.measureTextBlock('{_window.OuterDiv.Uid}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
             false);
 
         int index = size.IndexOf('|');
@@ -131,6 +131,6 @@ internal sealed class TextMeasurementService
         }
 
         return Interop.ExecuteJavaScriptDouble(
-            $"document.measureBaseline('{_window.OuterDiv.Uid}',{StringBuilderCache.GetStringAndRelease(builder)})", false);
+            $"osjs.measureBaseline('{_window.OuterDiv.Uid}',{StringBuilderCache.GetStringAndRelease(builder)})", false);
     }
 }

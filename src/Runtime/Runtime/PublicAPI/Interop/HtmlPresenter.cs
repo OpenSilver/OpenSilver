@@ -57,7 +57,7 @@ namespace CSHTML5.Native.Html.Controls
                         var htmlPresenter = (HtmlPresenter)d;
                         var sContent = OpenSilver.Interop.GetVariableStringForJS((string)newValue ?? string.Empty);
                         OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                            $"document.htmlPresenterHelpers.setHtml('{htmlPresenter._jsDiv.Uid}', {sContent})");
+                            $"osjs.htmlPresenter.setHtml('{htmlPresenter._jsDiv.Uid}', {sContent})");
                     },
                 });
         
@@ -150,7 +150,7 @@ namespace CSHTML5.Native.Html.Controls
                 {
                     if (_jsDiv.IsConnected)
                     {
-                        return OpenSilver.Interop.ExecuteJavaScriptAsync($"document.htmlPresenterHelpers.getDomElement('{_jsDiv.Uid}')");
+                        return OpenSilver.Interop.ExecuteJavaScriptAsync($"osjs.htmlPresenter.getDomElement('{_jsDiv.Uid}')");
                     }
                 }
 
@@ -195,7 +195,7 @@ namespace CSHTML5.Native.Html.Controls
             if (ScrollMode != ScrollMode.Disabled)
             {
                 string sArgs = OpenSilver.Interop.GetVariableStringForJS(e.UIEventArg);
-                if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onWheelNative('{OuterDiv.Uid}', {sArgs})"))
+                if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"osjs.htmlPresenter.onWheelNative('{OuterDiv.Uid}', {sArgs})"))
                 {
                     e.Handled = true;
                     e.Cancellable = false;
@@ -214,7 +214,7 @@ namespace CSHTML5.Native.Html.Controls
             base.OnKeyDown(e);
 
             string sArgs = OpenSilver.Interop.GetVariableStringForJS(e.UIEventArg);
-            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onKeyDownNative('{OuterDiv.Uid}', {sArgs})"))
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"osjs.htmlPresenter.onKeyDownNative('{OuterDiv.Uid}', {sArgs})"))
             {
                 e.Handled = true;
                 e.Cancellable = false;
@@ -238,7 +238,7 @@ namespace CSHTML5.Native.Html.Controls
             if (element.IsConnected)
             {
                 return Size.Parse(OpenSilver.Interop.ExecuteJavaScriptString(
-                    $"document.htmlPresenterHelpers.measureNative('{element.Uid}')"));
+                    $"osjs.htmlPresenter.measureNative('{element.Uid}')"));
             }
 
             return new Size();

@@ -32,7 +32,6 @@
     <Compile Include="OpenSilver\Internal\CommandLibraryHelper.cs" />
     <Compile Include="OpenSilver\Internal\Controls\IBorderElement.cs" />
     <Compile Include="OpenSilver\Internal\Controls\IGeneratorHost.cs" />
-    <Compile Include="OpenSilver\Internal\Controls\ImageManager.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ScrollExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Controls\TextViewManager.cs" />
     <Compile Include="OpenSilver\Internal\Data\ClrFieldAccessor.cs" />

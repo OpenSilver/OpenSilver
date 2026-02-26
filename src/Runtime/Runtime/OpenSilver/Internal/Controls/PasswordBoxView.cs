@@ -68,7 +68,7 @@ internal sealed class PasswordBoxView : TextViewBase
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            Interop.ExecuteJavaScriptVoid($"document.textviewManager.select('{OuterDiv.Uid}')");
+            Interop.ExecuteJavaScriptVoid($"osjs.textviewManager.select('{OuterDiv.Uid}')");
         }
     }
 
@@ -100,7 +100,7 @@ internal sealed class PasswordBoxView : TextViewBase
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             Interop.ExecuteJavaScriptVoid(
-                $"document.setProp('{OuterDiv.Uid}','value',\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\")");
+                $"osjs.setProp('{OuterDiv.Uid}','value',\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\")");
 
             InvalidateMeasure();
         }
@@ -110,7 +110,7 @@ internal sealed class PasswordBoxView : TextViewBase
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            return Interop.ExecuteJavaScriptString($"document.getProp('{OuterDiv.Uid}','value')") ?? string.Empty;
+            return Interop.ExecuteJavaScriptString($"osjs.getProp('{OuterDiv.Uid}','value')") ?? string.Empty;
         }
 
         return string.Empty;

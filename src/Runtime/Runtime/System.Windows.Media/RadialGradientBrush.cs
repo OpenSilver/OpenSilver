@@ -271,7 +271,7 @@ namespace System.Windows.Media
                     .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
 
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.drawSvgRadialGradient('{_gradientRef.Uid}',{cx},{cy},{r},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
+                    $"osjs.drawSvgRadialGradient('{_gradientRef.Uid}',{cx},{cy},{r},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
             }
         }
     }

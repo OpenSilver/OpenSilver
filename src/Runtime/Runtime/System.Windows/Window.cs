@@ -140,8 +140,8 @@ public class Window : ContentControl, IResizeObserverListener
         {
             if (OuterDiv.IsConnected)
             {
-                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"document.getProp('{RootDomElement.Uid}', 'offsetWidth')");
-                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"document.getProp('{RootDomElement.Uid}', 'offsetHeight')");
+                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{RootDomElement.Uid}', 'offsetWidth')");
+                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{RootDomElement.Uid}', 'offsetHeight')");
                 return new Rect(0, 0, width, height);
             }
 

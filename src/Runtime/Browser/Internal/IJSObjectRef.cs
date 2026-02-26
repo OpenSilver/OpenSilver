@@ -48,11 +48,11 @@ internal sealed class JSObjectRef : IJSObjectRef
         _jsRef = jsRef;
     }
 
-    public string ToJavaScriptString() => $"document.browserService.getObject('{_jsRef}')";
+    public string ToJavaScriptString() => $"osjs.browserService.getObject('{_jsRef}')";
 
     public void Dispose()
     {
         ScriptObject.UnregisterScriptObject(_jsRef);
-        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.browserService.releaseObject('{_jsRef}')");
+        OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.browserService.releaseObject('{_jsRef}')");
     }
 }

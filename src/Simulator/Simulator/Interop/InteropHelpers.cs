@@ -36,7 +36,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         internal static void InjectJavaScriptExecutionHandler(opensilver::DotNetForHtml5.IJavaScriptExecutionHandler javaScriptExecutionHandler)
         {
-            INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler;
+            opensilver::DotNetForHtml5.Cshtml5Initializer.Initialize(javaScriptExecutionHandler);
         }
 
         internal static void InjectWebClientFactory()

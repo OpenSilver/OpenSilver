@@ -12,11 +12,11 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Commands;
 using OpenSilver.Internal.Media;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -32,7 +32,6 @@ public sealed class Hyperlink : Span, ICommandSource
     private static readonly SolidColorBrush _defaultMouseOverBrush;
 
     private CanExecuteChangedWeakEventListener _canExecuteChangedListener;
-    private JavaScriptCallback _clickCallback;
     private bool _canExecute = true;
 
     static Hyperlink()
@@ -265,32 +264,19 @@ public sealed class Hyperlink : Span, ICommandSource
         set => SetValueInternal(TargetNameProperty, value);
     }
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        base.INTERNAL_OnAttachedToVisualTree();
-        INTERNAL_HtmlDomManager.AddCSSClass(OuterDiv, "opensilver-hyperlink");
+        return INTERNAL_HtmlDomManager.CreateHyperlinkDomElementAndAppendIt(parent, this);
     }
 
-    public override void INTERNAL_AttachToDomEvents()
+    internal static void OnClickNative(string id)
     {
-        base.INTERNAL_AttachToDomEvents();
-
-        _clickCallback = JavaScriptCallback.Create(OnClickNative);
-
-        string sClickCallback = OpenSilver.Interop.GetVariableStringForJS(_clickCallback);
-        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"document.addListener('{OuterDiv.Uid}', 'click', function (e) {{ {sClickCallback}(); }}))");
+        if (INTERNAL_HtmlDomManager.GetElementById(id) is Hyperlink hyperlink)
+        {
+            hyperlink.OnClick();
+        }
     }
-
-    public override void INTERNAL_DetachFromDomEvents()
-    {
-        base.INTERNAL_DetachFromDomEvents();
-
-        _clickCallback?.Dispose();
-        _clickCallback = null;
-    }
-
-    private void OnClickNative() => OnClick();
 
     private void OnClick()
     {

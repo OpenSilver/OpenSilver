@@ -95,7 +95,7 @@ internal sealed class FontFace
             string uriEscaped = Interop.GetVariableStringForJS(CssFontUrl);
             string sCallback = Interop.GetVariableStringForJS(loadCallback);
             Interop.ExecuteJavaScriptVoid(
-                $"document.loadFont('{CssFontName}', 'url({uriEscaped})', {sCallback})");
+                $"osjs.loadFont('{CssFontName}', 'url({uriEscaped})', {sCallback})");
         }
 
         return await _loadOperation.Task;

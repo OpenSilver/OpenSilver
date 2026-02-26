@@ -561,19 +561,22 @@ public sealed class Dispatcher
     private sealed class WasmDispatcher : IDispatcherImpl
     {
         private readonly Dispatcher _dispatcher;
+        private readonly string _nativeDispatcherId;
 
         public WasmDispatcher(Dispatcher dispatcher)
         {
             _dispatcher = dispatcher;
             var jsCallback = JavaScriptCallback.Create(OnDispatcherTickNative, false);
             string sHandler = OpenSilver.Interop.GetVariableStringForJS(jsCallback);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createUIDispatcher({sHandler})", false);
+            _nativeDispatcherId = OpenSilver.Interop.ExecuteJavaScriptString($"osjs.dispatcher.create({sHandler})", false);
         }
 
         public bool CheckAccess() => true;
 
         public void SetTickRate(int tickRate) =>
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.UIDispatcher.setTickRate({tickRate.ToInvariantString()})", false);
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                $"osjs.dispatcher.setTickRate('{_nativeDispatcherId}', {tickRate.ToInvariantString()})",
+                false);
 
         private void OnDispatcherTickNative() => _dispatcher.OnDispatcherTickNative();
     }

@@ -37,20 +37,20 @@ public readonly struct HtmlElementReference : IJavaScriptConvertible
     internal void SetAttribute(string name, bool value) => SetAttributeImpl(name, value ? "true" : "false");
 
     private void SetAttributeImpl(string name, string value) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.setAttr('{Uid}','{name}',{value})");
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.setAttr('{Uid}','{name}',{value})");
 
     internal void RemoveAttribute(string name) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.unsetAttr('{Uid}','{name}')");
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.unsetAttr('{Uid}','{name}')");
 
     internal void SetCssStyleProperty(string propertyName, string value) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.setCSS('{Uid}','{propertyName}','{value}')");
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.setCSS('{Uid}','{propertyName}','{value}')");
 
     internal void SetProperty(string name, double value) => SetPropertyImpl(name, value.ToInvariantString());
 
     internal void SetProperty(string name, string value) => SetPropertyImpl(name, $"\"{value}\"");
 
     private void SetPropertyImpl(string name, string value) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.setProp('{Uid}','{name}',{value})");
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.setProp('{Uid}','{name}',{value})");
 
     string IJavaScriptConvertible.ToJavaScriptString() => $"document.getElementById(\"{Uid}\")";
 

@@ -191,7 +191,7 @@ public partial class UIElement
 
         Vector offets = Vector.Parse(
             OpenSilver.Interop.ExecuteJavaScriptString(
-                $"document.transformToVisual('{OuterDiv.Uid}', '{otherVisual.OuterDiv.Uid}')"));
+                $"osjs.transformToVisual('{OuterDiv.Uid}', '{otherVisual.OuterDiv.Uid}')"));
 
         return new Matrix(1, 0, 0, 1, offets.X, offets.Y);
     }

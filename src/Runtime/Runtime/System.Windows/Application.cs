@@ -247,7 +247,7 @@ namespace System.Windows
             try
             {
                 paramsArray = JsonSerializer.Deserialize<HTMLParam[]>(
-                    OpenSilver.Interop.ExecuteJavaScriptString($"document.getAppParams('{_rootDiv.Uid}')"));
+                    OpenSilver.Interop.ExecuteJavaScriptString($"osjs.getAppParams('{_rootDiv.Uid}')"));
             }
             catch
             {

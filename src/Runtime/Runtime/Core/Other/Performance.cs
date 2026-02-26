@@ -24,7 +24,7 @@ namespace CSHTML5.Internal
             string sName = OpenSilver.Interop.GetVariableStringForJS(name);
             string sTime = initialTime.ToInvariantString();
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"document.addToPerformanceCounters({sName}, {sTime})");
+                $"osjs.addToPerformanceCounters({sName}, {sTime})");
         }
     }
 }

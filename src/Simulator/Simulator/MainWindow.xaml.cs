@@ -414,7 +414,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
                 await SetupSimulatorHostObject();
 
-                bool success = await _openSilverRuntimeDispatcher.InvokeAsync(() => StartApplication());
+
+                bool success = await _openSilverRuntimeDispatcher.InvokeAsync(() =>
+                {
+                    opensilver::DotNetForHtml5.Cshtml5Initializer.Initialize(_javaScriptExecutionHandler);
+                    return StartApplication();
+                });
 
                 await Dispatcher.BeginInvoke(async () =>
                 {
@@ -635,7 +640,6 @@ Click OK to continue.";
                 _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
 
                 InteropHelpers.InjectWebControlDispatcher(MainWebBrowser);
-                InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler);
                 InteropHelpers.InjectWebClientFactory();
                 InteropHelpers.InjectClipboardHandler();
                 InteropHelpers.InjectSimulatorProxy(

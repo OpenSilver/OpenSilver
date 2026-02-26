@@ -52,11 +52,11 @@ namespace CSHTML5.Native.Html.Printing
             // Remove the class "section-to-print" from the previous print area:
             if (CurrentPrintArea != null && CurrentPrintArea.IsLoadedCache)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"document.removeClass('{CurrentPrintArea.OuterDiv.Uid}',\"section-to-print\")");
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.removeClass('{CurrentPrintArea.OuterDiv.Uid}',\"section-to-print\")");
             }
 
             // Add the class "section-to-print" to the new print area: (credits: https://stackoverflow.com/questions/468881/print-div-id-printarea-div-only )
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.addClass('{element.OuterDiv.Uid}',\"section-to-print\")");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.addClass('{element.OuterDiv.Uid}',\"section-to-print\")");
 
             // Remember the new print area:
             CurrentPrintArea = element;

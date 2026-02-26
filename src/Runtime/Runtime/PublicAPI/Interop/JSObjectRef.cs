@@ -13,7 +13,6 @@
 
 using System;
 using System.Text.Json;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace CSHTML5.Types
@@ -26,14 +25,13 @@ namespace CSHTML5.Types
 
         string IJavaScriptConvertible.ToJavaScriptString()
         {
-
             if (IsArray)
             {
-                return $"document.jsObjRef[\"{ReferenceId}\"][{_arrayIndex}]";
+                return $"osjs.getRef('{ReferenceId}')[{_arrayIndex}]";
             }
             else
             {
-                return _jsCache ??= $"document.jsObjRef[\"{ReferenceId}\"]";
+                return _jsCache ??= $"osjs.getRef('{ReferenceId}')";
             }
         }
 
@@ -99,7 +97,7 @@ namespace CSHTML5.Types
         {
             if (ReferenceId is not null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"delete document.jsObjRef['{ReferenceId}']");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.deleteRef('{ReferenceId}')");
 
                 if (IsTrackingAllJavascriptObjects)
                 {
@@ -172,7 +170,6 @@ namespace CSHTML5.Types
 
             if (IsArray)
             {
-                var fullName = Value.GetType().FullName;
                 if (Value is string s)
                 {
                     result = s;

@@ -74,7 +74,7 @@ public readonly struct HtmlElementStyleReference
 
     private void SetStylePropertyValue(string propertyName, string value) =>
         Interop.ExecuteJavaScriptVoidAsync(
-            $"document.setCSS('{Uid}','{propertyName}','{value}')");
+            $"osjs.setCSS('{Uid}','{propertyName}','{value}')");
 
     private string GetCSSProperty(string propertyName) =>
         Interop.ExecuteJavaScriptString(

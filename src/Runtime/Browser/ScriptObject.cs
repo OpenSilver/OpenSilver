@@ -44,7 +44,7 @@ namespace System.Windows.Browser
                 JavaScriptCallback.Create(AddEventListenerFromJS));
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"document.browserService.initialize({getMemberCallback}, {setPropertyCallback}, {invokeMethodCallback}, {addEventListenerCallback})");
+                $"osjs.browserService.initialize({getMemberCallback}, {setPropertyCallback}, {invokeMethodCallback}, {addEventListenerCallback})");
         }
 
         internal ScriptObject(IJSObjectRef jsObject)
@@ -151,7 +151,7 @@ namespace System.Windows.Browser
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
-                    $"document.browserService.getProperty({sJSObj}, '{name}')"));
+                    $"osjs.browserService.getProperty({sJSObj}, '{name}')"));
 
             return Unwrap(result);
         }
@@ -189,7 +189,7 @@ namespace System.Windows.Browser
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
-                    $"document.browserService.invoke({sJSObj}, '{name}', {sParams})"));
+                    $"osjs.browserService.invoke({sJSObj}, '{name}', {sParams})"));
 
             return Unwrap(result);
         }
@@ -215,7 +215,7 @@ namespace System.Windows.Browser
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
-                    $"document.browserService.invokeSelf({sJSObj}, {sParams})"));
+                    $"osjs.browserService.invokeSelf({sJSObj}, {sParams})"));
 
             return Unwrap(result);
         }
@@ -270,7 +270,7 @@ namespace System.Windows.Browser
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
-                    $"document.browserService.setProperty({sJSObj}, '{name}', {sValue})"));
+                    $"osjs.browserService.setProperty({sJSObj}, '{name}', {sValue})"));
 
             Exception ex = UnwrapException(result);
             if (ex != null)
@@ -414,7 +414,7 @@ namespace System.Windows.Browser
         private static ManagedObject CreateManagedObject(object obj)
         {
             string jsRef = OpenSilver.Interop.ExecuteJavaScriptString(
-                $"document.browserService.registerManagedObject({(obj is Delegate ? "true" : "false")})");
+                $"osjs.browserService.registerManagedObject({(obj is Delegate ? "true" : "false")})");
             var managedObject = new ManagedObject(new JSObjectRef(jsRef), obj);
             RegisterScriptObject(jsRef, managedObject);
             RegisterManagedObject(obj, managedObject);

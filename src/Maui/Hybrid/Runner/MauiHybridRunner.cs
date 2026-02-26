@@ -49,9 +49,22 @@ namespace OpenSilver.MauiHybrid.Runner
 
             await StartJsAsync();
             var context = InitializeOpenSilver();
+            
+            var dispatcher = Dispatcher.GetForCurrentThread() ??
+                throw new InvalidOperationException("This method must be invoked on the thread associated with the UI Dispatcher.");
+
+            var handler = new MauiJavaScriptExecutionHandler(
+                ExecuteJavaScriptAsync,
+                dispatcher.Dispatch,
+                dispatcher.DispatchAsync,
+                () => MainThread.IsMainThread);
+
             var tcs = new TaskCompletionSource<T>();
 
-            context.Post(async (s) => {
+            context.Post(async (s) =>
+            {
+                DotNetForHtml5.Cshtml5Initializer.Initialize(handler);
+
                 try
                 {
                     var app = await createAppDelegate();
@@ -112,19 +125,8 @@ namespace OpenSilver.MauiHybrid.Runner
             }
         }
 
-        private BackgroundThreadSynchronizationContext InitializeOpenSilver()
+        private static BackgroundThreadSynchronizationContext InitializeOpenSilver()
         {
-            var dispatcher = Dispatcher.GetForCurrentThread() ??
-                throw new InvalidOperationException("This method must be invoked on the thread associated with the UI Dispatcher.");
-
-            var handler = new MauiJavaScriptExecutionHandler(
-                ExecuteJavaScriptAsync,
-                dispatcher.Dispatch,
-                dispatcher.DispatchAsync,
-                () => MainThread.IsMainThread
-            );
-
-            INTERNAL_Simulator.JavaScriptExecutionHandler = handler;
             INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround = true;
 
             var context = new BackgroundThreadSynchronizationContext();

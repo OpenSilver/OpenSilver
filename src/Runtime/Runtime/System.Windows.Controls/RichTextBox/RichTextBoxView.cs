@@ -102,7 +102,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
         Host.Synchronize();
 
-        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.deleteView('{OuterDiv.Uid}')");
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.richTextViewManager.deleteView('{OuterDiv.Uid}')");
     }
 
     private void SetProperties()
@@ -130,7 +130,7 @@ internal sealed class RichTextBoxView : TextViewBase
         double maxWidth = double.IsPositiveInfinity(constraint.Width) ? -1 : constraint.Width;
         double maxHeight = double.IsPositiveInfinity(constraint.Height) ? -1 : constraint.Height;
         string size = Interop.ExecuteJavaScriptString(
-            $"document.richTextViewManager.measureView('{OuterDiv.Uid}', {maxWidth.ToInvariantString()}, {maxHeight.ToInvariantString()})");
+            $"osjs.richTextViewManager.measureView('{OuterDiv.Uid}', {maxWidth.ToInvariantString()}, {maxHeight.ToInvariantString()})");
 
         int i = size.IndexOf('|');
         string w = size.Substring(0, i);
@@ -168,7 +168,7 @@ internal sealed class RichTextBoxView : TextViewBase
             return string.Empty;
         }
 
-        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getSelectedText('{OuterDiv.Uid}')");
+        return Interop.ExecuteJavaScriptString($"osjs.richTextViewManager.getSelectedText('{OuterDiv.Uid}')");
     }
 
     internal int GetContentLength()
@@ -178,7 +178,7 @@ internal sealed class RichTextBoxView : TextViewBase
             return 0;
         }
 
-        return Interop.ExecuteJavaScriptInt32($"document.richTextViewManager.getContentLength('{OuterDiv.Uid}')");
+        return Interop.ExecuteJavaScriptInt32($"osjs.richTextViewManager.getContentLength('{OuterDiv.Uid}')");
     }
 
     internal void SetSelectedText(string text)
@@ -189,7 +189,7 @@ internal sealed class RichTextBoxView : TextViewBase
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.setSelectedText('{OuterDiv.Uid}', {HttpUtility.JavaScriptStringEncode(text, true)})");
+            $"osjs.richTextViewManager.setSelectedText('{OuterDiv.Uid}', {HttpUtility.JavaScriptStringEncode(text, true)})");
 
         OnContentChanged(true);
     }
@@ -201,7 +201,7 @@ internal sealed class RichTextBoxView : TextViewBase
             return;
         }
 
-        Interop.ExecuteJavaScriptVoid($"document.richTextViewManager.selectAll('{OuterDiv.Uid}')");
+        Interop.ExecuteJavaScriptVoid($"osjs.richTextViewManager.selectAll('{OuterDiv.Uid}')");
     }
 
     internal void Select(int start, int length)
@@ -212,7 +212,7 @@ internal sealed class RichTextBoxView : TextViewBase
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.select('{OuterDiv.Uid}', {start.ToInvariantString()}, {length.ToInvariantString()})");
+            $"osjs.richTextViewManager.select('{OuterDiv.Uid}', {start.ToInvariantString()}, {length.ToInvariantString()})");
     }
 
     internal object GetFormat(DependencyProperty dp)
@@ -337,7 +337,7 @@ internal sealed class RichTextBoxView : TextViewBase
         }
 
         return Interop.ExecuteJavaScriptString(
-            $"document.richTextViewManager.getFormat('{OuterDiv.Uid}', '{propertyName}')");
+            $"osjs.richTextViewManager.getFormat('{OuterDiv.Uid}', '{propertyName}')");
     }
 
     internal void Format(DependencyProperty dp, object value)
@@ -412,7 +412,7 @@ internal sealed class RichTextBoxView : TextViewBase
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.format('{OuterDiv.Uid}', '{property}', {HttpUtility.JavaScriptStringEncode(value, true)})");
+            $"osjs.richTextViewManager.format('{OuterDiv.Uid}', '{property}', {HttpUtility.JavaScriptStringEncode(value, true)})");
 
         OnContentChanged(true);
     }
@@ -604,7 +604,7 @@ internal sealed class RichTextBoxView : TextViewBase
             return [];
         }
 
-        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.Uid}')") switch
+        return Interop.ExecuteJavaScriptString($"osjs.richTextViewManager.getContents('{OuterDiv.Uid}')") switch
         {
             "" or null => [],
             string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
@@ -618,7 +618,7 @@ internal sealed class RichTextBoxView : TextViewBase
             return [];
         }
 
-        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.Uid}', {start.ToInvariantString()}, {length.ToInvariantString()})") switch
+        return Interop.ExecuteJavaScriptString($"osjs.richTextViewManager.getContents('{OuterDiv.Uid}', {start.ToInvariantString()}, {length.ToInvariantString()})") switch
         {
             "" or null => [],
             string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
@@ -633,7 +633,7 @@ internal sealed class RichTextBoxView : TextViewBase
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.enable('{OuterDiv.Uid}', {(value ? "true" : "false")})");
+            $"osjs.richTextViewManager.enable('{OuterDiv.Uid}', {(value ? "true" : "false")})");
     }
 
     internal void SetContentsFromBlocks()
@@ -648,7 +648,7 @@ internal sealed class RichTextBoxView : TextViewBase
             .GetDeltas();
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.setContents('{OuterDiv.Uid}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
+            $"osjs.richTextViewManager.setContents('{OuterDiv.Uid}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
 
         OnContentChanged(false);
     }
@@ -667,7 +667,7 @@ internal sealed class RichTextBoxView : TextViewBase
             .GetDeltas();
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.updateContents('{OuterDiv.Uid}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
+            $"osjs.richTextViewManager.updateContents('{OuterDiv.Uid}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
 
         OnContentChanged(true);
     }
@@ -676,7 +676,7 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         if (!OuterDiv.IsConnected) return;
 
-        if (RichTextViewManager.Instance.OnKeyDown(this, e))
+        if (RichTextViewManager.OnKeyDown(this, e))
         {
             e.Handled = true;
             e.Cancellable = false;
@@ -724,7 +724,7 @@ internal sealed class RichTextBoxView : TextViewBase
     }
 
     private void SetAcceptsReturn(bool value) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.setAcceptsReturn('{OuterDiv.Uid}', '{(value ? "true" : "false")}')");
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.richTextViewManager.setAcceptsReturn('{OuterDiv.Uid}', '{(value ? "true" : "false")}')");
 
     internal void OnAcceptsTabChanged(bool acceptsTab)
     {
@@ -735,7 +735,7 @@ internal sealed class RichTextBoxView : TextViewBase
     }
 
     private void SetAcceptsTab(bool value) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.setAcceptsTab('{OuterDiv.Uid}', '{(value ? "true" : "false")}')");
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.richTextViewManager.setAcceptsTab('{OuterDiv.Uid}', '{(value ? "true" : "false")}')");
 
     private void OnContentChanged(bool invalidateModel)
     {

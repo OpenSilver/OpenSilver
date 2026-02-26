@@ -18,84 +18,67 @@ using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
-internal sealed class TextViewManager
+internal static class TextViewManager
 {
-    private readonly JavaScriptCallback _inputHandler;
-    private readonly JavaScriptCallback _scrollHandler;
-    private readonly JavaScriptCallback _selectionChangeHandler;
+    public static void CreateTextView(string id, string parentId) =>
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.textviewManager.createTextView('{id}','{parentId}')");
 
-    private TextViewManager()
-    {
-        _inputHandler = JavaScriptCallback.Create(OnInputNative);
-        _scrollHandler = JavaScriptCallback.Create(OnScrollNative);
-        _selectionChangeHandler = JavaScriptCallback.Create(OnSelectionChangeNative);
-        string sInputHandler = Interop.GetVariableStringForJS(_inputHandler);
-        string sScrollHandler = Interop.GetVariableStringForJS(_scrollHandler);
-        string sSelectionChangeHandler = Interop.GetVariableStringForJS(_selectionChangeHandler);
-        Interop.ExecuteJavaScriptVoidAsync($"document.createTextviewManager({sInputHandler},{sScrollHandler},{sSelectionChangeHandler})");
-    }
+    public static void CreatePasswordView(string id, string parentId) =>
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.textviewManager.createPasswordView('{id}','{parentId}')");
 
-    public static TextViewManager Instance { get; } = new();
-
-    public void CreateTextView(string id, string parentId) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.textviewManager.createTextView('{id}','{parentId}')");
-
-    public void CreatePasswordView(string id, string parentId) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.textviewManager.createPasswordView('{id}','{parentId}')");
-
-    public bool OnKeyDown(TextBoxView textBoxView, KeyEventArgs e)
+    public static bool OnKeyDown(TextBoxView textBoxView, KeyEventArgs e)
     {
         Debug.Assert(textBoxView is not null && textBoxView.OuterDiv.IsConnected);
         Debug.Assert(e is not null);
 
         string sArgs = Interop.GetVariableStringForJS(e.UIEventArg);
-        return Interop.ExecuteJavaScriptBoolean($"document.textviewManager.onKeyDownNative('{textBoxView.OuterDiv.Uid}', {sArgs})");
+        return Interop.ExecuteJavaScriptBoolean($"osjs.textviewManager.onKeyDownNative('{textBoxView.OuterDiv.Uid}', {sArgs})");
     }
 
-    public int GetSelectionStart(TextBoxView textBoxView)
+    public static int GetSelectionStart(TextBoxView textBoxView)
     {
         Debug.Assert(textBoxView is not null && textBoxView.OuterDiv.IsConnected);
 
-        return Interop.ExecuteJavaScriptInt32($"document.textviewManager.getSelectionStart('{textBoxView.OuterDiv.Uid}')");
+        return Interop.ExecuteJavaScriptInt32($"osjs.textviewManager.getSelectionStart('{textBoxView.OuterDiv.Uid}')");
     }
 
-    public void SetSelectionStart(TextBoxView textBoxView, int selectionStart)
+    public static void SetSelectionStart(TextBoxView textBoxView, int selectionStart)
     {
         Debug.Assert(textBoxView is not null && textBoxView.OuterDiv.IsConnected);
 
-        Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectionStart('{textBoxView.OuterDiv.Uid}', {selectionStart.ToInvariantString()})");
+        Interop.ExecuteJavaScriptVoid($"osjs.textviewManager.setSelectionStart('{textBoxView.OuterDiv.Uid}', {selectionStart.ToInvariantString()})");
     }
 
-    public int GetSelectionLength(TextBoxView textBoxView)
+    public static int GetSelectionLength(TextBoxView textBoxView)
     {
         Debug.Assert(textBoxView is not null && textBoxView.OuterDiv.IsConnected);
 
-        return Interop.ExecuteJavaScriptInt32($"document.textviewManager.getSelectionLength('{textBoxView.OuterDiv.Uid}')");
+        return Interop.ExecuteJavaScriptInt32($"osjs.textviewManager.getSelectionLength('{textBoxView.OuterDiv.Uid}')");
     }
 
-    public void SetSelectionLength(TextBoxView textBoxView, int selectionLength)
+    public static void SetSelectionLength(TextBoxView textBoxView, int selectionLength)
     {
         Debug.Assert(textBoxView is not null && textBoxView.OuterDiv.IsConnected);
 
-        Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectionLength('{textBoxView.OuterDiv.Uid}', {selectionLength.ToInvariantString()})");
+        Interop.ExecuteJavaScriptVoid($"osjs.textviewManager.setSelectionLength('{textBoxView.OuterDiv.Uid}', {selectionLength.ToInvariantString()})");
     }
 
-    public string GetSelectedText(TextBoxView textBoxView)
+    public static string GetSelectedText(TextBoxView textBoxView)
     {
         Debug.Assert(textBoxView is not null && textBoxView.OuterDiv.IsConnected);
 
-        return Interop.ExecuteJavaScriptString($"document.textviewManager.getSelectedText('{textBoxView.OuterDiv.Uid}')");
+        return Interop.ExecuteJavaScriptString($"osjs.textviewManager.getSelectedText('{textBoxView.OuterDiv.Uid}')");
     }
 
-    public void SetSelectedText(TextBoxView textBoxView, string text)
+    public static void SetSelectedText(TextBoxView textBoxView, string text)
     {
         Debug.Assert(textBoxView is not null && textBoxView.OuterDiv.IsConnected);
 
         string sText = Interop.GetVariableStringForJS(text);
-        Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectedText('{textBoxView.OuterDiv.Uid}', {sText})");
+        Interop.ExecuteJavaScriptVoid($"osjs.textviewManager.setSelectedText('{textBoxView.OuterDiv.Uid}', {sText})");
     }
 
-    private static void OnInputNative(string id)
+    internal static void OnInputNative(string id)
     {
         if (INTERNAL_HtmlDomManager.GetElementById(id) is TextViewBase textview)
         {
@@ -103,20 +86,20 @@ internal sealed class TextViewManager
         }
     }
 
-    private static void OnScrollNative(string id)
+    internal static void OnScrollNative(string id)
     {
         if (INTERNAL_HtmlDomManager.GetElementById(id) is TextViewBase textview)
         {
             if (!textview.IsScrollClient) return;
 
-            double scrollLeft = Interop.ExecuteJavaScriptDouble($"document.getProp('{textview.OuterDiv.Uid}','scrollLeft')");
-            double scrollTop = Interop.ExecuteJavaScriptDouble($"document.getProp('{textview.OuterDiv.Uid}','scrollTop')");
+            double scrollLeft = Interop.ExecuteJavaScriptDouble($"osjs.getProp('{textview.OuterDiv.Uid}','scrollLeft')");
+            double scrollTop = Interop.ExecuteJavaScriptDouble($"osjs.getProp('{textview.OuterDiv.Uid}','scrollTop')");
 
             textview.UpdateOffsets(new Vector(scrollLeft, scrollTop));
         }
     }
 
-    private static void OnSelectionChangeNative(string id)
+    internal static void OnSelectionChangeNative(string id)
     {
         if (INTERNAL_HtmlDomManager.GetElementById(id) is TextBoxView textview)
         {

@@ -13,7 +13,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
@@ -219,7 +218,7 @@ namespace System.Windows.Printing
                 // Add 'print-section' class for elements we want to print
                 foreach (UIElement e in _elements)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.addClass('{e.OuterDiv.Uid}', 'print-section')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.addClass('{e.OuterDiv.Uid}', 'print-section')");
                 }
             }
 
@@ -230,7 +229,7 @@ namespace System.Windows.Printing
                 {
                     if (e.OuterDiv.IsConnected)
                     {
-                        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.removeClass('{e.OuterDiv.Uid}', 'print-section')");
+                        OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.removeClass('{e.OuterDiv.Uid}', 'print-section')");
                     }
                 }
             }
@@ -279,7 +278,7 @@ namespace System.Windows.Printing
                     {
                         foreach (UIElement el in unloadedElements)
                         {
-                            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.addClass('{el.OuterDiv.Uid}', 'print-section')");
+                            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.addClass('{el.OuterDiv.Uid}', 'print-section')");
                         }
 
                         _printJSCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(() =>

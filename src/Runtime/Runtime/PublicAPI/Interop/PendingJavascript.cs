@@ -108,7 +108,7 @@ namespace CSHTML5.Internal
 
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
         {
-            if (referenceId > 0 && !javascript.StartsWith("document.callScriptSafe"))
+            if (referenceId > 0 && !javascript.StartsWith("osjs.callScriptSafe"))
             {
                 javascript = OpenSilver.Interop.WrapReferenceIdInJavascriptCall(javascript, referenceId);
             }

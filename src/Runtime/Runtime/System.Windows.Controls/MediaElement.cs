@@ -223,7 +223,7 @@ namespace System.Windows.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _mediaElement.IsConnected)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.mediaElementHelpers.resetSource('{_mediaElement.Uid}')");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.mediaElement.resetSource('{_mediaElement.Uid}')");
             }
 
             CreateMediaElement(OuterDiv, source);
@@ -300,7 +300,7 @@ namespace System.Windows.Controls
             {
                 string sType = OpenSilver.Interop.GetVariableStringForJS(type);
                 string canPlay = OpenSilver.Interop.ExecuteJavaScriptString(
-                    $"document.mediaElementHelpers.canPlayType('{_mediaElement.Uid}', {sType})");
+                    $"osjs.mediaElement.canPlayType('{_mediaElement.Uid}', {sType})");
                 return ToMediaCanPlayResponse(canPlay);
             }
 
@@ -324,7 +324,7 @@ namespace System.Windows.Controls
             {
                 if (_mediaElement.IsConnected)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.mediaElementHelpers.pause('{_mediaElement.Uid}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.mediaElement.pause('{_mediaElement.Uid}')");
                 }
             }
         }
@@ -338,7 +338,7 @@ namespace System.Windows.Controls
             {
                 if (_mediaElement.IsConnected)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.mediaElementHelpers.play('{_mediaElement.Uid}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.mediaElement.play('{_mediaElement.Uid}')");
                 }
             }
         }
@@ -352,7 +352,7 @@ namespace System.Windows.Controls
             {
                 if (_mediaElement.IsConnected)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.mediaElementHelpers.stop('{_mediaElement.Uid}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.mediaElement.stop('{_mediaElement.Uid}')");
                 }
             }
         }
@@ -443,17 +443,17 @@ namespace System.Windows.Controls
             _mediaOpenedCallback = JavaScriptCallback.Create(OnMediaOpened);
             string mediaOpenedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaOpenedCallback);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.addListener('{mediaElement.Uid}', 'loadedmetadata', function (e) {{ {mediaOpenedCallback}(); }}))");
+                $"osjs.addListener('{mediaElement.Uid}', 'loadedmetadata', function (e) {{ {mediaOpenedCallback}(); }})");
 
             _mediaEndedCallback = JavaScriptCallback.Create(OnMediaEnded);
             string mediaEndedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaEndedCallback);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.addListener('{mediaElement.Uid}', 'ended', function (e) {{ {mediaEndedCallback}(); }}))");
+                $"osjs.addListener('{mediaElement.Uid}', 'ended', function (e) {{ {mediaEndedCallback}(); }})");
 
             _mediaFailedCallback = JavaScriptCallback.Create(OnMediaFailed);
             string mediaFailedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaFailedCallback);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.addListener('{mediaElement.Uid}', 'error', function (e) {{ {mediaFailedCallback}(); }}))");
+                $"osjs.addListener('{mediaElement.Uid}', 'error', function (e) {{ {mediaFailedCallback}(); }})");
 
             return mediaElement;
         }

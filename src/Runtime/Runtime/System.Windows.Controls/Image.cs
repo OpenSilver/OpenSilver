@@ -154,8 +154,6 @@ namespace System.Windows.Controls
         /// </summary>
         public event EventHandler<RoutedEventArgs> ImageOpened;
 
-        internal HtmlElementReference ImageDiv => _imageDiv;
-
         /// <inheritdoc />
         protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
@@ -274,11 +272,27 @@ namespace System.Windows.Controls
             }
         }
 
-        internal void OnLoadNative()
+        internal static void OnLoadNative(string id)
+        {
+            if (INTERNAL_HtmlDomManager.GetElementById(id) is Image image)
+            {
+                image.OnLoad();
+            }
+        }
+
+        internal static void OnErrorNative(string id)
+        {
+            if (INTERNAL_HtmlDomManager.GetElementById(id) is Image image)
+            {
+                image.OnError();
+            }
+        }
+
+        private void OnLoad()
         {
             InvalidateMeasure();
 
-            _naturalSize = ImageManager.Instance.GetNaturalSize(this);
+            _naturalSize = GetNaturalSize();
 
             if (Source is BitmapImage bmi)
             {
@@ -288,7 +302,7 @@ namespace System.Windows.Controls
             ImageOpened?.Invoke(this, new RoutedEventArgs { Source = this });
         }
 
-        internal void OnErrorNative()
+        private void OnError()
         {
             InvalidateMeasure();
 
@@ -300,6 +314,15 @@ namespace System.Windows.Controls
             }
 
             ImageFailed?.Invoke(this, new ExceptionRoutedEventArgs { Source = this });
+        }
+
+        private Size GetNaturalSize()
+        {
+            Debug.Assert(_imageDiv.IsConnected);
+
+            double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.image.getNaturalWidth('{_imageDiv.Uid}')");
+            double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.image.getNaturalHeight('{_imageDiv.Uid}')");
+            return new Size(width, height);
         }
     }
 }

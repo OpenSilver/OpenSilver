@@ -77,17 +77,8 @@ namespace OpenSilver.Photino.Runner
             }
         }
 
-        private BackgroundThreadSynchronizationContext InitializeOpenSilver()
+        private static BackgroundThreadSynchronizationContext InitializeOpenSilver()
         {
-            var handler = new PhotinoExecutionHandler(
-                ExecuteJavaScriptAsync,
-                a =>
-                {
-                    window.Invoke(a);
-                }
-            );
-
-            INTERNAL_Simulator.JavaScriptExecutionHandler = handler;
             INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround = true;
 
             var context = new BackgroundThreadSynchronizationContext();
@@ -188,11 +179,15 @@ namespace OpenSilver.Photino.Runner
             });
 
             var context = InitializeOpenSilver();
+            var handler = new PhotinoExecutionHandler(ExecuteJavaScriptAsync, a => window.Invoke(a));
             await _jsStarted.Task;
 
             var tcs = new TaskCompletionSource<T>();
 
-            context.Post(async (s) => {
+            context.Post(async (s) =>
+            {
+                DotNetForHtml5.Cshtml5Initializer.Initialize(handler);
+
                 try
                 {
                     var app = await createAppDelegate();

@@ -45,21 +45,14 @@ namespace OpenSilver.Internal
             {
                 return new WPFClipboard();
             }
-            else if (IsNavigatorClipboardAvailable())
-            {
-                return new NavigatorClipboard();
-            }
             else
             {
-                return new ExecCommandClipboard();
+                return new NavigatorClipboard();
             }
         }
 
         private static bool IsWPFClipboardAvailable()
             => Interop.IsRunningInTheSimulator && INTERNAL_Simulator.AsyncClipboard != null;
-
-        private static bool IsNavigatorClipboardAvailable()
-            => Interop.ExecuteJavaScriptBoolean("!!navigator.clipboard", false);
 
         private class WPFClipboard : IAsyncClipboard
         {
@@ -103,9 +96,7 @@ namespace OpenSilver.Internal
 
                 string sText = Interop.GetVariableStringForJS(text);
 
-                Interop.ExecuteJavaScriptVoid(
-                    $"navigator.clipboard.writeText({sText}).then(() => {sCallback}(true), () => {sCallback}(false))",
-                    false);
+                Interop.ExecuteJavaScriptVoid($"osjs.clipboard.setText({sText}, {sCallback})", false);
 
                 return tcs.Task;
             }
@@ -130,9 +121,7 @@ namespace OpenSilver.Internal
                         }
                     }));
 
-                Interop.ExecuteJavaScriptVoid(
-                    $"navigator.clipboard.readText().then(text => {sCallback}(text, true), () => {sCallback}('', false))",
-                    false);
+                Interop.ExecuteJavaScriptVoid($"osjs.clipboard.getText({sCallback})", false);
 
                 return tcs.Task;
             }
@@ -147,66 +136,13 @@ namespace OpenSilver.Internal
                 string sCallback = Interop.GetVariableStringForJS(
                     JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<bool>(b => tcs.SetResult(b)));
 
-                Interop.ExecuteJavaScriptVoid(
-                    $"navigator.clipboard.readText().then(text => {sCallback}(!!text), () => {sCallback}(false))",
-                    false);
+                Interop.ExecuteJavaScriptVoid($"osjs.clipboard.containsText({sCallback})", false);
 
                 return tcs.Task;
             }
 
             private static SecurityException ClipboardAccessNotAllowException()
                 => new SecurityException("Clipboard access is not allowed");
-        }
-
-        private class ExecCommandClipboard : IAsyncClipboard
-        {
-            static ExecCommandClipboard()
-            {
-                Interop.ExecuteJavaScriptVoid(
-                    """
-                    _opensilver.clipboard = {
-                        writeText : function (data) {
-                            const input = document.createElement('input');
-                            document.body.appendChild(input);
-                            input.value = data;
-                            input.select();
-                            document.execCommand('copy');
-                        },
-
-                        readText : function () {
-                            const input = document.createElement('input');
-                            document.body.appendChild(input);
-                            input.focus();
-                            document.execCommand('paste');
-                            const text = input.value;
-                            input.remove();
-                            return text;
-                        }
-                    }
-                    """);
-            }
-
-            public void SetText(string text)
-            {
-                string escapedText = Interop.GetVariableStringForJS(text);
-                Interop.ExecuteJavaScriptVoid($"_opensilver.clipboard.writeText({escapedText})");
-            }
-
-            public Task SetTextAsync(string text)
-            {
-                SetText(text);
-                return Task.CompletedTask;
-            }
-
-            public string GetText()
-                => Interop.ExecuteJavaScriptString("_opensilver.clipboard.readText()");
-
-            public Task<string> GetTextAsync() => Task.FromResult(GetText());
-
-            public bool ContainsText()
-                => Interop.ExecuteJavaScriptBoolean("!!_opensilver.clipboard.readText()");
-
-            public Task<bool> ContainsTextAsync() => Task.FromResult(ContainsText());
         }
     }
 }

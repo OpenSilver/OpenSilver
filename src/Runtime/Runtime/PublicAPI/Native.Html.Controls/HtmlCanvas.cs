@@ -318,7 +318,7 @@ namespace CSHTML5.Native.Html.Controls
                 $"document.getElementById('{_jsCanvas.Uid}').getContext('2d')");
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.addListener('{_jsCanvas.Uid}', 'selectstart', function (e) {{ e.preventDefault(); }})");
+                $"osjs.addListener('{_jsCanvas.Uid}', 'selectstart', function (e) {{ e.preventDefault(); }})");
 
             return div1;
         }

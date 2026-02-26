@@ -77,7 +77,7 @@ internal sealed class TextBoxView : TextViewBase
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             Interop.ExecuteJavaScriptVoid(
-                $"document.setProp('{OuterDiv.Uid}','value',\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\")");
+                $"osjs.setProp('{OuterDiv.Uid}','value',\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\")");
 
             InvalidateMeasure();
         }
@@ -112,7 +112,7 @@ internal sealed class TextBoxView : TextViewBase
 
         if (Interop.IsRunningInTheSimulator)
         {
-            Interop.ExecuteJavaScriptVoidAsync($"document.textviewManager.handleKeyDownFromSimulator('{OuterDiv.Uid}')");
+            Interop.ExecuteJavaScriptVoidAsync($"osjs.textviewManager.handleKeyDownFromSimulator('{OuterDiv.Uid}')");
         }
 
         SetTextNative(host.Text);
@@ -122,7 +122,7 @@ internal sealed class TextBoxView : TextViewBase
     {
         if (!OuterDiv.IsConnected) return;
 
-        if (TextViewManager.Instance.OnKeyDown(this, e))
+        if (TextViewManager.OnKeyDown(this, e))
         {
             e.Handled = true;
             e.Cancellable = false;
@@ -207,7 +207,7 @@ internal sealed class TextBoxView : TextViewBase
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
-                return TextViewManager.Instance.GetSelectionStart(this);
+                return TextViewManager.GetSelectionStart(this);
             }
 
             return 0;
@@ -216,7 +216,7 @@ internal sealed class TextBoxView : TextViewBase
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
-                TextViewManager.Instance.SetSelectionStart(this, value);
+                TextViewManager.SetSelectionStart(this, value);
             }
         }
     }
@@ -227,7 +227,7 @@ internal sealed class TextBoxView : TextViewBase
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
-                return TextViewManager.Instance.GetSelectionLength(this);
+                return TextViewManager.GetSelectionLength(this);
             }
 
             return 0;
@@ -236,7 +236,7 @@ internal sealed class TextBoxView : TextViewBase
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
-                TextViewManager.Instance.SetSelectionLength(this, value);
+                TextViewManager.SetSelectionLength(this, value);
             }
         }
     }
@@ -247,7 +247,7 @@ internal sealed class TextBoxView : TextViewBase
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
-                return TextViewManager.Instance.GetSelectedText(this);
+                return TextViewManager.GetSelectedText(this);
             }
 
             return string.Empty;
@@ -256,7 +256,7 @@ internal sealed class TextBoxView : TextViewBase
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
             {
-                TextViewManager.Instance.SetSelectedText(this, value);
+                TextViewManager.SetSelectedText(this, value);
                 
                 Host.UpdateTextProperty(GetText());
                 InvalidateMeasure();
@@ -269,7 +269,7 @@ internal sealed class TextBoxView : TextViewBase
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             Interop.ExecuteJavaScriptVoid(
-                $"document.textviewManager.setSelectionRange('{OuterDiv.Uid}', {start.ToInvariantString()}, {end.ToInvariantString()})");
+                $"osjs.textviewManager.setSelectionRange('{OuterDiv.Uid}', {start.ToInvariantString()}, {end.ToInvariantString()})");
         }
     }
 
@@ -277,7 +277,7 @@ internal sealed class TextBoxView : TextViewBase
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
-            return Interop.ExecuteJavaScriptString($"document.getProp('{OuterDiv.Uid}','value')") ?? string.Empty;
+            return Interop.ExecuteJavaScriptString($"osjs.getProp('{OuterDiv.Uid}','value')") ?? string.Empty;
         }
 
         return string.Empty;

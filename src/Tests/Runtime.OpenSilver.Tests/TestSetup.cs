@@ -51,22 +51,22 @@ namespace Runtime.OpenSilver.Tests
                 return e.Result;
             }
 
-            if (Regex.IsMatch(param, @"document\.inputManager\.focus\('([^""]*)'\)"))
+            if (Regex.IsMatch(param, @"osjs\.inputManager\.focus\('([^""]*)'\)"))
             {
                 return true;
             }
 
-            if (Regex.IsMatch(param, @"document\.getProp\('([^""]*)', 'offsetWidth'\)"))
+            if (Regex.IsMatch(param, @"osjs\.getProp\('([^""]*)', 'offsetWidth'\)"))
             {
                 return 0;
             }
 
-            if (Regex.IsMatch(param, @"document\.getProp\('([^""]*)', 'offsetHeight'\)"))
+            if (Regex.IsMatch(param, @"osjs\.getProp\('([^""]*)', 'offsetHeight'\)"))
             {
                 return 0;
             }
 
-            if (Regex.IsMatch(param, @"document\.getBBox\('([^""]*)'\)"))
+            if (Regex.IsMatch(param, @"osjs\.getBBox\('([^""]*)'\)"))
             {
                 return JsonDocument.Parse("{\"x\":0,\"y\":0,\"width\":0,\"height\":0}").RootElement;
             }

@@ -56,15 +56,15 @@
 })();
 
 window._photinoRuntime = (function () {
-    const _promises = [];
+    const _init = (async function () {
+        const dependencies = [];
 
-    (function () {
         const styleheets = ['libs/cshtml5.css', 'libs/quill.core.css'];
-        const scripts = ['libs/cshtml5.js', 'libs/quill.min.js', 'libs/html-to-image.js', 'libs/filesaver.min.js'];
+        const scripts = ['libs/quill.min.js', 'libs/html-to-image.js', 'libs/filesaver.min.js'];
         const timestamp = '?date=' + new Date().toISOString();
 
         styleheets.forEach((name) => {
-            _promises.push(new Promise((resolve, reject) => {
+            dependencies.push(new Promise((resolve, reject) => {
                 const url = name + timestamp;
                 const stylesheet = document.createElement('link');
                 stylesheet.setAttribute('rel', 'stylesheet');
@@ -77,7 +77,7 @@ window._photinoRuntime = (function () {
         });
 
         scripts.forEach((name) => {
-            _promises.push(new Promise((resolve, reject) => {
+            dependencies.push(new Promise((resolve, reject) => {
                 const url = name + timestamp;
                 const script = document.createElement('script');
                 script.setAttribute('type', 'application/javascript');
@@ -87,6 +87,18 @@ window._photinoRuntime = (function () {
                 document.getElementsByTagName('head')[0].appendChild(script);
             }));
         });
+
+        await Promise.all(dependencies);
+
+        return new Promise((resolve, reject) => {
+            const url = 'libs/cshtml5.js' + timestamp;
+            const script = document.createElement('script');
+            script.setAttribute('type', 'application/javascript');
+            script.setAttribute('src', url);
+            script.onload = () => { resolve(url); };
+            script.onerror = () => { reject(url); };
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }); 
     })();
 
     window.external.receiveMessage(msg => {
@@ -107,7 +119,7 @@ window._photinoRuntime = (function () {
     return {
         startAsync: async function () {
             try {
-                await Promise.all(_promises);
+                await _init;
                 return true;
             } catch (error) {
                 console.error(error);

@@ -475,7 +475,7 @@ public partial class ItemsControl
         if (ItemContainerGenerator.ContainerFromIndex(index) is UIElement container
             && container.OuterDiv.IsConnected)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.scrollToVisual('{container.OuterDiv.Uid}')");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.scrollToVisual('{container.OuterDiv.Uid}')");
         }
     }
 }

@@ -288,7 +288,7 @@ public sealed class ImageBrush : TileBrush
             string imageId = _image.Uid;
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setSvgPatternNaturalSize('{patternId}', '{imageId}', '{shapeId}', {(int)_imageBrush.AlignmentX}, {(int)_imageBrush.AlignmentY})");
+                $"osjs.setSvgPatternNaturalSize('{patternId}', '{imageId}', '{shapeId}', {(int)_imageBrush.AlignmentX}, {(int)_imageBrush.AlignmentY})");
         }
     }
 }

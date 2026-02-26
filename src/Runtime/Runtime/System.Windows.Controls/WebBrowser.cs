@@ -52,7 +52,7 @@ namespace System.Windows.Controls
             var sLoadedCallback = OpenSilver.Interop.GetVariableStringForJS(_jsCallbackOnIframeLoaded);
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.addListener('{_iFrame.Uid}', 'load', function (e) {{ {sLoadedCallback}(); }}))");
+                $"osjs.addListener('{_iFrame.Uid}', 'load', function (e) {{ {sLoadedCallback}(); }})");
 
             var source = this.SourceUri;
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))

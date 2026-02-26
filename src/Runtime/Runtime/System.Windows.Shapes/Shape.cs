@@ -767,7 +767,7 @@ namespace System.Windows.Shapes
             if (svgElement.IsConnected)
             {
                 SVGRect bbox = JsonSerializer.Deserialize<SVGRect>(
-                    OpenSilver.Interop.ExecuteJavaScriptString($"document.getBBox('{svgElement.Uid}')"));
+                    OpenSilver.Interop.ExecuteJavaScriptString($"osjs.getBBox('{svgElement.Uid}')"));
                 return new Rect(bbox.X, bbox.Y, bbox.Width, bbox.Height);
             }
 

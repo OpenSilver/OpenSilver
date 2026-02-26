@@ -27,37 +27,37 @@ namespace System.Windows.Browser
 
         public void OnRaised0()
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid("callScriptableObjectEvent($0, $1, [])", flushQueue:false, 
+            OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.browserService.callScriptableObjectEvent($0, $1, [])", flushQueue:false, 
                 _scriptKey, _functionName);
         }
 
         public void OnRaised1(object obj1)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid("callScriptableObjectEvent($0, $1, [$2])", flushQueue:false, 
+            OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.browserService.callScriptableObjectEvent($0, $1, [$2])", flushQueue:false, 
                 _scriptKey, _functionName, obj1);
         }
 
         public void OnRaised2(object obj1, object obj2)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid("callScriptableObjectEvent($0, $1, [$2, $3])", flushQueue:false, 
+            OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.browserService.callScriptableObjectEvent($0, $1, [$2, $3])", flushQueue:false, 
                 _scriptKey, _functionName, obj1, obj2);
         }
 
         public void OnRaised3(object obj1, object obj2, object obj3)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid("callScriptableObjectEvent($0, $1, [$2, $3, $4])", flushQueue:false, 
+            OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.browserService.callScriptableObjectEvent($0, $1, [$2, $3, $4])", flushQueue:false, 
                 _scriptKey, _functionName, obj1, obj2, obj3);
         }
 
         public void OnRaised4(object obj1, object obj2, object obj3, object obj4)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid("callScriptableObjectEvent($0, $1, [$2, $3, $4, $5])", flushQueue:false, 
+            OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.browserService.callScriptableObjectEvent($0, $1, [$2, $3, $4, $5])", flushQueue:false, 
                 _scriptKey, _functionName, obj1, obj2, obj3, obj4);
         }
 
         public void OnRaised5(object obj1, object obj2, object obj3, object obj4, object obj5)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid("callScriptableObjectEvent($0, $1, [$2, $3, $4, $5, $6])", flushQueue:false, 
+            OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.browserService.callScriptableObjectEvent($0, $1, [$2, $3, $4, $5, $6])", flushQueue:false, 
                 _scriptKey, _functionName, obj1, obj2, obj3, obj4, obj5);
         }
     }

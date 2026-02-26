@@ -24,8 +24,8 @@ internal static class OnCallBackImpl
 {
     public static void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
     {
-        string errorMessage = OpenSilver.Interop.ExecuteJavaScriptString($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][0]");
-        int indexOfNextUnmodifiedJSCallInList = OpenSilver.Interop.ExecuteJavaScriptInt32($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][1]");
+        string errorMessage = OpenSilver.Interop.ExecuteJavaScriptString($"osjs.getRef('{idWhereCallbackArgsAreStored}')[0]");
+        int indexOfNextUnmodifiedJSCallInList = OpenSilver.Interop.ExecuteJavaScriptInt32($"osjs.getRef('{idWhereCallbackArgsAreStored}')[1]");
 
         if (OpenSilver.Interop.IsRunningInTheSimulator)
         {

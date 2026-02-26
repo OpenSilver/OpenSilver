@@ -202,7 +202,7 @@ namespace System.Windows.Shapes
             string width = Math.Round(rect.Width, 2).ToInvariantString();
             string height = Math.Round(rect.Height, 2).ToInvariantString();
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.arrangeRectangle('{SvgElement.Uid}',{x},{y},{width},{height})");
+                $"osjs.arrangeRectangle('{SvgElement.Uid}',{x},{y},{width},{height})");
         }
 
         internal sealed override Size GetNaturalSize()

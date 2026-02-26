@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
-using CSHTML5.Internal;
 
 namespace OpenSilver.Internal;
 
@@ -28,13 +27,7 @@ internal static class ResizeObserver
 {
     private static readonly Dictionary<string, WeakListenerList> _listeners = [];
 
-    static ResizeObserver()
-    {
-        var jsCallback = Interop.GetVariableStringForJS(JavaScriptCallback.Create(OnSizeChangedCallback));
-        Interop.ExecuteJavaScriptVoidAsync($"document.createResizeManager({jsCallback})");
-    }
-
-    private static void OnSizeChangedCallback(string id, double width, double height)
+    internal static void OnSizeChangedNative(string id, double width, double height)
     {
         if (!_listeners.TryGetValue(id, out WeakListenerList listeners))
         {
@@ -66,7 +59,7 @@ internal static class ResizeObserver
             {
                 listeners = new(id);
                 _listeners[id] = listeners;
-                Interop.ExecuteJavaScriptVoidAsync($"document.resizeManager.observe('{element.Uid}')");
+                Interop.ExecuteJavaScriptVoidAsync($"osjs.resizeObserver.observe('{element.Uid}')");
             }
 
             LinkedListNode<WeakListener> weakListener = listeners.AddLast(new WeakListener(listener));
@@ -106,7 +99,7 @@ internal static class ResizeObserver
             if (list.Count == 0)
             {
                 _listeners.Remove(list.Id);
-                Interop.ExecuteJavaScriptVoidAsync($"document.resizeManager.unobserve('{list.Id}')");
+                Interop.ExecuteJavaScriptVoidAsync($"osjs.resizeObserver.unobserve('{list.Id}')");
             }
         }
     }

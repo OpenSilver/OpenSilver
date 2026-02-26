@@ -44,14 +44,14 @@ public sealed class OpenFileDialog
         _id = _idGenerator.NewId();
         _callbacks = new OpenFileDialogCallbacks();
         Interop.ExecuteJavaScriptVoidAsync(
-            $"document.openFileDialog.createDialog('{_id.ToInvariantString()}', {Interop.GetVariableStringForJS(_callbacks.Change)}, {Interop.GetVariableStringForJS(_callbacks.ChangeComplete)}, {Interop.GetVariableStringForJS(_callbacks.Cancel)})");
+            $"osjs.openFileDialog.createDialog('{_id.ToInvariantString()}', {Interop.GetVariableStringForJS(_callbacks.Change)}, {Interop.GetVariableStringForJS(_callbacks.ChangeComplete)}, {Interop.GetVariableStringForJS(_callbacks.Cancel)})");
     }
 
     ~OpenFileDialog()
     {
         _callbacks.Dispose();
         Interop.ExecuteJavaScriptVoidAsync(
-            $"document.openFileDialog.deleteDialog('{_id.ToInvariantString()}')");
+            $"osjs.openFileDialog.deleteDialog('{_id.ToInvariantString()}')");
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public sealed class OpenFileDialog
 
             _multiselect = value;
             Interop.ExecuteJavaScriptVoidAsync(
-                $"document.openFileDialog.setMultiple('{_id.ToInvariantString()}', {(value ? "true" : "false")})");
+                $"osjs.openFileDialog.setMultiple('{_id.ToInvariantString()}', {(value ? "true" : "false")})");
         }
     }
 
@@ -139,7 +139,7 @@ public sealed class OpenFileDialog
             }
 
             Interop.ExecuteJavaScriptVoidAsync(
-                $"document.openFileDialog.setAccept('{_id.ToInvariantString()}', '{accept}')");
+                $"osjs.openFileDialog.setAccept('{_id.ToInvariantString()}', '{accept}')");
         }
     }
 
@@ -209,7 +209,7 @@ public sealed class OpenFileDialog
     /// </exception>
     public Task<bool?> ShowDialogAsync(Window owner)
     {
-        string message = Interop.ExecuteJavaScriptString($"document.openFileDialog.showDialog('{_id.ToInvariantString()}')");
+        string message = Interop.ExecuteJavaScriptString($"osjs.openFileDialog.showDialog('{_id.ToInvariantString()}')");
 
         if (!string.IsNullOrEmpty(message))
         {

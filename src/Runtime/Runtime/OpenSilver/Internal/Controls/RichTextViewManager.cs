@@ -18,38 +18,21 @@ using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
-internal sealed class RichTextViewManager
+internal static class RichTextViewManager
 {
-    private readonly JavaScriptCallback _selectionChangedHandler;
-    private readonly JavaScriptCallback _contentChangedHandler;
-    private readonly JavaScriptCallback _scrollHandler;
+    public static void CreateView(string id, string parentId) =>
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.richTextViewManager.createView('{id}','{parentId}')");
 
-    private RichTextViewManager()
-    {
-        _selectionChangedHandler = JavaScriptCallback.Create(OnSelectionChangedNative);
-        _contentChangedHandler = JavaScriptCallback.Create(OnContentChangedNative);
-        _scrollHandler = JavaScriptCallback.Create(OnScrollNative);
-        string sSelectionChangedHandler = Interop.GetVariableStringForJS(_selectionChangedHandler);
-        string sContentChangedHandler = Interop.GetVariableStringForJS(_contentChangedHandler);
-        string sScrollHandler = Interop.GetVariableStringForJS(_scrollHandler);
-        Interop.ExecuteJavaScriptVoidAsync($"document.createRichTextViewManager({sSelectionChangedHandler}, {sContentChangedHandler}, {sScrollHandler})");
-    }
-
-    public static RichTextViewManager Instance { get; } = new();
-
-    public void CreateView(string id, string parentId) =>
-        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.createView('{id}','{parentId}')");
-
-    public bool OnKeyDown(RichTextBoxView richTextBoxView, KeyEventArgs e)
+    public static bool OnKeyDown(RichTextBoxView richTextBoxView, KeyEventArgs e)
     {
         Debug.Assert(richTextBoxView is not null && richTextBoxView.OuterDiv.IsConnected);
         Debug.Assert(e is not null);
 
         string sArgs = Interop.GetVariableStringForJS(e.UIEventArg);
-        return Interop.ExecuteJavaScriptBoolean($"document.richTextViewManager.onKeyDownNative('{richTextBoxView.OuterDiv}', {sArgs})");
+        return Interop.ExecuteJavaScriptBoolean($"osjs.richTextViewManager.onKeyDownNative('{richTextBoxView.OuterDiv}', {sArgs})");
     }
 
-    private static void OnSelectionChangedNative(string id, int start, int length)
+    internal static void OnSelectionChangedNative(string id, int start, int length)
     {
         if (INTERNAL_HtmlDomManager.GetElementById(id) is RichTextBoxView view)
         {
@@ -57,7 +40,7 @@ internal sealed class RichTextViewManager
         }
     }
 
-    private static void OnContentChangedNative(string id)
+    internal static void OnContentChangedNative(string id)
     {
         if (INTERNAL_HtmlDomManager.GetElementById(id) is RichTextBoxView view)
         {
@@ -65,14 +48,14 @@ internal sealed class RichTextViewManager
         }
     }
 
-    private static void OnScrollNative(string id)
+    internal static void OnScrollNative(string id)
     {
         if (INTERNAL_HtmlDomManager.GetElementById(id) is RichTextBoxView view)
         {
             if (!view.IsScrollClient) return;
 
-            double scrollLeft = Interop.ExecuteJavaScriptDouble($"document.getProp('{view.OuterDiv.Uid}','scrollLeft')");
-            double scrollTop = Interop.ExecuteJavaScriptDouble($"document.getProp('{view.OuterDiv.Uid}','scrollTop')");
+            double scrollLeft = Interop.ExecuteJavaScriptDouble($"osjs.getProp('{view.OuterDiv.Uid}','scrollLeft')");
+            double scrollTop = Interop.ExecuteJavaScriptDouble($"osjs.getProp('{view.OuterDiv.Uid}','scrollTop')");
 
             view.UpdateOffsets(new Vector(scrollLeft, scrollTop));
         }

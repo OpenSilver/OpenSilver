@@ -529,7 +529,7 @@ namespace System.Windows
 
         private static Color? GetSystemColor(string color)
         {
-            string str = OpenSilver.Interop.ExecuteJavaScriptString($"document.getSystemColor('{color}')");
+            string str = OpenSilver.Interop.ExecuteJavaScriptString($"osjs.getSystemColor('{color}')");
             if (str is not null && str.StartsWith("rgb("))
             {
                 str = str.Substring(4, str.Length - 5);

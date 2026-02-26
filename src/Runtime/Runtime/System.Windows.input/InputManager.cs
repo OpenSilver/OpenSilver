@@ -116,8 +116,6 @@ internal sealed class InputManager
     }
 
     private readonly EventQueue _eventQueue = new();
-    private readonly JavaScriptCallback _handler;
-    private readonly JavaScriptCallback _pointerHandler;
 
     private const int _doubleClickDeltaTime = 400;
     private const int _doubleClickDeltaX = 5;
@@ -128,17 +126,7 @@ internal sealed class InputManager
     private int _lastClickTime;
     private bool _mouseLeftDown;
 
-    private InputManager()
-    {
-        if (Current is null)
-        {
-            _handler = JavaScriptCallback.Create(ProcessInput);
-            _pointerHandler = JavaScriptCallback.Create(ProcessPointerInput);
-            string sHandler = OpenSilver.Interop.GetVariableStringForJS(_handler);
-            string sPointerHandler = OpenSilver.Interop.GetVariableStringForJS(_pointerHandler);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sHandler}, {sPointerHandler})");
-        }
-    }
+    private InputManager() { }
 
     /// <summary>
     /// Return the input manager associated with the current context.
@@ -147,12 +135,12 @@ internal sealed class InputManager
 
     internal void RegisterRoot(HtmlElementReference element)
     {
-        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.registerRoot('{element.Uid}')");
+        OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.inputManager.registerRoot('{element.Uid}')");
     }
 
     internal ModifierKeys GetKeyboardModifiers()
     {
-        return (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("document.inputManager.getModifiers()", false);
+        return (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("osjs.inputManager.getModifiers()", false);
     }
 
     internal bool CaptureMouse(UIElement uie)
@@ -163,7 +151,7 @@ internal sealed class InputManager
         {
             Pointer.Captured = uie;
 
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.capturePointer('{outerDiv.Uid}')");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.inputManager.capturePointer('{outerDiv.Uid}')");
 
             using (_eventQueue.DisableProcessing())
             {
@@ -185,7 +173,7 @@ internal sealed class InputManager
         if (Pointer.Captured == uie)
         {
             Pointer.Captured = null;
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.releasePointerCapture()");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.inputManager.releasePointerCapture()");
 
             using (_eventQueue.DisableProcessing())
             {
@@ -235,7 +223,7 @@ internal sealed class InputManager
 
     internal static bool SetFocusNative(HtmlElementReference element)
     {
-        return OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.inputManager.focus('{element.Uid}')");
+        return OpenSilver.Interop.ExecuteJavaScriptBoolean($"osjs.inputManager.focus('{element.Uid}')");
     }
 
     internal static void ClearTabIndex(UIElement uie)
@@ -308,6 +296,8 @@ internal sealed class InputManager
         }
     }
 
+    internal static void ProcessInputNative(string id, int eventId, object jsEventArg) => Current.ProcessInput(id, eventId, jsEventArg);
+
     private void ProcessInput(string id, int eventId, object jsEventArg)
     {
         using (_eventQueue.DisableProcessing())
@@ -322,6 +312,9 @@ internal sealed class InputManager
             }
         }
     }
+
+    internal static void ProcessPointerInputNative(string id, int eventId, object jsEventArg, bool isTouchEvent, double pageX, double pageY, int keyModifiers)
+        => Current.ProcessPointerInput(id, eventId, jsEventArg, isTouchEvent, pageX, pageY, keyModifiers);
 
     private void ProcessPointerInput(string id, int eventId, object jsEventArg, bool isTouchEvent, double pageX, double pageY, int keyModifiers)
     {
@@ -572,7 +565,7 @@ internal sealed class InputManager
 
             if (handled)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid("document.inputManager.suppressContextMenu(true)");
+                OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.inputManager.suppressContextMenu(true)");
             }
         }
     }

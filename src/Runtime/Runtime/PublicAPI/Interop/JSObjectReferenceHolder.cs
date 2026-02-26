@@ -144,9 +144,8 @@ internal sealed class JSObjectReferenceHolder
             _removed.Clear();
             _added.Clear();
         }
-        var trueRefCount = Interop.ExecuteJavaScript("Object.keys(document.jsObjRef).length");
+        var trueRefCount = Interop.ExecuteJavaScript("osjs.getRefCount()");
         var trueRefCountAsInt = Convert.ToInt32(trueRefCount);
-        trueRefCount.Dispose();
 
         StringBuilder diffs = new StringBuilder("[");
         foreach (var r in removed)

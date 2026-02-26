@@ -93,7 +93,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
         internal static void RemoveNodeNative(HtmlElementReference element) =>
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.detachView('{element.Uid}')");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.detachView('{element.Uid}')");
 
         private static object _window;
 
@@ -110,13 +110,13 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         internal static void AddCSSClass(HtmlElementReference element, string className)
         {
             Debug.Assert(element.IsConnected);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.addClass('{element.Uid}','{className}')");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.addClass('{element.Uid}','{className}')");
         }
 
         internal static void RemoveCSSClass(HtmlElementReference element, string className)
         {
             Debug.Assert(element.IsConnected);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.removeClass('{element.Uid}','{className}')");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.removeClass('{element.Uid}','{className}')");
         }
 
         internal static void SetVisibility(HtmlElementReference element, Visibility visibility)
@@ -124,15 +124,15 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             switch (visibility)
             {
                 case Visibility.Visible:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setVisible('{element.Uid}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.setVisible('{element.Uid}')");
                     break;
 
                 case Visibility.Hidden:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setHidden('{element.Uid}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.setHidden('{element.Uid}')");
                     break;
 
                 case Visibility.Collapsed:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setCollapsed('{element.Uid}')");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.setCollapsed('{element.Uid}')");
                     break;
             }
         }
@@ -146,7 +146,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createElementSafe('{tagName}', '{uid}', '{parent.Uid}', {index.ToInvariantString()})");
+                $"osjs.createVisual('{tagName}', '{uid}', '{parent.Uid}', {index.ToInvariantString()})");
 
             AddToGlobalStore(uid, uie);
 
@@ -159,7 +159,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createLayout('{tagName}','{uid}','{parent.Uid}'{(isKeyboardFocusable ? ",true" : string.Empty)})");
+                $"osjs.createLayout('{tagName}','{uid}','{parent.Uid}'{(isKeyboardFocusable ? ",true" : string.Empty)})");
 
             AddToGlobalStore(uid, uie);
 
@@ -173,7 +173,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createWindow('{uid}', '{window.RootDomElement.Uid}')");
+                $"osjs.createWindow('{uid}', '{window.RootDomElement.Uid}')");
 
             AddToGlobalStore(uid, window);
 
@@ -188,7 +188,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string sPointerEvents = popupRoot.Popup.StayOpen ? "none" : "auto";
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createPopupRoot('{uid}','{popupRoot.ParentWindow.RootDomElement.Uid}','{sPointerEvents}')");
+                $"osjs.createPopupRoot('{uid}','{popupRoot.ParentWindow.RootDomElement.Uid}','{sPointerEvents}')");
 
             AddToGlobalStore(uid, popupRoot);
 
@@ -203,7 +203,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uniqueIdentifier = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createTextBlock('{uniqueIdentifier}','{parent.Uid}')");
+                $"osjs.createTextBlock('{uniqueIdentifier}','{parent.Uid}')");
 
             AddToGlobalStore(uniqueIdentifier, textBlock);
 
@@ -218,7 +218,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
             string imgUid = NewId();
 
-            ImageManager.Instance.CreateImage(uid, imgUid, parent.Uid);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.image.create('{uid}','{imgUid}','{parent.Uid}')");
 
             AddToGlobalStore(uid, imgUid, image);
 
@@ -235,7 +236,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string canvasUid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createInkPresenter('{uid}','{canvasUid}','{parent.Uid}')");
+                $"osjs.createInkPresenter('{uid}','{canvasUid}','{parent.Uid}')");
 
             AddToGlobalStore(uid, canvasUid, inkPresenter);
 
@@ -247,7 +248,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uniqueIdentifier = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createInline('{inline.TagName}','{uniqueIdentifier}','{parent.Uid}')");
+                $"osjs.createInline('{inline.TagName}','{uniqueIdentifier}','{parent.Uid}')");
 
             AddToGlobalStore(uniqueIdentifier, inline);
 
@@ -259,9 +260,21 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uniqueIdentifier = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createBlock('{block.TagName}','{uniqueIdentifier}','{parent.Uid}')");
+                $"osjs.createBlock('{block.TagName}','{uniqueIdentifier}','{parent.Uid}')");
 
             AddToGlobalStore(uniqueIdentifier, block);
+
+            return new(uniqueIdentifier);
+        }
+
+        internal static HtmlElementReference CreateHyperlinkDomElementAndAppendIt(HtmlElementReference parent, Hyperlink hyperlink)
+        {
+            string uniqueIdentifier = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createHyperlink('{hyperlink.TagName}','{uniqueIdentifier}','{parent.Uid}')");
+
+            AddToGlobalStore(uniqueIdentifier, hyperlink);
 
             return new(uniqueIdentifier);
         }
@@ -273,7 +286,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uniqueIdentifier = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createBorder('{uniqueIdentifier}','{parent.Uid}')");
+                $"osjs.createBorder('{uniqueIdentifier}','{parent.Uid}')");
 
             AddToGlobalStore(uniqueIdentifier, border);
 
@@ -291,7 +304,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string defsUid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createShape('{shape.SvgTagName}','{svgUid}','{shapeUid}','{defsUid}','{parent.Uid}')");
+                $"osjs.createShape('{shape.SvgTagName}','{svgUid}','{shapeUid}','{defsUid}','{parent.Uid}')");
 
             AddToGlobalStore(svgUid, shapeUid, shape);
 
@@ -303,7 +316,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createSvg('{uid}','{parent.Uid}','{tagName}')");
+                $"osjs.createSvg('{uid}','{parent.Uid}','{tagName}')");
 
             return new(uid);
         }
@@ -318,7 +331,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string contentId = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.htmlPresenterHelpers.createView('{id}','{contentId}','{parent.Uid}',{(htmlPresenter.UseShadowDom ? "true" : "false")})");
+                $"osjs.htmlPresenter.createView('{id}','{contentId}','{parent.Uid}',{(htmlPresenter.UseShadowDom ? "true" : "false")})");
 
             AddToGlobalStore(id, htmlPresenter);
 
@@ -334,7 +347,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string uid = NewId();
 
-            TextViewManager.Instance.CreateTextView(uid, parent.Uid);
+            TextViewManager.CreateTextView(uid, parent.Uid);
             
             AddToGlobalStore(uid, textBoxView);
 
@@ -349,7 +362,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string uid = NewId();
 
-            TextViewManager.Instance.CreatePasswordView(uid, parent.Uid);
+            TextViewManager.CreatePasswordView(uid, parent.Uid);
             
             AddToGlobalStore(uid, passwordBoxView);
 
@@ -365,7 +378,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string uid = NewId();
 
-            RichTextViewManager.Instance.CreateView(uid, parent.Uid);
+            RichTextViewManager.CreateView(uid, parent.Uid);
 
             AddToGlobalStore(uid, richTextBoxView);
 
@@ -526,12 +539,12 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 string clipBottom = Math.Round(clipRect.Bottom, 2).ToInvariantString();
 
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.arrange('{htmlId}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})");
+                    $"osjs.arrange('{htmlId}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})");
             }
             else
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.arrange('{htmlId}',{left},{top},{width},{height})");
+                    $"osjs.arrange('{htmlId}',{left},{top},{width},{height})");
             }
         }
     }

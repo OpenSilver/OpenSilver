@@ -587,7 +587,7 @@ namespace System.Windows.Media
                     .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
 
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.drawSvgLinearGradient('{_gradientRef.Uid}',{x1},{y1},{x2},{y2},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
+                    $"osjs.drawSvgLinearGradient('{_gradientRef.Uid}',{x1},{y1},{x2},{y2},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
             }
         }
     }

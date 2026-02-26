@@ -397,7 +397,7 @@ public static partial class Interop
     internal static string FormatArguments(string format, params object[] variables)
     {
         // If the javascript code has references to previously obtained JavaScript objects,
-        // we replace those references with calls to the "document.jsObjRef"
+        // we replace those references with calls to the "osjs.getRef"
         // dictionary.
         // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we
         // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
@@ -465,7 +465,7 @@ public static partial class Interop
         // Change the JS code to call ShowErrorMessage in case of error:
         string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
 
-        javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
+        javascript = $"osjs.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
         return javascript;
     }
 
