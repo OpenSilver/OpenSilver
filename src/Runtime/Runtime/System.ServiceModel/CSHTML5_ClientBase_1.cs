@@ -1145,7 +1145,7 @@ namespace System.ServiceModel
                     {
                         Debug.Assert(soapVersion == "1.2");
 
-                        var headerElement = envelopeElement.Element(XName.Get(MessageStrings.Action, MessageStrings.SOAP12.Namespace));
+                        var headerElement = envelopeElement.Element(XName.Get(MessageStrings.Header, MessageStrings.SOAP12.Namespace));
                         string action = headerElement.Element(XName.Get(MessageStrings.Action, MessageStrings.NamespaceAddressing10)).Value;
                         FaultException fe = GetFaultException12(operation, faultElement, action);
                         return (null, fe);
