@@ -189,23 +189,18 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
         return null;
     }
 
-    internal static readonly DependencyProperty TemplateNameScopeProperty =
-        DependencyProperty.RegisterAttached(
-            "TemplateNameScope",
-            typeof(INameScope),
-            typeof(FrameworkTemplate),
-            null);
+    internal static readonly UncommonField<INameScope> TemplateNameScopeField = new();
 
     internal static INameScope GetTemplateNameScope(DependencyObject templatedParent)
     {
         Debug.Assert(templatedParent is IFrameworkElement);
-        return (INameScope)templatedParent.GetValue(TemplateNameScopeProperty);
+        return TemplateNameScopeField.GetValue(templatedParent);
     }
 
     internal static void SetTemplateNameScope(DependencyObject templatedParent, INameScope namescope)
     {
         Debug.Assert(templatedParent is IFrameworkElement);
-        templatedParent.SetValueInternal(TemplateNameScopeProperty, namescope);
+        TemplateNameScopeField.SetValue(templatedParent, namescope);
     }
 
     bool ISealable.CanSeal => true;

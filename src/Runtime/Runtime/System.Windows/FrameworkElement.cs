@@ -573,7 +573,7 @@ namespace System.Windows
             // Update the template cache
             fe.TemplateCache = newTemplate;
 
-            fe.ClearValue(FrameworkTemplate.TemplateNameScopeProperty);
+            FrameworkTemplate.TemplateNameScopeField.ClearValue(fe);
             fe.TemplateChild = null;
         }
 
