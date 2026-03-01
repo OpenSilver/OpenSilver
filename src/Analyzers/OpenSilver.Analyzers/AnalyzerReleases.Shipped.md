@@ -13,3 +13,4 @@ OS0001 | Compatibility | Warning | NotImplementedAnalyzer
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 OS0002 | Usage | Warning | UseRootVisualOrStartupUriAnalyzer
+OS0003 | Compatibility | Warning | OpenSilverCompatibilityVersionAnalyzer

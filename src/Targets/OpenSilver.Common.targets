@@ -87,7 +87,12 @@
       </Resource>
     -->
     <OpenSilverEnableDefaultResourceEmbedding Condition=" '$(OpenSilverEnableDefaultResourceEmbedding)' == '' ">true</OpenSilverEnableDefaultResourceEmbedding>
+    <OpenSilverSuppressCompatibilityWarnings Condition=" '$(OpenSilverSuppressCompatibilityWarnings)' == ''">false</OpenSilverSuppressCompatibilityWarnings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="OpenSilverSuppressCompatibilityWarnings" />
+  </ItemGroup>
 
   <!--============================================================
   Get a consistent way to access the output directory, independent on whether OutputPath is Relative or Absolute:
