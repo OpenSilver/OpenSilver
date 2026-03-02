@@ -28,6 +28,8 @@ namespace TestApplication.OpenSilver.Tests
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = false;
             openFileDialog.Filter = "Image Files(*.BMP;*.JPG;*.GIF;*.PNG)|*.*";
+            openFileDialog.FilterIndex = 2;
+            openFileDialog.InitialDirectory = @"C:\";
 #if OPENSILVER
             bool? isOperationSuccessful = await openFileDialog.ShowDialogAsync();
 #else
