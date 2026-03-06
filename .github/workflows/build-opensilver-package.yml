@@ -1,14 +1,35 @@
 name: OpenSilver Build
-env:
-  next-release-version: '3.4.0'
-  current-release-version: '3.3.0'
+
 on:
   push:
     branches:
       - develop
+
+  workflow_dispatch:
+    inputs:
+        version:
+            description: 'OpenSilver package version'
+            required: false
+            default: ''
+        publish-myget:
+            description: 'Publish to MyGet.org'
+            required: false
+            type: boolean
+            default: true
+        publish-nuget-org:
+            description: 'Publish to NuGet.org'
+            required: false
+            type: boolean
+            default: false
+
+env:
+  NEXT_RELEASE_VERSION: '3.4.0'
+  VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || '' }}
+  PUBLISH_MYGET: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs['publish-myget']) }}
+  PUBLISH_NUGET_ORG: ${{ github.event_name == 'workflow_dispatch' && inputs['publish-nuget-org'] || false }}
+
 jobs:
   OpenSilver-Build:
-    #We should not run these steps on the forks by default.
     if: github.repository_owner == 'OpenSilver'
     runs-on: windows-latest
     steps:
@@ -19,37 +40,62 @@ jobs:
         with:
           dotnet-version: '10.x'
           dotnet-quality: 'ga'
+
       - name: Clone OpenSilver repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
+
       - name: Restore Packages
         run: ./restore-packages-opensilver.bat
+
       - name: Update compiler
         run: ./build/update-nuget-packages.bat
-      - name: Format Version Suffix
-        id: format-suffix
-        run: echo "suffix=$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}" >> $env:GITHUB_OUTPUT
+
       - name: Format Package Version
-        id: format-version
-        run: echo "version=${{ env.next-release-version }}-preview-${{ steps.format-suffix.outputs.suffix }}" >> $env:GITHUB_OUTPUT
+        id: version
+        shell: pwsh
+        run: |
+          $v = "${{ env.VERSION }}"
+          if ([string]::IsNullOrWhiteSpace($v))
+          {
+            $timestamp = Get-Date -Format "yyyy-MM-dd-HHmmss"
+            $v = "$env:NEXT_RELEASE_VERSION-preview-$timestamp-$env:GITHUB_SHA_SHORT"
+          }
+          "value=$v" >> $env:GITHUB_OUTPUT
+
       - name: Build OpenSilver NuGet package
-        run: ./build/build-nuget-package-OpenSilver.bat ${{ steps.format-version.outputs.version }}
+        run: ./build/build-nuget-package-OpenSilver.bat ${{ steps.version.outputs.value }}
+
       - name: Build OpenSilver.Simulator NuGet package
-        run: ./build/build-nuget-package-OpenSilver.Simulator.bat ${{ steps.format-version.outputs.version }}
+        run: ./build/build-nuget-package-OpenSilver.Simulator.bat ${{ steps.version.outputs.value }}
+
       - name: Build OpenSilver.WebAssembly NuGet package
-        run: ./build/build-nuget-package-OpenSilver.Wasm.bat ${{ steps.format-version.outputs.version }}
+        run: ./build/build-nuget-package-OpenSilver.Wasm.bat ${{ steps.version.outputs.value }}
+
       - name: Build OpenSilver.MauiHybrid NuGet package
-        run: ./build/build-nuget-package-OpenSilver.MauiHybrid.bat ${{ steps.format-version.outputs.version }}
+        run: ./build/build-nuget-package-OpenSilver.MauiHybrid.bat ${{ steps.version.outputs.value }}
+
       - name: Build OpenSilver.Photino NuGet package
-        run: ./build/build-nuget-package-OpenSilver.Photino.bat ${{ steps.format-version.outputs.version }}
+        run: ./build/build-nuget-package-OpenSilver.Photino.bat ${{ steps.version.outputs.value }}
+
       - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'push' }}
         with:
           name: OpenSilver
           path: "build/output/OpenSilver"
-      - name: Upload packages
+
+      - name: Upload packages to GitHub
+        if: ${{ github.event_name == 'push' }}
         run: |
            dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/index.json
+
       - name: Upload packages to MyGet
+        if: ${{ env.PUBLISH_MYGET == 'true' }}
         run: |
            dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_TOKEN }} -s https://www.myget.org/F/opensilver/api/v2/package
+
+      - name: Upload packages to NuGet.org
+        if: ${{ env.PUBLISH_NUGET_ORG == 'true' }}
+        run: |
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json

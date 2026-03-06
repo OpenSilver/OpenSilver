@@ -2,6 +2,14 @@
 
 SETLOCAL
 
+IF "%~1" == "--help" (
+	GOTO :help
+)
+
+IF "%~1" == "-h" (
+	GOTO :help
+)
+
 SET BUILD_DIR=%~dp0
 SET SRC_DIR=%~dp0..\src
 
@@ -9,11 +17,11 @@ REM Define the escape character for colored text
 FOR /F %%a IN ('"prompt $E$S & echo on & for %%b in (1) do rem"') DO SET "ESC=%%a"
 
 IF "%~1" == "" (
-	SET /P OPENSILVER_PKG_VER="%ESC%[92mOpensilver version:%ESC%[0m "
 	SET /P PKG_VER="%ESC%[92mPackage version:%ESC%[0m "
+	SET /P OPENSILVER_PKG_VER="%ESC%[92mOpensilver version:%ESC%[0m "
 ) ELSE (
-	SET OPENSILVER_PKG_VER=%1
-	SET PKG_VER=%2
+	SET PKG_VER=%1
+	SET OPENSILVER_PKG_VER=%2
 )
 
 IF "%PKG_VER%" == "" (
@@ -87,5 +95,11 @@ echo.
 echo %ESC%[95mPacking %ESC%[0mOpenSilver.Theme.WhistlerBlue %ESC%[95mNuGet package%ESC%[0m
 echo. 
 %BUILD_DIR%\nuget pack %BUILD_DIR%\nuspec\OpenSilver.Theme.WhistlerBlue.nuspec -OutputDirectory %OUTPUT_DIR% -Properties %PROPERTIES%
+
+EXIT /b
+
+:help
+ECHO [1] OpenSilver.Themes.* NuGet packages Version
+ECHO [2] OpenSilver Version
 
 ENDLOCAL

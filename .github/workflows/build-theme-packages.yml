@@ -7,31 +7,65 @@ on:
             description: 'OpenSilver version'
             required: true
         version:
-            description: 'Theme packages version'
-            required: true
+            description: 'OpenSilver.Theme.* packages version'
+            required: false
+            default: ''
+        publish-myget:
+            description: 'Publish to MyGet.org'
+            required: false
+            type: boolean
+            default: true
+        publish-nuget-org:
+            description: 'Publish to NuGet.org'
+            required: false
+            type: boolean
+            default: false
 
 jobs:
   OpenSilverThemesBuild:
-    #We should not run these steps on the forks by default.
     if: github.repository_owner == 'OpenSilver'
     runs-on: windows-latest
     steps:
       - uses: microsoft/setup-msbuild@v1.1
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      - uses: actions/setup-dotnet@v1
+      - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '9.0.102'
+          dotnet-version: '10.x'
+          dotnet-quality: 'ga'
+
       - name: Clone OpenSilver repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
+
+      - name: Format Package Version
+        id: version
+        shell: pwsh
+        run: |
+          $v = "${{ github.event.inputs.version }}"
+          if ([string]::IsNullOrWhiteSpace($v))
+          {
+            $timestamp = Get-Date -Format "yyyy-MM-dd-HHmmss"
+            $v = "$env:NEXT_RELEASE_VERSION-preview-$timestamp-$env:GITHUB_SHA_SHORT"
+          }
+          "value=$v" >> $env:GITHUB_OUTPUT
+
       - name: Restore Packages
         run: ./restore-packages-opensilver.bat
+
       - name: Update compiler
         run: ./build/update-nuget-packages.bat
+
       - name: Build Theme Packages
-        run: ./build/Build_Themes.bat ${{ github.event.inputs.opensilver-version }} ${{ github.event.inputs.version }}
+        run: ./build/Build_Themes.bat ${{ steps.version.outputs.value }} ${{ github.event.inputs.opensilver-version }}
+
       - name: Upload packages to MyGet
+        if: ${{ inputs['publish-myget'] }}
         run: |
            dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_TOKEN }} -s https://www.myget.org/F/opensilver/api/v2/package
+
+      - name: Upload packages to NuGet.org
+        if: ${{ inputs['publish-nuget-org'] }}
+        run: |
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json
