@@ -14,6 +14,7 @@
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using Microsoft.JSInterop;
+using OpenSilver.Internal.Xaml;
 using OpenSilver.MauiHybrid.JavaScript;
 using OpenSilver.MauiHybrid.Threading;
 using System.Diagnostics;
@@ -68,6 +69,12 @@ namespace OpenSilver.MauiHybrid.Runner
                 try
                 {
                     var app = await createAppDelegate();
+
+                    if (app is IComponentConnector componentConnector)
+                    {
+                        componentConnector.InitializeComponent();
+                    }
+
                     tcs.SetResult(app);
                 }
                 catch (Exception ex)

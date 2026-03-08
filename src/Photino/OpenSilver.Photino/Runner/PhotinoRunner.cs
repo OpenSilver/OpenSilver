@@ -18,6 +18,7 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using Photino.NET;
 using System.Collections.Concurrent;
+using OpenSilver.Internal.Xaml;
 
 namespace OpenSilver.Photino.Runner
 {
@@ -191,6 +192,12 @@ namespace OpenSilver.Photino.Runner
                 try
                 {
                     var app = await createAppDelegate();
+
+                    if (app is IComponentConnector componentConnector)
+                    {
+                        componentConnector.InitializeComponent();
+                    }
+
                     tcs.SetResult(app);
                 }
                 catch (Exception ex)

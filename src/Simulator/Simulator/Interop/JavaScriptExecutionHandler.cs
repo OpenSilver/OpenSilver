@@ -24,12 +24,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     public class JavaScriptExecutionHandler : IJavaScriptExecutionHandler
     {
         private bool _webControlDisposed = false;
+        private readonly bool _enableLogging;
         private readonly WebView2 _webControl;
         private readonly List<string> _fullLogOfExecutedJavaScriptCode = new();
 
-        public JavaScriptExecutionHandler(WebView2 webControl)
+        public JavaScriptExecutionHandler(WebView2 webControl, bool enableLogging)
         {
             _webControl = webControl;
+            _enableLogging = enableLogging;
         }
 
         public void MarkWebControlAsDisposed()
@@ -43,7 +45,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             // This prevents interop calls from throwing an exception if they are called after the simulator started closing
             if (_webControlDisposed || javaScriptToExecute == null)
                 return;
-            if (OpenSilver.Simulator.SimulatorLauncher.Parameters.LogExecutedJavaScriptCode)
+            if (_enableLogging)
                 _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
 
             if (_webControl.Dispatcher.CheckAccess())
@@ -66,7 +68,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             if (_webControlDisposed || javaScriptToExecute == null)
                 return null;
 
-            if (OpenSilver.Simulator.SimulatorLauncher.Parameters.LogExecutedJavaScriptCode)
+            if (_enableLogging)
                 _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
 
             string execScriptTaskResultAsString = null;

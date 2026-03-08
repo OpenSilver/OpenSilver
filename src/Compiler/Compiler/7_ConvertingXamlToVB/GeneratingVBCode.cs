@@ -75,6 +75,14 @@ namespace OpenSilver.Compiler
 
                 builder.Append(' ', 4 * 2).AppendLine("End Sub");
 
+                builder.AppendLine();
+
+                builder.Append(' ', 4 * 2).AppendLine("<Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>")
+                    .Append(' ', 4 * 2).AppendLine("<Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)>")
+                    .Append(' ', 4 * 2).AppendLine($"Sub IComponentConnector_InitializeComponent() Implements {IComponentConnectorClass}.InitializeComponent")
+                    .Append(' ', 4 * 3).AppendLine("Me.InitializeComponent()")
+                    .Append(' ', 4 * 2).AppendLine("End Sub");
+
                 return builder.ToString();
             }
 

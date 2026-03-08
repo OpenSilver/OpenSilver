@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Xaml;
 using System.Windows;
 
 namespace OpenSilver.WebAssembly;
@@ -40,17 +41,8 @@ public static class Runner
     /// This method automatically initializes the OpenSilver runtime by calling <see cref="OpenSilverRuntime.StartAsync"/>.
     /// Use this overload when the application creation process is synchronous.
     /// </remarks>
-    public static async Task<T> RunApplicationAsync<T>(Func<T> createAppDelegate) where T : Application
-    {
-        ArgumentNullException.ThrowIfNull(createAppDelegate);
-
-        if (await OpenSilverRuntime.StartAsync())
-        {
-            return createAppDelegate();
-        }
-
-        throw new InvalidOperationException("An unexpected error occurred. Please check the browser console for more details.");
-    }
+    public static Task<T> RunApplicationAsync<T>(Func<T> createAppDelegate) where T : Application
+        => RunApplicationAsync(() => Task.FromResult(createAppDelegate()));
 
     /// <summary>
     /// Starts an OpenSilver application with an asynchronous application factory method.
@@ -78,7 +70,14 @@ public static class Runner
 
         if (await OpenSilverRuntime.StartAsync())
         {
-            return await createAppDelegate();
+            var app = await createAppDelegate();
+
+            if (app is IComponentConnector componentConnector)
+            {
+                componentConnector.InitializeComponent();
+            }
+
+            return app;
         }
 
         throw new InvalidOperationException("An unexpected error occurred. Please check the browser console for more details.");
@@ -98,5 +97,5 @@ public static class Runner
     /// Use this method when no additional setup is required for the application.
     /// </remarks>
     public static Task<T> RunApplicationAsync<T>() where T : Application, new()
-        => RunApplicationAsync(() => new T());
+        => RunApplicationAsync(() => Task.FromResult(new T()));
 }

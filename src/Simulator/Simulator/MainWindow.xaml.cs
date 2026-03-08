@@ -32,7 +32,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         JavaScriptExecutionHandler _javaScriptExecutionHandler;
         bool _htmlHasBeenLoaded = false;
         Assembly _entryPointAssembly;
-        Action _appCreationDelegate;
+        Func<Task<opensilver::System.Windows.Application>> _appCreationDelegate;
         SimulatorLaunchParameters _simulatorLaunchParameters;
         string _outputRootPath;
         string _outputResourcesPath;
@@ -54,7 +54,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         internal static MainWindow Instance { get; private set; }
 
-        public MainWindow(Action appCreationDelegate, Assembly appAssembly, SimulatorLaunchParameters simulatorLaunchParameters)
+        public MainWindow(Func<Task<opensilver::System.Windows.Application>> appCreationDelegate,
+            Assembly appAssembly,
+            SimulatorLaunchParameters simulatorLaunchParameters)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -67,7 +69,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             Title = "Simulator II - OpenSilver";
 
             _appCreationDelegate = appCreationDelegate ?? throw new ArgumentNullException(nameof(appCreationDelegate));
-            _simulatorLaunchParameters = simulatorLaunchParameters;
+            _simulatorLaunchParameters = simulatorLaunchParameters ?? throw new ArgumentNullException(nameof(simulatorLaunchParameters));
             _entryPointAssembly = appAssembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
             _simulatorUrl = simulatorLaunchParameters?.SimulatorUrl ?? DefaultSimulatorUrl;
@@ -414,11 +416,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
                 await SetupSimulatorHostObject();
 
-
-                bool success = await _openSilverRuntimeDispatcher.InvokeAsync(() =>
+                bool success = await await _openSilverRuntimeDispatcher.InvokeAsync(() =>
                 {
                     opensilver::DotNetForHtml5.Cshtml5Initializer.Initialize(_javaScriptExecutionHandler);
-                    return StartApplication();
+                    return StartApplicationAsync();
                 });
 
                 await Dispatcher.BeginInvoke(async () =>
@@ -561,9 +562,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 File.WriteAllText(saveFileDialog.FileName, html);
         }
 
-        private void ButtonRestart_Click(object sender, RoutedEventArgs e)
+        private async void ButtonRestart_Click(object sender, RoutedEventArgs e)
         {
-            this.StartApplication();
+            await this.StartApplicationAsync();
         }
 
         private void ButtonViewJavaScriptLog_Click(object sender, RoutedEventArgs e)
@@ -637,7 +638,7 @@ Click OK to continue.";
             {
                 // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
 
-                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
+                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser, _simulatorLaunchParameters.LogExecutedJavaScriptCode);
 
                 InteropHelpers.InjectWebControlDispatcher(MainWebBrowser);
                 InteropHelpers.InjectWebClientFactory();
@@ -700,12 +701,18 @@ Click OK to continue.";
             });
         }
 
-        private bool StartApplication()
+        private async Task<bool> StartApplicationAsync()
         {
             // Create a new instance of the application:
             try
             {
-                _appCreationDelegate();
+                var app = await _appCreationDelegate();
+
+                if (app is opensilver::OpenSilver.Internal.Xaml.IComponentConnector componentConnector)
+                {
+                    componentConnector.InitializeComponent();
+                }
+
                 return true;
             }
             catch (Exception ex)

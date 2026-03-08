@@ -58,7 +58,7 @@ namespace OpenSilver.Compiler
                 builder.Append(' ', 4).AppendLine($"interface {IComponentConnectorClass} with")
                     .Append(' ', 4 * 2).AppendLine("[<global.System.Diagnostics.DebuggerNonUserCode>]")
                     .Append(' ', 4 * 2).AppendLine("[<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]")
-                    .Append(' ', 4 * 2 ).AppendLine($"member this.Connect({componentIdParam}: int, {targetParam}: obj): unit = ");
+                    .Append(' ', 4 * 2).AppendLine($"member this.Connect({componentIdParam}: int, {targetParam}: obj): unit = ");
 
                 if (_entries.Count > 0)
                 {
@@ -76,6 +76,11 @@ namespace OpenSilver.Compiler
                 {
                     builder.Append(' ', 4 * 3).AppendLine("()");
                 }
+
+                builder.Append(' ', 4 * 2).AppendLine("[<global.System.Diagnostics.DebuggerNonUserCode>]")
+                    .Append(' ', 4 * 2).AppendLine("[<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]")
+                    .Append(' ', 4 * 2).AppendLine("member this.InitializeComponent(): unit =")
+                    .Append(' ', 4 * 3).AppendLine("this.InitializeComponent()");
 
                 return builder.ToString();
             }

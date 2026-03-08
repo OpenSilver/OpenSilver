@@ -32,5 +32,10 @@ namespace OpenSilver.Internal.Xaml
         /// The target to connect events and names to.
         /// </param>
         void Connect(int connectionId, object target);
+
+        /// <summary>
+        /// Loads the compiled page of a component.
+        /// </summary>
+        void InitializeComponent();
     }
 }
