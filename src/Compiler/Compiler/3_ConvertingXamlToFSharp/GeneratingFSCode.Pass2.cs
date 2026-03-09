@@ -307,8 +307,6 @@ namespace OpenSilver.Compiler
 
                 if (hasCodeBehind)
                 {
-                    bool isApp = IsClassTheApplicationClass(baseType);
-
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"global.{KnownNamespaces.SystemWindows}.Application",
@@ -318,19 +316,11 @@ namespace OpenSilver.Compiler
 
                     string classNameXaml = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
 
-                    string additionalConstructors = isApp ?
-                        @$"    private new(stub: global.OpenSilver.XamlDesignerConstructorStub) as this =
-        {classNameXaml}()
-        then
-            this.InitializeComponent ()
-" : string.Empty;
-
                     // combine local variables and members
                     parameters.ResultingFieldsForNamedElements.AddRange(parameters.ResultingMembersForNamedElements);
 
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(additionalConstructors,
-                                                               initializeComponentMethod,
+                    string partialClass = GeneratePartialClass(initializeComponentMethod,
                                                                connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
                                                                classNameXaml,
@@ -1467,7 +1457,7 @@ namespace GlobalResource
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny, element);
 
-                                        string markupExtension = 
+                                        string markupExtension =
                                             $"({childUid} :> {IMarkupExtensionClass}).ProvideValue(new global.System.ServiceProvider({parentUid}, null))";
 
                                         parameters.AppendLine(

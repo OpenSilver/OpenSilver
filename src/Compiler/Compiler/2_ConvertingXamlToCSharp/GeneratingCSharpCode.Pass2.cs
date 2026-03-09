@@ -319,8 +319,6 @@ namespace OpenSilver.Compiler
 
                 if (hasCodeBehind)
                 {
-                    bool isApp = IsClassTheApplicationClass(baseType);
-
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"global::{KnownNamespaces.SystemWindows}.Application",
@@ -328,13 +326,8 @@ namespace OpenSilver.Compiler
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
-                    string additionalConstructors = isApp
-                        ? $"private {className}(global::OpenSilver.XamlDesignerConstructorStub stub) {{ InitializeComponent(); }}"
-                        : string.Empty;
-
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass(_reader.Document.Root,
-                                                               additionalConstructors,
                                                                initializeComponentMethod,
                                                                connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
@@ -608,7 +601,7 @@ namespace OpenSilver.Compiler
                                     }
                                 }
 
-                                 parameters.CurrentScope.RegisterName(name, elementUid);
+                                parameters.CurrentScope.RegisterName(name, elementUid);
                             }
                             else if (string.IsNullOrEmpty(attribute.Name.NamespaceName) || attribute.Name.NamespaceName == element.Name.NamespaceName)
                             {

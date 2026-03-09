@@ -110,7 +110,6 @@ namespace OpenSilver.Compiler
 
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass(_reader.Document.Root,
-                                                               string.Empty,
                                                                initializeComponentMethod,
                                                                new ComponentConnectorBuilderCS().ToString(),
                                                                resultingFieldsForNamedElements,
