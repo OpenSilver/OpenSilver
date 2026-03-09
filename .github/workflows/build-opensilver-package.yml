@@ -16,6 +16,11 @@ on:
             required: false
             type: boolean
             default: true
+        publish-myget-rc:
+            description: 'Publish to MyGet.org RC feed'
+            required: false
+            type: boolean
+            default: false
         publish-nuget-org:
             description: 'Publish to NuGet.org'
             required: false
@@ -26,6 +31,7 @@ env:
   NEXT_RELEASE_VERSION: '3.4.0'
   VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || '' }}
   PUBLISH_MYGET: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs['publish-myget']) }}
+  PUBLISH_MYGET_RC: ${{ github.event_name == 'workflow_dispatch' && inputs['publish-myget-rc'] || false }}
   PUBLISH_NUGET_ORG: ${{ github.event_name == 'workflow_dispatch' && inputs['publish-nuget-org'] || false }}
 
 jobs:
@@ -56,7 +62,7 @@ jobs:
         id: version
         shell: pwsh
         run: |
-          $v = "${{ env.VERSION }}"
+          $v = $env:VERSION
           if ([string]::IsNullOrWhiteSpace($v))
           {
             $timestamp = Get-Date -Format "yyyy-MM-dd-HHmmss"
@@ -94,6 +100,11 @@ jobs:
         if: ${{ env.PUBLISH_MYGET == 'true' }}
         run: |
            dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_TOKEN }} -s https://www.myget.org/F/opensilver/api/v2/package
+
+      - name: Upload packages to MyGet RC feed
+        if: ${{ env.PUBLISH_MYGET_RC == 'true' }}
+        run: |
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_RC_TOKEN }} -s ${{ secrets.MYGET_RC_FEED }}
 
       - name: Upload packages to NuGet.org
         if: ${{ env.PUBLISH_NUGET_ORG == 'true' }}
