@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Windows.Media;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls;
 
@@ -211,51 +210,6 @@ public class Canvas : Panel
         {
             p.InvalidateArrange();
         }
-    }
-
-    /// <summary>
-    /// Identifies the Canvas.ZIndex attached property.
-    /// </summary>
-    public static readonly DependencyProperty ZIndexProperty =
-        DependencyProperty.RegisterAttached(
-            "ZIndex",
-            typeof(int),
-            typeof(Canvas),
-            new PropertyMetadata(0)
-            {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetZIndex((int)newValue),
-            });
-
-    /// <summary>
-    /// Gets the value of the Canvas.ZIndex property for a given element.
-    /// </summary>
-    /// <param name="element">
-    /// The element for which to retrieve the Canvas.ZIndex value.
-    /// </param>
-    /// <returns>
-    /// The Canvas.ZIndex position of the element.
-    /// </returns>
-    public static int GetZIndex(UIElement element)
-    {
-        ArgumentNullException.ThrowIfNull(element);
-
-        return (int)element.GetValue(ZIndexProperty);
-    }
-
-    /// <summary>
-    /// Sets the value of the Canvas.ZIndex attached property for a given element.
-    /// </summary>
-    /// <param name="element">
-    /// The element on which to apply the property value.
-    /// </param>
-    /// <param name="value">
-    /// The order on the z-plane in which this element appears.
-    /// </param>
-    public static void SetZIndex(UIElement element, int value)
-    {
-        ArgumentNullException.ThrowIfNull(element);
-
-        element.SetValueInternal(ZIndexProperty, value);
     }
 
     /// <summary>

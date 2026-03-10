@@ -166,6 +166,51 @@ namespace System.Windows.Controls
         internal static int GlobalProgressiveRenderingChunkSize;
 
         /// <summary>
+        /// Identifies the Panel.ZIndex attached property.
+        /// </summary>
+        public static readonly DependencyProperty ZIndexProperty =
+            DependencyProperty.RegisterAttached(
+                "ZIndex",
+                typeof(int),
+                typeof(Panel),
+                new PropertyMetadata(0)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetZIndex((int)newValue),
+                });
+
+        /// <summary>
+        /// Gets the value of the Panel.ZIndex property for a given element.
+        /// </summary>
+        /// <param name="element">
+        /// The element for which to retrieve the Panel.ZIndex value.
+        /// </param>
+        /// <returns>
+        /// The Panel.ZIndex position of the element.
+        /// </returns>
+        public static int GetZIndex(UIElement element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            return (int)element.GetValue(ZIndexProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the Panel.ZIndex attached property for a given element.
+        /// </summary>
+        /// <param name="element">
+        /// The element on which to apply the property value.
+        /// </param>
+        /// <param name="value">
+        /// The order on the z-plane in which this element appears.
+        /// </param>
+        public static void SetZIndex(UIElement element, int value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            element.SetValueInternal(ZIndexProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
