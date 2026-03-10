@@ -586,12 +586,17 @@ internal sealed class CoreTypesConverterCS : CoreTypesConverter
 
     public override string ConvertToGeometry(XObject context, string source)
     {
-        return ConvertFromInvariantString(source, "System.Windows.Media.Geometry");
+        return $"global::System.Windows.Media.Geometry.Parse({Escape(source)})";
     }
 
     public override string ConvertToPathGeometry(XObject context, string source)
     {
-        return ConvertFromInvariantString(source, "System.Windows.Media.PathGeometry");
+        return $"(global::System.Windows.Media.PathGeometry)global::System.Windows.Media.Geometry.Parse({Escape(source)})";
+    }
+
+    public override string ConvertToPathFigureCollection(XObject context, string source)
+    {
+        return $"global::System.Windows.Media.PathFigureCollection.Parse({Escape(source)})";
     }
 
     public override string ConvertToMatrix(XObject context, string source)

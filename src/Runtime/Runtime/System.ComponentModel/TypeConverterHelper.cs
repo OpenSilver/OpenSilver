@@ -336,7 +336,7 @@ namespace System.ComponentModel
             var geometryConverter = new GeometryConverter();
             var transformConverter = new TransformConverter();
 
-            return new Dictionary<Type, TypeConverter>(41)
+            return new Dictionary<Type, TypeConverter>(42)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(ModifierKeys)] = new ModifierKeysConverter(),
@@ -356,6 +356,7 @@ namespace System.ComponentModel
                 [typeof(FontFamily)] = new FontFamilyConverter(),
                 [typeof(Geometry)] = geometryConverter,
                 [typeof(PathGeometry)] = geometryConverter,
+                [typeof(PathFigureCollection)] = new PathFigureCollectionConverter(),
                 [typeof(Matrix)] = new MatrixConverter(),
                 [typeof(Matrix3D)] = new Matrix3DConverter(),
                 [typeof(PointCollection)] = new PointCollectionConverter(),

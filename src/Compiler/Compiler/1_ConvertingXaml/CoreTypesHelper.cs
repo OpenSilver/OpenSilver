@@ -42,7 +42,7 @@ internal abstract class CoreTypesConverter
         // from finding the converter.
         //
 
-        _knownCoreTypes = new Dictionary<string, Func<XObject, string, string>>(44, StringComparer.OrdinalIgnoreCase)
+        _knownCoreTypes = new Dictionary<string, Func<XObject, string, string>>(45, StringComparer.OrdinalIgnoreCase)
         {
             ["System.Windows.Input.Cursor"] = ConvertToCursor,
             ["System.Windows.Input.ModifierKeys"] = ConvertToModifierKeys,
@@ -63,6 +63,7 @@ internal abstract class CoreTypesConverter
             ["System.Windows.Media.FontFamily"] = ConvertToFontFamily,
             ["System.Windows.Media.Geometry"] = ConvertToGeometry,
             ["System.Windows.Media.PathGeometry"] = ConvertToPathGeometry,
+            ["System.Windows.Media.PathFigureCollection"] = ConvertToPathFigureCollection,
             ["System.Windows.Media.Matrix"] = ConvertToMatrix,
             ["System.Windows.Media.PointCollection"] = ConvertToPointCollection,
             ["System.Windows.Media.Transform"] = ConvertToTransform,
@@ -124,6 +125,8 @@ internal abstract class CoreTypesConverter
     public abstract string ConvertToGeometry(XObject context, string source);
 
     public abstract string ConvertToPathGeometry(XObject context, string source);
+
+    public abstract string ConvertToPathFigureCollection(XObject context, string source);
 
     public abstract string ConvertToMatrix(XObject context, string source);
 

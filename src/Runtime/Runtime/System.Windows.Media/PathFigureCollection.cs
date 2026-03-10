@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Shapes;
@@ -23,6 +24,7 @@ namespace System.Windows.Media;
 /// Represents a collection of <see cref="PathFigure"/> objects that collectively
 /// make up the geometry of a <see cref="PathGeometry"/>.
 /// </summary>
+[TypeConverter(typeof(PathFigureCollectionConverter))]
 public sealed class PathFigureCollection : PresentationFrameworkCollection<PathFigure>
 {
     private Geometry _parentGeometry;

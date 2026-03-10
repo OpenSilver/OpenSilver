@@ -16,7 +16,6 @@ using Mono.Cecil;
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -583,12 +582,17 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
 
     public override string ConvertToGeometry(XObject context, string source)
     {
-        return ConvertFromInvariantString(source, "Global.System.Windows.Media.Geometry");
+        return $"Global.System.Windows.Media.Geometry.Parse({Escape(source)})";
     }
 
     public override string ConvertToPathGeometry(XObject context, string source)
     {
-        return ConvertFromInvariantString(source, "Global.System.Windows.Media.PathGeometry");
+        return $"DirectCast(Global.System.Windows.Media.Geometry.Parse({Escape(source)}), Global.System.Windows.Media.PathGeometry)";
+    }
+
+    public override string ConvertToPathFigureCollection(XObject context, string source)
+    {
+        return $"Global.System.Windows.Media.PathFigureCollection.Parse({Escape(source)})";
     }
 
     public override string ConvertToMatrix(XObject context, string source)
