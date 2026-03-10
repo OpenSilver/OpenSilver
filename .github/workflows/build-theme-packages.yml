@@ -26,6 +26,9 @@ on:
             type: boolean
             default: false
 
+env:
+  NEXT_RELEASE_VERSION: '3.4.0'
+
 jobs:
   OpenSilverThemesBuild:
     if: github.repository_owner == 'OpenSilver'
