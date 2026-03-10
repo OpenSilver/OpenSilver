@@ -89,6 +89,15 @@ namespace System.Windows
             Dispatcher.CurrentDispatcher.InvokeAsync(DoStartup);
         }
 
+        // only for xaml.io designer
+        protected Application(XamlDesignerConstructorStub _)
+        {
+            if (this is IComponentConnector componentConnector)
+            {
+                componentConnector.InitializeComponent();
+            }
+        }
+
         /// <summary>
         /// Gets or sets the <see cref="OpenSilver.Theming.Theme"/> used across this <see cref="Application"/>.
         /// </summary>
