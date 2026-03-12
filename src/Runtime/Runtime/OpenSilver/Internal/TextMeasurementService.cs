@@ -19,6 +19,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using CSHTML5.Internal;
 using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal;
@@ -73,28 +74,7 @@ internal sealed class TextMeasurementService
         string maxWidth = GetWidthConstraint(textblock);
         string innerHTML = BuildInnerHtml(textblock);
 
-        string size = Interop.ExecuteJavaScriptString(
-            $"osjs.measureTextBlock('{_window.OuterDiv.Uid}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
-            false);
-
-        int index = size.IndexOf('|');
-        if (index > -1)
-        {
-            return new Size(
-                double.Parse(size.Substring(0, index), CultureInfo.InvariantCulture),
-                double.Parse(size.Substring(index + 1), CultureInfo.InvariantCulture));
-        }
-        return new Size(0, 0);
-
-        static string BuildInnerHtml(TextBlock tb)
-        {
-            StringBuilder builder = StringBuilderCache.Acquire();
-            foreach (Inline inline in tb.Inlines.InternalItems)
-            {
-                inline.AppendHtml(builder);
-            }
-            return StringBuilderCache.GetStringAndRelease(builder);
-        }
+        return MeasureTextBlockCore(innerHTML, whiteSpace, overflowWrap, lineHeight, lineStackingStrategy, maxWidth);
 
         static string GetWidthConstraint(TextBlock tb)
         {
@@ -111,6 +91,78 @@ internal sealed class TextMeasurementService
             return string.Empty;
         }
     }
+
+    public Size MeasureTextBlockDirect(TextBlock textblock, double maxWidth)
+    {
+        (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(textblock.TextWrapping);
+        string lineHeight = FontProperties.ToCssLineHeight(textblock.LineHeight);
+        string lineStackingStrategy = FontProperties.ToCssLineStackingStrategy(textblock.LineStackingStrategy);
+        string strMaxWidth = FormatMaxWidth(maxWidth);
+        string innerHTML = BuildInnerHtml(textblock);
+
+        return MeasureTextBlockCore(innerHTML, whiteSpace, overflowWrap, lineHeight, lineStackingStrategy, strMaxWidth);
+    }
+
+    public Size MeasureTextContent(
+        string text,
+        string fontSize,
+        string fontFamily,
+        string fontWeight,
+        string fontStyle,
+        string letterSpacing,
+        string lineHeight,
+        string whiteSpace,
+        string overflowWrap,
+        double maxWidth,
+        string emptyVal)
+    {
+        string strMaxWidth = FormatMaxWidth(maxWidth);
+        string escapedText = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text);
+
+        string strSize = Interop.ExecuteJavaScriptString(
+            $"osjs.measureTextContent('{_window.OuterDiv.Uid}',\"{escapedText}\",'{fontSize}','{fontFamily}','{fontWeight}','{fontStyle}','{letterSpacing}','{lineHeight}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
+
+        return ParseSize(strSize);
+    }
+
+    internal static string BuildInnerHtml(TextBlock tb)
+    {
+        StringBuilder builder = StringBuilderCache.Acquire();
+        foreach (Inline inline in tb.Inlines.InternalItems)
+        {
+            inline.AppendHtml(builder);
+        }
+        return StringBuilderCache.GetStringAndRelease(builder);
+    }
+
+    private Size MeasureTextBlockCore(string innerHTML, string whiteSpace, string overflowWrap, string lineHeight, string lineStackingStrategy, string maxWidth)
+    {
+        string size = Interop.ExecuteJavaScriptString(
+            $"osjs.measureTextBlock('{_window.OuterDiv.Uid}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
+            false);
+
+        return ParseSize(size);
+    }
+
+    private static Size ParseSize(string size)
+    {
+        if (size is not null)
+        {
+            int index = size.IndexOf('|');
+            if (index > -1)
+            {
+                return new Size(
+                    double.Parse(size.Substring(0, index), CultureInfo.InvariantCulture),
+                    double.Parse(size.Substring(index + 1), CultureInfo.InvariantCulture));
+            }
+        }
+        return new Size(0, 0);
+    }
+
+    private static string FormatMaxWidth(double maxWidth) =>
+        (double.IsNaN(maxWidth) || double.IsInfinity(maxWidth))
+            ? string.Empty
+            : $"{maxWidth.ToInvariantString()}px";
 
     public double MeasureBaseline(IEnumerable<FontProperties> fonts)
     {

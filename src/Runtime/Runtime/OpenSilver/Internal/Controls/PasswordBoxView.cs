@@ -13,9 +13,11 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -55,13 +57,42 @@ internal sealed class PasswordBoxView : TextViewBase
     protected sealed override Size MeasureContent(Size constraint)
     {
         int pwdLength = Host.Password.Length;
+        string emptyVal = pwdLength > 0 ? new string('\u2022', pwdLength) : "M";
 
-        return ParentWindow.TextMeasurementService.MeasureView(
-            OuterDiv.Uid,
+        if (ParentWindow is not null)
+        {
+            return ParentWindow.TextMeasurementService.MeasureView(
+                OuterDiv.Uid,
+                "pre",
+                string.Empty,
+                constraint.Width,
+                emptyVal);
+        }
+
+        return MeasureContentWithoutDom(constraint.Width, emptyVal);
+    }
+
+    private Size MeasureContentWithoutDom(double maxWidth, string emptyVal)
+    {
+        if (Application.Current is not Application app
+            || app.MainWindow?.TextMeasurementService is not TextMeasurementService service)
+        {
+            return new Size(0, 0);
+        }
+
+        PasswordBox host = Host;
+        return service.MeasureTextContent(
+            string.Empty,
+            FontProperties.ToCssPxFontSize(host.FontSize),
+            FontProperties.ToCssFontFamily(host.FontFamily),
+            FontProperties.ToCssFontWeight(host.FontWeight),
+            FontProperties.ToCssFontStyle(host.FontStyle),
+            FontProperties.ToCssLetterSpacing(host.CharacterSpacing),
+            FontProperties.ToCssLineHeight(Block.GetLineHeight(this)),
             "pre",
             string.Empty,
-            constraint.Width,
-            pwdLength > 0 ? new string('•', pwdLength) : "M");
+            maxWidth,
+            emptyVal);
     }
 
     internal void SelectNative()

@@ -1019,6 +1019,11 @@ namespace System.Windows.Controls
                 return new Size(paddingWidth, paddingHeight);
             }
 
+            if (ParentWindow is null)
+            {
+                return MeasureWithoutDom(availableSize, paddingWidth, paddingHeight);
+            }
+
             if (_noWrapSize.IsEmpty)
             {
                 _noWrapSize = ParentWindow.TextMeasurementService.MeasureView(
@@ -1050,6 +1055,33 @@ namespace System.Windows.Controls
                 "break-word",
                 Math.Max(0, availableSize.Width - paddingWidth),
                 string.Empty);
+
+            return new Size(textSize.Width + paddingWidth, textSize.Height + paddingHeight);
+        }
+
+        private Size MeasureWithoutDom(Size availableSize, double paddingWidth, double paddingHeight)
+        {
+            if (Application.Current is not Application app || app.MainWindow?.TextMeasurementService is not TextMeasurementService service)
+            {
+                return new Size(paddingWidth, paddingHeight);
+            }
+
+            Size noWrapSize = service.MeasureTextBlockDirect(this, double.PositiveInfinity);
+
+            if (TextWrapping == TextWrapping.NoWrap || (noWrapSize.Width + paddingWidth) <= availableSize.Width)
+            {
+                var desiredSize = new Size(noWrapSize.Width + paddingWidth, noWrapSize.Height + paddingHeight);
+
+                if (TextTrimming != TextTrimming.None)
+                {
+                    desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
+                    desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
+                }
+
+                return desiredSize;
+            }
+
+            Size textSize = service.MeasureTextBlockDirect(this, Math.Max(0, availableSize.Width - paddingWidth));
 
             return new Size(textSize.Width + paddingWidth, textSize.Height + paddingHeight);
         }

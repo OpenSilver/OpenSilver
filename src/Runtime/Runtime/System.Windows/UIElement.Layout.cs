@@ -40,7 +40,7 @@ namespace System.Windows
         /// The size that this <see cref="UIElement"/> computed during the measure pass
         /// of the layout process.
         /// </returns>
-        public Size DesiredSize => !IsRenderable ? new Size() : _desiredSize;
+        public Size DesiredSize => ReadFlag(CoreFlags.IsCollapsed) ? new Size() : _desiredSize;
 
         /// <summary>
         /// Gets a value indicating whether the current size returned by layout measure is valid.
@@ -139,14 +139,6 @@ namespace System.Windows
         /// </remarks>
         public void Measure(Size availableSize)
         {
-            if (!OuterDiv.IsConnected)
-            {
-                if (MeasureRequest != null)
-                    LayoutManager.Current.MeasureQueue.Remove(this);
-                MeasureDirty = false;
-                return;
-            }
-
             using (Dispatcher.DisableProcessing())
             {
                 //enforce that Measure can not receive NaN size .
@@ -164,7 +156,7 @@ namespace System.Windows
 
                 bool isCloseToPreviousMeasure = DoubleUtil.AreClose(availableSize, PreviousAvailableSize);
 
-                if (!IsRenderable || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (ReadFlag(CoreFlags.IsCollapsed) || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset measure request.
                     if (MeasureRequest != null)
@@ -311,14 +303,6 @@ namespace System.Windows
         /// </remarks>
         public void Arrange(Rect finalRect)
         {
-            if (!OuterDiv.IsConnected)
-            {
-                if (ArrangeRequest != null)
-                    LayoutManager.Current.ArrangeQueue.Remove(this);
-                ArrangeDirty = false;
-                return;
-            }
-
             using (Dispatcher.DisableProcessing())
             {
                 //enforce that Arrange can not come with Infinity size or NaN
@@ -335,7 +319,7 @@ namespace System.Windows
                             GetType().FullName));
                 }
 
-                if (!IsRenderable || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (ReadFlag(CoreFlags.IsCollapsed) || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset arrange request.
                     if (ArrangeRequest != null)
@@ -661,7 +645,7 @@ namespace System.Windows
 
         private void RenderLayout()
         {
-            if (!BypassLayoutPolicies)
+            if (!BypassLayoutPolicies && OuterDiv.IsConnected)
             {
                 INTERNAL_HtmlDomManager.ArrangeNative(OuterDiv.Uid, VisualOffset, RenderSize, LayoutClip);
             }

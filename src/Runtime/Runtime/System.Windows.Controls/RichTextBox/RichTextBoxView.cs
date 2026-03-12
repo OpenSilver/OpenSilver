@@ -127,6 +127,11 @@ internal sealed class RichTextBoxView : TextViewBase
 
     protected override Size MeasureContent(Size constraint)
     {
+        if (!OuterDiv.IsConnected)
+        {
+            return new Size();
+        }
+
         double maxWidth = double.IsPositiveInfinity(constraint.Width) ? -1 : constraint.Width;
         double maxHeight = double.IsPositiveInfinity(constraint.Height) ? -1 : constraint.Height;
         string size = Interop.ExecuteJavaScriptString(

@@ -197,6 +197,8 @@ namespace System.Windows.Shapes
 
         private void ArrangeNative(Rect rect)
         {
+            if (!SvgElement.IsConnected) return;
+
             string x = Math.Round(rect.X, 2).ToInvariantString();
             string y = Math.Round(rect.Y, 2).ToInvariantString();
             string width = Math.Round(rect.Width, 2).ToInvariantString();
