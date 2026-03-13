@@ -1441,11 +1441,6 @@ namespace OpenSilver.Compiler
                 return (element == _reader.Document.Root);
             }
 
-            private bool IsClassTheApplicationClass(string className)
-            {
-                return className == $"Global.{KnownNamespaces.SystemWindows}.Application";
-            }
-
             private bool IsResourceDictionaryCreatedFromSource(XElement element)
             {
                 if (element.Attribute("Source") != null)
