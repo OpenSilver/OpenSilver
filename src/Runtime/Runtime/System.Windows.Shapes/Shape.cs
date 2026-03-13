@@ -342,9 +342,74 @@ namespace System.Windows.Shapes
         }
 
         /// <summary>
+        /// Identifies the <see cref="StrokeLineCap"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty StrokeLineCapProperty =
+            DependencyProperty.Register(
+                nameof(StrokeLineCap),
+                typeof(PenLineCap),
+                typeof(Shape),
+                new PropertyMetadata(PenLineCap.Flat)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        Shape shape = (Shape)d;
+
+                        string value = (PenLineCap)newValue switch
+                        {
+                            PenLineCap.Square => "square",
+                            PenLineCap.Round => "round",
+                            _ => "butt",
+                        };
+
+                        shape.SetSvgAttribute("stroke-linecap", value);
+                    },
+                });
+
+        /// <summary>
+        /// Gets or sets a <see cref="PenLineCap" /> enumeration value that describes the <see cref="Shape"/> 
+        /// at the extremity of a line.
+        /// </summary>
+        /// <returns>
+        /// A value of the <see cref="PenLineCap" /> enumeration that specifies the shape at the extremity of a 
+        /// <see cref="Stroke" />. The default is <see cref="PenLineCap.Flat" />.
+        /// </returns>
+        public PenLineCap StrokeLineCap
+        {
+            get => (PenLineCap)GetValue(StrokeLineCapProperty);
+            set => SetValueInternal(StrokeLineCapProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="StrokeStartLineCap"/> dependency property.
+        /// </summary>
+        [NotImplemented]
+        public static readonly DependencyProperty StrokeStartLineCapProperty =
+            DependencyProperty.Register(
+                nameof(StrokeStartLineCap),
+                typeof(PenLineCap),
+                typeof(Shape),
+                new PropertyMetadata(PenLineCap.Flat));
+
+        /// <summary>
+        /// Gets or sets a <see cref="PenLineCap"/> enumeration value that describes
+        /// the <see cref="Shape"/> at the start of a <see cref="Stroke"/>.
+        /// </summary>
+        /// <returns>
+        /// A value of the <see cref="PenLineCap"/> enumeration that specifies the
+        /// shape at the start of a <see cref="Stroke"/>. The default is <see cref="PenLineCap.Flat"/>.
+        /// </returns>
+        [NotImplemented]
+        public PenLineCap StrokeStartLineCap
+        {
+            get => (PenLineCap)GetValue(StrokeStartLineCapProperty);
+            set => SetValueInternal(StrokeStartLineCapProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="StrokeEndLineCap"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty StrokeEndLineCapProperty =
             DependencyProperty.Register(
                 nameof(StrokeEndLineCap),
@@ -360,7 +425,7 @@ namespace System.Windows.Shapes
         /// One of the enumeration values for <see cref="PenLineCap"/>. The default
         /// is <see cref="PenLineCap.Flat"/>.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public PenLineCap StrokeEndLineCap
         {
             get => (PenLineCap)GetValue(StrokeEndLineCapProperty);
@@ -437,32 +502,6 @@ namespace System.Windows.Shapes
         {
             get => (double)GetValue(StrokeMiterLimitProperty);
             set => SetValueInternal(StrokeMiterLimitProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="StrokeStartLineCap"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty StrokeStartLineCapProperty =
-            DependencyProperty.Register(
-                nameof(StrokeStartLineCap),
-                typeof(PenLineCap),
-                typeof(Shape),
-                new PropertyMetadata(PenLineCap.Flat));
-
-        /// <summary>
-        /// Gets or sets a <see cref="PenLineCap"/> enumeration value that describes
-        /// the <see cref="Shape"/> at the start of a <see cref="Stroke"/>.
-        /// </summary>
-        /// <returns>
-        /// A value of the <see cref="PenLineCap"/> enumeration that specifies the
-        /// shape at the start of a <see cref="Stroke"/>. The default is <see cref="PenLineCap.Flat"/>.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public PenLineCap StrokeStartLineCap
-        {
-            get => (PenLineCap)GetValue(StrokeStartLineCapProperty);
-            set => SetValueInternal(StrokeStartLineCapProperty, value);
         }
 
         /// <summary>
