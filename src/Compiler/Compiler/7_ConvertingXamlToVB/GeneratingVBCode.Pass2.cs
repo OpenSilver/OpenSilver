@@ -284,8 +284,6 @@ namespace OpenSilver.Compiler
 
                 if (hasCodeBehind)
                 {
-                    bool isApp = IsClassTheApplicationClass(baseType);
-
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"Global.{KnownNamespaces.SystemWindows}.Application",
@@ -293,15 +291,8 @@ namespace OpenSilver.Compiler
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
-                    string additionalConstructors = isApp ?
-                        @"Private Sub New(stub as Global.OpenSilver.XamlDesignerConstructorStub)
-    InitializeComponent()
-End Sub
-" : string.Empty;
-
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(additionalConstructors,
-                                                               initializeComponentMethod,
+                    string partialClass = GeneratePartialClass(initializeComponentMethod,
                                                                connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
@@ -1377,7 +1368,7 @@ End Sub
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny, element);
 
-                                        string markupExtension = 
+                                        string markupExtension =
                                             $"CType({childUid},{IMarkupExtensionClass}).ProvideValue(New Global.System.ServiceProvider({parentUid}, Nothing))";
 
                                         parameters.AppendLine(
@@ -1448,11 +1439,6 @@ End Sub
             private bool IsElementTheRootElement(XElement element)
             {
                 return (element == _reader.Document.Root);
-            }
-
-            private bool IsClassTheApplicationClass(string className)
-            {
-                return className == $"Global.{KnownNamespaces.SystemWindows}.Application";
             }
 
             private bool IsResourceDictionaryCreatedFromSource(XElement element)

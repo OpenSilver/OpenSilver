@@ -216,7 +216,6 @@ namespace OpenSilver.Compiler
 
 
         private static string GeneratePartialClass(
-            string additionalConstructors,
             string initializeComponentMethod,
             string connectMethod,
             List<string> fieldsForNamedElements,
@@ -240,8 +239,6 @@ type {className}() =
     inherit {baseType}()
     let mutable contentLoaded = false
 {fieldsForNamedElementsMergedCode}
-
-{additionalConstructors}
 
 {initializeComponentMethod}
 

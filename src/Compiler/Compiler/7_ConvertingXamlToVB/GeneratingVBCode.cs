@@ -218,7 +218,6 @@ namespace OpenSilver.Compiler
 
 
         private static string GeneratePartialClass(
-            string additionalConstructors,
             string initializeComponentMethod,
             string connectMethod,
             List<string> fieldsForNamedElements,
@@ -236,8 +235,6 @@ Partial Public Class {className}
 '#pragma warning disable 169, 649, 0628 // Prevents warning CS0169 ('field ... is never used'), CS0649 ('field ... is never assigned to, and will always have its default value null'), and CS0628 ('member : new protected member declared in sealed class')
 {fieldsForNamedElementsMergedCode}
 '#pragma warning restore 169, 649, 0628
-
-{additionalConstructors}
 
 {initializeComponentMethod}
 

@@ -106,8 +106,7 @@ namespace OpenSilver.Compiler
                     string classNameXaml = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
 
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass("",
-                                                               initializeComponentMethod,
+                    string partialClass = GeneratePartialClass(initializeComponentMethod,
                                                                new ComponentConnectorBuilderFS().ToString(),
                                                                resultingFieldsForNamedElements,
                                                                classNameXaml,

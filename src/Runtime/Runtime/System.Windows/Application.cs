@@ -89,6 +89,12 @@ namespace System.Windows
             Dispatcher.CurrentDispatcher.InvokeAsync(DoStartup);
         }
 
+        // only for xaml.io designer
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected Application(XamlDesignerConstructorStub _)
+        {
+        }
+
         /// <summary>
         /// Gets or sets the <see cref="OpenSilver.Theming.Theme"/> used across this <see cref="Application"/>.
         /// </summary>
