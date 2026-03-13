@@ -65,6 +65,7 @@ namespace System.Windows.Controls.Primitives
             EventManager.RegisterClassHandler<DataGridColumnHeader>(Mouse.MouseLeaveEvent, new MouseEventHandler(DataGridColumnHeader_MouseLeave));
 
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridColumnHeader), new PropertyMetadata(typeof(DataGridColumnHeader)));
+            AllowScrollOnTouchMoveProperty.OverrideMetadata(typeof(DataGridColumnHeader), new PropertyMetadata(false));
         }
 
         /// <summary>
