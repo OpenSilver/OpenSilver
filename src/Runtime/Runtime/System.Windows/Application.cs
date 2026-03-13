@@ -90,12 +90,9 @@ namespace System.Windows
         }
 
         // only for xaml.io designer
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected Application(XamlDesignerConstructorStub _)
         {
-            if (this is IComponentConnector componentConnector)
-            {
-                componentConnector.InitializeComponent();
-            }
         }
 
         /// <summary>
