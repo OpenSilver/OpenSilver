@@ -267,6 +267,30 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uniqueIdentifier);
         }
 
+        internal static HtmlElementReference CreateListDomElementAndAppendIt(HtmlElementReference parent, List list)
+        {
+            string uniqueIdentifier = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createList('{list.TagName}','{uniqueIdentifier}','{parent.Uid}')");
+
+            AddToGlobalStore(uniqueIdentifier, list);
+
+            return new(uniqueIdentifier);
+        }
+
+        internal static HtmlElementReference CreateListItemDomElementAndAppendIt(HtmlElementReference parent, ListItem listItem)
+        {
+            string uniqueIdentifier = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createListItem('{listItem.TagName}','{uniqueIdentifier}','{parent.Uid}')");
+
+            AddToGlobalStore(uniqueIdentifier, listItem);
+
+            return new(uniqueIdentifier);
+        }
+
         internal static HtmlElementReference CreateHyperlinkDomElementAndAppendIt(HtmlElementReference parent, Hyperlink hyperlink)
         {
             string uniqueIdentifier = NewId();

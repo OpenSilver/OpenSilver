@@ -37,6 +37,7 @@ internal static class CssPropertyNames
     public const string FontWeight = "font-weight";
     public const string Height = "height";
     public const string LineHeight = "line-height";
+    public const string ListStyleType = "list-style-type";
     public const string LetterSpacing = "letter-spacing";
     public const string Margin = "margin";
     public const string MaskImage = "mask-image";

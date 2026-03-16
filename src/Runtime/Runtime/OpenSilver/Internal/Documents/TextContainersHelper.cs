@@ -31,6 +31,8 @@ internal static class TextContainersHelper
             Paragraph paragraph => new TextContainerParagraph(paragraph),
             Section section => new TextContainerSection(section),
             RichTextBox richTextBox => new TextContainerRichTextBox(richTextBox),
+            List list => new TextContainerList(list),
+            ListItem listItem => new TextContainerListItem(listItem),
             _ => null,
         };
 

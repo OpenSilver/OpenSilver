@@ -45,6 +45,8 @@ Object.defineProperty(window, 'osjs', {
             PASSWORDBOXVIEW: 'opensilver-passwordboxview',
             INLINE: 'opensilver-inline',
             BLOCK: 'opensilver-block',
+            LIST: 'opensilver-list',
+            LISTITEM: 'opensilver-listitem',
             HYPERLINK: 'opensilver-hyperlink',
             WINDOW: 'opensilver-window',
             POPUP: 'opensilver-popup',
@@ -685,6 +687,26 @@ Object.defineProperty(window, 'osjs', {
                 block.classList.add(CSS_CLASS.BLOCK);
 
                 parent.appendChild(block);
+            },
+            createList: function (tagName, id, parentId) {
+                const parent = document.getElementById(parentId);
+                if (!parent) return;
+
+                const list = document.createElement(tagName);
+                list.setAttribute('id', id);
+                list.classList.add(CSS_CLASS.BLOCK, CSS_CLASS.LIST);
+
+                parent.appendChild(list);
+            },
+            createListItem: function (tagName, id, parentId) {
+                const parent = document.getElementById(parentId);
+                if (!parent) return;
+
+                const listItem = document.createElement(tagName);
+                listItem.setAttribute('id', id);
+                listItem.classList.add(CSS_CLASS.LISTITEM);
+
+                parent.appendChild(listItem);
             },
             createHyperlink: function (tagName, id, parentId) {
                 const parent = document.getElementById(parentId);

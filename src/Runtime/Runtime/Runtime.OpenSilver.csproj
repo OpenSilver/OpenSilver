@@ -27,6 +27,7 @@
     <Compile Include="OpenSilver\HtmlElementReference.cs" />
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
+    <Compile Include="OpenSilver\Internal\Documents\TextContainerList.cs" />
     <Compile Include="OpenSilver\OpenSilverCompatibilityPreferences.cs" />
     <Compile Include="OpenSilver\Internal\Commands\CommandHelpers.cs" />
     <Compile Include="OpenSilver\Internal\CommandLibraryHelper.cs" />
@@ -126,6 +127,10 @@
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
+    <Compile Include="System.Windows.Documents\List.cs" />
+    <Compile Include="System.Windows.Documents\ListItem.cs" />
+    <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
+    <Compile Include="System.Windows\TextMarkerStyle.cs" />
     <Compile Include="System.Windows.Input\GestureEventArgs.cs" />
     <Compile Include="System.Windows.Input\ManipulationCompletedEventArgs.cs" />
     <Compile Include="System.Windows.Input\ManipulationDelta.cs" />
