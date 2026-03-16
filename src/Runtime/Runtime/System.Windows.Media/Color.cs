@@ -35,9 +35,25 @@ namespace System.Windows.Media
             return c1;
         }
 
-        ///<summary>
-        /// FromScRgb
-        ///</summary>
+        /// <summary>
+        /// Creates a new <see cref="Color"/> structure by using the specified ScRGB 
+        /// alpha channel and color channel values.
+        /// </summary>
+        /// <param name="a">
+        /// The ScRGB alpha channel, <see cref="ScA"/>, of the new color.
+        /// </param>
+        /// <param name="r">
+        /// The ScRGB red channel, <see cref="ScR"/>, of the new color.
+        /// </param>
+        /// <param name="g">
+        /// The ScRGB green channel, <see cref="ScG"/>, of the new color.
+        /// </param>
+        /// <param name="b">
+        /// The ScRGB blue channel, <see cref="ScB"/>, of the new color.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Color"/> structure with the specified values.
+        /// </returns>
         public static Color FromScRgb(float a, float r, float g, float b)
         {
             Color c1 = new Color();
@@ -94,14 +110,22 @@ namespace System.Windows.Media
             return c1;
         }
 
-        ///<summary>
-        /// Color - sRgb legacy interface, assumes Rgb values are sRgb
-        ///</summary>
-        public static Color FromRgb(byte r, byte g, byte b)
-        {
-            Color c1 = Color.FromArgb(0xff, r, g, b);
-            return c1;
-        }
+        /// <summary>
+        /// Creates a new <see cref="Color"/> structure by using the specified sRGB color channel values.
+        /// </summary>
+        /// <param name="r">
+        /// The sRGB red channel, <see cref="R"/>, of the new color.
+        /// </param>
+        /// <param name="g">
+        /// The sRGB green channel, <see cref="G"/>, of the new color.
+        /// </param>
+        /// <param name="b">
+        /// The sRGB blue channel, <see cref="B"/>, of the new color.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Color"/> structure with the specified values and an alpha channel value of 255.
+        /// </returns>
+        public static Color FromRgb(byte r, byte g, byte b) => FromArgb(0xff, r, g, b);
 
         /// <summary>
         /// Gets a hash code for the current <see cref="Color"/> structure.
@@ -109,10 +133,7 @@ namespace System.Windows.Media
         /// <returns>
         /// A hash code for the current <see cref="Color"/> structure.
         /// </returns>
-        public override int GetHashCode()
-        {
-            return this.sRgbColor.GetHashCode();
-        }
+        public override int GetHashCode() => sRgbColor.GetHashCode();
 
         /// <summary>
         /// Creates a string representation of the color using the ARGB channels in hex notation.
@@ -206,10 +227,7 @@ namespace System.Windows.Media
         /// true if the specified <see cref="Color"/> structure is identical to the
         /// current <see cref="Color"/> structure; otherwise, false.
         /// </returns>
-        public bool Equals(Color color)
-        {
-            return this == color;
-        }
+        public bool Equals(Color color) => this == color;
 
         /// <summary>
         /// Tests whether the specified object is a <see cref="Color"/> structure
@@ -222,18 +240,119 @@ namespace System.Windows.Media
         /// true if the specified object is a <see cref="Color"/> structure and is
         /// identical to the current <see cref="Color"/> structure; otherwise, false.
         /// </returns>
-        public override bool Equals(object o)
-        {
-            if (o is Color)
-            {
-                Color color = (Color)o;
+        public override bool Equals(object o) => o is Color color && this == color;
 
-                return (this == color);
-            }
-            else
-            {
-                return false;
-            }
+        /// <summary>
+        /// Adds two <see cref="Color"/> structures. 
+        /// </summary>
+        /// <param name="color1">
+        /// The first <see cref="Color"/> structure to add.
+        /// </param>
+        /// <param name="color2">
+        /// The second <see cref="Color"/> structure to add.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Color"/> structure whose color values are the results of 
+        /// the addition operation.
+        /// </returns>
+        public static Color Add(Color color1, Color color2) => color1 + color2;
+
+        /// <summary>
+        /// Subtracts a <see cref="Color"/> structure from a <see cref="Color"/> structure.
+        /// </summary>
+        /// <param name="color1">
+        /// The <see cref="Color"/> structure to be subtracted from.
+        /// </param>
+        /// <param name="color2">
+        /// The <see cref="Color"/> structure to subtract from color1.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Color"/> structure whose color values are the results of 
+        /// the subtraction operation.
+        /// </returns>
+        public static Color Subtract(Color color1, Color color2) => color1 - color2;
+
+        /// <summary>
+        /// Multiplies the alpha, red, blue, and green channels of the specified 
+        /// <see cref="Color"/> structure by the specified value.
+        /// </summary>
+        /// <param name="color">
+        /// The <see cref="Color"/> to be multiplied.
+        /// </param>
+        /// <param name="coefficient">
+        /// The value to multiply by.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Color"/> structure whose color values are the results of
+        /// the multiplication operation.
+        /// </returns>
+        public static Color Multiply(Color color, float coefficient) => color * coefficient;
+
+        /// <summary>
+        /// Adds two <see cref="Color"/> structures.
+        /// </summary>
+        /// <param name="color1">
+        /// The first <see cref="Color"/> structure to add.
+        /// </param>
+        /// <param name="color2">
+        /// The second <see cref="Color"/> structure to add.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Color"/> structure whose color values are the results of 
+        /// the addition operation.
+        /// </returns>
+        public static Color operator +(Color color1, Color color2)
+        {
+            return FromScRgb(
+                color1.sRgbColor.a / 255.0f + color2.sRgbColor.a / 255.0f,
+                SRgbToScRgb(color1.sRgbColor.r) + SRgbToScRgb(color2.sRgbColor.r),
+                SRgbToScRgb(color1.sRgbColor.g) + SRgbToScRgb(color2.sRgbColor.g),
+                SRgbToScRgb(color1.sRgbColor.b) + SRgbToScRgb(color2.sRgbColor.b));
+        }
+
+        /// <summary>
+        /// Subtracts a <see cref="Color"/> structure from a <see cref="Color"/> structure.
+        /// </summary>
+        /// <param name="color1">
+        /// The <see cref="Color"/> structure to be subtracted from.
+        /// </param>
+        /// <param name="color2">
+        /// The <see cref="Color"/> structure to subtract from color1.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Color"/> structure whose color values are the results of 
+        /// the subtraction operation.
+        /// </returns>
+        public static Color operator -(Color color1, Color color2)
+        {
+            return FromScRgb(
+                color1.sRgbColor.a / 255.0f - color2.sRgbColor.a / 255.0f,
+                SRgbToScRgb(color1.sRgbColor.r) - SRgbToScRgb(color2.sRgbColor.r),
+                SRgbToScRgb(color1.sRgbColor.g) - SRgbToScRgb(color2.sRgbColor.g),
+                SRgbToScRgb(color1.sRgbColor.b) - SRgbToScRgb(color2.sRgbColor.b));
+        }
+
+        /// <summary>
+        /// Multiplies the alpha, red, blue, and green channels of the specified 
+        /// <see cref="Color"/> structure by the specified value.
+        /// </summary>
+        /// <param name="color">
+        /// The <see cref="Color"/> to be multiplied.
+        /// </param>
+        /// <param name="coefficient">
+        /// The value to multiply by.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Color"/> structure whose color values are the results of 
+        /// the multiplication operation.
+        /// </returns>
+        public static Color operator *(Color color, float coefficient)
+        {
+            return FromScRgb(
+                (color.sRgbColor.a / 255.0f) * coefficient,
+                SRgbToScRgb(color.sRgbColor.r) * coefficient,
+                SRgbToScRgb(color.sRgbColor.g) * coefficient,
+                SRgbToScRgb(color.sRgbColor.b) * coefficient);
         }
 
         /// <summary>
@@ -285,10 +404,7 @@ namespace System.Windows.Media
         /// <returns>
         /// true if color1 and color2 are not equal; otherwise, false.
         /// </returns>
-        public static bool operator !=(Color color1, Color color2)
-        {
-            return (!(color1 == color2));
-        }
+        public static bool operator !=(Color color1, Color color2) => !(color1 == color2);
 
         /// <summary>
         /// Gets or sets the sRGB alpha channel value of the color.
@@ -298,14 +414,8 @@ namespace System.Windows.Media
         /// </returns>
         public byte A
         {
-            get
-            {
-                return sRgbColor.a;
-            }
-            set
-            {
-                sRgbColor.a = value;
-            }
+            get => sRgbColor.a;
+            set => sRgbColor.a = value;
         }
 
         /// <summary>
@@ -316,14 +426,8 @@ namespace System.Windows.Media
         /// </returns>
         public byte R
         {
-            get
-            {
-                return sRgbColor.r;
-            }
-            set
-            {
-                sRgbColor.r = value;
-            }
+            get => sRgbColor.r;
+            set => sRgbColor.r = value;
         }
 
         /// <summary>
@@ -334,14 +438,8 @@ namespace System.Windows.Media
         /// </returns>
         public byte G
         {
-            get
-            {
-                return sRgbColor.g;
-            }
-            set
-            {
-                sRgbColor.g = value;
-            }
+            get => sRgbColor.g;
+            set => sRgbColor.g = value;
         }
 
         /// <summary>
@@ -352,14 +450,66 @@ namespace System.Windows.Media
         /// </returns>
         public byte B
         {
-            get
-            {
-                return sRgbColor.b;
-            }
+            get => sRgbColor.b;
+            set => sRgbColor.b = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the ScRGB alpha channel value of the color.
+        /// </summary>
+        /// <returns>
+        /// The ScRGB alpha channel value of the <see cref="Color"/> structure, a value between 0 and 1.
+        /// </returns>
+        public float ScA
+        {
+            get => sRgbColor.a / 255.0f;
             set
             {
-                sRgbColor.b = value;
+                float a = value switch
+                {
+                    < 0.0f => 0.0f,
+                    > 1.0f => 1.0f,
+                    _ => value,
+                };
+
+                sRgbColor.a = (byte)((a * 255.0f) + 0.5f);
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the ScRGB red channel value of the color.
+        /// </summary>
+        /// <returns>
+        /// The ScRGB red channel value of the <see cref="Color"/> structure, a value between 0 and 1.
+        /// </returns>
+        public float ScR
+        {
+            get => SRgbToScRgb(sRgbColor.r);
+            set => sRgbColor.r = ScRgbTosRgb(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the ScRGB green channel value of the color.
+        /// </summary>
+        /// <returns>
+        /// The ScRGB green channel value of the <see cref="Color"/> structure, a value between 0 and 1.
+        /// </returns>
+        public float ScG
+        {
+            get => SRgbToScRgb(sRgbColor.g);
+            set => sRgbColor.g = ScRgbTosRgb(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the ScRGB blue channel value of the color.
+        /// </summary>
+        /// <returns>
+        /// The ScRGB red channel value of the <see cref="Color"/> structure, a value between 0 and 1.
+        /// </returns>
+        public float ScB
+        {
+            get => SRgbToScRgb(sRgbColor.b);
+            set => sRgbColor.b = ScRgbTosRgb(value);
         }
 
         internal string ToHtmlString(double opacity)
@@ -401,27 +551,51 @@ namespace System.Windows.Media
             return new SolidColorBrush(color);
         }
 
-        ///<summary>
+        /// <summary>
         /// private helper function to set context values from a color value with a set context and ScRgb values
-        ///</summary>
-        ///
+        /// </summary>
+        private static float SRgbToScRgb(byte bval)
+        {
+            float val = bval / 255.0f;
+
+            if (!(val > 0.0))       // Handles NaN case too. (Though, NaN isn't actually possible in this case.)
+            {
+                return 0.0f;
+            }
+            else if (val <= 0.04045)
+            {
+                return val / 12.92f;
+            }
+            else if (val < 1.0f)
+            {
+                return (float)Math.Pow(((double)val + 0.055) / 1.055, 2.4);
+            }
+            else
+            {
+                return 1.0f;
+            }
+        }
+
+        /// <summary>
+        /// private helper function to set context values from a color value with a set context and ScRgb values
+        /// </summary>
         private static byte ScRgbTosRgb(float val)
         {
             if (!(val > 0.0))       // Handles NaN case too
             {
-                return (0);
+                return 0;
             }
             else if (val <= 0.0031308)
             {
-                return ((byte)((255.0f * val * 12.92f) + 0.5f));
+                return (byte)((255.0f * val * 12.92f) + 0.5f);
             }
             else if (val < 1.0)
             {
-                return ((byte)((255.0f * ((1.055f * (float)Math.Pow((double)val, (1.0 / 2.4))) - 0.055f)) + 0.5f));
+                return (byte)((255.0f * ((1.055f * (float)Math.Pow((double)val, (1.0 / 2.4))) - 0.055f)) + 0.5f);
             }
             else
             {
-                return (255);
+                return 255;
             }
         }
 

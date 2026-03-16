@@ -143,7 +143,7 @@ namespace System.Windows
         /// <returns>
         /// A new FontWeight object that corresponds to the weightValue parameter.
         /// </returns>
-        internal static FontWeight FromOpenTypeWeight(int weightValue)
+        public static FontWeight FromOpenTypeWeight(int weightValue)
         {
             if (weightValue < 1 || weightValue > 999)
             {
@@ -160,7 +160,7 @@ namespace System.Windows
         /// An integer value between 1 and 999 that corresponds to the usWeightClass definition 
         /// in the OpenType specification.
         /// </returns>
-        internal int ToOpenTypeWeight() => RealWeight;
+        public int ToOpenTypeWeight() => RealWeight;
 
         /// <summary>
         /// Creates a string representation of this object based on the format string 
