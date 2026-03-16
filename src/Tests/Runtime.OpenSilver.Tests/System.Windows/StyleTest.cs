@@ -22,7 +22,7 @@ namespace System.Windows.Tests
         public void Set_TargetType_To_Null()
         {
             var s = new Style();
-            Assert.ThrowsException<ArgumentNullException>(() => s.TargetType = null);
+            Assert.Throws<ArgumentNullException>(() => s.TargetType = null);
         }
 
         [TestMethod]
@@ -35,7 +35,7 @@ namespace System.Windows.Tests
             s2.BasedOn = s3;
             s3.BasedOn = s1;
 
-            Assert.ThrowsException<InvalidOperationException>(() => s1.Seal());
+            Assert.Throws<InvalidOperationException>(() => s1.Seal());
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace System.Windows.Tests
         {
             var s = new Style(typeof(FrameworkElement));
 
-            Assert.ThrowsException<ArgumentException>(() => s.BasedOn = s);
+            Assert.Throws<ArgumentException>(() => s.BasedOn = s);
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace System.Windows.Tests
             var s = new Style(typeof(ItemsControl));
             var b = new Button();
 
-            Assert.ThrowsException<InvalidOperationException>(() => s.CheckTargetType(b));
+            Assert.Throws<InvalidOperationException>(() => s.CheckTargetType(b));
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace System.Windows.Tests
             var cc = new ContentControl();
 
             Assert.IsNull(s.TargetType);
-            Assert.ThrowsException<InvalidOperationException>(() => s.CheckTargetType(cc));
+            Assert.Throws<InvalidOperationException>(() => s.CheckTargetType(cc));
         }
 
         [TestMethod]
@@ -71,7 +71,7 @@ namespace System.Windows.Tests
             var s = new Style(typeof(ContentControl));
             s.Seal();
 
-            Assert.ThrowsException<InvalidOperationException>(() => s.TargetType = typeof(ItemsControl));
+            Assert.Throws<InvalidOperationException>(() => s.TargetType = typeof(ItemsControl));
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace System.Windows.Tests
             s1.BasedOn = s2;
             s1.Seal();
 
-            Assert.ThrowsException<InvalidOperationException>(() => s1.BasedOn = new Style(typeof(DependencyObject)));
+            Assert.Throws<InvalidOperationException>(() => s1.BasedOn = new Style(typeof(DependencyObject)));
         }
 
         [TestMethod]
@@ -102,11 +102,11 @@ namespace System.Windows.Tests
             // Check s1.EffectiveValues
             var effectiveValues = s1.EffectiveValues;
 
-            Assert.AreEqual(effectiveValues.Count, 3);
+            Assert.HasCount(3, effectiveValues);
             Assert.IsTrue(effectiveValues.ContainsKey(FrameworkElement.HeightProperty.GlobalIndex));
-            Assert.AreEqual(effectiveValues[FrameworkElement.HeightProperty.GlobalIndex], 40d);
+            Assert.AreEqual(40d, effectiveValues[FrameworkElement.HeightProperty.GlobalIndex]);
             Assert.IsTrue(effectiveValues.ContainsKey(FrameworkElement.WidthProperty.GlobalIndex));
-            Assert.AreEqual(effectiveValues[FrameworkElement.WidthProperty.GlobalIndex], 20d);
+            Assert.AreEqual(20d, effectiveValues[FrameworkElement.WidthProperty.GlobalIndex]);
             Assert.IsTrue(effectiveValues.ContainsKey(ContentControl.ContentTemplateProperty.GlobalIndex));
             Assert.AreEqual(effectiveValues[ContentControl.ContentTemplateProperty.GlobalIndex], contentTemplate);
         }
@@ -139,17 +139,17 @@ namespace System.Windows.Tests
 
             var effectiveValues = s1.EffectiveValues;
 
-            Assert.AreEqual(effectiveValues.Count, 5);
+            Assert.HasCount(5, effectiveValues);
             Assert.IsTrue(effectiveValues.ContainsKey(ListBox.SelectionModeProperty.GlobalIndex));
-            Assert.AreEqual(effectiveValues[ListBox.SelectionModeProperty.GlobalIndex], SelectionMode.Extended);
+            Assert.AreEqual(SelectionMode.Extended, effectiveValues[ListBox.SelectionModeProperty.GlobalIndex]);
             Assert.IsTrue(effectiveValues.ContainsKey(ItemsControl.DisplayMemberPathProperty.GlobalIndex));
-            Assert.AreEqual(effectiveValues[ItemsControl.DisplayMemberPathProperty.GlobalIndex], "DisplayMemberPathListBox");
+            Assert.AreEqual("DisplayMemberPathListBox", effectiveValues[ItemsControl.DisplayMemberPathProperty.GlobalIndex]);
             Assert.IsTrue(effectiveValues.ContainsKey(ItemsControl.ItemTemplateProperty.GlobalIndex));
             Assert.AreEqual(effectiveValues[ItemsControl.ItemTemplateProperty.GlobalIndex], itemTemplate);
             Assert.IsTrue(effectiveValues.ContainsKey(FrameworkElement.WidthProperty.GlobalIndex));
-            Assert.AreEqual(effectiveValues[FrameworkElement.WidthProperty.GlobalIndex], 22d);
+            Assert.AreEqual(22d, effectiveValues[FrameworkElement.WidthProperty.GlobalIndex]);
             Assert.IsTrue(effectiveValues.ContainsKey(FrameworkElement.HeightProperty.GlobalIndex));
-            Assert.AreEqual(effectiveValues[FrameworkElement.HeightProperty.GlobalIndex], 40d);
+            Assert.AreEqual(40d, effectiveValues[FrameworkElement.HeightProperty.GlobalIndex]);
         }
     }
 }

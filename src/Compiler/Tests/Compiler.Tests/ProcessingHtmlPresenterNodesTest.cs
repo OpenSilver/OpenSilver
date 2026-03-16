@@ -42,7 +42,7 @@ namespace Compiler.Tests
 
             var res = ProcessingHtmlPresenterNodes.Process(xaml);
 
-            Assert.AreEqual(res, @"
+            Assert.AreEqual(@"
 <sdk:Page x:Class=""XRSharpApplication32.MainPage""
           xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
           xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -57,7 +57,7 @@ namespace Compiler.Tests
         </native:HtmlPresenter>
     </StackPanel>
 </sdk:Page>
-");
+", res);
         }
     }
 }

@@ -63,7 +63,7 @@ namespace System.Windows.Media.Animation.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -71,7 +71,7 @@ namespace System.Windows.Media.Animation.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -79,7 +79,7 @@ namespace System.Windows.Media.Animation.Tests
         [TestMethod]
         public void ConvertFrom_Paced_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom("Paced")
             );
         }
@@ -87,7 +87,7 @@ namespace System.Windows.Media.Animation.Tests
         [TestMethod]
         public void ConvertFrom_Percent_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom("%")
             );
         }
@@ -95,13 +95,13 @@ namespace System.Windows.Media.Animation.Tests
         [TestMethod]
         public void ConvertTo_String()
         {
-            Assert.AreEqual(Converter.ConvertTo(KeyTime.FromTimeSpan(TimeSpan.FromDays(3)), typeof(string)), "3.00:00:00");
+            Assert.AreEqual("3.00:00:00", Converter.ConvertTo(KeyTime.FromTimeSpan(TimeSpan.FromDays(3)), typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(null, typeof(string))
             );
         }
@@ -109,7 +109,7 @@ namespace System.Windows.Media.Animation.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(true, typeof(string))
             );
         }
@@ -117,7 +117,7 @@ namespace System.Windows.Media.Animation.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_3()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(KeyTime.FromTimeSpan(TimeSpan.FromDays(1)), typeof(bool))
             );
         }

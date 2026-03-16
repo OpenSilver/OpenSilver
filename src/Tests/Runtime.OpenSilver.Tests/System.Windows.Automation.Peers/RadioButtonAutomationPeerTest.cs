@@ -56,7 +56,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.SelectionItem) as ISelectionItemProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<InvalidOperationException>(() => provider.RemoveFromSelection());
+            Assert.Throws<InvalidOperationException>(() => provider.RemoveFromSelection());
         }
 
         [TestMethod]
@@ -66,7 +66,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.SelectionItem) as ISelectionItemProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<InvalidOperationException>(() => provider.AddToSelection());
+            Assert.Throws<InvalidOperationException>(() => provider.AddToSelection());
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.SelectionItem) as ISelectionItemProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.Select());
+            Assert.Throws<ElementNotEnabledException>(() => provider.Select());
         }
 
         [TestMethod]

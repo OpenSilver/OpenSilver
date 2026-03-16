@@ -480,7 +480,7 @@ namespace System.ComponentModel.Tests
                 .GetValue(converter));
 
             Assert.IsNotNull(enumType);
-            Assert.AreSame(enumType, typeof(MyEnum1));
+            Assert.AreSame(typeof(MyEnum1), enumType);
         }
 
         [TestMethod]
@@ -491,8 +491,8 @@ namespace System.ComponentModel.Tests
             Assert.IsNotNull(converter);
             Assert.IsInstanceOfType<NullableConverter2>(converter);
 
-            Assert.AreSame(converter.As<NullableConverter2>().NullableType, typeof(int?));
-            Assert.AreSame(converter.As<NullableConverter2>().UnderlyingType, typeof(int));
+            Assert.AreSame(typeof(int?), converter.As<NullableConverter2>().NullableType);
+            Assert.AreSame(typeof(int), converter.As<NullableConverter2>().UnderlyingType);
             Assert.IsNotNull(converter.As<NullableConverter2>().UnderlyingTypeConverter);
             Assert.IsInstanceOfType<Int32Converter>(converter.As<NullableConverter2>().UnderlyingTypeConverter);
         }
@@ -505,8 +505,8 @@ namespace System.ComponentModel.Tests
             Assert.IsNotNull(converter);
             Assert.IsInstanceOfType<NullableConverter2>(converter);
 
-            Assert.AreSame(converter.As<NullableConverter2>().NullableType, typeof(Point?));
-            Assert.AreSame(converter.As<NullableConverter2>().UnderlyingType, typeof(Point));
+            Assert.AreSame(typeof(Point?), converter.As<NullableConverter2>().NullableType);
+            Assert.AreSame(typeof(Point), converter.As<NullableConverter2>().UnderlyingType);
             Assert.IsNotNull(converter.As<NullableConverter2>().UnderlyingTypeConverter);
             Assert.IsInstanceOfType<PointConverter>(converter.As<NullableConverter2>().UnderlyingTypeConverter);
         }
@@ -519,8 +519,8 @@ namespace System.ComponentModel.Tests
             Assert.IsNotNull(converter);
             Assert.IsInstanceOfType<NullableConverter2>(converter);
 
-            Assert.AreSame(converter.As<NullableConverter2>().NullableType, typeof(MyStruct1?));
-            Assert.AreSame(converter.As<NullableConverter2>().UnderlyingType, typeof(MyStruct1));
+            Assert.AreSame(typeof(MyStruct1?), converter.As<NullableConverter2>().NullableType);
+            Assert.AreSame(typeof(MyStruct1), converter.As<NullableConverter2>().UnderlyingType);
             Assert.IsNotNull(converter.As<NullableConverter2>().UnderlyingTypeConverter);
             Assert.IsInstanceOfType<MyStruct1Converter>(converter.As<NullableConverter2>().UnderlyingTypeConverter);
         }

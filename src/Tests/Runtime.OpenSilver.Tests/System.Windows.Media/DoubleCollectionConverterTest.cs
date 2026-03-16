@@ -56,9 +56,9 @@ namespace System.Windows.Media.Tests
 
             DoubleCollection doubleCollection = value as DoubleCollection;
 
-            Assert.AreEqual(doubleCollection.Count, 2);
-            Assert.AreEqual(doubleCollection[0], 1.0);
-            Assert.AreEqual(doubleCollection[1], 2.0);
+            Assert.AreEqual(2, doubleCollection.Count);
+            Assert.AreEqual(1.0, doubleCollection[0]);
+            Assert.AreEqual(2.0, doubleCollection[1]);
         }
 
         [TestMethod]
@@ -70,16 +70,16 @@ namespace System.Windows.Media.Tests
 
             DoubleCollection doubleCollection = value as DoubleCollection;
 
-            Assert.AreEqual(doubleCollection.Count, 3);
-            Assert.AreEqual(doubleCollection[0], 1.0);
-            Assert.AreEqual(doubleCollection[1], 2.0);
-            Assert.AreEqual(doubleCollection[2], 4.0);
+            Assert.AreEqual(3, doubleCollection.Count);
+            Assert.AreEqual(1.0, doubleCollection[0]);
+            Assert.AreEqual(2.0, doubleCollection[1]);
+            Assert.AreEqual(4.0, doubleCollection[2]);
         }
 
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -87,7 +87,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -103,7 +103,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new DoubleCollection(), null)
             );
         }
@@ -111,7 +111,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new DoubleCollection() { 1.0, 2.0 }, typeof(int))
             );
         }
@@ -119,7 +119,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new Color(), typeof(string))
             );
         }

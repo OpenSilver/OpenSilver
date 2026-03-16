@@ -22,7 +22,7 @@ namespace System.ComponentModel.Tests
         {
             var properties = TypeConverterHelper.GetProperties(typeof(_MyType1));
 
-            Assert.AreEqual(properties.Count, 2);
+            Assert.AreEqual(2, properties.Count);
             Assert.IsNotNull(properties[nameof(_MyType1.IntProperty)]);
             Assert.IsNotNull(properties[nameof(_MyType1.DoubleProperty)]);
         }
@@ -32,7 +32,7 @@ namespace System.ComponentModel.Tests
         {
             var properties = TypeConverterHelper.GetProperties(typeof(_MyType2));
 
-            Assert.AreEqual(properties.Count, 3);
+            Assert.AreEqual(3, properties.Count);
             Assert.IsNotNull(properties[nameof(_MyType1.IntProperty)]);
             Assert.IsNotNull(properties[nameof(_MyType1.DoubleProperty)]);
             Assert.IsNotNull(properties[nameof(_MyType2.StringProperty)]);
@@ -43,7 +43,7 @@ namespace System.ComponentModel.Tests
         {
             var properties = TypeConverterHelper.GetProperties(typeof(_MyType3));
 
-            Assert.AreEqual(properties.Count, 4);
+            Assert.AreEqual(4, properties.Count);
             Assert.IsNotNull(properties[nameof(_MyType1.IntProperty)]);
             Assert.IsNotNull(properties[nameof(_MyType1.DoubleProperty)]);
             Assert.IsNotNull(properties[nameof(_MyType2.StringProperty)]);
@@ -55,9 +55,9 @@ namespace System.ComponentModel.Tests
         {
             var properties = TypeConverterHelper.GetProperties(typeof(_MyType5));
 
-            Assert.AreEqual(properties.Count, 1);
-            Assert.AreEqual(properties[0].Name, nameof(_MyType5.FloatProperty));
-            Assert.AreSame(properties[0].ComponentType, typeof(_MyType5));
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(nameof(_MyType5.FloatProperty), properties[0].Name);
+            Assert.AreSame(typeof(_MyType5), properties[0].ComponentType);
         }
 
         [TestMethod]
@@ -65,9 +65,9 @@ namespace System.ComponentModel.Tests
         {
             var properties = TypeConverterHelper.GetProperties(typeof(_MyClass2));
 
-            Assert.AreEqual(properties.Count, 1);
-            Assert.AreEqual(properties[0].Name, nameof(_MyClass2.ByteProperty));
-            Assert.AreSame(properties[0].ComponentType, typeof(_MyClass2));
+            Assert.AreEqual(1, properties.Count);
+            Assert.AreEqual(nameof(_MyClass2.ByteProperty), properties[0].Name);
+            Assert.AreSame(typeof(_MyClass2), properties[0].ComponentType);
         }
 
         [TestMethod]

@@ -56,7 +56,7 @@ namespace System.Windows.Media.Tests
 
             PointCollection pointCollection = value as PointCollection;
 
-            Assert.AreEqual(pointCollection.Count, 2);
+            Assert.AreEqual(2, pointCollection.Count);
             Assert.AreEqual(pointCollection[0], new Point(1, 1));
             Assert.AreEqual(pointCollection[1], new Point(2, 2));
         }
@@ -70,7 +70,7 @@ namespace System.Windows.Media.Tests
 
             PointCollection pointCollection = value as PointCollection;
 
-            Assert.AreEqual(pointCollection.Count, 2);
+            Assert.AreEqual(2, pointCollection.Count);
             Assert.AreEqual(pointCollection[0], new Point(1, 1));
             Assert.AreEqual(pointCollection[1], new Point(2, 2));
         }
@@ -84,7 +84,7 @@ namespace System.Windows.Media.Tests
 
             PointCollection pointCollection = value as PointCollection;
 
-            Assert.AreEqual(pointCollection.Count, 2);
+            Assert.AreEqual(2, pointCollection.Count);
             Assert.AreEqual(pointCollection[0], new Point(1, 1));
             Assert.AreEqual(pointCollection[1], new Point(2, 2));
         }
@@ -92,7 +92,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_InvalidOperationException()
         {
-            Assert.ThrowsException<InvalidOperationException>(
+            Assert.Throws<InvalidOperationException>(
                 () => Converter.ConvertFrom("1,1,1")
             );
         }
@@ -100,7 +100,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -108,7 +108,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -128,7 +128,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new PointCollection(), null)
             );
         }
@@ -136,7 +136,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(true, typeof(string))
             );
         }
@@ -144,7 +144,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new PointCollection(), typeof(byte))
             );
         }

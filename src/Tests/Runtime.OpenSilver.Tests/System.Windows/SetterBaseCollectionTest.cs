@@ -48,7 +48,7 @@ namespace System.Windows.Tests
         {
             var sbc = new SetterBaseCollection();
 
-            Assert.ThrowsException<ArgumentNullException>(() => sbc.Add(null));
+            Assert.Throws<ArgumentNullException>(() => sbc.Add(null));
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace System.Windows.Tests
         {
             var sbc = new SetterBaseCollection();
 
-            Assert.ThrowsException<ArgumentNullException>(() => sbc.Insert(0, null));
+            Assert.Throws<ArgumentNullException>(() => sbc.Insert(0, null));
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace System.Windows.Tests
             var sbc = new SetterBaseCollection();
             sbc.Add(new Setter(Control.PaddingProperty, new Thickness(20d)));
 
-            Assert.ThrowsException<ArgumentNullException>(() => sbc[0] = null);
+            Assert.Throws<ArgumentNullException>(() => sbc[0] = null);
         }
 
         #endregion Check for null values
@@ -82,7 +82,7 @@ namespace System.Windows.Tests
 
             var setter = new Setter(Control.PaddingProperty, new Thickness(20d));
 
-            Assert.ThrowsException<InvalidOperationException>(() => sbc.Add(setter));
+            Assert.Throws<InvalidOperationException>(() => sbc.Add(setter));
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace System.Windows.Tests
             sbc.Seal();
 
             Assert.IsTrue(sbc.IsSealed);
-            Assert.ThrowsException<InvalidOperationException>(() => sbc.Clear());
+            Assert.Throws<InvalidOperationException>(() => sbc.Clear());
         }
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace System.Windows.Tests
 
             var setter = new Setter(Control.PaddingProperty, new Thickness(20d));
 
-            Assert.ThrowsException<InvalidOperationException>(() => sbc.Insert(0, setter));
+            Assert.Throws<InvalidOperationException>(() => sbc.Insert(0, setter));
         }
 
         [TestMethod]
@@ -116,7 +116,7 @@ namespace System.Windows.Tests
             sbc.Seal();
 
             Assert.IsTrue(sbc.IsSealed);
-            Assert.ThrowsException<InvalidOperationException>(() => sbc.RemoveAt(0));
+            Assert.Throws<InvalidOperationException>(() => sbc.RemoveAt(0));
         }
 
         [TestMethod]
@@ -129,7 +129,7 @@ namespace System.Windows.Tests
             sbc.Seal();
 
             Assert.IsTrue(sbc.IsSealed);
-            Assert.ThrowsException<InvalidOperationException>(() => sbc.Remove(setter));
+            Assert.Throws<InvalidOperationException>(() => sbc.Remove(setter));
         }
 
         [TestMethod]
@@ -143,7 +143,7 @@ namespace System.Windows.Tests
 
             var setter = new Setter(Control.IsTabStopProperty, false);
 
-            Assert.ThrowsException<InvalidOperationException>(() => sbc[0] = setter);
+            Assert.Throws<InvalidOperationException>(() => sbc[0] = setter);
         }
 
         #endregion IsSealed

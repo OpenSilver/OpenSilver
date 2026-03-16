@@ -34,8 +34,8 @@ public class AttachedPropertyBrowsableForTypeAttributeTests
     [TestMethod]
     public void Ctor_NullTargetType_ThrowsArgumentNullException()
     {
-        var ex = Assert.ThrowsException<ArgumentNullException>(() => new AttachedPropertyBrowsableForTypeAttribute(null));
-        Assert.AreEqual(ex.ParamName, "targetType");
+        var ex = Assert.Throws<ArgumentNullException>(() => new AttachedPropertyBrowsableForTypeAttribute(null));
+        Assert.AreEqual("targetType", ex.ParamName);
     }
 
     public static IEnumerable<object[]> Equals_TestData()
@@ -48,8 +48,8 @@ public class AttachedPropertyBrowsableForTypeAttributeTests
         yield return new object[] { attribute, null, false };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(Equals_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(Equals_TestData))]
     public void Equals_Object_ReturnsExpected(AttachedPropertyBrowsableForTypeAttribute attribute, object obj, bool expected)
     {
         Assert.AreEqual(expected, attribute.Equals(obj));

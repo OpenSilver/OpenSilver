@@ -25,15 +25,15 @@ namespace System.Windows.Automation.Peers.Tests
         [TestMethod]
         public void Ctor_1_Should_Throw_InvalidOperationException()
         {
-            Assert.ThrowsException<InvalidOperationException>(() => new ItemTestAutomationPeer(null));
+            Assert.Throws<InvalidOperationException>(() => new ItemTestAutomationPeer(null));
         }
 
         [TestMethod]
         public void Ctor_2_Should_Throw_InvalidOperationException()
         {
-            Assert.ThrowsException<InvalidOperationException>(() => new ItemTestAutomationPeer(null, null));
-            Assert.ThrowsException<InvalidOperationException>(() => new ItemTestAutomationPeer("Test", null));
-            Assert.ThrowsException<InvalidOperationException>(() => new ItemTestAutomationPeer(new DependencyObject(), null));
+            Assert.Throws<InvalidOperationException>(() => new ItemTestAutomationPeer(null, null));
+            Assert.Throws<InvalidOperationException>(() => new ItemTestAutomationPeer("Test", null));
+            Assert.Throws<InvalidOperationException>(() => new ItemTestAutomationPeer(new DependencyObject(), null));
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace System.Windows.Automation.Peers.Tests
             var textblock = new TextBlock();
             AutomationProperties.SetAcceleratorKey(textblock, "key");
 
-            Assert.AreEqual(new ItemTestAutomationPeer(textblock).GetAcceleratorKey(), "key");
+            Assert.AreEqual("key", new ItemTestAutomationPeer(textblock).GetAcceleratorKey());
         }
 
         [TestMethod]
@@ -57,7 +57,7 @@ namespace System.Windows.Automation.Peers.Tests
 
                 AutomationProperties.SetAcceleratorKey(wrapper.Control.ItemContainerGenerator.ContainerFromItem("Item"), "key");
 
-                Assert.AreEqual(itemPeer.GetAcceleratorKey(), "key");
+                Assert.AreEqual("key", itemPeer.GetAcceleratorKey());
             }
         }
 
@@ -67,7 +67,7 @@ namespace System.Windows.Automation.Peers.Tests
             var textblock = new TextBlock();
             AutomationProperties.SetAccessKey(textblock, "key");
 
-            Assert.AreEqual(new ItemTestAutomationPeer(textblock).GetAccessKey(), "key");
+            Assert.AreEqual("key", new ItemTestAutomationPeer(textblock).GetAccessKey());
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace System.Windows.Automation.Peers.Tests
 
                 AutomationProperties.SetAccessKey(wrapper.Control.ItemContainerGenerator.ContainerFromItem("Item"), "key");
 
-                Assert.AreEqual(itemPeer.GetAccessKey(), "key");
+                Assert.AreEqual("key", itemPeer.GetAccessKey());
             }
         }
 

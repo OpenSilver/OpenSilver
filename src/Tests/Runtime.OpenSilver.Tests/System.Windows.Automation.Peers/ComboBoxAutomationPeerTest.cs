@@ -34,7 +34,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.Expand());
+            Assert.Throws<ElementNotEnabledException>(() => provider.Expand());
         }
 
         [Ignore]
@@ -68,7 +68,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.Collapse());
+            Assert.Throws<ElementNotEnabledException>(() => provider.Collapse());
         }
 
         [Ignore]
@@ -103,11 +103,11 @@ namespace System.Windows.Automation.Peers.Tests
                 var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
 
                 Assert.IsNotNull(provider);
-                Assert.AreEqual(provider.ExpandCollapseState, ExpandCollapseState.Collapsed);
+                Assert.AreEqual(ExpandCollapseState.Collapsed, provider.ExpandCollapseState);
 
                 comboBox.IsDropDownOpen = true;
 
-                Assert.AreEqual(provider.ExpandCollapseState, ExpandCollapseState.Expanded);
+                Assert.AreEqual(ExpandCollapseState.Expanded, provider.ExpandCollapseState);
             }
         }
 
@@ -149,7 +149,7 @@ namespace System.Windows.Automation.Peers.Tests
             {
                 IRawElementProviderSimple[] selection = provider.GetSelection();
 
-                Assert.AreEqual(selection.Length, 1);
+                Assert.HasCount(1, selection);
                 Assert.IsInstanceOfType<ListBoxItemAutomationPeer>(selection[0].Peer);
                 Assert.AreSame(selection[0].Peer.As<ListBoxItemAutomationPeer>().ItemsControlAutomationPeer, peer);
             }

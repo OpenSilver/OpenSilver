@@ -56,7 +56,7 @@ namespace System.Windows.Input.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_FormatException()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.Throws<FormatException>(
                 () => Converter.ConvertFrom("invalidCursor")
             );
         }
@@ -64,7 +64,7 @@ namespace System.Windows.Input.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -72,7 +72,7 @@ namespace System.Windows.Input.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -80,13 +80,13 @@ namespace System.Windows.Input.Tests
         [TestMethod]
         public void ConvertTo_String()
         {
-            Assert.AreEqual(Converter.ConvertTo(Cursors.Arrow, typeof(string)), nameof(CursorType.Arrow));
+            Assert.AreEqual(nameof(CursorType.Arrow), Converter.ConvertTo(Cursors.Arrow, typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(Cursors.Wait, null)
             );
         }
@@ -94,7 +94,7 @@ namespace System.Windows.Input.Tests
         [TestMethod]
         public void ConvertTo_Boolean_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(Cursors.No, typeof(bool))
             );
         }

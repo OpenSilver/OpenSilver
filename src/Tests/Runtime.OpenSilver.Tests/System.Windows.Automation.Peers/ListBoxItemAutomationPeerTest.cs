@@ -30,7 +30,7 @@ namespace System.Windows.Automation.Peers.Tests
             listboxItem.IsEnabled = false;
             var provider = peer.GetPattern(PatternInterface.SelectionItem) as ISelectionItemProvider;
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.Select());
+            Assert.Throws<ElementNotEnabledException>(() => provider.Select());
         }
 
         [TestMethod]
@@ -54,7 +54,7 @@ namespace System.Windows.Automation.Peers.Tests
             listboxItem.IsEnabled = false;
             var provider = peer.GetPattern(PatternInterface.SelectionItem) as ISelectionItemProvider;
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.AddToSelection());
+            Assert.Throws<ElementNotEnabledException>(() => provider.AddToSelection());
         }
 
         [TestMethod]
@@ -80,7 +80,7 @@ namespace System.Windows.Automation.Peers.Tests
             Assert.IsNotNull(provider);
             listboxItem.IsEnabled = false;
             listboxItem.IsSelected = true;
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.RemoveFromSelection());
+            Assert.Throws<ElementNotEnabledException>(() => provider.RemoveFromSelection());
         }
 
         [TestMethod]

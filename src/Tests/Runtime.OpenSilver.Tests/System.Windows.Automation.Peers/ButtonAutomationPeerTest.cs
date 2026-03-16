@@ -52,7 +52,7 @@ namespace System.Windows.Automation.Peers.Tests
             var buttonAutoPeer = new ButtonAutomationPeer(button);
             var invokeProvider = buttonAutoPeer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
 
-            Assert.ThrowsException<ElementNotEnabledException>(() => invokeProvider?.Invoke());
+            Assert.Throws<ElementNotEnabledException>(() => invokeProvider?.Invoke());
         }
     }
 }

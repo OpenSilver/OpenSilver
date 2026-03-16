@@ -37,10 +37,10 @@ namespace System.Windows.Automation.Peers.Tests
             var peer = new ScrollBarAutomationPeer(scrollbar);
 
             scrollbar.Orientation = Orientation.Horizontal;
-            Assert.AreEqual(peer.GetOrientation(), AutomationOrientation.Horizontal);
+            Assert.AreEqual(AutomationOrientation.Horizontal, peer.GetOrientation());
 
             scrollbar.Orientation = Orientation.Vertical;
-            Assert.AreEqual(peer.GetOrientation(), AutomationOrientation.Vertical);
+            Assert.AreEqual(AutomationOrientation.Vertical, peer.GetOrientation());
         }
     }
 }

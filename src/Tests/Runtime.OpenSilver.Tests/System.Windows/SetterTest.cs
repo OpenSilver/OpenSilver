@@ -39,7 +39,7 @@ namespace System.Windows.Tests
         {
             var setter = new Setter();
 
-            Assert.ThrowsException<ArgumentNullException>(() => setter.Property = null);
+            Assert.Throws<ArgumentNullException>(() => setter.Property = null);
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace System.Windows.Tests
         {
             var setter = new Setter();
 
-            Assert.ThrowsException<InvalidOperationException>(() => setter.Property = FrameworkElement.NameProperty);
+            Assert.Throws<InvalidOperationException>(() => setter.Property = FrameworkElement.NameProperty);
         }
 
         #endregion Setter.Property
@@ -57,13 +57,13 @@ namespace System.Windows.Tests
         [TestMethod]
         public void Setter_Constructor_When_Property_Is_Null()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => new Setter(null, new object()));
+            Assert.Throws<ArgumentNullException>(() => new Setter(null, new object()));
         }
 
         [TestMethod]
         public void Setter_Constructor_When_Property_Is_FrameworkElement_NameProperty()
         {
-            Assert.ThrowsException<InvalidOperationException>(() => new Setter(FrameworkElement.NameProperty, "name"));
+            Assert.Throws<InvalidOperationException>(() => new Setter(FrameworkElement.NameProperty, "name"));
         }
 
         [TestMethod]
@@ -96,7 +96,7 @@ namespace System.Windows.Tests
             var setter = new Setter(Control.BorderThicknessProperty, new Thickness(2d));
             setter.Seal();
 
-            Assert.ThrowsException<InvalidOperationException>(() => setter.Value = new Thickness(4d));
+            Assert.Throws<InvalidOperationException>(() => setter.Value = new Thickness(4d));
         }
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace System.Windows.Tests
             var setter = new Setter(Control.BorderThicknessProperty, new Thickness(2d));
             setter.Seal();
 
-            Assert.ThrowsException<InvalidOperationException>(() => setter.Property = Control.IsTabStopProperty);
+            Assert.Throws<InvalidOperationException>(() => setter.Property = Control.IsTabStopProperty);
         }
 
         #endregion IsSealed
@@ -118,7 +118,7 @@ namespace System.Windows.Tests
             var setter = new Setter();
             setter.Value = "test";
 
-            Assert.ThrowsException<ArgumentException>(() => setter.Seal());
+            Assert.Throws<ArgumentException>(() => setter.Seal());
         }
 
         [TestMethod]
@@ -126,7 +126,7 @@ namespace System.Windows.Tests
         {
             var setter = new Setter(Border.BorderBrushProperty, "test");
             
-            Assert.ThrowsException<ArgumentException>(() => setter.Seal());
+            Assert.Throws<ArgumentException>(() => setter.Seal());
         }
 
         #endregion Seal

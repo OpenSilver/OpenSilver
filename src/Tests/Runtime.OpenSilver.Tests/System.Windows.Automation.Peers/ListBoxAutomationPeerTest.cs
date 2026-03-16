@@ -69,7 +69,7 @@ namespace System.Windows.Automation.Peers.Tests
                 listbox.SelectedItem = "Item 2";
                 var selection = provider.GetSelection();
 
-                Assert.AreEqual(selection.Length, 1);
+                Assert.HasCount(1, selection);
                 Assert.IsInstanceOfType<ListBoxItemAutomationPeer>(selection[0].Peer);
                 Assert.AreSame(selection[0].Peer.As<ListBoxItemAutomationPeer>().ItemsControlAutomationPeer, peer);
 
@@ -77,7 +77,7 @@ namespace System.Windows.Automation.Peers.Tests
                 listbox.SelectedItems.Add("Item 4");
                 selection = provider.GetSelection();
 
-                Assert.AreEqual(selection.Length, 2);
+                Assert.HasCount(2, selection);
                 Assert.IsInstanceOfType<ListBoxItemAutomationPeer>(selection[0].Peer);
                 Assert.AreSame(selection[0].Peer.As<ListBoxItemAutomationPeer>().ItemsControlAutomationPeer, peer);
                 Assert.IsInstanceOfType<ListBoxItemAutomationPeer>(selection[1].Peer);

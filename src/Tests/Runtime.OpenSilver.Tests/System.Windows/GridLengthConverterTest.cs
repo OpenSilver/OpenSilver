@@ -151,7 +151,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -159,7 +159,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Style_Should_Throw_InvalidCastException()
         {
-            Assert.ThrowsException<InvalidCastException>(
+            Assert.Throws<InvalidCastException>(
                 () => Converter.ConvertFrom(new Style())
             );
         }
@@ -167,13 +167,13 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_String()
         {
-            Assert.AreEqual(Converter.ConvertTo(new GridLength(100), typeof(string)), "100");
+            Assert.AreEqual("100", Converter.ConvertTo(new GridLength(100), typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new GridLength(100), null)
             );
         }
@@ -181,7 +181,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(true, typeof(string))
             );
         }
@@ -189,7 +189,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new GridLength(100), typeof(bool))
             );
         }

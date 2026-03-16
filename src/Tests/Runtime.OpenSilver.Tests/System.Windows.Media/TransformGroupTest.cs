@@ -41,12 +41,12 @@ namespace System.Windows.Media.Tests
 
             var m = invertedTransform.Matrix;
 
-            Assert.AreEqual(m.M11, -0.5);
-            Assert.AreEqual(m.M12, 0);
-            Assert.AreEqual(m.M21, 0);
-            Assert.AreEqual(m.M22, 1.0 / 6.0);
-            Assert.AreEqual(m.OffsetX, -1);
-            Assert.AreEqual(m.OffsetY, -9);
+            Assert.AreEqual(-0.5, m.M11);
+            Assert.AreEqual(0, m.M12);
+            Assert.AreEqual(0, m.M21);
+            Assert.AreEqual(1.0 / 6.0, m.M22);
+            Assert.AreEqual(-1, m.OffsetX);
+            Assert.AreEqual(-9, m.OffsetY);
         }
 
         [TestMethod]
@@ -65,12 +65,12 @@ namespace System.Windows.Media.Tests
 
             var m = invertedTransform.Matrix;
 
-            Assert.AreEqual(m.M11, 1);
-            Assert.AreEqual(m.M12, 0);
-            Assert.AreEqual(m.M21, 0);
-            Assert.AreEqual(m.M22, 1);
-            Assert.AreEqual(m.OffsetX, -1.5);
-            Assert.AreEqual(m.OffsetY, -7.5);
+            Assert.AreEqual(1, m.M11);
+            Assert.AreEqual(0, m.M12);
+            Assert.AreEqual(0, m.M21);
+            Assert.AreEqual(1, m.M22);
+            Assert.AreEqual(-1.5, m.OffsetX);
+            Assert.AreEqual(-7.5, m.OffsetY);
         }
 
         [TestMethod]
@@ -82,10 +82,10 @@ namespace System.Windows.Media.Tests
             transform.Children.Add(new MatrixTransform(MatrixTest.GetIncrementalMatrix(3, 1)));
             var result = transform.TransformBounds(rect);
 
-            Assert.AreEqual(result.X, 55);
-            Assert.AreEqual(result.Y, 66);
-            Assert.AreEqual(result.Width, 800);
-            Assert.AreEqual(result.Height, 1000);
+            Assert.AreEqual(55, result.X);
+            Assert.AreEqual(66, result.Y);
+            Assert.AreEqual(800, result.Width);
+            Assert.AreEqual(1000, result.Height);
         }
 
         [TestMethod]
@@ -101,9 +101,9 @@ namespace System.Windows.Media.Tests
             transform.Children.Add(nestedTransform);
             var result = transform.TransformBounds(rect);
 
-            Assert.AreEqual(result.X, -88.5);
+            Assert.AreEqual(-88.5, result.X);
             Assert.IsTrue(result.Y >= 12.166666 && result.Y <= 12.166667);
-            Assert.AreEqual(result.Width, 55);
+            Assert.AreEqual(55, result.Width);
             Assert.IsTrue(result.Height >= 23.333333 && result.Height <= 23.333334);
         }
 
@@ -117,8 +117,8 @@ namespace System.Windows.Media.Tests
             var result = transform.TryTransform(point, out var outPoint);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(outPoint.X, 146);
-            Assert.AreEqual(outPoint.Y, 202);
+            Assert.AreEqual(146, outPoint.X);
+            Assert.AreEqual(202, outPoint.Y);
         }
 
         [TestMethod]

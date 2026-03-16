@@ -59,13 +59,13 @@ namespace System.Windows.Automation.Peers.Tests
         [TestMethod]
         public void FromElement_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => FrameworkElementAutomationPeer.FromElement(null));
+            Assert.Throws<ArgumentNullException>(() => FrameworkElementAutomationPeer.FromElement(null));
         }
 
         [TestMethod]
         public void CreatePeerForElement_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => FrameworkElementAutomationPeer.CreatePeerForElement(null));
+            Assert.Throws<ArgumentNullException>(() => FrameworkElementAutomationPeer.CreatePeerForElement(null));
         }
 
         [TestMethod]
@@ -169,7 +169,7 @@ namespace System.Windows.Automation.Peers.Tests
         [TestMethod]
         public void GetAutomationControlType_Should_Return_Custom()
         {
-            Assert.AreEqual(FrameworkElementAutomationPeer.CreatePeerForElement(new FE1()).GetAutomationControlType(), AutomationControlType.Custom);
+            Assert.AreEqual(AutomationControlType.Custom, FrameworkElementAutomationPeer.CreatePeerForElement(new FE1()).GetAutomationControlType());
         }
 
         [TestMethod]
@@ -231,7 +231,7 @@ namespace System.Windows.Automation.Peers.Tests
         [TestMethod]
         public void GetOrientation_Should_Return_None()
         {
-            Assert.AreEqual(new FE1AutomationPeer(new FE1()).GetOrientation(), AutomationOrientation.None);
+            Assert.AreEqual(AutomationOrientation.None, new FE1AutomationPeer(new FE1()).GetOrientation());
         }
 
         [TestMethod]
@@ -351,7 +351,7 @@ namespace System.Windows.Automation.Peers.Tests
             var peer = new FE1AutomationPeer(fe);
             var children = peer.GetChildren();
 
-            Assert.AreEqual(children.Count, 2);
+            Assert.HasCount(2, children);
             Assert.IsInstanceOfType<C1AutomationPeer>(children[0]);
             Assert.AreSame(children[0].As<C1AutomationPeer>().Owner, c1);
             Assert.IsInstanceOfType<C1AutomationPeer>(children[1]);
@@ -384,7 +384,7 @@ namespace System.Windows.Automation.Peers.Tests
             var peer = new FE1AutomationPeer(fe1);
             var children = peer.GetChildren();
 
-            Assert.AreEqual(children.Count, 2);
+            Assert.HasCount(2, children);
             Assert.IsInstanceOfType<C1AutomationPeer>(children[0]);
             Assert.AreSame(children[0].As<C1AutomationPeer>().Owner, c1);
             Assert.IsInstanceOfType<FE1AutomationPeer>(children[1]);

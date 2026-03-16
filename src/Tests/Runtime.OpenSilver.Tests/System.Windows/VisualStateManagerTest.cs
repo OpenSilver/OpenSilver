@@ -23,13 +23,13 @@ namespace System.Windows.Tests
         [TestMethod]
         public void VSM_GoToState_When_Control_Is_Null()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => VisualStateManager.GoToState(null, "state", true));
+            Assert.Throws<ArgumentNullException>(() => VisualStateManager.GoToState(null, "state", true));
         }
 
         [TestMethod]
         public void VSM_GoToState_When_State_Is_Null()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => VisualStateManager.GoToState(new ContentControl(), null, true));
+            Assert.Throws<ArgumentNullException>(() => VisualStateManager.GoToState(new ContentControl(), null, true));
         }
 
         [TestMethod]
@@ -61,16 +61,16 @@ namespace System.Windows.Tests
             Assert.IsNull(myControl2.InnerControl.CurrentState);
 
             Assert.IsTrue(myControl2.GoToState1());
-            Assert.AreEqual(myControl2.InnerControl.CurrentState, "state1");
+            Assert.AreEqual("state1", myControl2.InnerControl.CurrentState);
 
             Assert.IsTrue(myControl2.GoToState2());
-            Assert.AreEqual(myControl2.InnerControl.CurrentState, "state2");
+            Assert.AreEqual("state2", myControl2.InnerControl.CurrentState);
 
             Assert.IsTrue(myControl2.GoToState3());
-            Assert.AreEqual(myControl2.InnerControl.CurrentState, "state3");
+            Assert.AreEqual("state3", myControl2.InnerControl.CurrentState);
 
             Assert.IsTrue(myControl2.GoToState4());
-            Assert.AreEqual(myControl2.InnerControl.CurrentState, "state4");
+            Assert.AreEqual("state4", myControl2.InnerControl.CurrentState);
 
             Assert.IsFalse(VisualStateManager.GoToState(myControl2, "some_state_that_does_not_exist", false));
             Assert.IsNull(myControl2.InnerControl.CurrentState);

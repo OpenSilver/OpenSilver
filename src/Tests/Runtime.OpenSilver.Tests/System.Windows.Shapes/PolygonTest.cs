@@ -26,8 +26,8 @@ public sealed class PolygonTest
         var points = polygon.Points;
 
         Assert.IsNotNull(points);
-        Assert.AreEqual(points.Count, 0);
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource, BaseValueSource.Default);
+        Assert.AreEqual(0, points.Count);
+        Assert.AreEqual(BaseValueSource.Default, DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource);
     }
 
     [TestMethod]
@@ -36,7 +36,7 @@ public sealed class PolygonTest
         var polygon = new Polygon();
         polygon.Points.Add(new Point());
 
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource, BaseValueSource.Local);
+        Assert.AreEqual(BaseValueSource.Local, DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource);
     }
 
     [TestMethod]
@@ -50,7 +50,7 @@ public sealed class PolygonTest
 
         var points2 = polygon.Points;
 
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource, BaseValueSource.Default);
+        Assert.AreEqual(BaseValueSource.Default, DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource);
         Assert.AreNotSame(points1, points2);
     }
 
@@ -65,7 +65,7 @@ public sealed class PolygonTest
 
         var points2 = polygon.Points;
 
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource, BaseValueSource.Default);
+        Assert.AreEqual(BaseValueSource.Default, DependencyPropertyHelper.GetValueSource(polygon, Polygon.PointsProperty).BaseValueSource);
         Assert.AreSame(points1, points2);
     }
 }

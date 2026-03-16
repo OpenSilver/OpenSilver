@@ -16,6 +16,7 @@ using System.Windows;
 
 namespace OpenSilver.Internal.Tests;
 
+[TestClass]
 public partial class PFCDefaultValueFactoryTest
 {
     [TestMethod]
@@ -24,7 +25,7 @@ public partial class PFCDefaultValueFactoryTest
         var o = new MyDependencyObject();
         var value = o.GetValue(MyDependencyObject.MyProperty1);
 
-        Assert.IsInstanceOfType(value, typeof(StringCollection));
+        Assert.IsInstanceOfType<StringCollection>(value);
     }
 
     [TestMethod]
@@ -33,7 +34,7 @@ public partial class PFCDefaultValueFactoryTest
         var o = new MyDependencyObject();
         o.GetValue(MyDependencyObject.MyProperty1);
 
-        Assert.AreEqual(o.MyProperty1ChangedCounter, 0);
+        Assert.AreEqual(0, o.MyProperty1ChangedCounter);
     }
 
     [TestMethod]

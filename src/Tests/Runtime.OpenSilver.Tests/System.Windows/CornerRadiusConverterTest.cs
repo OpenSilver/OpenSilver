@@ -83,7 +83,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_FormatException()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.Throws<FormatException>(
                 () => Converter.ConvertFrom("1,2,3")
             );
         }
@@ -91,7 +91,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -99,7 +99,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Style_Should_Throw_InvalidCastException()
         {
-            Assert.ThrowsException<InvalidCastException>(
+            Assert.Throws<InvalidCastException>(
                 () => Converter.ConvertFrom(new Style())
             );
         }
@@ -107,13 +107,13 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_String()
         {
-            Assert.AreEqual(Converter.ConvertTo(new CornerRadius(1, 2, 3, 4), typeof(string)), "1,2,3,4");
+            Assert.AreEqual("1,2,3,4", Converter.ConvertTo(new CornerRadius(1, 2, 3, 4), typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException_1()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(null, typeof(string))
             );
         }
@@ -121,7 +121,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException_2()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new CornerRadius(), null)
             );
         }
@@ -129,7 +129,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentException()
         {
-            Assert.ThrowsException<ArgumentException>(
+            Assert.Throws<ArgumentException>(
                 () => Converter.ConvertTo(true, typeof(string))
             );
         }
@@ -137,7 +137,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new CornerRadius(1), typeof(bool))
             );
         }

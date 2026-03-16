@@ -55,7 +55,7 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
         {
             var js = args.Javascript;
             var lastLine = js.Split(
-                new [] { Environment.NewLine },
+                [Environment.NewLine],
                 StringSplitOptions.None
             ).Last();
             object result = null;
@@ -92,14 +92,14 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
         [TestMethod]
         public void ProductName_Should_Return_Value()
         {
-            Assert.AreEqual(HtmlPage.BrowserInformation.ProductName, "Mozilla");
+            Assert.AreEqual("Mozilla", HtmlPage.BrowserInformation.ProductName);
         }
 
         [TestMethod]
         public void ProductVersion_Should_Return_Empty_String()
         {
             //Silverlight always returns "" according to source code
-            Assert.AreEqual(HtmlPage.BrowserInformation.ProductVersion, "");
+            Assert.AreEqual("", HtmlPage.BrowserInformation.ProductVersion);
         }
 
         [Ignore]
@@ -113,51 +113,51 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
         [TestMethod]
         public void Name_Should_Return_Value()
         {
-            Assert.AreEqual(HtmlPage.BrowserInformation.Name, "Chrome");
+            Assert.AreEqual("Chrome", HtmlPage.BrowserInformation.Name);
         }
 
         [TestMethod]
         public void Name_Should_Return_Safari()
         {
-            Assert.AreEqual(new BrowserInformation(SafariUserAgent, Platform).Name, "Safari");
+            Assert.AreEqual("Safari", new BrowserInformation(SafariUserAgent, Platform).Name);
         }
 
         [TestMethod]
         public void Name_Should_Return_Opera()
         {
-            Assert.AreEqual(new BrowserInformation(OperaUserAgent, Platform).Name, "Opera");
+            Assert.AreEqual("Opera", new BrowserInformation(OperaUserAgent, Platform).Name);
         }
 
         [TestMethod]
         public void Name_Should_Return_Firefox()
         {
-            Assert.AreEqual(new BrowserInformation(FirefoxUserAgent, Platform).Name, "Firefox");
+            Assert.AreEqual("Firefox", new BrowserInformation(FirefoxUserAgent, Platform).Name);
         }
 
         [TestMethod]
         public void Name_Should_Return_Edge()
         {
-            Assert.AreEqual(new BrowserInformation(EdgeUserAgent, Platform).Name, "Edge");
+            Assert.AreEqual("Edge", new BrowserInformation(EdgeUserAgent, Platform).Name);
         }
 
         [TestMethod]
         public void Name_Should_Return_Netscape()
         {
-            Assert.AreEqual(new BrowserInformation("Mozilla/5.0 Unknown", Platform).Name, "Netscape");
+            Assert.AreEqual("Netscape", new BrowserInformation("Mozilla/5.0 Unknown", Platform).Name);
         }
 
         [Ignore]
         [TestMethod]
         public void Platform_Should_Return_Value()
         {
-            Assert.AreEqual(HtmlPage.BrowserInformation.Platform, Platform);
+            Assert.AreEqual(Platform, HtmlPage.BrowserInformation.Platform);
         }
 
         [Ignore]
         [TestMethod]
         public void UserAgent_Should_Return_Value()
         {
-            Assert.AreEqual(HtmlPage.BrowserInformation.UserAgent, ChromeUserAgent);
+            Assert.AreEqual(ChromeUserAgent, HtmlPage.BrowserInformation.UserAgent);
         }
     }
 }

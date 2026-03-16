@@ -27,7 +27,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.RangeValue) as IRangeValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<InvalidOperationException>(() => provider.SetValue(42));
+            Assert.Throws<InvalidOperationException>(() => provider.SetValue(42));
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.RangeValue) as IRangeValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.AreEqual(provider.LargeChange, double.NaN);
+            Assert.AreEqual(double.NaN, provider.LargeChange);
         }
 
         [TestMethod]
@@ -57,7 +57,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.RangeValue) as IRangeValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.AreEqual(provider.SmallChange, double.NaN);
+            Assert.AreEqual(double.NaN, provider.SmallChange);
         }
 
         [TestMethod]
@@ -68,7 +68,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.RangeValue) as IRangeValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.AreEqual(provider.Minimum, 50d);
+            Assert.AreEqual(50d, provider.Minimum);
         }
 
         [TestMethod]
@@ -79,7 +79,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.RangeValue) as IRangeValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.AreEqual(provider.Maximum, 100d);
+            Assert.AreEqual(100d, provider.Maximum);
         }
 
         [TestMethod]
@@ -90,7 +90,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.RangeValue) as IRangeValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.AreEqual(provider.Value, 61d);
+            Assert.AreEqual(61d, provider.Value);
         }
     }
 }

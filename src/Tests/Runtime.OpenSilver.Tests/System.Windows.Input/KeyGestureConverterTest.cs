@@ -15,7 +15,7 @@ public sealed class KeyGestureConverterTest : TypeConverterTestBase
 {
     protected override TypeConverter Converter { get; } = new KeyGestureConverter();
 
-    [DataTestMethod]
+    [TestMethod]
     // Valid type
     [DataRow(true, typeof(string))]
     // Invalid types
@@ -29,8 +29,8 @@ public sealed class KeyGestureConverterTest : TypeConverterTestBase
         Assert.AreEqual(expected, Converter.CanConvertFrom(sourceType));
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(CanConvertTo_Data), DynamicDataSourceType.Property)]
+    [TestMethod]
+    [DynamicData(nameof(CanConvertTo_Data))]
     public void CanConvertTo_ReturnsExpected(bool expected, bool passContext, object value, Type destinationType)
     {
         StandardContextImpl context = new() { Instance = value };
@@ -76,8 +76,8 @@ public sealed class KeyGestureConverterTest : TypeConverterTestBase
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertFrom_ReturnsExpected_Data), DynamicDataSourceType.Property)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertFrom_ReturnsExpected_Data))]
     public void ConvertFrom_ReturnsExpected(KeyGesture expected, ITypeDescriptorContext context, CultureInfo cultureInfo, string value)
     {
         KeyGesture converted = (KeyGesture)Converter.ConvertFrom(context, cultureInfo, value);
@@ -119,11 +119,11 @@ public sealed class KeyGestureConverterTest : TypeConverterTestBase
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertFrom_ThrowsNotSupportedException_Data), DynamicDataSourceType.Property)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertFrom_ThrowsNotSupportedException_Data))]
     public void ConvertFrom_ThrowsNotSupportedException(CultureInfo cultureInfo, object value)
     {
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(null, cultureInfo, value));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(null, cultureInfo, value));
     }
 
     public static IEnumerable<object[]> ConvertFrom_ThrowsNotSupportedException_Data
@@ -142,8 +142,8 @@ public sealed class KeyGestureConverterTest : TypeConverterTestBase
         }
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertTo_ReturnsExpected_Data), DynamicDataSourceType.Property)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertTo_ReturnsExpected_Data))]
     public void ConvertTo_ReturnsExpected(string expected, ITypeDescriptorContext context, CultureInfo cultureInfo, object value)
     {
         // Culture and context must not have any meaning
@@ -182,14 +182,14 @@ public sealed class KeyGestureConverterTest : TypeConverterTestBase
     [TestMethod]
     public void ConvertTo_ThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => Converter.ConvertTo(null, CultureInfo.InvariantCulture, new KeyGesture(Key.C, ModifierKeys.Control), null));
+        Assert.Throws<ArgumentNullException>(() => Converter.ConvertTo(null, CultureInfo.InvariantCulture, new KeyGesture(Key.C, ModifierKeys.Control), null));
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertTo_ThrowsNotSupportedException_Data), DynamicDataSourceType.Property)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertTo_ThrowsNotSupportedException_Data))]
     public void ConvertTo_ThrowsNotSupportedException(object value, Type destinationType)
     {
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertTo(null, CultureInfo.InvariantCulture, value, destinationType));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertTo(null, CultureInfo.InvariantCulture, value, destinationType));
     }
 
     public static IEnumerable<object[]> ConvertTo_ThrowsNotSupportedException_Data

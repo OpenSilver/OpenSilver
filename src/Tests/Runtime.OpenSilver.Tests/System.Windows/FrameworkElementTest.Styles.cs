@@ -29,7 +29,7 @@ namespace System.Windows.Tests
 
             var style = new Style(typeof(Button));
 
-            Assert.ThrowsException<InvalidOperationException>(() => fe.Style = style);
+            Assert.Throws<InvalidOperationException>(() => fe.Style = style);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace System.Windows.Tests
         {
             var fe = TestFeWithStyle();
 
-            Assert.AreEqual(fe.Prop1, 55d);
+            Assert.AreEqual(55d, fe.Prop1);
             Assert.IsNull(fe.Prop2);
         }
 
@@ -77,7 +77,7 @@ namespace System.Windows.Tests
 
             fe.Style = style;
 
-            Assert.AreEqual(fe.Prop1, 1d);
+            Assert.AreEqual(1d, fe.Prop1);
             Assert.AreEqual(fe.Prop2, (Brush)TestFE1.Prop2Property.GetMetadata(fe.GetType()).DefaultValue);
             Assert.AreEqual(fe.Margin, new Thickness(-10d));
         }
@@ -93,7 +93,7 @@ namespace System.Windows.Tests
 
             fe.Style = style;
 
-            Assert.AreEqual(fe.Prop1, 100d);
+            Assert.AreEqual(100d, fe.Prop1);
         }
 
         [TestMethod]
@@ -110,11 +110,11 @@ namespace System.Windows.Tests
 
             fe1.Style = style;
 
-            Assert.AreEqual(fe1.Prop1, 100d);
+            Assert.AreEqual(100d, fe1.Prop1);
 
             fe2.Style = style;
 
-            Assert.AreEqual(fe2.Prop1, 200d);
+            Assert.AreEqual(200d, fe2.Prop1);
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace System.Windows.Tests
             {
                 Assert.IsNull(fe1.Style);
                 Assert.AreSame(fe1.ImplicitStyle, implicitStyle);
-                Assert.AreEqual(fe1.Prop1, 100d);
+                Assert.AreEqual(100d, fe1.Prop1);
                 Assert.IsInstanceOfType<SolidColorBrush>(fe1.Prop2);
                 Assert.AreEqual(fe1.Prop2.As<SolidColorBrush>().Color, Colors.Black);
             }
@@ -156,7 +156,7 @@ namespace System.Windows.Tests
             {
                 Assert.IsNull(fe1.Style);
                 Assert.AreSame(fe1.ImplicitStyle, implicitStyle);
-                Assert.AreEqual(fe1.Prop1, 42d);
+                Assert.AreEqual(42d, fe1.Prop1);
                 Assert.IsInstanceOfType<SolidColorBrush>(fe1.Prop2);
                 Assert.AreEqual(fe1.Prop2.As<SolidColorBrush>().Color, Colors.Red);
             }
@@ -180,7 +180,7 @@ namespace System.Windows.Tests
             {
                 Assert.AreSame(fe1.Style, style);
                 Assert.AreSame(fe1.ImplicitStyle, implicitStyle);
-                Assert.AreEqual(fe1.Prop1, 200d);
+                Assert.AreEqual(200d, fe1.Prop1);
                 Assert.IsInstanceOfType<SolidColorBrush>(fe1.Prop2);
                 Assert.AreEqual(fe1.Prop2.As<SolidColorBrush>().Color, Colors.Red);
             }
@@ -204,13 +204,13 @@ namespace System.Windows.Tests
             {
                 Assert.AreSame(fe1.Style, style);
                 Assert.AreSame(fe1.ImplicitStyle, implicitStyle);
-                Assert.AreEqual(fe1.Prop1, 200d);
+                Assert.AreEqual(200d, fe1.Prop1);
                 Assert.IsInstanceOfType<SolidColorBrush>(fe1.Prop2);
                 Assert.AreEqual(fe1.Prop2.As<SolidColorBrush>().Color, Colors.Red);
 
                 fe1.ClearValue(FrameworkElement.StyleProperty);
 
-                Assert.AreEqual(fe1.Prop1, 100d);
+                Assert.AreEqual(100d, fe1.Prop1);
                 Assert.IsInstanceOfType<SolidColorBrush>(fe1.Prop2);
                 Assert.AreEqual(fe1.Prop2.As<SolidColorBrush>().Color, Colors.Green);
             }
@@ -231,7 +231,7 @@ namespace System.Windows.Tests
             {
                 Assert.IsNull(fe1.Style);
                 Assert.AreSame(fe1.ImplicitStyle, implicitStyle);
-                Assert.AreEqual(fe1.Prop1, 100d);
+                Assert.AreEqual(100d, fe1.Prop1);
                 Assert.IsInstanceOfType<SolidColorBrush>(fe1.Prop2);
                 Assert.AreEqual(fe1.Prop2.As<SolidColorBrush>().Color, Colors.Yellow);
 
@@ -239,7 +239,7 @@ namespace System.Windows.Tests
                 style.Setters.Add(new Setter(TestFE1.Prop2Property, new SolidColorBrush(Colors.Blue)));
                 fe1.Style = style;
 
-                Assert.AreEqual(fe1.Prop1, 42d);
+                Assert.AreEqual(42d, fe1.Prop1);
                 Assert.IsInstanceOfType<SolidColorBrush>(fe1.Prop2);
                 Assert.AreEqual(fe1.Prop2.As<SolidColorBrush>().Color, Colors.Blue);
             }

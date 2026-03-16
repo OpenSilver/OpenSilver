@@ -58,7 +58,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -66,7 +66,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -74,7 +74,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotImplementedException_1()
         {
-            Assert.ThrowsException<NotImplementedException>(
+            Assert.Throws<NotImplementedException>(
                 () => Converter.ConvertTo(null, typeof(string))
             );
         }
@@ -82,7 +82,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotImplementedException_2()
         {
-            Assert.ThrowsException<NotImplementedException>(
+            Assert.Throws<NotImplementedException>(
                 () => Converter.ConvertTo(new BitmapImage(new Uri("ms-appx:/Images/Logo1.png", UriKind.Absolute)), typeof(string))
             );
         }
@@ -90,7 +90,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotImplementedException_3()
         {
-            Assert.ThrowsException<NotImplementedException>(
+            Assert.Throws<NotImplementedException>(
                 () => Converter.ConvertTo(new BitmapImage(new Uri("ms-appx:/Images/Logo1.png", UriKind.Absolute)), typeof(decimal))
             );
         }

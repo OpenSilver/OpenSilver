@@ -20,58 +20,58 @@ namespace System.Windows.Tests;
 public partial class DependencyPropertyTest
 {
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Register_Should_Throw_When_Name_Is_Null()
     {
-        DependencyProperty.Register(
-            null,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null); 
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.Register(
+                null,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void Register_Should_Throw_When_Name_Is_Empty()
     {
-        DependencyProperty.Register(
-            string.Empty,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.Register(
+                string.Empty,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Register_Should_Throw_When_PropertyType_Is_Null()
     {
-        DependencyProperty.Register(
-            nameof(Register_Should_Throw_When_PropertyType_Is_Null),
-            null,
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.Register(
+                nameof(Register_Should_Throw_When_PropertyType_Is_Null),
+                null,
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Register_Should_Throw_When_OwnerType_Is_Null()
     {
-        DependencyProperty.Register(
-            nameof(Register_Should_Throw_When_OwnerType_Is_Null),
-            typeof(double),
-            null,
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.Register(
+                nameof(Register_Should_Throw_When_OwnerType_Is_Null),
+                typeof(double),
+                null,
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void Register_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType()
     {
-        DependencyProperty.Register(
-            nameof(Register_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
-            typeof(double),
-            typeof(MyDependencyObject1),
-            new PropertyMetadata(string.Empty));
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.Register(
+                nameof(Register_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
+                typeof(double),
+                typeof(MyDependencyObject1),
+                new PropertyMetadata(string.Empty)));
     }
 
     [TestMethod]
@@ -87,15 +87,15 @@ public partial class DependencyPropertyTest
         Assert.IsFalse(dp.IsAttached);
         Assert.IsFalse(dp.ReadOnly);
         Assert.IsNull(dp.DependencyPropertyKey);
-        Assert.AreEqual(dp.Name, nameof(Register_Properties_And_Metadata));
-        Assert.AreEqual(dp.PropertyType, typeof(char));
-        Assert.AreEqual(dp.OwnerType, typeof(MyDependencyObject1));
+        Assert.AreEqual(nameof(Register_Properties_And_Metadata), dp.Name);
+        Assert.AreEqual(typeof(char), dp.PropertyType);
+        Assert.AreEqual(typeof(MyDependencyObject1), dp.OwnerType);
         Assert.AreEqual(dp.ValidateValueCallback, validateValueCallback);
-        Assert.AreEqual((char)dp.DefaultMetadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)dp.DefaultMetadata.DefaultValue);
 
         PropertyMetadata metadata = dp.GetMetadata(typeof(MyDependencyObject1));
 
-        Assert.AreEqual((char)metadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)metadata.DefaultValue);
         Assert.AreEqual(metadata.PropertyChangedCallback, propertyChangedCallback);
         Assert.AreEqual(metadata.CoerceValueCallback, coerceValueCallback);
 
@@ -105,58 +105,58 @@ public partial class DependencyPropertyTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterAttached_Should_Throw_When_Name_Is_Null()
     {
-        DependencyProperty.RegisterAttached(
-            null,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterAttached(
+                null,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void RegisterAttached_Should_Throw_When_Name_Is_Empty()
     {
-        DependencyProperty.RegisterAttached(
-            string.Empty,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.RegisterAttached(
+                string.Empty,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterAttached_Should_Throw_When_PropertyType_Is_Null()
     {
-        DependencyProperty.RegisterAttached(
-            nameof(RegisterAttached_Should_Throw_When_PropertyType_Is_Null),
-            null,
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentNullException>(() => 
+            DependencyProperty.RegisterAttached(
+                nameof(RegisterAttached_Should_Throw_When_PropertyType_Is_Null),
+                null,
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterAttached_Should_Throw_When_OwnerType_Is_Null()
     {
-        DependencyProperty.RegisterAttached(
-            nameof(RegisterAttached_Should_Throw_When_OwnerType_Is_Null),
-            typeof(double),
-            null,
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterAttached(
+                nameof(RegisterAttached_Should_Throw_When_OwnerType_Is_Null),
+                typeof(double),
+                null,
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void RegisterAttached_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType()
     {
-        DependencyProperty.RegisterAttached(
-            nameof(RegisterAttached_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
-            typeof(float),
-            typeof(MyDependencyObject1),
-            new PropertyMetadata('a'));
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.RegisterAttached(
+                nameof(RegisterAttached_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
+                typeof(float),
+                typeof(MyDependencyObject1),
+                new PropertyMetadata('a')));
     }
 
     [TestMethod]
@@ -172,15 +172,15 @@ public partial class DependencyPropertyTest
         Assert.IsTrue(dp.IsAttached);
         Assert.IsFalse(dp.ReadOnly);
         Assert.IsNull(dp.DependencyPropertyKey);
-        Assert.AreEqual(dp.Name, nameof(RegisterAttached_Properties_And_Metadata));
-        Assert.AreEqual(dp.PropertyType, typeof(char));
-        Assert.AreEqual(dp.OwnerType, typeof(MyDependencyObject1));
+        Assert.AreEqual(nameof(RegisterAttached_Properties_And_Metadata), dp.Name);
+        Assert.AreEqual(typeof(char), dp.PropertyType);
+        Assert.AreEqual(typeof(MyDependencyObject1), dp.OwnerType);
         Assert.AreEqual(dp.ValidateValueCallback, validateValueCallback);
-        Assert.AreEqual((char)dp.DefaultMetadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)dp.DefaultMetadata.DefaultValue);
 
         PropertyMetadata metadata = dp.GetMetadata(typeof(MyDependencyObject1));
 
-        Assert.AreEqual((char)metadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)metadata.DefaultValue);
         Assert.AreEqual(metadata.PropertyChangedCallback, propertyChangedCallback);
         Assert.AreEqual(metadata.CoerceValueCallback, coerceValueCallback);
 
@@ -202,7 +202,7 @@ public partial class DependencyPropertyTest
                 MethodToUpdateDom2 = UpdateDom2,
             });
 
-        Assert.AreEqual(dp.DefaultMetadata.DefaultValue, 42d);
+        Assert.AreEqual(42d, dp.DefaultMetadata.DefaultValue);
         Assert.IsNull(dp.DefaultMetadata.PropertyChangedCallback);
         Assert.IsNull(dp.DefaultMetadata.CoerceValueCallback);
         Assert.IsNull(dp.DefaultMetadata.MethodToUpdateDom);
@@ -238,7 +238,7 @@ public partial class DependencyPropertyTest
         var o = new MyDependencyObject1();
         o.SetValue(MyDependencyObject1.Property1, MyDependencyObject1.Property1.GetMetadata(o.GetType()).DefaultValue);
 
-        Assert.AreEqual(o.Property1ChangedCounter1, 0);
+        Assert.AreEqual(0, o.Property1ChangedCounter1);
     }
 
     [TestMethod]
@@ -247,7 +247,7 @@ public partial class DependencyPropertyTest
         var o = new MyDependencyObject1();
         o.SetValue(MyDependencyObject1.Property1, (double)MyDependencyObject1.Property1.GetMetadata(o.GetType()).DefaultValue + 1);
 
-        Assert.AreEqual(o.Property1ChangedCounter1, 1);
+        Assert.AreEqual(1, o.Property1ChangedCounter1);
     }
 
     [TestMethod]
@@ -298,8 +298,8 @@ public partial class DependencyPropertyTest
         o.SetValue(dp, 4);
         o.SetValue(dp, 5);
 
-        Assert.ThrowsException<ArgumentException>(() => o.SetValue(dp, -1));
-        Assert.ThrowsException<ArgumentException>(() => o.SetValue(dp, 6));
+        Assert.Throws<ArgumentException>(() => o.SetValue(dp, -1));
+        Assert.Throws<ArgumentException>(() => o.SetValue(dp, 6));
 
         static bool ValidateValue(object value)
         {

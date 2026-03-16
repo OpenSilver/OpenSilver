@@ -33,7 +33,7 @@ public partial class DependencyPropertyTest
             typeof(MyDependencyObject1),
             null);
 
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.Throws<ArgumentNullException>(
             () => dp.OverrideMetadata(null, new PropertyMetadata("a")));
     }
 
@@ -46,7 +46,7 @@ public partial class DependencyPropertyTest
             typeof(MyDependencyObject1),
             null);
 
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.Throws<ArgumentNullException>(
             () => dp.OverrideMetadata(typeof(MyDependencyObject2), null));
     }
 
@@ -59,17 +59,17 @@ public partial class DependencyPropertyTest
             typeof(MyDependencyObject1),
             null);
 
-        Assert.ThrowsException<ArgumentException>(
+        Assert.Throws<ArgumentException>(
             () => dp.OverrideMetadata(typeof(string), new PropertyMetadata("b")));
     }
 
     [TestMethod]
     public void OverrideMetadata_Should_Throw_When_Same_ForType_Twice()
     {
-        Assert.ThrowsException<ArgumentException>(
+        Assert.Throws<ArgumentException>(
             () => MyDependencyObject1.Property1.OverrideMetadata(typeof(MyDependencyObject1), new PropertyMetadata(100.0)));
 
-        Assert.ThrowsException<ArgumentException>(
+        Assert.Throws<ArgumentException>(
             () => MyDependencyObject1.Property1.OverrideMetadata(typeof(MyDependencyObject2), new PropertyMetadata(100.0)));
     }
 
@@ -82,7 +82,7 @@ public partial class DependencyPropertyTest
             typeof(MyDependencyObject1),
             new MyPropertyMetadata(string.Empty));
 
-        Assert.ThrowsException<ArgumentException>(
+        Assert.Throws<ArgumentException>(
             () => dp.OverrideMetadata(typeof(MyDependencyObject2), new PropertyMetadata(string.Empty)));
     }
 
@@ -94,14 +94,14 @@ public partial class DependencyPropertyTest
 
         o.SetValue(MyDependencyObject1.Property1, 100.0);
 
-        Assert.AreEqual(o.Property1ChangedCounter1, 1);
-        Assert.AreEqual(o.Property1ChangedCounter2, 1);
+        Assert.AreEqual(1, o.Property1ChangedCounter1);
+        Assert.AreEqual(1, o.Property1ChangedCounter2);
 
         static void OnProperty1Changed(object sender, EventArgs e)
         {
             var o = (MyDependencyObject2)sender;
-            Assert.AreEqual(o.Property1ChangedCounter1, 1);
-            Assert.AreEqual(o.Property1ChangedCounter2, 0);
+            Assert.AreEqual(1, o.Property1ChangedCounter1);
+            Assert.AreEqual(0, o.Property1ChangedCounter2);
         }
     }
 
@@ -129,7 +129,7 @@ public partial class DependencyPropertyTest
 
         DependencyProperty dp = key.DependencyProperty;
 
-        Assert.ThrowsException<InvalidOperationException>(
+        Assert.Throws<InvalidOperationException>(
             () => dp.OverrideMetadata(typeof(MyDependencyObject2), new PropertyMetadata("test")));
     }
 
@@ -150,7 +150,7 @@ public partial class DependencyPropertyTest
 
         var o = new MyDependencyObject2();
 
-        Assert.AreEqual((string)o.GetValue(dp), nameof(DependencyPropertyKey_OverrideMetadata));
+        Assert.AreEqual(nameof(DependencyPropertyKey_OverrideMetadata), (string)o.GetValue(dp));
 
         o.SetValue(key, "new value");
 

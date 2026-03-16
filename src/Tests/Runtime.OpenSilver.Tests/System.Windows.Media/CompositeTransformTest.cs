@@ -74,10 +74,10 @@ namespace System.Windows.Media.Tests
             };
             var result = transform.TransformBounds(rect);
 
-            Assert.AreEqual(result.X, -40);
-            Assert.AreEqual(result.Y, 10);
-            Assert.AreEqual(result.Width, 40);
-            Assert.AreEqual(result.Height, 10);
+            Assert.AreEqual(-40, result.X);
+            Assert.AreEqual(10, result.Y);
+            Assert.AreEqual(40, result.Width);
+            Assert.AreEqual(10, result.Height);
         }
 
         [TestMethod]

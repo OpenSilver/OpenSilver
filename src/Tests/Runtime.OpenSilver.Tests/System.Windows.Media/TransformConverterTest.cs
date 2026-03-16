@@ -86,7 +86,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -94,7 +94,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -110,7 +110,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new MatrixTransform(), null)
             );
         }
@@ -118,7 +118,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new Matrix(), typeof(string))
             );
         }
@@ -126,7 +126,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new MatrixTransform(), typeof(Geometry))
             );
         }

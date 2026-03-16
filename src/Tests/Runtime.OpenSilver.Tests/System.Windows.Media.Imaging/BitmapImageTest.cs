@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace System.Windows.Media.Imaging.Tests
@@ -10,7 +11,7 @@ namespace System.Windows.Media.Imaging.Tests
         private static readonly string Base64ImageExample = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
         [TestMethod]
-        public void BitmapImage_SetStreamSource_ShouldConsumeAsSoonAsSet()
+        public async Task BitmapImage_SetStreamSource_ShouldConsumeAsSoonAsSet()
         {
             BitmapImage bitmapImage = new BitmapImage();
             MemoryStream ms = new MemoryStream(Convert.FromBase64String(Base64ImageExample));
@@ -23,7 +24,7 @@ namespace System.Windows.Media.Imaging.Tests
             // has been disposed of
             image.Source = bitmapImage;
 
-            Assert.IsTrue(bitmapImage.GetDataStringAsync(image).Result.EndsWith(Base64ImageExample));
+            Assert.EndsWith(Base64ImageExample, await bitmapImage.GetDataStringAsync(image));
         }
     }
 }

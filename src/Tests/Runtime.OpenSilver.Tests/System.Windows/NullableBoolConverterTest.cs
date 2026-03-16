@@ -117,7 +117,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_FormatException_1()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.Throws<FormatException>(
                 () => Converter.ConvertFrom("   ")
             );
         }
@@ -125,7 +125,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_FormatException_2()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.Throws<FormatException>(
                 () => Converter.ConvertFrom("not_a_bool")
             );
         }
@@ -169,7 +169,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(420)
             );
         }
@@ -177,7 +177,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotImplementedException()
         {
-            Assert.ThrowsException<NotImplementedException>(
+            Assert.Throws<NotImplementedException>(
                 () => Converter.ConvertTo((bool?)true, typeof(string))
             );
         }

@@ -26,11 +26,11 @@ namespace System.Windows.Automation.Peers.Tests
             var textbox = new TextBox { Text = "Some text" };
             var peer = new TextBoxAutomationPeer(textbox);
 
-            Assert.AreEqual(peer.GetName(), "Some text");
+            Assert.AreEqual("Some text", peer.GetName());
 
             AutomationProperties.SetName(textbox, "Some name");
             
-            Assert.AreEqual(peer.GetName(), "Some name");
+            Assert.AreEqual("Some name", peer.GetName());
         }
 
         [TestMethod] 
@@ -41,7 +41,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Value) as IValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.SetValue("Some text"));
+            Assert.Throws<ElementNotEnabledException>(() => provider.SetValue("Some text"));
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Value) as IValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.SetValue("Some text"));
+            Assert.Throws<ElementNotEnabledException>(() => provider.SetValue("Some text"));
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Value) as IValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ArgumentNullException>(() => provider.SetValue(null));
+            Assert.Throws<ArgumentNullException>(() => provider.SetValue(null));
         }
 
         [TestMethod]
@@ -77,7 +77,7 @@ namespace System.Windows.Automation.Peers.Tests
 
             provider.SetValue("Some text");
 
-            Assert.AreEqual(textbox.Text, "Some text");
+            Assert.AreEqual("Some text", textbox.Text);
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Value) as IValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.AreEqual(provider.Value, "Some text");
+            Assert.AreEqual("Some text", provider.Value);
         }
 
         [TestMethod]

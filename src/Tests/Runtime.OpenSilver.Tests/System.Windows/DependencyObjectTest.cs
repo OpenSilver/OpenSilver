@@ -93,7 +93,7 @@ public class DependencyObjectTest
 
         fe1.MyProperty = do1;
 
-        Assert.AreEqual(changedCount, 1);
+        Assert.AreEqual(1, changedCount);
     }
 
     [TestMethod]
@@ -112,15 +112,15 @@ public class DependencyObjectTest
 
         do3.MyProperty = do4;
 
-        Assert.AreEqual(changedCount, 1);
+        Assert.AreEqual(1, changedCount);
 
         do2.MyProperty = do3;
 
-        Assert.AreEqual(changedCount, 2);
+        Assert.AreEqual(2, changedCount);
 
         do1.MyProperty = do2;
 
-        Assert.AreEqual(changedCount, 3);
+        Assert.AreEqual(3, changedCount);
     }
 }
 

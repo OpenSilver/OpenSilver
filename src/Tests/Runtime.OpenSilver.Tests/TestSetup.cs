@@ -15,10 +15,10 @@
 using CSHTML5.Internal;
 using DotNetForHtml5;
 using DotNetForHtml5.Core;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using OpenSilver;
 using System;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -27,9 +27,35 @@ using System.Windows.Controls;
 
 namespace Runtime.OpenSilver.Tests
 {
-    [TestClass]
-    public class TestSetup
+    internal static class TestSetup
     {
+        /// <summary>
+        /// This method will be executed whenever the assembly is loaded,
+        /// so before any number of tests being run.
+        /// </summary>
+        [ModuleInitializer]
+        public static void AssemblyInitialize()
+        {
+            Features.Interop.UseNewLineSeparator = true;
+
+            var javaScriptExecutionHandlerMock = new Mock<INativeMethods>();
+            javaScriptExecutionHandlerMock
+                .Setup(x => x.ExecuteJavaScriptWithResult(It.IsAny<string>()))
+                .Returns<string>(ExecuteJsMock);
+            javaScriptExecutionHandlerMock
+                .Setup(x => x.InvokeJS(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns<string, int, bool>((js, refId, wantsResult) => ExecuteJsMock(js));
+
+            var javaScriptExecutionHandler2 = javaScriptExecutionHandlerMock.Object;
+            INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;
+
+            // Instantiating Application because it sets itself as Application.Current
+            _ = new App
+            {
+                RootVisual = new Grid(),
+            };
+        }
+
         public static event EventHandler<ExecuteJavascriptEventArgs> ExecuteJavascript;
 
         private static void OnExecuteJavascript(ExecuteJavascriptEventArgs e)
@@ -72,34 +98,6 @@ namespace Runtime.OpenSilver.Tests
             }
 
             return new JsonElement();
-        }
-
-        /// <summary>
-        /// This method will be executed whenever the assembly is loaded,
-        /// so before any number of tests being run.
-        /// </summary>
-        /// <param name="testContext"></param>
-        [AssemblyInitialize]
-        public static void AssemblyInitialize(TestContext testContext)
-        {
-            Features.Interop.UseNewLineSeparator = true;
-
-            var javaScriptExecutionHandlerMock = new Mock<INativeMethods>();
-            javaScriptExecutionHandlerMock
-                .Setup(x => x.ExecuteJavaScriptWithResult(It.IsAny<string>()))
-                .Returns<string>(ExecuteJsMock);
-            javaScriptExecutionHandlerMock
-                .Setup(x => x.InvokeJS(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
-                .Returns<string, int, bool>((js, refId, wantsResult) => ExecuteJsMock(js));
-
-            var javaScriptExecutionHandler2 = javaScriptExecutionHandlerMock.Object;
-            INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;
-
-            // Instantiating Application because it sets itself as Application.Current
-            _ = new App
-            {
-                RootVisual = new Grid(),
-            };
         }
 
         public static void AttachVisualChild(UIElement element)

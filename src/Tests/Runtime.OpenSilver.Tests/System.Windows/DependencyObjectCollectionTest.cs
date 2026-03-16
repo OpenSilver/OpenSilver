@@ -24,7 +24,7 @@ namespace System.Windows.Tests
             DependencyObjectCollection<DependencyObject> dependencyObjectCollection =
                 new DependencyObjectCollection<DependencyObject>();
 
-            Assert.AreEqual(dependencyObjectCollection.IndexOf(new DependencyObject()), -1);
+            Assert.AreEqual(-1, dependencyObjectCollection.IndexOf(new DependencyObject()));
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace System.Windows.Tests
             DependencyObjectCollection<object> dependencyObjectCollection =
                 new DependencyObjectCollection<object>();
 
-            Assert.ThrowsException<ArgumentException>(
+            Assert.Throws<ArgumentException>(
                 () => dependencyObjectCollection.IndexOf("Some Item"),
                 "item is not a DependencyObject.");
         }

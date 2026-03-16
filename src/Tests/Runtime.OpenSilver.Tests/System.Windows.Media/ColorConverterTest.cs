@@ -122,7 +122,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Sc_Should_Throw_FormatException()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.Throws<FormatException>(
                 () => Converter.ConvertFrom("SC#0.5, 1.0, 0.0, 1.0")
             );
         }
@@ -142,7 +142,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_InvalidColor_Should_Throw_FormatException()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.Throws<FormatException>(
                 () => Converter.ConvertFrom("invalid color")
             );
         }
@@ -150,7 +150,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -158,7 +158,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_ArgumentException()
         {
-            Assert.ThrowsException<ArgumentException>(
+            Assert.Throws<ArgumentException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -174,7 +174,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new Color(), null)
             );
         }
@@ -182,7 +182,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new Color(), typeof(bool))
             );
         }
@@ -190,7 +190,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(true, typeof(string))
             );
         }

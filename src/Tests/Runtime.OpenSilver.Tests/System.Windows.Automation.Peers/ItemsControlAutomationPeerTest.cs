@@ -41,7 +41,7 @@ namespace System.Windows.Automation.Peers.Tests
             var children = peer.GetChildren();
 
             Assert.IsNotNull(children);
-            Assert.AreEqual(children.Count, 0);
+            Assert.IsEmpty(children);
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace System.Windows.Automation.Peers.Tests
             var children = peer.GetChildren();
 
             Assert.IsNotNull(children);
-            Assert.AreEqual(children.Count, 3);
+            Assert.HasCount(3, children);
             
             for (int i = 0; i < children.Count; i++)
             {
@@ -78,7 +78,7 @@ namespace System.Windows.Automation.Peers.Tests
             var children = peer.GetChildren();
             
             Assert.IsNotNull(children);
-            Assert.AreEqual(children.Count, 1);
+            Assert.HasCount(1, children);
             
             var child = children[0].As<ItemTestAutomationPeer>();
 

@@ -28,7 +28,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Toggle) as IToggleProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.Toggle());
+            Assert.Throws<ElementNotEnabledException>(() => provider.Toggle());
         }
 
         [TestMethod]
@@ -60,13 +60,13 @@ namespace System.Windows.Automation.Peers.Tests
             Assert.IsNotNull(provider);
 
             toggle.IsChecked = true;
-            Assert.AreEqual(provider.ToggleState, ToggleState.On);
+            Assert.AreEqual(ToggleState.On, provider.ToggleState);
 
             toggle.IsChecked = false;
-            Assert.AreEqual(provider.ToggleState, ToggleState.Off);
+            Assert.AreEqual(ToggleState.Off, provider.ToggleState);
 
             toggle.IsChecked = null;
-            Assert.AreEqual(provider.ToggleState, ToggleState.Indeterminate);
+            Assert.AreEqual(ToggleState.Indeterminate, provider.ToggleState);
         }
     }
 }

@@ -27,12 +27,12 @@ namespace System.Windows.Media.Tests
 
             var m = invertedTransform.Matrix;
 
-            Assert.AreEqual(m.M11, 0.1);
-            Assert.AreEqual(m.M12, 0);
-            Assert.AreEqual(m.M21, 0);
-            Assert.AreEqual(m.M22, -0.5);
-            Assert.AreEqual(m.OffsetX, 0);
-            Assert.AreEqual(m.OffsetY, 0);
+            Assert.AreEqual(0.1, m.M11);
+            Assert.AreEqual(0, m.M12);
+            Assert.AreEqual(0, m.M21);
+            Assert.AreEqual(-0.5, m.M22);
+            Assert.AreEqual(0, m.OffsetX);
+            Assert.AreEqual(0, m.OffsetY);
         }
 
         [TestMethod]
@@ -41,10 +41,10 @@ namespace System.Windows.Media.Tests
             var rect = new Rect(1, 1, 100, 110);
             var transform = new ScaleTransform { ScaleX = -1.5, ScaleY = -2 };
             var result = transform.TransformBounds(rect);
-            Assert.AreEqual(result.X, -151.5);
-            Assert.AreEqual(result.Y, -222);
-            Assert.AreEqual(result.Width, 150);
-            Assert.AreEqual(result.Height, 220);
+            Assert.AreEqual(-151.5, result.X);
+            Assert.AreEqual(-222, result.Y);
+            Assert.AreEqual(150, result.Width);
+            Assert.AreEqual(220, result.Height);
         }
 
         [TestMethod]
@@ -54,8 +54,8 @@ namespace System.Windows.Media.Tests
             var transform = new ScaleTransform { ScaleX = 100, ScaleY = 2 };
             var result = transform.TryTransform(point, out var outPoint);
             Assert.IsTrue(result);
-            Assert.AreEqual(outPoint.X, -1000);
-            Assert.AreEqual(outPoint.Y, 3);
+            Assert.AreEqual(-1000, outPoint.X);
+            Assert.AreEqual(3, outPoint.Y);
         }
     }
 }

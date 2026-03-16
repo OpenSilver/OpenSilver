@@ -61,10 +61,10 @@ namespace System.Windows.Media.Animation.Tests
 
             KeySpline keySpline = value as KeySpline;
 
-            Assert.AreEqual(keySpline.ControlPoint1.X, 0);
-            Assert.AreEqual(keySpline.ControlPoint1.Y, 0.5);
-            Assert.AreEqual(keySpline.ControlPoint2.X, 0.5);
-            Assert.AreEqual(keySpline.ControlPoint2.Y, 1);
+            Assert.AreEqual(0, keySpline.ControlPoint1.X);
+            Assert.AreEqual(0.5, keySpline.ControlPoint1.Y);
+            Assert.AreEqual(0.5, keySpline.ControlPoint2.X);
+            Assert.AreEqual(1, keySpline.ControlPoint2.Y);
         }
 
         [TestMethod]
@@ -76,10 +76,10 @@ namespace System.Windows.Media.Animation.Tests
 
             KeySpline keySpline = value as KeySpline;
 
-            Assert.AreEqual(keySpline.ControlPoint1.X, 0.1);
-            Assert.AreEqual(keySpline.ControlPoint1.Y, 0.5);
-            Assert.AreEqual(keySpline.ControlPoint2.X, 0.7);
-            Assert.AreEqual(keySpline.ControlPoint2.Y, 0.9);
+            Assert.AreEqual(0.1, keySpline.ControlPoint1.X);
+            Assert.AreEqual(0.5, keySpline.ControlPoint1.Y);
+            Assert.AreEqual(0.7, keySpline.ControlPoint2.X);
+            Assert.AreEqual(0.9, keySpline.ControlPoint2.Y);
         }
 
         [TestMethod]
@@ -91,10 +91,10 @@ namespace System.Windows.Media.Animation.Tests
 
             KeySpline keySpline = value as KeySpline;
 
-            Assert.AreEqual(keySpline.ControlPoint1.X, 0.2);
-            Assert.AreEqual(keySpline.ControlPoint1.Y, 0);
-            Assert.AreEqual(keySpline.ControlPoint2.X, 0.7);
-            Assert.AreEqual(keySpline.ControlPoint2.Y, 0.8);
+            Assert.AreEqual(0.2, keySpline.ControlPoint1.X);
+            Assert.AreEqual(0, keySpline.ControlPoint1.Y);
+            Assert.AreEqual(0.7, keySpline.ControlPoint2.X);
+            Assert.AreEqual(0.8, keySpline.ControlPoint2.Y);
         }
 
         [TestMethod]
@@ -106,28 +106,28 @@ namespace System.Windows.Media.Animation.Tests
 
             KeySpline keySpline = value as KeySpline;
 
-            Assert.AreEqual(keySpline.ControlPoint1.X, 0);
-            Assert.AreEqual(keySpline.ControlPoint1.Y, 0);
-            Assert.AreEqual(keySpline.ControlPoint2.X, 1);
-            Assert.AreEqual(keySpline.ControlPoint2.Y, 1);
+            Assert.AreEqual(0, keySpline.ControlPoint1.X);
+            Assert.AreEqual(0, keySpline.ControlPoint1.Y);
+            Assert.AreEqual(1, keySpline.ControlPoint2.X);
+            Assert.AreEqual(1, keySpline.ControlPoint2.Y);
         }
 
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_InvalidOperationException()
         {
-            Assert.ThrowsException<InvalidOperationException>(() => Converter.ConvertFrom(" "));
-            Assert.ThrowsException<InvalidOperationException>(() => Converter.ConvertFrom("0.2"));
-            Assert.ThrowsException<InvalidOperationException>(() => Converter.ConvertFrom("0.2 0.2"));
-            Assert.ThrowsException<InvalidOperationException>(() => Converter.ConvertFrom("0.2 0.2 0.3"));
+            Assert.Throws<InvalidOperationException>(() => Converter.ConvertFrom(" "));
+            Assert.Throws<InvalidOperationException>(() => Converter.ConvertFrom("0.2"));
+            Assert.Throws<InvalidOperationException>(() => Converter.ConvertFrom("0.2 0.2"));
+            Assert.Throws<InvalidOperationException>(() => Converter.ConvertFrom("0.2 0.2 0.3"));
         }
 
         [TestMethod]
         public void ConvertFrom_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(true));
-            Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(123456789));
-            Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(null));
-            Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(new string[0]));
+            Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(true));
+            Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(123456789));
+            Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(null));
+            Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(new string[0]));
         }
 
         [TestMethod]

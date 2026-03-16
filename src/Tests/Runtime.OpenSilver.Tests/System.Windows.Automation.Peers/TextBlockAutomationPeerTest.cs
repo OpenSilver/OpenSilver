@@ -25,11 +25,11 @@ namespace System.Windows.Automation.Peers.Tests
             var textblock = new TextBlock { Text = "Some text" };
             var peer = new TextBlockAutomationPeer(textblock);
 
-            Assert.AreEqual(peer.GetName(), "Some text");
+            Assert.AreEqual("Some text", peer.GetName());
 
             AutomationProperties.SetName(textblock, "Some name");
 
-            Assert.AreEqual(peer.GetName(), "Some name");
+            Assert.AreEqual("Some name", peer.GetName());
         }
 
         [TestMethod]

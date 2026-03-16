@@ -67,8 +67,8 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         yield return new object[] { new CustomTypeDescriptorContext { Instance = (ModifierKeys)0x10 }, typeof(ModifierKeys), false };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(CanConvertTo_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(CanConvertTo_TestData))]
     public void CanConvertTo_Invoke_ReturnsExpected(ITypeDescriptorContext context, Type destinationType, bool expected)
     {
         Assert.AreEqual(expected, Converter.CanConvertTo(context, destinationType));
@@ -95,8 +95,8 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         yield return new object[] { ModifierKeys.Windows | ModifierKeys.Shift, "Windows+Shift" };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertTo_ModifierKeysToString_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertTo_ModifierKeysToString_TestData))]
     public void ConvertTo_InvokeModifierKeysToString_ReturnsExpected(ModifierKeys value, string expected)
     {
         Assert.AreEqual(expected, Converter.ConvertTo(value, typeof(string)));
@@ -112,21 +112,21 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         yield return new object[] { (ModifierKeys)int.MaxValue };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertTo_InvalidModifierKeys_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertTo_InvalidModifierKeys_TestData))]
     public void ConvertTo_InvalidModifierKeys_ThrowsInvalidEnumArgumentException(ModifierKeys value)
     {
-        var ex = Assert.ThrowsException<InvalidEnumArgumentException>(() => Converter.ConvertTo(value, typeof(string)));
-        Assert.AreEqual(ex.ParamName, "value");
+        var ex = Assert.Throws<InvalidEnumArgumentException>(() => Converter.ConvertTo(value, typeof(string)));
+        Assert.AreEqual("value", ex.ParamName);
 
-        ex = Assert.ThrowsException<InvalidEnumArgumentException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), null, value, typeof(string)));
-        Assert.AreEqual(ex.ParamName, "value");
+        ex = Assert.Throws<InvalidEnumArgumentException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), null, value, typeof(string)));
+        Assert.AreEqual("value", ex.ParamName);
 
-        ex = Assert.ThrowsException<InvalidEnumArgumentException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, typeof(string)));
-        Assert.AreEqual(ex.ParamName, "value");
+        ex = Assert.Throws<InvalidEnumArgumentException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, typeof(string)));
+        Assert.AreEqual("value", ex.ParamName);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null)]
     // TODO: this should not throw InvalidCastException.
     //[InlineData("", "")]
@@ -137,20 +137,20 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         //Assert.Throws<NotSupportedException>(() => converter.ConvertTo(value, typeof(string)));
         //Assert.Throws<NotSupportedException>(() => converter.ConvertTo(new CustomTypeDescriptorContext(), null, value, typeof(string)));
         //Assert.Throws<NotSupportedException>(() => converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, typeof(string)));
-        Assert.ThrowsException<NullReferenceException>(() => Converter.ConvertTo(value, typeof(string)));
-        Assert.ThrowsException<NullReferenceException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), null, value, typeof(string)));
-        Assert.ThrowsException<NullReferenceException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, typeof(string)));
+        Assert.Throws<NullReferenceException>(() => Converter.ConvertTo(value, typeof(string)));
+        Assert.Throws<NullReferenceException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), null, value, typeof(string)));
+        Assert.Throws<NullReferenceException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, typeof(string)));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("")]
     [DataRow("value")]
     public void ConvertTo_InvokeNotModifierKeysToStringNotNull_ThrowsInvalidCastException(object value)
     {
         // TODO: this should not throw InvalidCastException.
-        Assert.ThrowsException<InvalidCastException>(() => Converter.ConvertTo(value, typeof(string)));
-        Assert.ThrowsException<InvalidCastException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), null, value, typeof(string)));
-        Assert.ThrowsException<InvalidCastException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, typeof(string)));
+        Assert.Throws<InvalidCastException>(() => Converter.ConvertTo(value, typeof(string)));
+        Assert.Throws<InvalidCastException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), null, value, typeof(string)));
+        Assert.Throws<InvalidCastException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, typeof(string)));
     }
 
     public static IEnumerable<object[]> ConvertTo_CantConvert_TestData()
@@ -168,13 +168,13 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         yield return new object[] { Key.None, typeof(Key) };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertTo_CantConvert_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertTo_CantConvert_TestData))]
     public void ConvertTo_CantConvert_ThrowsNotSupportedException(object value, Type destinationType)
     {
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertTo(value, destinationType));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertTo(null, null, value, destinationType));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, destinationType));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertTo(value, destinationType));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertTo(null, null, value, destinationType));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value, destinationType));
     }
 
     public static IEnumerable<object[]> ConvertTo_NullDestinationType_TestData()
@@ -186,21 +186,21 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         yield return new object[] { ModifierKeys.None };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertTo_NullDestinationType_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertTo_NullDestinationType_TestData))]
     public void ConvertTo_NullDestinationType_ThrowsArgumentNullException(object value)
     {
-        var ex = Assert.ThrowsException<ArgumentNullException>(() => Converter.ConvertTo(value, null));
-        Assert.AreEqual(ex.ParamName, "destinationType");
+        var ex = Assert.Throws<ArgumentNullException>(() => Converter.ConvertTo(value, null));
+        Assert.AreEqual("destinationType", ex.ParamName);
 
-        ex = Assert.ThrowsException<ArgumentNullException>(() => Converter.ConvertTo(null, null, Key.None, null));
-        Assert.AreEqual(ex.ParamName, "destinationType");
+        ex = Assert.Throws<ArgumentNullException>(() => Converter.ConvertTo(null, null, Key.None, null));
+        Assert.AreEqual("destinationType", ex.ParamName);
 
-        ex = Assert.ThrowsException<ArgumentNullException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, Key.None, null));
-        Assert.AreEqual(ex.ParamName, "destinationType");
+        ex = Assert.Throws<ArgumentNullException>(() => Converter.ConvertTo(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, Key.None, null));
+        Assert.AreEqual("destinationType", ex.ParamName);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null, false)]
     [DataRow(typeof(object), false)]
     [DataRow(typeof(string), true)]
@@ -252,8 +252,8 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         yield return new object[] { "  Control,  Shift  ", ModifierKeys.Control | ModifierKeys.Shift };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertFrom_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertFrom_TestData))]
     public void ConvertFrom_InvokeStringValue_ReturnsExpected(string value, ModifierKeys expected)
     {
         Assert.AreEqual(expected, Converter.ConvertFrom(value));
@@ -264,31 +264,31 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
     [TestMethod]
     public void ConvertFrom_NullValue_ThrowsNotSupportedException()
     {
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(null));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(null, null, null));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, null));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(null));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(null, null, null));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, null));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("NOSUCHKEY+NOSUCHKEY")]
     [DataRow("Control+NOSUCHKEY")]
     public void ConvertFrom_InvokeInvalidValue_ThrowsNotSupportedException(string value)
     {
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(value));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(null, null, value));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(value));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(null, null, value));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("_")]
     [DataRow(" _ ")]
     [DataRow("NOSUCHKEY")]
     [DataRow(" NOSUCHKEY ")]
     public void ConvertFrom_InvokeInvalidValue_ThrowsFormatException(string value)
     {
-        Assert.ThrowsException<FormatException>(() => Converter.ConvertFrom(value));
-        Assert.ThrowsException<FormatException>(() => Converter.ConvertFrom(null, null, value));
-        Assert.ThrowsException<FormatException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value));
+        Assert.Throws<FormatException>(() => Converter.ConvertFrom(value));
+        Assert.Throws<FormatException>(() => Converter.ConvertFrom(null, null, value));
+        Assert.Throws<FormatException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value));
     }
 
     public static IEnumerable<object[]> ConvertFrom_CantConvert_TestData()
@@ -298,13 +298,13 @@ public sealed class ModifierKeysConverterTest : TypeConverterTestBase
         yield return new object[] { ModifierKeys.None };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(ConvertFrom_CantConvert_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(ConvertFrom_CantConvert_TestData))]
     public void ConvertFrom_CantConvert_ThrowsNotSupportedException(object value)
     {
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(value));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(null, null, value));
-        Assert.ThrowsException<NotSupportedException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(value));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(null, null, value));
+        Assert.Throws<NotSupportedException>(() => Converter.ConvertFrom(new CustomTypeDescriptorContext(), CultureInfo.InvariantCulture, value));
     }
 
     private class CustomTypeDescriptorContext : ITypeDescriptorContext

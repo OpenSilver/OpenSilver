@@ -42,8 +42,8 @@ namespace System.Windows.Media.Tests
             Assert.IsTrue(m.M12 >= -0.321394 && m.M12 <= - 0.321393);
             Assert.IsTrue(m.M21 >= 0.321393 && m.M21 <= 0.321394);
             Assert.IsTrue(m.M22 >= 0.883022 && m.M22 <= 0.883023);
-            Assert.AreEqual(m.OffsetX, 0);
-            Assert.AreEqual(m.OffsetY, 0);
+            Assert.AreEqual(0, m.OffsetX);
+            Assert.AreEqual(0, m.OffsetY);
         }
 
         [TestMethod]

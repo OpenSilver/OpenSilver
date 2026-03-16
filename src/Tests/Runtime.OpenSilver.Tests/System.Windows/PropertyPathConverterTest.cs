@@ -68,7 +68,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -76,7 +76,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotImplementedException()
         {
-            Assert.ThrowsException<NotImplementedException>(
+            Assert.Throws<NotImplementedException>(
                 () => Converter.ConvertTo(new PropertyPath("My.Path"), typeof(string))
             );
         }

@@ -31,7 +31,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.Invoke());
+            Assert.Throws<ElementNotEnabledException>(() => provider.Invoke());
         }
 
         [TestMethod]

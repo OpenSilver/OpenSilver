@@ -115,7 +115,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_FormatException()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.Throws<FormatException>(
                 () => Converter.ConvertFrom("1,2,3")
             );
         }
@@ -123,7 +123,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -131,13 +131,13 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_String()
         {
-            Assert.AreEqual(Converter.ConvertTo(new Thickness(1), typeof(string)), "1,1,1,1");
+            Assert.AreEqual("1,1,1,1", Converter.ConvertTo(new Thickness(1), typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException_1()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new Thickness(), null)
             );
         }
@@ -145,7 +145,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException_2()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(null, typeof(string))
             );
         }
@@ -153,7 +153,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentException()
         {
-            Assert.ThrowsException<ArgumentException>(
+            Assert.Throws<ArgumentException>(
                 () => Converter.ConvertTo(true, typeof(string))
             );
         }
@@ -161,7 +161,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Sould_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new Thickness(), typeof(long))
             );
         }

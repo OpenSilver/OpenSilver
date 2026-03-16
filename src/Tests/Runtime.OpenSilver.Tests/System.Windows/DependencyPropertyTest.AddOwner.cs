@@ -18,17 +18,15 @@ namespace System.Windows.Tests;
 public partial class DependencyPropertyTest
 {
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void AddOwner_Should_Throw_When_OwnerType_Is_Null()
     {
-        MyDependencyObject1.Property1.AddOwner(null);
+        Assert.Throws<ArgumentNullException>(() => MyDependencyObject1.Property1.AddOwner(null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void AddOwner_Should_Throw_When_Same_OwnerType_Twice()
     {
-        MyDependencyObject1.Property1.AddOwner(typeof(MyDependencyObject1));
+        Assert.Throws<ArgumentException>(() => MyDependencyObject1.Property1.AddOwner(typeof(MyDependencyObject1)));
     }
 
     [TestMethod]
@@ -54,12 +52,12 @@ public partial class DependencyPropertyTest
 
         var o = new MyDependencyObject3();
 
-        Assert.AreEqual((double)o.GetValue(dp), 69.0);
-        Assert.AreEqual((double)o.GetValue(MyDependencyObject1.Property1), 69.0);
+        Assert.AreEqual(69.0, (double)o.GetValue(dp));
+        Assert.AreEqual(69.0, (double)o.GetValue(MyDependencyObject1.Property1));
 
         o.SetValue(dp, 420.0);
 
-        Assert.AreEqual(o.Property1ChangedCounter, 1);
+        Assert.AreEqual(1, o.Property1ChangedCounter);
 
         static void Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -75,7 +75,7 @@ namespace Compiler.Tests
 
             Assert.AreEqual(declaringTypeName, GlobalPrefix + typeof(ToolTipService).FullName);
             Assert.AreEqual(returnValueNamespaceName, typeof(UIElement).Namespace);
-            Assert.AreEqual(returnValueLocalTypeName, nameof(UIElement));
+            Assert.AreEqual(nameof(UIElement), returnValueLocalTypeName);
         }
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace Compiler.Tests
                 out var isTypeEnum);
 
             Assert.AreEqual(propertyNamespaceName, typeof(string).Namespace);
-            Assert.AreEqual(propertyLocalTypeName, nameof(String));
+            Assert.AreEqual(nameof(String), propertyLocalTypeName);
             Assert.AreEqual(propertyAssemblyName, typeof(string).Assembly.GetName().Name);
             Assert.IsFalse(isTypeEnum);
         }
@@ -124,9 +124,9 @@ namespace Compiler.Tests
                 out var propertyAssemblyName,
                 out var isTypeEnum);
 
-            Assert.AreEqual(propertyNamespaceName, ExperimentalNamespace);
-            Assert.AreEqual(propertyLocalTypeName, "AnotherGenericType<global::Experimental.AnotherGenericType<global::System.Int32>>");
-            Assert.AreEqual(propertyAssemblyName, ExperimentalSubjectName);
+            Assert.AreEqual(ExperimentalNamespace, propertyNamespaceName);
+            Assert.AreEqual("AnotherGenericType<global::Experimental.AnotherGenericType<global::System.Int32>>", propertyLocalTypeName);
+            Assert.AreEqual(ExperimentalSubjectName, propertyAssemblyName);
             Assert.IsFalse(isTypeEnum);
         }
 
@@ -145,8 +145,8 @@ namespace Compiler.Tests
                 out var isTypeEnum);
 
             Assert.AreEqual(propertyNamespaceName, typeof(ClassWithNestedEnum).FullName);
-            Assert.AreEqual(propertyLocalTypeName, nameof(ClassWithNestedEnum.InputBehavior));
-            Assert.AreEqual(propertyAssemblyName, ExperimentalSubjectName);
+            Assert.AreEqual(nameof(ClassWithNestedEnum.InputBehavior), propertyLocalTypeName);
+            Assert.AreEqual(ExperimentalSubjectName, propertyAssemblyName);
             Assert.IsTrue(isTypeEnum);
         }
 
@@ -163,9 +163,9 @@ namespace Compiler.Tests
                 out var memberTypeNamespace,
                 out var memberTypeName);
 
-            Assert.AreEqual(memberDeclaringTypeName, "global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>");
+            Assert.AreEqual("global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>", memberDeclaringTypeName);
             Assert.AreEqual(memberTypeNamespace, typeof(string).Namespace);
-            Assert.AreEqual(memberTypeName, nameof(String));
+            Assert.AreEqual(nameof(String), memberTypeName);
         }
 
         [TestMethod]
@@ -181,9 +181,9 @@ namespace Compiler.Tests
                 out var memberTypeNamespace,
                 out var memberTypeName);
 
-            Assert.AreEqual(memberDeclaringTypeName, "global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>");
+            Assert.AreEqual("global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>", memberDeclaringTypeName);
             Assert.AreEqual(memberTypeNamespace, typeof(int).Namespace);
-            Assert.AreEqual(memberTypeName, nameof(Int32));
+            Assert.AreEqual(nameof(Int32), memberTypeName);
         }
 
         [TestMethod]
@@ -196,7 +196,7 @@ namespace Compiler.Tests
                 typeof(DerivedClassGenericType).Assembly.GetName().Name,
                 null);
 
-            Assert.AreEqual(res, "global::Experimental.DerivedClassGenericType.MyField");
+            Assert.AreEqual("global::Experimental.DerivedClassGenericType.MyField", res);
         }
 
         [TestMethod]
@@ -212,9 +212,9 @@ namespace Compiler.Tests
                 out var returnValueNamespaceName,
                 out var returnValueLocalTypeName);
 
-            Assert.AreEqual(declaringTypeName, "global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>");
+            Assert.AreEqual("global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>", declaringTypeName);
             Assert.AreEqual(returnValueNamespaceName, typeof(string).Namespace);
-            Assert.AreEqual(returnValueLocalTypeName, nameof(String));
+            Assert.AreEqual(nameof(String), returnValueLocalTypeName);
         }
 
         [TestMethod]
@@ -265,7 +265,7 @@ namespace Compiler.Tests
                 typeof(ContentControl).Assembly.GetName().Name,
                 null);
 
-            Assert.AreEqual(res, Content);
+            Assert.AreEqual(Content, res);
         }
 
         [TestMethod]
@@ -283,7 +283,7 @@ namespace Compiler.Tests
                 out var isTypeEnum);
 
             Assert.AreEqual(returnValueNamespace, typeof(string).Namespace);
-            Assert.AreEqual(returnValueTypeName, nameof(String));
+            Assert.AreEqual(expected: nameof(String), returnValueTypeName);
             Assert.AreEqual(returnValueAssemblyName, typeof(string).Assembly.GetName().Name);
             Assert.IsFalse(isTypeEnum);
         }
@@ -302,9 +302,9 @@ namespace Compiler.Tests
                 out var returnValueAssemblyName,
                 out var isTypeEnum);
 
-            Assert.AreEqual(returnValueNamespace, ExperimentalNamespace);
-            Assert.AreEqual(returnValueTypeName, "AnotherGenericType<global::System.String>");
-            Assert.AreEqual(returnValueAssemblyName, ExperimentalSubjectName);
+            Assert.AreEqual(ExperimentalNamespace, returnValueNamespace);
+            Assert.AreEqual("AnotherGenericType<global::System.String>", returnValueTypeName);
+            Assert.AreEqual(ExperimentalSubjectName, returnValueAssemblyName);
             Assert.IsFalse(isTypeEnum);
         }
 

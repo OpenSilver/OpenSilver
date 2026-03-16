@@ -28,7 +28,7 @@ namespace System.Windows.Tests
         {
             var fe = new TestFE2();
 
-            Assert.ThrowsException<InvalidOperationException>(() => fe.Children.Add(fe));
+            Assert.Throws<InvalidOperationException>(() => fe.Children.Add(fe));
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace System.Windows.Tests
             parent.Children.Add(child);
             var newParent = new TestFE1();
 
-            Assert.ThrowsException<InvalidOperationException>(() => newParent.AddLogicalChild(child));
+            Assert.Throws<InvalidOperationException>(() => newParent.AddLogicalChild(child));
         }
 
         [TestMethod]
@@ -60,7 +60,7 @@ namespace System.Windows.Tests
             var child = new TestFE2();
             parent.Children.Add(child);
 
-            Assert.AreEqual(child.Inherits, 42d);
+            Assert.AreEqual(42d, child.Inherits);
         }
 
         [TestMethod]
@@ -97,7 +97,7 @@ namespace System.Windows.Tests
             var child = new TestFE2();
             parent.Children.Add(child);
 
-            Assert.AreEqual(child.Inherits, 42d);
+            Assert.AreEqual(42d, child.Inherits);
 
             parent.Children.Remove(child);
 

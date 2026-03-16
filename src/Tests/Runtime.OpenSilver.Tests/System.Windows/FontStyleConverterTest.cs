@@ -86,7 +86,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -94,7 +94,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -102,7 +102,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom("invalid font style")
             );
         }
@@ -110,25 +110,25 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_String_1()
         {
-            Assert.AreEqual(Converter.ConvertTo(FontStyles.Normal, typeof(string)), "Normal");
+            Assert.AreEqual("Normal", Converter.ConvertTo(FontStyles.Normal, typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_String_2()
         {
-            Assert.AreEqual(Converter.ConvertTo(FontStyles.Oblique, typeof(string)), "Oblique");
+            Assert.AreEqual("Oblique", Converter.ConvertTo(FontStyles.Oblique, typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_String_3()
         {
-            Assert.AreEqual(Converter.ConvertTo(FontStyles.Italic, typeof(string)), "Italic");
+            Assert.AreEqual("Italic", Converter.ConvertTo(FontStyles.Italic, typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new FontStyle(), null)
             );
         }
@@ -136,7 +136,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new FontStyle(), typeof(bool))
             );
         }
@@ -144,7 +144,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(420, typeof(string))
             );
         }

@@ -38,17 +38,17 @@ public class DependencyPropertyDescriptorTests
 
         component.Property++;
 
-        Assert.AreEqual(count, 1);
+        Assert.AreEqual(1, count);
 
         component.Property++;
 
-        Assert.AreEqual(count, 2);
+        Assert.AreEqual(2, count);
 
         property.RemoveValueChanged(component, OnChanged);
 
         component.Property++;
 
-        Assert.AreEqual(count, 2);
+        Assert.AreEqual(2, count);
     }
 
     public static IEnumerable<object[]> FromProperty_TestData()
@@ -72,8 +72,8 @@ public class DependencyPropertyDescriptorTests
         };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(FromProperty_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(FromProperty_TestData))]
     public void FromProperty_InvokeDependencyObjectPropertyDescriptor_Success(
         DependencyPropertyDescriptor descriptor,
         bool isAttached,
@@ -128,8 +128,8 @@ public class DependencyPropertyDescriptorTests
     [TestMethod]
     public void FromProperty_NullProperty_ThrowsArgumentNullException()
     {
-        var ex = Assert.ThrowsException<ArgumentNullException>(() => DependencyPropertyDescriptor.FromProperty(null));
-        Assert.AreEqual(ex.ParamName, "property");
+        var ex = Assert.Throws<ArgumentNullException>(() => DependencyPropertyDescriptor.FromProperty(null));
+        Assert.AreEqual("property", ex.ParamName);
     }
 
     [TestMethod]
@@ -159,16 +159,16 @@ public class DependencyPropertyDescriptorTests
     [TestMethod]
     public void FromProperty_NullDependencyProperty_ThrowsArgumentNullException()
     {
-        var ex = Assert.ThrowsException<ArgumentNullException>(() => DependencyPropertyDescriptor.FromProperty(null, typeof(object)));
-        Assert.AreEqual(ex.ParamName, "dependencyProperty");
+        var ex = Assert.Throws<ArgumentNullException>(() => DependencyPropertyDescriptor.FromProperty(null, typeof(object)));
+        Assert.AreEqual("dependencyProperty", ex.ParamName);
     }
 
     [TestMethod]
     public void FromProperty_NullTargetType_ThrowsArgumentNullException()
     {
         DependencyProperty property = DependencyProperty.Register(MethodBase.GetCurrentMethod().Name, typeof(string), typeof(DependencyObject));
-        var ex = Assert.ThrowsException<ArgumentNullException>(() => DependencyPropertyDescriptor.FromProperty(property, null));
-        Assert.AreEqual(ex.ParamName, "targetType");
+        var ex = Assert.Throws<ArgumentNullException>(() => DependencyPropertyDescriptor.FromProperty(property, null));
+        Assert.AreEqual("targetType", ex.ParamName);
     }
 
     public class NotDependencyObject

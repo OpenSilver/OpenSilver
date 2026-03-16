@@ -68,7 +68,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -76,7 +76,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -84,7 +84,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertFrom_String_Should_Throw_InvalidOperationException()
         {
-            Assert.ThrowsException<InvalidOperationException>(
+            Assert.Throws<InvalidOperationException>(
                 () => Converter.ConvertFrom("100, 100, 100")
             );
         }
@@ -92,19 +92,19 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_String_1()
         {
-            Assert.AreEqual(Converter.ConvertTo(Size.Empty, typeof(string)), "Empty");
+            Assert.AreEqual("Empty", Converter.ConvertTo(Size.Empty, typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_String_2()
         {
-            Assert.AreEqual(Converter.ConvertTo(new Size(100, 100), typeof(string)), "100,100");
+            Assert.AreEqual("100,100", Converter.ConvertTo(new Size(100, 100), typeof(string)));
         }
 
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new Size(1, 1), null)
             );
         }
@@ -112,7 +112,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new Size(1, 1), typeof(bool))
             );
         }
@@ -120,7 +120,7 @@ namespace System.Windows.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new Rect(1, 1, 1, 1), typeof(string))
             );
         }

@@ -26,8 +26,8 @@ public sealed class PolylineTest
         var points = polyline.Points;
 
         Assert.IsNotNull(points);
-        Assert.AreEqual(points.Count, 0);
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource, BaseValueSource.Default);
+        Assert.AreEqual(0, points.Count);
+        Assert.AreEqual(BaseValueSource.Default, DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource);
     }
 
     [TestMethod]
@@ -36,7 +36,7 @@ public sealed class PolylineTest
         var polyline = new Polyline();
         polyline.Points.Add(new Point());
 
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource, BaseValueSource.Local);
+        Assert.AreEqual(BaseValueSource.Local, DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource);
     }
 
     [TestMethod]
@@ -50,7 +50,7 @@ public sealed class PolylineTest
 
         var points2 = polyline.Points;
 
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource, BaseValueSource.Default);
+        Assert.AreEqual(BaseValueSource.Default, DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource);
         Assert.AreNotSame(points1, points2);
     }
 
@@ -65,7 +65,7 @@ public sealed class PolylineTest
 
         var points2 = polyline.Points;
 
-        Assert.AreEqual(DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource, BaseValueSource.Default);
+        Assert.AreEqual(BaseValueSource.Default, DependencyPropertyHelper.GetValueSource(polyline, Polyline.PointsProperty).BaseValueSource);
         Assert.AreSame(points1, points2);
     }
 }

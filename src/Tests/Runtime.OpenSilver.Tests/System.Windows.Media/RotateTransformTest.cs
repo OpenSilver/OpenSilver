@@ -56,8 +56,8 @@ namespace System.Windows.Media.Tests
             var result = transform.TryTransform(point, out var outPoint);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(outPoint.X, -10);
-            Assert.AreEqual(outPoint.Y, 10);
+            Assert.AreEqual(-10, outPoint.X);
+            Assert.AreEqual(10, outPoint.Y);
         }
     }
 }

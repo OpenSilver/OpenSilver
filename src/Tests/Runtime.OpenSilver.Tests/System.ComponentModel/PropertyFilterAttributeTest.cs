@@ -19,7 +19,7 @@ namespace System.ComponentModel.Tests;
 [TestClass]
 public class PropertyFilterAttributeTests
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(PropertyFilterOptions.All)]
     [DataRow(PropertyFilterOptions.SetValues)]
     [DataRow(PropertyFilterOptions.Invalid)]
@@ -54,8 +54,8 @@ public class PropertyFilterAttributeTests
         yield return new object[] { new PropertyFilterAttribute(PropertyFilterOptions.None), null, false };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(Equals_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(Equals_TestData))]
     public void Equals_Object_ReturnsExpected(PropertyFilterAttribute attribute, object other, bool expected)
     {
         Assert.AreEqual(expected, attribute.Equals(other));
@@ -80,8 +80,8 @@ public class PropertyFilterAttributeTests
         yield return new object[] { new PropertyFilterAttribute(PropertyFilterOptions.None), null, false };
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(Match_TestData), DynamicDataSourceType.Method)]
+    [TestMethod]
+    [DynamicData(nameof(Match_TestData))]
     public void Match_Object_ReturnsExpected(PropertyFilterAttribute attribute, object value, bool expected)
     {
         Assert.AreEqual(expected, attribute.Match(value));

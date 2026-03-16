@@ -18,58 +18,58 @@ namespace System.Windows.Tests;
 public partial class DependencyPropertyTest
 {
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterReadOnly_Should_Throw_When_Name_Is_Null()
     {
-        DependencyProperty.RegisterReadOnly(
-            null,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterReadOnly(
+                null,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void RegisterReadOnly_Should_Throw_When_Name_Is_Empty()
     {
-        DependencyProperty.RegisterReadOnly(
-            string.Empty,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.RegisterReadOnly(
+                string.Empty,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterReadOnly_Should_Throw_When_PropertyType_Is_Null()
     {
-        DependencyProperty.RegisterReadOnly(
-            nameof(RegisterReadOnly_Should_Throw_When_PropertyType_Is_Null),
-            null,
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterReadOnly(
+                nameof(RegisterReadOnly_Should_Throw_When_PropertyType_Is_Null),
+                null,
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterReadOnly_Should_Throw_When_OwnerType_Is_Null()
     {
-        DependencyProperty.RegisterReadOnly(
-            nameof(RegisterReadOnly_Should_Throw_When_OwnerType_Is_Null),
-            typeof(double),
-            null,
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterReadOnly(
+                nameof(RegisterReadOnly_Should_Throw_When_OwnerType_Is_Null),
+                typeof(double),
+                null,
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void RegisterReadOnly_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType()
     {
-        DependencyProperty.RegisterReadOnly(
-            nameof(RegisterReadOnly_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
-            typeof(bool),
-            typeof(MyDependencyObject1),
-            new PropertyMetadata(100));
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.RegisterReadOnly(
+                nameof(RegisterReadOnly_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
+                typeof(bool),
+                typeof(MyDependencyObject1),
+                new PropertyMetadata(100)));
     }
 
     [TestMethod]
@@ -87,15 +87,15 @@ public partial class DependencyPropertyTest
         Assert.IsFalse(dp.IsAttached);
         Assert.IsTrue(dp.ReadOnly);
         Assert.AreSame(dp.DependencyPropertyKey, dpKey);
-        Assert.AreEqual(dp.Name, nameof(RegisterReadOnly_Properties_And_Metadata));
-        Assert.AreEqual(dp.PropertyType, typeof(char));
-        Assert.AreEqual(dp.OwnerType, typeof(MyDependencyObject1));
+        Assert.AreEqual(nameof(RegisterReadOnly_Properties_And_Metadata), dp.Name);
+        Assert.AreEqual(typeof(char), dp.PropertyType);
+        Assert.AreEqual(typeof(MyDependencyObject1), dp.OwnerType);
         Assert.AreEqual(dp.ValidateValueCallback, validateValueCallback);
-        Assert.AreEqual((char)dp.DefaultMetadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)dp.DefaultMetadata.DefaultValue);
 
         PropertyMetadata metadata = dp.GetMetadata(typeof(MyDependencyObject1));
 
-        Assert.AreEqual((char)metadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)metadata.DefaultValue);
         Assert.AreEqual(metadata.PropertyChangedCallback, propertyChangedCallback);
         Assert.AreEqual(metadata.CoerceValueCallback, coerceValueCallback);
 
@@ -105,58 +105,58 @@ public partial class DependencyPropertyTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterAttachedReadOnly_Should_Throw_When_Name_Is_Null()
     {
-        DependencyProperty.RegisterAttachedReadOnly(
-            null,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterAttachedReadOnly(
+                null,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void RegisterAttachedReadOnly_Should_Throw_When_Name_Is_Empty()
     {
-        DependencyProperty.RegisterAttachedReadOnly(
-            string.Empty,
-            typeof(double),
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.RegisterAttachedReadOnly(
+                string.Empty,
+                typeof(double),
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterAttachedReadOnly_Should_Throw_When_PropertyType_Is_Null()
     {
-        DependencyProperty.RegisterAttachedReadOnly(
-            nameof(RegisterAttachedReadOnly_Should_Throw_When_PropertyType_Is_Null),
-            null,
-            typeof(MyDependencyObject1),
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterAttachedReadOnly(
+                nameof(RegisterAttachedReadOnly_Should_Throw_When_PropertyType_Is_Null),
+                null,
+                typeof(MyDependencyObject1),
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RegisterAttachedReadOnly_Should_Throw_When_OwnerType_Is_Null()
     {
-        DependencyProperty.RegisterAttachedReadOnly(
-            nameof(RegisterAttachedReadOnly_Should_Throw_When_OwnerType_Is_Null),
-            typeof(double),
-            null,
-            null);
+        Assert.Throws<ArgumentNullException>(() =>
+            DependencyProperty.RegisterAttachedReadOnly(
+                nameof(RegisterAttachedReadOnly_Should_Throw_When_OwnerType_Is_Null),
+                typeof(double),
+                null,
+                null));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void RegisterAttachedReadOnly_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType()
     {
-        DependencyProperty.RegisterAttachedReadOnly(
-            nameof(RegisterAttachedReadOnly_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
-            typeof(string),
-            typeof(MyDependencyObject1),
-            new PropertyMetadata(49.0));
+        Assert.Throws<ArgumentException>(() =>
+            DependencyProperty.RegisterAttachedReadOnly(
+                nameof(RegisterAttachedReadOnly_Should_Throw_When_DefaultValue_Type_Does_Not_Match_PropertyType),
+                typeof(string),
+                typeof(MyDependencyObject1),
+                new PropertyMetadata(49.0)));
     }
 
     [TestMethod]
@@ -174,15 +174,15 @@ public partial class DependencyPropertyTest
         Assert.IsTrue(dp.IsAttached);
         Assert.IsTrue(dp.ReadOnly);
         Assert.AreSame(dp.DependencyPropertyKey, dpKey);
-        Assert.AreEqual(dp.Name, nameof(RegisterAttachedReadOnly_Properties_And_Metadata));
-        Assert.AreEqual(dp.PropertyType, typeof(char));
-        Assert.AreEqual(dp.OwnerType, typeof(MyDependencyObject1));
+        Assert.AreEqual(nameof(RegisterAttachedReadOnly_Properties_And_Metadata), dp.Name);
+        Assert.AreEqual(typeof(char), dp.PropertyType);
+        Assert.AreEqual(typeof(MyDependencyObject1), dp.OwnerType);
         Assert.AreEqual(dp.ValidateValueCallback, validateValueCallback);
-        Assert.AreEqual((char)dp.DefaultMetadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)dp.DefaultMetadata.DefaultValue);
 
         PropertyMetadata metadata = dp.GetMetadata(typeof(MyDependencyObject1));
 
-        Assert.AreEqual((char)metadata.DefaultValue, 'x');
+        Assert.AreEqual('x', (char)metadata.DefaultValue);
         Assert.AreEqual(metadata.PropertyChangedCallback, propertyChangedCallback);
         Assert.AreEqual(metadata.CoerceValueCallback, coerceValueCallback);
 
@@ -192,11 +192,12 @@ public partial class DependencyPropertyTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void ReadOnly_Property_Should_Throw_When_Writing_Without_Key()
     {
         var o = new MyDependencyObject1();
-        o.SetValue(MyDependencyObject1.ReadOnlyProperty1, nameof(ReadOnly_Property_Should_Throw_When_Writing_Without_Key));
+
+        Assert.Throws<InvalidOperationException>(() =>
+            o.SetValue(MyDependencyObject1.ReadOnlyProperty1, nameof(ReadOnly_Property_Should_Throw_When_Writing_Without_Key)));
     }
 
     [TestMethod]
@@ -205,8 +206,8 @@ public partial class DependencyPropertyTest
         var o = new MyDependencyObject1();
         o.SetValue(MyDependencyObject1.ReadOnlyProperty1Key, nameof(ReadOnly_Property_Write_With_Key));
 
-        Assert.AreEqual(o.ReadOnlyProperty1ChangedCounter1, 1);
-        Assert.AreEqual((string)o.GetValue(MyDependencyObject1.ReadOnlyProperty1), nameof(ReadOnly_Property_Write_With_Key));
+        Assert.AreEqual(1, o.ReadOnlyProperty1ChangedCounter1);
+        Assert.AreEqual(nameof(ReadOnly_Property_Write_With_Key), (string)o.GetValue(MyDependencyObject1.ReadOnlyProperty1));
     }
 
     [TestMethod]
@@ -222,11 +223,11 @@ public partial class DependencyPropertyTest
 
         var o = new MyDependencyObject1();
 
-        Assert.AreEqual((int)o.GetValue(dp), 100);
+        Assert.AreEqual(100, (int)o.GetValue(dp));
 
         o.SetValue(key, 150);
 
-        Assert.AreEqual((int)o.GetValue(dp), 100);
+        Assert.AreEqual(100, (int)o.GetValue(dp));
 
         static object ReadOnlyCallback(DependencyObject d)
         {
@@ -257,13 +258,13 @@ public partial class DependencyPropertyTest
 
         o1.SetValue(key, nameof(Inherit_ReadOnly_Property_Should_Propagate));
 
-        Assert.AreEqual(o1.PropertyChangedCounter, 1);
-        Assert.AreEqual(o2.PropertyChangedCounter, 1);
-        Assert.AreEqual(o3.PropertyChangedCounter, 1);
+        Assert.AreEqual(1, o1.PropertyChangedCounter);
+        Assert.AreEqual(1, o2.PropertyChangedCounter);
+        Assert.AreEqual(1, o3.PropertyChangedCounter);
 
-        Assert.AreEqual((string)o1.GetValue(dp), nameof(Inherit_ReadOnly_Property_Should_Propagate));
-        Assert.AreEqual((string)o2.GetValue(dp), nameof(Inherit_ReadOnly_Property_Should_Propagate));
-        Assert.AreEqual((string)o3.GetValue(dp), nameof(Inherit_ReadOnly_Property_Should_Propagate));
+        Assert.AreEqual(nameof(Inherit_ReadOnly_Property_Should_Propagate), (string)o1.GetValue(dp));
+        Assert.AreEqual(nameof(Inherit_ReadOnly_Property_Should_Propagate), (string)o2.GetValue(dp));
+        Assert.AreEqual(nameof(Inherit_ReadOnly_Property_Should_Propagate), (string)o3.GetValue(dp));
 
         static void OnChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

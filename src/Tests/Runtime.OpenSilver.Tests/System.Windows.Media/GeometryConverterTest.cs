@@ -54,13 +54,13 @@ namespace System.Windows.Media.Tests
 
             var pg = (PathGeometry)test;
 
-            Assert.AreEqual(pg.Figures.Count, 1);
-            Assert.AreEqual(pg.Figures[0].Segments.Count, 1);
+            Assert.AreEqual(1, pg.Figures.Count);
+            Assert.AreEqual(1, pg.Figures[0].Segments.Count);
             Assert.IsInstanceOfType<PolyLineSegment>(pg.Figures[0].Segments[0]);
 
             var segments = (PolyLineSegment)pg.Figures[0].Segments[0];
             
-            Assert.AreEqual(segments.Points.Count, 5);
+            Assert.AreEqual(5, segments.Points.Count);
             Assert.AreEqual(segments.Points[0], new Point(20, 0));
             Assert.AreEqual(segments.Points[1], new Point(20, 10));
             Assert.AreEqual(segments.Points[2], new Point(50, 30));
@@ -71,7 +71,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(null)
             );
         }
@@ -79,7 +79,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -95,7 +95,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_ArgumentNullException()
         {
-            Assert.ThrowsException<ArgumentNullException>(
+            Assert.Throws<ArgumentNullException>(
                 () => Converter.ConvertTo(new PathGeometry(), null)
             );
         }
@@ -103,7 +103,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_1()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(420, typeof(string))
             );
         }
@@ -111,7 +111,7 @@ namespace System.Windows.Media.Tests
         [TestMethod]
         public void ConvertTo_Should_Throw_NotSupportedException_2()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.Throws<NotSupportedException>(
                 () => Converter.ConvertTo(new PathGeometry(), typeof(bool))
             );
         }

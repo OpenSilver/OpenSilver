@@ -35,12 +35,12 @@ namespace System.Windows.Media.Tests
             // Invert of Identity is Identity
             m.Invert();
             Assert.AreEqual(m, Matrix.Identity);
-            Assert.AreEqual(m.M11, 1);
-            Assert.AreEqual(m.M12, 0);
-            Assert.AreEqual(m.M21, 0);
-            Assert.AreEqual(m.M22, 1);
-            Assert.AreEqual(m.OffsetX, 0);
-            Assert.AreEqual(m.OffsetY, 0);
+            Assert.AreEqual(1, m.M11);
+            Assert.AreEqual(0, m.M12);
+            Assert.AreEqual(0, m.M21);
+            Assert.AreEqual(1, m.M22);
+            Assert.AreEqual(0, m.OffsetX);
+            Assert.AreEqual(0, m.OffsetY);
         }
 
         #endregion Identity
@@ -169,7 +169,7 @@ namespace System.Windows.Media.Tests
             var m = GetSingularMatrix(2, 6);
 
             Assert.IsFalse(m.HasInverse);
-            Assert.ThrowsException<InvalidOperationException>(() => m.Invert());
+            Assert.Throws<InvalidOperationException>(() => m.Invert());
             Assert.AreEqual(m, GetSingularMatrix(2, 6));
         }
 
@@ -236,7 +236,7 @@ namespace System.Windows.Media.Tests
         {
             Matrix m = new Matrix();
 
-            Assert.AreEqual(m._type, MatrixTypes.TRANSFORM_IS_IDENTITY);
+            Assert.AreEqual(MatrixTypes.TRANSFORM_IS_IDENTITY, m._type);
             Assert.IsTrue(m == Matrix.Identity);
             Assert.IsFalse(GetIncrementalMatrix(0, 1) == m);
         }
@@ -247,7 +247,7 @@ namespace System.Windows.Media.Tests
             Matrix m = new Matrix(1, 0, 1, 1, 0, 0);
             m.M21 = 0;
 
-            Assert.AreEqual(m._type, MatrixTypes.TRANSFORM_IS_UNKNOWN);
+            Assert.AreEqual(MatrixTypes.TRANSFORM_IS_UNKNOWN, m._type);
             Assert.IsTrue(m.IsIdentity);
             Assert.IsTrue(Matrix.Identity == m);
             Assert.IsFalse(m == GetIncrementalMatrix(0, 1));

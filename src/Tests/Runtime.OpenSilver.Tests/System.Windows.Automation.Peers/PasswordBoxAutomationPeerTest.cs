@@ -37,7 +37,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Value) as IValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ElementNotEnabledException>(() => provider.SetValue("password"));
+            Assert.Throws<ElementNotEnabledException>(() => provider.SetValue("password"));
         }
 
         [TestMethod]
@@ -48,7 +48,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Value) as IValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<ArgumentNullException>(() => provider.SetValue(null));
+            Assert.Throws<ArgumentNullException>(() => provider.SetValue(null));
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace System.Windows.Automation.Peers.Tests
 
             provider.SetValue("password");
 
-            Assert.AreEqual(passwordBox.Password, "password");
+            Assert.AreEqual("password", passwordBox.Password);
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace System.Windows.Automation.Peers.Tests
             var provider = peer.GetPattern(PatternInterface.Value) as IValueProvider;
 
             Assert.IsNotNull(provider);
-            Assert.ThrowsException<InvalidOperationException>(() => provider.Value);
+            Assert.Throws<InvalidOperationException>(() => provider.Value);
         }
 
         [TestMethod]
