@@ -1308,25 +1308,36 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(false) { Inherits = true });
 
-#endregion
+        #endregion
 
-#region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
-
-        /// <summary>
-        /// Sets pointer capture to a UIElement.
-        /// </summary>
-        /// <returns>True if the object has pointer capture; otherwise, false.</returns>
-        public bool CaptureMouse() => InputManager.Current.CaptureMouse(this);
+        #region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
 
         /// <summary>
-        /// Gets a value indicating whether the pointer is captured to this element.
+        /// Gets a value indicating whether the mouse is captured to this element.
         /// </summary>
-        public bool IsMouseCaptured => Pointer.Captured == this;
+        /// <returns>
+        /// true if the element has mouse capture; otherwise, false. The default is false.
+        /// </returns>
+        public bool IsMouseCaptured => Mouse.Captured == this;
 
         /// <summary>
-        /// Releases pointer captures for capture of one specific pointer by this UIElement.
+        /// Attempts to force capture of the mouse to this element.
         /// </summary>
-        public void ReleaseMouseCapture() => InputManager.Current.ReleaseMouseCapture(this);
+        /// <returns>
+        /// true if the mouse is successfully captured; otherwise, false.
+        /// </returns>
+        public bool CaptureMouse() => Mouse.Capture(this);
+
+        /// <summary>
+        /// Releases the mouse capture, if this element held the capture.
+        /// </summary>
+        public void ReleaseMouseCapture()
+        {
+            if (Mouse.Captured == this)
+            {
+                Mouse.Capture(null);
+            }
+        }
 
         internal static readonly DependencyPropertyKey IsMouseOverPropertyKey =
             DependencyProperty.RegisterReadOnly(

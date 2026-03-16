@@ -192,7 +192,7 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnMouseLeftButtonUp(e);
 
-            if (Pointer.Captured == this)
+            if (IsMouseCaptured)
             {
                 ReleaseMouseCapture();
             }

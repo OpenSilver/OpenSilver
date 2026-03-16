@@ -144,13 +144,19 @@ internal sealed class InputManager
         return (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("osjs.inputManager.getModifiers()", false);
     }
 
+    internal IInputElement MouseCapture { get; private set; }
+
     internal bool CaptureMouse(UIElement uie)
     {
-        Debug.Assert(uie is not null);
-
-        if (Pointer.Captured is null && _mouseLeftDown && uie.OuterDiv is { IsConnected: true } outerDiv)
+        if (uie is null)
         {
-            Pointer.Captured = uie;
+            ReleaseMouseCapture();
+            return true;
+        }
+
+        if (MouseCapture is null && _mouseLeftDown && uie.OuterDiv is { IsConnected: true } outerDiv)
+        {
+            MouseCapture = uie;
 
             OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.inputManager.capturePointer('{outerDiv.Uid}')");
 
@@ -166,25 +172,7 @@ internal sealed class InputManager
             return true;
         }
 
-        return Pointer.Captured == uie;
-    }
-
-    internal void ReleaseMouseCapture(UIElement uie)
-    {
-        if (Pointer.Captured == uie)
-        {
-            Pointer.Captured = null;
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.inputManager.releasePointerCapture()");
-
-            using (_eventQueue.DisableProcessing())
-            {
-                _eventQueue.AddEvent(new MouseEventArgs
-                {
-                    RoutedEvent = Mouse.LostMouseCaptureEvent,
-                    Source = uie,
-                });
-            }
-        }
+        return MouseCapture == uie;
     }
 
     internal Point GetMousePosition() => _mousePosition;
@@ -292,7 +280,7 @@ internal sealed class InputManager
             // element that was clicked would still have captured the pointer 
             // events, preventing the user to click on anything until the capture 
             // is released (if it does ever happen).
-            if (Pointer.Captured == uie)
+            if (uie.IsMouseCaptured)
             {
                 uie.ReleaseMouseCapture();
             }
@@ -450,9 +438,21 @@ internal sealed class InputManager
 
     private void ReleaseMouseCapture()
     {
-        if (Pointer.Captured is UIElement uie)
+        if (MouseCapture is not IInputElement mouseCapture)
         {
-            ReleaseMouseCapture(uie);
+            return;
+        }
+
+        MouseCapture = null;
+        OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.inputManager.releasePointerCapture()");
+
+        using (_eventQueue.DisableProcessing())
+        {
+            _eventQueue.AddEvent(new MouseEventArgs
+            {
+                RoutedEvent = Mouse.LostMouseCaptureEvent,
+                Source = mouseCapture,
+            });
         }
     }
 

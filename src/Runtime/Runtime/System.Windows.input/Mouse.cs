@@ -433,6 +433,45 @@ public static class Mouse
         => UIElement.RemoveHandler(element, MouseWheelEvent, handler);
 
     /// <summary>
+    /// Gets the element that has captured the mouse.
+    /// </summary>
+    /// <returns>
+    /// The element captured by the mouse.
+    /// </returns>
+    public static IInputElement Captured => InputManager.Current.MouseCapture;
+
+    /// <summary>
+    /// Captures mouse input to the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// The element to capture the mouse.
+    /// </param>
+    /// <returns>
+    /// true if the element was able to capture the mouse; otherwise, false.
+    /// </returns>
+    public static bool Capture(UIElement element) => InputManager.Current.CaptureMouse(element);
+
+    /// <summary>
+    /// Captures mouse input to the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// The element to capture the mouse.
+    /// </param>
+    /// <returns>
+    /// true if the element was able to capture the mouse; otherwise, false.
+    /// </returns>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static bool Capture(IInputElement element)
+    {
+        return element switch
+        {
+            UIElement uie => Capture(uie),
+            null => Capture(null),
+            _ => throw new InvalidOperationException(string.Format(Strings.Invalid_IInputElement, element.GetType())),
+        };
+    }
+
+    /// <summary>
     /// Gets the position of the mouse relative to a specified element.
     /// </summary>
     /// <param name="relativeTo">

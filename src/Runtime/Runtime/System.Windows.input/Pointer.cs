@@ -11,15 +11,16 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+
 namespace System.Windows.Input
 {
     /// <summary>
     /// Represents a pointer device.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class Pointer
     {
-        internal static UIElement Captured { get; set; }
-
         /// <summary>
         /// Gets a value that determines whether the pointer device was in contact with
         /// a sensor or digitizer at the time that the event was reported.

@@ -85,10 +85,7 @@ namespace System.Windows
             // is still pressing the button, and never stops doing so. By releasing the pointer capture, controls like the "RepeatButton"
             // can know that the user is no longer pressing the button by listening to "OnPointerCaptureLost".
 
-            if (Pointer.Captured != null)
-            {
-                Pointer.Captured.ReleaseMouseCapture();
-            }
+            Mouse.Capture(null);
 
             //todo: raise the "PointerReleased" event as well.
 

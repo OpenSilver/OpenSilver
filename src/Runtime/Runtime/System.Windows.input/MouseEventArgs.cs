@@ -16,8 +16,8 @@ using System.ComponentModel;
 namespace System.Windows.Input;
 
 /// <summary>
-/// Provides event data for pointer message events related to specific user interface
-/// elements, such as PointerPressed.
+/// Provides data for mouse related routed events that do not specifically involve mouse 
+/// buttons or the mouse wheel, for example <see cref="UIElement.MouseMove"/>.
 /// </summary>
 public class MouseEventArgs : InputEventArgs
 {
@@ -71,6 +71,7 @@ public class MouseEventArgs : InputEventArgs
     /// <summary>
     /// Gets a reference to a pointer token.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public Pointer Pointer { get; internal set; }
 
     /// <summary>
