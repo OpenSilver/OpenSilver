@@ -125,6 +125,7 @@ internal sealed class InputManager
     private int _clickCount;
     private int _lastClickTime;
     private bool _mouseLeftDown;
+    private Point _mousePosition;
 
     private InputManager() { }
 
@@ -185,6 +186,8 @@ internal sealed class InputManager
             }
         }
     }
+
+    internal Point GetMousePosition() => _mousePosition;
 
     internal bool SetFocus(UIElement uie)
     {
@@ -318,6 +321,8 @@ internal sealed class InputManager
 
     private void ProcessPointerInput(string id, int eventId, object jsEventArg, bool isTouchEvent, double pageX, double pageY, int keyModifiers)
     {
+        _mousePosition = new Point(pageX, pageY);
+
         using (_eventQueue.DisableProcessing())
         {
             if (INTERNAL_HtmlDomManager.GetElementById(id) is not UIElement uie)

@@ -278,8 +278,6 @@ public class ContextMenu : MenuBase
 
     private void HandleOwnerMouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        PopupService.UpdateMousePosition(e);
-
         SetCurrentValueInternal(IsOpenProperty, BooleanBoxes.TrueBox);
         e.Handled = true;
     }
@@ -336,7 +334,8 @@ public class ContextMenu : MenuBase
 
         if (Owner is FrameworkElement fe)
         {
-            fe.OnContextMenuOpening(PopupService.MousePosition.X, PopupService.MousePosition.Y);
+            Point pt = Mouse.GetPosition(null);
+            fe.OnContextMenuOpening(pt.X, pt.Y);
         }
 
         _popup.IsOpen = true;

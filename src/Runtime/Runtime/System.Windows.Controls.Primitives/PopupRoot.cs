@@ -29,7 +29,6 @@ internal sealed class PopupRoot : FrameworkElement
     static PopupRoot()
     {
         KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(PopupRoot), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
-        EventManager.RegisterClassHandler<PopupRoot>(Mouse.PreviewMouseMoveEvent, new MouseEventHandler(OnMouseMove), true);
         EventManager.RegisterClassHandler<PopupRoot>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
     }
 
@@ -115,8 +114,6 @@ internal sealed class PopupRoot : FrameworkElement
             })();
             """);
     }
-
-    private static void OnMouseMove(object sender, MouseEventArgs e) => PopupService.UpdateMousePosition(e);
 
     private static void OnMouseDown(object sender, MouseEventArgs e) => PopupService.HandleMouseButton();
 

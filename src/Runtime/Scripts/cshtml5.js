@@ -144,24 +144,30 @@ Object.defineProperty(window, 'osjs', {
                 return '';
             }
 
+            function getPointerPosition(x, y, relativeTo) {
+                if (relativeTo) {
+                    const relativeToBounds = relativeTo.getBoundingClientRect();
+                    const bodyBounds = document.body.getBoundingClientRect();
+                    x -= (relativeToBounds.left - bodyBounds.left);
+                    y -= (relativeToBounds.top - bodyBounds.top);
+                }
+
+                return [x, y];
+            }
+
             function invokePointerCallback(element, type, e) {
                 if (!element) {
                     _callbacks.inputManagerEvent('', type, e);
                     return;
                 }
 
-                let pageX = e.pageX;
-                let pageY = e.pageY;
-
-                const parentWindow = document.getElementById(element.windowid);
-                if (parentWindow) {
-                    const windowRect = parentWindow.getBoundingClientRect();
-                    const bodyRect = document.body.getBoundingClientRect();
-                    pageX -= (windowRect.left - bodyRect.left);
-                    pageY -= (windowRect.top - bodyRect.top);
-                }
-
+                const [pageX, pageY] = getPointerPosition(e.pageX, e.pageY, document.getElementById(element.windowid));
                 _callbacks.inputManagerPointerEvent(getClosestElementId(element), type, e, e.pointerType === 'touch', pageX, pageY, _modifiers);
+            }
+
+            function invokePointerCallbackOnRoot(rootElement, type, e) {
+                const [pageX, pageY] = getPointerPosition(e.pageX, e.pageY, rootElement);
+                _callbacks.inputManagerPointerEvent('', type, e, e.pointerType === 'touch', pageX, pageY, _modifiers);
             }
 
             function initDom() {
@@ -270,8 +276,12 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('pointermove', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
-                        const target = _pointerCapture || e.target;
-                        invokePointerCallback(getClosestElement(target), EVENTS.POINTER_MOVE, e);
+                        const target = getClosestElement(_pointerCapture);
+                        if (target) {
+                            invokePointerCallback(target, EVENTS.POINTER_MOVE, e);
+                        } else {
+                            invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MOVE, e);
+                        }
                     });
 
                     root.addEventListener('wheel', function (e) {
@@ -281,39 +291,67 @@ Object.defineProperty(window, 'osjs', {
                         if (e.deltaY === 0) return;
                         e.isHandled = true;
                         setModifiers(e);
-                        const target = _pointerCapture || e.target;
-                        invokePointerCallback(getClosestElement(target), EVENTS.WHEEL, e);
+                        const target = getClosestElement(_pointerCapture || e.target);
+                        if (target) {
+                            invokePointerCallback(target, EVENTS.WHEEL, e);
+                        } else {
+                            invokePointerCallbackOnRoot(e.currentTarget, EVENTS.WHEEL, e);
+                        }
                     });
 
                     root.addEventListener('pointerdown', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
-                        const element = (_pointerCapture === null || e.target === _pointerCapture) ? getClosestElement(e.target) : null;
+                        const target = (_pointerCapture === null || e.target === _pointerCapture) ? getClosestElement(e.target) : null;
                         switch (e.button) {
                             case 0:
-                                invokePointerCallback(element, EVENTS.POINTER_LEFT_DOWN, e);
+                                if (target) {
+                                    invokePointerCallback(target, EVENTS.POINTER_LEFT_DOWN, e);
+                                } else {
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_LEFT_DOWN, e);
+                                }
                                 break;
                             case 1:
-                                invokePointerCallback(element, EVENTS.POINTER_MIDDLE_DOWN, e);
+                                if (target) {
+                                    invokePointerCallback(target, EVENTS.POINTER_MIDDLE_DOWN, e);
+                                } else {
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_DOWN, e);
+                                }
                                 break;
                             case 2:
-                                invokePointerCallback(element, EVENTS.POINTER_RIGHT_DOWN, e);
+                                if (target) {
+                                    invokePointerCallback(target, EVENTS.POINTER_RIGHT_DOWN, e);
+                                } else {
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_RIGHT_DOWN, e);
+                                }
                                 break;
                         }
                     });
 
                     root.addEventListener('pointerup', function (e) {
                         e.isHandled = true;
-                        const target = _pointerCapture || e.target;
+                        const target = getClosestElement(_pointerCapture || e.target);
                         switch (e.button) {
                             case 0:
-                                invokePointerCallback(getClosestElement(target), EVENTS.POINTER_LEFT_UP, e);
+                                if (target) {
+                                    invokePointerCallback(target, EVENTS.POINTER_LEFT_UP, e);
+                                } else {
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_LEFT_UP, e);
+                                }
                                 break;
                             case 1:
-                                invokePointerCallback(getClosestElement(target), EVENTS.POINTER_MIDDLE_UP, e);
+                                if (target) {
+                                    invokePointerCallback(target, EVENTS.POINTER_MIDDLE_UP, e);
+                                } else {
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_UP, e); 
+                                }
                                 break;
                             case 2:
-                                invokePointerCallback(getClosestElement(target), EVENTS.POINTER_RIGHT_UP, e);
+                                if (target) {
+                                    invokePointerCallback(target, EVENTS.POINTER_RIGHT_UP, e);
+                                } else {
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_RIGHT_UP, e);
+                                }
                                 break;
                         }
                     });
@@ -322,16 +360,16 @@ Object.defineProperty(window, 'osjs', {
                     if (!view) return;
 
                     view.addEventListener('pointerenter', function (e) {
-                        if (_pointerCapture === null || this === _pointerCapture) {
+                        if (_pointerCapture === null || e.currentTarget === _pointerCapture) {
                             setModifiers(e);
-                            invokePointerCallback(getClosestElement(this), EVENTS.POINTER_ENTER, e);
+                            invokePointerCallback(getClosestElement(e.currentTarget), EVENTS.POINTER_ENTER, e);
                         }
                     });
 
                     view.addEventListener('pointerleave', function (e) {
-                        if (_pointerCapture === null || this === _pointerCapture) {
+                        if (_pointerCapture === null || e.currentTarget === _pointerCapture) {
                             setModifiers(e);
-                            invokePointerCallback(getClosestElement(this), EVENTS.POINTER_LEAVE, e);
+                            invokePointerCallback(getClosestElement(e.currentTarget), EVENTS.POINTER_LEAVE, e);
                         }
                     });
 
@@ -339,7 +377,7 @@ Object.defineProperty(window, 'osjs', {
                         view.addEventListener('keypress', function (e) {
                             if (!e.isHandled) {
                                 e.isHandled = true;
-                                _callbacks.inputManagerEvent(getClosestElementId(this), EVENTS.KEYPRESS, e);
+                                _callbacks.inputManagerEvent(getClosestElementId(e.currentTarget), EVENTS.KEYPRESS, e);
                             }
                         });
 
@@ -347,7 +385,7 @@ Object.defineProperty(window, 'osjs', {
                             if (!e.isHandled) {
                                 e.isHandled = true;
                                 setModifiers(e);
-                                _callbacks.inputManagerEvent(getClosestElementId(this), EVENTS.KEYDOWN, e);
+                                _callbacks.inputManagerEvent(getClosestElementId(e.currentTarget), EVENTS.KEYDOWN, e);
                             }
                         });
 
@@ -355,7 +393,7 @@ Object.defineProperty(window, 'osjs', {
                             if (!e.isHandled) {
                                 e.isHandled = true;
                                 setModifiers(e);
-                                _callbacks.inputManagerEvent(getClosestElementId(this), EVENTS.KEYUP, e);
+                                _callbacks.inputManagerEvent(getClosestElementId(e.currentTarget), EVENTS.KEYUP, e);
                             }
                         });
                     }

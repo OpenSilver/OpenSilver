@@ -11,6 +11,12 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using System.ComponentModel;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+
 namespace System.Windows.Input;
 
 /// <summary>
@@ -425,4 +431,65 @@ public static class Mouse
     /// </param>
     public static void RemoveMouseWheelHandler(DependencyObject element, MouseWheelEventHandler handler)
         => UIElement.RemoveHandler(element, MouseWheelEvent, handler);
+
+    /// <summary>
+    /// Gets the position of the mouse relative to a specified element.
+    /// </summary>
+    /// <param name="relativeTo">
+    /// The coordinate space in which to calculate the position of the mouse.
+    /// </param>
+    /// <returns>
+    /// The position of the mouse relative to the parameter relativeTo.
+    /// </returns>
+    public static Point GetPosition(UIElement relativeTo) =>
+        GetPosition(InputManager.Current.GetMousePosition(), relativeTo);
+
+    /// <summary>
+    /// Gets the position of the mouse relative to a specified element.
+    /// </summary>
+    /// <param name="relativeTo">
+    /// The coordinate space in which to calculate the position of the mouse.
+    /// </param>
+    /// <returns>
+    /// The position of the mouse relative to the parameter relativeTo.
+    /// </returns>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static Point GetPosition(IInputElement relativeTo) =>
+        GetPosition(InputManager.Current.GetMousePosition(), relativeTo);
+
+    internal static Point GetPosition(Point origin, IInputElement relativeTo)
+    {
+        return relativeTo switch
+        {
+            UIElement uie => GetPosition(origin, uie),
+            null => GetPosition(origin, null),
+            _ => throw new InvalidOperationException(string.Format(Strings.Invalid_IInputElement, relativeTo.GetType())),
+        };
+    }
+
+    internal static Point GetPosition(Point origin, UIElement relativeTo)
+    {
+        if (relativeTo is Popup popup)
+        {
+            relativeTo = popup.IsOpen ? popup.Child : null;
+        }
+
+        if (relativeTo is null)
+        {
+            return origin;
+        }
+
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(relativeTo))
+        {
+            Matrix m = relativeTo.InternalTransformToAncestor(null);
+            if (m.HasInverse)
+            {
+                m.Invert();
+            }
+
+            return m.Transform(origin);
+        }
+
+        return new Point(0.0, 0.0);
+    }
 }

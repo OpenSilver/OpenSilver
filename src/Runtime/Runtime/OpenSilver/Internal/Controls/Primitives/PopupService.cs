@@ -12,22 +12,13 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 
 namespace OpenSilver.Internal.Controls.Primitives;
 
 internal static class PopupService
 {
-    /// <summary>
-    /// Place the Popup relative to this point 
-    /// </summary>
-    internal static Point MousePosition { get; private set; }
-
     internal static HashSet<PopupRoot> ActivePopups { get; } = [];
-
-    internal static void UpdateMousePosition(MouseEventArgs e) => MousePosition = e.GetPosition(null);
 
     internal static void HandleMouseButton()
     {

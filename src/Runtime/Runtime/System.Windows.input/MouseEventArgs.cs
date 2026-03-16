@@ -11,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
-using CSHTML5.Internal;
+using System.ComponentModel;
 
 namespace System.Windows.Input;
 
@@ -81,51 +79,27 @@ public class MouseEventArgs : InputEventArgs
     public int ClickCount { get; internal set; }
 
     /// <summary>
-    /// Returns the pointer position for this event occurrence, optionally evaluated
-    /// against a coordinate origin of a supplied UIElement.
+    /// Returns the position of the mouse pointer relative to the specified element.
     /// </summary>
     /// <param name="relativeTo">
-    /// Any UIElement-derived object that is connected to the same object tree. To
-    /// specify the object relative to the overall coordinate system, use a relativeTo value
-    /// of null.
+    /// The element to use as the frame of reference for calculating the position of the mouse pointer.
     /// </param>
     /// <returns>
-    /// A PointerPoint value that represents the pointer point associated with this
-    /// event. If null was passed as relativeTo, the coordinates are in the frame
-    /// of reference of the overall window. If a non-null relativeTo was passed,
-    /// the coordinates are relative to the object referenced by relativeTo.
+    /// The x- and y-coordinates of the mouse pointer position relative to the specified object.
     /// </returns>
     public Point GetPosition(UIElement relativeTo)
-        => GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
+        => Mouse.GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
 
-    internal static Point GetPosition(Point origin, UIElement relativeTo)
-    {
-        if (relativeTo is Popup popup)
-        {
-            relativeTo = popup.IsOpen ? popup.Child : null;
-        }
-
-        if (relativeTo is null)
-        {
-            //-----------------------------------
-            // Return the absolute pointer coordinates:
-            //-----------------------------------
-            return origin;
-        }
-        else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(relativeTo))
-        {
-            //-----------------------------------
-            // Returns the pointer coordinates relative to the "relativeTo" element:
-            //-----------------------------------
-
-            Matrix m = relativeTo.InternalTransformToAncestor(null);
-            if (m.HasInverse)
-            {
-                m.Invert();
-            }
-            return m.Transform(origin);
-        }
-
-        return new Point(0.0, 0.0);
-    }
+    /// <summary>
+    /// Returns the position of the mouse pointer relative to the specified element.
+    /// </summary>
+    /// <param name="relativeTo">
+    /// The element to use as the frame of reference for calculating the position of the mouse pointer.
+    /// </param>
+    /// <returns>
+    /// The x- and y-coordinates of the mouse pointer position relative to the specified object.
+    /// </returns>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public Point GetPosition(IInputElement relativeTo)
+        => Mouse.GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
 }

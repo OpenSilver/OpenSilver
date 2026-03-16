@@ -17,11 +17,11 @@ using System.ComponentModel;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
+using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
-using OpenSilver.Internal.Controls.Primitives;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -548,11 +548,11 @@ namespace System.Windows.Controls.Primitives
                     offset = new Point(0, 0);
                     break;
                 case PlacementMode.Mouse:
-                    offset = PopupService.MousePosition;
+                    offset = Mouse.GetPosition(null);
                     offset.Y += _cursorOffsetY;
                     break;
                 case PlacementMode.MousePoint:
-                    offset = PopupService.MousePosition;
+                    offset = Mouse.GetPosition(null);
                     break;
                 default:
                     Debug.Assert(false, $"Unexpected absolute placement mode: '{placement}'.");
