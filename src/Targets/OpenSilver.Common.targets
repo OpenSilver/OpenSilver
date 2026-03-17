@@ -264,6 +264,7 @@
       <ApplicationDefinition Remove="@(_XamlPreprocessorProcessedApplicationDefinitionFiles)" />
       <Content Remove="@(_XamlPreprocessorProcessedContentFiles)" />
       <Compile Include="@(_XamlPreprocessorGeneratedFiles)" />
+      <_Pass1GeneratedFilesToRemove Include="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)**\*.g.i.$(OutputExtension)" Condition="'$(IsSecondPass)'=='True'" />
     </ItemGroup>
 
     <!--============================================================
@@ -297,7 +298,8 @@
     <!--============================================================
       Launch the second pass (only during Pass 1)
       ============================================================-->
-    <MSBuild Condition="'$(IsSecondPass)'!='True'" Projects="$(MSBuildProjectFile)" Properties="IsSecondPass=True" />
+    <Delete Condition="'$(IsSecondPass)'=='True' And '@(_Pass1GeneratedFilesToRemove)' != ''" Files="@(_Pass1GeneratedFilesToRemove)" />
+    <MSBuild Condition="'$(IsSecondPass)'!='True'" Projects="$(MSBuildProjectFile)" Properties="IsSecondPass=True;Configuration=$(Configuration);Platform=$(Platform)" />
 
     <!--============================================================
       Enable the Post Build event only during Pass 2 (to avoid calling the Post Build event twice)
