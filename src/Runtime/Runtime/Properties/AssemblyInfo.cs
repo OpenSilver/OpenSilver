@@ -17,15 +17,14 @@ using System.Windows.Markup;
 [assembly: InternalsVisibleTo("OpenSilver.Browser")]
 [assembly: InternalsVisibleTo("OpenSilver.Simulator")]
 [assembly: InternalsVisibleTo("Runtime.OpenSilver.Tests")]
-[assembly: InternalsVisibleTo("OpenSilver.ControlsKit.FastControls")]
 [assembly: InternalsVisibleTo("XRSharp")]
 [assembly: InternalsVisibleTo("Xaml3D")]
-
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")] // This is used for example in the {x:Static ...} markup extension.
-
-[assembly: InternalsVisibleTo("Telerik.Windows.Controls.GridView")]
+[assembly: InternalsVisibleTo("OpenSilver.WpfCompat")]
 
 [assembly: OpenSilver.XamlDesigner(7)]
+
+// This is used for example in the {x:Static ...} markup extension.
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")]
 
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]
@@ -60,5 +59,6 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Controls.Primitives")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows")]
 
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "System.Windows.Controls")] // This is used for example when migrating Silverlight apps, for example with the DockPanel control that was in the Toolkit.
+// This is used for example when migrating Silverlight apps, for example with the DockPanel control that was in the Toolkit.
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "System.Windows.Controls")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "System.Windows.Controls.Primitives")]
