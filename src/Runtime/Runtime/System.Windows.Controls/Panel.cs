@@ -151,7 +151,7 @@ namespace System.Windows.Controls
         /// Setting this option can improve performance.
         /// Value lower than 0 means progressive rendering is disabled.
         /// Value of 0 means it uses the size defined at the application level, see
-        /// <see cref="Settings.ProgressiveRenderingChunkSize"/>.
+        /// <see cref="Interop.Settings.ProgressiveRenderingChunkSize"/>.
         /// Default value is 0.
         /// </summary>
         /// <remarks>

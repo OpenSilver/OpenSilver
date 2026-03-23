@@ -1,6 +1,7 @@
 namespace System.Windows.Interop
 {
     [OpenSilver.NotImplemented]
+    [Obsolete("Use System.Windows.Interop.Host instead.")]
     public class SilverlightHost
     {
         [OpenSilver.NotImplemented]

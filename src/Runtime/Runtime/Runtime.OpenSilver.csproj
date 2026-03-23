@@ -449,7 +449,6 @@
     <Compile Include="System.Windows.Ink\DrawingAttributes.cs" />
     <Compile Include="System.Windows.Input\StylusPoint.cs" />
     <Compile Include="System.Windows.Input\StylusPointCollection.cs" />
-    <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
     <Compile Include="System.Windows.Media\BrushConverter.cs" />
     <Compile Include="System.Windows.Media\Color.cs" />
     <Compile Include="System.Windows.Media\RenderingEventArgs.cs" />
@@ -713,8 +712,10 @@
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TouchFrameEventHandler.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TouchPoint.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TouchPointCollection.cs" />
-    <Compile Include="System.Windows.Interop\WORKINPROGRESS\Settings.cs" />
     <Compile Include="System.Windows.Interop\WORKINPROGRESS\SilverlightHost.cs" />
+    <Compile Include="System.Windows.Interop\Settings.cs" />
+    <Compile Include="System.Windows.Interop\Host.cs" />
+    <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
     <Compile Include="System.Windows.Markup\XamlReader.cs" />
     <Compile Include="System.Windows.Media\AlignmentX.cs" />
     <Compile Include="System.Windows.Media\AlignmentY.cs" />
@@ -1054,7 +1055,6 @@
     <Compile Include="System.Windows\GridLength.cs" />
     <Compile Include="System.Windows\GridUnitType.cs" />
     <Compile Include="System.Windows\HorizontalAlignment.cs" />
-    <Compile Include="System.Windows\Host.cs" />
     <Compile Include="System.Windows\MessageBox.cs" />
     <Compile Include="System.Windows\MessageBoxButton.cs" />
     <Compile Include="System.Windows\MessageBoxResult.cs" />
@@ -1069,7 +1069,6 @@
     <Compile Include="System.Windows\Setter.cs" />
     <Compile Include="System.Windows\SetterBase.cs" />
     <Compile Include="System.Windows\SetterBaseCollection.cs" />
-    <Compile Include="System.Windows\Settings.cs" />
     <Compile Include="System.Windows\SizeChangedEventArgs.cs" />
     <Compile Include="System.Windows\SizeChangedEventHandler.cs" />
     <Compile Include="System.Windows\StartupEventArgs.cs" />
