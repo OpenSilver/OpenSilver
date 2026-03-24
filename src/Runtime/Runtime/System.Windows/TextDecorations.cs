@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -54,7 +54,7 @@ namespace System.Windows
     /// <summary>
     ///     TextDecorationLocation - Referenced localization of the text decoration
     /// </summary>
-    internal enum TextDecorationLocation
+    public enum TextDecorationLocation
     {
         /// <summary>
         ///     Underline - Underline position

@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -576,6 +576,37 @@ public class Window : ContentControl, IResizeObserverListener
         return state == WindowState.Maximized ||
                state == WindowState.Minimized ||
                state == WindowState.Normal;
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ResizeMode"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty ResizeModeProperty =
+        DependencyProperty.Register(
+            nameof(ResizeMode),
+            typeof(ResizeMode),
+            typeof(Window),
+            new FrameworkPropertyMetadata(ResizeMode.CanResize),
+            ValidateResizeMode);
+
+    /// <summary>
+    /// Gets or sets the resize mode (WPF compatibility).
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public ResizeMode ResizeMode
+    {
+        get => (ResizeMode)GetValue(ResizeModeProperty);
+        set => SetValueInternal(ResizeModeProperty, value);
+    }
+
+    private static bool ValidateResizeMode(object value)
+    {
+        var m = (ResizeMode)value;
+        return m is ResizeMode.NoResize
+            or ResizeMode.CanMinimize
+            or ResizeMode.CanResize
+            or ResizeMode.CanResizeWithGrip;
     }
 
     [OpenSilver.NotImplemented]

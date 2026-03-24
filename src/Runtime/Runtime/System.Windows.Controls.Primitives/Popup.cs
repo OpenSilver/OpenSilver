@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -20,6 +20,7 @@ using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
@@ -139,6 +140,46 @@ namespace System.Windows.Controls.Primitives
                 || value == PlacementMode.Left
                 || value == PlacementMode.Top;
         }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the popup supports transparency (WPF compatibility).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public bool AllowsTransparency
+        {
+            get => (bool)GetValue(AllowsTransparencyProperty);
+            set => SetValueInternal(AllowsTransparencyProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="AllowsTransparency"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AllowsTransparencyProperty =
+            DependencyProperty.Register(
+                nameof(AllowsTransparency),
+                typeof(bool),
+                typeof(Popup),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets how the popup animates when opened or closed (WPF compatibility).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public PopupAnimation PopupAnimation
+        {
+            get => (PopupAnimation)GetValue(PopupAnimationProperty);
+            set => SetValueInternal(PopupAnimationProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="PopupAnimation"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupAnimationProperty =
+            DependencyProperty.Register(
+                nameof(PopupAnimation),
+                typeof(PopupAnimation),
+                typeof(Popup),
+                new PropertyMetadata(PopupAnimation.None));
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new PopupRootAutomationPeer(this);

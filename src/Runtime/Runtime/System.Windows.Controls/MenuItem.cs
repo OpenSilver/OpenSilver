@@ -1,4 +1,4 @@
-﻿// (c) Copyright Microsoft Corporation.
+// (c) Copyright Microsoft Corporation.
 // This source is subject to the Microsoft Public License (Ms-PL).
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
@@ -67,6 +67,13 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
         DefaultStyleKeyProperty.OverrideMetadata(typeof(MenuItem), new PropertyMetadata(typeof(MenuItem)));
         EventManager.RegisterClassHandler<MenuItem>(MenuBase.IsSelectedChangedEvent, new RoutedPropertyChangedEventHandler<bool>(OnIsSelectedChanged));
     }
+
+    /// <summary>
+    /// Add-owner of <see cref="Popup.AllowsTransparencyProperty"/> for control template triggers that use
+    /// <c>SourceName</c> on the submenu <see cref="Popup"/> (WPF compatibility).
+    /// </summary>
+    public static readonly DependencyProperty AllowsTransparencyProperty =
+        Popup.AllowsTransparencyProperty.AddOwner(typeof(MenuItem));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MenuItem"/> class.

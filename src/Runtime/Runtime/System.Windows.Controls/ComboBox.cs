@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -61,6 +61,13 @@ namespace System.Windows.Controls
             IsSelectionActivePropertyKey.OverrideMetadata(typeof(ComboBox),new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
             IsTextSearchEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
+
+        /// <summary>
+        /// Add-owner of <see cref="Popup.AllowsTransparencyProperty"/> for control template triggers that use
+        /// <c>SourceName</c> on the drop-down <see cref="Popup"/> (WPF compatibility).
+        /// </summary>
+        public static readonly DependencyProperty AllowsTransparencyProperty =
+            Popup.AllowsTransparencyProperty.AddOwner(typeof(ComboBox));
 
         /// <summary>
         /// Initializes a new instance of the ComboBox class.

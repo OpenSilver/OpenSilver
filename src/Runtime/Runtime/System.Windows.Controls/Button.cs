@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,6 +13,8 @@
 
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
+using OpenSilver;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -52,5 +54,45 @@ namespace System.Windows.Controls
         /// </returns>
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ButtonAutomationPeer(this);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the button is the default (WPF compatibility).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public bool IsDefault
+        {
+            get => (bool)GetValue(IsDefaultProperty);
+            set => SetValueInternal(IsDefaultProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="IsDefault"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsDefaultProperty =
+            DependencyProperty.Register(
+                nameof(IsDefault),
+                typeof(bool),
+                typeof(Button),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the button is a cancel button (WPF compatibility).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public bool IsCancel
+        {
+            get => (bool)GetValue(IsCancelProperty);
+            set => SetValueInternal(IsCancelProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="IsCancel"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsCancelProperty =
+            DependencyProperty.Register(
+                nameof(IsCancel),
+                typeof(bool),
+                typeof(Button),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
     }
 }

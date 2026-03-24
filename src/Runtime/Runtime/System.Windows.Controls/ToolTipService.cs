@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -98,6 +99,35 @@ namespace System.Windows.Controls
             ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(PlacementProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the ToolTipService.InitialShowDelay attached property (milliseconds, WPF compatibility).
+        /// </summary>
+        public static readonly DependencyProperty InitialShowDelayProperty =
+            DependencyProperty.RegisterAttached(
+                "InitialShowDelay",
+                typeof(int),
+                typeof(ToolTipService),
+                new PropertyMetadata(TOOLTIPSERVICE_initialShowDelay));
+
+        /// <summary>
+        /// Gets the initial show delay for the tooltip on the specified element.
+        /// </summary>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+        public static int GetInitialShowDelay(DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            return (int)element.GetValue(InitialShowDelayProperty);
+        }
+
+        /// <summary>
+        /// Sets the initial show delay for the tooltip on the specified element.
+        /// </summary>
+        public static void SetInitialShowDelay(DependencyObject element, int value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            element.SetValueInternal(InitialShowDelayProperty, value);
         }
 
         /// <summary>
