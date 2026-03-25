@@ -112,6 +112,7 @@ Object.defineProperty(window, 'osjs', {
 
             let _modifiers = MODIFIERKEYS.NONE;
             let _pointerCapture = null;
+            let _activePointerId;
             let _suppressContextMenu = false;
 
             function setModifiers(e) {
@@ -174,6 +175,8 @@ Object.defineProperty(window, 'osjs', {
 
             function initDom() {
                 document.addEventListener('pointerdown', function (e) {
+                    if (!_pointerCapture)
+                        _activePointerId = e.pointerId;
                     if (!e.isHandled) {
                         switch (e.button) {
                             case 0:
@@ -304,6 +307,8 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('pointerdown', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
+                        if (!_pointerCapture)
+                            _activePointerId = e.pointerId;
                         const target = (_pointerCapture === null || e.target === _pointerCapture) ? getClosestElement(e.target) : null;
                         switch (e.button) {
                             case 0:
@@ -345,7 +350,7 @@ Object.defineProperty(window, 'osjs', {
                                 if (target) {
                                     invokePointerCallback(target, EVENTS.POINTER_MIDDLE_UP, e);
                                 } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_UP, e); 
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_UP, e);
                                 }
                                 break;
                             case 2:
@@ -407,11 +412,15 @@ Object.defineProperty(window, 'osjs', {
                     const element = document.getElementById(id);
                     if (element) {
                         _pointerCapture = element;
+                        element.setPointerCapture(_activePointerId);
                         document.body.classList.add(CSS_CLASS.POINTER_CAPTURED);
                     }
                 },
                 releasePointerCapture: function () {
-                    _pointerCapture = null;
+                    if (_pointerCapture) {
+                        _pointerCapture.releasePointerCapture(_activePointerId);
+                        _pointerCapture = null;
+                    }
                     document.body.classList.remove(CSS_CLASS.POINTER_CAPTURED);
                 },
                 suppressContextMenu: function (value) {
