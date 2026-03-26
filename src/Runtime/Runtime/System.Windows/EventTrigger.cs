@@ -57,7 +57,23 @@ public sealed class EventTrigger : TriggerBase
     /// <returns>
     /// The existing <see cref="TriggerActionCollection"/>.
     /// </returns>
-    public TriggerActionCollection Actions => _actions ??= new TriggerActionCollection(this);
+    public TriggerActionCollection Actions
+    {
+        get
+        {
+            if (_actions is null)
+            {
+                _actions = new TriggerActionCollection(this);
+                if (IsSealed)
+                {
+                    _actions.Seal();
+                }
+            }
+            return _actions;
+        }
+    }
+
+    internal bool HasActions => _actions is not null && _actions.InternalCount > 0;
 
     /// <summary>
     /// Gets or sets the name of the event that initiates the trigger.
@@ -113,6 +129,29 @@ public sealed class EventTrigger : TriggerBase
 
             _sourceName = value;
         }
+    }
+
+    internal override void Seal()
+    {
+        if (IsSealed)
+        {
+            return;
+        }
+
+        if (_routedEvent is null)
+        {
+            throw new InvalidOperationException(string.Format(Strings.NullPropertyIllegal, "EventTrigger.RoutedEvent"));
+        }
+
+        // EnterActions/ExitActions aren't meaningful on event triggers.
+        if (HasEnterActions || HasExitActions)
+        {
+            throw new InvalidOperationException(Strings.EventTriggerDoesNotEnterExit);
+        }
+
+        _actions?.Seal();
+
+        base.Seal();
     }
 
     //

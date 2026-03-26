@@ -13,7 +13,6 @@
 
 using Mono.Cecil;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 
 namespace OpenSilver.Compiler;
@@ -21,7 +20,9 @@ namespace OpenSilver.Compiler;
 internal abstract partial class TypeReferenceHelper
 {
     public static TypeReferenceHelper CSharp { get; } = new TypeReferenceHelperCS();
+
     public static TypeReferenceHelper VisualBasic { get; } = new TypeReferenceHelperVB();
+
     public static TypeReferenceHelper FSharp { get; } = new TypeReferenceHelperFS();
 
     public string ConvertToString(TypeReference type)

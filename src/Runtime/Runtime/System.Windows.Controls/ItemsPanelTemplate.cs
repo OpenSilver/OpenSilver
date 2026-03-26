@@ -11,17 +11,18 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Specifies the panel that the <see cref="ItemsPresenter"/> creates for the layout of 
+/// the items of an <see cref="ItemsControl"/>.
+/// </summary>
+public class ItemsPanelTemplate : FrameworkTemplate
 {
     /// <summary>
-    /// Specifies the panel that the ItemsPresenter creates for the layout of the
-    /// items of an ItemsControl.
+    /// Initializes a new instance of the <see cref="ItemsPanelTemplate"/> class.
     /// </summary>
-    public class ItemsPanelTemplate : FrameworkTemplate
-    {
-        /// <summary>
-        /// Initializes a new instance of the ItemsPanelTemplate class.
-        /// </summary>
-        public ItemsPanelTemplate() { }
-    }
+    public ItemsPanelTemplate() { }
+
+    internal override Type TargetTypeInternal => typeof(ItemsPresenter);
 }

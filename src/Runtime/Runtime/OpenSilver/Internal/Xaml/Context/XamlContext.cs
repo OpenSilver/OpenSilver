@@ -22,7 +22,6 @@ namespace OpenSilver.Internal.Xaml.Context
     {
         private readonly XamlContextStack _stack;
         private object _rootInstance;
-        private Lazy<INameResolver> _nameResolver;
 
         internal XamlContext()
         {
@@ -63,31 +62,6 @@ namespace OpenSilver.Internal.Xaml.Context
                     _rootInstance = rootFrame.Instance;
                 }
                 return _rootInstance;
-            }
-        }
-
-        internal INameResolver NameResolver
-        {
-            get
-            {
-                if (_nameResolver == null)
-                {
-                    _nameResolver = new Lazy<INameResolver>(() =>
-                    {
-                        if (SavedDepth > 0)
-                        {
-                            return new TemplateNameResolver((IInternalFrameworkElement)_stack.GetFrame(SavedDepth + 1).Instance);
-                        }
-                        else if (RootInstance is IInternalFrameworkElement rootObject)
-                        {
-                            return new XamlNameResolver(rootObject);
-                        }
-
-                        return null;
-                    });
-                }
-
-                return _nameResolver.Value;
             }
         }
 

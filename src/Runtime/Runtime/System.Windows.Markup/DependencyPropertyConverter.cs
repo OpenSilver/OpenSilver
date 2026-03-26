@@ -11,165 +11,248 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml;
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows.Controls;
 using System.Xaml;
-using OpenSilver.Internal;
 
-namespace System.Windows.Markup
+namespace System.Windows.Markup;
+
+/// <summary>
+/// Converts from a string to a <see cref="DependencyProperty"/> object.
+/// </summary>
+internal sealed class DependencyPropertyConverter : TypeConverter
 {
     /// <summary>
-    /// Class for converting a given DependencyProperty to and from a string
+    /// Determines whether an object of the specified type can be converted to an instance of 
+    /// <see cref="DependencyProperty"/>.
     /// </summary>
-    internal sealed class DependencyPropertyConverter : TypeConverter
+    /// <param name="context">
+    /// A format context that provides information about the environment from which this converter 
+    /// is being invoked.
+    /// </param>
+    /// <param name="sourceType">
+    /// The type being evaluated for conversion.
+    /// </param>
+    /// <returns>
+    /// true if this converter can perform the operation; otherwise, false.
+    /// </returns>
+    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
-        #region Public Methods
+        // We can only convert from a string and that too only if we have all the contextual information
+        // Note: Sometimes even the serializer calls CanConvertFrom in order 
+        // to determine if it is a valid converter to use for serialization.
+        return sourceType == typeof(string);
+    }
 
-        /// <summary>
-        /// CanConvertFrom()
-        /// </summary>
-        /// <param name="context">ITypeDescriptorContext</param>
-        /// <param name="sourceType">type to convert from</param>
-        /// <returns>true if the given type can be converted, false otherwise</returns>
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+    /// <summary>
+    /// Determines whether an instance of <see cref="DependencyProperty"/> can be converted to the 
+    /// specified type.
+    /// </summary>
+    /// <param name="context">
+    /// A format context that provides information about the environment from which this converter 
+    /// is being invoked.
+    /// </param>
+    /// <param name="destinationType">
+    /// The type being evaluated for conversion.
+    /// </param>
+    /// <returns>
+    /// Always returns false.
+    /// </returns>
+    public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) => false;
+
+    /// <summary>
+    /// Attempts to convert the specified object to a <see cref="DependencyProperty"/>, using the 
+    /// specified context.
+    /// </summary>
+    /// <param name="context">
+    /// A format context that provides information about the environment from which this converter 
+    /// is being invoked.
+    /// </param>
+    /// <param name="culture">
+    /// Culture specific information.
+    /// </param>
+    /// <param name="source">
+    /// The object to convert.
+    /// </param>
+    /// <returns>
+    /// The converted object. If the conversion is successful, this is a <see cref="DependencyProperty"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="context"/> or <paramref name="source"/> is null.
+    /// </exception>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="source"/> cannot be converted.
+    /// </exception>
+    public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object source)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(source);
+
+        if (ResolveProperty(context, null, source) is DependencyProperty property)
         {
-            // We can only convert from a string and that too only if we have all the contextual information
-            // Note: Sometimes even the serializer calls CanConvertFrom in order 
-            // to determine if it is a valid converter to use for serialization.
-            if (sourceType == typeof(string))
-            {
-                return true;
-            }
+            return property;
+        }
+        else
+        {
+            throw GetConvertFromException(source);
+        }
+    }
 
-            return false;
+    /// <summary>
+    /// Attempts to convert a <see cref="DependencyProperty"/> to the specified type, using the specified 
+    /// context. Always throws an exception.
+    /// </summary>
+    /// <param name="context">
+    /// A format context that provides information about the environment from which this converter 
+    /// is being invoked.
+    /// </param>
+    /// <param name="culture">
+    /// Culture specific information.
+    /// </param>
+    /// <param name="value">
+    /// The object to convert.
+    /// </param>
+    /// <param name="destinationType">
+    /// The type to convert the object to.
+    /// </param>
+    /// <returns>
+    /// Always throws an exception.
+    /// </returns>
+    /// <exception cref="NotSupportedException">
+    /// In all cases.
+    /// </exception>
+    public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+    {
+        throw GetConvertToException(value, destinationType);
+    }
+
+    internal static DependencyProperty ResolveProperty(IServiceProvider serviceProvider, string targetName, object source)
+    {
+        if (source is DependencyProperty dProperty)
+        {
+            return dProperty;
         }
 
-        /// <summary>
-        /// TypeConverter method override. 
-        /// </summary>
-        /// <param name="context">ITypeDescriptorContext</param>
-        /// <param name="destinationType">Type to convert to</param>
-        /// <returns>true if conversion is possible</returns>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        Type type = null;
+        string property;
+
+        if (source is string value)
         {
-            return false;
-        }
-
-        /// <summary>
-        /// ConvertFrom() -TypeConverter method override. using the given name to return DependencyProperty
-        /// </summary>
-        /// <param name="context">ITypeDescriptorContext</param>
-        /// <param name="culture">CultureInfo</param>
-        /// <param name="source">Object to convert from</param>
-        /// <returns>instance of Command</returns>
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object source)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-            ArgumentNullException.ThrowIfNull(source);
-
-            DependencyProperty property = ResolveProperty(context, source);
-
-            if (property != null)
+            value = value.Trim();
+            // If it contains a . it means that it is a full name with type and property.
+            if (value.Contains("."))
             {
-                return property;
+                // Prefixes could have .'s so we take the last one and do a type resolve against that
+                int lastIndex = value.LastIndexOf('.');
+                string typeName = value.Substring(0, lastIndex);
+                property = value.Substring(lastIndex + 1);
+
+                IXamlTypeResolver resolver = serviceProvider.GetService(typeof(IXamlTypeResolver)) as IXamlTypeResolver;
+                type = resolver.Resolve(typeName);
             }
             else
             {
-                throw GetConvertFromException(source);
+                // Only have the property name
+                // Strip prefixes if there are any, v3 essentially discards the prefix in this case
+                int lastIndex = value.LastIndexOf(':');
+                property = value.Substring(lastIndex + 1);
             }
         }
-
-        /// <summary>
-        /// ConvertTo() - Serialization purposes, returns the string from Command.Name by adding ownerType.FullName
-        /// </summary>
-        /// <param name="context">ITypeDescriptorContext</param>
-        /// <param name="culture">CultureInfo</param>
-        /// <param name="value">the	object to convert from</param>
-        /// <param name="destinationType">the type to convert to</param>
-        /// <returns>string object, if the destination type is string</returns>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        else
         {
-            throw GetConvertToException(value, destinationType);
+            throw NotSupported();
         }
 
-        #endregion Public Methods
-
-        private static DependencyProperty ResolveProperty(IServiceProvider serviceProvider, object source)
+        // We got additional info from either Trigger.SourceName or Setter.TargetName
+        if (type is null && targetName is not null)
         {
-            Type type = null;
-            string property;
+            IAmbientProvider ambientProvider = serviceProvider.GetService(typeof(IAmbientProvider))
+                as IAmbientProvider;
+            XamlSchemaContext schemaContext = (serviceProvider.GetService(typeof(IXamlSchemaContextProvider))
+                as IXamlSchemaContextProvider).SchemaContext;
 
-            if (source is DependencyProperty dProperty)
+            type = GetTypeFromName(schemaContext, ambientProvider, targetName);
+        }
+
+        // Still don't have a Type so we need to loop up the chain and grab Style.TargetType,
+        if (type is null)
+        {
+            if (serviceProvider.GetService(typeof(IXamlSchemaContextProvider)) is not IXamlSchemaContextProvider ixscp)
             {
-                return dProperty;
+                throw NotSupported();
             }
 
-            if (source is string value)
+            XamlSchemaContext schemaContext = ixscp.SchemaContext;
+
+            XamlType styleXType = schemaContext.GetXamlType(typeof(Style));
+            XamlType frameworkTemplateXType = schemaContext.GetXamlType(typeof(FrameworkTemplate));
+            XamlType dataTemplateXType = schemaContext.GetXamlType(typeof(DataTemplate));
+            XamlType controlTemplateXType = schemaContext.GetXamlType(typeof(ControlTemplate));
+
+            XamlType[] ceilingTypes = [styleXType, frameworkTemplateXType, dataTemplateXType, controlTemplateXType];
+
+            XamlMember styleTargetType = styleXType.GetMember(nameof(Style.TargetType));
+            XamlMember templateProperty = frameworkTemplateXType.GetMember(nameof(FrameworkTemplate.Template));
+            XamlMember controlTemplateTargetType = controlTemplateXType.GetMember(nameof(ControlTemplate.TargetType));
+
+            if (serviceProvider.GetService(typeof(IAmbientProvider)) is not IAmbientProvider ambientProvider)
             {
-                value = value.Trim();
-                // If it contains a . it means that it is a full name with type and property.
-                if (value.Contains("."))
+                throw NotSupported();
+            }
+
+            AmbientPropertyValue firstAmbientValue = ambientProvider.GetFirstAmbientValue(ceilingTypes,
+                styleTargetType, templateProperty, controlTemplateTargetType);
+
+            if (firstAmbientValue is not null)
+            {
+                if (firstAmbientValue.Value is Type ambientType)
                 {
-                    // Prefixes could have .'s so we take the last one and do a type resolve against that
-                    int lastIndex = value.LastIndexOf('.');
-                    string typeName = value.Substring(0, lastIndex);
-                    property = value.Substring(lastIndex + 1);
-
-                    IXamlTypeResolver resolver = serviceProvider.GetService(typeof(IXamlTypeResolver)) as IXamlTypeResolver;
-                    type = resolver.Resolve(typeName);
+                    type = ambientType;
+                }
+                else if (firstAmbientValue.Value is XamlTemplateContent templateContent)
+                {
+                    type = templateContent.OwnerTemplate.TargetTypeInternal;
                 }
                 else
                 {
-                    // Only have the property name
-                    // Strip prefixes if there are any, v3 essentially discards the prefix in this case
-                    int lastIndex = value.LastIndexOf(':');
-                    property = value.Substring(lastIndex + 1);
+                    throw NotSupported();
                 }
             }
-            else
-            {
-                throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
-            }
-
-            // Still don't have a Type so we need to loop up the chain and grab Style.TargetType,
-            if (type == null)
-            {
-                if (serviceProvider.GetService(typeof(IXamlSchemaContextProvider)) is not IXamlSchemaContextProvider ixscp)
-                {
-                    throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
-                }
-
-                XamlSchemaContext schemaContext = ixscp.SchemaContext;
-                XamlType styleXType = schemaContext.GetXamlType(typeof(Style));
-                var ceilingTypes = new List<XamlType>(1) { styleXType };
-                XamlMember styleTargetType = styleXType.GetMember(nameof(Style.TargetType));
-
-                if (serviceProvider.GetService(typeof(IAmbientProvider)) is not IAmbientProvider ambientProvider)
-                {
-                    throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
-                }
-
-                AmbientPropertyValue firstAmbientValue = ambientProvider.GetFirstAmbientValue(ceilingTypes, styleTargetType);
-                if (firstAmbientValue != null)
-                {
-                    if (firstAmbientValue.Value is Type ambientType)
-                    {
-                        type = ambientType;
-                    }
-                    else
-                    {
-                        throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
-                    }
-                }
-            }
-
-            if (type != null && property != null)
-            {
-                return DependencyProperty.FromName(property, type);
-            }
-
-            throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
         }
+
+        if (type is not null && property is not null)
+        {
+            return DependencyProperty.FromName(property, type);
+        }
+
+        throw NotSupported();
+
+        static NotSupportedException NotSupported()
+        {
+            return new NotSupportedException(
+                string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
+        }
+    }
+
+    // Setters and triggers may have a sourceName which we need to resolve
+    // This only works in templates and it works by looking up the mapping between 
+    // name and type in the template.  We use ambient lookup to find the Template property
+    // and then query it for the type.
+    private static Type GetTypeFromName(XamlSchemaContext schemaContext, IAmbientProvider ambientProvider, string target)
+    {
+        XamlType frameworkTemplateXType = schemaContext.GetXamlType(typeof(FrameworkTemplate));
+        XamlMember templateProperty = frameworkTemplateXType.GetMember(nameof(FrameworkTemplate.Template));
+
+        AmbientPropertyValue ambientValue = ambientProvider.GetFirstAmbientValue([frameworkTemplateXType], templateProperty);
+
+        if (ambientValue.Value is XamlTemplateContent templateContent)
+        {
+            return templateContent.GetTypeForName(target).UnderlyingType;
+        }
+
+        return null;
     }
 }

@@ -294,6 +294,15 @@
   <data name="CollectionView_WrongType" xml:space="preserve">
     <value>Le type '{0}' n'est pas un type CollectionView.</value>
   </data>
+  <data name="ConditionCannotUseBothPropertyAndBinding" xml:space="preserve">
+    <value>La condition ne peut pas utiliser à la fois Property et Binding.</value>
+  </data>
+  <data name="ConditionValueOfExpressionNotSupported" xml:space="preserve">
+    <value>Le type d'expression n'est pas une condition de déclencheur valide.</value>
+  </data>
+  <data name="ConditionValueOfMarkupExtensionNotSupported" xml:space="preserve">
+    <value>'{0}' n'est pas une condition de déclencheur valide.</value>
+  </data>
   <data name="CompatibilityPreferencesSealed" xml:space="preserve">
     <value>Impossible de changer la propriété '{0}'. La classe '{1}' est sealed.</value>
   </data>
@@ -1307,5 +1316,32 @@
   </data>
   <data name="WindowContentMustBeFrameworkElement" xml:space="preserve">
     <value>La propriété Content d'une Window doit être un FrameworkElement.</value>
+  </data>
+  <data name="EventTriggerDoesNotEnterExit" xml:space="preserve">
+    <value>Les déclencheurs d'événements ne prennent pas en charge EnterActions ou ExitActions.</value>
+  </data>
+  <data name="VisualTriggerSettersIncludeUnsupportedSetterType" xml:space="preserve">
+    <value>VisualTrigger ne prend pas en charge le type Setter '{0}'.</value>
+  </data>
+  <data name="StylePropertyInStyleNotAllowed" xml:space="preserve">
+    <value>L'objet Style n'est pas autorisé à affecter la propriété Style de l'objet auquel elle s'applique.</value>
+  </data>
+  <data name="ChildNameMustBeNonEmpty" xml:space="preserve">
+    <value>L'identificateur de nœud enfant de la propriété Target ne peut pas être une chaîne vide.</value>
+  </data>
+  <data name="SetterOnStyleNotAllowedToHaveTarget" xml:space="preserve">
+    <value>Comme un Style n'a pas de nœuds enfants, un Style Setter ne peut pas spécifier un nom de nœud d'enfant '{0}'.</value>
+  </data>
+  <data name="NameNotFound" xml:space="preserve">
+    <value>Impossible de trouver un enfant avec Name '{0}' dans VisualTree.</value>
+  </data>
+  <data name="SourceNameNotSupportedForDataTriggers" xml:space="preserve">
+    <value>Impossible de spécifier la propriété SourceName d'un DataTrigger ou MultiDataTrigger.</value>
+  </data>
+  <data name="ReadOnlyPropertyNotAllowed" xml:space="preserve">
+    <value>L'objet '{1}' ne peut pas spécifier de valeur pour la propriété en lecture seule '{0}'.</value>
+  </data>
+  <data name="TemplateContentSetTwice" xml:space="preserve">
+    <value>La propriété TemplateContent du modèle ne peut être définie qu'une fois.</value>
   </data>
 </root>

@@ -78,7 +78,7 @@ public class ItemsPresenter : FrameworkElement
     {
         var ip = (ItemsPresenter)d;
         ip.ClearPanel();
-        UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+        StyleHelper.UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
     }
 
     private void ClearPanel()

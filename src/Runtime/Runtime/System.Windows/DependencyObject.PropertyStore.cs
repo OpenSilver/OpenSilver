@@ -51,17 +51,21 @@ public partial class DependencyObject
 
         public ReadOnlySpan<TValue> Span => _entries.AsSpan(0, _count);
 
-        public bool Remove(int targetIndex)
+        public bool TryRemove(int targetIndex, out TValue value)
         {
             int index = LookupEntry(targetIndex);
             if (index >= 0)
             {
+                value = _entries[index];
                 RemoveAt(index);
                 return true;
             }
 
+            value = default;
             return false;
         }
+
+        public bool Remove(int targetIndex) => TryRemove(targetIndex, out _);
 
         public void RemoveAt(int index)
         {

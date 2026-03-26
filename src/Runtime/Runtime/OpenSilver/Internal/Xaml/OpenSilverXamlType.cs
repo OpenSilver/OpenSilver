@@ -15,6 +15,7 @@ using System;
 using System.Reflection;
 using System.Windows;
 using System.Xaml;
+using System.Xaml.Markup;
 
 namespace OpenSilver.Internal.Xaml;
 
@@ -24,6 +25,12 @@ internal class OpenSilverXamlType : XamlType
         : base(underlyingType, schema)
     {
     }
+
+    protected override EventHandler<XamlSetMarkupExtensionEventArgs> LookupSetMarkupExtensionHandler() =>
+        Helper.LookupSetMarkupExtensionHandler(UnderlyingType);
+
+    protected override EventHandler<XamlSetTypeConverterEventArgs> LookupSetTypeConverterHandler() =>
+        Helper.LookupSetTypeConverterHandler(UnderlyingType);
 
     protected override XamlMember LookupMember(string name, bool skipReadOnlyCheck) => FindMember(name, false, skipReadOnlyCheck);
 

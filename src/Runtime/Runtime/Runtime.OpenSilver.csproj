@@ -28,6 +28,9 @@
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
     <Compile Include="OpenSilver\Internal\Documents\TextContainerList.cs" />
+    <Compile Include="OpenSilver\Internal\StyleTriggerStorage.cs" />
+    <Compile Include="OpenSilver\Internal\TemplateTriggerStorage.cs" />
+    <Compile Include="OpenSilver\Internal\TriggerStorage.cs" />
     <Compile Include="OpenSilver\OpenSilverCompatibilityPreferences.cs" />
     <Compile Include="OpenSilver\Internal\Commands\CommandHelpers.cs" />
     <Compile Include="OpenSilver\Internal\CommandLibraryHelper.cs" />
@@ -98,7 +101,7 @@
     <Compile Include="OpenSilver\Internal\Media\ISvgBrush.cs" />
     <Compile Include="OpenSilver\Internal\NamedObject.cs" />
     <Compile Include="OpenSilver\Internal\SynchronyzedStore.cs" />
-    <Compile Include="OpenSilver\Internal\TemplateContent.cs" />
+    <Compile Include="OpenSilver\Internal\CompiledTemplateContent.cs" />
     <Compile Include="OpenSilver\Internal\UIElementHelpers.cs" />
     <Compile Include="OpenSilver\Internal\CollectionChangedHelper.cs" />
     <Compile Include="OpenSilver\Internal\Data\BindingCollection.cs" />
@@ -130,6 +133,7 @@
     <Compile Include="System.Windows.Documents\List.cs" />
     <Compile Include="System.Windows.Documents\ListItem.cs" />
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
+    <Compile Include="System.Windows\TemplateContent.cs" />
     <Compile Include="System.Windows\TextMarkerStyle.cs" />
     <Compile Include="System.Windows.Input\GestureEventArgs.cs" />
     <Compile Include="System.Windows.Input\ManipulationCompletedEventArgs.cs" />
@@ -303,7 +307,6 @@
     <Compile Include="OpenSilver\Internal\DependentList.cs" />
     <Compile Include="OpenSilver\Internal\DoubleUtil.cs" />
     <Compile Include="OpenSilver\Internal\Helper.cs" />
-    <Compile Include="OpenSilver\Internal\INameResolver.cs" />
     <Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
     <Compile Include="OpenSilver\Internal\PFCDefaultValueFactory.cs" />
     <Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
@@ -423,7 +426,7 @@
     <Compile Include="System.Windows.Input\KeyboardNavigation.cs" />
     <Compile Include="System.Windows.Input\TraversalRequest.cs" />
     <Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
-    <Compile Include="System.Windows.Markup\SetterValueConverter.cs" />
+    <Compile Include="System.Windows.Markup\SetterTriggerConditionValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\IValueAnimator.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\AnimationClock.cs" />
     <Compile Include="System.Windows.Media.Animation\KeySplineConverter.cs" />
@@ -1098,6 +1101,12 @@
     <Compile Include="System.Windows\PresentationFrameworkCollection_1.cs" />
     <Compile Include="System.Windows\TextDecorationCollection.cs" />
     <Compile Include="System.Windows\TextTrimming.cs" />
+    <Compile Include="System.Windows\Condition.cs" />
+    <Compile Include="System.Windows\ConditionCollection.cs" />
+    <Compile Include="System.Windows\DataTrigger.cs" />
+    <Compile Include="System.Windows\MultiDataTrigger.cs" />
+    <Compile Include="System.Windows\MultiTrigger.cs" />
+    <Compile Include="System.Windows\Trigger.cs" />
     <Compile Include="System.Windows\TriggerAction.cs" />
     <Compile Include="System.Windows\TriggerActionCollection.cs" />
     <Compile Include="System.Windows\TriggerBase.cs" />

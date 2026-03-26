@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using System.Windows.Markup;
 using OpenSilver.Internal;
 
 namespace System.Windows.Media.Animation;
@@ -47,11 +48,18 @@ public abstract class ControllableStoryboardAction : TriggerAction
         }
     }
 
+    internal sealed override void Invoke(IFrameworkElement fe, INameScope namescope)
+    {
+        Debug.Assert(fe is not null, "Invoke needs an object as starting point");
+
+        Invoke(fe, GetStoryboard(fe, namescope));
+    }
+
     internal sealed override void Invoke(IFrameworkElement fe)
     {
         Debug.Assert(fe is not null, "Invoke needs an object as starting point");
 
-        Invoke(fe, GetStoryboard(fe));
+        Invoke(fe, GetStoryboard(fe, null));
     }
 
     internal virtual void Invoke(IFrameworkElement containingFE, Storyboard storyboard) { }
@@ -59,14 +67,14 @@ public abstract class ControllableStoryboardAction : TriggerAction
     // Find a Storyboard object for this StoryboardAction to act on, using the
     //  given BeginStoryboardName to find a BeginStoryboard instance and use
     //  its Storyboard object reference.
-    private Storyboard GetStoryboard(IFrameworkElement fe)
+    private Storyboard GetStoryboard(IFrameworkElement fe, INameScope namescope)
     {
         if (BeginStoryboardName is null)
         {
             throw new InvalidOperationException(Strings.Storyboard_BeginStoryboardNameRequired);
         }
 
-        BeginStoryboard keyedBeginStoryboard = ResolveBeginStoryboardName(BeginStoryboardName, fe);
+        BeginStoryboard keyedBeginStoryboard = ResolveBeginStoryboardName(BeginStoryboardName, fe, namescope);
 
         Storyboard storyboard = keyedBeginStoryboard.Storyboard ??
             throw new InvalidOperationException(string.Format(Strings.Storyboard_BeginStoryboardNoStoryboard, BeginStoryboardName));
@@ -74,14 +82,24 @@ public abstract class ControllableStoryboardAction : TriggerAction
         return storyboard;
     }
 
-    private static BeginStoryboard ResolveBeginStoryboardName(string targetName, IFrameworkElement fe)
+    private static BeginStoryboard ResolveBeginStoryboardName(string targetName, IFrameworkElement fe, INameScope nameScope)
     {
-        if (fe is null)
+        object namedObject;
+
+        if (nameScope is not null)
+        {
+            namedObject = nameScope.FindName(targetName);
+        }
+        else if (fe is not null)
+        {
+            namedObject = fe.FindName(targetName);
+        }
+        else
         {
             throw new InvalidOperationException(string.Format(Strings.Storyboard_NoNameScope, targetName));
         }
 
-        if (fe.FindName(targetName) is not object namedObject)
+        if (namedObject is null)
         {
             throw new InvalidOperationException(
                 string.Format(Strings.Storyboard_NameNotFound, targetName, fe.GetType().ToString()));

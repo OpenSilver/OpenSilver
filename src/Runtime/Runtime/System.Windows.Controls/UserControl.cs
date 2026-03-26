@@ -108,9 +108,10 @@ public class UserControl : Control, IUserControl
 
         internal override bool BuildVisualTree(IFrameworkElement container)
         {
-            UserControl uc = (UserControl)container;
-            uc.TemplateChild = uc.Content as FrameworkElement;
-            return false;
+            var uc = (UserControl)container;
+            var content = uc.Content as FrameworkElement;
+            uc.TemplateChild = content;
+            return content is not null;
         }
     }
 }

@@ -17,12 +17,12 @@ using OpenSilver.Internal.Xaml.Context;
 
 namespace OpenSilver.Internal;
 
-internal sealed class TemplateContent : ITemplateContent
+internal sealed class CompiledTemplateContent : TemplateContent
 {
     private readonly XamlContext _xamlContext;
     private readonly Func<IFrameworkElement, XamlContext, IFrameworkElement> _factory;
 
-    internal TemplateContent(XamlContext xamlContext, Func<IFrameworkElement, XamlContext, IFrameworkElement> factory)
+    internal CompiledTemplateContent(XamlContext xamlContext, Func<IFrameworkElement, XamlContext, IFrameworkElement> factory)
     {
         ArgumentNullException.ThrowIfNull(xamlContext);
         ArgumentNullException.ThrowIfNull(factory);
@@ -31,7 +31,8 @@ internal sealed class TemplateContent : ITemplateContent
         _factory = factory;
     }
 
-    public IFrameworkElement LoadContent<T>(T owner) where T : DependencyObject, IFrameworkElement
+    /// <inheritdoc />
+    public override IFrameworkElement LoadContent<T>(T owner)
     {
         var context = new XamlContext(_xamlContext)
         {

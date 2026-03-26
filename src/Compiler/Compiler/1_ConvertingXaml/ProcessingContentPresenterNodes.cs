@@ -40,60 +40,62 @@ internal static class ProcessingContentPresenterNodes
     }
 
     private static void TraverseNextElement(
-        XElement currentElement,
+        XElement element,
         bool isInsideControlTemplate,
         ConversionSettings settings)
     {
-        if (GeneratingCode.IsControlTemplate(currentElement, settings.AssemblyName))
+        if (!XamlParser.IsMemberNode(element))
         {
-            isInsideControlTemplate = IsContentControlTargetType(currentElement, settings);
-        }
+            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name,
+                out string namespaceName, out string typeName, out string assemblyName);
 
-        if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains(".") &&
-            settings.Inspector.IsAssignableFrom(SystemWindowsControlsClrNamespace, "ContentPresenter",
-                currentElement.Name.NamespaceName, currentElement.Name.LocalName,
-                currentElement))
-        {
-            bool hasContentAttribute = HasAttribute(currentElement, "Content", settings.Inspector);
-            bool hasContentTemplateAttribute = HasAttribute(currentElement, "ContentTemplate", settings.Inspector);
-            bool hasContentTemplateSelectorAttribute = HasAttribute(currentElement, "ContentTemplateSelector", settings.Inspector);
-
-            if (!hasContentAttribute || (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute))
+            if (settings.Inspector.IsControlTemplate(namespaceName, typeName, assemblyName, element))
             {
-                string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
+                isInsideControlTemplate = IsContentControlTargetType(element, settings);
+            }
+            else if (isInsideControlTemplate && settings.Inspector.IsContentPresenter(namespaceName, typeName, assemblyName, element))
+            {
+                bool hasContentAttribute = HasAttribute(element, "Content", settings.Inspector);
+                bool hasContentTemplateAttribute = HasAttribute(element, "ContentTemplate", settings.Inspector);
+                bool hasContentTemplateSelectorAttribute = HasAttribute(element, "ContentTemplateSelector", settings.Inspector);
 
-                // First look for the default namespace, it should cover 99% of cases.
-                if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, currentElement.GetDefaultNamespace()) == -1)
+                if (!hasContentAttribute || (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute))
                 {
-                    systemWindowsPrefix = GenerateXmlnsPrefix(currentElement);
-                    currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), SystemWindowsClrNamespace);
+                    string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
 
-                    systemWindowsControlsPrefix = GenerateXmlnsPrefix(currentElement);
-                    currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), SystemWindowsControlsClrNamespace);
-                }
+                    // First look for the default namespace, it should cover 99% of cases.
+                    if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, element.GetDefaultNamespace()) == -1)
+                    {
+                        systemWindowsPrefix = GenerateXmlnsPrefix(element);
+                        element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), SystemWindowsClrNamespace);
 
-                string xPrefix = currentElement.GetPrefixOfNamespace(GeneratingCode.xNamespace);
-                if (xPrefix is null)
-                {
-                    xPrefix = GenerateXmlnsPrefix(currentElement);
-                    currentElement.SetAttributeValue(XNamespace.Xmlns.GetName(xPrefix), GeneratingCode.xNamespace.NamespaceName);
-                }
+                        systemWindowsControlsPrefix = GenerateXmlnsPrefix(element);
+                        element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), SystemWindowsControlsClrNamespace);
+                    }
 
-                if (!hasContentAttribute)
-                {
-                    SetTemplateBinding(currentElement, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                }
+                    string xPrefix = element.GetPrefixOfNamespace(GeneratingCode.xNamespace);
+                    if (xPrefix is null)
+                    {
+                        xPrefix = GenerateXmlnsPrefix(element);
+                        element.SetAttributeValue(XNamespace.Xmlns.GetName(xPrefix), GeneratingCode.xNamespace.NamespaceName);
+                    }
 
-                if (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute)
-                {
-                    SetTemplateBinding(currentElement, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                    SetTemplateBinding(currentElement, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                    if (!hasContentAttribute)
+                    {
+                        SetTemplateBinding(element, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                    }
+
+                    if (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute)
+                    {
+                        SetTemplateBinding(element, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                        SetTemplateBinding(element, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                    }
                 }
             }
         }
 
         // Recursion:
-        foreach (var childElements in currentElement.Elements())
+        foreach (var childElements in element.Elements())
         {
             TraverseNextElement(childElements, isInsideControlTemplate, settings);
         }
@@ -103,7 +105,7 @@ internal static class ProcessingContentPresenterNodes
     {
         if (element.Attribute("TargetType") is XAttribute targetType)
         {
-            string namespaceName, typeName;
+            string namespaceName, typeName, assemblyName;
 
             int index = targetType.Value.IndexOf(':');
             if (index > -1)
@@ -114,34 +116,35 @@ internal static class ProcessingContentPresenterNodes
                     throw new XamlParseException($"'{prefix}' is an undeclared prefix.", targetType);
                 }
 
-                namespaceName = xmlns.NamespaceName;
+                (namespaceName, assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                    xmlns.NamespaceName);
+
                 typeName = targetType.Value.Substring(index + 1);
             }
             else
             {
-                namespaceName = element.GetDefaultNamespace().NamespaceName;
+                (namespaceName, assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                    element.GetDefaultNamespace().NamespaceName);
+
                 typeName = targetType.Value;
             }
 
-            return settings.Inspector.IsAssignableFrom(
-                SystemWindowsControlsClrNamespace,
-                "ContentControl",
-                namespaceName,
-                typeName,
-                element);
+            return settings.Inspector.IsContentControl(namespaceName, typeName, assemblyName, element);
         }
 
         return false;
     }
 
-    private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector reflectionOnSeparateAppDomain)
+    private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector inspector)
     {
         bool found = cp.Attribute(attributeName) != null;
         if (!found)
         {
             foreach (var child in cp.Elements())
             {
-                string namespaceName = child.Name.NamespaceName;
+                (string namespaceName, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                    child.Name.NamespaceName);
+
                 string[] typeAndProperty = child.Name.LocalName.Split('.');
 
                 if (typeAndProperty.Length == 2)
@@ -150,12 +153,7 @@ internal static class ProcessingContentPresenterNodes
                     if (typeAndProperty[1].Trim() == attributeName)
                     {
                         // Then make sure this is not an attached property.
-                        bool isProperty = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                            SystemWindowsControlsClrNamespace,
-                            "ContentPresenter",
-                            namespaceName,
-                            typeAndProperty[0],
-                            child);
+                        bool isProperty = inspector.IsContentPresenter(namespaceName, typeAndProperty[0], assemblyName, child);
 
                         if (isProperty)
                         {

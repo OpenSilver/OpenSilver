@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -59,10 +59,34 @@ internal sealed class Storage
         set => (_uncommonFields ??= new()).Clock = value;
     }
 
-    internal object LocalStyleValue
+    internal object ParentTemplateTriggerValue
     {
-        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.LocalStyleValue;
-        set => (_uncommonFields ??= new()).LocalStyleValue = value;
+        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.ParentTemplateTriggerValue;
+        set => (_uncommonFields ??= new()).ParentTemplateTriggerValue = value;
+    }
+
+    internal object StyleTriggerValue
+    {
+        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.StyleTriggerValue;
+        set => (_uncommonFields ??= new()).StyleTriggerValue = value;
+    }
+
+    internal object TemplateTriggerValue
+    {
+        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.TemplateTriggerValue;
+        set => (_uncommonFields ??= new()).TemplateTriggerValue = value;
+    }
+
+    internal object StyleValue
+    {
+        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.StyleValue;
+        set => (_uncommonFields ??= new()).StyleValue = value;
+    }
+
+    internal object ThemeStyleTriggerValue
+    {
+        get => _uncommonFields is null ? DependencyProperty.UnsetValue : _uncommonFields.ThemeStyleTriggerValue;
+        set => (_uncommonFields ??= new()).ThemeStyleTriggerValue = value;
     }
 
     internal object ThemeStyleValue
@@ -79,6 +103,11 @@ internal sealed class Storage
 
     internal (object effectiveValue, BaseValueSourceInternal kind) GetValue()
     {
+        if (_uncommonFields is not null && _uncommonFields.ParentTemplateTriggerValue != DependencyProperty.UnsetValue)
+        {
+            return (_uncommonFields.ParentTemplateTriggerValue, BaseValueSourceInternal.ParentTemplateTrigger);
+        }
+
         if (LocalValue != DependencyProperty.UnsetValue)
         {
             return (LocalValue, BaseValueSourceInternal.Local);
@@ -86,9 +115,17 @@ internal sealed class Storage
 
         if (_uncommonFields is not null)
         {
-            if (_uncommonFields.LocalStyleValue != DependencyProperty.UnsetValue)
+            if (_uncommonFields.StyleTriggerValue != DependencyProperty.UnsetValue)
             {
-                return (_uncommonFields.LocalStyleValue, BaseValueSourceInternal.Style);
+                return (_uncommonFields.StyleTriggerValue, BaseValueSourceInternal.StyleTrigger);
+            }
+            else if (_uncommonFields.StyleValue != DependencyProperty.UnsetValue)
+            {
+                return (_uncommonFields.StyleValue, BaseValueSourceInternal.Style);
+            }
+            else if (_uncommonFields.ThemeStyleTriggerValue != DependencyProperty.UnsetValue)
+            {
+                return (_uncommonFields.ThemeStyleTriggerValue, BaseValueSourceInternal.ThemeStyleTrigger);
             }
             else if (_uncommonFields.ThemeStyleValue != DependencyProperty.UnsetValue)
             {
@@ -107,13 +144,21 @@ internal sealed class Storage
     {
         public UncommonFields()
         {
-            LocalStyleValue = DependencyProperty.UnsetValue;
+            ParentTemplateTriggerValue = DependencyProperty.UnsetValue;
+            StyleTriggerValue = DependencyProperty.UnsetValue;
+            TemplateTriggerValue = DependencyProperty.UnsetValue;
+            StyleValue = DependencyProperty.UnsetValue;
+            ThemeStyleTriggerValue = DependencyProperty.UnsetValue;
             ThemeStyleValue = DependencyProperty.UnsetValue;
             InheritedValue = DependencyProperty.UnsetValue;
         }
 
         internal TimelineClock Clock;
-        internal object LocalStyleValue;
+        internal object ParentTemplateTriggerValue;
+        internal object StyleTriggerValue;
+        internal object TemplateTriggerValue;
+        internal object StyleValue;
+        internal object ThemeStyleTriggerValue;
         internal object ThemeStyleValue;
         internal object InheritedValue;
     }

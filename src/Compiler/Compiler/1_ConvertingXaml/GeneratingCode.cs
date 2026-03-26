@@ -31,6 +31,18 @@ namespace OpenSilver.Compiler
         internal static readonly XNamespace[] DefaultXamlNamespaces = [DefaultXamlNamespace, LegacyXamlNamespace];
         internal static readonly XNamespace xNamespace = "http://schemas.microsoft.com/winfx/2006/xaml"; // Used for example for "x:Name" attributes and {x:Null} markup extensions.
 
+        internal static string GetAttributeValue(XAttribute attribute)
+        {
+            string value = attribute.Value;
+
+            if (value is not null && value.StartsWith("{}"))
+            {
+                return value.Substring(2);
+            }
+
+            return value;
+        }
+
         internal static bool IsXNameAttribute(XAttribute attr) =>
             attr.Name.LocalName == "Name" && attr.Name.NamespaceName == xNamespace;
 

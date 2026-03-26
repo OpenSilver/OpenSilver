@@ -215,7 +215,7 @@ namespace System.Windows.Controls
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ContentPresenter cp = (ContentPresenter)d;
-            UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+            StyleHelper.UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
             cp.InvalidateMeasure();
         }

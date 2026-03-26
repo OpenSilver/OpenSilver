@@ -11,26 +11,27 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Media.Animation;
+using System.Windows.Markup;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Describes an action to perform for a trigger.
+/// </summary>
+public abstract class TriggerAction : DependencyObject
 {
-    /// <summary>
-    /// Describes an action to perform for a trigger.
-    /// </summary>
-    public abstract class TriggerAction : DependencyObject
-    {
-        internal TriggerAction() { }
+    internal TriggerAction() { }
 
-        /// <summary>
-        ///     Called when all conditions have been satisfied for this action to be
-        /// invoked.  (Conditions are not described on this TriggerAction object,
-        /// but on the Trigger object holding it.)
-        /// </summary>
-        /// <remarks>
-        ///     This variant is called when the Trigger lives on an element, as
-        /// opposed to Style, so it is given only the reference to the element.
-        /// </remarks>
-        internal abstract void Invoke(IFrameworkElement fe);
-    }
+    internal abstract void Invoke(IFrameworkElement fe, INameScope namescope);
+
+    /// <summary>
+    ///     Called when all conditions have been satisfied for this action to be
+    /// invoked.  (Conditions are not described on this TriggerAction object,
+    /// but on the Trigger object holding it.)
+    /// </summary>
+    /// <remarks>
+    ///     This variant is called when the Trigger lives on an element, as
+    /// opposed to Style, so it is given only the reference to the element.
+    /// </remarks>
+    internal abstract void Invoke(IFrameworkElement fe);
 }

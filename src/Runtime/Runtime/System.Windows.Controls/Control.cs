@@ -501,7 +501,7 @@ public partial class Control : FrameworkElement, IInternalControl
     private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         Control control = (Control)d;
-        UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+        StyleHelper.UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
         control.InvalidateMeasure();
     }

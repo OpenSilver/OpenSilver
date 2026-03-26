@@ -1005,10 +1005,20 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
                 eventName = source;
             }
 
-            XElement style = GetClosestXElement(context);
-            while (style is not null && !GeneratingCode.IsStyle(style, _assemblyName))
+            XElement style = null;
+
+            for (XElement element = GetClosestXElement(context); element is not null; element = element.Parent)
             {
-                style = style.Parent;
+                if (XamlParser.IsMemberNode(element))
+                {
+                    continue;
+                }
+
+                if (IsStyle(element, _inspector))
+                {
+                    style = element;
+                    break;
+                }
             }
 
             if (style is not null && style.Attribute("TargetType") is XAttribute targetType)
@@ -1030,6 +1040,14 @@ internal sealed class CoreTypesConverterFS : CoreTypesConverter
         string ownerTypeString = TypeReferenceHelper.FSharp.ConvertToString(ownerType);
 
         return $"{RuntimeHelperClass}.RoutedEventFromName(\"{eventName}\", typeof<global.{ownerTypeString}>)";
+
+        static bool IsStyle(XElement element, AssembliesInspector inspector)
+        {
+            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name,
+                out string namespaceName, out string typeName, out string assemblyName);
+
+            return inspector.IsStyle(namespaceName, typeName, assemblyName, element);
+        }
     }
 
     public override string ConvertToResponsiveThreshold(XObject context, string source)

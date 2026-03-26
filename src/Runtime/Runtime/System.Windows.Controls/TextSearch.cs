@@ -464,16 +464,17 @@ namespace System.Windows.Controls
             // Here hopefully they've supplied a path into their object which we can use.
             if (!string.IsNullOrEmpty(primaryTextPath) && primaryTextBindingHome != null)
             {
-                _ = BindingOperations.SetBinding(primaryTextBindingHome, BindingExpressionBase.NoTargetProperty,
+                var bindingExpr = (BindingExpression)BindingExpressionBase.CreateUntargetedBindingExpression(
+                    primaryTextBindingHome,
                     new Binding(primaryTextPath)
                     {
                         Mode = BindingMode.OneWay,
                         Source = item,
                     });
+                bindingExpr.Attach(primaryTextBindingHome);
+                object primaryText = bindingExpr.GetValue(primaryTextBindingHome, BindingExpressionBase.NoTargetProperty);
+                bindingExpr.Detach();
 
-                object primaryText = primaryTextBindingHome.GetValue(BindingExpressionBase.NoTargetProperty);
-                primaryTextBindingHome.ClearValue(BindingExpressionBase.NoTargetProperty);
-                
                 return ConvertToPlainText(primaryText);
             }
 
@@ -546,7 +547,7 @@ namespace System.Windows.Controls
         private int MatchedItemIndex { get; set; }
 
         // Element to which this TextSearch instance is attached.
-        private ItemsControl _attachedTo;
+        private readonly ItemsControl _attachedTo;
         private List<string> _charsEntered;
         private DispatcherTimer _timeoutTimer;
     }

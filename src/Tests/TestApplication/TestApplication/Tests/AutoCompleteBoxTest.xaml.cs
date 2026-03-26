@@ -53,9 +53,6 @@ namespace TestApplication.Tests
 
             IList<DependencyObject> popupDescendants = popup.Child.GetVisualDescendants().ToList();
             Grid popupGrid = popupDescendants.OfType<Grid>().First();
-            popupGrid.CustomLayout = true;
-            popupGrid.IsAutoHeightOnCustomLayout = true;
-            popupGrid.IsAutoWidthOnCustomLayout = true;
 
             ListBox listBox = popupDescendants.OfType<ListBox>().First();
 
@@ -65,11 +62,11 @@ namespace TestApplication.Tests
             listBox.ItemsPanel = itemsPanelTemplate;
         }
 
-        private static FrameworkElement CreateItemsPanelTemplate(FrameworkElement templateOwner_ItemsPanelTemplate,
+        private static IFrameworkElement CreateItemsPanelTemplate(IFrameworkElement templateOwner_ItemsPanelTemplate,
             XamlContext xamlContext)
         {
             var virtualizingStackPanel = new VirtualizingStackPanel();
-            global::OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplatedParent(virtualizingStackPanel, templateOwner_ItemsPanelTemplate);
+            global::OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_SetTemplatedParent(xamlContext, virtualizingStackPanel);
             return virtualizingStackPanel;
         }
 #endif

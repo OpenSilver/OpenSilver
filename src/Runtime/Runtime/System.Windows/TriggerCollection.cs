@@ -11,16 +11,18 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Diagnostics;
 
 namespace System.Windows;
 
 /// <summary>
-/// Represents a collection of <see cref="EventTrigger"/> objects.
+/// Represents a collection of <see cref="TriggerBase"/> objects.
 /// </summary>
 public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerBase>
 {
     private readonly IInternalFrameworkElement _owner;
+    private bool _sealed;
 
     internal TriggerCollection() { }
 
@@ -30,10 +32,20 @@ public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerB
         _owner = owner;
     }
 
+    /// <summary>
+    /// Gets a value that indicates whether this collection is read-only and cannot be changed.
+    /// </summary>
+    /// <returns>
+    /// true if this collection is read-only; otherwise, false.
+    /// </returns>
+    public new bool IsSealed => _sealed;
+
     private bool IsInitialized => _owner is not null && _owner.IsInitialized;
 
     internal override void AddOverride(TriggerBase value)
     {
+        CheckSealed();
+
         AddDependencyObjectInternal(value);
         
         if (IsInitialized)
@@ -44,6 +56,8 @@ public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerB
 
     internal override void ClearOverride()
     {
+        CheckSealed();
+
         if (IsInitialized)
         {
             EventTrigger.DisconnectAllTriggers(_owner);
@@ -54,6 +68,8 @@ public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerB
 
     internal override void InsertOverride(int index, TriggerBase value)
     {
+        CheckSealed();
+
         InsertDependencyObjectInternal(index, value);
 
         if (IsInitialized)
@@ -64,6 +80,8 @@ public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerB
 
     internal override void RemoveAtOverride(int index)
     {
+        CheckSealed();
+
         TriggerBase trigger = GetItemInternal(index);
         RemoveAtDependencyObjectInternal(index);
 
@@ -77,6 +95,8 @@ public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerB
 
     internal override void SetItemOverride(int index, TriggerBase value)
     {
+        CheckSealed();
+
         TriggerBase oldTrigger = GetItemInternal(index);
         SetItemDependencyObjectInternal(index, value);
         
@@ -84,6 +104,27 @@ public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerB
         {
             EventTrigger.DisconnectOneTrigger(_owner, oldTrigger);
             EventTrigger.ProcessOneTrigger(_owner, value);
+        }
+    }
+
+    internal new void Seal()
+    {
+        Debug.Assert(_owner is null);
+
+        _sealed = true;
+
+        // Seal all the setters
+        foreach (TriggerBase trigger in InternalItems)
+        {
+            trigger.Seal();
+        }
+    }
+
+    private void CheckSealed()
+    {
+        if (_sealed)
+        {
+            throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(TriggerCollection)));
         }
     }
 }

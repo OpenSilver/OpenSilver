@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -211,6 +211,10 @@ internal enum BaseValueSourceInternal : short
     Default = 1,
     Inherited = 2,
     ThemeStyle = 3,
+    ThemeStyleTrigger = 4,
     Style = 5,
+    TemplateTrigger = 6,
+    StyleTrigger = 7,
+    ParentTemplateTrigger = 10,
     Local = 11,
 }

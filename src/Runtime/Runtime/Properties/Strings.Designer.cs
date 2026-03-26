@@ -466,6 +466,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Child node identifier used for Target property cannot be an empty string..
+        /// </summary>
+        internal static string ChildNameMustBeNonEmpty {
+            get {
+                return ResourceManager.GetString("ChildNameMustBeNonEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot change modal state while the ChildWindow is open..
         /// </summary>
         internal static string ChildWindow_CannotChangeModalState {
@@ -606,6 +615,33 @@ namespace OpenSilver.Internal {
         internal static string CompatibilityPreferencesSealed {
             get {
                 return ResourceManager.GetString("CompatibilityPreferencesSealed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition cannot use both Property and Binding..
+        /// </summary>
+        internal static string ConditionCannotUseBothPropertyAndBinding {
+            get {
+                return ResourceManager.GetString("ConditionCannotUseBothPropertyAndBinding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression type is not a valid trigger condition..
+        /// </summary>
+        internal static string ConditionValueOfExpressionNotSupported {
+            get {
+                return ResourceManager.GetString("ConditionValueOfExpressionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid trigger condition..
+        /// </summary>
+        internal static string ConditionValueOfMarkupExtensionNotSupported {
+            get {
+                return ResourceManager.GetString("ConditionValueOfMarkupExtensionNotSupported", resourceCulture);
             }
         }
         
@@ -876,6 +912,15 @@ namespace OpenSilver.Internal {
         internal static string EventNotFound {
             get {
                 return ResourceManager.GetString("EventNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event triggers do not support EnterActions or ExitActions..
+        /// </summary>
+        internal static string EventTriggerDoesNotEnterExit {
+            get {
+                return ResourceManager.GetString("EventTriggerDoesNotEnterExit", resourceCulture);
             }
         }
         
@@ -2041,6 +2086,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Child with Name &apos;{0}&apos; not found in VisualTree..
+        /// </summary>
+        internal static string NameNotFound {
+            get {
+                return ResourceManager.GetString("NameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot register duplicate Name &apos;{0}&apos; in this scope..
         /// </summary>
         internal static string NameScopeDuplicateNamesNotAllowed {
@@ -2491,6 +2545,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{1}&apos; object cannot specify value for read-only property &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReadOnlyPropertyNotAllowed {
+            get {
+                return ResourceManager.GetString("ReadOnlyPropertyNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot call this method on the Empty Rect..
         /// </summary>
         internal static string Rect_CannotCallMethod {
@@ -2923,6 +2986,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A Style has no child nodes so a Style Setter cannot specify child node name &apos;{0}&apos;..
+        /// </summary>
+        internal static string SetterOnStyleNotAllowedToHaveTarget {
+            get {
+                return ResourceManager.GetString("SetterOnStyleNotAllowedToHaveTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not valid for Setter.Value. The only supported MarkupExtension types are DynamicResourceExtension and BindingBase or derived types..
         /// </summary>
         internal static string SetterValueOfMarkupExtensionNotSupported {
@@ -2964,6 +3036,15 @@ namespace OpenSilver.Internal {
         internal static string Size_WidthCannotBeNegative {
             get {
                 return ResourceManager.GetString("Size_WidthCannotBeNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot specify SourceName property for a DataTrigger or MultiDataTrigger..
+        /// </summary>
+        internal static string SourceNameNotSupportedForDataTriggers {
+            get {
+                return ResourceManager.GetString("SourceNameNotSupportedForDataTriggers", resourceCulture);
             }
         }
         
@@ -3157,6 +3238,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Style object is not allowed to affect the Style property of the object to which it applies..
+        /// </summary>
+        internal static string StylePropertyInStyleNotAllowed {
+            get {
+                return ResourceManager.GetString("StylePropertyInStyleNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; TargetType does not match type of element &apos;{1}&apos;..
         /// </summary>
         internal static string StyleTargetTypeMismatchWithElement {
@@ -3180,6 +3270,15 @@ namespace OpenSilver.Internal {
         internal static string TargetNameNotFound {
             get {
                 return ResourceManager.GetString("TargetNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template&apos;s TemplateContent property can only be set once..
+        /// </summary>
+        internal static string TemplateContentSetTwice {
+            get {
+                return ResourceManager.GetString("TemplateContentSetTwice", resourceCulture);
             }
         }
         
@@ -3576,6 +3675,15 @@ namespace OpenSilver.Internal {
         internal static string VerifyAccess {
             get {
                 return ResourceManager.GetString("VerifyAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VisualTrigger does not support Setter type &apos;{0}&apos;..
+        /// </summary>
+        internal static string VisualTriggerSettersIncludeUnsupportedSetterType {
+            get {
+                return ResourceManager.GetString("VisualTriggerSettersIncludeUnsupportedSetterType", resourceCulture);
             }
         }
         

@@ -153,7 +153,7 @@ public sealed class Storyboard : Timeline
     /// <summary>
     /// Applies the animations associated with this <see cref="Storyboard"/> to their targets and initiates them.
     /// </summary>
-    public void Begin() => BeginCommon(this, true, false);
+    public void Begin() => BeginCommon(this, null, true, false);
 
     /// <summary>
     /// Applies the animations associated with this <see cref="Storyboard"/> to their targets and initiates them.
@@ -162,7 +162,7 @@ public sealed class Storyboard : Timeline
     /// An object contained within the same name scope as the targets of this storyboard's animations. Animations without a
     /// Storyboard.TargetName are applied to containingObject.
     /// </param>
-    public void Begin(FrameworkElement containingObject) => BeginCommon(containingObject, true, false);
+    public void Begin(FrameworkElement containingObject) => BeginCommon(containingObject, null, true, false);
 
     /// <summary>
     /// Applies the animations associated with this <see cref="Storyboard"/> to their targets and initiates them.
@@ -174,13 +174,13 @@ public sealed class Storyboard : Timeline
     /// <param name="isControllable">
     /// true if the storyboard should be interactively controllable; otherwise, false.
     /// </param>
-    public void Begin(FrameworkElement containingObject, bool isControllable) => BeginCommon(containingObject, isControllable, false);
+    public void Begin(FrameworkElement containingObject, bool isControllable) => BeginCommon(containingObject, null, isControllable, false);
 
     // This method should only be used by VisualStateManager for Silverlight compatibility. In WPF, Begin is asynchronous. In 
     // Silverlight the VSM fires a frame immediately, but other storyboards don't.
-    internal void BeginVSM(FrameworkElement containingObject) => BeginCommon(containingObject, true, true);
+    internal void BeginVSM(FrameworkElement containingObject) => BeginCommon(containingObject, null, true, true);
 
-    private void BeginCommon(DependencyObject containingObject, bool isControllable, bool alignedToLastTick)
+    internal void BeginCommon(DependencyObject containingObject, INameScope namescope, bool isControllable, bool alignedToLastTick)
     {
         if (GetStoryboardClock(containingObject, false) is TimelineClock currentClock)
         {
@@ -194,6 +194,7 @@ public sealed class Storyboard : Timeline
         ClockTreeWalkRecursive(storyboardClockTree,
             isControllable,
             containingObject,
+            namescope,
             null,
             null,
             null,
@@ -714,6 +715,7 @@ public sealed class Storyboard : Timeline
         TimelineClock currentClock,
         bool hasControllableRoot,
         DependencyObject containingObject,
+        INameScope nameScope,
         TimelineClock parentClock,
         DependencyObject parentObject,
         string parentObjectName,
@@ -755,7 +757,7 @@ public sealed class Storyboard : Timeline
                     targetObject = ResolveTargetName(
                         currentObjectName,
                         FrameworkElement.FindMentor(containingObject),
-                        currentTimeline.NameResolver);
+                        nameScope);
                 }
                 else
                 {
@@ -809,6 +811,7 @@ public sealed class Storyboard : Timeline
                     childClock,
                     hasControllableRoot,
                     containingObject,
+                    nameScope,
                     storyboardClock,
                     targetObject,
                     currentObjectName,
@@ -817,13 +820,13 @@ public sealed class Storyboard : Timeline
         }
     }
 
-    private static DependencyObject ResolveTargetName(string targetName, IInternalFrameworkElement fe, INameResolver nameResolver)
+    private static DependencyObject ResolveTargetName(string targetName, IInternalFrameworkElement fe, INameScope namescope)
     {
         object namedObject;
 
-        if (nameResolver is not null)
+        if (namescope is not null)
         {
-            namedObject = nameResolver.Resolve(targetName);
+            namedObject = namescope.FindName(targetName);
         }
         else if (fe is not null)
         {

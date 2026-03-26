@@ -212,7 +212,7 @@ public class MemoryLeakTest
                 Template = new ControlTemplate
                 {
                     TargetType = typeof(MyControl),
-                    Template = new TemplateContent(
+                    Template = new CompiledTemplateContent(
                     new XamlContext(),
                     (owner, context) =>
                     {

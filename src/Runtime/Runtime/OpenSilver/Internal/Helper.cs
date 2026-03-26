@@ -11,10 +11,47 @@
 *
 \*====================================================================================*/
 
-namespace OpenSilver.Internal
+using System;
+using System.Windows;
+using System.Xaml.Markup;
+
+namespace OpenSilver.Internal;
+
+internal static class Helper
 {
-    internal static class Helper
+    public const string ObsoleteMemberMessage = "Deprecated. It will be removed in a future release.";
+
+    internal static EventHandler<XamlSetMarkupExtensionEventArgs> LookupSetMarkupExtensionHandler(Type type)
     {
-        public const string ObsoleteMemberMessage = "Deprecated. It will be removed in a future release.";
+        if (typeof(Setter) == type)
+        {
+            return Setter.ReceiveMarkupExtension;
+        }
+        else if (typeof(DataTrigger) == type)
+        {
+            return DataTrigger.ReceiveMarkupExtension;
+        }
+        else if (typeof(Condition) == type)
+        {
+            return Condition.ReceiveMarkupExtension;
+        }
+        return null;
+    }
+
+    internal static EventHandler<XamlSetTypeConverterEventArgs> LookupSetTypeConverterHandler(Type type)
+    {
+        if (typeof(Setter).IsAssignableFrom(type))
+        {
+            return Setter.ReceiveTypeConverter;
+        }
+        else if (typeof(Trigger).IsAssignableFrom(type))
+        {
+            return Trigger.ReceiveTypeConverter;
+        }
+        else if (typeof(Condition).IsAssignableFrom(type))
+        {
+            return Condition.ReceiveTypeConverter;
+        }
+        return null;
     }
 }

@@ -13,127 +13,143 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Mono.Cecil;
 
-namespace OpenSilver.Compiler
+namespace OpenSilver.Compiler;
+
+internal static class TypeDefinitionExtensions
 {
-    internal static class TypeDefinitionExtensions
+    /// <summary>
+    /// Returns true if type is a subclass of targetType.
+    /// Does not test interface inheritance.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="targetType"></param>
+    /// <returns></returns>
+    public static bool IsSubclassOf(this TypeDefinition type, TypeDefinition targetType)
     {
-        /// <summary>
-        /// Returns true if childType is a subclass of parentType.
-        /// Does not test interface inheritance.
-        /// </summary>
-        /// <param name="childType"></param>
-        /// <param name="parentType"></param>
-        /// <returns></returns>
-        public static bool IsSubclassOf(this TypeDefinition childType, TypeDefinition parentType) =>
-           childType.EnumerateBaseClasses(skipSelf: true).Any(b => Equals(b, parentType));
-
-        /// <summary>
-        /// Returns true if childType directly or indirectly implements parentInterface.
-        /// </summary>
-        /// <param name="childType"></param>
-        /// <param name="parentInterface"></param>
-        /// <returns></returns>
-        public static bool DoesAnySubTypeImplementInterface(this TypeDefinition childType, TypeDefinition parentInterface)
+        foreach (TypeDefinition baseType in type.EnumerateBaseClasses(skipSelf: true))
         {
-            if (!parentInterface.IsInterface)
+            if (Equals(baseType, targetType))
             {
-                throw new ArgumentException("Parent type must be an interface.", nameof(parentInterface));
+                return true;
             }
-
-            return
-                childType
-                .EnumerateBaseClasses()
-                .Any(typeDefinition => typeDefinition.DoesSpecificTypeImplementInterface(parentInterface));
         }
 
-        /// <summary>
-        /// Returns true if childType directly implements parentInterface.
-        /// Does not test parent classes of childType.
-        /// </summary>
-        /// <param name="childType"></param>
-        /// <param name="parentInterface"></param>
-        /// <returns></returns>
-        public static bool DoesSpecificTypeImplementInterface(this TypeDefinition childType, TypeDefinition parentInterface)
-        {
-            if (!parentInterface.IsInterface)
-            {
-                throw new ArgumentException("Parent type must be an interface.", nameof(parentInterface));
-            }
+        return false;
+    }
 
-            return childType
-               .Interfaces
-               .Any(impl => DoesSpecificInterfaceImplementInterface(impl.InterfaceType.ResolveOrThrow(), parentInterface));
+    /// <summary>
+    /// Returns true if type directly or indirectly implements interfaceType.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="interfaceType"></param>
+    /// <returns></returns>
+    public static bool DoesAnySubTypeImplementInterface(this TypeDefinition type, TypeDefinition interfaceType)
+    {
+        if (!interfaceType.IsInterface)
+        {
+            throw new ArgumentException("Parent type must be an interface.", nameof(interfaceType));
         }
 
-        /// <summary>
-        /// Returns true if child is equal to or implements parent.
-        /// Both child and parent must be interfaces.
-        /// </summary>
-        /// <param name="childInterface"></param>
-        /// <param name="parentInterface"></param>
-        /// <returns></returns>
-        public static bool DoesSpecificInterfaceImplementInterface(TypeDefinition childInterface, TypeDefinition parentInterface)
+        foreach (TypeDefinition baseType in type.EnumerateBaseClasses())
         {
-            if (!childInterface.IsInterface)
+            if (baseType.DoesSpecificTypeImplementInterface(interfaceType))
             {
-                throw new ArgumentException("Child type must be an interface.", nameof(parentInterface));
+                return true;
             }
-            if (!parentInterface.IsInterface)
-            {
-                throw new ArgumentException("Parent type must be an interface.", nameof(parentInterface));
-            }
-            return Equals(childInterface, parentInterface) || childInterface.DoesAnySubTypeImplementInterface(parentInterface);
         }
 
-        /// <summary>
-        /// Is source type assignable to target type
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static bool IsAssignableFrom(this TypeDefinition target, TypeDefinition source)
-            => target == source
-              || Equals(target, source)
-              || source.IsSubclassOf(target)
-              || target.IsInterface && source.DoesAnySubTypeImplementInterface(target);
+        return false;
+    }
 
-        /// <summary>
-        /// Enumerate the current type, it's parent and all the way to the top type
-        /// </summary>
-        /// <param name="classType"></param>
-        /// <returns></returns>
-        public static IEnumerable<TypeDefinition> EnumerateBaseClasses(this TypeDefinition classType, bool skipSelf = false)
+    /// <summary>
+    /// Returns true if type directly implements interfaceType.
+    /// Does not test parent classes of type.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="interfaceType"></param>
+    /// <returns></returns>
+    public static bool DoesSpecificTypeImplementInterface(this TypeDefinition type, TypeDefinition interfaceType)
+    {
+        if (!interfaceType.IsInterface)
         {
-            if (classType == null)
+            throw new ArgumentException("Parent type must be an interface.", nameof(interfaceType));
+        }
+
+        foreach (InterfaceImplementation impl in type.Interfaces)
+        {
+            if (DoesSpecificInterfaceImplementInterface(impl.InterfaceType.Resolve(), interfaceType))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true if type is equal to or implements the interface.
+    /// Both type and interfaceType must be interfaces.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="interfaceType"></param>
+    /// <returns></returns>
+    public static bool DoesSpecificInterfaceImplementInterface(TypeDefinition type, TypeDefinition interfaceType)
+    {
+        if (!type.IsInterface)
+        {
+            throw new ArgumentException("Child type must be an interface.", nameof(interfaceType));
+        }
+        if (!interfaceType.IsInterface)
+        {
+            throw new ArgumentException("Parent type must be an interface.", nameof(interfaceType));
+        }
+
+        return Equals(type, interfaceType) || type.DoesAnySubTypeImplementInterface(interfaceType);
+    }
+
+    /// <summary>
+    /// Is source type assignable to target type
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsAssignableFrom(this TypeDefinition target, TypeDefinition source)
+        => target == source
+          || Equals(target, source)
+          || source.IsSubclassOf(target)
+          || target.IsInterface && source.DoesAnySubTypeImplementInterface(target);
+
+    /// <summary>
+    /// Enumerate the current type, it's parent and all the way to the top type
+    /// </summary>
+    /// <param name="classType"></param>
+    /// <returns></returns>
+    public static IEnumerable<TypeDefinition> EnumerateBaseClasses(this TypeDefinition classType, bool skipSelf = false)
+    {
+        if (classType == null)
+        {
+            yield break;
+        }
+
+        TypeDefinition td = classType;
+        if (skipSelf)
+        {
+            if (classType.BaseType == null)
             {
                 yield break;
             }
 
-            TypeDefinition td = classType;
-            if (skipSelf)
-            {
-                if (classType.BaseType == null)
-                {
-                    yield break;
-                }
-
-                td = classType.BaseType.ResolveOrThrow();
-            }
-
-            for (; td != null; td = td.BaseType?.ResolveOrThrow())
-            {
-                yield return td;
-            }
+            td = classType.BaseType.ResolveOrThrow();
         }
 
-        public static bool Equals(TypeDefinition a, TypeDefinition b)
+        for (; td != null; td = td.BaseType?.ResolveOrThrow())
         {
-            return
-                a.MetadataToken == b.MetadataToken
-                && a.FullName == b.FullName;
+            yield return td;
         }
     }
+
+    public static bool Equals(TypeDefinition a, TypeDefinition b) =>
+        a.MetadataToken == b.MetadataToken && a.FullName == b.FullName;
 }

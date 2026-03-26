@@ -37,9 +37,29 @@ public enum BaseValueSource
     DefaultStyle = BaseValueSourceInternal.ThemeStyle,
 
     /// <summary>
+    /// Source is from a trigger in the default style. The default style comes from the current theme.
+    /// </summary>
+    DefaultStyleTrigger = BaseValueSourceInternal.ThemeStyleTrigger,
+
+    /// <summary>
     /// Source is from a style setter of a non-theme style.
     /// </summary>
     Style = BaseValueSourceInternal.Style,
+
+    /// <summary>
+    /// Source is a trigger-based value in a template that is from a non-theme style.
+    /// </summary>
+    TemplateTrigger = BaseValueSourceInternal.TemplateTrigger,
+
+    /// <summary>
+    /// Source is a trigger-based value of a non-theme style.
+    /// </summary>
+    StyleTrigger = BaseValueSourceInternal.StyleTrigger,
+
+    /// <summary>
+    /// Source is a trigger-based value from a parent template that created the element.
+    /// </summary>
+    ParentTemplateTrigger = BaseValueSourceInternal.ParentTemplateTrigger,
 
     /// <summary>
     /// Source is a locally set value.

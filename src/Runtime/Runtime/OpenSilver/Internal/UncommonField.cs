@@ -25,7 +25,7 @@ internal sealed class UncommonField<T>
     ///     Create a new UncommonField.
     /// </summary>
     public UncommonField()
-        : this(default(T))
+        : this(default)
     {
     }
 
@@ -99,10 +99,29 @@ internal sealed class UncommonField<T>
     ///     Clear this field from the given DependencyObject instance.
     /// </summary>
     /// <param name="instance"></param>
-    public void ClearValue(DependencyObject instance)
+    /// <param name="oldValue"></param>
+    public bool ClearValue(DependencyObject instance, out T oldValue)
     {
         Debug.Assert(instance is not null);
 
-        instance.RemoveUncommonStorage(GlobalIndex);
+        if (instance.RemoveUncommonStorage(GlobalIndex, out Storage storage))
+        {
+            object value = storage.LocalValue;
+            oldValue = (T)value;
+            return true;
+        }
+
+        oldValue = _defaultValue;
+        return false;
+    }
+
+    /// <summary>
+    ///     Clear this field from the given DependencyObject instance.
+    /// </summary>
+    /// <param name="instance"></param>
+    public void ClearValue(DependencyObject instance)
+    {
+        Debug.Assert(instance is not null);
+        instance.RemoveUncommonStorage(GlobalIndex, out _);
     }
 }

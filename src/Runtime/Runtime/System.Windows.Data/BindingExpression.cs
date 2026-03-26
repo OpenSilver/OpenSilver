@@ -317,6 +317,8 @@ namespace System.Windows.Data
             UpdateNotifyDataErrors(newValue);
             UpdateValidationError(GetBaseValidationError());
 
+            RaiseValueChanged();
+
             if (ParentBindingExpressionBase != null)
             {
                 ParentBindingExpressionBase.InvalidateChild(this);

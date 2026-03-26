@@ -11,15 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Media.Animation;
+using OpenSilver.Internal;
 
 namespace System.Windows;
 
 /// <summary>
-/// Represents a collection of <see cref="BeginStoryboard"/> objects.
+/// Represents a collection of <see cref="TriggerAction"/> objects.
 /// </summary>
 public sealed class TriggerActionCollection : PresentationFrameworkCollection<TriggerAction>
 {
+    private bool _sealed;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="TriggerActionCollection"/> class.
     /// </summary>
@@ -30,15 +32,53 @@ public sealed class TriggerActionCollection : PresentationFrameworkCollection<Tr
         owner.ProvideSelfAsInheritanceContext(this, null);
     }
 
-    internal override void AddOverride(TriggerAction value) => AddDependencyObjectInternal(value);
+    internal override void AddOverride(TriggerAction value)
+    {
+        CheckSealed();
+        AddDependencyObjectInternal(value);
+    }
 
-    internal override void ClearOverride() => ClearDependencyObjectInternal();
+    internal override void ClearOverride()
+    {
+        CheckSealed();
+        ClearDependencyObjectInternal();
+    }
 
-    internal override void InsertOverride(int index, TriggerAction value) => InsertDependencyObjectInternal(index, value);
+    internal override void InsertOverride(int index, TriggerAction value)
+    {
+        CheckSealed();
+        InsertDependencyObjectInternal(index, value);
+    }
 
-    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+    internal override void RemoveAtOverride(int index)
+    {
+        CheckSealed();
+        RemoveAtDependencyObjectInternal(index);
+    }
 
     internal override TriggerAction GetItemOverride(int index) => GetItemInternal(index);
 
-    internal override void SetItemOverride(int index, TriggerAction value) => SetItemDependencyObjectInternal(index, value);
+    internal override void SetItemOverride(int index, TriggerAction value)
+    {
+        CheckSealed();
+        SetItemDependencyObjectInternal(index, value);
+    }
+
+    internal new void Seal()
+    {
+        _sealed = true;
+
+        foreach (TriggerAction action in InternalItems)
+        {
+            action.Seal();
+        }
+    }
+
+    private void CheckSealed()
+    {
+        if (_sealed)
+        {
+            throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(TriggerActionCollection)));
+        }
+    }
 }

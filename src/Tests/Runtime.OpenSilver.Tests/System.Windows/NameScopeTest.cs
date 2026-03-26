@@ -283,7 +283,7 @@ namespace System.Windows.Tests
                     Template = new ControlTemplate
                     {
                         TargetType = typeof(Control1),
-                        Template = new TemplateContent(new XamlContext(),
+                        Template = new CompiledTemplateContent(new XamlContext(),
                             (owner, context) =>
                             {
                                 Border name4 = new Border 
@@ -325,7 +325,7 @@ namespace System.Windows.Tests
                     Template = new ControlTemplate
                     {
                         TargetType = typeof(Control1),
-                        Template = new TemplateContent(new XamlContext(),
+                        Template = new CompiledTemplateContent(new XamlContext(),
                             (owner, context) =>
                             {
                                 Border name8 = new Border
@@ -361,7 +361,7 @@ namespace System.Windows.Tests
                     Template = new ControlTemplate
                     {
                         TargetType = typeof(Control2),
-                        Template = new TemplateContent(new XamlContext(),
+                        Template = new CompiledTemplateContent(new XamlContext(),
                         (owner, context) =>
                         {
                             Border border = new Border

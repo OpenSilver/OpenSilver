@@ -269,7 +269,7 @@ namespace OpenSilver.Compiler
                         xaml,
                         sourceFile,
                         fileIdentity,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.CSharp, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.CSharp, TypeReferenceHelper.CSharp, options),
                         !IsSecondPass);
 
                     generatedCode = CreateCSHeaderContainingHash(xaml)
@@ -284,7 +284,7 @@ namespace OpenSilver.Compiler
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.VisualBasic, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.VisualBasic, TypeReferenceHelper.VisualBasic, options),
                         !IsSecondPass);
 
                     generatedCode = CreateVBHeaderContainingHash(xaml)
@@ -299,7 +299,7 @@ namespace OpenSilver.Compiler
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.FSharp, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.FSharp, TypeReferenceHelper.FSharp, options),
                         !IsSecondPass);
 
                     generatedCode = CreateFSHeaderContainingHash(xaml)

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Windows.Controls;
 
 namespace System.Windows
 {
@@ -21,6 +22,7 @@ namespace System.Windows
     public class DataTemplate : FrameworkTemplate
     {
         private Type _dataType;
+        private TriggerCollection _triggers;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataTemplate"/> class without initializing
@@ -56,6 +58,30 @@ namespace System.Windows
         public object DataTemplateKey => DataType is not null ? new DataTemplateKey(DataType) : null;
 
         /// <summary>
+        /// Gets a collection of <see cref="TriggerBase"/> objects that apply property changes
+        /// or perform actions based on specified conditions.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="TriggerBase"/> objects. The default is an empty collection.
+        /// </returns>
+        public TriggerCollection Triggers
+        {
+            get
+            {
+                if (_triggers is null)
+                {
+                    _triggers = [];
+                    
+                    if (IsSealed())
+                    {
+                        _triggers.Seal();
+                    }
+                }
+                return _triggers;
+            }
+        }
+
+        /// <summary>
         /// Creates the <see cref="UIElement"/> objects in the <see cref="DataTemplate"/>.
         /// </summary>
         /// <returns>
@@ -72,5 +98,9 @@ namespace System.Windows
                 return null;
             }
         }
+
+        internal override Type TargetTypeInternal => typeof(ContentPresenter);
+
+        internal override TriggerCollection TriggersInternal => _triggers;
     }
 }

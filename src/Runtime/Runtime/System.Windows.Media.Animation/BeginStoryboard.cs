@@ -76,17 +76,21 @@ public sealed class BeginStoryboard : TriggerAction
         set => SetValueInternal(FrameworkElement.NameProperty, value);
     }
 
-    internal override void Invoke(IFrameworkElement fe)
+    internal override void Invoke(IFrameworkElement fe, INameScope namescope) => Begin(fe, namescope);
+
+    internal override void Invoke(IFrameworkElement fe) => Begin(fe, null);
+
+    private void Begin(IFrameworkElement fe, INameScope namescope)
     {
         if (Storyboard is Storyboard storyboard)
         {
             if (fe is FrameworkElement frameworkElement)
             {
-                storyboard.Begin(frameworkElement, Name is not null);
+                storyboard.BeginCommon(frameworkElement, namescope, Name is not null, false);
             }
             else
             {
-                storyboard.Begin();
+                storyboard.BeginCommon((DependencyObject)fe, namescope, Name is not null, false);
             }
         }
     }

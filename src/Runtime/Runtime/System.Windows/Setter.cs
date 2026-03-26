@@ -11,27 +11,27 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.ComponentModel;
-using System.Windows.Markup;
-using System.Xaml.Markup;
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Markup;
 using System.Windows.Media;
-using OpenSilver.Internal;
+using System.Xaml.Markup;
 
 namespace System.Windows;
 
 /// <summary>
 /// Applies a value to a property in a <see cref="Style"/>.
 /// </summary>
+[XamlSetMarkupExtension(nameof(ReceiveMarkupExtension))]
+[XamlSetTypeConverter(nameof(ReceiveTypeConverter))]
 public sealed class Setter : SetterBase, ISupportInitialize
 {
     private DependencyProperty _property;
     private object _value;
-
-    private object _unresolvedValue = null;
-    private ITypeDescriptorContext _serviceProvider = null;
-    private CultureInfo _cultureInfoForTypeConverter = null;
+    private string _targetName;
+    private InitializationState _initializationState;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Setter"/> class.
@@ -54,6 +54,28 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
         _property = property;
         _value = value == DependencyProperty.UnsetValue ? null : value;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Setter"/> class with the specified 
+    /// property, value, and target name.
+    /// </summary>
+    /// <param name="property">
+    /// The <see cref="DependencyProperty"/> to apply the <see cref="Value"/> to.
+    /// </param>
+    /// <param name="value">
+    /// The value to apply to the property.
+    /// </param>
+    /// <param name="targetName">
+    /// The name of the child node this <see cref="Setter"/> is intended for.
+    /// </param>
+    public Setter(DependencyProperty property, object value, string targetName)
+    {
+        CheckValidProperty(property);
+
+        _property = property;
+        _value = value == DependencyProperty.UnsetValue ? null : value;
+        _targetName = targetName;
     }
 
     /// <summary>
@@ -82,7 +104,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
     /// <returns>
     /// The value to apply to the property that is specified by the <see cref="Setter"/>.
     /// </returns>
-    [TypeConverter(typeof(SetterValueConverter))]
+    [TypeConverter(typeof(SetterTriggerConditionValueConverter))]
     public object Value
     {
         get => _value;
@@ -109,6 +131,30 @@ public sealed class Setter : SetterBase, ISupportInitialize
     }
 
     /// <summary>
+    /// Gets or sets the name of the element to which this <see cref="Setter"/> applies.
+    /// </summary>
+    /// <returns>
+    /// The name of the element. The default is null.
+    /// </returns>
+    /// <remarks>
+    /// You can set this property to the name of any element within the scope of where the setter
+    /// collection (the collection that this setter is part of) is applied. This is typically a
+    /// named element that is within the template that contains this setter. This property is
+    /// used in templates and is not typically used in styles.
+    /// </remarks>
+    [DefaultValue(null)]
+    [Ambient]
+    public string TargetName
+    {
+        get => _targetName;
+        set
+        {
+            CheckSealed();
+            _targetName = value;
+        }
+    }
+
+    /// <summary>
     /// Seals this setter
     /// </summary>
     internal override void Seal()
@@ -122,6 +168,15 @@ public sealed class Setter : SetterBase, ISupportInitialize
         if (dp is null)
         {
             throw new ArgumentException(string.Format(Strings.NullPropertyIllegal, "Setter.Property"));
+        }
+
+        if (string.IsNullOrEmpty(TargetName))
+        {
+            // Setter on container is not allowed to affect the StyleProperty.
+            if (dp == FrameworkElement.StyleProperty)
+            {
+                throw new ArgumentException(Strings.StylePropertyInStyleNotAllowed);
+            }
         }
 
         if (dp.IsObjectType || !dp.IsValidValue(value))
@@ -172,6 +227,13 @@ public sealed class Setter : SetterBase, ISupportInitialize
     {
         ArgumentNullException.ThrowIfNull(property);
 
+        if (property.ReadOnly)
+        {
+            // Read-only properties will not be consulting Style/Template/Trigger Setter for value.
+            // Rather than silently do nothing, throw error.
+            throw new ArgumentException(string.Format(Strings.ReadOnlyPropertyNotAllowed, property.Name, GetType().Name));
+        }
+
         if (property == FrameworkElement.NameProperty)
         {
             // Note: Silverlight allows this, but will crash as soon as
@@ -180,11 +242,33 @@ public sealed class Setter : SetterBase, ISupportInitialize
         }
     }
 
-    internal void ReceiveTypeConverter(ITypeDescriptorContext serviceProvider, CultureInfo culture, object unresolvedValue)
+    internal static void ReceiveTypeConverter(object targetObject, XamlSetTypeConverterEventArgs eventArgs)
     {
-        _serviceProvider = serviceProvider;
-        _cultureInfoForTypeConverter = culture;
-        _unresolvedValue = unresolvedValue;
+        if (targetObject is not Setter setter)
+        {
+            throw new ArgumentNullException(nameof(targetObject));
+        }
+
+        ArgumentNullException.ThrowIfNull(eventArgs);
+
+        if (eventArgs.Member.Name == nameof(Property))
+        {
+            setter._initializationState ??= new();
+            setter._initializationState.UnresolvedProperty = eventArgs.Value;
+            setter._initializationState.ServiceProvider = eventArgs.ServiceProvider;
+            setter._initializationState.CultureInfoForTypeConverter = eventArgs.CultureInfo;
+
+            eventArgs.Handled = true;
+        }
+        else if (eventArgs.Member.Name == nameof(Value))
+        {
+            setter._initializationState ??= new();
+            setter._initializationState.UnresolvedValue = eventArgs.Value;
+            setter._initializationState.ServiceProvider = eventArgs.ServiceProvider;
+            setter._initializationState.CultureInfoForTypeConverter = eventArgs.CultureInfo;
+
+            eventArgs.Handled = true;
+        }
     }
 
     internal static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
@@ -192,7 +276,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
         ArgumentNullException.ThrowIfNull(targetObject);
         ArgumentNullException.ThrowIfNull(eventArgs);
 
-        if (targetObject is not Setter setter || eventArgs.Member.Name != "Value")
+        if (targetObject is not Setter setter || eventArgs.Member.Name != nameof(Value))
         {
             return;
         }
@@ -210,20 +294,31 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
     void ISupportInitialize.EndInit()
     {
-        if (_unresolvedValue != null)
+        if (_initializationState is not InitializationState state)
         {
-            try
-            {
-                Value = SetterValueConverter.ResolveValue(_serviceProvider,
-                    Property, _cultureInfoForTypeConverter, _unresolvedValue);
-            }
-            finally
-            {
-                _unresolvedValue = null;
-            }
+            return;
         }
 
-        _serviceProvider = null;
-        _cultureInfoForTypeConverter = null;
+        _initializationState = null;
+
+        if (state.UnresolvedProperty is not null)
+        {
+            Property = DependencyPropertyConverter.ResolveProperty(state.ServiceProvider,
+                TargetName, state.UnresolvedProperty);
+        }
+
+        if (state.UnresolvedValue is not null)
+        {
+            Value = SetterTriggerConditionValueConverter.ResolveValue(state.ServiceProvider,
+                Property, state.CultureInfoForTypeConverter, state.UnresolvedValue);
+        }
+    }
+
+    private sealed class InitializationState
+    {
+        public object UnresolvedProperty;
+        public object UnresolvedValue;
+        public ITypeDescriptorContext ServiceProvider;
+        public CultureInfo CultureInfoForTypeConverter;
     }
 }

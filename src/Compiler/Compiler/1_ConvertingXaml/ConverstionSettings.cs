@@ -21,12 +21,14 @@ internal sealed class ConversionSettings
         AssembliesInspector inspector,
         CoreTypesConverter coreTypes,
         SystemTypesHelper systemTypes,
+        TypeReferenceHelper typeReferenceHelper,
         XamlPreprocessorOptions options)
     {
         AssemblyName = assemblyName;
         Inspector = inspector;
         CoreTypes = coreTypes;
         SystemTypes = systemTypes;
+        TypeReferenceHelper = typeReferenceHelper;
         Options = options;
     }
 
@@ -37,6 +39,8 @@ internal sealed class ConversionSettings
     public CoreTypesConverter CoreTypes { get; }
 
     public SystemTypesHelper SystemTypes { get; }
+
+    public TypeReferenceHelper TypeReferenceHelper { get; }
 
     public XamlPreprocessorOptions Options { get; }
 }

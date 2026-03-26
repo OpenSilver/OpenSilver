@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -211,7 +211,7 @@ internal static class DependencyObjectStore
     {
         Debug.Assert(newValue != DependencyProperty.UnsetValue);
 
-        storage.LocalStyleValue = newValue;
+        storage.StyleValue = newValue;
 
         ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
@@ -256,9 +256,211 @@ internal static class DependencyObjectStore
     {
         ref EffectiveValueEntry oldEntry = ref storage.Entry;
 
-        storage.LocalStyleValue = DependencyProperty.UnsetValue;
+        storage.StyleValue = DependencyProperty.UnsetValue;
 
         if (oldEntry.BaseValueSourceInternal > BaseValueSourceInternal.Style)
+        {
+            return;
+        }
+
+        if (oldEntry.IsExpression)
+        {
+            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
+            currentExpr.OnDetach(d, dp);
+        }
+
+        (object effectiveValue, BaseValueSourceInternal effectiveValueKind) = ComputeEffectiveBaseValue(
+            storage, d, dp, metadata);
+
+        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, effectiveValue, effectiveValueKind);
+
+        if (oldEntry.IsAnimated)
+        {
+            newEntry.SetAnimatedValue(oldEntry.ModifiedValue.AnimatedValue);
+            newEntry.IsAnimatedOverLocal = oldEntry.IsAnimatedOverLocal;
+        }
+
+        UpdateEffectiveValue(storage,
+            d,
+            dp,
+            metadata,
+            ref oldEntry,
+            ref newEntry,
+            true,
+            OperationType.Unknown);
+    }
+
+    internal static void SetParentTemplateTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        object newValue)
+    {
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
+
+        storage.ParentTemplateTriggerValue = newValue;
+
+        //
+        // In WPF, ParentTemplateTrigger has a lower precedence than Local. Since OpenSilver does not support
+        // the ParentTemplate value source, it is not possible to replicate this behavior. As a workaround,
+        // ParentTemplateTrigger and Local values are treated as if they have the same precedence, which means
+        // that the most recently set value will be the active value.
+        //
+        //if (BaseValueSourceInternal.ParentTemplateTrigger < storage.Entry.BaseValueSourceInternal)
+        //{
+        //    return;
+        //}
+
+        SetTriggerValue(storage, d, dp, metadata, newValue, BaseValueSourceInternal.ParentTemplateTrigger);
+    }
+
+    internal static void SetStyleTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        object newValue)
+    {
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
+
+        storage.StyleTriggerValue = newValue;
+
+        if (BaseValueSourceInternal.StyleTrigger < storage.Entry.BaseValueSourceInternal)
+        {
+            return;
+        }
+
+        SetTriggerValue(storage, d, dp, metadata, newValue, BaseValueSourceInternal.StyleTrigger);
+    }
+
+    internal static void SetTemplateTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        object newValue)
+    {
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
+
+        storage.TemplateTriggerValue = newValue;
+
+        if (BaseValueSourceInternal.TemplateTrigger < storage.Entry.BaseValueSourceInternal)
+        {
+            return;
+        }
+
+        SetTriggerValue(storage, d, dp, metadata, newValue, BaseValueSourceInternal.TemplateTrigger);
+    }
+
+    internal static void SetThemeStyleTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        object newValue)
+    {
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
+
+        storage.ThemeStyleTriggerValue = newValue;
+
+        if (BaseValueSourceInternal.ThemeStyleTrigger < storage.Entry.BaseValueSourceInternal)
+        {
+            return;
+        }
+
+        SetTriggerValue(storage, d, dp, metadata, newValue, BaseValueSourceInternal.ThemeStyleTrigger);
+    }
+
+    private static void SetTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        object newValue,
+        BaseValueSourceInternal valueSource)
+    {
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
+
+        if (oldEntry.IsExpression)
+        {
+            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
+            currentExpr.OnDetach(d, dp);
+        }
+
+        EffectiveValueEntry newEntry = EvaluateEffectiveValue(d, dp, metadata, newValue, valueSource);
+
+        if (oldEntry.IsAnimated)
+        {
+            newEntry.SetAnimatedValue(oldEntry.ModifiedValue.AnimatedValue);
+            newEntry.IsAnimatedOverLocal = oldEntry.IsAnimatedOverLocal;
+        }
+
+        UpdateEffectiveValue(storage,
+            d,
+            dp,
+            metadata,
+            ref oldEntry,
+            ref newEntry,
+            false,
+            OperationType.Unknown);
+    }
+
+    internal static void ClearParentTemplateTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata)
+    {
+        storage.ParentTemplateTriggerValue = DependencyProperty.UnsetValue;
+
+        ClearTriggerValue(storage, d, dp, metadata, BaseValueSourceInternal.ParentTemplateTrigger);
+    }
+
+    internal static void ClearStyleTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata)
+    {
+        storage.StyleTriggerValue = DependencyProperty.UnsetValue;
+
+        ClearTriggerValue(storage, d, dp, metadata, BaseValueSourceInternal.StyleTrigger);
+    }
+
+    internal static void ClearTemplateTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata)
+    {
+        storage.TemplateTriggerValue = DependencyProperty.UnsetValue;
+
+        ClearTriggerValue(storage, d, dp, metadata, BaseValueSourceInternal.TemplateTrigger);
+    }
+
+    internal static void ClearThemeStyleTriggerValue(
+        Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata)
+    {
+        storage.ThemeStyleTriggerValue = DependencyProperty.UnsetValue;
+
+        ClearTriggerValue(storage, d, dp, metadata, BaseValueSourceInternal.ThemeStyleTrigger);
+    }
+
+    private static void ClearTriggerValue(Storage storage,
+        DependencyObject d,
+        DependencyProperty dp,
+        PropertyMetadata metadata,
+        BaseValueSourceInternal valueSource)
+    {
+        ref EffectiveValueEntry oldEntry = ref storage.Entry;
+
+        if (oldEntry.BaseValueSourceInternal > valueSource)
         {
             return;
         }

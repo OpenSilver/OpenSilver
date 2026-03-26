@@ -30,7 +30,7 @@
   <Target Name="GetOpenSilverAssemblyAttributes"
           DependsOnTargets="SetSourceRevisionId">
     <PropertyGroup>
-      <OpenSilverCompatibilityVersionAttribute>2</OpenSilverCompatibilityVersionAttribute>
+      <OpenSilverCompatibilityVersionAttribute>3</OpenSilverCompatibilityVersionAttribute>
       <OpenSilverExposeResourcesToExtractor Condition="'$(OpenSilverExposeResourcesToExtractor)' != 'true'">false</OpenSilverExposeResourcesToExtractor>
     </PropertyGroup>
 

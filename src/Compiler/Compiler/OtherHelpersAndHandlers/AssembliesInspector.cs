@@ -107,11 +107,41 @@ namespace OpenSilver.Compiler
         public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName)
             => _monoCecilVersion.GetPropertyOrFieldInfo(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo, out memberDeclaringTypeName, out memberTypeNamespace, out memberTypeName);
 
-        public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName, IXmlLineInfo lineInfo)
-            => _monoCecilVersion.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName, lineInfo);
+        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName, assemblyName, lineInfo);
 
-        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, IXmlLineInfo lineInfo)
-            => _monoCecilVersion.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName, lineInfo);
+        public bool IsDependencyObject(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsDependencyObject(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsApplication(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsApplication(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsResourceDictionary(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsResourceDictionary(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsStyle(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsStyle(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsFrameworkTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsFrameworkTemplate(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsDataTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsDataTemplate(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsControlTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsControlTemplate(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsContentPresenter(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsContentPresenter(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsContentControl(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsContentControl(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsIFrameworkElement(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsIFrameworkElement(namespaceName, typeName, assemblyName, lineInfo);
+
+        public bool IsIUIElement(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+            => _monoCecilVersion.IsIUIElement(namespaceName, typeName, assemblyName, lineInfo);
 
         public bool IsResourceDictionarySourcePropertyVisible(string namespaceName, string typeName, IXmlLineInfo lineInfo)
             => _monoCecilVersion.IsResourceDictionarySourcePropertyVisible(namespaceName, typeName, lineInfo);

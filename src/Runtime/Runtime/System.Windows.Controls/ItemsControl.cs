@@ -140,7 +140,7 @@ namespace System.Windows.Controls
         {
             var template = new ItemsPanelTemplate
             {
-                Template = new TemplateContent(
+                Template = new CompiledTemplateContent(
                     new XamlContext(),
                     static (owner, context) =>
                     {
@@ -808,7 +808,7 @@ namespace System.Windows.Controls
             new ControlTemplate
             {
                 TargetType = typeof(ItemsControl),
-                Template = new TemplateContent(
+                Template = new CompiledTemplateContent(
                     new XamlContext(),
                     static (owner, context) =>
                     {

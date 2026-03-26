@@ -127,7 +127,7 @@ namespace OpenSilver.Compiler
             return new XamlNode(nodeType, value);
         }
 
-        private static bool IsMemberNode(XElement element) => element.Name.LocalName.Contains(".");
+        internal static bool IsMemberNode(XElement element) => element.Name.LocalName.Contains(".");
 
         private static void VerifyObjectNode(XElement element)
         {

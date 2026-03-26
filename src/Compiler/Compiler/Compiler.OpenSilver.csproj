@@ -48,9 +48,9 @@
     <Compile Include="1_ConvertingXaml\XamlPreprocessorOptions.cs" />
     <Compile Include="1_ConvertingXaml\XamlReader.cs" />
     <Compile Include="1_ConvertingXaml\XNodeSelector.cs" />
+    <Compile Include="1_ConvertingXaml\SetterTriggerConditionHelpers.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass1.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />
-    <Compile Include="Helpers\XDocumentHelper.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\ConvertingXamlToFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\CoreTypesHelperFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.cs" />
@@ -60,6 +60,7 @@
     <Compile Include="EntryPoints\UpdateIncludesInFSharpProjectFile.cs" />
     <Compile Include="EntryPoints\ResourceClassifier.cs" />
     <Compile Include="EntryPoints\ResourcesGenerator.cs" />
+    <Compile Include="Helpers\XDocumentHelper.cs" />
     <Compile Include="Helpers\ResourceIDHelper.cs" />
     <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferencesVB.cs" />

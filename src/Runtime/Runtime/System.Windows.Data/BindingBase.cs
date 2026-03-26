@@ -256,7 +256,7 @@ public abstract class BindingBase : MarkupExtension
                     // So we handle it similarly to how the parser does it.
 
                     EventHandler<XamlSetMarkupExtensionEventArgs> setMarkupExtension
-                        = LookupSetMarkupExtensionHandler(targetType);
+                        = Helper.LookupSetMarkupExtensionHandler(targetType);
 
                     if (setMarkupExtension is not null && propertyInfo is not null)
                     {
@@ -316,15 +316,6 @@ public abstract class BindingBase : MarkupExtension
                 }
             }
         }
-    }
-
-    private static EventHandler<XamlSetMarkupExtensionEventArgs> LookupSetMarkupExtensionHandler(Type type)
-    {
-        if (typeof(Setter) == type)
-        {
-            return Setter.ReceiveMarkupExtension;
-        }
-        return null;
     }
 
     /// <summary> Return true if any of the given flags are set. </summary>

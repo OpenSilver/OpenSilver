@@ -278,8 +278,8 @@ namespace System.Windows.Controls
 
         private sealed class UseContentTemplate : FrameworkTemplate
         {
-            private readonly TemplateContent _defaultTemplate =
-                new TemplateContent(
+            private readonly CompiledTemplateContent _defaultTemplate =
+                new CompiledTemplateContent(
                     new XamlContext(),
                     static (owner, context) =>
                     {

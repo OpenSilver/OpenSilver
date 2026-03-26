@@ -377,6 +377,8 @@ public sealed class MultiBindingExpression : BindingExpressionBase
         IsInTransfer = true;
         NeedsDataTransfer = false;
 
+        RaiseValueChanged();
+
         Invalidate();
 
         IsInTransfer = false;

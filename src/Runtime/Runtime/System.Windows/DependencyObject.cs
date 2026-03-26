@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -122,7 +122,7 @@ namespace System.Windows
             private set => WriteFlag(Flags.IsSealed, value);
         }
 
-        internal void Seal()
+        internal virtual void Seal()
         {
             // Since this object no longer changes it won't be able to notify dependents
             _dependentListMap = null;
@@ -702,6 +702,144 @@ namespace System.Windows
             }
         }
 
+        internal void SetStyleTriggerValue(DependencyProperty dp, object value)
+        {
+            Debug.Assert(dp != null);
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                ClearStyleTriggerValue(dp);
+            }
+            else
+            {
+                Storage storage = GetOrCreateStorage(dp, metadata);
+                DependencyObjectStore.SetStyleTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata,
+                    value);
+            }
+        }
+
+        private void ClearStyleTriggerValue(DependencyProperty dp)
+        {
+            Debug.Assert(dp is not null);
+
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                DependencyObjectStore.ClearStyleTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata);
+            }
+        }
+
+        internal void SetThemeStyleTriggerValue(DependencyProperty dp, object value)
+        {
+            Debug.Assert(dp != null);
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                ClearThemeStyleTriggerValue(dp);
+            }
+            else
+            {
+                Storage storage = GetOrCreateStorage(dp, metadata);
+                DependencyObjectStore.SetThemeStyleTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata,
+                    value);
+            }
+        }
+
+        private void ClearThemeStyleTriggerValue(DependencyProperty dp)
+        {
+            Debug.Assert(dp is not null);
+
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                DependencyObjectStore.ClearThemeStyleTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata);
+            }
+        }
+
+        internal void SetTemplateTriggerValue(DependencyProperty dp, object value)
+        {
+            Debug.Assert(dp is not null);
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                ClearTemplateTriggerValue(dp);
+            }
+            else
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                Storage storage = GetOrCreateStorage(dp, metadata);
+                DependencyObjectStore.SetTemplateTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata,
+                    value);
+            }
+        }
+
+        private void ClearTemplateTriggerValue(DependencyProperty dp)
+        {
+            Debug.Assert(dp is not null);
+
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                DependencyObjectStore.ClearTemplateTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata);
+            }
+        }
+
+        internal void SetParentTemplateTriggerValue(DependencyProperty dp, object value)
+        {
+            Debug.Assert(dp is not null);
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                ClearParentTemplateTriggerValue(dp);
+            }
+            else
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                Storage storage = GetOrCreateStorage(dp, metadata);
+                DependencyObjectStore.SetParentTemplateTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata,
+                    value);
+            }
+        }
+
+        private void ClearParentTemplateTriggerValue(DependencyProperty dp)
+        {
+            Debug.Assert(dp is not null);
+
+            if (GetStorage(dp.GlobalIndex) is Storage storage)
+            {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+                DependencyObjectStore.ClearParentTemplateTriggerValue(storage,
+                    this,
+                    dp,
+                    metadata);
+            }
+        }
+
         internal void SetThemeStyleValue(DependencyProperty dp, object value)
         {
             Debug.Assert(dp != null);
@@ -1158,11 +1296,11 @@ namespace System.Windows
             return storage;
         }
 
-        internal void RemoveUncommonStorage(int targetIndex)
+        internal bool RemoveUncommonStorage(int targetIndex, out Storage storage)
         {
             Debug.Assert(_effectiveValues is not null);
 
-            _effectiveValues.Remove(targetIndex);
+            return _effectiveValues.TryRemove(targetIndex, out storage);
         }
     }
 }

@@ -76,6 +76,10 @@ public abstract class BindingExpressionBase : Expression
         _flags = (PrivateFlags)binding.Flags;
     }
 
+    /// <summary> Create an untargeted BindingExpression </summary>
+    internal static BindingExpressionBase CreateUntargetedBindingExpression(DependencyObject d, BindingBase binding) =>
+        binding.CreateBindingExpression(d, NoTargetProperty, null);
+
     /// <summary>
     /// Gets the <see cref="BindingBase"/> object from which this <see cref="BindingExpressionBase"/> object is created.
     /// </summary>
@@ -227,8 +231,15 @@ public abstract class BindingExpressionBase : Expression
         // don't invalidate during Attach.  The property engine does it already.
         if (IsAttaching) return;
 
-        Target.ApplyExpression(TargetProperty, this);
+        if (TargetProperty != NoTargetProperty)
+        {
+            Target.ApplyExpression(TargetProperty, this);
+        }
     }
+
+    internal void RaiseValueChanged() => ValueChanged?.Invoke(this, EventArgs.Empty);
+
+    internal event EventHandler ValueChanged;
 
     internal sealed override void OnAttach(DependencyObject d, DependencyProperty dp) => Attach(d, dp);
 
@@ -238,6 +249,13 @@ public abstract class BindingExpressionBase : Expression
         AttachOverride(d, dp);
         IsAttaching = false;
     }
+
+    /// <summary> Attach the BindingExpression to its target element </summary>
+    /// <remarks>
+    /// This method must be called once during the initialization.
+    /// </remarks>
+    /// <param name="d">The target element </param>
+    internal void Attach(DependencyObject d) => Attach(d, NoTargetProperty);
 
     /// <summary>
     /// Attach the binding expression to the given target object and property.

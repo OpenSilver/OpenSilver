@@ -315,7 +315,7 @@ namespace OpenSilver.Internal.Xaml
             Debug.Assert(xamlContext != null);
             Debug.Assert(factory != null);
 
-            template.Template = new TemplateContent(xamlContext, (e, c) => factory((FrameworkElement)e, c));
+            template.Template = new CompiledTemplateContent(xamlContext, (e, c) => factory((FrameworkElement)e, c));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -325,7 +325,7 @@ namespace OpenSilver.Internal.Xaml
             Debug.Assert(xamlContext != null);
             Debug.Assert(factory != null);
 
-            template.Template = new TemplateContent(xamlContext, factory);
+            template.Template = new CompiledTemplateContent(xamlContext, factory);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -427,16 +427,10 @@ namespace OpenSilver.Internal.Xaml
             return false;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void XamlContext_SetAnimationContext(XamlContext context, Timeline timeline)
         {
-            Debug.Assert(context != null);
-            Debug.Assert(timeline != null);
-
-            if (timeline is not Storyboard)
-            {
-                timeline.NameResolver = context.NameResolver;
-            }
         }
     }
 }

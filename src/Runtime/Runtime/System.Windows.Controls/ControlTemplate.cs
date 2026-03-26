@@ -11,27 +11,58 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls
+using System.Xaml.Markup;
+
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Defines the element tree that is applied as the control template for a control.
+/// </summary>
+public sealed class ControlTemplate : FrameworkTemplate
 {
+    private Type _targetType;
+    private TriggerCollection _triggers;
+
     /// <summary>
-    /// Defines the element tree that is applied as the control template for a control.
+    /// Initializes a new instance of the ControlTemplate class.
     /// </summary>
-    public sealed class ControlTemplate : FrameworkTemplate
+    public ControlTemplate() { }
+
+    /// <summary>
+    /// Gets or sets the type to which the ControlTemplate is applied.
+    /// </summary>
+    [Ambient]
+    public Type TargetType
     {
-        private Type _targetType;
+        get => _targetType;
+        set { CheckSealed(); _targetType = value; }
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the ControlTemplate class.
-        /// </summary>
-        public ControlTemplate() { }
-
-        /// <summary>
-        /// Gets or sets the type to which the ControlTemplate is applied.
-        /// </summary>
-        public Type TargetType
+    /// <summary>
+    /// Gets a collection of <see cref="TriggerBase"/> objects that apply property changes
+    /// or perform actions based on specified conditions.
+    /// </summary>
+    /// <returns>
+    /// A collection of <see cref="TriggerBase"/> objects. The default is an empty collection.
+    /// </returns>
+    public TriggerCollection Triggers
+    {
+        get
         {
-            get => _targetType;
-            set { CheckSealed(); _targetType = value; }
+            if (_triggers is null)
+            {
+                _triggers = [];
+
+                if (IsSealed())
+                {
+                    _triggers.Seal();
+                }
+            }
+            return _triggers;
         }
     }
+
+    internal override Type TargetTypeInternal => TargetType;
+
+    internal override TriggerCollection TriggersInternal => _triggers;
 }

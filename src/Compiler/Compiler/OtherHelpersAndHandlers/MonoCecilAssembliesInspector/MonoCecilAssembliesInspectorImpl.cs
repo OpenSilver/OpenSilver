@@ -103,7 +103,6 @@ namespace OpenSilver.Compiler
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        private const string SystemXamlNamespace = "System.Xaml";
         private const string GenericMarkupExtension = "IMarkupExtension`1";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
         private const string DependencyProperty = "DependencyProperty";
@@ -115,17 +114,74 @@ namespace OpenSilver.Compiler
         private const string ClrNamespace = "clr-namespace:";
         private const string StaticRes = "StaticResource";
         private const string StaticResExtension = "StaticResourceExtension";
-        private const string DependencyObj = "DependencyObject";
         private const string FrameworkTemplateName = "FrameworkTemplate";
         private const string ResourceDictionaryName = "ResourceDictionary";
 
         private readonly MonoCecilAssemblyStorage _storage;
-        private readonly Dictionary<AssemblyDefinition, AssemblyData> _assemblies = new();
-        private readonly ConcurrentDictionary<string, TypeDefinition> _typeNameToType = new();
-        private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<string>> _typesPerAssembly = new();
+        private readonly Dictionary<AssemblyDefinition, AssemblyData> _assemblies = [];
+        private readonly ConcurrentDictionary<TypeKey, TypeDefinition> _typeNameToType = [];
+        private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<TypeKey>> _typesPerAssembly = [];
 
         private readonly SystemTypesHelper _systemTypesHelper;
         private readonly TypeReferenceHelper _typeReferenceHelper;
+
+        private TypeDefinition _iListType;
+        private TypeDefinition _iDictionaryType;
+
+        private TypeDefinition _dependencyObjectType;
+        private TypeDefinition _styleType;
+        private TypeDefinition _frameworkTemplateType;
+        private TypeDefinition _controlTemplateType;
+        private TypeDefinition _dataTemplateType;
+        private TypeDefinition _applicationType;
+        private TypeDefinition _resourceDictionaryType;
+        private TypeDefinition _contentPresenterType;
+        private TypeDefinition _contentControlType;
+        private TypeDefinition _iUIElementType;
+        private TypeDefinition _iFrameworkElementType;
+        private TypeDefinition _iMarkupExtensionType;
+
+        private TypeDefinition IListType =>
+            _iListType ??= FindType(typeof(IList).Namespace, nameof(IList));
+
+        private TypeDefinition IDictionaryType =>
+            _iDictionaryType ??= FindType(typeof(IDictionary).Namespace, nameof(IDictionary));
+
+        private TypeDefinition DependencyObjectType =>
+            _dependencyObjectType ??= FindType(KnownNamespaces.SystemWindows, "DependencyObject", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition ApplicationType =>
+            _applicationType ??= FindType(KnownNamespaces.SystemWindows, "Application", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition ResourceDictionaryType =>
+            _resourceDictionaryType ??= FindType(KnownNamespaces.SystemWindows, "ResourceDictionary", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition StyleType =>
+            _styleType ??= FindType(KnownNamespaces.SystemWindows, "Style", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition FrameworkTemplateType =>
+            _frameworkTemplateType ??= FindType(KnownNamespaces.SystemWindows, "FrameworkTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition DataTemplateType =>
+            _dataTemplateType ??= FindType(KnownNamespaces.SystemWindows, "DataTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition ControlTemplateType =>
+            _controlTemplateType ??= FindType(KnownNamespaces.SystemWindowsControls, "ControlTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition ContentPresenterType =>
+            _contentPresenterType ??= FindType(KnownNamespaces.SystemWindowsControls, "ContentPresenter", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition ContentControlType =>
+            _contentControlType ??= FindType(KnownNamespaces.SystemWindowsControls, "ContentControl", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition IUIElementType =>
+            _iUIElementType ??= FindType(KnownNamespaces.SystemWindows, "IUIElement", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition IFrameworkElementType =>
+            _iFrameworkElementType ??= FindType(KnownNamespaces.SystemWindows, "IFrameworkElement", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition IMarkupExtensionType =>
+            _iMarkupExtensionType ??= FindType(KnownNamespaces.SystemXaml, GenericMarkupExtension, Constants.OPENSILVER_ASSEMBLY_NAME);
 
         public MonoCecilAssembliesInspectorImpl(SupportedLanguage compilerType)
         {
@@ -156,7 +212,7 @@ namespace OpenSilver.Compiler
         private AssemblyDefinition StoreAssembly(AssemblyDefinition assembly)
         {
             _assemblies.Add(assembly, new AssemblyData(assembly));
-            _typesPerAssembly.Add(assembly, new ConcurrentHashSet<string>());
+            _typesPerAssembly.Add(assembly, new ConcurrentHashSet<TypeKey>());
             return assembly;
         }
 
@@ -224,13 +280,10 @@ namespace OpenSilver.Compiler
                 typeName = StaticResExtension;
             }
 
-            // Generate string representing the type:
-            string fullTypeNameWithNamespaceInsideBraces = !string.IsNullOrEmpty(namespaceName)
-                ? "{" + namespaceName + "}" + typeName
-                : typeName;
+            var typeKey = new TypeKey(namespaceName, typeName);
 
             // Start by looking in the cache dictionary:
-            if (_typeNameToType.TryGetValue(fullTypeNameWithNamespaceInsideBraces, out TypeDefinition type))
+            if (_typeNameToType.TryGetValue(typeKey, out TypeDefinition type))
             {
                 return type;
             }
@@ -281,8 +334,8 @@ namespace OpenSilver.Compiler
 
                     if (type != null)
                     {
-                        _typeNameToType[fullTypeNameWithNamespaceInsideBraces] = type;
-                        _typesPerAssembly[assembly].TryAdd(fullTypeNameWithNamespaceInsideBraces);
+                        _typeNameToType[typeKey] = type;
+                        _typesPerAssembly[assembly].TryAdd(typeKey);
                         return type;
                     }
                 }
@@ -293,7 +346,7 @@ namespace OpenSilver.Compiler
                 return null;
             }
 
-            throw new XamlParseException($"Cannot find type '{fullTypeNameWithNamespaceInsideBraces}'.", lineInfo);
+            throw new XamlParseException($"Cannot find type '{typeKey}'.", lineInfo);
         }
 
         private static bool IsNamespaceAnXmlNamespace(string namespaceName)
@@ -526,17 +579,11 @@ namespace OpenSilver.Compiler
             return methodInfo.ReturnType.PopulateGeneric(elementType, ownerElementType);
         }
 
-        private bool IsCollection(TypeDefinition elementType)
-        {
-            var iList = FindType(typeof(IList).Namespace, nameof(IList));
-            return iList.IsAssignableFrom(elementType);
-        }
+        private bool IsCollection(TypeDefinition type) =>
+            TypeDefinitionExtensions.Equals(type, IListType) || type.DoesAnySubTypeImplementInterface(IListType);
 
-        private bool IsDictionary(TypeDefinition elementType)
-        {
-            var iDictionary = FindType(typeof(IDictionary).Namespace, nameof(IDictionary));
-            return iDictionary.IsAssignableFrom(elementType);
-        }
+        private bool IsDictionary(TypeDefinition type) =>
+            TypeDefinitionExtensions.Equals(type, IDictionaryType) || type.DoesAnySubTypeImplementInterface(IDictionaryType);
 
         private bool IsElementACollection(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
@@ -563,11 +610,6 @@ namespace OpenSilver.Compiler
             }
 
             return null;
-        }
-
-        private TypeDefinition GetDependencyObjectType()
-        {
-            return FindType(KnownNamespaces.SystemWindows, DependencyObj, Constants.OPENSILVER_ASSEMBLY_NAME);
         }
 
         public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny,
@@ -616,15 +658,73 @@ namespace OpenSilver.Compiler
             return null;
         }
 
-        public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName, IXmlLineInfo lineInfo)
+        public bool IsDependencyObject(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
-            var type = FindType(namespaceName, typeName, lineInfo);
-            var fromType = FindType(fromNamespaceName, fromTypeName, lineInfo);
-
-            return type.IsAssignableFrom(fromType);
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, DependencyObjectType) || type.IsSubclassOf(DependencyObjectType);
         }
 
-        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, IXmlLineInfo lineInfo)
+        public bool IsApplication(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, ApplicationType) || type.IsSubclassOf(ApplicationType);
+        }
+
+        public bool IsResourceDictionary(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, ResourceDictionaryType) || type.IsSubclassOf(ResourceDictionaryType);
+        }
+
+        public bool IsStyle(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, StyleType) || type.IsSubclassOf(StyleType);
+        }
+
+        public bool IsFrameworkTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, FrameworkTemplateType) || type.IsSubclassOf(FrameworkTemplateType);
+        }
+
+        public bool IsDataTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, DataTemplateType) || type.IsSubclassOf(DataTemplateType);
+        }
+
+        public bool IsControlTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, ControlTemplateType) || type.IsSubclassOf(ControlTemplateType);
+        }
+
+        public bool IsContentPresenter(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, ContentPresenterType) || type.IsSubclassOf(ContentPresenterType);
+        }
+
+        public bool IsContentControl(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, ContentControlType) || type.IsSubclassOf(ContentControlType);
+        }
+
+        public bool IsIUIElement(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, IUIElementType) || type.DoesAnySubTypeImplementInterface(IUIElementType);
+        }
+
+        public bool IsIFrameworkElement(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || type.DoesAnySubTypeImplementInterface(IFrameworkElementType);
+        }
+
+        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
             const string TemplatePropertyName = "Template";
 
@@ -633,7 +733,7 @@ namespace OpenSilver.Compiler
                 return false;
             }
 
-            var type = FindType(namespaceName, typeName, lineInfo);
+            var type = FindType(namespaceName, typeName, assemblyName, lineInfo);
 
             return FindPropertyDeep(type, TemplatePropertyName, out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == FrameworkTemplateName &&
@@ -726,9 +826,7 @@ namespace OpenSilver.Compiler
         public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
         {
             var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
-            var markupExtensionGeneric = FindType(SystemXamlNamespace, GenericMarkupExtension);
-
-            return markupExtensionGeneric.IsAssignableFrom(elementType);
+            return elementType.DoesAnySubTypeImplementInterface(IMarkupExtensionType);
         }
 
         public bool IsTypeAssignableFrom(
@@ -955,7 +1053,7 @@ namespace OpenSilver.Compiler
             out string returnValueNamespaceName,
             out string returnValueLocalTypeName)
         {
-            var dependencyObjectType = GetDependencyObjectType();
+            var dependencyObjectType = DependencyObjectType;
 
             var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
             TypeReference currentType = elementType;
@@ -1010,7 +1108,47 @@ namespace OpenSilver.Compiler
         {
             return _typeReferenceHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
         }
+
+        private readonly struct TypeKey
+        {
+            private readonly int _hashCode;
+
+            public TypeKey(string namespaceName, string typeName)
+            {
+                Namespace = namespaceName;
+                Type = typeName;
+
+                _hashCode = GetHashCode(typeName) ^ GetHashCode(namespaceName);
+            }
+
+            public readonly string Namespace;
+            public readonly string Type;
+
+            public override string ToString()
+            {
+                if (string.IsNullOrEmpty(Namespace))
+                {
+                    return Type;
+                }
+                else
+                {
+                    return $"{Namespace}.{Type}";
+                }
+            }
+
+            public override bool Equals(object obj) => obj is TypeKey type && this == type;
+
+            public override int GetHashCode() => _hashCode;
+
+            public static bool operator ==(TypeKey type1, TypeKey type2) =>
+                type1.Type == type2.Type && type1.Namespace == type2.Namespace;
+
+            public static bool operator !=(TypeKey type1, TypeKey type2) => !(type1 == type2);
+
+            private static int GetHashCode(string s) => s?.GetHashCode() ?? 0;
+        }
     }
+
     public class InvalidCompilerTypeException : Exception
     {
         public InvalidCompilerTypeException() : base("Invalid Compiler Type")

@@ -211,7 +211,5 @@ public abstract class Timeline : DependencyObject
     /// </returns>
     protected virtual Duration GetNaturalDurationCore() => Duration.Automatic;
 
-    internal INameResolver NameResolver { get; set; }
-
     internal virtual TimelineClock CreateClock() => null;
 }

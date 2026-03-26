@@ -11,12 +11,12 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
 using System.Xaml.Markup;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Xaml;
 
 namespace System.Windows;
 
@@ -26,7 +26,7 @@ namespace System.Windows;
 [ContentProperty(nameof(Template))]
 public abstract class FrameworkTemplate : DependencyObject, ISealable
 {
-    private ITemplateContent _template;
+    private TemplateContent _template;
     private ResourceDictionary _resources;
     private bool _isSealed;
 
@@ -77,30 +77,40 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
         return DependencyProperty.UnsetValue;
     }
 
+    internal virtual Type TargetTypeInternal => null;
+
+    internal virtual TriggerCollection TriggersInternal => null;
+
+    /// <summary>
+    /// Gets or sets a reference to the object that records or plays the XAML nodes for
+    /// the template when the template is defined or applied by a writer.
+    /// </summary>
+    /// <returns>
+    /// A reference to the object that records or plays the XAML nodes for the template.
+    /// </returns>
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [Ambient]
     [XamlDeferLoad(typeof(TemplateContentLoader), typeof(IFrameworkElement))]
-    public ITemplateContent Template
+    public TemplateContent Template
     {
         get => _template;
-        set { CheckSealed(); _template = value; }
-    }
-
-    internal bool ApplyTemplateContent(FrameworkElement container)
-    {
-        Debug.Assert(container is not null, "Must have a non-null TemplatedParent.");
-
-        if (Template is not null)
+        set
         {
-            FrameworkElement visualTree = (FrameworkElement)Template.LoadContent(container);
-            container.TemplateChild = visualTree;
+            CheckSealed();
 
-            return visualTree is not null;
-        }
-        else
-        {
-            return BuildVisualTree(container);
+            if (_template is not null)
+            {
+                throw new XamlParseException(Strings.TemplateContentSetTwice);
+            }
+
+            ArgumentNullException.ThrowIfNull(value);
+
+            value.OwnerTemplate = this;
+            _template = value;
         }
     }
+
+    internal bool ApplyTemplateContent(FrameworkElement container) => StyleHelper.ApplyTemplateContent(container, this);
 
     internal bool ApplyTemplateContent<T>(T container) where T : DependencyObject, IInternalFrameworkElement
     {
@@ -143,7 +153,20 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
     /// <summary>
     /// Locks the template so it cannot be changed.
     /// </summary>
-    public new void Seal() => _isSealed = true;
+    public new void Seal()
+    {
+        if (_isSealed) return;
+
+        // Seal triggers
+        TriggersInternal?.Seal();
+
+        // Seal Resource Dictionary
+        _resources?.IsReadOnly = true;
+
+        _template?.Seal();
+
+        _isSealed = true;
+    }
 
     /// <summary>
     /// Gets a value that indicates whether this object is in an immutable state

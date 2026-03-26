@@ -60,10 +60,11 @@ public partial class Control : FrameworkElement
                 {
                     if (HasVisualStateUpdater)
                     {
-                        var visualStatesUpdater = VisualStatesUpdaterField.GetValue(this);
-                        visualStatesUpdater.Dispose();
-                        VisualStatesUpdaterField.ClearValue(this);
                         HasVisualStateUpdater = false;
+                        if (VisualStatesUpdaterField.ClearValue(this, out VisualStateUpdater visualStatesUpdater))
+                        {
+                            visualStatesUpdater.Dispose();
+                        }
                     }
                 }
             }

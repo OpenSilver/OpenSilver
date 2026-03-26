@@ -680,7 +680,7 @@ namespace System.Xaml
                 if (!AddToCollectionIfAppropriate(xt, xm, parent, obj, keyObj))
                 {
                     if (!xm.IsReadOnly || xm.IsConstructorArgument)
-                        ms.Value = GetCorrectlyTypedValue(xm, xm.Type, obj);
+                        CreatePropertyValueFromValue(state, ms, xm, xm.Type, obj);
                 }
             }
         }
@@ -718,6 +718,10 @@ namespace System.Xaml
             return key;
         }
 
+        // IMPORTANT:
+        // The CreatePropertyValueFromValue method is a copy of this method, so any change made in one method
+        // should be replicated in the other.
+        //
         // It expects that it is not invoked when there is no value to 
         // assign.
         // When it is passed null, then it returns a default instance.
@@ -775,6 +779,101 @@ namespace System.Xaml
                 throw WithLineInfo(new XamlObjectWriterException(
                     String.Format("Value '{0}' (of type {1}) is not of or convertible to type {2} (member {3})", value, value != null ? (object)value.GetType() : "(null)", xt, xm),
                     null));
+        }
+
+        // IMPORTANT:
+        // This is a copy of GetCorrectlyTypedValue, so any change made in one method should be replicated in the other.
+        // The only difference is that this method adds support for custom TypeConverter handlers.
+        void CreatePropertyValueFromValue(ObjectState state, MemberAndValue ms, XamlMember xm, XamlType xt, object value)
+        {
+            try
+            {
+                if (value == null)
+                {
+                    if (xt.IsContentValue(service_provider)) // it is for collection/dictionary key and item
+                    {
+                        ms.Value = null;
+                        return;
+                    }
+                    else
+                    {
+                        ms.Value = xt.IsNullable ? null : xt.Invoker.CreateInstance([]);
+                        return;
+                    }
+                }
+                if (ReferenceEquals(xt, null))
+                {
+                    ms.Value = value;
+                    return;
+                }
+
+                if (typeof(Expression).IsInstanceOfType(value))
+                {
+                    ms.Value = value;
+                    return;
+                }
+
+                // FIXME: this could be generalized by some means, but I cannot find any.
+                if (xt.UnderlyingType == typeof(XamlType) && value is string)
+                    value = ResolveTypeFromName((string)value);
+
+                // FIXME: this could be generalized by some means, but I cannot find any.
+                if (xt.UnderlyingType == typeof(Type))
+                    value = new TypeExtension((string)value).ProvideValue(service_provider);
+                if (ReferenceEquals(xt, XamlLanguage.Type) && value is string)
+                    value = new TypeExtension((string)value);
+
+                var xtc = xm?.TypeConverter ?? xt.TypeConverter;
+                var declaringType = xm.IsAttachable ? xm.DeclaringType : state.Type;
+
+                if (xm != null && !xm.IsUnknown && declaringType != null)
+                {
+                    if (xtc != null && xtc.ConverterType != null && xtc != BuiltInValueConverters.String)
+                    {
+                        var tc = xtc.ConverterInstance;
+                        if (tc != null)
+                        {
+                            if (declaringType.SetTypeConverterHandler is not null)
+                            {
+                                var eventArgs = new XamlSetTypeConverterEventArgs(xm, tc, value, service_provider, CultureInfo.InvariantCulture);
+                                declaringType.SetTypeConverterHandler(state.Value, eventArgs);
+                                if (eventArgs.Handled)
+                                {
+                                    ms.Value = null;
+                                    ms.IsAlreadySet = true;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (xtc != null && value != null)
+                {
+                    var tc = xtc.ConverterInstance;
+                    if (tc != null && tc.CanConvertFrom(service_provider, value.GetType()))
+                        value = tc.ConvertFrom(service_provider, CultureInfo.InvariantCulture, value);
+                    ms.Value = value;
+                    return;
+                }
+
+                if (IsAllowedType(xt, value))
+                {
+                    ms.Value = value;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                // For + ex.Message, the runtime should print InnerException message like .NET does.
+                throw WithLineInfo(new XamlObjectWriterException(
+                    String.Format("Could not convert object \'{0}' (of type {1}) to {2}: ", value, value != null ? (object)value.GetType() : "(null)", xt) + ex.Message,
+                    ex));
+            }
+
+            throw WithLineInfo(new XamlObjectWriterException(
+                String.Format("Value '{0}' (of type {1}) is not of or convertible to type {2} (member {3})", value, value != null ? (object)value.GetType() : "(null)", xt, xm),
+                null));
         }
 
         XamlType ResolveTypeFromName(string name)

@@ -29,6 +29,7 @@ public class Style : DependencyObject, ISealable
 {
     private bool _sealed;
     private SetterBaseCollection _setters;
+    private TriggerCollection _triggers;
     private Type _targetType;
     private Style _basedOn;
     private ResourceDictionary _resources;
@@ -155,6 +156,62 @@ public class Style : DependencyObject, ISealable
     }
 
     /// <summary>
+    /// Gets a collection of <see cref="TriggerBase"/> objects that apply property values
+    /// based on specified conditions.
+    /// </summary>
+    /// <returns>
+    /// A collection of <see cref="TriggerBase"/> objects. The default is an empty collection.
+    /// </returns>
+    public TriggerCollection Triggers
+    {
+        get
+        {
+            if (_triggers is null)
+            {
+                _triggers = [];
+
+                // If the style has been sealed prior to this the newly
+                // created collection also needs to be sealed
+                if (_sealed)
+                {
+                    _triggers.Seal();
+                }
+            }
+            return _triggers;
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this style has any triggers (including base styles).
+    /// </summary>
+    internal bool HasTriggers => (_triggers is not null && _triggers.Count > 0) || (_basedOn is not null && _basedOn.HasTriggers);
+
+    /// <summary>
+    /// Gets all triggers from this style and all base styles in the chain.
+    /// Triggers from derived styles come last (higher priority).
+    /// </summary>
+    internal IEnumerable<TriggerBase> GetAllTriggers()
+    {
+        // First yield triggers from base styles (lower priority)
+        if (_basedOn is not null)
+        {
+            foreach (var trigger in _basedOn.GetAllTriggers())
+            {
+                yield return trigger;
+            }
+        }
+
+        // Then yield triggers from this style (higher priority)
+        if (_triggers is not null)
+        {
+            foreach (var trigger in _triggers)
+            {
+                yield return trigger;
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets or sets the collection of resources that can be used within the scope of this style.
     /// </summary>
     /// <returns>
@@ -238,13 +295,13 @@ public class Style : DependencyObject, ISealable
         _basedOn?.Seal();
 
         // Seal the ResourceDictionary
-        if (_resources is not null)
-        {
-            _resources.IsReadOnly = true;
-        }
+        _resources?.IsReadOnly = true;
 
         // Seal setters
         _setters?.Seal();
+
+        // Seal triggers
+        _triggers?.Seal();
 
         //
         // Build shared tables
@@ -313,7 +370,7 @@ public class Style : DependencyObject, ISealable
     {
         if (_setters is null || _setters.InternalCount == 0)
         {
-            EffectiveValues = _basedOn?.EffectiveValues ?? new(0);
+            EffectiveValues = _basedOn?.EffectiveValues ?? [];
             return;
         }
 
@@ -382,6 +439,12 @@ public class Style : DependencyObject, ISealable
             // processing of BasedOn Style properties will occur in subsequent call to ProcessSelfStyle
             if (setterBase is Setter setter)
             {
+                // Style Setters are not allowed to have a child target name - since there are no child nodes in a Style.
+                if (setter.TargetName is not null)
+                {
+                    throw new InvalidOperationException(string.Format(Strings.SetterOnStyleNotAllowedToHaveTarget, setter.TargetName));
+                }
+
                 UpdatePropertyValueList(setter.Property, setter.Value, propertyValues, ref length);
             }
             else
