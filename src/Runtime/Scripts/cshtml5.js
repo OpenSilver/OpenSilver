@@ -278,7 +278,7 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('pointermove', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
-                        const target = getClosestElement(_pointerCapture);
+                        const target = getClosestElement(_pointerCapture || e.target);
                         if (target) {
                             invokePointerCallback(target, EVENTS.POINTER_MOVE, e);
                         } else {
