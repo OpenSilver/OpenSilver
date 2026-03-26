@@ -153,7 +153,6 @@ namespace OpenSilver.Compiler
 
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
-                public readonly List<string> ResultingFindNameCalls = new List<string>();
                 public readonly ComponentConnectorBuilderCS ComponentConnector = new ComponentConnectorBuilderCS();
                 private readonly string _sourceFile;
                 private int _frameworkTemplateCount = 0;
@@ -321,8 +320,7 @@ namespace OpenSilver.Compiler
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"global::{KnownNamespaces.SystemWindows}.Application",
                         _settings.AssemblyName,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        parameters.ResultingFindNameCalls);
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass(_reader.Document.Root,
@@ -571,7 +569,11 @@ namespace OpenSilver.Compiler
                                     // or any other c# keyword)
                                     string fieldName = "@" + name;
                                     parameters.ResultingFieldsForNamedElements.Add($"{fieldModifier} {elementType} {fieldName};");
-                                    parameters.ResultingFindNameCalls.Add($"this.{fieldName} = (({elementType})(this.FindName(\"{name}\")));");
+
+                                    int componentId = parameters.ComponentConnector.ConnectNamedElement(elementType, fieldName);
+
+                                    parameters.AppendLine(
+                                        $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid});");
                                 }
 
                                 if (isXNameAttr)

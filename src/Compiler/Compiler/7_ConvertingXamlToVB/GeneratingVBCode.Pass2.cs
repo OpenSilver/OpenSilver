@@ -151,7 +151,6 @@ namespace OpenSilver.Compiler
 
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
-                public readonly List<string> ResultingFindNameCalls = new List<string>();
                 public readonly ComponentConnectorBuilderVB ComponentConnector = new ComponentConnectorBuilderVB();
                 private int _frameworkTemplateCount = 0;
 
@@ -286,8 +285,7 @@ namespace OpenSilver.Compiler
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"Global.{KnownNamespaces.SystemWindows}.Application",
                         _settings.AssemblyName,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        parameters.ResultingFindNameCalls);
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass(initializeComponentMethod,
@@ -519,7 +517,11 @@ namespace OpenSilver.Compiler
                                     // or any other VB keyword)
                                     string fieldName = $"[{name}]";
                                     parameters.ResultingFieldsForNamedElements.Add($"{fieldModifier} WithEvents {fieldName} As {elementType}");
-                                    parameters.ResultingFindNameCalls.Add($"Me.{fieldName} = (CType(Me.FindName(\"{name}\"), {elementType}))");
+
+                                    int componentId = parameters.ComponentConnector.ConnectNamedElement(elementType, fieldName);
+
+                                    parameters.AppendLine(
+                                        $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid})");
                                 }
 
                                 if (isXNameAttr)

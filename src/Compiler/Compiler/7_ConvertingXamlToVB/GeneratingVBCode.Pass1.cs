@@ -95,8 +95,7 @@ namespace OpenSilver.Compiler
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"Global.{KnownNamespaces.SystemWindows}.Application",
                         _settings.AssemblyName,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        new List<string>());
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass(initializeComponentMethod,

@@ -168,7 +168,6 @@ namespace OpenSilver.Compiler
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingMembersForNamedElements = new List<string>();
-                public readonly List<string> ResultingFindNameCalls = new List<string>();
                 public readonly ComponentConnectorBuilderFS ComponentConnector = new ComponentConnectorBuilderFS();
                 private int _frameworkTemplateCount = 0;
 
@@ -309,8 +308,7 @@ namespace OpenSilver.Compiler
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"global.{KnownNamespaces.SystemWindows}.Application",
                         _settings.AssemblyName,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        parameters.ResultingFindNameCalls);
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     string classNameXaml = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
 
@@ -581,7 +579,11 @@ namespace GlobalResource
         with get() = {fieldNameLocal}
         and set(value) = {fieldNameLocal} <- value
 ");
-                                    parameters.ResultingFindNameCalls.Add($"this.{fieldName} <- this.FindName(\"{name}\") :?> {elementType}");
+
+                                    int componentId = parameters.ComponentConnector.ConnectNamedElement(elementType, fieldName);
+
+                                    parameters.AppendLine(
+                                        $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid})");
                                 }
 
                                 if (isXNameAttr)

@@ -97,8 +97,7 @@ namespace OpenSilver.Compiler
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"global.{KnownNamespaces.SystemWindows}.Application",
                         _settings.AssemblyName,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        new List<string>());
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     // combine local variables and members
                     resultingFieldsForNamedElements.AddRange(resultingMembersForNamedElements);

@@ -52,6 +52,13 @@ namespace OpenSilver.Compiler
                 return componentId;
             }
 
+            public int ConnectNamedElement(string componentType, string fieldName)
+            {
+                int componentId = _entries.Count;
+                _entries.Add(new NamedElementEntry(componentId, componentType, fieldName));
+                return componentId;
+            }
+
             public override string ToString()
             {
                 var builder = new StringBuilder();
@@ -161,6 +168,24 @@ namespace OpenSilver.Compiler
                     return $"((global::System.Windows.EventSetter)({targetParam})).Handler = new {_handlerType}(this.{_handlerName});";
                 }
             }
+
+            private sealed class NamedElementEntry : ComponentConnectorEntry
+            {
+                private readonly string _componentType;
+                private readonly string _fieldName;
+
+                public NamedElementEntry(int componentId, string componentType, string fieldName)
+                    : base(componentId)
+                {
+                    _componentType = componentType;
+                    _fieldName = fieldName;
+                }
+
+                public override string ToString()
+                {
+                    return $"this.{_fieldName} = (({_componentType})({targetParam}));";
+                }
+            }
         }
 
         public static string GenerateCode(XDocument doc,
@@ -191,8 +216,7 @@ namespace OpenSilver.Compiler
         private static string CreateInitializeComponentMethod(
             string applicationTypeFullName,
             string assemblyNameWithoutExtension,
-            string fileNameWithPathRelativeToProjectRoot,
-            List<string> findNameCalls)
+            string fileNameWithPathRelativeToProjectRoot)
         {
             string componentUri = $"/{assemblyNameWithoutExtension};component/{fileNameWithPathRelativeToProjectRoot.Replace('\\', '/')}";
 
@@ -214,7 +238,6 @@ namespace OpenSilver.Compiler
             }}
             _contentLoaded = true;
             {loadComponentCall}
-            {string.Join(Environment.NewLine + "            ", findNameCalls)}
         }}
 ";
         }
