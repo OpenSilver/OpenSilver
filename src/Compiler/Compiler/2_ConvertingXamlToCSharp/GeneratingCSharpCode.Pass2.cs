@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -1961,6 +1961,14 @@ namespace OpenSilver.Compiler
                 return false;
             }
 
+            private bool IsPropertyAttached(TypeDefinition declaringType, string propertyName, IXmlLineInfo lineInfo) =>
+                _settings.Inspector.IsPropertyAttached(
+                    propertyName,
+                    declaringType.Namespace,
+                    declaringType.Name,
+                    declaringType.Module.Assembly.Name.Name,
+                    lineInfo);
+
             private bool IsPropertyOrFieldACollection(XElement propertyElement, bool isAttachedProperty)
             {
                 if (isAttachedProperty)
@@ -2225,7 +2233,7 @@ namespace OpenSilver.Compiler
                 return GenerateCodeForInstantiatingAttributeValue(
                     XName.Get(declaringType.Name, declaringType.Namespace),
                     propertyName,
-                    property.Value.Contains('.'),
+                    IsPropertyAttached(declaringType, propertyName, property),
                     GeneratingCode.GetAttributeValue(value),
                     element,
                     property);
