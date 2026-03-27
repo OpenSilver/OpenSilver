@@ -50,8 +50,7 @@ Object.defineProperty(window, 'osjs', {
             HYPERLINK: 'opensilver-hyperlink',
             WINDOW: 'opensilver-window',
             POPUP: 'opensilver-popup',
-            INKPRESENTER: 'opensilver-inkpresenter',
-            POINTER_CAPTURED: 'opensilver-pointer-captured'
+            INKPRESENTER: 'opensilver-inkpresenter'
         });
 
         const _jsObjRef = new Map();
@@ -413,7 +412,6 @@ Object.defineProperty(window, 'osjs', {
                     if (element) {
                         _pointerCapture = element;
                         element.setPointerCapture(_activePointerId);
-                        document.body.classList.add(CSS_CLASS.POINTER_CAPTURED);
                     }
                 },
                 releasePointerCapture: function () {
@@ -421,7 +419,6 @@ Object.defineProperty(window, 'osjs', {
                         _pointerCapture.releasePointerCapture(_activePointerId);
                         _pointerCapture = null;
                     }
-                    document.body.classList.remove(CSS_CLASS.POINTER_CAPTURED);
                 },
                 suppressContextMenu: function (value) {
                     _suppressContextMenu = value;
