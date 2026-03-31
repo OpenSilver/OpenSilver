@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -37,13 +37,14 @@ internal sealed class InputManager
         POINTER_MIDDLE_UP = 6,
         POINTER_ENTER = 7,
         POINTER_LEAVE = 8,
-        WHEEL = 9,
-        KEYDOWN = 10,
-        KEYUP = 11,
-        KEYPRESS = 12,
-        FOCUS_UNMANAGED = 13,
-        WINDOW_FOCUS = 14,
-        WINDOW_BLUR = 15,
+        POINTER_CAPTURE_LOST = 9,
+        WHEEL = 10,
+        KEYDOWN = 11,
+        KEYUP = 12,
+        KEYPRESS = 13,
+        FOCUS_UNMANAGED = 14,
+        WINDOW_FOCUS = 15,
+        WINDOW_BLUR = 16,
     }
 
     private readonly struct PointerCallbackParameters(bool isTouchEvent, double pageX, double pageY, ModifierKeys modifiers, object uiEventArg)
@@ -124,7 +125,6 @@ internal sealed class InputManager
     private MouseButton _lastButton;
     private int _clickCount;
     private int _lastClickTime;
-    private bool _mouseLeftDown;
     private Point _mousePosition;
 
     private InputManager() { }
@@ -154,22 +154,25 @@ internal sealed class InputManager
             return true;
         }
 
-        if (MouseCapture is null && _mouseLeftDown && uie.OuterDiv is { IsConnected: true } outerDiv)
+        if (MouseCapture is null && uie.OuterDiv is { IsConnected: true } outerDiv)
         {
-            MouseCapture = uie;
-
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.inputManager.capturePointer('{outerDiv.Uid}')");
-
-            using (_eventQueue.DisableProcessing())
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"osjs.inputManager.capturePointer('{outerDiv.Uid}')"))
             {
-                _eventQueue.AddEvent(new MouseEventArgs
+                MouseCapture = uie;
+
+                using (_eventQueue.DisableProcessing())
                 {
-                    RoutedEvent = Mouse.GotMouseCaptureEvent,
-                    Source = uie,
-                });
+                    _eventQueue.AddEvent(new MouseEventArgs
+                    {
+                        RoutedEvent = Mouse.GotMouseCaptureEvent,
+                        Source = uie,
+                    });
+                }
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         return MouseCapture == uie;
@@ -358,12 +361,10 @@ internal sealed class InputManager
                 break;
 
             case EVENTS.POINTER_LEFT_DOWN:
-                _mouseLeftDown = true;
                 ProcessOnMouseLeftButtonDown(uie, parameters);
                 break;
 
             case EVENTS.POINTER_LEFT_UP:
-                _mouseLeftDown = false;
                 ProcessOnMouseLeftButtonUp(uie, parameters);
                 break;
 
@@ -402,7 +403,6 @@ internal sealed class InputManager
         switch (eventType)
         {
             case EVENTS.POINTER_LEFT_DOWN:
-                _mouseLeftDown = true;
                 RefreshClickCount(MouseButton.Left, Environment.TickCount, new Point());
                 PopupService.HandleMouseButton();
                 break;
@@ -417,8 +417,7 @@ internal sealed class InputManager
                 PopupService.HandleMouseButton();
                 break;
 
-            case EVENTS.POINTER_LEFT_UP:
-                _mouseLeftDown = false;
+            case EVENTS.POINTER_CAPTURE_LOST:
                 ReleaseMouseCapture();
                 break;
 
@@ -553,8 +552,6 @@ internal sealed class InputManager
 
             ProcessOnTapped(mouseTarget, parameters);
         }
-
-        ReleaseMouseCapture();
     }
 
     private void ProcessOnMouseRightButtonDown(UIElement uie, PointerCallbackParameters parameters)
@@ -581,8 +578,6 @@ internal sealed class InputManager
         {
             ProcessMouseUpEvent(mouseTarget, parameters, MouseButton.Right);
         }
-
-        ReleaseMouseCapture();
     }
 
     private void ProcessOnMouseMiddleButtonDown(UIElement uie, PointerCallbackParameters parameters)
