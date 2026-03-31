@@ -50,7 +50,8 @@ Object.defineProperty(window, 'osjs', {
             HYPERLINK: 'opensilver-hyperlink',
             WINDOW: 'opensilver-window',
             POPUP: 'opensilver-popup',
-            INKPRESENTER: 'opensilver-inkpresenter'
+            INKPRESENTER: 'opensilver-inkpresenter',
+            POINTER_CAPTURED: 'opensilver-pointer-captured'
         });
 
         const _jsObjRef = new Map();
@@ -71,13 +72,14 @@ Object.defineProperty(window, 'osjs', {
                 POINTER_MIDDLE_UP: 6,
                 POINTER_ENTER: 7,
                 POINTER_LEAVE: 8,
-                WHEEL: 9,
-                KEYDOWN: 10,
-                KEYUP: 11,
-                KEYPRESS: 12,
-                FOCUS_UNMANAGED: 13,
-                WINDOW_FOCUS: 14,
-                WINDOW_BLUR: 15,
+                POINTER_CAPTURE_LOST: 9,
+                WHEEL: 10,
+                KEYDOWN: 11,
+                KEYUP: 12,
+                KEYPRESS: 13,
+                FOCUS_UNMANAGED: 14,
+                WINDOW_FOCUS: 15,
+                WINDOW_BLUR: 16,
             };
 
             const MODIFIERKEYS = {
@@ -111,7 +113,8 @@ Object.defineProperty(window, 'osjs', {
 
             let _modifiers = MODIFIERKEYS.NONE;
             let _pointerCapture = null;
-            let _activePointerId;
+            let _activePointerId = null;
+            let _pressedButtons = 0;
             let _suppressContextMenu = false;
 
             function setModifiers(e) {
@@ -124,7 +127,12 @@ Object.defineProperty(window, 'osjs', {
                     _modifiers |= MODIFIERKEYS.SHIFT;
                 if (e.metaKey)
                     _modifiers |= MODIFIERKEYS.WINDOWS;
-            };
+            }
+
+            function setActivePointer(e) {
+                _pressedButtons = e.buttons;
+                _activePointerId = isPointerDown() ? e.pointerId : null;
+            }
 
             function getClosestElement(element) {
                 while (element) {
@@ -144,6 +152,10 @@ Object.defineProperty(window, 'osjs', {
                     return e.xamlid;
                 }
                 return '';
+            }
+
+            function isPointerDown() {
+                return (_pressedButtons & 7) !== 0;
             }
 
             function getPointerPosition(x, y, relativeTo) {
@@ -174,9 +186,8 @@ Object.defineProperty(window, 'osjs', {
 
             function initDom() {
                 document.addEventListener('pointerdown', function (e) {
-                    if (!_pointerCapture)
-                        _activePointerId = e.pointerId;
                     if (!e.isHandled) {
+                        setActivePointer(e);
                         switch (e.button) {
                             case 0:
                                 _callbacks.inputManagerEvent('', EVENTS.POINTER_LEFT_DOWN, e);
@@ -193,34 +204,19 @@ Object.defineProperty(window, 'osjs', {
 
                 document.addEventListener('pointerup', function (e) {
                     if (!e.isHandled) {
-                        const target = _pointerCapture;
-                        switch (e.button) {
-                            case 0:
-                                invokePointerCallback(getClosestElement(target), EVENTS.POINTER_LEFT_UP, e);
-                                break;
-                            case 1:
-                                invokePointerCallback(getClosestElement(target), EVENTS.POINTER_MIDDLE_UP, e);
-                                break;
-                            case 2:
-                                invokePointerCallback(getClosestElement(target), EVENTS.POINTER_RIGHT_UP, e);
-                                break;
-                        }
+                        setActivePointer(e);
                     }
                 });
 
                 document.addEventListener('pointermove', function (e) {
                     if (!e.isHandled) {
                         setModifiers(e);
-                        const target = _pointerCapture;
-                        if (target !== null) {
-                            invokePointerCallback(getClosestElement(target), EVENTS.POINTER_MOVE, e);
-                        }
                     }
                 });
 
                 document.addEventListener('contextmenu', function (e) {
                     if (_suppressContextMenu ||
-                        (_pointerCapture !== null && this !== _pointerCapture)) {
+                        (_pointerCapture !== null && this !== _pointerCapture.element)) {
                         _suppressContextMenu = false;
                         e.preventDefault();
                     }
@@ -280,7 +276,7 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('pointermove', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
-                        const target = getClosestElement(_pointerCapture || e.target);
+                        const target = getClosestElement(e.target);
                         if (target) {
                             invokePointerCallback(target, EVENTS.POINTER_MOVE, e);
                         } else {
@@ -295,7 +291,7 @@ Object.defineProperty(window, 'osjs', {
                         if (e.deltaY === 0) return;
                         e.isHandled = true;
                         setModifiers(e);
-                        const target = getClosestElement(_pointerCapture || e.target);
+                        const target = getClosestElement((_pointerCapture !== null ? _pointerCapture.element : null) || e.target);
                         if (target) {
                             invokePointerCallback(target, EVENTS.WHEEL, e);
                         } else {
@@ -306,9 +302,8 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('pointerdown', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
-                        if (!_pointerCapture)
-                            _activePointerId = e.pointerId;
-                        const target = (_pointerCapture === null || e.target === _pointerCapture) ? getClosestElement(e.target) : null;
+                        setActivePointer(e);
+                        const target = getClosestElement(e.target);
                         switch (e.button) {
                             case 0:
                                 if (target) {
@@ -336,7 +331,9 @@ Object.defineProperty(window, 'osjs', {
 
                     root.addEventListener('pointerup', function (e) {
                         e.isHandled = true;
-                        const target = getClosestElement(_pointerCapture || e.target);
+                        setModifiers(e);
+                        setActivePointer(e);
+                        const target = getClosestElement(e.target);
                         switch (e.button) {
                             case 0:
                                 if (target) {
@@ -349,7 +346,7 @@ Object.defineProperty(window, 'osjs', {
                                 if (target) {
                                     invokePointerCallback(target, EVENTS.POINTER_MIDDLE_UP, e);
                                 } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_UP, e);
+                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_UP, e); 
                                 }
                                 break;
                             case 2:
@@ -361,22 +358,25 @@ Object.defineProperty(window, 'osjs', {
                                 break;
                         }
                     });
+
+                    root.addEventListener('lostpointercapture', function (e) {
+                        if (_pointerCapture !== null && _pointerCapture.element === e.target) {
+                            _pointerCapture = null;
+                            _callbacks.inputManagerEvent('', EVENTS.POINTER_CAPTURE_LOST, e);
+                        }
+                    });
                 },
                 addListeners: function (view, isFocusable) {
                     if (!view) return;
 
                     view.addEventListener('pointerenter', function (e) {
-                        if (_pointerCapture === null || e.currentTarget === _pointerCapture) {
-                            setModifiers(e);
-                            invokePointerCallback(getClosestElement(e.currentTarget), EVENTS.POINTER_ENTER, e);
-                        }
+                        setModifiers(e);
+                        invokePointerCallback(getClosestElement(e.currentTarget), EVENTS.POINTER_ENTER, e);
                     });
 
                     view.addEventListener('pointerleave', function (e) {
-                        if (_pointerCapture === null || e.currentTarget === _pointerCapture) {
-                            setModifiers(e);
-                            invokePointerCallback(getClosestElement(e.currentTarget), EVENTS.POINTER_LEAVE, e);
-                        }
+                        setModifiers(e);
+                        invokePointerCallback(getClosestElement(e.currentTarget), EVENTS.POINTER_LEAVE, e);
                     });
 
                     if (isFocusable) {
@@ -409,15 +409,32 @@ Object.defineProperty(window, 'osjs', {
                 },
                 capturePointer: function (id) {
                     const element = document.getElementById(id);
-                    if (element) {
-                        _pointerCapture = element;
-                        element.setPointerCapture(_activePointerId);
+                    if (element && _activePointerId !== null && isPointerDown()) {
+                        try {
+                            element.setPointerCapture(_activePointerId);
+                        } catch (error) {
+                            return false;
+                        }
+
+                        document.body.classList.add(CSS_CLASS.POINTER_CAPTURED);
+
+                        _pointerCapture = {
+                            element: element,
+                            pointerId: _activePointerId,
+                        };
+
+                        return true;
                     }
+                    return false;
                 },
                 releasePointerCapture: function () {
-                    if (_pointerCapture) {
-                        _pointerCapture.releasePointerCapture(_activePointerId);
-                        _pointerCapture = null;
+                    const capture = _pointerCapture;
+                    _pointerCapture = null;
+                    if (capture !== null && capture.element.hasPointerCapture(capture.pointerId)) {
+                        document.body.classList.remove(CSS_CLASS.POINTER_CAPTURED);
+                        try {
+                            capture.element.releasePointerCapture(capture.pointerId);
+                        } catch (error) { }
                     }
                 },
                 suppressContextMenu: function (value) {
