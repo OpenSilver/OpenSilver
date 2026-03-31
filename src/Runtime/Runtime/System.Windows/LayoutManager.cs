@@ -72,7 +72,7 @@ namespace System.Windows
                 return;
             }
 
-            UIRenderer.ProcessRenderQueue();
+            UIRenderer.ProcessRenderQueue(false);
 
             int cnt = 0;
             bool gotException = true;
@@ -155,7 +155,7 @@ namespace System.Windows
                 _layoutRequestPosted = false;
                 _isInUpdateLayout = false;
 
-                UIRenderer.ProcessRenderQueue();
+                UIRenderer.ProcessRenderQueue(true);
 
                 if (gotException)
                 {
@@ -700,13 +700,15 @@ namespace System.Windows
             _disposeQueue.Enqueue(element);
         }
 
-        public void ProcessRenderQueue()
+        public void ProcessRenderQueue(bool render)
         {
             while (_disposeQueue.Count > 0)
             {
                 var node = _disposeQueue.Dequeue();
                 INTERNAL_HtmlDomManager.RemoveNodeNative(node);
             }
+
+            OpenSilver.Interop.JavaScriptRuntime.Flush();
         }
     }
 }
