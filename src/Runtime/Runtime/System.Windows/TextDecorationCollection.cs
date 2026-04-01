@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -23,18 +23,12 @@ namespace System.Windows;
 [TypeConverter(typeof(TextDecorationCollectionConverter))]
 public sealed class TextDecorationCollection
 {
-    /// <summary>
-    /// Initializes a new instance with a single decoration at the given location (WPF compatibility).
-    /// </summary>
-    public TextDecorationCollection(TextDecorationLocation location)
+    internal TextDecorationCollection(TextDecorationLocation location)
     {
         Location = location;
     }
 
-    /// <summary>
-    /// Gets the decoration location when this collection represents a single predefined decoration.
-    /// </summary>
-    public TextDecorationLocation Location { get; }
+    internal TextDecorationLocation Location { get; }
 
     internal string ToHtmlString()
     {
