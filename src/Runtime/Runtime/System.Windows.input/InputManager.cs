@@ -189,6 +189,12 @@ internal sealed class InputManager
             return true;
         }
 
+        if (!AllowFocusChange(focused, uie))
+        {
+            ClearTabIndex(uie);
+            return false;
+        }
+
         HtmlElementReference target = uie.GetFocusTarget();
         if (target.IsConnected)
         {
@@ -798,6 +804,12 @@ internal sealed class InputManager
             return;
         }
 
+        if (!AllowFocusChange(oldFocus, newFocus))
+        {
+            RestoreFocus(oldFocus);
+            return;
+        }
+
         KeyboardNavigation.UpdateFocusedElement(newFocus, focusScope);
 
         using (_eventQueue.DisableProcessing())
@@ -821,6 +833,41 @@ internal sealed class InputManager
             }
 
             return uie;
+        }
+    }
+
+    private static bool AllowFocusChange(UIElement oldFocus, UIElement newFocus)
+    {
+        if (newFocus is TextBox textBox)
+        {
+            return textBox.PrepareFocus(oldFocus, UIElement.GotFocusEvent, newFocus);
+        }
+
+        return true;
+    }
+
+    private static void RestoreFocus(UIElement oldFocus)
+    {
+        if (oldFocus is not null)
+        {
+            HtmlElementReference target = oldFocus.GetFocusTarget();
+            if (target.IsConnected)
+            {
+                SetFocusNative(target);
+                return;
+            }
+        }
+
+        if (Window.Current is Window window)
+        {
+            if (window.RootDomElement.IsConnected)
+            {
+                SetFocusNative(window.RootDomElement);
+            }
+            else if (window.OuterDiv.IsConnected)
+            {
+                SetFocusNative(window.OuterDiv);
+            }
         }
     }
 

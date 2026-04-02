@@ -829,6 +829,22 @@ namespace System.Windows.Controls
             }
         }
 
+        protected virtual void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
+        {
+        }
+
+        internal bool PrepareFocus(IInputElement oldFocus, RoutedEvent routedEvent = null, object source = null)
+        {
+            var args = new KeyboardFocusChangedEventArgs(oldFocus, this)
+            {
+                RoutedEvent = routedEvent,
+                Source = source ?? this,
+            };
+
+            OnPreviewGotKeyboardFocus(args);
+            return !args.Handled;
+        }
+
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);

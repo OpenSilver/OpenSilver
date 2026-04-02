@@ -138,6 +138,7 @@
     <Compile Include="System.Windows\TemplateContent.cs" />
     <Compile Include="System.Windows\TextMarkerStyle.cs" />
     <Compile Include="System.Windows.Input\GestureEventArgs.cs" />
+    <Compile Include="System.Windows.input\KeyboardFocusChangedEventArgs.cs" />
     <Compile Include="System.Windows.Input\ManipulationCompletedEventArgs.cs" />
     <Compile Include="System.Windows.Input\ManipulationDelta.cs" />
     <Compile Include="System.Windows.Input\ManipulationDeltaEventArgs.cs" />
