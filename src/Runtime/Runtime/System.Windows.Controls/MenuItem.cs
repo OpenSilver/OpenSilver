@@ -93,6 +93,95 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     }
 
     /// <summary>
+    /// Identifies the <see cref="Checked"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent CheckedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(Checked),
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MenuItem));
+
+    /// <summary>
+    /// Occurs when <see cref="IsChecked"/> changes to true.
+    /// </summary>
+    public event RoutedEventHandler Checked
+    {
+        add => AddHandler(CheckedEvent, value);
+        remove => RemoveHandler(CheckedEvent, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="Unchecked"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent UncheckedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(Unchecked),
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MenuItem));
+
+    /// <summary>
+    /// Occurs when <see cref="IsChecked"/> changes to false.
+    /// </summary>
+    public event RoutedEventHandler Unchecked
+    {
+        add => AddHandler(UncheckedEvent, value);
+        remove => RemoveHandler(UncheckedEvent, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="IsCheckable"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsCheckableProperty =
+        DependencyProperty.Register(
+            nameof(IsCheckable),
+            typeof(bool),
+            typeof(MenuItem),
+            new PropertyMetadata(BooleanBoxes.FalseBox, OnCheckStatePropertyChanged));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether a check mark can appear next to the menu item.
+    /// </summary>
+    public bool IsCheckable
+    {
+        get => (bool)GetValue(IsCheckableProperty);
+        set => SetValueInternal(IsCheckableProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="IsChecked"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsCheckedProperty =
+        DependencyProperty.Register(
+            nameof(IsChecked),
+            typeof(bool),
+            typeof(MenuItem),
+            new PropertyMetadata(BooleanBoxes.FalseBox, OnIsCheckedChanged));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the menu item is checked.
+    /// </summary>
+    public bool IsChecked
+    {
+        get => (bool)GetValue(IsCheckedProperty);
+        set => SetValueInternal(IsCheckedProperty, value);
+    }
+
+    private static void OnCheckStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((MenuItem)d).ChangeVisualState(true);
+    }
+
+    private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var menuItem = (MenuItem)d;
+        bool isChecked = (bool)e.NewValue;
+        menuItem.ChangeVisualState(true);
+        menuItem.RaiseEvent(new RoutedEventArgs(isChecked ? CheckedEvent : UncheckedEvent, menuItem));
+    }
+
+    /// <summary>
     /// Identifies the <see cref="SubmenuOpened"/> routed event.
     /// </summary>
     public static readonly RoutedEvent SubmenuOpenedEvent =
@@ -889,6 +978,11 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
             FocusOrSelect();
         }
 
+        if (IsCheckable)
+        {
+            IsChecked = !IsChecked;
+        }
+
         if (RootMenuBase is MenuBase parentMenuBase)
         {
             parentMenuBase.OnMenuItemPreviewClick(this);
@@ -939,6 +1033,15 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
         else
         {
             VisualStateManager.GoToState(this, VisualStates.StateUnfocused, useTransitions);
+        }
+
+        if (IsCheckable && IsChecked)
+        {
+            VisualStateManager.GoToState(this, "Checked", useTransitions);
+        }
+        else
+        {
+            VisualStateManager.GoToState(this, "Unchecked", useTransitions);
         }
     }
 
