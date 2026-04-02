@@ -891,7 +891,7 @@
     <Compile Include="System.Windows.Controls\SelectionChangedEventHandler.cs" />
     <Compile Include="System.Windows.Controls\SelectionMode.cs" />
     <Compile Include="System.Windows.Controls\SpellCheck.cs" />
-    <Compile Include="System.Windows.Controls\TickPlacement.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\TickPlacement.cs" />
     <Compile Include="System.Windows.Controls\Slider.cs" />
     <Compile Include="System.Windows.Controls\StackPanel.cs" />
     <Compile Include="System.Windows.Controls\StretchDirection.cs" />

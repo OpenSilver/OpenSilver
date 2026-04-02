@@ -27,7 +27,7 @@ namespace System.Windows
             Strikethrough = new TextDecorationCollection(TextDecorationLocation.Strikethrough);
 
             // Overline
-            OverLine = new TextDecorationCollection(TextDecorationLocation.Overline);
+            OverLine = new TextDecorationCollection(TextDecorationLocation.OverLine);
 
             ////Baseline
             //Baseline = new TextDecorationCollection(TextDecorationLocation.Baseline);
@@ -52,27 +52,27 @@ namespace System.Windows
     }
 
     /// <summary>
-    ///     TextDecorationLocation - Referenced localization of the text decoration
+    /// Specifies the vertical position of a TextDecoration object.
     /// </summary>
     public enum TextDecorationLocation
     {
         /// <summary>
-        ///     Underline - Underline position
+        /// The vertical position of an underline. This is the default value.
         /// </summary>
         Underline = 0,
 
         /// <summary>
-        ///     OverLine - OverLine position
+        /// The vertical position of an overline.
         /// </summary>
-        Overline = 1,
+        OverLine = 1,
 
         /// <summary>
-        ///     Strikethrough - Strikethrough position
+        /// The vertical position of a strikethrough.
         /// </summary>
         Strikethrough = 2,
 
         ///// <summary>
-        /////     Baseline - Baseline position
+        ///// The vertical position of a baseline.
         ///// </summary>
         //Baseline = 3,
     }

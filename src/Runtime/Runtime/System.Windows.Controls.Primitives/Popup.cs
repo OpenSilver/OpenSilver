@@ -20,7 +20,6 @@ using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
-using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
@@ -142,8 +141,13 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the popup supports transparency (WPF compatibility).
+        /// Gets or sets a value that indicates whether a <see cref="Popup"/> control can contain 
+        /// transparent content.
         /// </summary>
+        /// <returns>
+        /// true if the <see cref="Popup"/> control can contain transparent content; otherwise, false.
+        /// The default is false.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public bool AllowsTransparency
         {
@@ -154,16 +158,24 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Identifies the <see cref="AllowsTransparency"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty AllowsTransparencyProperty =
-            DependencyProperty.Register(
-                nameof(AllowsTransparency),
-                typeof(bool),
+            Window.AllowsTransparencyProperty.AddOwner(
                 typeof(Popup),
-                new PropertyMetadata(BooleanBoxes.FalseBox));
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, OnAllowsTransparencyChanged));
+
+        private static void OnAllowsTransparencyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            d.CoerceValue(PopupAnimationProperty);
+        }
 
         /// <summary>
-        /// Gets or sets how the popup animates when opened or closed (WPF compatibility).
+        /// Gets or sets an animation for the opening and closing of a <see cref="Popup"/> control.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Primitives.PopupAnimation"/> enumeration value that defines an animation to open 
+        /// and close a <see cref="Popup"/> control. The default is <see cref="PopupAnimation.None"/>.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public PopupAnimation PopupAnimation
         {
@@ -174,12 +186,28 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Identifies the <see cref="PopupAnimation"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PopupAnimationProperty =
             DependencyProperty.Register(
                 nameof(PopupAnimation),
                 typeof(PopupAnimation),
                 typeof(Popup),
-                new PropertyMetadata(PopupAnimation.None));
+                new FrameworkPropertyMetadata(PopupAnimation.None, null, CoercePopupAnimation),
+                IsValidPopupAnimation);
+
+        private static object CoercePopupAnimation(DependencyObject o, object value)
+        {
+            return ((Popup)o).AllowsTransparency ? value : PopupAnimation.None;
+        }
+
+        private static bool IsValidPopupAnimation(object o)
+        {
+            PopupAnimation value = (PopupAnimation)o;
+            return value == PopupAnimation.None ||
+                   value == PopupAnimation.Fade ||
+                   value == PopupAnimation.Slide ||
+                   value == PopupAnimation.Scroll;
+        }
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new PopupRootAutomationPeer(this);

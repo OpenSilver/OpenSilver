@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using OpenSilver;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -227,8 +226,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets or sets the position of tick marks relative to the track (WPF compatibility).
+        /// Identifies the <see cref="TickPlacement"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty TickPlacementProperty =
+            DependencyProperty.Register(
+                nameof(TickPlacement),
+                typeof(TickPlacement),
+                typeof(Slider),
+                new FrameworkPropertyMetadata(TickPlacement.None),
+                IsValidTickPlacement);
+
         [OpenSilver.NotImplemented]
         public TickPlacement TickPlacement
         {
@@ -236,24 +244,13 @@ namespace System.Windows.Controls
             set => SetValueInternal(TickPlacementProperty, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="TickPlacement"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TickPlacementProperty =
-            DependencyProperty.Register(
-                nameof(TickPlacement),
-                typeof(TickPlacement),
-                typeof(Slider),
-                new PropertyMetadata(TickPlacement.None));
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether the slider snaps to tick marks (WPF compatibility).
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public bool IsSnapToTickEnabled
+        private static bool IsValidTickPlacement(object o)
         {
-            get => (bool)GetValue(IsSnapToTickEnabledProperty);
-            set => SetValueInternal(IsSnapToTickEnabledProperty, value);
+            TickPlacement value = (TickPlacement)o;
+            return value == TickPlacement.None ||
+                   value == TickPlacement.TopLeft ||
+                   value == TickPlacement.BottomRight ||
+                   value == TickPlacement.Both;
         }
 
         /// <summary>
@@ -264,7 +261,17 @@ namespace System.Windows.Controls
                 nameof(IsSnapToTickEnabled),
                 typeof(bool),
                 typeof(Slider),
-                new PropertyMetadata(BooleanBoxes.FalseBox));
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the slider snaps to tick marks (WPF compatibility).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public bool IsSnapToTickEnabled
+        {
+            get => (bool)GetValue(IsSnapToTickEnabledProperty);
+            set => SetValueInternal(IsSnapToTickEnabledProperty, value);
+        }
 
         /// <summary> 
         /// Called when the IsEnabled property changes.

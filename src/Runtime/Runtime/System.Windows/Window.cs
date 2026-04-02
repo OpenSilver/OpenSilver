@@ -285,7 +285,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Left"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty LeftProperty =
         DependencyProperty.Register(
             nameof(Left),
@@ -299,7 +299,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// The position of the window's left edge.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public double Left
     {
         get => (double)GetValue(LeftProperty);
@@ -309,7 +309,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Top"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty TopProperty =
         DependencyProperty.Register(
             nameof(Top),
@@ -323,7 +323,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// The position of the window's top.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public double Top
     {
         get => (double)GetValue(TopProperty);
@@ -333,7 +333,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Title"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(
             nameof(Title),
@@ -347,7 +347,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// A <see cref="string"/> that contains the window's title.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public string Title
     {
         get => (string)GetValue(TitleProperty);
@@ -359,7 +359,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="AllowsTransparency"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty AllowsTransparencyProperty =
         DependencyProperty.Register(
             nameof(AllowsTransparency),
@@ -373,7 +373,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window supports transparency; otherwise, false.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public bool AllowsTransparency
     {
         get => (bool)GetValue(AllowsTransparencyProperty);
@@ -383,7 +383,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Icon"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
             nameof(Icon),
@@ -397,7 +397,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// An System.Windows.Media.ImageSource object that represents the icon.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public ImageSource Icon
     {
         get => (ImageSource)GetValue(IconProperty);
@@ -414,7 +414,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="IsActive"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty IsActiveProperty = IsActivePropertyKey.DependencyProperty;
 
     /// <summary>
@@ -423,16 +423,16 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window is active; otherwise, false. The default is false.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public bool IsActive => (bool)GetValue(IsActiveProperty);
 
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public new bool IsVisible { get; private set; }
 
     /// <summary>
     /// Identifies the <see cref="ShowActivated"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty ShowActivatedProperty =
         DependencyProperty.Register(
             nameof(ShowActivated),
@@ -446,7 +446,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if a window is activated when first shown; otherwise, false. The default is true.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public bool ShowActivated
     {
         get => (bool)GetValue(ShowActivatedProperty);
@@ -456,7 +456,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="ShowInTaskbar"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty ShowInTaskbarProperty =
         DependencyProperty.Register(
             nameof(ShowInTaskbar),
@@ -471,7 +471,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// true if the window has a task bar button; otherwise, false. Does not apply when the window
     /// is hosted in a browser.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public bool ShowInTaskbar
     {
         get => (bool)GetValue(ShowInTaskbarProperty);
@@ -481,7 +481,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Topmost"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty TopmostProperty =
         DependencyProperty.Register(
             nameof(Topmost),
@@ -495,7 +495,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window is topmost; otherwise, false.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public bool Topmost
     {
         get => (bool)GetValue(TopmostProperty);
@@ -509,13 +509,13 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowStartupLocation"/> value that specifies the top/left position
     /// of a window when first shown. The default is <see cref="WindowStartupLocation.Manual"/>.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.Manual;
 
     /// <summary>
     /// Identifies the <see cref="WindowStyle"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty WindowStyleProperty =
         DependencyProperty.Register(
             nameof(WindowStyle),
@@ -530,7 +530,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowStyle"/> that specifies a window's border style. The default is
     /// <see cref="WindowStyle.SingleBorderWindow"/>.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public WindowStyle WindowStyle
     {
         get => (WindowStyle)GetValue(WindowStyleProperty);
@@ -548,7 +548,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="WindowState"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty WindowStateProperty =
         DependencyProperty.Register(
             nameof(WindowState),
@@ -563,7 +563,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowState"/> that determines whether a window is restored, minimized, or maximized.
     /// The default is <see cref="WindowState.Normal"/> (restored).
     /// </returns>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public WindowState WindowState
     {
         get => (WindowState)GetValue(WindowStateProperty);
@@ -581,7 +581,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="ResizeMode"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public static readonly DependencyProperty ResizeModeProperty =
         DependencyProperty.Register(
             nameof(ResizeMode),
@@ -591,9 +591,12 @@ public class Window : ContentControl, IResizeObserverListener
             ValidateResizeMode);
 
     /// <summary>
-    /// Gets or sets the resize mode (WPF compatibility).
+    /// Gets or sets the resize mode.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    /// <returns>
+    /// A <see cref="Windows.ResizeMode"/> value specifying the resize mode.
+    /// </returns>
+    [NotImplemented]
     public ResizeMode ResizeMode
     {
         get => (ResizeMode)GetValue(ResizeModeProperty);
@@ -602,22 +605,22 @@ public class Window : ContentControl, IResizeObserverListener
 
     private static bool ValidateResizeMode(object value)
     {
-        var m = (ResizeMode)value;
-        return m is ResizeMode.NoResize
-            or ResizeMode.CanMinimize
-            or ResizeMode.CanResize
-            or ResizeMode.CanResizeWithGrip;
+        var mode = (ResizeMode)value;
+        return mode is ResizeMode.NoResize
+                    or ResizeMode.CanMinimize
+                    or ResizeMode.CanResize
+                    or ResizeMode.CanResizeWithGrip;
     }
 
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public void Show() { }
 
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public void Close() { }
 
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public void DragMove() { }
 
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public void DragResize(WindowResizeEdge resizeEdge) { }
 }

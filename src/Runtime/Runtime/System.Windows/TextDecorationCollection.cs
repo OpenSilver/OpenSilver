@@ -36,7 +36,7 @@ public sealed class TextDecorationCollection
         {
             TextDecorationLocation.Underline => "underline",
             TextDecorationLocation.Strikethrough => "line-through",
-            TextDecorationLocation.Overline => "overline",
+            TextDecorationLocation.OverLine => "overline",
             _ => "none",
         };
     }
@@ -52,7 +52,7 @@ public sealed class TextDecorationCollection
         {
             TextDecorationLocation.Underline => nameof(TextDecorationLocation.Underline),
             TextDecorationLocation.Strikethrough => nameof(TextDecorationLocation.Strikethrough),
-            TextDecorationLocation.Overline => nameof(TextDecorationLocation.Overline),
+            TextDecorationLocation.OverLine => nameof(TextDecorationLocation.OverLine),
             _ => string.Empty,
         };
     }

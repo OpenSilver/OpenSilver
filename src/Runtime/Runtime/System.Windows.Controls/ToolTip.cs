@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver;
 using OpenSilver.Internal;
 using System.Windows.Controls.Primitives;
 
@@ -286,23 +285,23 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the tooltip displays a drop shadow (WPF compatibility).
+        /// Identifies the <see cref="HasDropShadow"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty HasDropShadowProperty =
+            ToolTipService.HasDropShadowProperty.AddOwner(typeof(ToolTip));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the control has a drop shadow.
+        /// </summary>
+        /// <returns>
+        /// true if the control has a drop shadow; otherwise, false. The default is false.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public bool HasDropShadow
         {
             get => (bool)GetValue(HasDropShadowProperty);
             set => SetValueInternal(HasDropShadowProperty, value);
         }
-
-        /// <summary>
-        /// Identifies the <see cref="HasDropShadow"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty HasDropShadowProperty =
-            DependencyProperty.Register(
-                nameof(HasDropShadow),
-                typeof(bool),
-                typeof(ToolTip),
-                new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 }
