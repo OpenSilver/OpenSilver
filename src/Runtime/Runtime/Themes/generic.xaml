@@ -4200,6 +4200,32 @@
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
+                            <VisualStateGroup x:Name="CheckStates">
+                                <VisualState x:Name="Checked">
+                                    <animation:Storyboard>
+                                        <animation:DoubleAnimation Duration="0"
+                                                                   animation:Storyboard.TargetName="GlyphPanel"
+                                                                   animation:Storyboard.TargetProperty="Opacity"
+                                                                   To="1" />
+                                        <animation:DoubleAnimation Duration="0"
+                                                                   animation:Storyboard.TargetName="Glyph"
+                                                                   animation:Storyboard.TargetProperty="Opacity"
+                                                                   To="1" />
+                                    </animation:Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Unchecked">
+                                    <animation:Storyboard>
+                                        <animation:DoubleAnimation Duration="0"
+                                                                   animation:Storyboard.TargetName="GlyphPanel"
+                                                                   animation:Storyboard.TargetProperty="Opacity"
+                                                                   To="0" />
+                                        <animation:DoubleAnimation Duration="0"
+                                                                   animation:Storyboard.TargetName="Glyph"
+                                                                   animation:Storyboard.TargetProperty="Opacity"
+                                                                   To="0" />
+                                    </animation:Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
                             <VisualStateGroup>
                                 <VisualState>
                                     <VisualState.StateTriggers>
@@ -4256,24 +4282,25 @@
                                                        ContentTemplateSelector="{markup:Null}"
                                                        Margin="1"
                                                        VerticalAlignment="Center" />
-                            <!--<controls:Border
-                        BorderThickness="1"
-                        CornerRadius="3"
-                        BorderBrush="#FFCDD3E6"
-                        Background="#FFE6EFF4"
-                        x:Name="GlyphPanel"
-                        Width="22"
-                        Height="22"
-                        Margin="1"
-                        Visibility="Collapsed">
-                        <shapes:Path
-                            Data="M0,5.1L1.7,5.2 3.4,7.1 8,0.4 9.2,0 3.3,10.8z"
-                            Fill="#FF0C12A1"
-                            x:Name="Glyph"
-                            Width="9"
-                            Height="11"
-                            FlowDirection="LeftToRight"/>
-                    </controls:Border>-->
+                            <controls:Border x:Name="GlyphPanel"
+                                             Width="22"
+                                             Height="22"
+                                             Margin="1"
+                                             Opacity="0"
+                                             BorderThickness="1"
+                                             CornerRadius="3"
+                                             BorderBrush="#FFCDD3E6"
+                                             Background="#FFE6EFF4">
+                                <shapes:Path x:Name="Glyph"
+                                             Width="9"
+                                             Height="11"
+                                             Opacity="0"
+                                             Fill="#FF0C12A1"
+                                             FlowDirection="LeftToRight"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Data="M0,5.1L1.7,5.2 3.4,7.1 8,0.4 9.2,0 3.3,10.8z" />
+                            </controls:Border>
                             <controls:ContentPresenter x:Name="Presenter"
                                                        Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
                                                        ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
