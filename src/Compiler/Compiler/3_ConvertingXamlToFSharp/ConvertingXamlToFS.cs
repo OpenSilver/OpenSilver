@@ -42,6 +42,10 @@ namespace OpenSilver.Compiler
 
                 InsertingImplicitNodes.InsertImplicitNodes(doc, settings, "global.");
 
+                // Resolve {x:Type ...} in TargetType/DataType attributes to plain type names
+                // before markup extension processing converts them to child elements
+                GeneratingCode.ResolveTypeExtensionAttributes(doc, settings.AssemblyName);
+
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into
                 // "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
                 ProcessingContentPresenterNodes.Process(doc, settings);

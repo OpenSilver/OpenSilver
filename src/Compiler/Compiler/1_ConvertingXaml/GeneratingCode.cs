@@ -171,7 +171,6 @@ namespace OpenSilver.Compiler
             return ns == "System.Windows.Markup" && assemblyName == "OpenSilver";
         }
 
-
         public static bool IsDynamicResourceExtension(XElement element)
         {
             if (element.Name.LocalName != "DynamicResourceExtension")
@@ -294,6 +293,83 @@ namespace OpenSilver.Compiler
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Resolves {x:Type ...} markup extensions to plain type name strings for
+        /// Style.TargetType, ControlTemplate.TargetType, and DataTemplate.DataType.
+        /// This must run before <see cref="InsertingMarkupNodesInXaml"/> so that these
+        /// attributes remain simple strings and are not converted to child elements.
+        /// </summary>
+        internal static void ResolveTypeExtensionAttributes(XDocument doc, string assemblyName)
+        {
+            ResolveTypeExtensionAttributes(doc.Root, assemblyName);
+        }
+
+        private static void ResolveTypeExtensionAttributes(XElement element, string assemblyName)
+        {
+            if (IsStyle(element, assemblyName) || IsControlTemplate(element, assemblyName))
+            {
+                if (element.Attribute("TargetType") is XAttribute targetType)
+                {
+                    ResolveTypeExtensionAttribute(element, targetType);
+                }
+            }
+            else if (IsDataTemplate(element, assemblyName))
+            {
+                if (element.Attribute("DataType") is XAttribute dataType)
+                {
+                    ResolveTypeExtensionAttribute(element, dataType);
+                }
+            }
+
+            foreach (var child in element.Elements())
+            {
+                ResolveTypeExtensionAttributes(child, assemblyName);
+            }
+        }
+
+        private static void ResolveTypeExtensionAttribute(XElement element, XAttribute attribute)
+        {
+            string value = attribute.Value;
+            if (value.Length < 3 || value[0] != '{')
+                return;
+
+            string content = value.AsSpan(1).Trim().ToString();
+
+            int closingBrace = content.LastIndexOf('}');
+            if (closingBrace < 0)
+                return;
+
+            content = content.Substring(0, closingBrace).Trim();
+
+            int spaceIndex = content.IndexOf(' ');
+            if (spaceIndex < 0)
+                return;
+
+            string extensionName = content.Substring(0, spaceIndex);
+            string args = content.Substring(spaceIndex + 1).Trim();
+
+            int colonIndex = extensionName.IndexOf(':');
+            if (colonIndex < 0)
+                return;
+
+            string prefix = extensionName.Substring(0, colonIndex);
+            string localName = extensionName.Substring(colonIndex + 1);
+
+            XNamespace ns = element.GetNamespaceOfPrefix(prefix);
+            if (ns is null || ns.NamespaceName != xNamespace.NamespaceName)
+                return;
+
+            if (localName is not "Type" and not "TypeExtension")
+                return;
+
+            int equalsIndex = args.IndexOf('=');
+            string typeName = equalsIndex > -1
+                ? args.Substring(equalsIndex + 1).Trim()
+                : args;
+
+            attribute.Value = typeName;
         }
     }
 }
