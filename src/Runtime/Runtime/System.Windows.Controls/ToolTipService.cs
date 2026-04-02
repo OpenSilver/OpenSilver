@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -142,6 +143,99 @@ namespace System.Windows.Controls
             ArgumentNullException.ThrowIfNull(element);
 
             element.SetValueInternal(PlacementTargetProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the ToolTipService.InitialShowDelay attached property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty InitialShowDelayProperty =
+            DependencyProperty.RegisterAttached(
+                "InitialShowDelay",
+                typeof(int),
+                typeof(ToolTipService),
+                new FrameworkPropertyMetadata(TOOLTIPSERVICE_initialShowDelay),
+                PositiveValueValidation);
+
+        /// <summary>
+        /// Gets the value of the ToolTipService.InitialShowDelay attached property for an object.
+        /// </summary>
+        /// <param name="element">
+        /// The object from which the property value is read.
+        /// </param>
+        /// <returns>
+        /// The object's ToolTipService.InitialShowDelay property value.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+        public static int GetInitialShowDelay(DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            return (int)element.GetValue(InitialShowDelayProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the ToolTipService.InitialShowDelay attached property for an object.
+        /// </summary>
+        /// <param name="element">
+        /// The object to which the attached property is written.
+        /// </param>
+        /// <param name="value">
+        /// The value to set.
+        /// </param>
+        [OpenSilver.NotImplemented]
+        public static void SetInitialShowDelay(DependencyObject element, int value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            element.SetValueInternal(InitialShowDelayProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the ToolTipService.HasDropShadow attached property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty HasDropShadowProperty =
+            DependencyProperty.RegisterAttached(
+                "HasDropShadow",
+                typeof(bool),
+                typeof(ToolTipService),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets the value of the ToolTipService.HasDropShadow attached property for an object.
+        /// </summary>
+        /// <param name="element">
+        /// The object from which the property value is read.
+        /// </param>
+        /// <returns>
+        /// The object's ToolTipService.HasDropShadow property value.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+        public static bool GetHasDropShadow(DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            return (bool)element.GetValue(HasDropShadowProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the ToolTipService.HasDropShadow attached property for an object.
+        /// </summary>
+        /// <param name="element">
+        /// The object to which the attached property is written.
+        /// </param>
+        /// <param name="value">
+        /// The value to set.
+        /// </param>
+        [OpenSilver.NotImplemented]
+        public static void SetHasDropShadow(DependencyObject element, bool value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            element.SetValue(HasDropShadowProperty, BooleanBoxes.Box(value));
         }
 
         /// <summary>
@@ -436,5 +530,7 @@ namespace System.Windows.Controls
                 CloseAutomaticToolTip(null, EventArgs.Empty);
             }
         }
+
+        private static bool PositiveValueValidation(object o) => ((int)o) >= 0;
     }
 }

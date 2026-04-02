@@ -556,7 +556,7 @@ internal sealed class RichTextBoxView : TextViewBase
                 {
                     TextDecorationLocation.Underline => nameof(TextDecorations.Underline),
                     TextDecorationLocation.Strikethrough => nameof(TextDecorations.Strikethrough),
-                    TextDecorationLocation.Overline => nameof(TextDecorations.OverLine),
+                    TextDecorationLocation.OverLine => nameof(TextDecorations.OverLine),
                     _ => "None",
                 },
             }

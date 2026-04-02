@@ -835,6 +835,7 @@
     <Compile Include="System.Windows.Controls.Primitives\DragStartedEventArgs.cs" />
     <Compile Include="System.Windows.Controls.Primitives\DragStartedEventHandler.cs" />
     <Compile Include="System.Windows.Controls.Primitives\PlacementMode.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\PopupAnimation.cs" />
     <Compile Include="System.Windows.Controls.Primitives\Popup.cs" />
     <Compile Include="System.Windows.Controls.Primitives\PopupRoot.cs" />
     <Compile Include="System.Windows.Controls.Primitives\RangeBase.cs" />
@@ -889,6 +890,8 @@
     <Compile Include="System.Windows.Controls\SelectionChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\SelectionChangedEventHandler.cs" />
     <Compile Include="System.Windows.Controls\SelectionMode.cs" />
+    <Compile Include="System.Windows.Controls\SpellCheck.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\TickPlacement.cs" />
     <Compile Include="System.Windows.Controls\Slider.cs" />
     <Compile Include="System.Windows.Controls\StackPanel.cs" />
     <Compile Include="System.Windows.Controls\StretchDirection.cs" />
@@ -944,6 +947,7 @@
     <Compile Include="System.Windows.Input\TextComposition.cs" />
     <Compile Include="System.Windows.Input\TextCompositionEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventHandler.cs" />
+    <Compile Include="System.Windows.Input\Stylus.cs" />
     <Compile Include="System.Windows.Input\StylusDevice.cs" />
     <Compile Include="System.Windows.Input\TabletDeviceType.cs" />
     <Compile Include="System.Windows.Input\TextCompositionEventHandler.cs" />
@@ -1090,6 +1094,7 @@
     <Compile Include="System.Windows\VisualStateGroup.cs" />
     <Compile Include="System.Windows\VisualStateManager.cs" />
     <Compile Include="System.Windows\WhenToCallPropertyChangedEnum.cs" />
+    <Compile Include="System.Windows\ResizeMode.cs" />
     <Compile Include="System.Windows\Window.cs" />
     <Compile Include="System.Windows\WindowSizeChangedEventHandler.cs" />
     <Compile Include="System.Windows\FontStyle.cs" />

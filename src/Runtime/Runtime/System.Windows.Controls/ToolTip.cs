@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -282,6 +282,26 @@ namespace System.Windows.Controls
             {
                 tooltip._parentPopup.VerticalOffset = (double)e.NewValue;
             }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="HasDropShadow"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty HasDropShadowProperty =
+            ToolTipService.HasDropShadowProperty.AddOwner(typeof(ToolTip));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the control has a drop shadow.
+        /// </summary>
+        /// <returns>
+        /// true if the control has a drop shadow; otherwise, false. The default is false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool HasDropShadow
+        {
+            get => (bool)GetValue(HasDropShadowProperty);
+            set => SetValueInternal(HasDropShadowProperty, value);
         }
     }
 }

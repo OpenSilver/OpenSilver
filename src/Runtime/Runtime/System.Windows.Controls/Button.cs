@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,6 +13,7 @@
 
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -52,5 +53,79 @@ namespace System.Windows.Controls
         /// </returns>
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ButtonAutomationPeer(this);
+
+        /// <summary>
+        /// Identifies the <see cref="IsCancel"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty IsCancelProperty =
+            DependencyProperty.Register(
+                nameof(IsCancel),
+                typeof(bool),
+                typeof(Button),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether a <see cref="Button"/> is a Cancel button. A user 
+        /// can activate the Cancel button by pressing the ESC key.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="Button"/> is a Cancel button; otherwise, false. The default is false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool IsCancel
+        {
+            get => (bool)GetValue(IsCancelProperty);
+            set => SetValueInternal(IsCancelProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="IsDefault"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty IsDefaultProperty =
+            DependencyProperty.Register(
+                nameof(IsDefault),
+                typeof(bool),
+                typeof(Button),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether a <see cref="Button"/> is the default button. A user 
+        /// invokes the default button by pressing the ENTER key.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="Button"/> is the default button; otherwise, false. The default is false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool IsDefault
+        {
+            get => (bool)GetValue(IsDefaultProperty);
+            set => SetValueInternal(IsDefaultProperty, value);
+        }
+
+        private static readonly DependencyPropertyKey IsDefaultedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsDefaulted),
+                typeof(bool),
+                typeof(Button),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Identifies the <see cref="IsDefaulted"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty IsDefaultedProperty = IsDefaultedPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that indicates whether a <see cref="Button"/> is the button that is activated 
+        /// when a user presses ENTER.
+        /// </summary>
+        /// <returns>
+        /// true if the button is activated when the user presses ENTER; otherwise, false. The default 
+        /// is false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool IsDefaulted => (bool)GetValue(IsDefaultedProperty);
     }
 }
