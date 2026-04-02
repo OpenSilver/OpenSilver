@@ -1041,7 +1041,7 @@
     <Compile Include="System.Windows.Shapes\Shape.cs" />
     <Compile Include="System.Windows\Application.cs" />
     <Compile Include="System.Windows\CoerceValueCallback.cs" />
-    <Compile Include="System.Windows\Content.cs" />
+    <Compile Include="System.Windows.Interop\Content.cs" />
     <Compile Include="System.Windows\CornerRadius.cs" />
     <Compile Include="System.Windows\DataTemplate.cs" />
     <Compile Include="System.Windows\DependencyObject.cs" />

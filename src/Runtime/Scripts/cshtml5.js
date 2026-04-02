@@ -2587,6 +2587,46 @@ Object.defineProperty(window, 'osjs', {
                     },
                 };
             })()),
+            host: Object.freeze((function () {
+                return {
+                    get origin() {
+                        return window.location.origin;
+                    },
+                    get zoomFactor() {
+                        return window.devicePixelRatio;
+                    },
+                    get isFullscreen() {
+                        return window.innerHeight === screen.height;
+                    },
+                    set isFullscreen(value) {
+                        if (value) {
+                            const element = document.body;
+                            const requestFullscreen = element.requestFullscreen || element.webkitRequestFullscreen;
+                            if (requestFullscreen) {
+                                requestFullscreen.call(element);
+                            }
+                        } else {
+                            const element = document.fullscreenElement || document.webkitFullscreenElement;
+                            if (element) {
+                                const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
+                                if (exitFullscreen) {
+                                    exitFullscreen.call(document);
+                                }
+                            }
+                        }
+                    },
+                    get navigationState() {
+                        let hash = decodeURIComponent(window.location.hash);
+                        if (hash.length > 0 && hash[0] == '#') {
+                            hash = hash.slice(1);
+                        }
+                        return hash;
+                    },
+                    set navigationState(value) {
+                        window.location.hash = value;
+                    },
+                }
+            })()),
         };
     })()),
     writable: false,

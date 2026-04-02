@@ -708,7 +708,10 @@ namespace System.Windows
                 INTERNAL_HtmlDomManager.RemoveNodeNative(node);
             }
 
-            OpenSilver.Interop.JavaScriptRuntime.Flush();
+            if (render)
+            {
+                OpenSilver.Interop.JavaScriptRuntime.Flush();
+            }
         }
     }
 }

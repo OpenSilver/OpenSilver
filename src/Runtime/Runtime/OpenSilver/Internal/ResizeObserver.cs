@@ -34,13 +34,16 @@ internal static class ResizeObserver
             return;
         }
 
+        var newSize = new Size(width, height);
+        listeners.Size = newSize;
+
         LinkedListNode<WeakListener> weakListener = listeners.First;
 
         while (weakListener is not null)
         {
             if (weakListener.Value.TryGetListener(out IResizeObserverListener listener))
             {
-                listener.OnSizeChanged(new Size(width, height));
+                listener.OnSizeChanged(newSize);
             }
 
             weakListener = weakListener.Next;
@@ -67,6 +70,21 @@ internal static class ResizeObserver
         }
     }
 
+    public static Size? GetCurrentSize(HtmlElementReference element)
+    {
+        lock (_listeners)
+        {
+            string id = element.Uid;
+
+            if (_listeners.TryGetValue(id, out WeakListenerList listeners))
+            {
+                return listeners.Size;
+            }
+
+            return default;
+        }
+    }
+
     private sealed class WeakListenerList : LinkedList<WeakListener>
     {
         public WeakListenerList(string id)
@@ -74,7 +92,9 @@ internal static class ResizeObserver
             Id = id;
         }
 
-        public string Id { get; }
+        public readonly string Id;
+
+        public Size? Size;
     }
 
     private sealed class WeakListener

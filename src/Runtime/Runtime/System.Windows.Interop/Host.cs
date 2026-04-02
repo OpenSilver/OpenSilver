@@ -12,32 +12,51 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Web;
+using System.Diagnostics;
 using OpenSilver.Internal;
 
 namespace System.Windows.Interop;
 
-public class Host
+public class Host : IResizeObserverListener
 {
     private readonly Application _app;
+    private readonly IDisposable _resizeObserver;
     private Content _content;
     private Settings _settings;
     private string _navigationState;
     private Dictionary<string, string> _initParams;
 
-    public Host() : this(null) { }
-
     internal Host(Application app)
     {
+        Debug.Assert(app is not null);
+
         _app = app;
         _navigationState = GetBrowserNavigationState();
+        _resizeObserver = ResizeObserver.Observe(app.GetRootDiv(), this);
         DOMEvents.Window.AddEventListener("hashchange", OnNavigationChanged);
+        DOMEvents.Document.AddEventListener("fullscreenchange", OnFullScreenChanged);
     }
 
     /// <summary>
     /// Gets the "Content" sub-object of this Host.
     /// </summary>
-    public Content Content => _content ??= new Content(_app);
+    public Content Content
+    {
+        get
+        {
+            if (_content is null)
+            {
+                _content = new Content();
+
+                if (ResizeObserver.GetCurrentSize(_app.GetRootDiv()) is Size size)
+                {
+                    _content.SetSize(size);
+                }
+            }
+
+            return _content;
+        }
+    }
 
     /// <summary>
     /// Gets the "Settings" sub-object of this tHost.
@@ -52,7 +71,7 @@ public class Host
     /// The URI of the package, XAML file, or XAML scripting tag that contains the
     /// content to load into the Silverlight plug-in.
     /// </returns>
-    public Uri Source => new Uri(OpenSilver.Interop.ExecuteJavaScriptString("window.location.origin", false));
+    public Uri Source => new Uri(OpenSilver.Interop.ExecuteJavaScriptString("osjs.host.origin", false));
 
     /// <summary>
     /// Gets or sets a URI fragment that represents the current navigation state.
@@ -69,8 +88,7 @@ public class Host
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"window.location.hash = {OpenSilver.Interop.GetVariableStringForJS(value)}");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.host.navigationState = {OpenSilver.Interop.GetVariableStringForJS(value)}");
         }
     }
 
@@ -90,17 +108,7 @@ public class Host
         NavigationStateChanged?.Invoke(this, new NavigationStateChangedEventArgs(previousNavigationState, state));
     }
 
-    private string GetBrowserNavigationState()
-    {
-        string state = HttpUtility.UrlDecode(OpenSilver.Interop.ExecuteJavaScriptString("location.hash")) ?? string.Empty;
-
-        if (state.Length > 0 && state[0] == '#')
-        {
-            state = state.Substring(1);
-        }
-
-        return state;
-    }
+    private string GetBrowserNavigationState() => OpenSilver.Interop.ExecuteJavaScriptString("osjs.host.navigationState");
 
     /// <summary>
     /// Gets the initialization parameters that were passed as part of HTML initialization
@@ -118,8 +126,7 @@ public class Host
 
         var initParams = new Dictionary<string, string>();
 
-        Application app = _app ?? Application.Current;
-        if (app != null && app.AppParams.TryGetValue(InitParamsName, out string initParamsString))
+        if (_app.AppParams.TryGetValue(InitParamsName, out string initParamsString))
         {
             foreach (string p in initParamsString.Split(','))
             {
@@ -146,5 +153,13 @@ public class Host
         }
 
         return initParams;
+    }
+
+    private void OnFullScreenChanged() => Content.FireFullScreenChanged();
+
+    void IResizeObserverListener.OnSizeChanged(Size size)
+    {
+        Content.SetSize(size);
+        Content.FireResized();
     }
 }
