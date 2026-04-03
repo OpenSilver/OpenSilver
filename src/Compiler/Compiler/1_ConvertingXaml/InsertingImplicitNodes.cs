@@ -25,20 +25,17 @@ namespace OpenSilver.Compiler
         // any property defined by the user.
         public const string InitializedFromStringAttribute = "__.InitializeFromString.__";
 
-        public static void InsertImplicitNodes(XDocument doc,
-            ConversionSettings settings,
-            string globalPrefix)
+        public static void InsertImplicitNodes(XDocument doc, ConversionSettings settings)
         {
             var indexesMapper = new Stack<List<int>>();
-            TraverseNextElement(doc.Root, 0, indexesMapper, settings, globalPrefix);
+            TraverseNextElement(doc.Root, 0, indexesMapper, settings);
         }
 
         private static void TraverseNextElement(
             XElement currentElement, 
             int currentElementIndex, 
             /*Stack<Dictionary<int, int>> indexesMapper*/ Stack<List<int>> indexesMapper,
-            ConversionSettings settings,
-            string globalPrefix)
+            ConversionSettings settings)
         {
             bool skipTraversalOfChildren = false;
 
@@ -146,14 +143,14 @@ namespace OpenSilver.Compiler
                         namespaceName, localName, assemblyNameIfAny, currentElement, false);
                                     
                     // Distinguish system types (string, double, etc.) to other types
-                    if (settings.SystemTypes.IsKnownType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
+                    if (settings.SystemTypes.IsKnownType(elementTypeInCSharp.Substring(settings.TypeReferenceHelper.Global.Length), assemblyNameIfAny))
                     {
                         // In this case we do nothing because system types are handled
                         // later in the process. Example: "<sys:Double>50</sys:Double>"
                         // becomes "Double x = 50;"
                     }
                     else if (settings.Inspector.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny, currentElement) ||
-                             settings.CoreTypes.IsKnownType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
+                             settings.CoreTypes.IsKnownType(elementTypeInCSharp.Substring(settings.TypeReferenceHelper.Global.Length), assemblyNameIfAny))
                     {
                         // Add the attribute that will tell the compiler to later
                         // intialize the type by converting from the string using the
@@ -293,7 +290,7 @@ namespace OpenSilver.Compiler
                 int i = 0;
                 foreach (var childElements in children)
                 {
-                    TraverseNextElement(childElements, i, indexesMapper, settings, globalPrefix);
+                    TraverseNextElement(childElements, i, indexesMapper, settings);
                     ++i;
                 }
                 indexesMapper.Pop();

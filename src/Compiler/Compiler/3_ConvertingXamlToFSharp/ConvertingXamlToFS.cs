@@ -40,11 +40,11 @@ namespace OpenSilver.Compiler
                 // Process the "TextBlock" and "Span" nodes in order to surround direct text content with "<Run>" tags:
                 ProcessingTextBlockNodes.Process(doc, settings);
 
-                InsertingImplicitNodes.InsertImplicitNodes(doc, settings, "global.");
+                InsertingImplicitNodes.InsertImplicitNodes(doc, settings);
 
                 // Resolve {x:Type ...} in TargetType/DataType attributes to plain type names
                 // before markup extension processing converts them to child elements
-                GeneratingCode.ResolveTypeExtensionAttributes(doc, settings.AssemblyName);
+                ProcessTypeExtensionAttributes.Process(doc, settings);
 
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into
                 // "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
