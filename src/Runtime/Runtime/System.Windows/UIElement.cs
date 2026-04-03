@@ -305,8 +305,9 @@ namespace System.Windows
             NeverMeasured = true;
             NeverArranged = true;
 
-            VisibilityCache = (Visibility)VisibilityProperty.GetMetadata(DependencyObjectType).DefaultValue;
-            ClipToBoundsCache = (bool)ClipToBoundsProperty.GetMetadata(DependencyObjectType).DefaultValue;
+            SnapsToDevicePixelsCache = (bool)SnapsToDevicePixelsProperty.GetDefaultValue(DependencyObjectType);
+            VisibilityCache = (Visibility)VisibilityProperty.GetDefaultValue(DependencyObjectType);
+            ClipToBoundsCache = (bool)ClipToBoundsProperty.GetDefaultValue(DependencyObjectType);
 
             WriteVisualFlag(VisualFlags.IsUIElement, true);
         }
@@ -467,44 +468,40 @@ namespace System.Windows
         #endregion
 
         #region SnapsToDevicePixels
+
         /// <summary>
         /// Identifies the <see cref="SnapsToDevicePixels"/> dependency property.
         /// </summary>
+        [NotImplemented]
         public static readonly DependencyProperty SnapsToDevicePixelsProperty =
             DependencyProperty.Register(
                 nameof(SnapsToDevicePixels),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(
-                    BooleanBoxes.FalseBox,
-                    new PropertyChangedCallback(SnapsToDevicePixels_Changed)));
-
-        private static void SnapsToDevicePixels_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UIElement uie = (UIElement)d;
-            uie.SnapsToDevicePixelsCache = (bool)e.NewValue;
-
-            // if never measured, then nothing to do, it should be measured at some point
-            if (!uie.NeverMeasured || !uie.NeverArranged)
-            {
-                uie.InvalidateArrange();
-            }
-        }
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnSnapsToDevicePixelsChanged));
 
         /// <summary>
         /// Gets or sets a value that determines whether rendering for this element should use
         /// device-specific pixel settings during rendering. This is a dependency property.
         /// </summary>
         /// <returns>
-        /// <see langword="true"/> if the element should render in accordance to device pixels; otherwise, <see langword="false"/>.
-        /// The default as declared on <see cref="UIElement"/> is <see langword="false"/>.
+        /// <see langword="true"/> if the element should render in accordance to device pixels; 
+        /// otherwise, <see langword="false"/>. The default as declared on <see cref="UIElement"/> 
+        /// is <see langword="false"/>.
         /// </returns>
         [NotImplemented]
         public bool SnapsToDevicePixels
         {
             get => SnapsToDevicePixelsCache;
-            set => SetValue(SnapsToDevicePixelsProperty, value);
+            set => SetValueInternal(SnapsToDevicePixelsProperty, value);
         }
+
+        private static void OnSnapsToDevicePixelsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uie = (UIElement)d;
+            uie.SnapsToDevicePixelsCache = (bool)e.NewValue;
+        }
+
         #endregion
 
         /// <summary>

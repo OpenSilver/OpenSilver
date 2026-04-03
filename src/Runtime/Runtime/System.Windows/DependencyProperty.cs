@@ -753,6 +753,16 @@ namespace System.Windows
             return GetMetadata(owner).GetDefaultValue(owner, this);
         }
 
+        internal object GetDefaultValue(DependencyObjectType dependencyObjectType)
+        {
+            if (!IsDefaultValueChanged)
+            {
+                return DefaultMetadata.DefaultValue;
+            }
+
+            return GetMetadata(dependencyObjectType).DefaultValue;
+        }
+
         /// <summary>
         /// Retrieves the property metadata value for the dependency property as registered
         /// to the specified <see cref="Type"/>.

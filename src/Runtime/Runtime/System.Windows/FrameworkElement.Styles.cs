@@ -91,24 +91,19 @@ namespace System.Windows
             StyleHelper.UpdateStyleCache(fe, oldStyle, newStyle, ref fe._styleCache);
         }
 
-        private static Style _defaultFocusVisualStyle = null;
-        internal static Style DefaultFocusVisualStyle
+        internal static Style DefaultFocusVisualStyle { get; } = CreateDefaultFocusVisualStyle();
+
+        private static Style CreateDefaultFocusVisualStyle()
         {
-            get
-            {
-                if (_defaultFocusVisualStyle == null)
-                {
-                    Style defaultFocusVisualStyle = new();
-                    defaultFocusVisualStyle.Seal();
-                    _defaultFocusVisualStyle = defaultFocusVisualStyle;
-                }
-                return _defaultFocusVisualStyle;
-            }
+            var style = new Style(typeof(FrameworkElement));
+            style.Seal();
+            return style;
         }
 
         /// <summary>
         /// Identifies the <see cref="FocusVisualStyle"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FocusVisualStyleProperty =
             DependencyProperty.Register(
                 nameof(FocusVisualStyle),
@@ -117,18 +112,19 @@ namespace System.Windows
                 new FrameworkPropertyMetadata(DefaultFocusVisualStyle));
 
         /// <summary>
-        /// Gets or sets a property that enables customization of appearance, effects,
-        /// or other style characteristics that will apply to this element when it captures keyboard focus.
+        /// Gets or sets a property that enables customization of appearance, effects, or other style 
+        /// characteristics that will apply to this element when it captures keyboard focus.
         /// </summary>
         /// <returns>
-        /// The desired style to apply on focus. The default value as declared in the dependency property is an empty static <see cref="Windows.Style"/>. 
-        /// However, the effective value at run time is often (but not always) a style as supplied by theme support for controls.
+        /// The desired style to apply on focus. The default value as declared in the dependency property 
+        /// is an empty static <see cref="Windows.Style"/>. However, the effective value at run time is 
+        /// often (but not always) a style as supplied by theme support for controls.
         /// </returns>
         [OpenSilver.NotImplemented]
         public Style FocusVisualStyle
         {
             get => (Style)GetValue(FocusVisualStyleProperty);
-            set => SetValue(FocusVisualStyleProperty, value);
+            set => SetValueInternal(FocusVisualStyleProperty, value);
         }
 
         /// <summary>

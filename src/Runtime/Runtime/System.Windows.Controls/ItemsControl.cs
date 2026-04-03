@@ -531,30 +531,24 @@ namespace System.Windows.Controls
                 nameof(IsGrouping),
                 typeof(bool),
                 typeof(ItemsControl),
-                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, new PropertyChangedCallback(OnIsGroupingChanged)));
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
 
         /// <summary>
         /// Identifies the <see cref="IsGrouping"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsGroupingProperty = IsGroupingPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that indicates whether the control is using grouping.
         /// </summary>
-        /// <returns><see langword="true"/> if a control is using grouping; otherwise, <see langword="false"/>.</returns>
+        /// <returns>
+        /// <see langword="true"/> if a control is using grouping; otherwise, <see langword="false"/>.
+        /// </returns>
         [Bindable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [OpenSilver.NotImplemented]
         public bool IsGrouping => (bool)GetValue(IsGroupingProperty);
-
-        private static void OnIsGroupingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((ItemsControl)d).OnIsGroupingChanged(e);
-        }
-
-        internal virtual void OnIsGroupingChanged(DependencyPropertyChangedEventArgs e)
-        {
-        }
 
         /// <summary>
         /// Identifies the <see cref="AlternationCount"/> dependency property.

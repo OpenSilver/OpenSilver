@@ -196,6 +196,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="RecognizesAccessKey"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RecognizesAccessKeyProperty =
             DependencyProperty.Register(
                 nameof(RecognizesAccessKey),
@@ -204,17 +205,18 @@ namespace System.Windows.Controls
                 new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the <see cref="ContentPresenter"/> should use AccessText in its style.
+        /// Gets or sets a value that indicates whether the <see cref="ContentPresenter"/> should 
+        /// use AccessText in its style.
         /// </summary>
         /// <returns>
-        /// <see langword="true"/> if the <see cref="ContentPresenter"/> should use AccessText in its style; otherwise, <see langword="false"/>.
-        /// The default is <see langword="false"/>.
+        /// <see langword="true"/> if the <see cref="ContentPresenter"/> should use AccessText in 
+        /// its style; otherwise, <see langword="false"/>. The default is <see langword="false"/>.
         /// </returns>
         [OpenSilver.NotImplemented]
         public bool RecognizesAccessKey
         {
             get => (bool)GetValue(RecognizesAccessKeyProperty);
-            set => SetValue(RecognizesAccessKeyProperty, BooleanBoxes.Box(value));
+            set => SetValueInternal(RecognizesAccessKeyProperty, value);
         }
 
         /// <summary>

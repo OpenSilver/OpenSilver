@@ -705,14 +705,13 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="IsEditable"/> dependency property.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsEditableProperty =
             DependencyProperty.Register(
                 nameof(IsEditable),
                 typeof(bool),
                 typeof(ComboBox),
-                new FrameworkPropertyMetadata(
-                    BooleanBoxes.FalseBox,
-                    new PropertyChangedCallback(OnIsEditableChanged)));
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
 
 
         /// <summary>
@@ -726,11 +725,7 @@ namespace System.Windows.Controls
         public bool IsEditable
         {
             get => (bool)GetValue(IsEditableProperty);
-            set => SetValue(IsEditableProperty, BooleanBoxes.Box(value));
-        }
-
-        private static void OnIsEditableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
+            set => SetValueInternal(IsEditableProperty, value);
         }
 
         /// <summary>
