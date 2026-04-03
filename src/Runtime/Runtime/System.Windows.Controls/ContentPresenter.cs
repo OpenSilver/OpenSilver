@@ -11,11 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Data;
+using System.Windows.Markup;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -190,6 +191,32 @@ namespace System.Windows.Controls
         {
             // if ContentTemplateSelector is really changing (and in use), remove the old template
             Template = null;
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="RecognizesAccessKey"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty RecognizesAccessKeyProperty =
+            DependencyProperty.Register(
+                nameof(RecognizesAccessKey),
+                typeof(bool),
+                typeof(ContentPresenter),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the <see cref="ContentPresenter"/> should 
+        /// use AccessText in its style.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the <see cref="ContentPresenter"/> should use AccessText in 
+        /// its style; otherwise, <see langword="false"/>. The default is <see langword="false"/>.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool RecognizesAccessKey
+        {
+            get => (bool)GetValue(RecognizesAccessKeyProperty);
+            set => SetValueInternal(RecognizesAccessKeyProperty, value);
         }
 
         /// <summary>

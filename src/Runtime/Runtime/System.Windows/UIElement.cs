@@ -274,7 +274,7 @@ namespace System.Windows
             child.OnVisualParentChanged(this);
         }
 
-#endregion Visual Children
+        #endregion Visual Children
 
         private Window _window;
 
@@ -305,9 +305,10 @@ namespace System.Windows
             NeverMeasured = true;
             NeverArranged = true;
 
-            VisibilityCache = (Visibility)VisibilityProperty.GetMetadata(DependencyObjectType).DefaultValue;
-            ClipToBoundsCache = (bool)ClipToBoundsProperty.GetMetadata(DependencyObjectType).DefaultValue;
-            
+            SnapsToDevicePixelsCache = (bool)SnapsToDevicePixelsProperty.GetDefaultValue(DependencyObjectType);
+            VisibilityCache = (Visibility)VisibilityProperty.GetDefaultValue(DependencyObjectType);
+            ClipToBoundsCache = (bool)ClipToBoundsProperty.GetDefaultValue(DependencyObjectType);
+
             WriteVisualFlag(VisualFlags.IsUIElement, true);
         }
 
@@ -466,8 +467,45 @@ namespace System.Windows
 
         #endregion
 
+        #region SnapsToDevicePixels
+
         /// <summary>
-        /// When overriden, creates the dom elements designed to represent an instance of an UIElement and defines the place where its child(ren) will be added.
+        /// Identifies the <see cref="SnapsToDevicePixels"/> dependency property.
+        /// </summary>
+        [NotImplemented]
+        public static readonly DependencyProperty SnapsToDevicePixelsProperty =
+            DependencyProperty.Register(
+                nameof(SnapsToDevicePixels),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnSnapsToDevicePixelsChanged));
+
+        /// <summary>
+        /// Gets or sets a value that determines whether rendering for this element should use
+        /// device-specific pixel settings during rendering. This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the element should render in accordance to device pixels; 
+        /// otherwise, <see langword="false"/>. The default as declared on <see cref="UIElement"/> 
+        /// is <see langword="false"/>.
+        /// </returns>
+        [NotImplemented]
+        public bool SnapsToDevicePixels
+        {
+            get => SnapsToDevicePixelsCache;
+            set => SetValueInternal(SnapsToDevicePixelsProperty, value);
+        }
+
+        private static void OnSnapsToDevicePixelsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uie = (UIElement)d;
+            uie.SnapsToDevicePixelsCache = (bool)e.NewValue;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// When overridden, creates the dom elements designed to represent an instance of an UIElement and defines the place where its child(ren) will be added.
         /// </summary>
         /// <param name="parent">The parent of the UIElement</param>
         /// <returns>The "root" dom element of the UIElement.</returns>
@@ -610,7 +648,7 @@ namespace System.Windows
         private static void OnEffectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
-            
+
             if (element._weakEffectChangedEventToken != null)
             {
                 element._weakEffectChangedEventToken.Dispose();
@@ -923,7 +961,7 @@ namespace System.Windows
         internal void UpdateIsRenderableCache()
         {
             bool isRenderable;
-            
+
             if (InternalVisualParent is UIElement parent)
             {
                 isRenderable = parent.IsRenderable;
@@ -1215,9 +1253,9 @@ namespace System.Windows
         /// </summary>
         public event DependencyPropertyChangedEventHandler IsHitTestVisibleChanged;
 
-#endregion
+        #endregion
 
-#region pointer-events
+        #region pointer-events
 
         /// <summary>
         /// Gets the value that pointer-events (css) should be coerced to.
@@ -1388,7 +1426,7 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(BooleanBoxes.TrueBox));
 
-#endregion
+        #endregion
 
         internal bool IsDescendantOf(DependencyObject ancestor)
         {
@@ -1646,7 +1684,7 @@ namespace System.Windows
     internal enum CoreFlags : uint
     {
         None = 0x00000000,
-        //SnapsToDevicePixelsCache = 0x00000001,
+        SnapsToDevicePixelsCache = 0x00000001,
         ClipToBoundsCache = 0x00000002,
         MeasureDirty = 0x00000004,
         ArrangeDirty = 0x00000008,

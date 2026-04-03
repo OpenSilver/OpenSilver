@@ -91,6 +91,42 @@ namespace System.Windows
             StyleHelper.UpdateStyleCache(fe, oldStyle, newStyle, ref fe._styleCache);
         }
 
+        internal static Style DefaultFocusVisualStyle { get; } = CreateDefaultFocusVisualStyle();
+
+        private static Style CreateDefaultFocusVisualStyle()
+        {
+            var style = new Style(typeof(FrameworkElement));
+            style.Seal();
+            return style;
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="FocusVisualStyle"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty FocusVisualStyleProperty =
+            DependencyProperty.Register(
+                nameof(FocusVisualStyle),
+                typeof(Style),
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(DefaultFocusVisualStyle));
+
+        /// <summary>
+        /// Gets or sets a property that enables customization of appearance, effects, or other style 
+        /// characteristics that will apply to this element when it captures keyboard focus.
+        /// </summary>
+        /// <returns>
+        /// The desired style to apply on focus. The default value as declared in the dependency property 
+        /// is an empty static <see cref="Windows.Style"/>. However, the effective value at run time is 
+        /// often (but not always) a style as supplied by theme support for controls.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public Style FocusVisualStyle
+        {
+            get => (Style)GetValue(FocusVisualStyleProperty);
+            set => SetValueInternal(FocusVisualStyleProperty, value);
+        }
+
         /// <summary>
         /// Identifies the <see cref="DefaultStyleKey"/> dependency property.
         /// </summary>
