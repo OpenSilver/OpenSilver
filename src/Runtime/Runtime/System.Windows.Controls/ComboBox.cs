@@ -58,7 +58,7 @@ namespace System.Windows.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(typeof(ComboBox)));
             IsEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(OnVisualStatePropertyChanged));
-            IsSelectionActivePropertyKey.OverrideMetadata(typeof(ComboBox),new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
+            IsSelectionActivePropertyKey.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
             IsTextSearchEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
 
@@ -703,10 +703,35 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets a value that indicates whether the user can edit text in the text box
-        /// portion of the ComboBox. This property always returns false.
+        /// Identifies the <see cref="IsEditable"/> dependency property.
         /// </summary>
-        public bool IsEditable => false;
+        public static readonly DependencyProperty IsEditableProperty =
+            DependencyProperty.Register(
+                nameof(IsEditable),
+                typeof(bool),
+                typeof(ComboBox),
+                new FrameworkPropertyMetadata(
+                    BooleanBoxes.FalseBox,
+                    new PropertyChangedCallback(OnIsEditableChanged)));
+
+
+        /// <summary>
+        /// Gets or sets a value that enables or disables editing of the text in text box of the <see cref="ComboBox"/>.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the <see cref="ComboBox"/> can be edited; otherwise <see langword="false"/>.
+        /// The default is <see langword="false"/>.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool IsEditable
+        {
+            get => (bool)GetValue(IsEditableProperty);
+            set => SetValue(IsEditableProperty, BooleanBoxes.Box(value));
+        }
+
+        private static void OnIsEditableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
 
         /// <summary>
         /// Identifies the <see cref="SelectionBoxItem"/> dependency property.

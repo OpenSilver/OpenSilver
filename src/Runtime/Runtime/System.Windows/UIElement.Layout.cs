@@ -156,7 +156,7 @@ namespace System.Windows
                 }
 
                 bool neverMeasured = NeverMeasured;
-                
+
                 if (neverMeasured)
                 {
                     SwitchVisibilityIfNeeded(Visibility);
@@ -186,7 +186,7 @@ namespace System.Windows
 
                     return;
                 }
-                
+
                 if (IsMeasureValid && !neverMeasured && isCloseToPreviousMeasure)
                 {
                     return;
@@ -197,7 +197,7 @@ namespace System.Windows
 
                 //we always want to be arranged, ensure arrange request
                 InvalidateArrange();
-                
+
                 MeasureInProgress = true;
 
                 Size desiredSize = new Size(0, 0);
@@ -245,7 +245,7 @@ namespace System.Windows
                 }
 
                 //reset measure dirtiness
-                
+
                 MeasureDirty = false;
 
                 //reset measure request.
@@ -401,11 +401,11 @@ namespace System.Windows
 
                         //to make sure Clip is tranferred to Visual
                         LayoutClip = GetLayoutClip(finalRect.Size);
-                        
+
                         // see if we need to call OnRenderSizeChanged on this element
                         sizeChanged = MarkForSizeChangedIfNeeded(oldSize, RenderSize);
 
-                        sizeChanged |= !DoubleUtil.AreClose(oldOffset, VisualOffset) 
+                        sizeChanged |= !DoubleUtil.AreClose(oldOffset, VisualOffset)
                                     || !DoubleUtil.AreClose(oldLayoutClip, LayoutClip);
 
                         gotException = false;
@@ -696,7 +696,7 @@ namespace System.Windows
             v.WriteVisualFlag(VisualFlags.IsLayoutSuspended, true);
 
             ResetLayoutProperties(v);
-            
+
             int count = v.VisualChildrenCount;
 
             for (int i = 0; i < count; i++)
@@ -776,6 +776,12 @@ namespace System.Windows
         {
             get { return ReadFlag(CoreFlags.RenderingInvalidated); }
             set { WriteFlag(CoreFlags.RenderingInvalidated, value); }
+        }
+
+        internal bool SnapsToDevicePixelsCache
+        {
+            get { return ReadFlag(CoreFlags.SnapsToDevicePixelsCache); }
+            set { WriteFlag(CoreFlags.SnapsToDevicePixelsCache, value); }
         }
 
         internal bool ClipToBoundsCache

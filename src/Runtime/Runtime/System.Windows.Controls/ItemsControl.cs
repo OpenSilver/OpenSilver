@@ -11,17 +11,18 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
-using OpenSilver.Internal.Xaml.Context;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
+using OpenSilver.Internal.Xaml.Context;
 
 namespace System.Windows.Controls
 {
@@ -523,6 +524,36 @@ namespace System.Windows.Controls
         {
             get { return (bool)GetValue(IsTextSearchCaseSensitiveProperty); }
             set { SetValueInternal(IsTextSearchCaseSensitiveProperty, value); }
+        }
+
+        private static readonly DependencyPropertyKey IsGroupingPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsGrouping),
+                typeof(bool),
+                typeof(ItemsControl),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, new PropertyChangedCallback(OnIsGroupingChanged)));
+
+        /// <summary>
+        /// Identifies the <see cref="IsGrouping"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsGroupingProperty = IsGroupingPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that indicates whether the control is using grouping.
+        /// </summary>
+        /// <returns><see langword="true"/> if a control is using grouping; otherwise, <see langword="false"/>.</returns>
+        [Bindable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [OpenSilver.NotImplemented]
+        public bool IsGrouping => (bool)GetValue(IsGroupingProperty);
+
+        private static void OnIsGroupingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ItemsControl)d).OnIsGroupingChanged(e);
+        }
+
+        internal virtual void OnIsGroupingChanged(DependencyPropertyChangedEventArgs e)
+        {
         }
 
         /// <summary>
@@ -1273,7 +1304,7 @@ namespace System.Windows.Controls
             {
                 if (TextSearch.EnsureInstance(this) is TextSearch instance)
                 {
-                    instance.DoSearch(e.Text);                    
+                    instance.DoSearch(e.Text);
                 }
             }
 
