@@ -124,6 +124,7 @@ namespace OpenSilver.Compiler
 
         private readonly SystemTypesHelper _systemTypesHelper;
         private readonly TypeReferenceHelper _typeReferenceHelper;
+        private readonly XamlNameParser _xamlNameParser;
 
         private TypeDefinition _iListType;
         private TypeDefinition _iDictionaryType;
@@ -183,8 +184,10 @@ namespace OpenSilver.Compiler
         private TypeDefinition IMarkupExtensionType =>
             _iMarkupExtensionType ??= FindType(KnownNamespaces.SystemXaml, GenericMarkupExtension, Constants.OPENSILVER_ASSEMBLY_NAME);
 
-        public MonoCecilAssembliesInspectorImpl(SupportedLanguage compilerType)
+        public MonoCecilAssembliesInspectorImpl(string assemblyName, SupportedLanguage compilerType)
         {
+            _xamlNameParser = new XamlNameParser(assemblyName);
+
             switch (compilerType)
             {
                 case SupportedLanguage.CSharp:
@@ -262,16 +265,9 @@ namespace OpenSilver.Compiler
             else if (namespaceName.StartsWith(ClrNamespace, StringComparison.CurrentCultureIgnoreCase))
             {
                 // Override assemblyName
-                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(namespaceName, out string ns, out assemblyName);
+                _xamlNameParser.ParseClrNamespaceDeclaration(namespaceName, out string ns, out assemblyName);
                 namespaceName = ns;
-                GettingInformationAboutXamlTypes.FixNamespaceForCompatibility(ref assemblyName, ref namespaceName);
-            }
-
-            // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style
-            // namespace (cf. section that handles Binding in "GeneratingCSharpCode.cs")
-            if (namespaceName.StartsWith(_typeReferenceHelper.Global, StringComparison.CurrentCultureIgnoreCase))
-            {
-                namespaceName = namespaceName.Substring(_typeReferenceHelper.Global.Length);
+                XamlNameParser.FixNamespaceForCompatibility(ref assemblyName, ref namespaceName);
             }
 
             // Handle special cases:

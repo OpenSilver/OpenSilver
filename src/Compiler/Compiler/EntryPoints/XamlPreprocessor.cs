@@ -221,7 +221,7 @@ namespace OpenSilver.Compiler
 
         private AssembliesInspector LoadAssemblies()
         {
-            var inspector = new AssembliesInspector(_supportedLanguage);
+            var inspector = new AssembliesInspector(AssemblyName, _supportedLanguage);
 
             foreach (ITaskItem reference in ResolvedReferences)
             {

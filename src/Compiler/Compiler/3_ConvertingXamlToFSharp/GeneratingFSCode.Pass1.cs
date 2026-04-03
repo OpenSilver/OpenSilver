@@ -179,9 +179,9 @@ namespace GlobalResource
                 while (element.Parent != null)
                 {
                     XElement parent = element.Parent;
-                    if (GeneratingCode.IsDataTemplate(parent, _settings.AssemblyName) ||
-                        GeneratingCode.IsItemsPanelTemplate(parent, _settings.AssemblyName) ||
-                        GeneratingCode.IsControlTemplate(parent, _settings.AssemblyName))
+                    if (GeneratingCode.IsDataTemplate(parent, _settings) ||
+                        GeneratingCode.IsItemsPanelTemplate(parent, _settings) ||
+                        GeneratingCode.IsControlTemplate(parent, _settings))
                     {
                         return parent;
                     }
@@ -197,7 +197,7 @@ namespace GlobalResource
                 out string typeName,
                 out string assemblyName)
             {
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                _settings.XamlNameParser.GetClrNamespaceAndLocalName(
                     element.Name,
                     out namespaceName,
                     out typeName,

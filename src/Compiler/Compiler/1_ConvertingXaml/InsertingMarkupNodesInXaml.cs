@@ -82,7 +82,7 @@ namespace OpenSilver.Compiler
                                 currentElement.Name + ("." + currentAttributeName),
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
-                                settings.Inspector,
+                                settings,
                                 currentElement,
                                 currentAttribute));
                         }
@@ -92,7 +92,7 @@ namespace OpenSilver.Compiler
                                 "{" + currentAttributeNamespaceName + "}" + currentAttributeTypeName + "." + currentAttributeName,
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
-                                settings.Inspector,
+                                settings,
                                 currentElement,
                                 currentAttribute));
                         }
@@ -158,7 +158,7 @@ namespace OpenSilver.Compiler
             XName nodeName,
             string attributeValue,
             XNamespace lastDefaultNamespace,
-            AssembliesInspector reflectionOnSeparateAppDomain,
+            ConversionSettings settings,
             XElement currentElement,
             IXmlLineInfo lineInfo)
         {
@@ -206,7 +206,7 @@ namespace OpenSilver.Compiler
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(currentSubAttributeWithoutUselessPart.Length - 1, 1); //to remove the '}' at the end
 
                         // We add the suffix "Extension" to the markup extension name (unless it is a Binding or RelativeSource). For example, "StaticResource" becomes "StaticResourceExtension":
-                        if (ShouldAddExtension(nextClassName, currentElement, reflectionOnSeparateAppDomain, lineInfo))
+                        if (ShouldAddExtension(nextClassName, currentElement, settings, lineInfo))
                         {
                             // this is a trick, we need to check if :
                             // - type named 'MyCurrentMarkupExtensionName' exist.
@@ -230,7 +230,7 @@ namespace OpenSilver.Compiler
                             ns + localName,
                             currentSubAttributeWithoutUselessPart,
                             lastDefaultNamespace,
-                            reflectionOnSeparateAppDomain,
+                            settings,
                             currentElement,
                             lineInfo);
                         XElement subXElement1 = subXElement;
@@ -257,13 +257,13 @@ namespace OpenSilver.Compiler
                     string keyStringAfterPlaceHolderReplacement = keyString;
                     if (keyString == "_placeHolderForDefaultValue") //this test is to replace the name of the attribute (which is in keyString) if it was a placeholder
                     {
-                        GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                        settings.XamlNameParser.GetClrNamespaceAndLocalName(
                             nodeName,
                             out string namespaceName,
                             out string localName,
                             out string assemblyNameIfAny);
 
-                        keyStringAfterPlaceHolderReplacement = reflectionOnSeparateAppDomain.GetContentPropertyName(
+                        keyStringAfterPlaceHolderReplacement = settings.Inspector.GetContentPropertyName(
                             namespaceName, localName, assemblyNameIfAny, lineInfo);
                     }
                     else if (keyStringAfterPlaceHolderReplacement.StartsWith("{")) //if we enter this if, it means that keyString is of the form "{Binding ElementName" so we want to remove "{Binding "
@@ -295,7 +295,6 @@ namespace OpenSilver.Compiler
                 }
             }
 
-            XNamespace xNamespace = @"http://schemas.microsoft.com/winfx/2006/xaml/presentation"; //todo: support markup extensions that use custom namespaces.
             string actualNodeName = nodeName.LocalName;
             string nodeNamespace = "{" + nodeName.NamespaceName + "}";
             string[] splittedNodeName = actualNodeName.Split('.');
@@ -507,7 +506,7 @@ namespace OpenSilver.Compiler
             });
         }
 
-        private static bool ShouldAddExtension(string name, XElement currentElement, AssembliesInspector reflectionOnSeparateAppDomain, IXmlLineInfo lineInfo)
+        private static bool ShouldAddExtension(string name, XElement currentElement, ConversionSettings settings, IXmlLineInfo lineInfo)
         {
             string typeName;
             XNamespace xmlns;
@@ -526,9 +525,9 @@ namespace OpenSilver.Compiler
 
             if (xmlns != null)
             {
-                (string clrNS, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(xmlns.NamespaceName);
+                (string clrNS, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(xmlns.NamespaceName);
 
-                return reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(clrNS, typeName, assemblyName, lineInfo) == null;
+                return settings.Inspector.GetAssemblyQualifiedNameOfXamlType(clrNS, typeName, assemblyName, lineInfo) == null;
             }
 
             return false;

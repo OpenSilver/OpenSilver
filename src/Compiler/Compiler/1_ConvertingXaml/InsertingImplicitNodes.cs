@@ -86,7 +86,7 @@ namespace OpenSilver.Compiler
                 if (nodesThatAreNotPropertiesOfTheObject.Count > 0)
                 {
                     // Find out the name of the default children property (aka "ContentProperty") of the current element:
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    settings.XamlNameParser.GetClrNamespaceAndLocalName(
                         currentElement.Name,
                         out string namespaceName,
                         out string localName,
@@ -133,7 +133,7 @@ namespace OpenSilver.Compiler
                     string contentValue = directTextContent.Value;
 
                     // Get information about the element namespace and assembly
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    settings.XamlNameParser.GetClrNamespaceAndLocalName(
                         currentElement.Name,
                         out string namespaceName,
                         out string localName,
@@ -195,7 +195,7 @@ namespace OpenSilver.Compiler
 
                                 // SPECIAL CASE: If we are in a TextBlock, we want to set the
                                 // property "TextBlock.Text" instead of "TextBlock.Inlines"
-                                if (GeneratingCode.IsTextBlock(currentElement, settings.AssemblyName) || GeneratingCode.IsRun(currentElement, settings.AssemblyName))
+                                if (GeneratingCode.IsTextBlock(currentElement, settings) || GeneratingCode.IsRun(currentElement, settings))
                                 {
                                     contentPropertyName = "Text";
                                 }

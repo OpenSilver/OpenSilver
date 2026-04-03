@@ -29,14 +29,14 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
     private static readonly char[] _repeatBehaviorConverterIterationCharacter = ['x', 'X'];
 
     private readonly AssembliesInspector _inspector;
-    private readonly string _assemblyName;
     private readonly CommandConverter _commandConverter;
+    private readonly XamlNameParser _xamlNameParser;
 
     public CoreTypesConverterVB(AssembliesInspector inspector, string assemblyName)
     {
         _inspector = inspector;
-        _assemblyName = assemblyName;
         _commandConverter = new CommandConverter(_inspector, TypeReferenceHelper.VisualBasic);
+        _xamlNameParser = new XamlNameParser(assemblyName);
     }
 
     public override string ConvertFromInvariantString(string source, string destinationType)
@@ -978,7 +978,7 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
         if (index >= 0)
         {
             eventName = source.Substring(index + 1);
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+            _xamlNameParser.GetClrNamespaceAndLocalName(
                 source.Substring(0, index), GetClosestXElement(context), out namespaceName, out typeName, out assemblyName);
         }
         else
@@ -1003,7 +1003,7 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
                     continue;
                 }
 
-                if (IsStyle(element, _inspector))
+                if (IsStyle(element, _inspector, _xamlNameParser))
                 {
                     style = element;
                     break;
@@ -1014,7 +1014,7 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
             {
                 lineInfo = targetType;
 
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                _xamlNameParser.GetClrNamespaceAndLocalName(
                     targetType.Value, style, out namespaceName, out typeName, out assemblyName);
             }
             else
@@ -1030,9 +1030,9 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
 
         return $"{RuntimeHelperClass}.RoutedEventFromName(\"{eventName}\", GetType(Global.{ownerTypeString}))";
 
-        static bool IsStyle(XElement element, AssembliesInspector inspector)
+        static bool IsStyle(XElement element, AssembliesInspector inspector, XamlNameParser xamlNameParser)
         {
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name,
+            xamlNameParser.GetClrNamespaceAndLocalName(element.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
             return inspector.IsStyle(namespaceName, typeName, assemblyName, element);

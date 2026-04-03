@@ -233,7 +233,7 @@ namespace OpenSilver.Compiler
 
             public string Generate()
             {
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(_reader.Document.Root.Name,
+                _settings.XamlNameParser.GetClrNamespaceAndLocalName(_reader.Document.Root.Name,
                     out string namespaceName, out string typeName, out string assemblyName);
 
                 var context = new GeneratorContext();
@@ -394,9 +394,9 @@ namespace GlobalResource
                 {
                     // For these markup extensions, we resolve the value at compile time, so we don't need to
                     // instantiate the markup extension.
-                    if (GeneratingCode.IsNullExtension(element) ||
-                        GeneratingCode.IsStaticExtension(element) ||
-                        GeneratingCode.IsTypeExtension(element))
+                    if (GeneratingCode.IsNullExtension(element, _settings) ||
+                        GeneratingCode.IsStaticExtension(element, _settings) ||
+                        GeneratingCode.IsTypeExtension(element, _settings))
                     {
                         return true;
                     }
@@ -758,7 +758,7 @@ namespace GlobalResource
                             XName ownerTypeXName = attribute.Name.Namespace + split[0];
                             string memberName = split[1];
 
-                            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                            _settings.XamlNameParser.GetClrNamespaceAndLocalName(
                                 ownerTypeXName,
                                 out string ownerTypeNamespace,
                                 out string ownerTypeName,
@@ -834,7 +834,7 @@ namespace GlobalResource
                 int index = eventAttributeValue.IndexOf('.');
                 if (index >= 0)
                 {
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    _settings.XamlNameParser.GetClrNamespaceAndLocalName(
                         eventAttributeValue.Substring(0, index), eventSetter, out namespaceName, out typeName, out assemblyName);
                     eventName = eventAttributeValue.Substring(index + 1);
                 }
@@ -855,7 +855,7 @@ namespace GlobalResource
                     {
                         lineInfo = targetType;
 
-                        GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                        _settings.XamlNameParser.GetClrNamespaceAndLocalName(
                             targetType.Value, style, out namespaceName, out typeName, out assemblyName);
                     }
                     else
@@ -924,7 +924,7 @@ namespace GlobalResource
                 int idx = member.Name.LocalName.IndexOf('.');
 
                 string typeName = member.Name.LocalName.Substring(0, idx);
-                (string namespaceName, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                (string namespaceName, string assemblyName) = _settings.XamlNameParser.GetClrNamespaceAndAssembly(
                     member.Name.NamespaceName);
 
                 string propertyName = member.Name.LocalName.Substring(idx + 1);
@@ -957,7 +957,7 @@ namespace GlobalResource
                 int idx = element.Name.LocalName.IndexOf('.');
 
                 string typeName = element.Name.LocalName.Substring(0, idx);
-                (string namespaceName, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                (string namespaceName, string assemblyName) = _settings.XamlNameParser.GetClrNamespaceAndAssembly(
                     element.Name.NamespaceName);
 
                 string propertyName = element.Name.LocalName.Substring(idx + 1);
@@ -1168,7 +1168,7 @@ namespace GlobalResource
                                         $"global.{KnownNamespaces.SystemWindowsData}.BindingOperations.SetBinding({parentUid}, {dpFullName}, {childUid}) |> ignore");
                                 }
                             }
-                            else if (GeneratingCode.IsDynamicResourceExtension(child) || GeneratingCode.IsResponsiveExtension(child))
+                            else if (GeneratingCode.IsDynamicResourceExtension(child, _settings) || GeneratingCode.IsResponsiveExtension(child, _settings))
                             {
                                 //-----------------------------------
                                 // {DynamicResource} or {Responsive}
@@ -1273,7 +1273,7 @@ namespace GlobalResource
                                 parameters.AppendLine(
                                     $"{parentUid}.SetValue({dpName}, {RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}))");
                             }
-                            else if (GeneratingCode.IsNullExtension(child))
+                            else if (GeneratingCode.IsNullExtension(child, _settings))
                             {
                                 //------------------------------
                                 // {x:Null}
@@ -1291,7 +1291,7 @@ namespace GlobalResource
                                 }
                                 //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new global.System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
                             }
-                            else if (GeneratingCode.IsStaticExtension(child))
+                            else if (GeneratingCode.IsStaticExtension(child, _settings))
                             {
                                 string staticMemberName = ResolveStaticExtension(child);
 
@@ -1336,7 +1336,7 @@ namespace GlobalResource
                                         $"{parentUid}.{propertyName} <- ({staticMemberName} :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)}");
                                 }
                             }
-                            else if (GeneratingCode.IsTypeExtension(child))
+                            else if (GeneratingCode.IsTypeExtension(child, _settings))
                             {
                                 string resolvedTypeName = ResolveTypeExtension(child);
 
@@ -1549,7 +1549,7 @@ namespace GlobalResource
                         styleElement);
                 }
 
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(targetTypeAttribute.Value,
+                _settings.XamlNameParser.GetClrNamespaceAndLocalName(targetTypeAttribute.Value,
                     styleElement,
                     out string namespaceName,
                     out string localTypeName,
@@ -1566,7 +1566,7 @@ namespace GlobalResource
 
             private string GetCSharpFullTypeName(string typeString, XElement elementWhereTheTypeIsUsed, IXmlLineInfo lineInfo)
             {
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(typeString,
+                _settings.XamlNameParser.GetClrNamespaceAndLocalName(typeString,
                     elementWhereTheTypeIsUsed,
                     out string namespaceName,
                     out string localTypeName,
@@ -1596,12 +1596,12 @@ namespace GlobalResource
                 {
                     return element.Attribute(GeneratingCode.xNamespace + "Name").Value;
                 }
-                else if (GeneratingCode.IsStyle(element, _settings.AssemblyName))
+                else if (GeneratingCode.IsStyle(element, _settings))
                 {
                     isImplicitStyle = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element);
                 }
-                else if (GeneratingCode.IsDataTemplate(element, _settings.AssemblyName) && element.Attribute("DataType") != null)
+                else if (GeneratingCode.IsDataTemplate(element, _settings) && element.Attribute("DataType") != null)
                 {
                     isImplicitDataTemplate = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true);
@@ -2028,7 +2028,7 @@ namespace GlobalResource
                 XElement child = element.Elements().First();
 
                 return !IsTypeAssignableFrom(child, element, isAttachedProperty) &&
-                    !GeneratingCode.IsBinding(child, _settings.AssemblyName) &&
+                    !GeneratingCode.IsBinding(child, _settings) &&
                     child.Name.LocalName != "StaticResource" &&
                     child.Name.LocalName != "StaticResourceExtension" &&
                     child.Name.LocalName != "TemplateBinding" &&
@@ -2084,8 +2084,8 @@ namespace GlobalResource
                     to, isAttached);
             }
 
-            private static void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
-                => GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+            private void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
+                => _settings.XamlNameParser.GetClrNamespaceAndLocalName(
                     xName,
                     out namespaceName,
                     out localName,
@@ -2099,7 +2099,7 @@ namespace GlobalResource
                 out string typeName,
                 out string assemblyName)
             {
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                _settings.XamlNameParser.GetClrNamespaceAndLocalName(
                     xName,
                     out namespaceName,
                     out typeName,
@@ -2218,7 +2218,7 @@ namespace GlobalResource
             {
                 Debug.Assert(value is not null);
 
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                _settings.XamlNameParser.GetClrNamespaceAndLocalName(
                     value, element, out string namespaceName, out string typeName, out string assemblyName);
 
                 return _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);

@@ -46,7 +46,7 @@ internal static class ProcessingContentPresenterNodes
     {
         if (!XamlParser.IsMemberNode(element))
         {
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name,
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(element.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
             if (settings.Inspector.IsControlTemplate(namespaceName, typeName, assemblyName, element))
@@ -55,9 +55,9 @@ internal static class ProcessingContentPresenterNodes
             }
             else if (isInsideControlTemplate && settings.Inspector.IsContentPresenter(namespaceName, typeName, assemblyName, element))
             {
-                bool hasContentAttribute = HasAttribute(element, "Content", settings.Inspector);
-                bool hasContentTemplateAttribute = HasAttribute(element, "ContentTemplate", settings.Inspector);
-                bool hasContentTemplateSelectorAttribute = HasAttribute(element, "ContentTemplateSelector", settings.Inspector);
+                bool hasContentAttribute = HasAttribute(element, "Content", settings);
+                bool hasContentTemplateAttribute = HasAttribute(element, "ContentTemplate", settings);
+                bool hasContentTemplateSelectorAttribute = HasAttribute(element, "ContentTemplateSelector", settings);
 
                 if (!hasContentAttribute || (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute))
                 {
@@ -116,14 +116,14 @@ internal static class ProcessingContentPresenterNodes
                     throw new XamlParseException($"'{prefix}' is an undeclared prefix.", targetType);
                 }
 
-                (namespaceName, assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                (namespaceName, assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
                     xmlns.NamespaceName);
 
                 typeName = targetType.Value.Substring(index + 1);
             }
             else
             {
-                (namespaceName, assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                (namespaceName, assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
                     element.GetDefaultNamespace().NamespaceName);
 
                 typeName = targetType.Value;
@@ -135,14 +135,14 @@ internal static class ProcessingContentPresenterNodes
         return false;
     }
 
-    private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector inspector)
+    private static bool HasAttribute(XElement cp, string attributeName, ConversionSettings settings)
     {
         bool found = cp.Attribute(attributeName) != null;
         if (!found)
         {
             foreach (var child in cp.Elements())
             {
-                (string namespaceName, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                (string namespaceName, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
                     child.Name.NamespaceName);
 
                 string[] typeAndProperty = child.Name.LocalName.Split('.');
@@ -153,7 +153,7 @@ internal static class ProcessingContentPresenterNodes
                     if (typeAndProperty[1].Trim() == attributeName)
                     {
                         // Then make sure this is not an attached property.
-                        bool isProperty = inspector.IsContentPresenter(namespaceName, typeAndProperty[0], assemblyName, child);
+                        bool isProperty = settings.Inspector.IsContentPresenter(namespaceName, typeAndProperty[0], assemblyName, child);
 
                         if (isProperty)
                         {

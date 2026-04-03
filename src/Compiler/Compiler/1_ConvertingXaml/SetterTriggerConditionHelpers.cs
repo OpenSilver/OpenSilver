@@ -34,7 +34,7 @@ internal static class SetterTriggerConditionHelpers
             string typeString = property.Value.Substring(0, index);
             string propertyName = property.Value.Substring(index + 1);
 
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(
                 typeString,
                 element,
                 out string namespaceName,
@@ -56,7 +56,7 @@ internal static class SetterTriggerConditionHelpers
                         targetNameAttr);
                 }
 
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                settings.XamlNameParser.GetClrNamespaceAndLocalName(
                     targetElement.Name,
                     out string namespaceName,
                     out string typeName,
@@ -73,7 +73,7 @@ internal static class SetterTriggerConditionHelpers
                         continue;
                     }
 
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    settings.XamlNameParser.GetClrNamespaceAndLocalName(
                         parent.Name,
                         out string namespaceName,
                         out string typeName,
@@ -116,7 +116,7 @@ internal static class SetterTriggerConditionHelpers
                 continue;
             }
 
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(parent.Name,
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(parent.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
             if (settings.Inspector.IsStyle(namespaceName, typeName, assemblyName, parent))
@@ -152,7 +152,7 @@ internal static class SetterTriggerConditionHelpers
             int idx = element.Name.LocalName.IndexOf('.');
 
             string typeName = element.Name.LocalName.Substring(0, idx);
-            (string namespaceName, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+            (string namespaceName, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
                 element.Name.NamespaceName);
 
             string propertyName = element.Name.LocalName.Substring(idx + 1);
@@ -175,7 +175,7 @@ internal static class SetterTriggerConditionHelpers
 
         if (!XamlParser.IsMemberNode(element))
         {
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name,
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(element.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
             // Skips types that create a new scope
@@ -220,7 +220,7 @@ internal static class SetterTriggerConditionHelpers
         {
             lineInfo = targetType;
 
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(
                 targetType.Value, style, out namespaceName, out typeName, out assemblyName);
         }
         else
@@ -244,7 +244,7 @@ internal static class SetterTriggerConditionHelpers
         {
             lineInfo = targetType;
 
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(
                 targetType.Value, template, out namespaceName, out typeName, out assemblyName);
         }
         else

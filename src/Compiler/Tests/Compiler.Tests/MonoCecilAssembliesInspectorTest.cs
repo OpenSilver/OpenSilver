@@ -33,7 +33,7 @@ namespace Compiler.Tests
         private const string ExperimentalNamespace = "Experimental";
         private const string Content = "Content";
 
-        private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(SupportedLanguage.CSharp);
+        private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(ExperimentalSubjectName, SupportedLanguage.CSharp);
         private static readonly DefaultAssemblyResolver DefaultResolver = new();
 
         [ClassInitialize]

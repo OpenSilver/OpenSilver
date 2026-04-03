@@ -27,31 +27,31 @@ internal static class ProcessTypeExtensionAttributes
     {
         if (!XamlParser.IsMemberNode(element))
         {
-            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
-            element.Name,
-            out string namespaceName,
-            out string typeName,
-            out string assemblyName);
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(
+                element.Name,
+                out string namespaceName,
+                out string typeName,
+                out string assemblyName);
 
             if (settings.Inspector.IsStyle(namespaceName, typeName, assemblyName, element))
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(element, targetType);
+                    ResolveTypeExtensionAttribute(element, targetType, settings);
                 }
             }
             else if (settings.Inspector.IsControlTemplate(namespaceName, typeName, assemblyName, element))
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(element, targetType);
+                    ResolveTypeExtensionAttribute(element, targetType, settings);
                 }
             }
             else if (settings.Inspector.IsDataTemplate(namespaceName, typeName, assemblyName, element))
             {
                 if (element.Attribute("DataType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(element, targetType);
+                    ResolveTypeExtensionAttribute(element, targetType, settings);
                 }
             }
         }
@@ -62,7 +62,7 @@ internal static class ProcessTypeExtensionAttributes
         }
     }
 
-    private static void ResolveTypeExtensionAttribute(XElement element, XAttribute attribute)
+    private static void ResolveTypeExtensionAttribute(XElement element, XAttribute attribute, ConversionSettings settings)
     {
         string value = attribute.Value;
 
@@ -81,13 +81,13 @@ internal static class ProcessTypeExtensionAttributes
 
         ReadOnlySpan<char> markupExtensionName = content.Slice(0, separatorIndex);
 
-        if (IsTypeExtension(markupExtensionName, element))
+        if (IsTypeExtension(markupExtensionName, element, settings))
         {
             attribute.Value = content.Slice(separatorIndex + 1).Trim().ToString();
         }
     }
 
-    private static bool IsTypeExtension(ReadOnlySpan<char> span, XElement element)
+    private static bool IsTypeExtension(ReadOnlySpan<char> span, XElement element, ConversionSettings settings)
     {
         XName xname = null;
 
@@ -115,7 +115,7 @@ internal static class ProcessTypeExtensionAttributes
             }
         }
 
-        return xname is not null && GeneratingCode.IsTypeExtension(xname);
+        return xname is not null && GeneratingCode.IsTypeExtension(xname, settings);
     }
 
     private static int IndexOfWhiteSpace(ReadOnlySpan<char> span)

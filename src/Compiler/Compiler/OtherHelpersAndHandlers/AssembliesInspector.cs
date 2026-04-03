@@ -25,9 +25,9 @@ namespace OpenSilver.Compiler
     {
         private readonly MonoCecilAssembliesInspectorImpl _monoCecilVersion;
 
-        public AssembliesInspector(SupportedLanguage compilerType)
+        public AssembliesInspector(string assemblyName, SupportedLanguage compilerType)
         {
-            _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(compilerType);
+            _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(assemblyName, compilerType);
         }
 
         public void Dispose() => _monoCecilVersion.Dispose();

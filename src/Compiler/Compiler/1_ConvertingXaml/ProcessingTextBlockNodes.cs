@@ -43,13 +43,13 @@ namespace OpenSilver.Compiler
         {
             if (currentNode is XText)
             {
-                if ((GeneratingCode.IsTextBlock(parentElement, settings.AssemblyName) && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
-                    || GeneratingCode.IsSpan(parentElement, settings.AssemblyName)
-                    || GeneratingCode.IsItalic(parentElement, settings.AssemblyName)
-                    || GeneratingCode.IsUnderline(parentElement, settings.AssemblyName)
-                    || GeneratingCode.IsBold(parentElement, settings.AssemblyName)
-                    || GeneratingCode.IsHyperlink(parentElement, settings.AssemblyName)
-                    || GeneratingCode.IsParagraph(parentElement, settings.AssemblyName))
+                if ((GeneratingCode.IsTextBlock(parentElement, settings) && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
+                    || GeneratingCode.IsSpan(parentElement, settings)
+                    || GeneratingCode.IsItalic(parentElement, settings)
+                    || GeneratingCode.IsUnderline(parentElement, settings)
+                    || GeneratingCode.IsBold(parentElement, settings)
+                    || GeneratingCode.IsHyperlink(parentElement, settings)
+                    || GeneratingCode.IsParagraph(parentElement, settings))
                 {
                     // Surround with a <Run>:
                     var contentWrapper = new ExtendedXElement(XName.Get("Run", GeneratingCode.DefaultXamlNamespace));
