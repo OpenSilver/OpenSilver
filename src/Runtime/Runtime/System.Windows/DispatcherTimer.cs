@@ -33,6 +33,44 @@ namespace System.Windows.Threading
         public DispatcherTimer() { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DispatcherTimer"/> class
+        /// which processes timer events at the specified priority.
+        /// </summary>
+        /// <param name="priority">The priority at which to invoke the timer.</param>
+        [NotImplemented]
+        public DispatcherTimer(DispatcherPriority priority)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DispatcherTimer"/> class
+        /// which runs on the specified <see cref="Dispatcher"/> at the specified priority.
+        /// </summary>
+        /// <param name="priority">The priority at which to invoke the timer.</param>
+        /// <param name="dispatcher">The dispatcher the timer is associated with.</param>
+        [NotImplemented]
+        public DispatcherTimer(DispatcherPriority priority, Dispatcher dispatcher)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DispatcherTimer"/> class
+        /// which uses the specified time interval, priority, event handler, and <see cref="Dispatcher"/>.
+        /// </summary>
+        /// <param name="interval">The period of time between ticks.</param>
+        /// <param name="priority">The priority at which to invoke the timer.</param>
+        /// <param name="callback">The event handler to call when the <see cref="Tick"/> event occurs.</param>
+        /// <param name="dispatcher">The dispatcher the timer is associated with.</param>
+        [NotImplemented]
+        public DispatcherTimer(TimeSpan interval, DispatcherPriority priority, EventHandler callback, Dispatcher dispatcher)
+        {
+            Interval = interval;
+
+            Tick += callback;
+            Start();
+        }
+
+        /// <summary>
         /// Gets or sets the amount of time between timer ticks.
         /// </summary>
         /// <returns>

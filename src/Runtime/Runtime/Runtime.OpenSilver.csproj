@@ -133,6 +133,8 @@
     <Compile Include="System.Windows.Documents\List.cs" />
     <Compile Include="System.Windows.Documents\ListItem.cs" />
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\DrawingContext.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\FormattedText.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
     <Compile Include="System.Windows\TextMarkerStyle.cs" />
     <Compile Include="System.Windows.Input\GestureEventArgs.cs" />

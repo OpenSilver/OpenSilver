@@ -1109,6 +1109,9 @@ namespace System.Windows
                 typeof(TextCompositionEventHandler),
                 typeof(UIElement));
 
+        [NotImplemented]
+        protected virtual void OnPreviewTextInput(TextCompositionEventArgs e) { }
+
         /// <summary>
         /// Occurs when a UI element gets text in a device-independent manner.
         /// </summary>

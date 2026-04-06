@@ -370,6 +370,27 @@ namespace System.Windows
             uie.FocusableChanged?.Invoke(uie, e);
         }
 
+        [NotImplemented]
+        internal static readonly DependencyPropertyKey IsKeyboardFocusedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsKeyboardFocused),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Identifies the <see cref="IsKeyboardFocused"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsKeyboardFocusedProperty = IsKeyboardFocusedPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value indicating whether this element has keyboard focus. This is a dependency property.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if this element has keyboard focus; otherwise, <see langword="false"/>. The default is <see langword="false"/>.
+        /// </value>
+        public bool IsKeyboardFocused => Keyboard.FocusedElement == this;
+
         #region ClipToBounds
 
         /// <summary>
