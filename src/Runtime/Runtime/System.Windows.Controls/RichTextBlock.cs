@@ -471,6 +471,11 @@ namespace System.Windows.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (ParentWindow is null)
+            {
+                return new Size(0, 0);
+            }
+
             Thickness padding = Padding;
             double paddingWidth = padding.Left + padding.Right;
             double paddingHeight = padding.Top + padding.Bottom;

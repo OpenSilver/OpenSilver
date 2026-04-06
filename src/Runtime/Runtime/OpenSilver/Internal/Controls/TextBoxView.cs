@@ -17,6 +17,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -285,11 +286,42 @@ internal sealed class TextBoxView : TextViewBase
 
     protected sealed override Size MeasureContent(Size constraint)
     {
-        return ParentWindow.TextMeasurementService.MeasureView(
-            OuterDiv.Uid,
-            Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
-            Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
-            constraint.Width,
+        string whiteSpace = Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
+        string overflowWrap = Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word";
+
+        if (ParentWindow is not null)
+        {
+            return ParentWindow.TextMeasurementService.MeasureView(
+                OuterDiv.Uid,
+                whiteSpace,
+                overflowWrap,
+                constraint.Width,
+                "M");
+        }
+
+        return MeasureContentWithoutDom(constraint.Width, whiteSpace, overflowWrap);
+    }
+
+    private Size MeasureContentWithoutDom(double maxWidth, string whiteSpace, string overflowWrap)
+    {
+        if (Application.Current is not Application app
+            || app.MainWindow?.TextMeasurementService is not TextMeasurementService service)
+        {
+            return new Size(0, 0);
+        }
+
+        TextBox host = Host;
+        return service.MeasureTextContent(
+            host.Text ?? string.Empty,
+            FontProperties.ToCssPxFontSize(host.FontSize),
+            FontProperties.ToCssFontFamily(host.FontFamily),
+            FontProperties.ToCssFontWeight(host.FontWeight),
+            FontProperties.ToCssFontStyle(host.FontStyle),
+            FontProperties.ToCssLetterSpacing(host.CharacterSpacing),
+            FontProperties.ToCssLineHeight(Block.GetLineHeight(this)),
+            whiteSpace,
+            overflowWrap,
+            maxWidth,
             "M");
     }
 }

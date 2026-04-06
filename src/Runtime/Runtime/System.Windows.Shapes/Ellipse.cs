@@ -118,6 +118,8 @@ namespace System.Windows.Shapes
 
         private void ArrangeNative(double rx, double ry, double penThickness)
         {
+            if (!SvgElement.IsConnected) return;
+
             rx = Math.Round(rx, 2);
             ry = Math.Round(ry, 2);
             penThickness = Math.Round(penThickness, 2);

@@ -780,13 +780,13 @@ namespace System.Windows.Shapes
 
         internal void SetSvgAttribute(string attribute, string value)
         {
-            Debug.Assert(SvgElement.IsConnected);
+            if (!SvgElement.IsConnected) return;
             SvgElement.SetAttribute(attribute, value);
         }
 
         internal void RemoveSvgAttribute(string attribute)
         {
-            Debug.Assert(SvgElement.IsConnected);
+            if (!SvgElement.IsConnected) return;
             SvgElement.RemoveAttribute(attribute);
         }
 

@@ -1082,6 +1082,27 @@ Object.defineProperty(window, 'osjs', {
 
                                 return size;
                             },
+                            measureTextContent: function (text, fontSize, fontFamily, fontWeight, fontStyle, letterSpacing, lineHeight, whiteSpace, overflowWrap, maxWidth, emptyVal) {
+                                if (text.endsWith('\n')) text += '\n';
+                                htmlMeasurer.textContent = text.length === 0 ? emptyVal : text;
+                                htmlMeasurer.style.fontSize = fontSize;
+                                htmlMeasurer.style.fontWeight = fontWeight;
+                                htmlMeasurer.style.fontFamily = fontFamily;
+                                htmlMeasurer.style.fontStyle = fontStyle;
+                                htmlMeasurer.style.letterSpacing = letterSpacing;
+                                htmlMeasurer.style.lineHeight = lineHeight;
+                                htmlMeasurer.style.setProperty('--line-stacking-strategy', '');
+                                htmlMeasurer.style.whiteSpace = whiteSpace;
+                                htmlMeasurer.style.overflowWrap = overflowWrap;
+                                htmlMeasurer.style.maxWidth = maxWidth;
+
+                                const rect = htmlMeasurer.getBoundingClientRect();
+                                const size = Math.ceil(rect.width) + '|' + Math.ceil(rect.height);
+
+                                htmlMeasurer.textContent = '';
+
+                                return size;
+                            },
                             measureBaseline: function (fonts) {
                                 let baselineOffset = 0.0;
                                 for (const font of fonts) {
@@ -1110,6 +1131,13 @@ Object.defineProperty(window, 'osjs', {
                     if (element) {
                         return owner._measurementService.measureTextView(element, whiteSpace, overflowWrap, maxWidth, emptyVal);
                     }
+                }
+                return '0|0';
+            },
+            measureTextContent: function (measurerId, text, fontSize, fontFamily, fontWeight, fontStyle, letterSpacing, lineHeight, whiteSpace, overflowWrap, maxWidth, emptyVal) {
+                const owner = document.getElementById(measurerId);
+                if (owner && owner._measurementService) {
+                    return owner._measurementService.measureTextContent(text, fontSize, fontFamily, fontWeight, fontStyle, letterSpacing, lineHeight, whiteSpace, overflowWrap, maxWidth, emptyVal);
                 }
                 return '0|0';
             },
