@@ -100,6 +100,11 @@ namespace OpenSilver.Compiler
                     return "double.NegativeInfinity";
             }
 
+            if (TryConvertLengthWithUnit(value, out double convertedLength))
+            {
+                return $"{convertedLength.ToString("R", CultureInfo.InvariantCulture)}D";
+            }
+
             if (value.EndsWith("d"))
             {
                 value = value.Substring(0, value.Length - 1);
@@ -135,6 +140,11 @@ namespace OpenSilver.Compiler
 
                 case "-infinity":
                     return "float.NegativeInfinity";                    
+            }
+
+            if (TryConvertLengthWithUnit(value, out double convertedLength))
+            {
+                return $"{convertedLength.ToString("R", CultureInfo.InvariantCulture)}F";
             }
 
             if (value.EndsWith("f"))
@@ -326,6 +336,33 @@ namespace OpenSilver.Compiler
             }
 
             return Escape(source);
+        }
+
+        private static bool TryConvertLengthWithUnit(string value, out double convertedValue)
+        {
+            const double PixelsPerInch = 96D;
+
+            convertedValue = default;
+
+            double multiplier = value.EndsWith("px", StringComparison.Ordinal) ? 1D
+                : value.EndsWith("in", StringComparison.Ordinal) ? PixelsPerInch
+                : value.EndsWith("cm", StringComparison.Ordinal) ? PixelsPerInch / 2.54D
+                : value.EndsWith("pt", StringComparison.Ordinal) ? PixelsPerInch / 72D
+                : double.NaN;
+
+            if (double.IsNaN(multiplier))
+            {
+                return false;
+            }
+
+            string numericPortion = value.Substring(0, value.Length - 2);
+            if (!double.TryParse(numericPortion, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed))
+            {
+                return false;
+            }
+
+            convertedValue = parsed * multiplier;
+            return true;
         }
 
         private static string Escape(string s) => string.Concat("@\"", s.Replace("\"", "\"\""), "\"");

@@ -26,6 +26,24 @@ namespace System.Windows.Media
         public ArcSegment() { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ArcSegment"/> class with the specified values.
+        /// </summary>
+        /// <param name="point">The endpoint of the arc.</param>
+        /// <param name="size">The x- and y-radius of the arc.</param>
+        /// <param name="rotationAngle">The rotation of the ellipse in degrees.</param>
+        /// <param name="isLargeArc">Whether the arc should be greater than 180 degrees.</param>
+        /// <param name="sweepDirection">The direction in which the arc is drawn.</param>
+        /// <param name="isStroked">Ignored in OpenSilver; retained for WPF constructor compatibility.</param>
+        public ArcSegment(Point point, Size size, double rotationAngle, bool isLargeArc, SweepDirection sweepDirection, bool isStroked)
+        {
+            Point = point;
+            Size = size;
+            RotationAngle = rotationAngle;
+            IsLargeArc = isLargeArc;
+            SweepDirection = sweepDirection;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="IsLargeArc"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsLargeArcProperty =

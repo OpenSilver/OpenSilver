@@ -106,7 +106,7 @@ namespace System.Windows.Media
                 nameof(RadiusX),
                 typeof(double),
                 typeof(RectangleGeometry),
-                new PropertyMetadata(0.0));
+                new PropertyMetadata(0.0, OnPathChanged));
 
         /// <summary>
         /// Gets or sets the x-radius of the ellipse that is used to round the corners of
@@ -132,7 +132,7 @@ namespace System.Windows.Media
                 nameof(RadiusY),
                 typeof(double),
                 typeof(RectangleGeometry),
-                new PropertyMetadata(0.0));
+                new PropertyMetadata(0.0, OnPathChanged));
 
         /// <summary>
         /// Gets or sets the y-radius of the ellipse that is used to round the corners of
@@ -178,13 +178,47 @@ namespace System.Windows.Media
         internal override string ToPathData(IFormatProvider formatProvider)
         {
             var rect = Rect;
+            if (rect.IsEmpty)
+            {
+                return string.Empty;
+            }
 
-            var left = rect.Left.ToString(formatProvider);
-            var top = rect.Top.ToString(formatProvider);
-            var right = rect.Right.ToString(formatProvider);
-            var bottom = rect.Bottom.ToString(formatProvider);
+            double radiusX = Math.Max(0, Math.Abs(RadiusX));
+            double radiusY = Math.Max(0, Math.Abs(RadiusY));
 
-            return $"M{left},{top} L{right},{top} {right},{bottom} {left},{bottom} Z";
+            if (radiusX == 0 || radiusY == 0)
+            {
+                var left = rect.Left.ToString(formatProvider);
+                var top = rect.Top.ToString(formatProvider);
+                var right = rect.Right.ToString(formatProvider);
+                var bottom = rect.Bottom.ToString(formatProvider);
+
+                return $"M{left},{top} L{right},{top} {right},{bottom} {left},{bottom} Z";
+            }
+
+            radiusX = Math.Min(radiusX, rect.Width / 2);
+            radiusY = Math.Min(radiusY, rect.Height / 2);
+
+            string leftValue = rect.Left.ToString(formatProvider);
+            string topValue = rect.Top.ToString(formatProvider);
+            string rightValue = rect.Right.ToString(formatProvider);
+            string bottomValue = rect.Bottom.ToString(formatProvider);
+            string radiusXValue = radiusX.ToString(formatProvider);
+            string radiusYValue = radiusY.ToString(formatProvider);
+            string leftPlusRadiusX = (rect.Left + radiusX).ToString(formatProvider);
+            string rightMinusRadiusX = (rect.Right - radiusX).ToString(formatProvider);
+            string topPlusRadiusY = (rect.Top + radiusY).ToString(formatProvider);
+            string bottomMinusRadiusY = (rect.Bottom - radiusY).ToString(formatProvider);
+
+            return $"M{leftPlusRadiusX},{topValue} " +
+                   $"L{rightMinusRadiusX},{topValue} " +
+                   $"A{radiusXValue},{radiusYValue} 0 0 1 {rightValue},{topPlusRadiusY} " +
+                   $"L{rightValue},{bottomMinusRadiusY} " +
+                   $"A{radiusXValue},{radiusYValue} 0 0 1 {rightMinusRadiusX},{bottomValue} " +
+                   $"L{leftPlusRadiusX},{bottomValue} " +
+                   $"A{radiusXValue},{radiusYValue} 0 0 1 {leftValue},{bottomMinusRadiusY} " +
+                   $"L{leftValue},{topPlusRadiusY} " +
+                   $"A{radiusXValue},{radiusYValue} 0 0 1 {leftPlusRadiusX},{topValue} Z";
         }
     }
 }

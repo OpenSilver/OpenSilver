@@ -30,6 +30,8 @@ namespace System.Windows;
 /// </summary>
 public class Window : ContentControl, IResizeObserverListener
 {
+    private bool _contentRenderedRaised;
+
     static Window()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
@@ -108,6 +110,7 @@ public class Window : ContentControl, IResizeObserverListener
         RaiseLoadedEvent();
 
         SetLayoutSize();
+        RaiseContentRendered();
     }
 
     private static void OnGotFocus(object sender, RoutedEventArgs e) => Current = (Window)sender;
@@ -119,12 +122,12 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Occurs when the window has rendered or changed its rendering size.
     /// </summary>
-    public new event WindowSizeChangedEventHandler SizeChanged;
+    public new event SizeChangedEventHandler SizeChanged;
 
     private void OnWindowSizeChanged(Size size)
     {
         InvalidateMeasure();
-        SizeChanged?.Invoke(this, new WindowSizeChangedEventArgs(size));
+        SizeChanged?.Invoke(this, new SizeChangedEventArgs(size));
     }
 
     /// <summary>
@@ -146,6 +149,24 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     #endregion
+
+    /// <summary>
+    /// Occurs after the window content has been rendered.
+    /// </summary>
+    public event EventHandler ContentRendered;
+
+    protected virtual void OnContentRendered(EventArgs e) => ContentRendered?.Invoke(this, e);
+
+    private void RaiseContentRendered()
+    {
+        if (_contentRenderedRaised)
+        {
+            return;
+        }
+
+        _contentRenderedRaised = true;
+        OnContentRendered(EventArgs.Empty);
+    }
 
     /// <summary>
     /// Identifies the <see cref="Content"/> dependency property.

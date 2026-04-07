@@ -157,20 +157,21 @@ namespace System.Windows.Media
         {
             get
             {
-                // Note: Transform is not supported. This will only be valid
-                // if Transform is null or is the Identity transform.
-
-                Rect boundsRect;
-
                 Point currentCenter = Center;
                 double currentRadiusX = RadiusX;
                 double currentRadiusY = RadiusY;
 
-                boundsRect = new Rect(
+                Rect boundsRect = new Rect(
                     currentCenter.X - Math.Abs(currentRadiusX),
                     currentCenter.Y - Math.Abs(currentRadiusY),
                     2.0 * Math.Abs(currentRadiusX),
                     2.0 * Math.Abs(currentRadiusY));
+
+                Transform transform = Transform;
+                if (transform is not null && !Transform.IsIdentityTransform(transform))
+                {
+                    boundsRect = transform.TransformBounds(boundsRect);
+                }
 
                 return boundsRect;
             }
@@ -180,10 +181,46 @@ namespace System.Windows.Media
         {
             var cx = Center.X;
             var cy = Center.Y;
-            var rx = RadiusX;
-            var ry = RadiusY;
+            var rx = Math.Abs(RadiusX);
+            var ry = Math.Abs(RadiusY);
 
-            return $"M{cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy + ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} Z";
+            if (rx == 0 || ry == 0)
+            {
+                return string.Empty;
+            }
+
+            Transform transform = Transform;
+            if (transform is null || Transform.IsIdentityTransform(transform))
+            {
+                return $"M{cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy + ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} Z";
+            }
+
+            // Use four cubic Beziers so any affine transform on the ellipse is preserved in the emitted path data.
+            const double kappa = 0.5522847498307936;
+            double cpx = rx * kappa;
+            double cpy = ry * kappa;
+
+            Point TransformPoint(double x, double y) => transform.Transform(new Point(x, y));
+            string FormatPoint(Point p) => $"{p.X.ToString(formatProvider)},{p.Y.ToString(formatProvider)}";
+
+            Point top = TransformPoint(cx, cy - ry);
+            Point topRightControl1 = TransformPoint(cx + cpx, cy - ry);
+            Point topRightControl2 = TransformPoint(cx + rx, cy - cpy);
+            Point right = TransformPoint(cx + rx, cy);
+            Point bottomRightControl1 = TransformPoint(cx + rx, cy + cpy);
+            Point bottomRightControl2 = TransformPoint(cx + cpx, cy + ry);
+            Point bottom = TransformPoint(cx, cy + ry);
+            Point bottomLeftControl1 = TransformPoint(cx - cpx, cy + ry);
+            Point bottomLeftControl2 = TransformPoint(cx - rx, cy + cpy);
+            Point left = TransformPoint(cx - rx, cy);
+            Point topLeftControl1 = TransformPoint(cx - rx, cy - cpy);
+            Point topLeftControl2 = TransformPoint(cx - cpx, cy - ry);
+
+            return $"M{FormatPoint(top)} " +
+                   $"C{FormatPoint(topRightControl1)} {FormatPoint(topRightControl2)} {FormatPoint(right)} " +
+                   $"C{FormatPoint(bottomRightControl1)} {FormatPoint(bottomRightControl2)} {FormatPoint(bottom)} " +
+                   $"C{FormatPoint(bottomLeftControl1)} {FormatPoint(bottomLeftControl2)} {FormatPoint(left)} " +
+                   $"C{FormatPoint(topLeftControl1)} {FormatPoint(topLeftControl2)} {FormatPoint(top)} Z";
         }
     }
 }

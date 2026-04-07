@@ -26,6 +26,20 @@ namespace System.Windows.Media
         public BezierSegment() { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="BezierSegment"/> class with the specified control points and end point.
+        /// </summary>
+        /// <param name="point1">The first control point of the curve.</param>
+        /// <param name="point2">The second control point of the curve.</param>
+        /// <param name="point3">The end point of the curve.</param>
+        /// <param name="isStroked">Ignored in OpenSilver; retained for WPF constructor compatibility.</param>
+        public BezierSegment(Point point1, Point point2, Point point3, bool isStroked)
+        {
+            Point1 = point1;
+            Point2 = point2;
+            Point3 = point3;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="Point1"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty Point1Property =
