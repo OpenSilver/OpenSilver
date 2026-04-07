@@ -21,6 +21,7 @@ using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Xml.Linq;
 
@@ -48,6 +49,7 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
     [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
     [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
+    [ContentProperty(nameof(Text))]
     public class TextBox : Control
     {
         private const string ContentElementName = "ContentElement"; // SL
