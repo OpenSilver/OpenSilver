@@ -98,7 +98,7 @@ internal sealed class TextMeasurementService
 
         static string GetWidthConstraint(TextBlock tb)
         {
-            if (tb.TextWrapping == TextWrapping.Wrap)
+            if (tb.TextWrapping is TextWrapping.Wrap or TextWrapping.WrapWithOverflow)
             {
                 double width = tb.Width;
                 if (!double.IsNaN(width))

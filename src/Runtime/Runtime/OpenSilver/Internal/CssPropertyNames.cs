@@ -52,6 +52,7 @@ internal static class CssPropertyNames
     public const string PointerEvents = "pointer-events";
     public const string TextAlign = "text-align";
     public const string TextDecoration = "text-decoration";
+    public const string TextOverflow = "text-overflow";
     public const string TextShadow = "text-shadow";
     public const string Transform = "transform";
     public const string TransformOrigin = "transform-origin";

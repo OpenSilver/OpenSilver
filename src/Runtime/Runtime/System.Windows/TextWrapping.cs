@@ -11,25 +11,31 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Specifies whether text wraps when it reaches the edge of its container.
+/// </summary>
+public enum TextWrapping
 {
     /// <summary>
-    /// Specifies whether text wraps when it reaches the edge of its container.
+    /// Line-breaking occurs if the line overflows beyond the available block width.
+    /// However, a line may overflow beyond the block width if the line breaking algorithm
+    /// cannot determine a line break opportunity, as in the case of a very long word
+    /// constrained in a fixed-width container with no scrolling allowed.
     /// </summary>
-    public enum TextWrapping
-    {
-        /// <summary>
-        /// No line wrapping is performed.
-        /// </summary>
-        NoWrap = 1,
-             
-        /// <summary>
-        /// Line breaking occurs if a line of text overflows beyond the available width
-        /// of its container. Line breaking occurs even if the standard line-breaking
-        /// algorithm cannot determine any line break opportunity, such as when a line
-        /// of text includes a long word that is constrained by a fixed-width container
-        /// without scrolling.
-        /// </summary>
-        Wrap = 2,
-    }
+    WrapWithOverflow = 0,
+
+    /// <summary>
+    /// No line wrapping is performed.
+    /// </summary>
+    NoWrap = 1,
+
+    /// <summary>
+    /// Line-breaking occurs if the line overflows beyond the available block width,
+    /// even if the standard line breaking algorithm cannot determine any line break
+    /// opportunity, as in the case of a very long word constrained in a fixed-width
+    /// container with no scrolling allowed.
+    /// </summary>
+    Wrap = 2,
 }

@@ -1019,17 +1019,22 @@ namespace System.Windows.Controls
                 return new Size(paddingWidth, paddingHeight);
             }
 
+            TextWrapping textWrapping = TextWrapping;
+            string whiteSpace, overflowWrap;
+
             if (_noWrapSize.IsEmpty)
             {
+                (whiteSpace, overflowWrap) = UIElementHelpers.ToCssTextWrapping(TextWrapping.NoWrap);
+
                 _noWrapSize = ParentWindow.TextMeasurementService.MeasureView(
                     OuterDiv.Uid,
-                    "pre",
-                    string.Empty,
+                    whiteSpace,
+                    overflowWrap,
                     double.PositiveInfinity,
                     string.Empty);
             }
 
-            if (TextWrapping == TextWrapping.NoWrap || (_noWrapSize.Width + paddingWidth) <= availableSize.Width)
+            if (textWrapping == TextWrapping.NoWrap || (_noWrapSize.Width + paddingWidth) <= availableSize.Width)
             {
                 var desiredSize = new Size(_noWrapSize.Width + paddingWidth, _noWrapSize.Height + paddingHeight);
 
@@ -1044,10 +1049,12 @@ namespace System.Windows.Controls
                 return desiredSize;
             }
 
+            (whiteSpace, overflowWrap) = UIElementHelpers.ToCssTextWrapping(textWrapping);
+
             Size textSize = ParentWindow.TextMeasurementService.MeasureView(
                 OuterDiv.Uid,
-                "pre-wrap",
-                "break-word",
+                whiteSpace,
+                overflowWrap,
                 Math.Max(0, availableSize.Width - paddingWidth),
                 string.Empty);
 

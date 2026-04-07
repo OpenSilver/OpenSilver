@@ -151,9 +151,9 @@ internal static class UIElementHelpers
 
     internal static void SetTextTrimming(this UIElement uie, TextTrimming textTrimming)
     {
-        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Overflow, textTrimming switch
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextOverflow, textTrimming switch
         {
-            TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "clip",
+            TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "ellipsis",
             _ => string.Empty,
         });
     }
@@ -169,6 +169,7 @@ internal static class UIElementHelpers
         textWrapping switch
         {
             TextWrapping.Wrap => ("pre-wrap", "break-word"),
+            TextWrapping.WrapWithOverflow => ("pre-wrap", "normal"),
             _ => ("pre", string.Empty),
         };
 

@@ -474,13 +474,15 @@ namespace System.Windows.Controls
             Thickness padding = Padding;
             double paddingWidth = padding.Left + padding.Right;
             double paddingHeight = padding.Top + padding.Bottom;
-            bool wrap = TextWrapping == TextWrapping.Wrap;
+            TextWrapping textWrapping = TextWrapping;
+            (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(textWrapping);
+            double maxWidth = textWrapping == TextWrapping.NoWrap ? double.PositiveInfinity : Math.Max(0, availableSize.Width - paddingWidth);
 
             Size textSize = ParentWindow.TextMeasurementService.MeasureView(
                 OuterDiv.Uid,
-                wrap ? "pre-wrap" : "pre",
-                wrap ? "break-word" : string.Empty,
-                wrap ? Math.Max(0, availableSize.Width - paddingWidth) : double.PositiveInfinity,
+                whiteSpace,
+                overflowWrap,
+                maxWidth,
                 string.Empty);
 
             return new Size(textSize.Width + paddingWidth, textSize.Height + paddingHeight);

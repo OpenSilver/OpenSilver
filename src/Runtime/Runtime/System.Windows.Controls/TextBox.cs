@@ -401,7 +401,7 @@ namespace System.Windows.Controls
         private static object CoerceHorizontalScrollBarVisibility(DependencyObject d, object baseValue)
         {
             var tb = (TextBox)d;
-            if (tb.TextWrapping == TextWrapping.Wrap)
+            if (tb.TextWrapping is TextWrapping.Wrap or TextWrapping.WrapWithOverflow)
             {
                 return ScrollBarVisibility.Disabled;
             }

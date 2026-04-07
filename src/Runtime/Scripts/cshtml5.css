@@ -119,10 +119,10 @@ body {
 }
 
 .opensilver-textblock {
-    text-overflow: ellipsis;
     text-align: start;
     white-space: pre;
-    overflow: visible;
+    text-overflow: clip;
+    overflow: clip;
 }
 
 .opensilver-inline {

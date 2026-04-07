@@ -54,12 +54,13 @@ internal sealed class PasswordBoxView : TextViewBase
 
     protected sealed override Size MeasureContent(Size constraint)
     {
+        (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(TextWrapping.NoWrap);
         int pwdLength = Host.Password.Length;
 
         return ParentWindow.TextMeasurementService.MeasureView(
             OuterDiv.Uid,
-            "pre",
-            string.Empty,
+            whiteSpace,
+            overflowWrap,
             constraint.Width,
             pwdLength > 0 ? new string('•', pwdLength) : "M");
     }

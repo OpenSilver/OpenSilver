@@ -285,10 +285,12 @@ internal sealed class TextBoxView : TextViewBase
 
     protected sealed override Size MeasureContent(Size constraint)
     {
+        (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(Host.TextWrapping);
+
         return ParentWindow.TextMeasurementService.MeasureView(
             OuterDiv.Uid,
-            Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
-            Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
+            whiteSpace,
+            overflowWrap,
             constraint.Width,
             "M");
     }
