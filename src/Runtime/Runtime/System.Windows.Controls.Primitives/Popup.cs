@@ -82,25 +82,6 @@ namespace System.Windows.Controls.Primitives
                 typeof(Popup), 
                 new PropertyMetadata(null, OnPlacementTargetChanged));
 
-        /// <summary>
-        /// Identifies the <see cref="AllowsTransparency"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty AllowsTransparencyProperty =
-            DependencyProperty.Register(
-                nameof(AllowsTransparency),
-                typeof(bool),
-                typeof(Popup),
-                new PropertyMetadata(false));
-
-        /// <summary>
-        /// Gets or sets whether the popup can render with transparency.
-        /// </summary>
-        public bool AllowsTransparency
-        {
-            get => (bool)GetValue(AllowsTransparencyProperty);
-            set => SetValueInternal(AllowsTransparencyProperty, value);
-        }
-
         private static void OnPlacementTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
