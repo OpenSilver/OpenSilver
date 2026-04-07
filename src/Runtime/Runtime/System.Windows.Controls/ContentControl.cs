@@ -63,7 +63,7 @@ namespace System.Windows.Controls
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ctrl = (ContentControl)d;
-            ctrl.SetValue(HasContentPropertyKey, e.NewValue != null ? BooleanBoxes.TrueBox : BooleanBoxes.FalseBox);
+            ctrl.SetValueInternal(HasContentPropertyKey, e.NewValue is not null);
             ctrl.OnContentChanged(e.OldValue, e.NewValue);
         }
 
@@ -83,7 +83,8 @@ namespace System.Windows.Controls
         /// Gets a value that indicates whether the <see cref="ContentControl"/> contains content.
         /// </summary>
         /// <value>
-        /// <see langword="true"/> if the <see cref="ContentControl"/> contains content; otherwise, <see langword="false"/>. The default value is <see langword="false"/>.
+        /// <see langword="true"/> if the <see cref="ContentControl"/> contains content; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="false"/>.
         /// </value>
         [Browsable(false), ReadOnly(true)]
         public bool HasContent => (bool)GetValue(HasContentProperty);

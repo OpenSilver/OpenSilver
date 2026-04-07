@@ -26,16 +26,19 @@ namespace System.Windows.Media
         public QuadraticBezierSegment() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QuadraticBezierSegment"/> class with the specified
-        /// control point, end point, and Boolean indicating whether to stroke this <see cref="QuadraticBezierSegment"/>.
+        /// Initializes a new instance of the <see cref="QuadraticBezierSegment"/> class with the specified control 
+        /// point, end point, and Boolean indicating whether to stroke this <see cref="QuadraticBezierSegment"/>.
         /// </summary>
-        /// <param name="point1">The control point of this <see cref="QuadraticBezierSegment"/>.</param>
-        /// <param name="point2">The end point of this <see cref="QuadraticBezierSegment"/>.</param>
-        /// <param name="isStroked">
-        /// <see langword="true"/> if this <see cref="QuadraticBezierSegment"/> is to be stroked;
-        /// otherwise, <see langword="false"/>.
+        /// <param name="point1">
+        /// The control point of this <see cref="QuadraticBezierSegment"/>.
         /// </param>
-        [OpenSilver.NotImplemented]
+        /// <param name="point2">
+        /// The end point of this <see cref="QuadraticBezierSegment"/>.
+        /// </param>
+        /// <param name="isStroked">
+        /// <see langword="true"/> if this <see cref="QuadraticBezierSegment"/> is to be stroked; otherwise, 
+        /// <see langword="false"/>.
+        /// </param>
         public QuadraticBezierSegment(Point point1, Point point2, bool isStroked)
         {
             Point1 = point1;

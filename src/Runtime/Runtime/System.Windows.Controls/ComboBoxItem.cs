@@ -38,13 +38,14 @@ namespace System.Windows.Controls
         /// Gets a value that indicates whether the item is highlighted.
         /// </summary>
         /// <value>
-        /// <see langword="true"/> if a <see cref="ComboBoxItem"/> is highlighted; otherwise, <see langword="false"/>. The default is <see langword="false"/>.
+        /// <see langword="true"/> if a <see cref="ComboBoxItem"/> is highlighted; otherwise, <see langword="false"/>.
+        /// The default is <see langword="false"/>.
         /// </value>
         [OpenSilver.NotImplemented]
         public bool IsHighlighted
         {
             get => (bool)GetValue(IsHighlightedProperty);
-            protected set => SetValue(IsHighlightedPropertyKey, BooleanBoxes.Box(value));
+            protected set => SetValueInternal(IsHighlightedPropertyKey, value);
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

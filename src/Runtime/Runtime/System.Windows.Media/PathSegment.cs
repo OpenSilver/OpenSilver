@@ -23,15 +23,18 @@ namespace System.Windows.Media
     {
         private Geometry _parentGeometry;
 
+        internal PathSegment() { }
+
         /// <summary>
         /// Identifies the <see cref="IsStroked"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsStrokedProperty =
-            DependencyProperty.Register(nameof(IsStroked),
+            DependencyProperty.Register(
+                nameof(IsStroked),
                 typeof(bool),
                 typeof(PathSegment),
-                new UIPropertyMetadata(true));
+                new UIPropertyMetadata(BooleanBoxes.TrueBox));
 
         /// <summary>
         /// Gets or sets a value that indicates whether the segment is stroked.
@@ -44,10 +47,8 @@ namespace System.Windows.Media
         public bool IsStroked
         {
             get => (bool)GetValue(IsStrokedProperty);
-            set => SetValueInternal(IsStrokedProperty, BooleanBoxes.Box(value));
+            set => SetValueInternal(IsStrokedProperty, value);
         }
-
-        internal PathSegment() { }
 
         internal void SetParentGeometry(Geometry geometry) => _parentGeometry = geometry;
 

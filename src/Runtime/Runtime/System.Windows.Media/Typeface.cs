@@ -1,3 +1,16 @@
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using OpenSilver;
 
 namespace System.Windows.Media;
@@ -8,42 +21,6 @@ namespace System.Windows.Media;
 [NotImplemented]
 public class Typeface
 {
-    private readonly FontFamily _fontFamily;
-    private readonly FontFamily _fallbackFontFamily;
-
-    // these _style, _weight and _stretch are only used for storing what was passed into the constructor.
-    // Since FontFamily may change these values when it includes a style name implicitly,
-    private readonly FontStyle _style;
-    private readonly FontWeight _weight;
-    private readonly FontStretch _stretch;
-
-    internal FontFamily FallbackFontFamily => _fallbackFontFamily;
-
-    /// <summary>
-    /// Gets the name of the font family from which the typeface was constructed.
-    /// </summary>
-    /// <value>The <see cref="Media.FontFamily"/> from which the typeface was constructed.</value>
-    public FontFamily FontFamily => _fontFamily;
-
-    /// <summary>
-    /// Gets the relative weight of the typeface.
-    /// </summary>
-    /// <value>A <see cref="FontWeight"/> value that represents the relative weight of the typeface.</value>
-    public FontWeight Weight => _weight;
-
-    /// <summary>
-    /// Gets the style of the <see cref="Typeface"/>.
-    /// </summary>
-    /// <value>A <see cref="FontStyle"/> value that represents the style value for the typeface.</value>
-    public FontStyle Style => _style;
-
-    /// <summary>
-    /// Gets the stretch value for the <see cref="Typeface"/>.
-    /// The stretch value determines whether a typeface is expanded or condensed when it is displayed.
-    /// </summary>
-    /// <value>A <see cref="FontStretch"/> value that represents the stretch value for the typeface.</value>
-    public FontStretch Stretch => _stretch;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Typeface"/> class for the specified font family typeface name.
     /// </summary>
@@ -91,12 +68,39 @@ public class Typeface
     {
         ArgumentNullException.ThrowIfNull(fontFamily);
 
-        _fontFamily = fontFamily;
-        _style = style;
-        _weight = weight;
-        _stretch = stretch;
-        _fallbackFontFamily = fallbackFontFamily;
+        FontFamily = fontFamily;
+        Style = style;
+        Weight = weight;
+        Stretch = stretch;
+        FallbackFontFamily = fallbackFontFamily;
     }
+
+    internal FontFamily FallbackFontFamily { get; }
+
+    /// <summary>
+    /// Gets the name of the font family from which the typeface was constructed.
+    /// </summary>
+    /// <value>The <see cref="Media.FontFamily"/> from which the typeface was constructed.</value>
+    public FontFamily FontFamily { get; }
+
+    /// <summary>
+    /// Gets the relative weight of the typeface.
+    /// </summary>
+    /// <value>A <see cref="FontWeight"/> value that represents the relative weight of the typeface.</value>
+    public FontWeight Weight { get; }
+
+    /// <summary>
+    /// Gets the style of the <see cref="Typeface"/>.
+    /// </summary>
+    /// <value>A <see cref="FontStyle"/> value that represents the style value for the typeface.</value>
+    public FontStyle Style { get; }
+
+    /// <summary>
+    /// Gets the stretch value for the <see cref="Typeface"/>.
+    /// The stretch value determines whether a typeface is expanded or condensed when it is displayed.
+    /// </summary>
+    /// <value>A <see cref="FontStretch"/> value that represents the stretch value for the typeface.</value>
+    public FontStretch Stretch { get; }
 
     /// <summary>
     /// Retrieves the <see cref="GlyphTypeface"/> that corresponds to the <see cref="Typeface"/>.
@@ -109,7 +113,6 @@ public class Typeface
     /// <see langword="true"/> if the out parameter is set to a <see cref="GlyphTypeface"/> value;
     /// otherwise, <see langword="false"/>.
     /// </returns>
-    [NotImplemented]
     public bool TryGetGlyphTypeface(out GlyphTypeface glyphTypeface)
     {
         glyphTypeface = null;
@@ -118,14 +121,14 @@ public class Typeface
 
     public override int GetHashCode()
     {
-        int hash = _fontFamily.GetHashCode();
+        int hash = FontFamily.GetHashCode();
 
-        if (_fallbackFontFamily != null)
-            hash = hash * -1521134295 + _fallbackFontFamily.GetHashCode();
+        if (FallbackFontFamily != null)
+            hash = hash * -1521134295 + FallbackFontFamily.GetHashCode();
 
-        hash = hash * -1521134295 + _style.GetHashCode();
-        hash = hash * -1521134295 + _weight.GetHashCode();
-        hash = hash * -1521134295 + _stretch.GetHashCode();
+        hash = hash * -1521134295 + Style.GetHashCode();
+        hash = hash * -1521134295 + Weight.GetHashCode();
+        hash = hash * -1521134295 + Stretch.GetHashCode();
         return hash;
     }
 
@@ -137,18 +140,18 @@ public class Typeface
         if (o is not Typeface t)
             return false;
 
-        return _style == t._style
-            && _weight == t._weight
-            && _stretch == t._stretch
-            && _fontFamily.Equals(t._fontFamily)
-            && CompareFallbackFontFamily(t._fallbackFontFamily);
+        return Style == t.Style
+            && Weight == t.Weight
+            && Stretch == t.Stretch
+            && FontFamily.Equals(t.FontFamily)
+            && CompareFallbackFontFamily(t.FallbackFontFamily);
     }
 
     internal bool CompareFallbackFontFamily(FontFamily fallbackFontFamily)
     {
-        if (fallbackFontFamily == null || _fallbackFontFamily == null)
-            return fallbackFontFamily == _fallbackFontFamily;
+        if (fallbackFontFamily == null || FallbackFontFamily == null)
+            return fallbackFontFamily == FallbackFontFamily;
 
-        return _fallbackFontFamily.Equals(fallbackFontFamily);
+        return FallbackFontFamily.Equals(fallbackFontFamily);
     }
 }

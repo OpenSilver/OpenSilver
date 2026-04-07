@@ -865,10 +865,5 @@ namespace System.Windows
             VisualFlags.TreeLevelBit3 | VisualFlags.TreeLevelBit4 | VisualFlags.TreeLevelBit5 |
             VisualFlags.TreeLevelBit6 | VisualFlags.TreeLevelBit7 | VisualFlags.TreeLevelBit8 |
             VisualFlags.TreeLevelBit9 | VisualFlags.TreeLevelBit10;
-
-        [OpenSilver.NotImplemented]
-        protected virtual void OnRender(DrawingContext drawingContext)
-        {
-        }
     }
 }

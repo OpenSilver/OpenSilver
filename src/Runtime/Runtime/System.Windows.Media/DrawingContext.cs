@@ -1,4 +1,17 @@
-﻿using System.Windows.Threading;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+using System.Windows.Threading;
 using OpenSilver;
 
 namespace System.Windows.Media;
@@ -7,20 +20,9 @@ namespace System.Windows.Media;
 /// Describes visual content using draw, push, and pop commands.
 /// </summary>
 [NotImplemented]
-public abstract partial class DrawingContext : DispatcherObject, IDisposable
+public abstract class DrawingContext : DispatcherObject, IDisposable
 {
-    #region Constructors
-    /// <summary>
-    /// Default constructor for DrawingContext - this uses the current Dispatcher.
-    /// </summary>
-    internal DrawingContext()
-    {
-        // Nothing to do here
-    }
-
-    #endregion Constructors
-
-    #region Public Methods
+    internal DrawingContext() { }
 
     /// <summary>
     /// Draw Text at the location specified.
@@ -56,24 +58,11 @@ public abstract partial class DrawingContext : DispatcherObject, IDisposable
     /// </exception>
     void IDisposable.Dispose()
     {
-        // Call a virtual method for derived Dispose implementations
-        //
-        // Attempting to override a explicit interface member implementation causes
-        // the most-derived implementation to always be called, and the base
-        // implementation becomes uncallable. But FxCop requires the base Dispose
-        // method is always be called. To avoid this situation, we use the *Core
-        // pattern for derived classes, instead of attempting to override
-        // IDisposable.Dispose.
-
         VerifyAccess();
 
         DisposeCore();
         GC.SuppressFinalize(this);
     }
-
-    #endregion Public Methods
-
-    #region Protected Methods
 
     /// <summary>
     /// Dispose functionality implemented by subclasses
@@ -87,6 +76,4 @@ public abstract partial class DrawingContext : DispatcherObject, IDisposable
     /// This verifies that the API can be called for read only access.
     /// </summary>
     protected virtual void VerifyApiNonstructuralChange() => VerifyAccess();
-
-    #endregion Protected Methods
 }

@@ -39,7 +39,6 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     private IDisposable _resizeObserver;
-    private bool? _dialogResult = null;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
@@ -613,36 +612,12 @@ public class Window : ContentControl, IResizeObserverListener
                     or ResizeMode.CanResizeWithGrip;
     }
 
-    /// <summary>
-    /// Gets or sets the dialog result value, which is the value that is returned from the <see cref="ShowDialog"/> method.
-    /// </summary>
-    /// <value>A <see cref="Nullable{T}"/> value of type <see cref="bool"/>. The default is <see langword="false"/>.</value>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     [NotImplemented]
-    public bool? DialogResult
-    {
-        get => _dialogResult;
-        set
-        {
-            if (_dialogResult != value)
-            {
-                _dialogResult = value;
-                Close();
-            }
-        }
-    }
+    public bool? DialogResult { get; set; }
 
     [NotImplemented]
     public void Show() { }
 
-    /// <summary>
-    /// Opens a window and returns only when the newly opened window is closed.
-    /// </summary>
-    /// <returns>
-    /// A <see cref="Nullable{T}"/> value of type <see cref="bool"/> that specifies
-    /// whether the activity was accepted (<see langword="true"/>) or canceled (<see langword="false"/>).
-    /// The return value is the value of the <see cref="DialogResult"/> property before a window closes.
-    /// </returns>
     [NotImplemented]
     public void ShowDialog() { }
 
