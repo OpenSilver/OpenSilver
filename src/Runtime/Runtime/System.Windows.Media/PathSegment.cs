@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using OpenSilver.Internal;
 
 namespace System.Windows.Media
 {
@@ -23,6 +24,31 @@ namespace System.Windows.Media
         private Geometry _parentGeometry;
 
         internal PathSegment() { }
+
+        /// <summary>
+        /// Identifies the <see cref="IsStroked"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty IsStrokedProperty =
+            DependencyProperty.Register(
+                nameof(IsStroked),
+                typeof(bool),
+                typeof(PathSegment),
+                new UIPropertyMetadata(BooleanBoxes.TrueBox));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the segment is stroked.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the segment is stroked when a Pen is used to render the segment;
+        /// otherwise, <see langword="false"/>. The default is <see langword="true"/>.
+        /// </value>
+        [OpenSilver.NotImplemented]
+        public bool IsStroked
+        {
+            get => (bool)GetValue(IsStrokedProperty);
+            set => SetValueInternal(IsStrokedProperty, value);
+        }
 
         internal void SetParentGeometry(Geometry geometry) => _parentGeometry = geometry;
 

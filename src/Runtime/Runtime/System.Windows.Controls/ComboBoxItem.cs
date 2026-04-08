@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Windows.Input;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -20,6 +21,33 @@ namespace System.Windows.Controls
     /// </summary>
     public class ComboBoxItem : ListBoxItem
     {
+        private static readonly DependencyPropertyKey IsHighlightedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsHighlighted),
+                typeof(bool),
+                typeof(ComboBoxItem),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Identifies the <see cref="IsHighlighted"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty IsHighlightedProperty = IsHighlightedPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that indicates whether the item is highlighted.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if a <see cref="ComboBoxItem"/> is highlighted; otherwise, <see langword="false"/>.
+        /// The default is <see langword="false"/>.
+        /// </value>
+        [OpenSilver.NotImplemented]
+        public bool IsHighlighted
+        {
+            get => (bool)GetValue(IsHighlightedProperty);
+            protected set => SetValueInternal(IsHighlightedPropertyKey, value);
+        }
+
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             e.Handled = true;

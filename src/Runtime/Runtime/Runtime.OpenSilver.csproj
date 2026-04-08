@@ -133,6 +133,8 @@
     <Compile Include="System.Windows.Documents\List.cs" />
     <Compile Include="System.Windows.Documents\ListItem.cs" />
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
+    <Compile Include="System.Windows.Media\DrawingContext.cs" />
+    <Compile Include="System.Windows.Media\FormattedText.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
     <Compile Include="System.Windows\TextMarkerStyle.cs" />
     <Compile Include="System.Windows.Input\GestureEventArgs.cs" />
@@ -729,7 +731,7 @@
     <Compile Include="System.Windows.Media\WORKINPROGRESS\Matrix3DProjection.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\PlaneProjection.cs" />
     <Compile Include="System.Windows.Media\TileBrush.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\Typeface.cs" />
+    <Compile Include="System.Windows.Media\Typeface.cs" />
     <Compile Include="System.Windows.Media.Animation\PointAnimation.cs" />
     <Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\PixelShader.cs" />
     <Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\SamplingMode.cs" />

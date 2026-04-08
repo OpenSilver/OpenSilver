@@ -52,6 +52,7 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Mouse.GotMouseCaptureEvent, new MouseEventHandler(OnGotMouseCaptureThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(PreviewTextInputEvent, new TextCompositionEventHandler(OnPreviewTextInputThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputUpdateEvent, new TextCompositionEventHandler(OnTextInputUpdateThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TappedEvent, new TappedEventHandler(OnTappedThunk), false);
@@ -167,6 +168,8 @@ namespace System.Windows
         private static void OnMouseLeaveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseLeave(e);
 
         private static void OnTextInputStartThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInputStart(e);
+
+        private static void OnPreviewTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnPreviewTextInput(e);
 
         private static void OnTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInput(e);
 
@@ -1098,6 +1101,38 @@ namespace System.Windows
         /// A <see cref="TextCompositionEventArgs"/> that contains the event data.
         /// </param>
         protected virtual void OnTextInputStart(TextCompositionEventArgs e) { }
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewTextInput"/> routed event.
+        /// </summary>
+        [NotImplemented]
+        public static readonly RoutedEvent PreviewTextInputEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(PreviewTextInput),
+                RoutingStrategy.Tunnel,
+                typeof(TextCompositionEventHandler),
+                typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when this element gets text in a device-independent manner.
+        /// </summary>
+        [NotImplemented]
+        public event TextCompositionEventHandler PreviewTextInput
+        {
+            add => AddHandler(PreviewTextInputEvent, value, false);
+            remove => RemoveHandler(PreviewTextInputEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled TextCompositionManager.PreviewTextInput attached event reaches an 
+        /// element in its route that is derived from this class. Implement this method to add class 
+        /// handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="TextCompositionEventArgs"/> that contains the event data.
+        /// </param>
+        [NotImplemented]
+        protected virtual void OnPreviewTextInput(TextCompositionEventArgs e) { }
 
         /// <summary>
         /// Identifies the <see cref="TextInput"/> routed event.

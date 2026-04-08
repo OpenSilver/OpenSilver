@@ -12,8 +12,9 @@
 \*====================================================================================*/
 
 using System.Collections;
-using System.Windows.Markup;
+using System.ComponentModel;
 using System.Windows.Data;
+using System.Windows.Markup;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Xaml.Context;
@@ -61,8 +62,32 @@ namespace System.Windows.Controls
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ContentControl)d).OnContentChanged(e.OldValue, e.NewValue);
+            var ctrl = (ContentControl)d;
+            ctrl.SetValueInternal(HasContentPropertyKey, e.NewValue is not null);
+            ctrl.OnContentChanged(e.OldValue, e.NewValue);
         }
+
+        private static readonly DependencyPropertyKey HasContentPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(HasContent),
+                typeof(bool),
+                typeof(ContentControl),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, FrameworkPropertyMetadataOptions.None));
+
+        /// <summary>
+        /// Identifies the <see cref="HasContent"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty HasContentProperty = HasContentPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that indicates whether the <see cref="ContentControl"/> contains content.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the <see cref="ContentControl"/> contains content; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="false"/>.
+        /// </value>
+        [Browsable(false), ReadOnly(true)]
+        public bool HasContent => (bool)GetValue(HasContentProperty);
 
         /// <summary>
         /// Gets or sets the data template used to display the content of the <see cref="ContentControl"/>.
@@ -197,7 +222,7 @@ namespace System.Windows.Controls
             get
             {
                 object content = Content;
-                
+
                 if (ContentIsNotLogical || content is null)
                 {
                     return EmptyEnumerator.Instance;
@@ -234,7 +259,7 @@ namespace System.Windows.Controls
                 ContentIsNotLogical = true;
 
                 Content = item;
-                
+
                 if (itemTemplate is not null)
                 {
                     ContentTemplate = itemTemplate;
