@@ -58,7 +58,7 @@ internal sealed class CommandConverter
         // If no namespaceUri or no prefix or no typename, defaulted to Known Commands.
         // there is no typename too, check for default in Known Commands.
 
-        if (IsKnownType(ownerType) || ownerType is null)
+        if (ownerType is null || IsKnownType(ownerType))
         {
             command = GetKnownCommand(localName, ownerType);
         }
