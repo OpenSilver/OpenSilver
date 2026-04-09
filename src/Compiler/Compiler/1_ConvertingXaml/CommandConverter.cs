@@ -58,7 +58,7 @@ internal sealed class CommandConverter
         // If no namespaceUri or no prefix or no typename, defaulted to Known Commands.
         // there is no typename too, check for default in Known Commands.
 
-        if (ownerType is null || IsKnownType(ownerType))
+        if (IsKnownType(ownerType) || ownerType is null)
         {
             command = GetKnownCommand(localName, ownerType);
         }
@@ -88,7 +88,7 @@ internal sealed class CommandConverter
 
     private static bool IsKnownType(TypeDefinition commandType)
     {
-        if (commandType.GetAssemblyName() == "OpenSilver")
+        if (commandType is not null && commandType.GetAssemblyName() == "OpenSilver")
         {
             return commandType.FullName == "System.Windows.Input.ApplicationCommands" ||
                    commandType.FullName == "System.Windows.Input.EditingCommands" ||
