@@ -88,7 +88,7 @@ internal sealed class CommandConverter
 
     private static bool IsKnownType(TypeDefinition commandType)
     {
-        if (commandType.GetAssemblyName() == "OpenSilver")
+        if (commandType is not null && commandType.GetAssemblyName() == "OpenSilver")
         {
             return commandType.FullName == "System.Windows.Input.ApplicationCommands" ||
                    commandType.FullName == "System.Windows.Input.EditingCommands" ||
