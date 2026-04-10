@@ -566,6 +566,7 @@
     <Compile Include="System.Windows\WeakEventManager.cs" />
     <Compile Include="System.Windows\WeakEventManagerOfT.cs" />
     <Compile Include="System.Windows\WindowStartupLocation.cs" />
+    <Compile Include="System.Windows\SizeToContent.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\Typography.cs" />
     <Compile Include="System.Windows.Shapes\Polygon.cs" />
