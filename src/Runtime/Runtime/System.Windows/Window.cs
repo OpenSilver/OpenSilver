@@ -647,6 +647,27 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     /// <summary>
+    /// Identifies the <see cref="SizeToContent"/> dependency property.
+    /// </summary>
+    [NotImplemented]
+    public static readonly DependencyProperty SizeToContentProperty =
+        DependencyProperty.Register(
+            nameof(SizeToContent),
+            typeof(SizeToContent),
+            typeof(Window),
+            new FrameworkPropertyMetadata(SizeToContent.Manual));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether a window automatically sizes to fit its content.
+    /// </summary>
+    [NotImplemented]
+    public SizeToContent SizeToContent
+    {
+        get => (SizeToContent)GetValue(SizeToContentProperty);
+        set => SetValueInternal(SizeToContentProperty, value);
+    }
+
+    /// <summary>
     /// Identifies the <see cref="ResizeMode"/> dependency property.
     /// </summary>
     [NotImplemented]
