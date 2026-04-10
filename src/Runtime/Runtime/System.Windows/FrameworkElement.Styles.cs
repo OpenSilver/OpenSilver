@@ -13,12 +13,31 @@
 
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 using OpenSilver.Internal;
 
 namespace System.Windows
 {
     public partial class FrameworkElement
     {
+        /// <summary>
+        /// Identifies the <see cref="FontFamily"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FontFamilyProperty =
+            TextElement.FontFamilyProperty.AddOwner(
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits));
+
+        /// <summary>
+        /// Gets or sets the preferred top-level font family for the text content in this element.
+        /// </summary>
+        public FontFamily FontFamily
+        {
+            get => (FontFamily)GetValue(FontFamilyProperty);
+            set => SetValueInternal(FontFamilyProperty, value);
+        }
+
         // Style/Template state (internals maintained by Style, per-instance data in StyleDataField)
         private Style _styleCache;
 
