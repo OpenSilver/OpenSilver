@@ -98,6 +98,7 @@
     <Compile Include="OpenSilver\Internal\Media\Animation\KeyFramesAnimator.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\ResolvedKeyFrameEntry.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\TimelineClock.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\TimelineGroupClock.cs" />
     <Compile Include="OpenSilver\Internal\Media\ISvgBrush.cs" />
     <Compile Include="OpenSilver\Internal\NamedObject.cs" />
     <Compile Include="OpenSilver\Internal\SynchronyzedStore.cs" />
@@ -737,6 +738,7 @@
     <Compile Include="System.Windows.Media\WORKINPROGRESS\PlaneProjection.cs" />
     <Compile Include="System.Windows.Media\TileBrush.cs" />
     <Compile Include="System.Windows.Media\Typeface.cs" />
+    <Compile Include="System.Windows.Media.Animation\ParallelTimeline.cs" />
     <Compile Include="System.Windows.Media.Animation\PointAnimation.cs" />
     <Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\PixelShader.cs" />
     <Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\SamplingMode.cs" />
@@ -981,6 +983,7 @@
     <Compile Include="System.Windows.Media.Animation\RepeatBehaviorType.cs" />
     <Compile Include="System.Windows.Media.Animation\SineEase.cs" />
     <Compile Include="System.Windows.Media.Animation\Storyboard.cs" />
+    <Compile Include="System.Windows.Media.Animation\TimelineGroup.cs" />
     <Compile Include="System.Windows.Media.Animation\Timeline.cs" />
     <Compile Include="System.Windows.Media.Animation\TimelineCollection.cs" />
     <Compile Include="System.Windows.Media.Animation\BackEase.cs" />

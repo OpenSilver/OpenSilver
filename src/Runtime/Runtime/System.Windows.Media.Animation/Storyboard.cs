@@ -23,24 +23,13 @@ namespace System.Windows.Media.Animation;
 /// Controls animations with a timeline, and provides object and property targeting
 /// information for its child animations.
 /// </summary>
-[ContentProperty(nameof(Children))]
-public sealed class Storyboard : Timeline
+public class Storyboard : ParallelTimeline
 {
-    private TimelineCollection _children;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Storyboard"/> class.
     /// </summary>
     public Storyboard() { }
-
-    /// <summary>
-    /// Gets the collection of child <see cref="Timeline"/> objects.
-    /// </summary>
-    /// <returns>
-    /// The collection of child <see cref="Timeline"/> objects. The
-    /// default is an empty collection.
-    /// </returns>
-    public TimelineCollection Children => _children ??= new TimelineCollection(this);
 
     /// <summary>
     /// Identifies the Storyboard.TargetName attached property.
@@ -653,8 +642,6 @@ public sealed class Storyboard : Timeline
         }
     }
 
-    internal override TimelineClock CreateClock() => new StoryboardClock(this);
-
     private static readonly UncommonField<Dictionary<Storyboard, WeakReference<TimelineClock>>> StoryboardClockTreesField = new();
 
     private TimelineClock GetStoryboardClock(DependencyObject o, bool throwIfNull)
@@ -787,15 +774,15 @@ public sealed class Storyboard : Timeline
         }
         else
         {
-            if (currentClock is not StoryboardClock storyboardClock)
+            if (currentClock is not TimelineGroupClock timelineGroupClock)
             {
                 return;
             }
 
-            storyboardClock.SetParent(parentClock);
+            timelineGroupClock.SetParent(parentClock);
 
-            var storyboard = (Storyboard)currentTimeline;
-            List<Timeline> childrenTimelines = storyboard.Children.InternalItems;
+            var timelineGroup = (TimelineGroup)currentTimeline;
+            List<Timeline> childrenTimelines = timelineGroup.Children.InternalItems;
 
             for (int i = 0; i < childrenTimelines.Count; i++)
             {
@@ -805,14 +792,14 @@ public sealed class Storyboard : Timeline
                 }
 
                 childClock.HasControllableRoot = hasControllableRoot;
-                storyboardClock.AddClock(childClock);
+                timelineGroupClock.AddClock(childClock);
 
                 ClockTreeWalkRecursive(
                     childClock,
                     hasControllableRoot,
                     containingObject,
                     nameScope,
-                    storyboardClock,
+                    timelineGroupClock,
                     targetObject,
                     currentObjectName,
                     currentPropertyPath);
@@ -850,74 +837,4 @@ public sealed class Storyboard : Timeline
         return targetObject;
     }
 
-    private sealed class StoryboardClock : TimelineClock
-    {
-        private readonly List<TimelineClock> _children = new();
-
-        public StoryboardClock(Storyboard owner)
-            : base(owner)
-        {
-        }
-
-        public override IEnumerable<TimelineClock> Children => _children;
-
-        public void AddClock(TimelineClock clock)
-        {
-            Debug.Assert(clock is not null);
-            Debug.Assert(!clock.IsRoot);
-
-            _children.Add(clock);
-        }
-
-        protected override void OnFrameCore()
-        {
-            foreach (TimelineClock clock in _children)
-            {
-                clock.OnFrame(CurrentTime ?? TimeSpan.Zero);
-            }
-        }
-
-        protected override void OnStopCore()
-        {
-            foreach (TimelineClock clock in _children)
-            {
-                clock.OnStop();
-            }
-        }
-
-        public override Duration IterationDuration
-        {
-            get
-            {
-                Duration iterationDuration = Timeline.Duration;
-                if (iterationDuration.HasTimeSpan)
-                {
-                    return iterationDuration;
-                }
-
-                TimeSpan maxDuration = TimeSpan.Zero;
-
-                foreach (TimelineClock clock in _children)
-                {
-                    Duration duration = clock.EffectiveDuration;
-                    
-                    if (duration == Duration.Forever)
-                    {
-                        return Duration.Forever;
-                    }
-
-                    if (duration.HasTimeSpan)
-                    {
-                        TimeSpan timespan = duration.TimeSpan + clock.BeginTime;
-                        if (timespan > maxDuration)
-                        {
-                            maxDuration = timespan;
-                        }
-                    }
-                }
-
-                return new Duration(maxDuration);
-            }
-        }
-    }
 }
