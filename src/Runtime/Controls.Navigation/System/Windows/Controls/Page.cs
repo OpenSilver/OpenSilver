@@ -56,6 +56,16 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Gets or sets the title of the host window for this page.
+        /// OpenSilver treats it as an alias of <see cref="Title"/> for XAML compatibility.
+        /// </summary>
+        public string WindowTitle
+        {
+            get { return Title; }
+            set { Title = value; }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this page should never be cached, should be cached
         /// for an indefinite length of time, or should only be cached within the size limitations of
         /// the cache.
