@@ -72,14 +72,16 @@ Object.defineProperty(window, 'osjs', {
                 POINTER_MIDDLE_UP: 6,
                 POINTER_ENTER: 7,
                 POINTER_LEAVE: 8,
-                POINTER_CAPTURE_LOST: 9,
-                WHEEL: 10,
-                KEYDOWN: 11,
-                KEYUP: 12,
-                KEYPRESS: 13,
-                FOCUS_UNMANAGED: 14,
-                WINDOW_FOCUS: 15,
-                WINDOW_BLUR: 16,
+                POINTER_OVER: 9,
+                POINTER_CAPTURE_LOST: 10,
+                WHEEL: 11,
+                KEYDOWN: 12,
+                KEYUP: 13,
+                KEYPRESS: 14,
+                FOCUS_IN: 15,
+                FOCUS_OUT: 16,
+                WINDOW_FOCUS: 17,
+                WINDOW_BLUR: 18,
             };
 
             const MODIFIERKEYS = {
@@ -90,28 +92,42 @@ Object.defineProperty(window, 'osjs', {
                 WINDOWS: 8,
             };
 
+            const POINTERBUTTONSTATE = {
+                RELEASED: 0,
+                PRESSED: 1,
+            };
+
             const FocusManager = (function () {
-                let _isManagedFocusUpdate = false;
+                let _managedFocusUpdateCount = 0;
 
                 return {
                     get isManagingFocus() {
-                        return _isManagedFocusUpdate;
+                        return _managedFocusUpdateCount > 0;
                     },
                     focus: function (element) {
                         if (!element) return false;
 
                         element.setAttribute('tabindex', 0);
 
-                        _isManagedFocusUpdate = true;
-                        element.focus({ preventScroll: true });
-                        _isManagedFocusUpdate = false;
+                        _managedFocusUpdateCount++;
+                        try {
+                            element.focus({ preventScroll: true });
+                        } finally {
+                            _managedFocusUpdateCount--;
+                        }
 
                         return document.activeElement === element;
+                    },
+                    clearFocus: function () {
+                        _isManagedFocusUpdate = true;
+                        document.body.focus({ preventScroll: true });
+                        _isManagedFocusUpdate = false;
                     },
                 };
             })();
 
             let _modifiers = MODIFIERKEYS.NONE;
+            let _pointerOver = null;
             let _pointerCapture = null;
             let _activePointerId = null;
             let _pressedButtons = 0;
@@ -129,8 +145,12 @@ Object.defineProperty(window, 'osjs', {
                     _modifiers |= MODIFIERKEYS.WINDOWS;
             }
 
-            function setActivePointer(e) {
+            function setMouseButtons(e) {
                 _pressedButtons = e.buttons;
+            }
+
+            function setActivePointer(e) {
+                setMouseButtons(e);
                 _activePointerId = isPointerDown() ? e.pointerId : null;
             }
 
@@ -155,7 +175,23 @@ Object.defineProperty(window, 'osjs', {
             }
 
             function isPointerDown() {
-                return (_pressedButtons & 7) !== 0;
+                const mask = 7; // (left: 1) | (right: 2) | (middle: 4)
+                return (_pressedButtons & mask) !== 0;
+            }
+
+            function isButtonPressed(button) {
+                return (_pressedButtons & button) == button;
+            }
+
+            function updatePointerOver(pointerOver, rootElement, e) {
+                if (_pointerOver !== pointerOver) {
+                    _pointerOver = pointerOver;
+                    if (_pointerOver !== null) {
+                        invokePointerCallback(_pointerOver, EVENTS.POINTER_OVER, e);
+                    } else {
+                        invokePointerCallbackOnRoot(rootElement, EVENTS.POINTER_OVER, e);
+                    }
+                }
             }
 
             function getPointerPosition(x, y, relativeTo) {
@@ -208,6 +244,18 @@ Object.defineProperty(window, 'osjs', {
                     }
                 });
 
+                document.addEventListener('mousedown', function (e) {
+                    if (!e.isHandled) {
+                        setMouseButtons(e);
+                    }
+                });
+
+                document.addEventListener('mouseup', function (e) {
+                    if (!e.isHandled) {
+                        setMouseButtons(e);
+                    }
+                });
+
                 document.addEventListener('pointermove', function (e) {
                     if (!e.isHandled) {
                         setModifiers(e);
@@ -249,27 +297,30 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('focusin', function (e) {
                         if (FocusManager.isManagingFocus) return;
 
-                        // Unrequested focus update, either from user interaction or call to focus()
-                        // method via interop or external JavaScript component.
-                        if (root._ignoreFocus) return;
-
                         // Try to reconnect the focused element to a known OpenSilver element.
                         const xamlid = getClosestElementId(e.target);
                         if (xamlid) {
-                            _callbacks.inputManagerEvent(xamlid, EVENTS.FOCUS_UNMANAGED, e);
+                            _callbacks.inputManagerEvent(xamlid, EVENTS.FOCUS_IN, e);
                         } else {
                             // Root element received focus. Check if previous focused element belongs to
                             // the app. If yes, then move focus here again silently.
-                            if (getClosestElementId(e.relatedTarget)) {
-                                root._ignoreFocus = true;
-                                e.relatedTarget.focus({ preventScroll: true });
-                                root._ignoreFocus = false;
-
-                                // Make sure that refocus was successful.
-                                if (document.activeElement === e.relatedTarget) return;
+                            if (e.currentTarget === e.target) {
+                                if (getClosestElementId(e.relatedTarget)) {
+                                    if (FocusManager.focus(e.relatedTarget)) {
+                                        return;
+                                    }
+                                }
                             }
 
-                            _callbacks.inputManagerEvent('', EVENTS.FOCUS_UNMANAGED, e);
+                            _callbacks.inputManagerEvent('', EVENTS.FOCUS_OUT, e);
+                        }
+                    });
+
+                    root.addEventListener('focusout', function (e) {
+                        if (FocusManager.isManagingFocus) return;
+
+                        if (e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) {
+                            _callbacks.inputManagerEvent('', EVENTS.FOCUS_OUT, e);
                         }
                     });
 
@@ -359,11 +410,33 @@ Object.defineProperty(window, 'osjs', {
                         }
                     });
 
+                    root.addEventListener('mousedown', function (e) {
+                        e.isHandled = true;
+                        setMouseButtons(e);
+                    });
+
+                    root.addEventListener('mouseup', function (e) {
+                        e.isHandled = true;
+                        setMouseButtons(e);
+                    });
+
                     root.addEventListener('lostpointercapture', function (e) {
                         if (_pointerCapture !== null && _pointerCapture.element === e.target) {
                             _pointerCapture = null;
                             _callbacks.inputManagerEvent('', EVENTS.POINTER_CAPTURE_LOST, e);
                         }
+                    });
+
+                    root.addEventListener('pointerout', function (e) {
+                        const target = e.relatedTarget !== null && e.currentTarget.contains(e.relatedTarget) ?
+                            getClosestElement(e.relatedTarget) :
+                            null;
+                        updatePointerOver(target, e.currentTarget, e);
+                    });
+
+                    root.addEventListener('pointerover', function (e) {
+                        const target = getClosestElement(e.target);
+                        updatePointerOver(target, e.currentTarget, e);
                     });
                 },
                 addListeners: function (view, isFocusable) {
@@ -437,11 +510,17 @@ Object.defineProperty(window, 'osjs', {
                         } catch (error) { }
                     }
                 },
+                getPointerButtonState: function (button) {
+                    return isButtonPressed(button) ? POINTERBUTTONSTATE.PRESSED : POINTERBUTTONSTATE.RELEASED;
+                },
                 suppressContextMenu: function (value) {
                     _suppressContextMenu = value;
                 },
                 focus: function (id) {
                     return FocusManager.focus(document.getElementById(id));
+                },
+                clearFocus: function () {
+                    FocusManager.clearFocus();
                 },
             };
         })());

@@ -93,8 +93,6 @@ internal abstract partial class TextViewBase : FrameworkElement
 
     internal UIElement Host { get; }
 
-    internal sealed override UIElement KeyboardTarget => Host;
-
     internal sealed override bool EnablePointerEventsCore => true;
 
     protected abstract Size MeasureContent(Size constraint);

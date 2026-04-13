@@ -291,9 +291,10 @@ public sealed class KeyboardNavigation
         return rootVisual;
     }
 
-    internal static void UpdateFocusedElement(UIElement focusTarget, DependencyObject focusScope)
+    internal static void UpdateFocusedElement(UIElement focusTarget)
     {
-        if (focusScope != null && focusScope != focusTarget)
+        DependencyObject focusScope = FocusManager.GetFocusScope(focusTarget);
+        if (focusScope is not null && focusScope != focusTarget)
         {
             FocusManager.SetFocusedElement(focusScope, focusTarget);
         }

@@ -24,9 +24,29 @@ public class MouseEventArgs : InputEventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="MouseEventArgs"/> class.
     /// </summary>
-    public MouseEventArgs() { }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public MouseEventArgs()
+        : base(Mouse.PrimaryDevice, Environment.TickCount)
+    {
+    }
 
-    internal MouseEventArgs(bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MouseEventArgs"/> class using the specified 
+    /// <see cref="MouseDevice"/> and timestamp.
+    /// </summary>
+    /// <param name="mouse">
+    /// The mouse device associated with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    public MouseEventArgs(MouseDevice mouse, int timestamp)
+        : base(mouse, timestamp)
+    {
+    }
+
+    internal MouseEventArgs(MouseDevice mouse, int timestamp, bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
+        : base(mouse, timestamp)
     {
         IsTouchEvent = isTouchDevice;
         KeyModifiers = keyModifiers;
@@ -42,6 +62,41 @@ public class MouseEventArgs : InputEventArgs
     internal double _pointerAbsoluteY;
 
     internal bool IsTouchEvent { get; private set; }
+
+    /// <summary>
+    /// Gets the mouse device associated with this event.
+    /// </summary>
+    /// <returns>
+    /// The mouse device associated with this event. There is no default value.
+    /// </returns>
+    public MouseDevice MouseDevice => (MouseDevice)Device;
+
+    /// <summary>
+    /// Gets the current state of the left mouse button.
+    /// </summary>
+    /// <returns>
+    /// The current state of the left mouse button, which is either <see cref="MouseButtonState.Pressed"/> 
+    /// or <see cref="MouseButtonState.Released"/>. There is no default value.
+    /// </returns>
+    public MouseButtonState LeftButton => MouseDevice.LeftButton;
+
+    /// <summary>
+    /// Gets the current state of the middle mouse button.
+    /// </summary>
+    /// <returns>
+    /// The current state of the middle mouse button, which is either <see cref="MouseButtonState.Pressed"/> 
+    /// or <see cref="MouseButtonState.Released"/>. There is no default value.
+    /// </returns>
+    public MouseButtonState MiddleButton => MouseDevice.MiddleButton;
+
+    /// <summary>
+    /// Gets the current state of the right mouse button.
+    /// </summary>
+    /// <returns>
+    /// The current state of the right mouse button, which is either <see cref="MouseButtonState.Pressed"/> 
+    /// or <see cref="MouseButtonState.Released"/>. There is no default value.
+    /// </returns>
+    public MouseButtonState RightButton => MouseDevice.RightButton;
 
     /// <summary>
     /// Gets or sets a value that marks the routed event as handled, and prevents
@@ -89,7 +144,7 @@ public class MouseEventArgs : InputEventArgs
     /// The x- and y-coordinates of the mouse pointer position relative to the specified object.
     /// </returns>
     public Point GetPosition(UIElement relativeTo)
-        => Mouse.GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
+        => MouseDevice.GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
 
     /// <summary>
     /// Returns the position of the mouse pointer relative to the specified element.
@@ -102,5 +157,5 @@ public class MouseEventArgs : InputEventArgs
     /// </returns>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public Point GetPosition(IInputElement relativeTo)
-        => Mouse.GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
+        => MouseDevice.GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
 }

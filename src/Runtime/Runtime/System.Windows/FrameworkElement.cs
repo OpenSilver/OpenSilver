@@ -392,9 +392,9 @@ namespace System.Windows
                     OnFlowDirectionChanged,
                     CoerceFlowDirection));
 
-            EventManager.RegisterClassHandler<FrameworkElement>(
-                Validation.ErrorEvent,
-                new EventHandler<ValidationErrorEventArgs>(OnValidationError));
+            EventManager.RegisterClassHandler<FrameworkElement>(Validation.ErrorEvent,new EventHandler<ValidationErrorEventArgs>(OnValidationError));
+            EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnPreviewGotKeyboardFocus));
+            EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.GotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnGotKeyboardFocus));
         }
 
         /// <summary>
@@ -1194,6 +1194,39 @@ namespace System.Windows
         }
 
         #endregion
+
+        private static void OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (e.OriginalSource == sender)
+            {
+                FrameworkElement fe = (FrameworkElement)sender;
+
+                // If element has an FocusedElement we need to delegate focus to it
+                // and handle the event if focus successfully delegated
+                UIElement activeElement = FocusManager.GetFocusedElement(fe, true);
+                if (activeElement is not null && activeElement != sender && Keyboard.IsFocusable(activeElement))
+                {
+                    IInputElement oldFocus = Keyboard.FocusedElement;
+                    activeElement.Focus();
+                    // If focus is set to activeElement or delegated - handle the event
+                    if (Keyboard.FocusedElement == activeElement || Keyboard.FocusedElement != oldFocus)
+                    {
+                        e.Handled = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private static void OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (sender == e.OriginalSource)
+            {
+                var fe = (FrameworkElement)sender;
+                KeyboardNavigation.UpdateFocusedElement(fe);
+                KeyboardNavigation.Current.UpdateActiveElement(fe);
+            }
+        }
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {

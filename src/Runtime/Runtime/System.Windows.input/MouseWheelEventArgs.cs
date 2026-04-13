@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+
 namespace System.Windows.Input;
 
 /// <summary>
@@ -21,10 +23,32 @@ public class MouseWheelEventArgs : MouseEventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="MouseWheelEventArgs"/> class.
     /// </summary>
-    public MouseWheelEventArgs() { }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public MouseWheelEventArgs()
+        : base(Mouse.PrimaryDevice, Environment.TickCount)
+    {
+    }
 
-    internal MouseWheelEventArgs(bool isTouchDevice, ModifierKeys keyModifiers, double x, double y, int delta)
-        : base(isTouchDevice, keyModifiers, x, y)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MouseWheelEventArgs"/> class.
+    /// </summary>
+    /// <param name="mouse">
+    /// The mouse device associated with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    /// <param name="delta">
+    /// The amount the wheel has changed.
+    /// </param>
+    public MouseWheelEventArgs(MouseDevice mouse, int timestamp, int delta)
+        : base(mouse, timestamp)
+    {
+        Delta = delta;
+    }
+
+    internal MouseWheelEventArgs(MouseDevice mouse, int timestamp, int delta, bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
+        : base(mouse, timestamp, isTouchDevice, keyModifiers, x, y)
     {
         Delta = delta;
     }

@@ -217,7 +217,7 @@ public class RoutedCommand : ICommand
     public void Execute(object parameter, IInputElement target)
     {
         // We only support UIElement
-        if (target is not null && !IsValidInputElement(target))
+        if (target is not null && !InputElement.IsValid(target))
         {
             throw new InvalidOperationException(string.Format(Strings.Invalid_IInputElement, target.GetType()));
         }
@@ -255,7 +255,7 @@ public class RoutedCommand : ICommand
     internal bool CriticalCanExecute(object parameter, IInputElement target, bool trusted, out bool continueRouting)
     {
         // We only support UIElement
-        if (target is not null && !IsValidInputElement(target))
+        if (target is not null && !InputElement.IsValid(target))
         {
             throw new InvalidOperationException(string.Format(Strings.Invalid_IInputElement, target.GetType()));
         }
@@ -268,7 +268,7 @@ public class RoutedCommand : ICommand
     private static IInputElement FilterInputElement(IInputElement elem)
     {
         // We only support UIElement
-        if (elem is not null && IsValidInputElement(elem))
+        if (elem is not null && InputElement.IsValid(elem))
         {
             return elem;
         }
@@ -341,6 +341,4 @@ public class RoutedCommand : ICommand
 
         return args.Handled;
     }
-
-    private static bool IsValidInputElement(IInputElement element) => element is UIElement;
 }

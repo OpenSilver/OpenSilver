@@ -193,13 +193,13 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the IsFocused dependency property
         /// </summary>
-        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
+        public new static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         ///   Gets a value that indicates whether the <see cref="DescriptionViewer.Target" /> 
         ///   of the <see cref="DescriptionViewer" /> has focus. 
         /// </summary>
-        protected bool IsFocused
+        protected new bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
             private set { this.SetValue(IsFocusedPropertyKey, value); }

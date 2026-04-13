@@ -155,11 +155,248 @@ public static class Keyboard
         => UIElement.RemoveHandler(element, KeyUpEvent, handler);
 
     /// <summary>
+    /// Identifies the Keyboard.PreviewGotKeyboardFocus attached event.
+    /// </summary>
+    public static readonly RoutedEvent PreviewGotKeyboardFocusEvent =
+        EventManager.RegisterRoutedEvent(
+            "PreviewGotKeyboardFocus",
+            RoutingStrategy.Tunnel,
+            typeof(KeyboardFocusChangedEventHandler),
+            typeof(Keyboard));
+
+    /// <summary>
+    /// Adds a handler for the Keyboard.PreviewGotKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be added.
+    /// </param>
+    public static void AddPreviewGotKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.AddHandler(element, PreviewGotKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Keyboard.PreviewGotKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be removed.
+    /// </param>
+    public static void RemovePreviewGotKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.RemoveHandler(element, PreviewGotKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Identifies the Keyboard.GotKeyboardFocus attached event.
+    /// </summary>
+    public static readonly RoutedEvent GotKeyboardFocusEvent =
+        EventManager.RegisterRoutedEvent(
+            "GotKeyboardFocus",
+            RoutingStrategy.Bubble,
+            typeof(KeyboardFocusChangedEventHandler),
+            typeof(Keyboard));
+
+    /// <summary>
+    /// Adds a handler for the Keyboard.GotKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be added.
+    /// </param>
+    public static void AddGotKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.AddHandler(element, GotKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Keyboard.GotKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be removed.
+    /// </param>
+    public static void RemoveGotKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.RemoveHandler(element, GotKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Identifies the Keyboard.PreviewLostKeyboardFocus attached event.
+    /// </summary>
+    public static readonly RoutedEvent PreviewLostKeyboardFocusEvent =
+        EventManager.RegisterRoutedEvent(
+            "PreviewLostKeyboardFocus",
+            RoutingStrategy.Tunnel,
+            typeof(KeyboardFocusChangedEventHandler),
+            typeof(Keyboard));
+
+    /// <summary>
+    /// Adds a handler for the Keyboard.PreviewLostKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be added.
+    /// </param>
+    public static void AddPreviewLostKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.AddHandler(element, PreviewLostKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Keyboard.PreviewLostKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be removed.
+    /// </param>
+    public static void RemovePreviewLostKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.RemoveHandler(element, PreviewLostKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Identifies the Keyboard.LostKeyboardFocus attached event.
+    /// </summary>
+    public static readonly RoutedEvent LostKeyboardFocusEvent =
+        EventManager.RegisterRoutedEvent(
+            "LostKeyboardFocus",
+            RoutingStrategy.Bubble,
+            typeof(KeyboardFocusChangedEventHandler),
+            typeof(Keyboard));
+
+    /// <summary>
+    /// Adds a handler for the Keyboard.LostKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be added.
+    /// </param>
+    public static void AddLostKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.AddHandler(element, LostKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Keyboard.LostKeyboardFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be removed.
+    /// </param>
+    public static void RemoveLostKeyboardFocusHandler(DependencyObject element, KeyboardFocusChangedEventHandler handler)
+        => UIElement.RemoveHandler(element, LostKeyboardFocusEvent, handler);
+
+    /// <summary>
+    /// Identifies the Keyboard.PreviewKeyboardInputProviderAcquireFocus attached event.
+    /// </summary>
+    public static readonly RoutedEvent PreviewKeyboardInputProviderAcquireFocusEvent =
+        EventManager.RegisterRoutedEvent(
+            "PreviewKeyboardInputProviderAcquireFocus",
+            RoutingStrategy.Tunnel,
+            typeof(KeyboardInputProviderAcquireFocusEventHandler),
+            typeof(Keyboard));
+
+    /// <summary>
+    /// Adds a handler for the Keyboard.PreviewKeyboardInputProviderAcquireFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be added.
+    /// </param>
+    public static void AddPreviewKeyboardInputProviderAcquireFocusHandler(DependencyObject element, KeyboardInputProviderAcquireFocusEventHandler handler)
+        => UIElement.AddHandler(element, PreviewKeyboardInputProviderAcquireFocusEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Keyboard.PreviewKeyboardInputProviderAcquireFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be removed.
+    /// </param>
+    public static void RemovePreviewKeyboardInputProviderAcquireFocusHandler(DependencyObject element, KeyboardInputProviderAcquireFocusEventHandler handler)
+        => UIElement.RemoveHandler(element, PreviewKeyboardInputProviderAcquireFocusEvent, handler);
+
+    /// <summary>
+    /// Identifies the Keyboard.KeyboardInputProviderAcquireFocus attached event.
+    /// </summary>
+    public static readonly RoutedEvent KeyboardInputProviderAcquireFocusEvent =
+        EventManager.RegisterRoutedEvent(
+            "KeyboardInputProviderAcquireFocus",
+            RoutingStrategy.Bubble,
+            typeof(KeyboardInputProviderAcquireFocusEventHandler),
+            typeof(Keyboard));
+
+    /// <summary>
+    /// Adds a handler for the Keyboard.KeyboardInputProviderAcquireFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be added.
+    /// </param>
+    public static void AddKeyboardInputProviderAcquireFocusHandler(DependencyObject element, KeyboardInputProviderAcquireFocusEventHandler handler)
+        => UIElement.AddHandler(element, KeyboardInputProviderAcquireFocusEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the Keyboard.KeyboardInputProviderAcquireFocus attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler to be removed.
+    /// </param>
+    public static void RemoveKeyboardInputProviderAcquireFocusHandler(DependencyObject element, KeyboardInputProviderAcquireFocusEventHandler handler)
+        => UIElement.RemoveHandler(element, KeyboardInputProviderAcquireFocusEvent, handler);
+
+    /// <summary>
+    /// Gets the primary keyboard input device.
+    /// </summary>
+    /// <returns>
+    /// The device.
+    /// </returns>
+    public static KeyboardDevice PrimaryDevice => InputManager.Current.PrimaryKeyboardDevice;
+
+    /// <summary>
+    /// Gets the element that has keyboard focus.
+    /// </summary>
+    /// <returns>
+    /// The focused element.
+    /// </returns>
+    public static IInputElement FocusedElement => PrimaryDevice.FocusedElement;
+
+    /// <summary>
     /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
     /// </summary>
-    public static ModifierKeys Modifiers => InputManager.Current.GetKeyboardModifiers();
+    /// <returns>
+    /// A bitwise combination of the <see cref="ModifierKeys"/> values.
+    /// </returns>
+    public static ModifierKeys Modifiers => PrimaryDevice.Modifiers;
 
-    internal static bool IsFocusable(UIElement uie) => KeyboardNavigation.Current.IsTabStop(uie);
+    /// <summary>
+    /// Sets keyboard focus on the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// The element on which to set keyboard focus.
+    /// </param>
+    /// <returns>
+    /// The element with keyboard focus.
+    /// </returns>
+    public static IInputElement Focus(IInputElement element) => PrimaryDevice.Focus(element);
 
-    internal static IInputElement FocusedElement => FocusManager.GetFocusedElement(Window.Current) as IInputElement;
+    /// <summary>
+    /// Clears focus.
+    /// </summary>
+    public static void ClearFocus() => PrimaryDevice.ClearFocus();
+
+    internal static bool IsFocusable(DependencyObject uie) => KeyboardNavigation.Current.IsTabStop(uie);
 }

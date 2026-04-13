@@ -30,6 +30,38 @@ public delegate void InputEventHandler(object sender, InputEventArgs e);
 public class InputEventArgs : RoutedEventArgs
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="InputEventArgs"/> class.
+    /// </summary>
+    /// <param name="inputDevice">
+    /// The input device to associate with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    public InputEventArgs(InputDevice inputDevice, int timestamp)
+    {
+        Device = inputDevice;
+        Timestamp = timestamp;
+    }
+
+    /// <summary>
+    /// Gets the input device that initiated this event.
+    /// </summary>
+    /// <returns>
+    /// The input device associated with this event.
+    /// </returns>
+    public InputDevice Device { get; }
+
+    /// <summary>
+    /// Gets the time when this event occurred.
+    /// </summary>
+    /// <returns>
+    /// The number of milliseconds that have elapsed since the last reboot. After about 24.9 days 
+    /// this value reaches Int32.MaxValue and restarts at (the negative) <see cref="int.MinValue"/>.
+    /// </returns>
+    public int Timestamp { get; }
+
+    /// <summary>
     /// Invokes event handlers in a type-specific way, which can increase event system efficiency.
     /// </summary>
     /// <param name="genericHandler">

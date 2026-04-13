@@ -31,20 +31,13 @@ public interface IInputElement
     bool IsMouseOver { get; }
 
     /// <summary>
-    /// Gets or sets a value that indicates whether focus can be set to this element.
+    /// Gets a value that indicates whether the mouse pointer is over this element in the strictest hit 
+    /// testing sense.
     /// </summary>
     /// <returns>
-    /// true if the element can have focus set to it; otherwise, false.
+    /// true if the mouse pointer is over this element; otherwise, false.
     /// </returns>
-    bool Focusable { get; set; }
-
-    /// <summary>
-    /// Gets a value that indicates whether this element is enabled in the user interface (UI).
-    /// </summary>
-    /// <returns>
-    /// true if the element is enabled; otherwise, false.
-    /// </returns>
-    bool IsEnabled { get; }
+    bool IsMouseDirectlyOver { get; }
 
     /// <summary>
     /// Gets a value that indicates whether the mouse is captured to this element.
@@ -55,6 +48,39 @@ public interface IInputElement
     bool IsMouseCaptured { get; }
 
     /// <summary>
+    /// Gets or sets a value that indicates whether focus can be set to this element.
+    /// </summary>
+    /// <returns>
+    /// true if the element can have focus set to it; otherwise, false.
+    /// </returns>
+    bool Focusable { get; set; }
+
+    /// <summary>
+    /// Gets a value that indicates whether this element has keyboard focus.
+    /// </summary>
+    /// <returns>
+    /// true if this element has keyboard focus; otherwise, false.
+    /// </returns>
+    bool IsKeyboardFocused { get; }
+
+    /// <summary>
+    /// Gets a value that indicates whether keyboard focus is anywhere inside the element bounds,
+    /// including if keyboard focus is inside the bounds of any visual child elements.
+    /// </summary>
+    /// <returns>
+    /// true if keyboard focus is on the element or its child elements; otherwise, false.
+    /// </returns>
+    bool IsKeyboardFocusWithin { get; }
+
+    /// <summary>
+    /// Gets a value that indicates whether this element is enabled in the user interface (UI).
+    /// </summary>
+    /// <returns>
+    /// true if the element is enabled; otherwise, false.
+    /// </returns>
+    bool IsEnabled { get; }
+
+    /// <summary>
     /// Occurs when the right mouse button is released while the mouse pointer is over this element.
     /// </summary>
     event MouseButtonEventHandler PreviewMouseRightButtonUp;
@@ -63,6 +89,11 @@ public interface IInputElement
     /// Occurs when the right mouse button is released while the mouse pointer is over the element.
     /// </summary>
     event MouseButtonEventHandler MouseRightButtonUp;
+
+    /// <summary>
+    /// Occurs when this element gets text in a device-independent manner.
+    /// </summary>
+    event TextCompositionEventHandler PreviewTextInput;
 
     /// <summary>
     /// Occurs when this element gets text in a device-independent manner.
@@ -160,6 +191,26 @@ public interface IInputElement
     event MouseEventHandler MouseLeave;
 
     /// <summary>
+    /// Occurs when the keyboard is focused on this element.
+    /// </summary>
+    event KeyboardFocusChangedEventHandler PreviewGotKeyboardFocus;
+
+    /// <summary>
+    /// Occurs when the keyboard is focused on this element.
+    /// </summary>
+    event KeyboardFocusChangedEventHandler GotKeyboardFocus;
+
+    /// <summary>
+    /// Occurs when the keyboard is no longer focused on this element.
+    /// </summary>
+    event KeyboardFocusChangedEventHandler PreviewLostKeyboardFocus;
+
+    /// <summary>
+    /// Occurs when the keyboard is no longer focused on this element.
+    /// </summary>
+    event KeyboardFocusChangedEventHandler LostKeyboardFocus;
+
+    /// <summary>
     /// Adds a routed event handler for a specific routed event to an element.
     /// </summary>
     /// <param name="routedEvent">
@@ -211,12 +262,9 @@ public interface IInputElement
     /// </param>
     void RemoveHandler(RoutedEvent routedEvent, Delegate handler);
 
-    // bool IsKeyboardFocusWithin { get; }
     // bool IsStylusOver { get; }
     // bool IsStylusDirectlyOver { get; }
     // bool IsStylusCaptured { get; }
-    // bool IsKeyboardFocused { get; }
-    // bool IsMouseDirectlyOver { get; }
 
     // event StylusEventHandler PreviewStylusMove;
     // event StylusEventHandler PreviewStylusInRange;
@@ -227,7 +275,6 @@ public interface IInputElement
     // event StylusEventHandler PreviewStylusOutOfRange;
     // event StylusSystemGestureEventHandler PreviewStylusSystemGesture;
     // event StylusDownEventHandler StylusDown;
-    // event TextCompositionEventHandler PreviewTextInput;
     // event StylusButtonEventHandler StylusButtonDown;
     // event StylusButtonEventHandler StylusButtonUp;
     // event StylusEventHandler StylusEnter;
@@ -238,14 +285,15 @@ public interface IInputElement
     // event StylusEventHandler StylusOutOfRange;
     // event StylusSystemGestureEventHandler StylusSystemGesture;
     // event StylusEventHandler PreviewStylusUp;
-    // event KeyboardFocusChangedEventHandler GotKeyboardFocus;
     // event StylusEventHandler GotStylusCapture;
-    // event KeyboardFocusChangedEventHandler PreviewLostKeyboardFocus;
     // event StylusEventHandler LostStylusCapture;
-    // event KeyboardFocusChangedEventHandler LostKeyboardFocus;
     // event StylusEventHandler StylusUp;
-    // event KeyboardFocusChangedEventHandler PreviewGotKeyboardFocus;
 
     // bool CaptureStylus();
     // void ReleaseStylusCapture();
+}
+
+internal static class InputElement
+{
+    internal static bool IsValid(IInputElement e) => e is UIElement;
 }

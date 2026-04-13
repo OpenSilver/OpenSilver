@@ -583,10 +583,6 @@ public abstract class TextElement : UIElement
 
     internal virtual void AppendHtml(StringBuilder builder) { }
 
-    internal sealed override UIElement MouseTarget => null;
-
-    internal sealed override UIElement KeyboardTarget => null;
-
     internal override sealed void SetPointerEvents(bool hitTestable) { }
 
     /// <inheritdoc />

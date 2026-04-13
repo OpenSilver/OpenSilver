@@ -484,7 +484,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Gets a value indicating whether this element has logical focus.
         /// </summary>
-        public bool IsFocused
+        public new bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
             internal set { SetValue(IsFocusedProperty, value); }
@@ -496,7 +496,7 @@ namespace System.Windows.Controls
         /// <value>
         /// The identifier for the <see cref="IsFocused" /> dependency property.
         /// </value>
-        public static readonly DependencyProperty IsFocusedProperty =
+        public new static readonly DependencyProperty IsFocusedProperty =
             DependencyProperty.Register(
                 nameof(IsFocused),
                 typeof(bool),

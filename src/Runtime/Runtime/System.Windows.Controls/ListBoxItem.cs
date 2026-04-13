@@ -126,7 +126,7 @@ namespace System.Windows.Controls
         {
             base.OnGotFocus(e);
 
-            this.IsFocused = true;
+            this.IsFocusWithin = true;
             this.UpdateVisualStates();
 
             ParentSelector?.NotifyItemGotFocus(this);
@@ -136,7 +136,7 @@ namespace System.Windows.Controls
         {
             base.OnLostFocus(e);
 
-            this.IsFocused = false;
+            this.IsFocusWithin = false;
             this.UpdateVisualStates();
 
             ParentSelector?.NotifyItemLostFocus(this);
@@ -186,7 +186,7 @@ namespace System.Windows.Controls
                 VisualStateManager.GoToState(this, VisualStates.StateUnselected, useTransitions);
             }
 
-            if (IsFocused)
+            if (IsFocusWithin)
             {
                 VisualStateManager.GoToState(this, VisualStates.StateFocused, useTransitions);
             }
@@ -196,6 +196,6 @@ namespace System.Windows.Controls
             }
         }
 
-        internal bool IsFocused { get; private set; }
+        internal bool IsFocusWithin { get; private set; }
     }
 }

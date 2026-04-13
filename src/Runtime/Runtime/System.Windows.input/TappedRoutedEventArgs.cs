@@ -21,10 +21,27 @@ public sealed class TappedRoutedEventArgs : MouseEventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="TappedRoutedEventArgs"/> class.
     /// </summary>
-    public TappedRoutedEventArgs() { }
+    public TappedRoutedEventArgs()
+        : base(Mouse.PrimaryDevice, Environment.TickCount)
+    {
+    }
 
-    internal TappedRoutedEventArgs(bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
-        : base(isTouchDevice, keyModifiers, x, y)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TappedRoutedEventArgs"/> class.
+    /// </summary>
+    /// <param name="mouse">
+    /// The mouse device associated with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    public TappedRoutedEventArgs(MouseDevice mouse, int timestamp)
+        : base(mouse, timestamp)
+    {
+    }
+
+    internal TappedRoutedEventArgs(MouseDevice mouse, int timestamp, bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
+        : base(mouse, timestamp, isTouchDevice, keyModifiers, x, y)
     {
     }
 

@@ -146,13 +146,13 @@ namespace System.Windows.Controls
         /// <returns>
         /// true if the slider control has focus; otherwise, false. The default is false.
         /// </returns>
-        public bool IsFocused
+        public new bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
             internal set { SetValueInternal(IsFocusedPropertyKey, value); }
         }
 
-        private static readonly DependencyPropertyKey IsFocusedPropertyKey =
+        private new static readonly DependencyPropertyKey IsFocusedPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(IsFocused),
                 typeof(bool),
@@ -162,7 +162,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="IsFocused"/> dependency property.
         /// </summary> 
-        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
+        public new static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         /// IsFocusedProperty property changed handler. 

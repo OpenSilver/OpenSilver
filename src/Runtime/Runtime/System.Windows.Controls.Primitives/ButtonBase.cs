@@ -96,7 +96,7 @@ namespace System.Windows.Controls.Primitives
                 || value == ClickMode.Hover;
         }
 
-        private static readonly DependencyPropertyKey IsFocusedPropertyKey =
+        private new static readonly DependencyPropertyKey IsFocusedPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(IsFocused),
                 typeof(bool),
@@ -106,7 +106,7 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Identifies the <see cref="IsFocused"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
+        public new static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that determines whether the button has focus.
@@ -114,7 +114,7 @@ namespace System.Windows.Controls.Primitives
         /// <returns>
         /// true if the control has focus; otherwise, false. The default is false.
         /// </returns>
-        public bool IsFocused
+        public new bool IsFocused
         {
             get => (bool)GetValue(IsFocusedProperty);
             private set => SetValueInternal(IsFocusedPropertyKey, value);

@@ -1491,6 +1491,9 @@ namespace System.Windows.Controls
         #region Debugging Members
 
 #if DEBUG
+        /// <summary>
+        /// 
+        /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "This is a debug method.")]
         public int Debug_Index
         {

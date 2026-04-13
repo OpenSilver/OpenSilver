@@ -61,7 +61,7 @@ namespace System.Windows.Input
         /// </returns>
         public StylusPointCollection GetStylusPoints(UIElement relativeTo)
         {
-            Point p = Mouse.GetPosition(new Point(_x, _y), relativeTo);
+            Point p = MouseDevice.GetPosition(new Point(_x, _y), relativeTo);
             return new StylusPointCollection
             {
                 new StylusPoint(p.X, p.Y),

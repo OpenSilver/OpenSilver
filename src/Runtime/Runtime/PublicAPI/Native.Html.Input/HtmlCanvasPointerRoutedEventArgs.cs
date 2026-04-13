@@ -31,7 +31,7 @@ namespace CSHTML5.Native.Html.Input
 
         // Note: there are multiple constructor overloads.
         public HtmlCanvasPointerRoutedEventArgs(MouseEventArgs e, HtmlCanvas htmlCanvas)
-            : base(MouseButton.Left, MouseButtonState.Released, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
+            : base(e.MouseDevice, e.Timestamp, MouseButton.Left, MouseButtonState.Released, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
             this.Source = e.OriginalSource;
             this.Handled = e.Handled;
@@ -40,7 +40,7 @@ namespace CSHTML5.Native.Html.Input
         }
 
         internal HtmlCanvasPointerRoutedEventArgs(MouseButtonEventArgs e, HtmlCanvas htmlCanvas)
-            : base(e.ChangedButton, e.ButtonState, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
+            : base(e.MouseDevice, e.Timestamp, e.ChangedButton, e.ButtonState, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
             this.Source = e.OriginalSource;
             this.Handled = e.Handled;
@@ -50,7 +50,7 @@ namespace CSHTML5.Native.Html.Input
 
         // Note: there are multiple constructor overloads.
         public HtmlCanvasPointerRoutedEventArgs(RightTappedRoutedEventArgs e, HtmlCanvas htmlCanvas)
-            : base(MouseButton.Right, MouseButtonState.Released, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
+            : base(e.MouseDevice, e.Timestamp, MouseButton.Right, MouseButtonState.Released, e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
             this.Source = e.OriginalSource;
             this.Handled = e.Handled;

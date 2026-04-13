@@ -11,15 +11,25 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
+using System.Windows.Threading;
 
-namespace System.Windows.Input
+namespace System.Windows.Input;
+
+/// <summary>
+/// Abstract class that describes an input device.
+/// </summary>
+public abstract class InputDevice : DispatcherObject
 {
     /// <summary>
-    /// Represents the method that will handle a RightTapped routed event.
+    /// Initializes a new instance of the <see cref="InputDevice"/> class.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void RightTappedEventHandler(object sender, RightTappedRoutedEventArgs e);
+    protected InputDevice() { }
+
+    /// <summary>
+    /// When overridden in a derived class, gets the element that receives input from this device.
+    /// </summary>
+    /// <returns>
+    /// The element that receives input.
+    /// </returns>
+    public abstract IInputElement Target { get; }
 }

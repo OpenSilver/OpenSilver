@@ -30,6 +30,28 @@ public delegate void KeyboardEventHandler(object sender, KeyboardEventArgs e);
 public class KeyboardEventArgs : InputEventArgs
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="KeyboardEventArgs"/> class.
+    /// </summary>
+    /// <param name="keyboard">
+    /// The logical keyboard device associated with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    public KeyboardEventArgs(KeyboardDevice keyboard, int timestamp)
+        : base(keyboard, timestamp)
+    {
+    }
+
+    /// <summary>
+    /// Gets the keyboard device associated with the input event. 
+    /// </summary>
+    /// <returns>
+    /// The logical keyboard device associated with the event.
+    /// </returns>
+    public KeyboardDevice KeyboardDevice => (KeyboardDevice)Device;
+
+    /// <summary>
     /// Invokes event handlers in a type-specific way, which can increase event system efficiency.
     /// </summary>
     /// <param name="genericHandler">

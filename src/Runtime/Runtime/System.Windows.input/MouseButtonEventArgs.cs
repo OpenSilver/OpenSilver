@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+
 namespace System.Windows.Input;
 
 /// <summary>
@@ -22,10 +24,40 @@ public class MouseButtonEventArgs : MouseEventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="MouseButtonEventArgs"/> class.
     /// </summary>
-    public MouseButtonEventArgs() { }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public MouseButtonEventArgs()
+        : base(Mouse.PrimaryDevice, Environment.TickCount)
+    {
+    }
 
-    internal MouseButtonEventArgs(MouseButton button, MouseButtonState buttonState, bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
-        : base(isTouchDevice, keyModifiers, x, y)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MouseButtonEventArgs"/> class by using the 
+    /// specified <see cref="MouseDevice"/>, timestamp, and <see cref="MouseButton"/>.
+    /// </summary>
+    /// <param name="mouse">
+    /// The logical Mouse device associated with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    /// <param name="button">
+    /// The mouse button whose state is being described.
+    /// </param>
+    public MouseButtonEventArgs(MouseDevice mouse, int timestamp, MouseButton button)
+        : base(mouse, timestamp)
+    {
+        ChangedButton = button;
+    }
+
+    internal MouseButtonEventArgs(
+        MouseDevice mouse,
+        int timestamp,
+        MouseButton button,
+        MouseButtonState buttonState,
+        bool isTouchDevice,
+        ModifierKeys keyModifiers,
+        double x,
+        double y) : base(mouse, timestamp, isTouchDevice, keyModifiers, x, y)
     {
         MouseButtonUtilities.Validate(button);
         MouseButtonStateUtilities.Validate(buttonState);

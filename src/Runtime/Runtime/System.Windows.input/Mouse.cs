@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using OpenSilver.Internal;
 using System.ComponentModel;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 
 namespace System.Windows.Input;
 
@@ -24,6 +20,11 @@ namespace System.Windows.Input;
 /// </summary>
 public static class Mouse
 {
+    /// <summary>
+    /// Represents the number of units the mouse wheel is rotated to scroll one line.
+    /// </summary>
+    public const int MouseWheelDeltaForOneLine = 120;
+
     /// <summary>
     /// Identifies the Mouse.PreviewMouseDown attached event.
     /// </summary>
@@ -433,12 +434,52 @@ public static class Mouse
         => UIElement.RemoveHandler(element, MouseWheelEvent, handler);
 
     /// <summary>
+    /// Gets the primary mouse device.
+    /// </summary>
+    /// <returns>
+    /// The device.
+    /// </returns>
+    public static MouseDevice PrimaryDevice => InputManager.Current.PrimaryMouseDevice;
+
+    /// <summary>
     /// Gets the element that has captured the mouse.
     /// </summary>
     /// <returns>
     /// The element captured by the mouse.
     /// </returns>
-    public static IInputElement Captured => InputManager.Current.MouseCapture;
+    public static IInputElement Captured => PrimaryDevice.Captured;
+
+    /// <summary>
+    /// Gets the element the mouse pointer is directly over.
+    /// </summary>
+    /// <returns>
+    /// The element the mouse pointer is over.
+    /// </returns>
+    public static IInputElement DirectlyOver => PrimaryDevice.DirectlyOver;
+
+    /// <summary>
+    /// Gets the state of the left button of the mouse.
+    /// </summary>
+    /// <returns>
+    /// The state of the left mouse button.
+    /// </returns>
+    public static MouseButtonState LeftButton => PrimaryDevice.LeftButton;
+
+    /// <summary>
+    /// Gets the state of the middle button of the mouse.
+    /// </summary>
+    /// <returns>
+    /// The state of the middle mouse button.
+    /// </returns>
+    public static MouseButtonState MiddleButton => PrimaryDevice.MiddleButton;
+
+    /// <summary>
+    /// Gets the state of the right button.
+    /// </summary>
+    /// <returns>
+    /// The state of the right mouse button.
+    /// </returns>
+    public static MouseButtonState RightButton => PrimaryDevice.RightButton;
 
     /// <summary>
     /// Captures mouse input to the specified element.
@@ -449,7 +490,7 @@ public static class Mouse
     /// <returns>
     /// true if the element was able to capture the mouse; otherwise, false.
     /// </returns>
-    public static bool Capture(UIElement element) => InputManager.Current.CaptureMouse(element);
+    public static bool Capture(UIElement element) => PrimaryDevice.Capture(element);
 
     /// <summary>
     /// Captures mouse input to the specified element.
@@ -461,15 +502,7 @@ public static class Mouse
     /// true if the element was able to capture the mouse; otherwise, false.
     /// </returns>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static bool Capture(IInputElement element)
-    {
-        return element switch
-        {
-            UIElement uie => Capture(uie),
-            null => Capture(null),
-            _ => throw new InvalidOperationException(string.Format(Strings.Invalid_IInputElement, element.GetType())),
-        };
-    }
+    public static bool Capture(IInputElement element) => PrimaryDevice.Capture(element);
 
     /// <summary>
     /// Gets the position of the mouse relative to a specified element.
@@ -480,8 +513,7 @@ public static class Mouse
     /// <returns>
     /// The position of the mouse relative to the parameter relativeTo.
     /// </returns>
-    public static Point GetPosition(UIElement relativeTo) =>
-        GetPosition(InputManager.Current.GetMousePosition(), relativeTo);
+    public static Point GetPosition(UIElement relativeTo) => PrimaryDevice.GetPosition(relativeTo);
 
     /// <summary>
     /// Gets the position of the mouse relative to a specified element.
@@ -493,42 +525,5 @@ public static class Mouse
     /// The position of the mouse relative to the parameter relativeTo.
     /// </returns>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static Point GetPosition(IInputElement relativeTo) =>
-        GetPosition(InputManager.Current.GetMousePosition(), relativeTo);
-
-    internal static Point GetPosition(Point origin, IInputElement relativeTo)
-    {
-        return relativeTo switch
-        {
-            UIElement uie => GetPosition(origin, uie),
-            null => GetPosition(origin, null),
-            _ => throw new InvalidOperationException(string.Format(Strings.Invalid_IInputElement, relativeTo.GetType())),
-        };
-    }
-
-    internal static Point GetPosition(Point origin, UIElement relativeTo)
-    {
-        if (relativeTo is Popup popup)
-        {
-            relativeTo = popup.IsOpen ? popup.Child : null;
-        }
-
-        if (relativeTo is null)
-        {
-            return origin;
-        }
-
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(relativeTo))
-        {
-            Matrix m = relativeTo.InternalTransformToAncestor(null);
-            if (m.HasInverse)
-            {
-                m.Invert();
-            }
-
-            return m.Transform(origin);
-        }
-
-        return new Point(0.0, 0.0);
-    }
+    public static Point GetPosition(IInputElement relativeTo) => PrimaryDevice.GetPosition(relativeTo);
 }

@@ -20,6 +20,30 @@ namespace System.Windows.Input;
 /// </summary>
 public sealed class KeyEventArgs : KeyboardEventArgs
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public KeyEventArgs()
+        : base(Keyboard.PrimaryDevice, Environment.TickCount)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeyEventArgs"/> class.
+    /// </summary>
+    /// <param name="keyboard">
+    /// The logical keyboard device associated with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    /// <param name="key">
+    /// The key referenced by the event.
+    /// </param>
+    public KeyEventArgs(KeyboardDevice keyboard, int timestamp, Key key)
+        : base(keyboard, timestamp)
+    {
+        Key = key;
+    }
+
     /// <inheritdoc />
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
         ((KeyEventHandler)genericHandler)(genericTarget, this);

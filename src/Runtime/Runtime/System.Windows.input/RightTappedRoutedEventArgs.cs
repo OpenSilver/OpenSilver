@@ -11,12 +11,22 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+
 namespace System.Windows.Input
 {
     /// <summary>
     /// Provides event data for the RightTapped event.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class RightTappedRoutedEventArgs : MouseEventArgs
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RightTappedRoutedEventArgs"/> class.
+        /// </summary>
+        public RightTappedRoutedEventArgs()
+            : base(Mouse.PrimaryDevice, Environment.TickCount)
+        {
+        }
     }
 }

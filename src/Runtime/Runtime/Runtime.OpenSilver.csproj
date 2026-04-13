@@ -135,6 +135,11 @@
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
     <Compile Include="System.Windows.Media\DrawingContext.cs" />
     <Compile Include="System.Windows.Media\FormattedText.cs" />
+    <Compile Include="System.Windows.Input\InputDevice.cs" />
+    <Compile Include="System.Windows.Input\KeyboardDevice.cs" />
+    <Compile Include="System.Windows.Input\KeyboardFocusChangedEventArgs.cs" />
+    <Compile Include="System.Windows.Input\KeyboardInputProviderAcquireFocusEventArgs.cs" />
+    <Compile Include="System.Windows.Input\MouseDevice.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
     <Compile Include="System.Windows\TextMarkerStyle.cs" />
     <Compile Include="System.Windows.Input\GestureEventArgs.cs" />

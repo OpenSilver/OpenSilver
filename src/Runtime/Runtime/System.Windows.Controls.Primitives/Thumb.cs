@@ -87,7 +87,7 @@ namespace System.Windows.Controls.Primitives
             UpdateVisualState();
         }
 
-        private static readonly DependencyPropertyKey IsFocusedPropertyKey =
+        private new static readonly DependencyPropertyKey IsFocusedPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(IsFocused),
                 typeof(bool),
@@ -97,7 +97,7 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Gets the identifier for the <see cref="IsFocused"/> dependency property. 
         /// </summary> 
-        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
+        public new static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets whether the thumb has focus.
@@ -105,7 +105,7 @@ namespace System.Windows.Controls.Primitives
         /// <remarks>
         /// true to indicate the thumb has focus; otherwise false. The default is false.
         /// </remarks> 
-        public bool IsFocused
+        public new bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
             private set { SetValueInternal(IsFocusedPropertyKey, value); }

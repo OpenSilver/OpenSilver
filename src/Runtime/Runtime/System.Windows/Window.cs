@@ -34,8 +34,8 @@ public class Window : ContentControl, IResizeObserverListener
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
         KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
-        EventManager.RegisterClassHandler<Window>(GotFocusEvent, new RoutedEventHandler(OnGotFocus), true);
-        EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
+        EventManager.RegisterClassHandler<Window>(Keyboard.GotKeyboardFocusEvent, new RoutedEventHandler(OnGotKeyboardFocus), true);
+        EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
     }
 
     private IDisposable _resizeObserver;
@@ -64,6 +64,8 @@ public class Window : ContentControl, IResizeObserverListener
     /// Gets the currently activated window for an application.
     /// </summary>
     public static Window Current { get; set; }
+
+    internal static Window ActiveWindow { get; private set; }
 
     internal HtmlElementReference RootDomElement { get; private set; }
 
@@ -110,9 +112,15 @@ public class Window : ContentControl, IResizeObserverListener
         SetLayoutSize();
     }
 
-    private static void OnGotFocus(object sender, RoutedEventArgs e) => Current = (Window)sender;
+    private static void OnGotKeyboardFocus(object sender, RoutedEventArgs e)
+    {
+        var activeWindow = (Window)sender;
 
-    private static void OnMouseDown(object sender, MouseEventArgs e) => PopupService.HandleMouseButton();
+        Current = activeWindow;
+        ActiveWindow = activeWindow;
+    }
+
+    private static void OnPreviewMouseDown(object sender, MouseEventArgs e) => PopupService.HandleMouseButton();
 
     #region Bounds and SizeChanged event
 

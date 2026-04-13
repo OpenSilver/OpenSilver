@@ -333,7 +333,7 @@ namespace System.Windows
         /// </returns>
         public bool Focus() =>
             KeyboardNavigation.Current.Focus(this) is UIElement uie &&
-            InputManager.Current.SetFocus(uie);
+            Keyboard.Focus(uie) == uie;
 
         /// <summary>
         /// Occurs when the value of the <see cref="Focusable"/> property changes.
@@ -370,27 +370,124 @@ namespace System.Windows
             uie.FocusableChanged?.Invoke(uie, e);
         }
 
-        private static readonly DependencyPropertyKey IsKeyboardFocusedPropertyKey =
+        internal static readonly DependencyPropertyKey IsKeyboardFocusedPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(IsKeyboardFocused),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(BooleanBoxes.FalseBox));
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsKeyboardFocusedChanged));
 
         /// <summary>
         /// Identifies the <see cref="IsKeyboardFocused"/> dependency property.
         /// </summary>
-        [NotImplemented]
         public static readonly DependencyProperty IsKeyboardFocusedProperty = IsKeyboardFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value indicating whether this element has keyboard focus. This is a dependency property.
         /// </summary>
-        /// <value>
-        /// <see langword="true"/> if this element has keyboard focus; otherwise, <see langword="false"/>. The default is <see langword="false"/>.
-        /// </value>
-        [NotImplemented]
+        /// <returns>
+        /// true if this element has keyboard focus; otherwise, false. The default is false.
+        /// </returns>
         public bool IsKeyboardFocused => Keyboard.FocusedElement == this;
+
+        private static void OnIsKeyboardFocusedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((UIElement)d).RaiseIsKeyboardFocusedChanged(e);
+        }
+
+        private void RaiseIsKeyboardFocusedChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // Call the virtual method first.
+            OnIsKeyboardFocusedChanged(args);
+
+            // Raise the public event second.
+            IsKeyboardFocusedChanged?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="IsKeyboardFocusedChanged"/> event is raised on this element.
+        /// Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="DependencyPropertyChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnIsKeyboardFocusedChanged(DependencyPropertyChangedEventArgs e) { }
+
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsKeyboardFocused"/> property changes on this element.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsKeyboardFocusedChanged;
+
+        internal static readonly DependencyPropertyKey IsKeyboardFocusWithinPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsKeyboardFocusWithin),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsKeyboardFocusWithinChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsKeyboardFocusWithin"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsKeyboardFocusWithinProperty = IsKeyboardFocusWithinPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value indicating whether keyboard focus is anywhere within the element or its visual 
+        /// tree child elements. This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// true if keyboard focus is on the element or its child elements; otherwise, false.
+        /// </returns>
+        public bool IsKeyboardFocusWithin => ReadFlag(CoreFlags.IsKeyboardFocusWithinCache);
+
+        private static void OnIsKeyboardFocusWithinChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uie = (UIElement)d;
+            uie.WriteFlag(CoreFlags.IsKeyboardFocusWithinCache, (bool)e.NewValue);
+            uie.RaiseIsKeyboardFocusWithinChanged(e);
+        }
+
+        private void RaiseIsKeyboardFocusWithinChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // Call the virtual method first.
+            OnIsKeyboardFocusWithinChanged(args);
+
+            // Raise the public event second.
+            IsKeyboardFocusWithinChanged?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Invoked just before the <see cref="IsKeyboardFocusWithinChanged"/> event is raised by this element.
+        /// Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="DependencyPropertyChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnIsKeyboardFocusWithinChanged(DependencyPropertyChangedEventArgs e) { }
+
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsKeyboardFocusWithin"/> property changes on this element.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsKeyboardFocusWithinChanged;
+
+        internal static readonly DependencyPropertyKey IsFocusedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsFocused),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Identifies the <see cref="IsFocused"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that determines whether this element has logical focus. This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// true if this element has logical focus; otherwise, false.
+        /// </returns>
+        public bool IsFocused => (bool)GetValue(IsFocusedProperty);
 
         #region ClipToBounds
 
@@ -1372,6 +1469,18 @@ namespace System.Windows
 
         #region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
 
+        internal static readonly DependencyPropertyKey IsMouseCapturedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsMouseCaptured),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsMouseCapturedChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsMouseCaptured"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsMouseCapturedProperty = IsMouseCapturedPropertyKey.DependencyProperty;
+
         /// <summary>
         /// Gets a value indicating whether the mouse is captured to this element.
         /// </summary>
@@ -1379,6 +1488,83 @@ namespace System.Windows
         /// true if the element has mouse capture; otherwise, false. The default is false.
         /// </returns>
         public bool IsMouseCaptured => Mouse.Captured == this;
+
+        private static void OnIsMouseCapturedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((UIElement)d).RaiseIsMouseCapturedChanged(e);
+        }
+
+        private void RaiseIsMouseCapturedChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // Call the virtual method first.
+            OnIsMouseCapturedChanged(args);
+
+            // Raise the public event second.
+            IsMouseCapturedChanged?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="IsMouseCapturedChanged"/> event is raised on this element. 
+        /// Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="DependencyPropertyChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnIsMouseCapturedChanged(DependencyPropertyChangedEventArgs e) { }
+
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsMouseCaptured"/> property changes on this element.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsMouseCapturedChanged;
+
+        internal static readonly DependencyPropertyKey IsMouseCaptureWithinPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsMouseCaptureWithin),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsMouseCaptureWithinChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsMouseCaptureWithin"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsMouseCaptureWithinProperty = IsMouseCaptureWithinPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that determines whether mouse capture is held by this element or by child elements 
+        /// in its visual tree. This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// true if this element or a contained element has mouse capture; otherwise, false.
+        /// </returns>
+        public bool IsMouseCaptureWithin => ReadFlag(CoreFlags.IsMouseCaptureWithinCache);
+
+        private static void OnIsMouseCaptureWithinChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((UIElement)d).RaiseIsMouseCaptureWithinChanged(e);
+        }
+
+        private void RaiseIsMouseCaptureWithinChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // Call the virtual method first.
+            OnIsMouseCaptureWithinChanged(args);
+
+            // Raise the public event second.
+            IsMouseCaptureWithinChanged?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="IsMouseCaptureWithinChanged"/> event is raised on this element.
+        /// Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="DependencyPropertyChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnIsMouseCaptureWithinChanged(DependencyPropertyChangedEventArgs e) { }
+
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsMouseCaptureWithinProperty"/> changes on this element.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsMouseCaptureWithinChanged;
 
         /// <summary>
         /// Attempts to force capture of the mouse to this element.
@@ -1424,6 +1610,56 @@ namespace System.Windows
         {
             ((UIElement)d).WriteFlag(CoreFlags.IsMouseOverCache, (bool)e.NewValue);
         }
+
+        internal static readonly DependencyPropertyKey IsMouseDirectlyOverPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsMouseDirectlyOver),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsMouseDirectlyOverChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsMouseDirectlyOver"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsMouseDirectlyOverProperty = IsMouseDirectlyOverPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that indicates whether the position of the mouse pointer corresponds to hit 
+        /// test results, which take element compositing into account. This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// true if the mouse pointer is over the same element result as a hit test; otherwise, false. 
+        /// The default is false.
+        /// </returns>
+        public bool IsMouseDirectlyOver => Mouse.DirectlyOver == this;
+
+        private static void OnIsMouseDirectlyOverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((UIElement)d).RaiseIsMouseDirectlyOverChanged(e);
+        }
+
+        private void RaiseIsMouseDirectlyOverChanged(DependencyPropertyChangedEventArgs args)
+        {
+            // Call the virtual method first.
+            OnIsMouseDirectlyOverChanged(args);
+
+            // Raise the public event second.
+            IsMouseDirectlyOverChanged?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <see cref="IsMouseDirectlyOverChanged"/> event is raised on this element.
+        /// Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="DependencyPropertyChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnIsMouseDirectlyOverChanged(DependencyPropertyChangedEventArgs e) { }
+
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsMouseDirectlyOver"/> property changes on this element.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsMouseDirectlyOverChanged;
 
         #endregion
 
@@ -1716,11 +1952,11 @@ namespace System.Windows
         NeverArranged = 0x00000080,
         MeasureDuringArrange = 0x00000100,
         IsCollapsed = 0x00000200,
-        //IsKeyboardFocusWithinCache = 0x00000400,
+        IsKeyboardFocusWithinCache = 0x00000400,
         //IsKeyboardFocusWithinChanged = 0x00000800,
         IsMouseOverCache = 0x00001000,
         //IsMouseOverChanged = 0x00002000,
-        //IsMouseCaptureWithinCache = 0x00004000,
+        IsMouseCaptureWithinCache = 0x00004000,
         //IsMouseCaptureWithinChanged = 0x00008000,
         //IsStylusOverCache = 0x00010000,
         //IsStylusOverChanged = 0x00020000,

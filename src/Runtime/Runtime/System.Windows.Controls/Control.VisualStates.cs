@@ -87,7 +87,7 @@ public partial class Control : FrameworkElement
     {
         if (IsInvalid)
         {
-            VisualStateManager.GoToState(this, IsFocused ? VisualStates.StateInvalidFocused : VisualStates.StateInvalidUnfocused, true);
+            VisualStateManager.GoToState(this, IsFocusWithin ? VisualStates.StateInvalidFocused : VisualStates.StateInvalidUnfocused, true);
         }
         else
         {

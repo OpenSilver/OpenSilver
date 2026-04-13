@@ -112,6 +112,8 @@ public partial class Control : FrameworkElement, IInternalControl
         {
             var ctrl = (Control)sender;
             var doubleClick = new MouseButtonEventArgs(
+                e.MouseDevice,
+                e.Timestamp,
                 e.ChangedButton,
                 e.ButtonState,
                 e.IsTouchEvent,
@@ -585,7 +587,7 @@ public partial class Control : FrameworkElement, IInternalControl
     protected override void OnGotFocus(RoutedEventArgs e)
     {
         base.OnGotFocus(e);
-        IsFocused = true;
+        IsFocusWithin = true;
 
         if (IsInvalid)
         {
@@ -602,7 +604,7 @@ public partial class Control : FrameworkElement, IInternalControl
     protected override void OnLostFocus(RoutedEventArgs e)
     {
         base.OnLostFocus(e);
-        IsFocused = false;
+        IsFocusWithin = false;
 
         if (IsInvalid)
         {
@@ -691,10 +693,10 @@ public partial class Control : FrameworkElement, IInternalControl
         return finalSize;
     }
 
-    private bool IsFocused
+    private bool IsFocusWithin
     {
-        get => ReadControlFlag(ControlFlags.Focused);
-        set => WriteControlFlag(ControlFlags.Focused, value);
+        get => ReadControlFlag(ControlFlags.IsFocusWithin);
+        set => WriteControlFlag(ControlFlags.IsFocusWithin, value);
     }
 
     internal bool ReadControlFlag(ControlFlags flag) => (_flags & flag) != 0;
@@ -719,7 +721,7 @@ public partial class Control : FrameworkElement, IInternalControl
         HandleCommonVisualStates = 0x001, // Used in Control
         HasVisualStateUpdater = 0x002, // Used in Control
         Invalid = 0x004, // Used in Control
-        Focused = 0x008, // Used in Control
+        IsFocusWithin = 0x008, // Used in Control
         ContentIsNotLogical = 0x010, // Used in ContentControl
         CommandDisabled = 0x020, // Used in ButtonBase, MenuItem
         IsSpaceKeyDown = 0x040, // Used in ButtonBase

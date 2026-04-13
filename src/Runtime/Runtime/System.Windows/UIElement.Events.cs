@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media;
-using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
 
@@ -49,8 +48,8 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseWheelEvent, new MouseWheelEventHandler(OnMouseWheelThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnterThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(Mouse.GotMouseCaptureEvent, new MouseEventHandler(OnGotMouseCaptureThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.GotMouseCaptureEvent, new MouseEventHandler(OnGotMouseCaptureThunk), true);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), true);
             EventManager.RegisterClassHandler<UIElement>(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
             EventManager.RegisterClassHandler<UIElement>(PreviewTextInputEvent, new TextCompositionEventHandler(OnPreviewTextInputThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
@@ -60,6 +59,10 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Keyboard.KeyDownEvent, new KeyEventHandler(OnKeyDownThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Keyboard.PreviewKeyUpEvent, new KeyEventHandler(OnPreviewKeyUpThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Keyboard.KeyUpEvent, new KeyEventHandler(OnKeyUpThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnPreviewGotKeyboardFocusThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.GotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnGotKeyboardFocusThunk), true);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.PreviewLostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnPreviewLostKeyboardFocusThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(Keyboard.LostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnLostKeyboardFocusThunk), true);
             EventManager.RegisterClassHandler<UIElement>(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk), false);
             EventManager.RegisterClassHandler<UIElement>(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk), false);
             EventManager.RegisterClassHandler<UIElement>(DragEnterEvent, new DragEventHandler(OnDragEnterThunk), false);
@@ -195,13 +198,57 @@ namespace System.Windows
 
         private static void OnKeyUpThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnKeyUp(e);
 
+        private static void OnPreviewGotKeyboardFocusThunk(object sender, KeyboardFocusChangedEventArgs e) => ((UIElement)sender).OnPreviewGotKeyboardFocus(e);
+
+        private static void OnGotKeyboardFocusThunk(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            var uie = (UIElement)sender;
+            uie.SetValueInternal(IsKeyboardFocusWithinPropertyKey, true);
+
+            if (!e.Handled)
+            {
+                uie.OnGotKeyboardFocus(e);
+            }
+        }
+
+        private static void OnPreviewLostKeyboardFocusThunk(object sender, KeyboardFocusChangedEventArgs e) => ((UIElement)sender).OnPreviewLostKeyboardFocus(e);
+
+        private static void OnLostKeyboardFocusThunk(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            var uie = (UIElement)sender;
+            uie.ClearValue(IsKeyboardFocusWithinPropertyKey);
+
+            if (!e.Handled)
+            {
+                uie.OnLostKeyboardFocus(e);
+            }
+        }
+
         private static void OnGotFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnGotFocus(e);
 
         private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
 
-        private static void OnGotMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnGotMouseCapture(e);
+        private static void OnGotMouseCaptureThunk(object sender, MouseEventArgs e)
+        {
+            var uie = (UIElement)sender;
+            uie.SetValueInternal(IsMouseCaptureWithinPropertyKey, true);
 
-        private static void OnLostMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnLostMouseCapture(e);
+            if (!e.Handled)
+            {
+                uie.OnGotMouseCapture(e);
+            }
+        }
+
+        private static void OnLostMouseCaptureThunk(object sender, MouseEventArgs e)
+        {
+            var uie = (UIElement)sender;
+            uie.ClearValue(IsMouseCaptureWithinPropertyKey);
+
+            if (!e.Handled)
+            {
+                uie.OnLostMouseCapture(e);
+            }
+        }
 
         private static void OnDragEnterThunk(object sender, DragEventArgs e) => ((UIElement)sender).OnDragEnter(e);
 
@@ -1452,6 +1499,102 @@ namespace System.Windows
 
         #endregion
 
+        #region KeyboardFocus
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewGotKeyboardFocus"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewGotKeyboardFocusEvent = Keyboard.PreviewGotKeyboardFocusEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the keyboard is focused on this element.
+        /// </summary>
+        public event KeyboardFocusChangedEventHandler PreviewGotKeyboardFocus
+        {
+            add => AddHandler(Keyboard.PreviewGotKeyboardFocusEvent, value, false);
+            remove => RemoveHandler(Keyboard.PreviewGotKeyboardFocusEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Keyboard.PreviewGotKeyboardFocus attached event reaches an element in its 
+        /// route that is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="KeyboardFocusChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs e) { }
+
+        /// <summary>
+        /// Identifies the <see cref="GotKeyboardFocus"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent GotKeyboardFocusEvent = Keyboard.GotKeyboardFocusEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the keyboard is focused on this element.
+        /// </summary>
+        public event KeyboardFocusChangedEventHandler GotKeyboardFocus
+        {
+            add => AddHandler(Keyboard.GotKeyboardFocusEvent, value, false);
+            remove => RemoveHandler(Keyboard.GotKeyboardFocusEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Keyboard.GotKeyboardFocus attached event reaches an element in its route 
+        /// that is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="KeyboardFocusChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e) { }
+
+        /// <summary>
+        /// Identifies the <see cref="PreviewLostKeyboardFocus"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PreviewLostKeyboardFocusEvent = Keyboard.PreviewLostKeyboardFocusEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the keyboard is no longer focused on this element.
+        /// </summary>
+        public event KeyboardFocusChangedEventHandler PreviewLostKeyboardFocus
+        {
+            add => AddHandler(Keyboard.PreviewLostKeyboardFocusEvent, value, false);
+            remove => RemoveHandler(Keyboard.PreviewLostKeyboardFocusEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Keyboard.PreviewLostKeyboardFocusEvent attached event reaches an element in 
+        /// its route that is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="KeyboardFocusChangedEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnPreviewLostKeyboardFocus(KeyboardFocusChangedEventArgs e) { }
+
+        /// <summary>
+        /// Identifies the <see cref="LostKeyboardFocus"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent LostKeyboardFocusEvent = Keyboard.LostKeyboardFocusEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the keyboard is no longer focused on this element.
+        /// </summary>
+        public event KeyboardFocusChangedEventHandler LostKeyboardFocus
+        {
+            add => AddHandler(Keyboard.LostKeyboardFocusEvent, value, false);
+            remove => RemoveHandler(Keyboard.LostKeyboardFocusEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled Keyboard.LostKeyboardFocus attached event reaches an element in its route 
+        /// that is derived from this class. Implement this method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="KeyboardFocusChangedEventArgs"/> that contains event data.
+        /// </param>
+        protected virtual void OnLostKeyboardFocus(KeyboardFocusChangedEventArgs e) { }
+
+        #endregion KeyboardFocus
+
         #region GotMouseCapture
 
         /// <summary>
@@ -1511,9 +1654,5 @@ namespace System.Windows
         public virtual void INTERNAL_AttachToDomEvents() { }
 
         public virtual void INTERNAL_DetachFromDomEvents() { }
-
-        internal virtual UIElement MouseTarget => this;
-
-        internal virtual UIElement KeyboardTarget => this;
     }
 }
