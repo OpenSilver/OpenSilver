@@ -148,7 +148,7 @@ public abstract class MenuBase : ItemsControl
 
             if (_currentSelection is not null)
             {
-                wasFocused = FocusManager.GetFocusedElement() == _currentSelection;
+                wasFocused = _currentSelection.IsKeyboardFocused;
                 _currentSelection.SetCurrentValueInternal(MenuItem.IsSelectedProperty, BooleanBoxes.FalseBox);
             }
 

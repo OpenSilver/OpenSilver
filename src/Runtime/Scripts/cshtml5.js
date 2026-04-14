@@ -438,8 +438,22 @@ Object.defineProperty(window, 'osjs', {
                         const target = getClosestElement(e.target);
                         updatePointerOver(target, e.currentTarget, e);
                     });
+
+                    root.addEventListener('keypress', function (e) {
+                        _callbacks.inputManagerEvent('', EVENTS.KEYPRESS, e);
+                    });
+
+                    root.addEventListener('keydown', function (e) {
+                        setModifiers(e);
+                        _callbacks.inputManagerEvent('', EVENTS.KEYDOWN, e);
+                    });
+
+                    root.addEventListener('keyup', function (e) {
+                        setModifiers(e);
+                        _callbacks.inputManagerEvent('', EVENTS.KEYUP, e);
+                    });
                 },
-                addListeners: function (view, isFocusable) {
+                addListeners: function (view) {
                     if (!view) return;
 
                     view.addEventListener('pointerenter', function (e) {
@@ -451,31 +465,6 @@ Object.defineProperty(window, 'osjs', {
                         setModifiers(e);
                         invokePointerCallback(getClosestElement(e.currentTarget), EVENTS.POINTER_LEAVE, e);
                     });
-
-                    if (isFocusable) {
-                        view.addEventListener('keypress', function (e) {
-                            if (!e.isHandled) {
-                                e.isHandled = true;
-                                _callbacks.inputManagerEvent(getClosestElementId(e.currentTarget), EVENTS.KEYPRESS, e);
-                            }
-                        });
-
-                        view.addEventListener('keydown', function (e) {
-                            if (!e.isHandled) {
-                                e.isHandled = true;
-                                setModifiers(e);
-                                _callbacks.inputManagerEvent(getClosestElementId(e.currentTarget), EVENTS.KEYDOWN, e);
-                            }
-                        });
-
-                        view.addEventListener('keyup', function (e) {
-                            if (!e.isHandled) {
-                                e.isHandled = true;
-                                setModifiers(e);
-                                _callbacks.inputManagerEvent(getClosestElementId(e.currentTarget), EVENTS.KEYUP, e);
-                            }
-                        });
-                    }
                 },
                 getModifiers: function () {
                     return _modifiers;
@@ -582,10 +571,10 @@ Object.defineProperty(window, 'osjs', {
             return element;
         }
 
-        function createLayoutElement(tagName, id, windowid, isKeyboardFocusable) {
+        function createLayoutElement(tagName, id, windowid) {
             const element = createVisualElement(tagName, id, windowid);
             element.classList.add(CSS_CLASS.UIELEMENT, CSS_CLASS.UIELEMENT_UNARRANGED);
-            _inputManager.addListeners(element, isKeyboardFocusable);
+            _inputManager.addListeners(element);
             return element;
         }
 
@@ -708,18 +697,18 @@ Object.defineProperty(window, 'osjs', {
 
                 return element;
             },
-            createLayout: function (tagName, id, parentId, isKeyboardFocusable) {
+            createLayout: function (tagName, id, parentId) {
                 const parent = document.getElementById(parentId);
                 if (!parent) return;
 
-                const element = createLayoutElement(tagName, id, parent.windowid, isKeyboardFocusable);
+                const element = createLayoutElement(tagName, id, parent.windowid);
                 parent.appendChild(element);
             },
             createTextBlock: function (id, parentId) {
                 const parent = document.getElementById(parentId);
                 if (!parent) return;
 
-                const element = createLayoutElement('div', id, parent.windowid, false);
+                const element = createLayoutElement('div', id, parent.windowid);
                 element.classList.add(CSS_CLASS.TEXTBLOCK);
 
                 parent.appendChild(element);
@@ -728,7 +717,7 @@ Object.defineProperty(window, 'osjs', {
                 const parent = document.getElementById(parentId);
                 if (!parent) return;
 
-                const element = createLayoutElement('div', id, parent.windowid, false);
+                const element = createLayoutElement('div', id, parent.windowid);
                 element.classList.add(CSS_CLASS.BORDER);
 
                 parent.appendChild(element);
@@ -737,7 +726,7 @@ Object.defineProperty(window, 'osjs', {
                 const parent = document.getElementById(parentId);
                 if (!parent) return;
 
-                const element = createLayoutElement('div', id, parent.windowid, false);
+                const element = createLayoutElement('div', id, parent.windowid);
                 const canvas = createVisualElement('canvas', canvasId, parent.windowid);
                 canvas.classList.add(CSS_CLASS.INKPRESENTER);
 
@@ -1237,7 +1226,7 @@ Object.defineProperty(window, 'osjs', {
                     const parent = document.getElementById(parentId);
                     if (!parent) return;
 
-                    const view = createLayoutElement('div', id, parent.windowid, false);
+                    const view = createLayoutElement('div', id, parent.windowid);
                     const content = document.createElement('div');
                     content.setAttribute('id', contentId);
                     if (useShadowDom) {
@@ -1714,7 +1703,7 @@ Object.defineProperty(window, 'osjs', {
                     const parent = document.getElementById(parentId);
                     if (!parent) return;
 
-                    const element = createLayoutElement('div', id, parent.windowid, false);
+                    const element = createLayoutElement('div', id, parent.windowid);
                     element.style.lineHeight = '0px';
 
                     const img = createVisualElement('img', imgId, parent.windowid);
@@ -1852,7 +1841,7 @@ Object.defineProperty(window, 'osjs', {
                         const parent = document.getElementById(parentId);
                         if (!parent) return;
 
-                        const view = createLayoutElement('textarea', id, parent.windowid, true);
+                        const view = createLayoutElement('textarea', id, parent.windowid);
                         view.classList.add(CSS_CLASS.TEXTBOXVIEW);
 
                         view.setAttribute('tabindex', -1);
@@ -1892,7 +1881,7 @@ Object.defineProperty(window, 'osjs', {
                         const parent = document.getElementById(parentId);
                         if (!parent) return;
 
-                        const view = createLayoutElement('input', id, parent.windowid, true);
+                        const view = createLayoutElement('input', id, parent.windowid);
                         view.classList.add(CSS_CLASS.PASSWORDBOXVIEW);
 
                         view.setAttribute('type', 'password');
@@ -2355,7 +2344,7 @@ Object.defineProperty(window, 'osjs', {
                         const parent = document.getElementById(parentId);
                         if (!parent) return;
 
-                        const view = createLayoutElement('div', id, parent.windowid, true);
+                        const view = createLayoutElement('div', id, parent.windowid);
                         instances.set(id, view);
 
                         view.addEventListener('scroll', function (e) { _callbacks.richTextViewManagerScroll(this.id); });

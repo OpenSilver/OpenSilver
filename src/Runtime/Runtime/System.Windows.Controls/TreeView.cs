@@ -891,7 +891,7 @@ namespace System.Windows.Controls
         {
             if (SelectedContainer != null)
             {
-                if (SelectedContainer != FocusManager.GetFocusedElement())
+                if (!SelectedContainer.IsKeyboardFocused)
                 {
                     SelectedContainer.Focus();
                 }

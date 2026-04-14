@@ -40,7 +40,7 @@ namespace System.Windows.Controls
         /// <inheritdoc />
         protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this, false);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this);
 
             _iFrame = INTERNAL_HtmlDomManager.AppendDomElement("iframe", outerDiv, this);
             _iFrame.SetCssStyleProperty(CssPropertyNames.Width, "100%");

@@ -223,7 +223,7 @@ namespace System.Windows.Controls
             switch (e.Key)
             {
                 case Key.Enter:
-                    if (ItemsControlFromItemContainer(FocusManager.GetFocusedElement() as DependencyObject) == this)
+                    if (ItemsControlFromItemContainer(Keyboard.FocusedElement as DependencyObject) == this)
                     {
                         KeyboardCloseDropDown(true);
                     }

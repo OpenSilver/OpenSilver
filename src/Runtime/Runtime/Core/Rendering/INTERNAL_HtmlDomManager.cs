@@ -154,12 +154,11 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
         internal static HtmlElementReference CreateDomLayoutElementAndAppendIt(
-            string tagName, HtmlElementReference parent, UIElement uie, bool isKeyboardFocusable)
+            string tagName, HtmlElementReference parent, UIElement uie)
         {
             string uid = NewId();
 
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"osjs.createLayout('{tagName}','{uid}','{parent.Uid}'{(isKeyboardFocusable ? ",true" : string.Empty)})");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.createLayout('{tagName}','{uid}','{parent.Uid}')");
 
             AddToGlobalStore(uid, uie);
 

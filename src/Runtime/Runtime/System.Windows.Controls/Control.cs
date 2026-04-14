@@ -615,7 +615,7 @@ public partial class Control : FrameworkElement, IInternalControl
     /// <inheritdoc />
     protected internal sealed override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
-        return CreateDomElementInternal(parent, true);
+        return base.CreateDomElement(parent);
     }
 
     /// <summary>

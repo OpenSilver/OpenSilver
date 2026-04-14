@@ -217,7 +217,7 @@ namespace System.Windows.Controls
                 {
                     case Key.Space:
                         if (ModifierKeys.Alt != (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Alt))
-                            && FocusManager.GetFocusedElement() is ListBoxItem listBoxItem)
+                            && Keyboard.FocusedElement is ListBoxItem listBoxItem)
                         {
                             MakeKeyboardSelection(listBoxItem);
                             handled = true;

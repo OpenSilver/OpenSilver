@@ -1178,7 +1178,7 @@ namespace System.Windows.Controls
                         // collapsed.
                         if (!TreeView.IsControlKeyDown && CanExpandOnInput && IsExpanded)
                         {
-                            if (FocusManager.GetFocusedElement() != this)
+                            if (!IsKeyboardFocused)
                             {
                                 Focus();
                             }

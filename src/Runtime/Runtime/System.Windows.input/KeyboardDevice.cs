@@ -271,42 +271,24 @@ public abstract class KeyboardDevice : InputDevice
 
     internal void ProcessInput(UIElement uie, EVENTS eventType, object jsEventArg)
     {
-        if (uie is null)
-        {
-            ProcessUnmappedInput(eventType, jsEventArg);
-        }
-        else
-        {
-            DispatchEvent(uie, eventType, jsEventArg);
-        }
-    }
-
-    private void DispatchEvent(UIElement uie, EVENTS eventType, object jsEventArg)
-    {
         switch (eventType)
         {
             case EVENTS.KEYDOWN:
-                ProcessOnKeyDown(uie, jsEventArg);
+                ProcessOnKeyDown(jsEventArg);
                 break;
 
             case EVENTS.KEYUP:
-                ProcessOnKeyUp(uie, jsEventArg);
+                ProcessOnKeyUp(jsEventArg);
                 break;
 
             case EVENTS.KEYPRESS:
-                ProcessOnKeyPress(uie, jsEventArg);
+                ProcessOnKeyPress(jsEventArg);
                 break;
 
             case EVENTS.FOCUS_IN:
                 OnFocusIn(uie, jsEventArg);
                 break;
-        }
-    }
 
-    private void ProcessUnmappedInput(EVENTS eventType, object jsEventArg)
-    {
-        switch (eventType)
-        {
             case EVENTS.FOCUS_OUT:
                 OnFocusOut();
                 break;
@@ -321,8 +303,13 @@ public abstract class KeyboardDevice : InputDevice
         }
     }
 
-    private void ProcessOnKeyDown(UIElement uie, object jsEventArg)
+    private void ProcessOnKeyDown(object jsEventArg)
     {
+        if (_focus is not UIElement uie)
+        {
+            return;
+        }
+
         uint nativeKeyCode = OpenSilver.Interop.ExecuteJavaScriptUInt32(
             $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.keyCode", false);
 
@@ -376,8 +363,13 @@ public abstract class KeyboardDevice : InputDevice
         }
     }
 
-    private void ProcessOnKeyUp(UIElement uie, object jsEventArg)
+    private void ProcessOnKeyUp(object jsEventArg)
     {
+        if (_focus is not UIElement uie)
+        {
+            return;
+        }
+
         uint nativeKeyCode = OpenSilver.Interop.ExecuteJavaScriptUInt32(
             $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.keyCode", false);
 
@@ -423,8 +415,13 @@ public abstract class KeyboardDevice : InputDevice
         CommandManager.InvalidateRequerySuggested();
     }
 
-    private void ProcessOnKeyPress(UIElement uie, object jsEventArg)
+    private void ProcessOnKeyPress(object jsEventArg)
     {
+        if (_focus is not UIElement uie)
+        {
+            return;
+        }
+
         uint nativeKeyCode = OpenSilver.Interop.ExecuteJavaScriptUInt32(
             $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.keyCode", false);
 

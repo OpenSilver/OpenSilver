@@ -437,12 +437,7 @@ namespace System.Windows
         /// <inheritdoc />
         protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            return CreateDomElementInternal(parent, false);
-        }
-
-        internal HtmlElementReference CreateDomElementInternal(HtmlElementReference parent, bool isKeyboardFocusable)
-        {
-            return INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this, isKeyboardFocusable);
+            return INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this);
         }
 
         // Internal helper so the FrameworkElement could see the

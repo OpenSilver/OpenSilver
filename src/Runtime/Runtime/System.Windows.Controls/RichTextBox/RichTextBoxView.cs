@@ -90,7 +90,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
         SetProperties();
 
-        if (FocusManager.GetFocusedElement() == Host)
+        if (Host.IsKeyboardFocused)
         {
             InputManager.SetFocusNative(OuterDiv);
         }

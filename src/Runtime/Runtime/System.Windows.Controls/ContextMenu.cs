@@ -286,7 +286,7 @@ public class ContextMenu : MenuBase
     {
         int count = Items.Count;
         int startingIndex = down ? -1 : count;
-        if (FocusManager.GetFocusedElement() is MenuItem focusedMenuItem && this == focusedMenuItem.LogicalParent)
+        if (Keyboard.FocusedElement is MenuItem focusedMenuItem && this == focusedMenuItem.LogicalParent)
         {
             startingIndex = ItemContainerGenerator.IndexFromContainer(focusedMenuItem);
         }

@@ -368,7 +368,7 @@ namespace System.Windows.Controls
         /// <inheritdoc />
         protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
         {
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this, false);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parent, this);
             CreateMediaElement(outerDiv, Source);
             return outerDiv;
         }

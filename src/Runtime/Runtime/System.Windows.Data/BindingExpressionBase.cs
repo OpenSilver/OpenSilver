@@ -337,13 +337,15 @@ public abstract class BindingExpressionBase : Expression
 
         NeedsUpdate = true;
 
-        if (IsUpdateOnLostFocus && ReferenceEquals(FocusManager.GetFocusedElement(), Target))
+        if (IsUpdateOnLostFocus && IsTargetFocused())
         {
             return;
         }
 
         Update();
     }
+
+    private bool IsTargetFocused() => Target is UIElement uie && uie.IsKeyboardFocusWithin;
 
     internal virtual void Update() { }
 
