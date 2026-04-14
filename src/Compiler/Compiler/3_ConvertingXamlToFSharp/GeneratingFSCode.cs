@@ -122,7 +122,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"({targetParam} :?> {_componentType}).{_eventName}.AddHandler({RuntimeHelperClass}.CreateDelegate<{_handlerType}>(\"{_handlerName}\", this))";
+                    return $"({targetParam} :?> global.{_componentType}).{_eventName}.AddHandler({RuntimeHelperClass}.CreateDelegate<{_handlerType}>(\"{_handlerName}\", this))";
                 }
             }
 
@@ -146,7 +146,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"{_ownerType}.Add{_eventName}Handler(({targetParam} :?> {_componentType}), {RuntimeHelperClass}.CreateDelegate<{_handlerType}>(\"{_handlerName}\", this))";
+                    return $"global.{_ownerType}.Add{_eventName}Handler(({targetParam} :?> global.{_componentType}), {RuntimeHelperClass}.CreateDelegate<global.{_handlerType}>(\"{_handlerName}\", this))";
                 }
             }
 
@@ -164,7 +164,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"({targetParam} :?> global.System.Windows.EventSetter).Handler <- {RuntimeHelperClass}.CreateDelegate<{_handlerType}>(\"{_handlerName}\", this)";
+                    return $"({targetParam} :?> global.System.Windows.EventSetter).Handler <- {RuntimeHelperClass}.CreateDelegate<global.{_handlerType}>(\"{_handlerName}\", this)";
                 }
             }
 
@@ -182,7 +182,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"this.{_fieldName} <- {targetParam} :?> {_componentType}";
+                    return $"this.{_fieldName} <- {targetParam} :?> global.{_componentType}";
                 }
             }
         }

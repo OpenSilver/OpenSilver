@@ -11,16 +11,14 @@
 *
 \*====================================================================================*/
 
+using Mono.Cecil;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml;
-using System.Xml.Linq;
-using Mono.Cecil;
 
 namespace OpenSilver.Compiler
 {
@@ -103,26 +101,17 @@ namespace OpenSilver.Compiler
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        private const string GenericMarkupExtension = "IMarkupExtension`1";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
-        private const string DependencyProperty = "DependencyProperty";
-        private const string SetPrefix = "Set";
-        private const string GetPrefix = "Get";
-        private const string Name = "Name";
-        private const string PropertySuffix = "Property";
         private const string Using = "using:";
         private const string ClrNamespace = "clr-namespace:";
         private const string StaticRes = "StaticResource";
         private const string StaticResExtension = "StaticResourceExtension";
-        private const string FrameworkTemplateName = "FrameworkTemplate";
-        private const string ResourceDictionaryName = "ResourceDictionary";
 
         private readonly MonoCecilAssemblyStorage _storage;
         private readonly Dictionary<AssemblyDefinition, AssemblyData> _assemblies = [];
         private readonly ConcurrentDictionary<TypeKey, TypeDefinition> _typeNameToType = [];
         private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<TypeKey>> _typesPerAssembly = [];
 
-        private readonly SystemTypesHelper _systemTypesHelper;
         private readonly TypeReferenceHelper _typeReferenceHelper;
         private readonly XamlNameParser _xamlNameParser;
 
@@ -138,6 +127,18 @@ namespace OpenSilver.Compiler
         private TypeDefinition _resourceDictionaryType;
         private TypeDefinition _contentPresenterType;
         private TypeDefinition _contentControlType;
+        private TypeDefinition _relativeSourceType;
+        private TypeDefinition _bindingBaseType;
+        private TypeDefinition _bindingType;
+        private TypeDefinition _multiBindingType;
+        private TypeDefinition _templateBindingExtensionType;
+        private TypeDefinition _nullExtensionType;
+        private TypeDefinition _staticExtensionType;
+        private TypeDefinition _typeExtensionType;
+        private TypeDefinition _staticResourceExtensionType;
+        private TypeDefinition _themeResourceExtensionType;
+        private TypeDefinition _dynamicResourceExtensionType;
+        private TypeDefinition _responsiveExtensionType;
         private TypeDefinition _iUIElementType;
         private TypeDefinition _iFrameworkElementType;
         private TypeDefinition _iMarkupExtensionType;
@@ -175,6 +176,42 @@ namespace OpenSilver.Compiler
         private TypeDefinition ContentControlType =>
             _contentControlType ??= FindType(KnownNamespaces.SystemWindowsControls, "ContentControl", Constants.OPENSILVER_ASSEMBLY_NAME);
 
+        private TypeDefinition RelativeSourceType =>
+            _relativeSourceType ??= FindType(KnownNamespaces.SystemWindowsData, "RelativeSource", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition BindingBaseType =>
+            _bindingBaseType ??= FindType(KnownNamespaces.SystemWindowsData, "BindingBase", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition BindingType =>
+            _bindingType ??= FindType(KnownNamespaces.SystemWindowsData, "Binding", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition MultiBindingType =>
+            _multiBindingType ??= FindType(KnownNamespaces.SystemWindowsData, "MultiBinding", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition TemplateBindingExtensionType =>
+            _templateBindingExtensionType ??= FindType(KnownNamespaces.SystemWindows, "TemplateBindingExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition NullExtensionType =>
+            _nullExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "NullExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition StaticExtensionType =>
+            _staticExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "StaticExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition TypeExtensionType =>
+            _typeExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "TypeExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition StaticResourceExtensionType =>
+            _staticResourceExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "StaticResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition ThemeResourceExtensionType =>
+            _themeResourceExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "ThemeResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition DynamicResourceExtensionType =>
+            _dynamicResourceExtensionType ??= FindType(KnownNamespaces.SystemWindows, "DynamicResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
+        private TypeDefinition ResponsiveExtensionType =>
+            _responsiveExtensionType ??= FindType(KnownNamespaces.SystemWindows, "ResponsiveExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+
         private TypeDefinition IUIElementType =>
             _iUIElementType ??= FindType(KnownNamespaces.SystemWindows, "IUIElement", Constants.OPENSILVER_ASSEMBLY_NAME);
 
@@ -182,32 +219,19 @@ namespace OpenSilver.Compiler
             _iFrameworkElementType ??= FindType(KnownNamespaces.SystemWindows, "IFrameworkElement", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition IMarkupExtensionType =>
-            _iMarkupExtensionType ??= FindType(KnownNamespaces.SystemXaml, GenericMarkupExtension, Constants.OPENSILVER_ASSEMBLY_NAME);
+            _iMarkupExtensionType ??= FindType(KnownNamespaces.SystemXaml, "IMarkupExtension`1", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         public MonoCecilAssembliesInspectorImpl(string assemblyName, SupportedLanguage compilerType)
         {
             _xamlNameParser = new XamlNameParser(assemblyName);
 
-            switch (compilerType)
+            _typeReferenceHelper = compilerType switch
             {
-                case SupportedLanguage.CSharp:
-                    _systemTypesHelper = SystemTypesHelper.CSharp;
-                    _typeReferenceHelper = TypeReferenceHelper.CSharp;
-                    break;
-
-                case SupportedLanguage.VBNet:
-                    _systemTypesHelper = SystemTypesHelper.VisualBasic;
-                    _typeReferenceHelper = TypeReferenceHelper.VisualBasic;
-                    break;
-
-                case SupportedLanguage.FSharp:
-                    _systemTypesHelper = SystemTypesHelper.FSharp;
-                    _typeReferenceHelper = TypeReferenceHelper.FSharp;
-                    break;
-
-                default:
-                    throw new InvalidCompilerTypeException();
-            }
+                SupportedLanguage.CSharp => TypeReferenceHelper.CSharp,
+                SupportedLanguage.VBNet => TypeReferenceHelper.VisualBasic,
+                SupportedLanguage.FSharp => TypeReferenceHelper.FSharp,
+                _ => throw new InvalidCompilerTypeException(),
+            };
 
             _storage = new MonoCecilAssemblyStorage();
         }
@@ -250,9 +274,6 @@ namespace OpenSilver.Compiler
 
         internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName)
             => FindType(namespaceName, typeName, assemblyName, null);
-
-        private TypeDefinition FindType(string namespaceName, string typeName, IXmlLineInfo lineInfo)
-            => FindType(namespaceName, typeName, null, lineInfo);
 
         internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo,
             bool doNotRaiseExceptionIfNotFound = false)
@@ -342,7 +363,38 @@ namespace OpenSilver.Compiler
                 return null;
             }
 
-            throw new XamlParseException($"Cannot find type '{typeKey}'.", lineInfo);
+            throw GetTypeNotFoundError(namespaceName, typeName, assemblyName, lineInfo);
+        }
+
+        private static XamlParseException GetTypeNotFoundError(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            if (IsNamespaceAnXmlNamespace(namespaceName))
+            {
+                return new XamlParseException($"The type '{typeName}' does not exist in XML namespace '{namespaceName}'.", lineInfo);
+            }
+
+            if (string.IsNullOrEmpty(assemblyName))
+            {
+                if (string.IsNullOrEmpty(namespaceName))
+                {
+                    return new XamlParseException($"The type '{typeName}' does not exist.", lineInfo);
+                }
+                else
+                {
+                    return new XamlParseException($"The type '{typeName}' does not exist in CLR namespace '{namespaceName}'.", lineInfo);
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(namespaceName))
+                {
+                    return new XamlParseException($"The type '{typeName}' does not exist in assembly '{assemblyName}'.", lineInfo);
+                }
+                else
+                {
+                    return new XamlParseException($"The type '{typeName}' does not exist in CLR namespace '{namespaceName}' in assembly '{assemblyName}'.", lineInfo);
+                }
+            }
         }
 
         private static bool IsNamespaceAnXmlNamespace(string namespaceName)
@@ -350,184 +402,473 @@ namespace OpenSilver.Compiler
             return namespaceName.StartsWith("http://"); //todo: are there other conditions possible for XML namespaces declared with xmlnsDefinitionAttribute?
         }
 
-        private IMemberDefinition GetMemberInfo(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny,
-            IXmlLineInfo lineInfo, bool returnNullIfNotFoundInsteadOfException = false)
-        {
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-            var typeIterator = elementType;
-            while (typeIterator != null)
-            {
-                var prop = typeIterator.Properties.FirstOrDefault(x => x.Name == memberName);
-                if (prop != null) return prop;
-
-                var method = FindMethod(typeIterator, memberName);
-                if (method != null) return method;
-
-                var ev = typeIterator.Events.FirstOrDefault(x => x.Name == memberName);
-                if (ev != null) return ev;
-
-                var field = typeIterator.Fields.FirstOrDefault(x => x.Name == memberName);
-                if (field != null) return field;
-
-                typeIterator = typeIterator.BaseType?.ResolveOrThrow();
-            }
-
-            if (returnNullIfNotFoundInsteadOfException)
-                return null;
-
-            throw new XamlParseException($"Member '{memberName}' not found in type '{elementType}'.", lineInfo);
-        }
-
-        internal static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName, out TypeReference ownerElementType)
-            => FindPropertyDeep(elementType, propertyName, out ownerElementType, false, false, false);
-
-        private static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName,
-            out TypeReference ownerElementType, bool ignoreCase = false, bool staticOnly = false, bool publicOnly = false)
-        {
-            ownerElementType = elementType;
-            while (ownerElementType != null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-                var propertyDefinition = resolved.Properties.FirstOrDefault(p =>
-                    string.Compare(p.Name, propertyName, ignoreCase) == 0 && (!staticOnly || p.GetMethod.IsStatic) &&
-                    (!publicOnly || p.GetMethod.IsPublic));
-                if (propertyDefinition != null) return propertyDefinition;
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
-            }
-
-            return null;
-        }
-
-        internal static PropertyDefinition FindPropertyGetterDeep(TypeDefinition type, string name, out TypeReference ownerElementType,
-            bool staticOnly = false, bool publicOnly = false)
-        {
-            ownerElementType = type;
-            while (ownerElementType != null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-                var propertyDefinition = resolved.Properties.FirstOrDefault(p =>
-                {
-                    if (p.Name != name)
-                    {
-                        return false;
-                    }
-
-                    if (p.GetMethod is MethodDefinition getMethod)
-                    {
-                        return (!staticOnly || getMethod.IsStatic) && (!publicOnly || getMethod.IsPublic);
-                    }
-
-                    return false;
-                });
-
-                if (propertyDefinition != null) return propertyDefinition;
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(type, ownerElementType);
-            }
-
-            return null;
-        }
-
-        internal static FieldDefinition FindFieldDeep(TypeDefinition elementType, string propertyName,
-            out TypeReference ownerElementType, bool ignoreCase = false, bool staticOnly = false, bool publicOnly = false)
-        {
-            ownerElementType = elementType;
-            while (ownerElementType != null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-                var fieldDefinition = resolved.Fields.FirstOrDefault(p =>
-                    string.Compare(p.Name, propertyName, ignoreCase) == 0 && (!staticOnly || p.IsStatic) &&
-                    (!publicOnly || p.IsPublic));
-                if (fieldDefinition != null) return fieldDefinition;
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
-            }
-
-            return null;
-        }
-
-        internal static EventDefinition FindEventDeep(TypeDefinition elementType, string eventName,
-            out TypeReference ownerElementType, bool publicOnly)
-        {
-            ownerElementType = elementType;
-            while (ownerElementType != null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-                var eventDefinition = resolved.Events.FirstOrDefault(p =>
-                    string.Equals(p.Name, eventName, StringComparison.Ordinal) &&
-                    !p.AddMethod.IsStatic &&
-                    (!publicOnly || p.AddMethod.IsPublic));
-
-                if (eventDefinition != null) return eventDefinition;
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
-            }
-
-            return null;
-        }
-
-        public static MethodDefinition FindMethodDeep(TypeDefinition elementType,
-            string methodName,
-            bool onlyPublic,
-            bool onlyStatic,
+        internal static PropertyDefinition FindPropertyDeep(
+            TypeDefinition elementType,
+            string propertyName,
+            MemberFlags flags,
             out TypeReference ownerElementType)
         {
+            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+            {
+                ownerElementType = null;
+                return null;
+            }
+
             ownerElementType = elementType;
-            while (ownerElementType != null)
+
+            while (ownerElementType is not null)
             {
                 var resolved = ownerElementType.ResolveOrThrow();
-                var methodInfo = FindMethod(resolved, methodName, onlyPublic, onlyStatic);
-                if (methodInfo != null)
+
+                foreach (var property in resolved.Properties)
                 {
-                    return methodInfo;
+                    if (string.Compare(property.Name, propertyName, ignoreCaseFlag) != 0)
+                    {
+                        continue;
+                    }
+
+                    if (staticFlag != instanceFlag && staticFlag != IsStatic(property))
+                    {
+                        continue;
+                    }
+
+                    if (publicFlag != nonPublicFlag && publicFlag != IsPublic(property))
+                    {
+                        continue;
+                    }
+
+                    return property;
                 }
+
+                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+            }
+
+            return null;
+
+            static bool IsStatic(PropertyDefinition property)
+            {
+                return property.GetMethod is not null && property.GetMethod.IsStatic ||
+                       property.SetMethod is not null && property.SetMethod.IsStatic;
+            }
+
+            static bool IsPublic(PropertyDefinition property)
+            {
+                return property.GetMethod is not null && property.GetMethod.IsPublic ||
+                       property.SetMethod is not null && property.SetMethod.IsPublic;
+            }
+        }
+
+        private static bool TestMemberFlag(MemberFlags flags, MemberFlags value) => (flags & value) == value;
+
+        internal static FieldDefinition FindFieldDeep(
+            TypeDefinition elementType,
+            string name,
+            MemberFlags flags,
+            out TypeReference ownerElementType)
+        {
+            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+            {
+                ownerElementType = null;
+                return null;
+            }
+
+            ownerElementType = elementType;
+
+            while (ownerElementType is not null)
+            {
+                var resolved = ownerElementType.ResolveOrThrow();
+
+                foreach (var field in resolved.Fields)
+                {
+                    if (string.Compare(field.Name, name, ignoreCaseFlag) != 0)
+                    {
+                        continue;
+                    }
+
+                    if (staticFlag != instanceFlag && staticFlag != field.IsStatic)
+                    {
+                        continue;
+                    }
+
+                    if (publicFlag != nonPublicFlag && publicFlag != field.IsPublic)
+                    {
+                        continue;
+                    }
+
+                    return field;
+                }
+
                 ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
             }
 
             return null;
         }
 
-        private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName,
-            string assemblyNameIfAny, IXmlLineInfo lineInfo, bool isAttached = false)
+        internal static EventDefinition FindEventDeep(
+            TypeDefinition elementType,
+            string eventName,
+            MemberFlags flags,
+            out TypeReference ownerElementType)
         {
-            return GetPropertyOrFieldType(propertyName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
-                out _, isAttached);
+            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+            {
+                ownerElementType = null;
+                return null;
+            }
+
+            ownerElementType = elementType;
+
+            while (ownerElementType is not null)
+            {
+                var resolved = ownerElementType.ResolveOrThrow();
+
+                foreach (var eventDefinition in resolved.Events)
+                {
+                    if (string.Compare(eventDefinition.Name, eventName, ignoreCaseFlag) != 0)
+                    {
+                        continue;
+                    }
+
+                    if (staticFlag != instanceFlag && staticFlag != IsStatic(eventDefinition))
+                    {
+                        continue;
+                    }
+
+                    if (publicFlag != nonPublicFlag && publicFlag != IsPublic(eventDefinition))
+                    {
+                        continue;
+                    }
+
+                    return eventDefinition;
+                }
+
+                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+            }
+
+            return null;
+
+            static bool IsStatic(EventDefinition eventDefinition)
+            {
+                return eventDefinition.AddMethod is not null && eventDefinition.AddMethod.IsStatic ||
+                       eventDefinition.RemoveMethod is not null && eventDefinition.RemoveMethod.IsStatic;
+            }
+
+            static bool IsPublic(EventDefinition eventDefinition)
+            {
+                return eventDefinition.AddMethod is not null && eventDefinition.AddMethod.IsPublic ||
+                       eventDefinition.RemoveMethod is not null && eventDefinition.RemoveMethod.IsPublic;
+            }
         }
 
-        private TypeReference GetPropertyOrFieldType(string propertyName, string namespaceName, string localTypeName, string assemblyNameIfAny,
-            IXmlLineInfo lineInfo, out bool hasTypeConverter, bool isAttached = false)
+        public static MethodDefinition FindMethodDeep(
+            TypeDefinition elementType,
+            string methodName,
+            MemberFlags flags,
+            out TypeReference ownerElementType)
+        {
+            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+            {
+                ownerElementType = null;
+                return null;
+            }
+
+            ownerElementType = elementType;
+
+            while (ownerElementType is not null)
+            {
+                var resolved = ownerElementType.ResolveOrThrow();
+
+                foreach (var method in resolved.Methods)
+                {
+                    if (string.Compare(method.Name, methodName, ignoreCaseFlag) != 0)
+                    {
+                        continue;
+                    }
+
+                    if (staticFlag != instanceFlag && staticFlag != method.IsStatic)
+                    {
+                        continue;
+                    }
+
+                    if (publicFlag != nonPublicFlag && publicFlag != method.IsPublic)
+                    {
+                        continue;
+                    }
+
+                    return method;
+                }
+
+                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+            }
+
+            return null;
+        }
+
+        private bool IsCollection(TypeDefinition type) =>
+            TypeDefinitionExtensions.Equals(type, IListType) || type.DoesAnySubTypeImplementInterface(IListType);
+
+        private bool IsDictionary(TypeDefinition type) =>
+            TypeDefinitionExtensions.Equals(type, IDictionaryType) || type.DoesAnySubTypeImplementInterface(IDictionaryType);
+
+        private static CustomAttribute GetCustomAttributeDeep(TypeDefinition type, string fullName)
+        {
+            while (type is not null)
+            {
+                foreach (var attribute in type.CustomAttributes)
+                {
+                    if (attribute.AttributeType.FullName == fullName)
+                    {
+                        return attribute;
+                    }
+                }
+
+                type = type.BaseType?.ResolveOrThrow();
+            }
+
+            return null;
+        }
+
+        public bool IsDependencyObject(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, DependencyObjectType) || type.IsSubclassOf(DependencyObjectType);
+        }
+
+        public bool IsApplication(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, ApplicationType) || type.IsSubclassOf(ApplicationType);
+        }
+
+        public bool IsResourceDictionary(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, ResourceDictionaryType) || type.IsSubclassOf(ResourceDictionaryType);
+        }
+
+        public bool IsStyle(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, StyleType) || type.IsSubclassOf(StyleType);
+        }
+
+        public bool IsFrameworkTemplate(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, FrameworkTemplateType) || type.IsSubclassOf(FrameworkTemplateType);
+        }
+
+        public bool IsDataTemplate(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, DataTemplateType) || type.IsSubclassOf(DataTemplateType);
+        }
+
+        public bool IsControlTemplate(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, ControlTemplateType) || type.IsSubclassOf(ControlTemplateType);
+        }
+
+        public bool IsContentPresenter(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, ContentPresenterType) || type.IsSubclassOf(ContentPresenterType);
+        }
+
+        public bool IsContentControl(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, ContentControlType) || type.IsSubclassOf(ContentControlType);
+        }
+
+        public bool IsRelativeSource(TypeDefinition type)
+        {
+            return type == RelativeSourceType;
+        }
+
+        public bool IsBindingBase(TypeReference type)
+        {
+            return type == BindingBaseType;
+        }
+
+        public bool IsBinding(TypeDefinition type)
+        {
+            return type == BindingType;
+        }
+
+        public bool IsMultiBinding(TypeDefinition type)
+        {
+            return type == MultiBindingType;
+        }
+
+        public bool IsTemplateBindingExtension(TypeDefinition type)
+        {
+            return type == TemplateBindingExtensionType;
+        }
+
+        public bool IsNullExtension(TypeDefinition type)
+        {
+            return type == NullExtensionType;
+        }
+
+        public bool IsStaticExtension(TypeDefinition type)
+        {
+            return type == StaticExtensionType;
+        }
+
+        public bool IsTypeExtension(TypeDefinition type)
+        {
+            return type == TypeExtensionType;
+        }
+
+        public bool IsStaticResourceExtension(TypeDefinition type)
+        {
+            return type == StaticResourceExtensionType;
+        }
+
+        public bool IsThemeResourceExtension(TypeDefinition type)
+        {
+            return type == ThemeResourceExtensionType;
+        }
+
+        public bool IsDynamicResourceExtension(TypeDefinition type)
+        {
+            return type == DynamicResourceExtensionType;
+        }
+
+        public bool IsResponsiveExtensionType(TypeDefinition type)
+        {
+            return type == ResponsiveExtensionType;
+        }
+
+        public bool IsIList(TypeDefinition type)
+        {
+            return IsCollection(type);
+        }
+
+        public bool IsIDictionary(TypeDefinition type)
+        {
+            return IsDictionary(type);
+        }
+
+        public bool IsIUIElement(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, IUIElementType) || type.DoesAnySubTypeImplementInterface(IUIElementType);
+        }
+
+        public bool IsIFrameworkElement(TypeDefinition type)
+        {
+            return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || type.DoesAnySubTypeImplementInterface(IFrameworkElementType);
+        }
+
+        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        {
+            if (propertyName != "Template")
+            {
+                return false;
+            }
+
+            var type = FindType(namespaceName, typeName, assemblyName, lineInfo);
+            var property = FindPropertyDeep(
+                type,
+                "Template",
+                MemberFlags.Public | MemberFlags.Instance,
+                out _);
+
+            return property is not null && IsFrameworkTemplateTemplateProperty(property);
+        }
+
+        public bool IsFrameworkTemplateTemplateProperty(MemberReference memberReference)
+        {
+            return memberReference.Name == "Template" &&
+                   memberReference is PropertyDefinition propertyDefinition &&
+                   propertyDefinition.DeclaringType == FrameworkTemplateType;
+        }
+
+        public bool IsElementAMarkupExtension(TypeDefinition type)
+        {
+            return type.DoesAnySubTypeImplementInterface(IMarkupExtensionType);
+        }
+
+        public string GetContentPropertyName(TypeDefinition type, IXmlLineInfo lineInfo)
+        {
+            CustomAttribute contentPropertyAttribute = GetCustomAttributeDeep(type, ContentPropertyAttributeFullName);
+
+            if (contentPropertyAttribute is not null && contentPropertyAttribute.HasConstructorArguments)
+            {
+                string contentPropertyName = contentPropertyAttribute.ConstructorArguments[0].Value?.ToString();
+
+                if (string.IsNullOrEmpty(contentPropertyName))
+                {
+                    throw new XamlParseException("The ContentPropertyAttribute must have a non-empty Name.", lineInfo);
+                }
+
+                return contentPropertyName;
+            }
+
+            if (IsCollection(type) || IsDictionary(type))
+            {
+                return null;
+            }
+
+            throw new XamlParseException(
+                $"No default content property exists for element: '{_typeReferenceHelper.ConvertToString(type)}'.",
+                lineInfo);
+        }
+
+        public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue, IXmlLineInfo lineInfo)
+        {
+            name = name.Trim();
+
+            if (name.IndexOf(',') != -1)
+            {
+                foreach (string token in name.Split(','))
+                {
+                    string fieldName = token.Trim();
+
+                    // integer values are not allowed when we have multiple values
+                    yield return GetEnumValue(enumType, fieldName, ignoreCase, false) ??
+                        throw new XamlParseException($"Field '{fieldName}' not found in type: '{_typeReferenceHelper.ConvertToString(enumType)}'.", lineInfo);
+                }
+            }
+            else
+            {
+                yield return GetEnumValue(enumType, name, ignoreCase, allowIntegerValue) ??
+                    throw new XamlParseException($"Field '{name}' not found in type: '{_typeReferenceHelper.ConvertToString(enumType)}'.", lineInfo);
+            }
+        }
+
+        public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+        {
+            return _typeReferenceHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
+        }
+
+        public static bool HasTypeConverter(MemberReference member)
         {
             const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
 
-            hasTypeConverter = false;
-
-            if (isAttached)
+            if (member is PropertyDefinition property)
             {
-                return GetMethodReturnValueType(GetPrefix + propertyName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
+                return property.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName) &&
+                    !ShouldIgnoreTypeConverter(property);
             }
-
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-
-            if (FindPropertyDeep(elementType, propertyName, out TypeReference ownerElementType) is PropertyDefinition propertyInfo)
-            {
-                if (propertyInfo.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName))
-                {
-                    hasTypeConverter = !ShouldIgnoreTypeConverter(propertyInfo);
-                }
-
-                var propertyType = propertyInfo.PropertyType;
-                var returnType = propertyType.PopulateGeneric(elementType, ownerElementType);
-                return returnType;
-            }
-
-            if (FindFieldDeep(elementType, propertyName, out TypeReference fieldOwnerElementType) is FieldDefinition fieldInfo)
-            {
-                var fieldType = fieldInfo.FieldType;
-                return fieldType.PopulateGeneric(elementType, fieldOwnerElementType);
-            }
-
-            throw new XamlParseException($"Property or field '{propertyName}' not found in type '{elementType}'.", lineInfo);
+            return false;
         }
 
         private static bool ShouldIgnoreTypeConverter(PropertyDefinition propertyInfo)
@@ -557,552 +898,110 @@ namespace OpenSilver.Compiler
             }
         }
 
-        private TypeReference GetMethodReturnValueType(
-            string methodName,
-            string namespaceName,
-            string localTypeName,
-            string assemblyNameIfAny,
-            IXmlLineInfo lineInfo)
+        public MemberReference GetMemberFromType(
+            string memberName,
+            TypeDefinition fromType,
+            MemberKind lookupFlags,
+            out TypeReference declaringType,
+            out TypeReference memberType,
+            out MemberKind memberKind)
         {
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-            var methodInfo = FindMethodDeep(elementType, methodName, false, false, out var ownerElementType);
-
-            if (methodInfo == null)
+            if (TestFlag(lookupFlags, MemberKind.Property))
             {
-                throw new XamlParseException($"Method '{methodName}' not found in type '{elementType}'.", lineInfo);
-            }
-
-            return methodInfo.ReturnType.PopulateGeneric(elementType, ownerElementType);
-        }
-
-        private bool IsCollection(TypeDefinition type) =>
-            TypeDefinitionExtensions.Equals(type, IListType) || type.DoesAnySubTypeImplementInterface(IListType);
-
-        private bool IsDictionary(TypeDefinition type) =>
-            TypeDefinitionExtensions.Equals(type, IDictionaryType) || type.DoesAnySubTypeImplementInterface(IDictionaryType);
-
-        private bool IsElementACollection(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
-            return IsCollection(elementType);
-        }
-
-        private bool IsDictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
-            return IsDictionary(elementType);
-        }
-
-        private static CustomAttribute GetCustomAttributeDeep(TypeDefinition type, string fullName)
-        {
-            while (type != null)
-            {
-                var customAttr = type.CustomAttributes.FirstOrDefault(ca =>
-                    ca.AttributeType.FullName == fullName);
-
-                if (customAttr != null) return customAttr;
-
-                type = type.BaseType?.ResolveOrThrow();
-            }
-
-            return null;
-        }
-
-        public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny,
-            IXmlLineInfo lineInfo, bool ifTypeNotFoundTryGuessing = false)
-        {
-            // Distinguish between system types (String, Double...) and other types
-            if (_systemTypesHelper.IsKnownType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
-                return _systemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
-
-            // Find the type:
-            var type = FindType(
-                namespaceName, localTypeName, assemblyNameIfAny, lineInfo, ifTypeNotFoundTryGuessing);
-
-            if (type != null)
-            {
-                // Use information from the type
-                return $"{_typeReferenceHelper.Global}{type}";
-            }
-
-            if (ifTypeNotFoundTryGuessing)
-            {
-                // Try guessing
-                if (IsNamespaceAnXmlNamespace(namespaceName))
-                    // Attempt to find the type in the current namespace
-                    return localTypeName;
-
-                return $"{_typeReferenceHelper.Global}{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
-            }
-
-            throw new XamlParseException($"Type '{localTypeName}' not found in namespace '{namespaceName}'.", lineInfo);
-        }
-
-        public string GetAssemblyQualifiedNameOfXamlType(
-            string namespaceName,
-            string localTypeName,
-            string assemblyNameIfAny,
-            IXmlLineInfo lineInfo)
-        {
-            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo, true);
-
-            if (type != null)
-            {
-                return _typeReferenceHelper.ConvertToString(type) + ", " + type.Module.Assembly.Name.Name;
-            }
-
-            return null;
-        }
-
-        public bool IsDependencyObject(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, DependencyObjectType) || type.IsSubclassOf(DependencyObjectType);
-        }
-
-        public bool IsApplication(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, ApplicationType) || type.IsSubclassOf(ApplicationType);
-        }
-
-        public bool IsResourceDictionary(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, ResourceDictionaryType) || type.IsSubclassOf(ResourceDictionaryType);
-        }
-
-        public bool IsStyle(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, StyleType) || type.IsSubclassOf(StyleType);
-        }
-
-        public bool IsFrameworkTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, FrameworkTemplateType) || type.IsSubclassOf(FrameworkTemplateType);
-        }
-
-        public bool IsDataTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, DataTemplateType) || type.IsSubclassOf(DataTemplateType);
-        }
-
-        public bool IsControlTemplate(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, ControlTemplateType) || type.IsSubclassOf(ControlTemplateType);
-        }
-
-        public bool IsContentPresenter(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, ContentPresenterType) || type.IsSubclassOf(ContentPresenterType);
-        }
-
-        public bool IsContentControl(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, ContentControlType) || type.IsSubclassOf(ContentControlType);
-        }
-
-        public bool IsIUIElement(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, IUIElementType) || type.DoesAnySubTypeImplementInterface(IUIElementType);
-        }
-
-        public bool IsIFrameworkElement(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || type.DoesAnySubTypeImplementInterface(IFrameworkElementType);
-        }
-
-        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            const string TemplatePropertyName = "Template";
-
-            if (propertyName != TemplatePropertyName)
-            {
-                return false;
-            }
-
-            var type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-
-            return FindPropertyDeep(type, TemplatePropertyName, out _) is PropertyDefinition prop &&
-                prop.DeclaringType.Name == FrameworkTemplateName &&
-                prop.DeclaringType.Namespace == KnownNamespaces.SystemWindows &&
-                prop.DeclaringType.Module.Assembly.Name.Name == Constants.OPENSILVER_ASSEMBLY_NAME;
-        }
-
-        public bool IsResourceDictionarySourcePropertyVisible(string namespaceName, string typeName, IXmlLineInfo lineInfo)
-        {
-            var type = FindType(namespaceName, typeName, lineInfo);
-
-            return FindPropertyDeep(type, "Source", out _) is PropertyDefinition prop &&
-                prop.DeclaringType.Name == ResourceDictionaryName &&
-                prop.DeclaringType.Namespace == KnownNamespaces.SystemWindows &&
-                prop.DeclaringType.Module.Assembly.Name.Name == Constants.OPENSILVER_ASSEMBLY_NAME;
-        }
-
-        public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            var memberInfo = GetMemberInfo(memberName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-            switch (memberInfo)
-            {
-                case PropertyDefinition _:
-                    return MemberTypes.Property;
-                case MethodDefinition _:
-                    return MemberTypes.Method;
-                case FieldDefinition _:
-                    return MemberTypes.Field;
-                case EventDefinition _:
-                    return MemberTypes.Event;
-                default:
-                    return MemberTypes.Custom;
-            }
-        }
-
-        public (MemberTypes Type, MethodDefinition Method, TypeReference DeclaringType) GetAttachedMemberType(
-            string memberName, string ownerTypeNamespace, string ownerTypeName, string ownerTypeAssemblyName, IXmlLineInfo lineInfo)
-        {
-            TypeDefinition ownerType = FindType(ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName, lineInfo);
-
-            TypeReference declaringType;
-
-            // First try attached property
-            if (FindMethodDeep(ownerType, $"Set{memberName}", true, true, out declaringType) is MethodDefinition setMethod)
-            {
-                return (MemberTypes.Property, setMethod, declaringType);
-            }
-
-            // Then attached event
-            if (FindMethodDeep(ownerType, $"Add{memberName}Handler", true, true, out declaringType) is MethodDefinition addMethod)
-            {
-                return (MemberTypes.Event, addMethod, declaringType);
-            }
-
-            return (MemberTypes.Custom, null, null);
-        }
-
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo,
-            out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
-            out bool isTypeEnum, bool isAttached = false)
-        {
-            GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
-                out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName,
-                out isTypeEnum, out _, isAttached);
-        }
-
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny,
-            IXmlLineInfo lineInfo, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
-            out bool isTypeEnum, out bool hasTypeConverter, bool isAttached = false)
-        {
-            var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo,
-                out hasTypeConverter, isAttached);
-            propertyNamespaceName = _typeReferenceHelper.BuildFullPath(typeRef);
-            propertyLocalTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(typeRef, false);
-            propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;
-            isTypeEnum = _typeReferenceHelper.IsEnum(typeRef.ResolveOrThrow());
-        }
-
-        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo,
-            out string returnValueNamespaceName, out string returnValueLocalTypeName,
-            out string returnValueAssemblyName, out bool isTypeEnum)
-        {
-            var typeDef = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-            returnValueNamespaceName = _typeReferenceHelper.BuildFullPath(typeDef);
-            returnValueLocalTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(typeDef, false);
-            returnValueAssemblyName = typeDef.ResolveOrThrow().Module.Assembly.Name.Name;
-            isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
-        }
-
-        public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
-            return elementType.DoesAnySubTypeImplementInterface(IMarkupExtensionType);
-        }
-
-        public bool IsTypeAssignableFrom(
-            string nameSpaceOfTypeToAssignFrom, string nameOfTypeToAssignFrom, string assemblyNameOfTypeToAssignFrom,
-            string nameSpaceOfTypeToAssignTo, string nameOfTypeToAssignTo, string assemblyNameOfTypeToAssignTo,
-            IXmlLineInfo lineInfo, bool isAttached = false)
-        {
-            TypeDefinition typeOfElementToAssignFrom;
-            TypeDefinition typeOfElementToAssignTo;
-
-            var indexOfLastDot = nameOfTypeToAssignFrom.LastIndexOf('.');
-
-            if (indexOfLastDot == -1)
-            {
-                typeOfElementToAssignFrom = FindType(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom,
-                    assemblyNameOfTypeToAssignFrom, lineInfo);
-            }
-            else
-            {
-                var localTypeName = nameOfTypeToAssignFrom.Substring(0, indexOfLastDot);
-                var propertyName = nameOfTypeToAssignFrom.Substring(indexOfLastDot + 1);
-                typeOfElementToAssignFrom = GetPropertyOrFieldType(propertyName, nameSpaceOfTypeToAssignFrom,
-                    localTypeName, assemblyNameOfTypeToAssignFrom, lineInfo).ResolveOrThrow();
-            }
-
-            indexOfLastDot = nameOfTypeToAssignTo.LastIndexOf('.');
-            if (indexOfLastDot == -1)
-            {
-                typeOfElementToAssignTo = FindType(nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo,
-                    assemblyNameOfTypeToAssignTo, lineInfo);
-            }
-            else
-            {
-                var localTypeName = nameOfTypeToAssignTo.Substring(0, indexOfLastDot);
-                var propertyName = nameOfTypeToAssignTo.Substring(indexOfLastDot + 1);
-                typeOfElementToAssignTo = GetPropertyOrFieldType(propertyName, nameSpaceOfTypeToAssignTo, localTypeName,
-                    assemblyNameOfTypeToAssignTo, lineInfo, isAttached).ResolveOrThrow();
-            }
-
-            return typeOfElementToAssignTo.IsAssignableFrom(typeOfElementToAssignFrom);
-        }
-
-        public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-
-            // Get instance of the attribute:
-            var contentPropertyAttr = GetCustomAttributeDeep(type, ContentPropertyAttributeFullName);
-
-            if (contentPropertyAttr == null &&
-                !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny, lineInfo) &&
-                !IsDictionary(namespaceName, localTypeName, assemblyNameIfAny, lineInfo))
-            {
-                //if the element is a collection, it is possible to add the children directly to this element.
-                throw new XamlParseException($"No default content property exists for element: '{localTypeName}'.", lineInfo);
-            }
-
-            if (contentPropertyAttr == null)
-            {
-                return null;
-            }
-
-            var value = contentPropertyAttr.ConstructorArguments[0].Value.ToString();
-
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new XamlParseException("The ContentPropertyAttribute must have a non-empty Name.", lineInfo);
-            }
-
-            return value;
-        }
-
-        public bool IsTypeAnEnum(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            var elementType = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            return elementType.IsEnum;
-        }
-
-        public static MethodDefinition FindMethod(TypeDefinition td, string methodName, bool onlyPublic = false,
-            bool onlyStatic = false)
-        {
-            return td.Methods.FirstOrDefault(m =>
-                m.Name == methodName && (!onlyPublic || m.IsPublic) && (!onlyStatic || m.IsStatic));
-        }
-
-        public bool IsPropertyAttached(string propertyOrFieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            var elementType = FindType(namespaceName, typeName, assemblyName, lineInfo);
-
-            var field = FindFieldDeep(elementType, propertyOrFieldName + PropertySuffix, out _) ??
-                        FindFieldDeep(elementType, propertyOrFieldName + PropertySuffix.ToLower(), out _);
-
-            if (field == null) return false;
-
-            if (field.FieldType.Name != DependencyProperty) return false;
-
-            var nbOfParameters = 2;
-            var method = FindMethod(field.DeclaringType, SetPrefix + propertyOrFieldName, true, true);
-            if (method == null)
-            {
-                method = FindMethod(field.DeclaringType, GetPrefix + propertyOrFieldName, true, true);
-                nbOfParameters = 1;
-            }
-
-            if (method == null) return false;
-
-            return method.Parameters.Count == nbOfParameters;
-        }
-
-        public bool IsPropertyOrFieldACollection(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            var propertyOrFieldType = GetPropertyOrFieldType(propertyName, namespaceName, typeName, assemblyName, lineInfo);
-            return IsCollection(propertyOrFieldType.ResolveOrThrow()) || IsDictionary(propertyOrFieldType.ResolveOrThrow());
-        }
-
-        public bool IsPropertyOrFieldADictionary(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            var propertyOrFieldType = GetPropertyOrFieldType(propertyName, namespaceName, typeName, assemblyName, lineInfo);
-            return IsDictionary(propertyOrFieldType.ResolveOrThrow());
-        }
-
-        public XName GetCSharpEquivalentOfXamlTypeAsXName(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            //todo: in this method, we assume that the alias will be global, which will be false if the user chose something else --> find the right alias.
-            // Find the type:
-            if (FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo) is not TypeDefinition type)
-            {
-                throw new XamlParseException($"Type '{localTypeName}' not found in namespace '{namespaceName}'.", lineInfo);
-            }
-
-            // Use information from the type:
-            return XName.Get(type.Name, namespaceName);
-        }
-
-        public bool DoesTypeContainNameMemberOfTypeString(string namespaceName, string localTypeName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            var memberInfo = GetMemberInfo(Name, namespaceName, localTypeName, assemblyNameIfAny, lineInfo, true);
-            if (memberInfo == null) return false;
-
-            if (memberInfo is FieldDefinition fd && fd.FieldType.IsString() && fd.IsPublic && !fd.IsStatic) return true;
-
-            if (memberInfo is PropertyDefinition pd && pd.PropertyType.IsString()) return true;
-
-            return false;
-        }
-
-        public bool DoesMethodReturnACollection(string methodName, string typeNamespaceName, string localTypeName, string assemblyName,
-            IXmlLineInfo lineInfo)
-        {
-            var propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, assemblyName, lineInfo);
-            return IsCollection(propertyType.ResolveOrThrow())
-                   || IsDictionary(propertyType.ResolveOrThrow());
-        }
-
-        public bool DoesMethodReturnADictionary(string methodName, string typeNamespaceName, string localTypeName, string assemblyName,
-            IXmlLineInfo lineInfo)
-        {
-            var propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, assemblyName, lineInfo);
-            return IsDictionary(propertyType.ResolveOrThrow());
-        }
-
-        public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            var type = FindType(namespaceName, typeName, null, lineInfo, true);
-
-            var field = FindFieldDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
-            if (field != null && (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
-                return $"{_typeReferenceHelper.GetTypeNameIncludingGenericArguments(type, true)}.{field.Name}";
-
-            return null;
-        }
-
-        public string GetProperty(string fieldName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            var type = FindType(namespaceName, typeName, null, lineInfo, true);
-
-            var property = FindPropertyDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
-            if (property != null && (property.GetMethod.IsPublic || property.GetMethod.IsAssembly || property.GetMethod.IsFamilyOrAssembly))
-            {
-                return $"{_typeReferenceHelper.GetTypeNameIncludingGenericArguments(type, true)}.{property.Name}";
-            }
-
-            return null;
-        }
-
-        public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, string assemblyNameIfAny,
-            IXmlLineInfo lineInfo, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName)
-        {
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-            var propertyInfo = FindPropertyDeep(elementType, propertyOrFieldName, out var ownerElementType);
-            TypeReference propertyOrFieldType;
-            TypeReference propertyOrFieldDeclaringType;
-
-            if (propertyInfo == null)
-            {
-                var fieldInfo = FindFieldDeep(elementType, propertyOrFieldName, out var fieldOwnerElementType);
-                if (fieldInfo == null)
+                PropertyDefinition propertyDefinition = FindPropertyDeep(
+                    fromType,
+                    memberName,
+                    MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
+                    out declaringType);
+
+                if (propertyDefinition is not null)
                 {
-                    throw new XamlParseException($"Property or field '{propertyOrFieldName}' not found in type '{elementType}'.", lineInfo);
-                }
-
-                propertyOrFieldType = fieldInfo.FieldType.PopulateGeneric(elementType, fieldOwnerElementType);
-                propertyOrFieldDeclaringType = fieldOwnerElementType;
-            }
-            else
-            {
-                propertyOrFieldType = propertyInfo.PropertyType.PopulateGeneric(elementType, ownerElementType);
-                propertyOrFieldDeclaringType = ownerElementType;
-            }
-
-
-            memberDeclaringTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(propertyOrFieldDeclaringType, true);
-            memberTypeNamespace = _typeReferenceHelper.BuildFullPath(propertyOrFieldType);
-            memberTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(propertyOrFieldType, false);
-        }
-
-        public void GetAttachedPropertyGetMethodInfo(
-            string methodName,
-            string namespaceName,
-            string localTypeName,
-            string assemblyNameIfAny,
-            IXmlLineInfo lineInfo,
-            out string declaringTypeName,
-            out string returnValueNamespaceName,
-            out string returnValueLocalTypeName)
-        {
-            var dependencyObjectType = DependencyObjectType;
-
-            var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny, lineInfo);
-            TypeReference currentType = elementType;
-            while (currentType != null)
-            {
-                var resolved = currentType.ResolveOrThrow();
-                var method = resolved.Methods.FirstOrDefault(m =>
-                    m.Name == methodName && m.IsStatic && m.IsPublic && m.Parameters.Count == 1 &&
-                    dependencyObjectType.IsAssignableFrom(m.Parameters[0].ParameterType.ResolveOrThrow()));
-                if (method != null)
-                {
-                    declaringTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(currentType, true);
-                    var returnType = method.ReturnType.PopulateGeneric(elementType, currentType);
-                    returnValueNamespaceName = _typeReferenceHelper.BuildFullPath(returnType);
-                    returnValueLocalTypeName = _typeReferenceHelper.GetTypeNameIncludingGenericArguments(returnType, false);
-                    return;
-                }
-                currentType = resolved.BaseType?.PopulateGeneric(elementType, currentType);
-            }
-            throw new XamlParseException($"Method '{methodName}' not found in type '{elementType}'.", lineInfo);
-        }
-
-        public bool IsElementADictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny, IXmlLineInfo lineInfo)
-        {
-            var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny, lineInfo);
-            return IsDictionary(elementType);
-        }
-
-        public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue, IXmlLineInfo lineInfo)
-        {
-            name = name.Trim();
-
-            if (name.IndexOf(',') != -1)
-            {
-                foreach (string token in name.Split(','))
-                {
-                    string fieldName = token.Trim();
-
-                    // integer values are not allowed when we have multiple values
-                    yield return GetEnumValue(enumType, fieldName, ignoreCase, false) ??
-                        throw new XamlParseException($"Field '{fieldName}' not found in type: '{_typeReferenceHelper.ConvertToString(enumType)}'.", lineInfo);
+                    memberKind = MemberKind.Property;
+                    memberType = propertyDefinition.PropertyType.PopulateGeneric(fromType, declaringType);
+                    return propertyDefinition;
                 }
             }
-            else
-            {
-                yield return GetEnumValue(enumType, name, ignoreCase, allowIntegerValue) ??
-                    throw new XamlParseException($"Field '{name}' not found in type: '{_typeReferenceHelper.ConvertToString(enumType)}'.", lineInfo);
-            }
-        }
 
-        public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
-        {
-            return _typeReferenceHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
+            if (TestFlag(lookupFlags, MemberKind.AttachedPropertyGet))
+            {
+                MethodDefinition attachedGetter = FindMethodDeep(
+                    fromType,
+                    $"Get{memberName}",
+                    MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
+                    out declaringType);
+
+                if (attachedGetter is not null && attachedGetter.Parameters.Count == 1)
+                {
+                    memberKind = MemberKind.AttachedPropertyGet;
+                    memberType = attachedGetter.ReturnType.PopulateGeneric(fromType, declaringType);
+                    return attachedGetter;
+                }
+            }
+
+            if (TestFlag(lookupFlags, MemberKind.AttachedPropertySet))
+            {
+                MethodDefinition attachedSetter = FindMethodDeep(
+                    fromType,
+                    $"Set{memberName}",
+                    MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
+                    out declaringType);
+
+                if (attachedSetter is not null && attachedSetter.Parameters.Count == 2)
+                {
+                    memberKind = MemberKind.AttachedPropertySet;
+                    memberType = attachedSetter.Parameters[1].ParameterType.PopulateGeneric(fromType, declaringType);
+                    return attachedSetter;
+                }
+            }
+
+            if (TestFlag(lookupFlags, MemberKind.Event))
+            {
+                EventDefinition eventDefinition = FindEventDeep(
+                    fromType,
+                    memberName,
+                    MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
+                    out declaringType);
+
+                memberKind = MemberKind.Event;
+                memberType = eventDefinition.EventType.PopulateGeneric(fromType, declaringType);
+                return eventDefinition;
+            }
+
+            if (TestFlag(lookupFlags, MemberKind.AttachedEvent))
+            {
+                MethodDefinition attachedAddHandler = FindMethodDeep(
+                    fromType,
+                    $"Add{memberName}Handler",
+                    MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
+                    out declaringType);
+
+                if (attachedAddHandler is not null && attachedAddHandler.Parameters.Count == 2)
+                {
+                    memberKind = MemberKind.AttachedEvent;
+                    memberType = attachedAddHandler.Parameters[1].ParameterType.PopulateGeneric(fromType, declaringType);
+                    return attachedAddHandler;
+                }
+            }
+
+            if (TestFlag(lookupFlags, MemberKind.Field))
+            {
+                FieldDefinition fieldDefinition = FindFieldDeep(
+                    fromType,
+                    memberName,
+                    MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
+                    out declaringType);
+
+                memberKind = MemberKind.Field;
+                memberType = fieldDefinition.FieldType.PopulateGeneric(fromType, declaringType);
+                return fieldDefinition;
+            }
+
+            memberKind = MemberKind.Unknown;
+            declaringType = null;
+            memberType = null;
+            return null;
+
+            static bool TestFlag(MemberKind flags, MemberKind value) => (flags & value) == value;
         }
 
         private readonly struct TypeKey

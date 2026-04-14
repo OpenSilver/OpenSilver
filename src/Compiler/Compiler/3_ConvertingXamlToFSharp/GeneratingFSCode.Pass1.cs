@@ -12,7 +12,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -43,7 +42,7 @@ namespace OpenSilver.Compiler
                 GetClassInformationFromXaml(_reader.Document, _settings.Inspector,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
 
-                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root, true);
+                string baseType = GeneratingCode.GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root, _settings);
 
                 List<string> resultingFieldsForNamedElements = new List<string>();
                 List<string> resultingMembersForNamedElements = new List<string>();
@@ -81,7 +80,7 @@ namespace OpenSilver.Compiler
                             string fieldName = name;
                             string fieldNameLocal = name + "_local";
                             resultingFieldsForNamedElements.Add($@"
-    {fieldModifier} {fieldNameLocal} = Unchecked.defaultof<{GetCSharpEquivalentOfXamlTypeAsString(element, true)}>");
+    {fieldModifier} {fieldNameLocal} = Unchecked.defaultof<{GeneratingCode.GetCSharpEquivalentOfXamlTypeAsString(element, _settings)}>");
                             resultingMembersForNamedElements.Add($@"
     member this.{fieldName}
         with get() = {fieldNameLocal}
@@ -189,30 +188,6 @@ namespace GlobalResource
                 }
                 return element;
             }
-
-            private string GetCSharpEquivalentOfXamlTypeAsString(
-                XElement element,
-                bool ifTypeNotFoundTryGuessing,
-                out string namespaceName,
-                out string typeName,
-                out string assemblyName)
-            {
-                _settings.XamlNameParser.GetClrNamespaceAndLocalName(
-                    element.Name,
-                    out namespaceName,
-                    out typeName,
-                    out assemblyName);
-
-                return _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                    namespaceName,
-                    typeName,
-                    assemblyName,
-                    element,
-                    ifTypeNotFoundTryGuessing);
-            }
-
-            private string GetCSharpEquivalentOfXamlTypeAsString(XElement element, bool ifTypeNotFoundTryGuessing = false)
-                => GetCSharpEquivalentOfXamlTypeAsString(element, ifTypeNotFoundTryGuessing, out _, out _, out _);
         }
     }
 }

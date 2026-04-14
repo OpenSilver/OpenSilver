@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using Mono.Cecil;
 using System;
 using System.Xml.Linq;
 
@@ -43,8 +44,38 @@ namespace OpenSilver.Compiler
             return value;
         }
 
+        internal static bool SkipAttribute(XAttribute attribute)
+        {
+            if (IsReservedAttribute(attribute.Name.LocalName) || attribute.IsNamespaceDeclaration)
+            {
+                return true;
+            }
+
+            int index = attribute.Name.LocalName.IndexOf('.');
+
+            if (index == -1)
+            {
+                XElement element = attribute.Parent;
+
+                if (!string.IsNullOrEmpty(attribute.Name.NamespaceName) && attribute.Name.Namespace != element.Name.Namespace)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool IsReservedAttribute(string attributeName)
+        {
+            return attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
+                   attributeName == InsertingImplicitNodes.InitializedFromStringAttribute ||
+                   attributeName == InsertingMarkupNodesInXaml.GeneratedMarkupExtensionAttribute ||
+                   attributeName == GeneratingPathInXaml.PathInXamlAttribute;
+        }
+
         internal static bool IsXNameAttribute(XAttribute attr) =>
-            attr.Name.LocalName == "Name" && attr.Name.NamespaceName == xNamespace;
+            attr.Name.LocalName == "Name" && attr.Name.Namespace == xNamespace;
 
         internal static bool IsNameAttribute(XAttribute attr) =>
             attr.Name.LocalName == "Name" && string.IsNullOrEmpty(attr.Name.NamespaceName);
@@ -173,43 +204,6 @@ namespace OpenSilver.Compiler
             return ns == "System.Windows.Markup" && assemblyName == "OpenSilver";
         }
 
-
-        public static bool IsDynamicResourceExtension(XElement element, ConversionSettings settings)
-        {
-            if (element.Name.LocalName != "DynamicResourceExtension")
-            {
-                return false;
-            }
-
-            if (element.Name.NamespaceName == DefaultXamlNamespace ||
-                element.Name.NamespaceName == LegacyXamlNamespace)
-            {
-                return true;
-            }
-
-            (string ns, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(element.Name.NamespaceName);
-
-            return ns == "System.Windows" && assemblyName == "OpenSilver";
-        }
-
-        public static bool IsResponsiveExtension(XElement element, ConversionSettings settings)
-        {
-            if (element.Name.LocalName != "ResponsiveExtension")
-            {
-                return false;
-            }
-
-            if (element.Name.NamespaceName == DefaultXamlNamespace ||
-                element.Name.NamespaceName == LegacyXamlNamespace)
-            {
-                return true;
-            }
-
-            (string ns, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(element.Name.NamespaceName);
-
-            return ns == "System.Windows" && assemblyName == "OpenSilver";
-        }
-
         public static bool IsUriAbsolute(string path)
         {
             if (path.StartsWith("~"))
@@ -229,73 +223,104 @@ namespace OpenSilver.Compiler
 
         public static bool IsComponentUri(string value) => value.Contains(";component/", StringComparison.OrdinalIgnoreCase);
 
-        public static bool IsUriMapping(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
-        {
-            return IsOfType(
-                namespaceName, typeName, assemblyName,
-                KnownNamespaces.SystemWindowsNavigation, [DefaultXamlNamespace, SdkXamlNamespace], "UriMapping", Constants.OPENSILVER_CONTROLS_NAVIGATION_ASSEMBLY_NAME,
-                processedAssemblyName);
-        }
-
-        public static bool IsFrame(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
-        {
-            return IsOfType(
-                namespaceName, typeName, assemblyName,
-                KnownNamespaces.SystemWindowsControls, [DefaultXamlNamespace, SdkXamlNamespace], "Frame", Constants.OPENSILVER_CONTROLS_NAVIGATION_ASSEMBLY_NAME,
-                processedAssemblyName);
-        }
-
-        public static bool IsHyperlinkButton(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
-        {
-            return IsOfType(
-                namespaceName, typeName, assemblyName,
-                KnownNamespaces.SystemWindowsControls, [DefaultXamlNamespace, LegacyXamlNamespace], "HyperlinkButton", Constants.OPENSILVER_ASSEMBLY_NAME,
-                processedAssemblyName);
-        }
-
-        public static bool IsHyperlink(string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
-        {
-            return IsOfType(
-                namespaceName, typeName, assemblyName,
-                KnownNamespaces.SystemWindowsDocuments, [DefaultXamlNamespace, LegacyXamlNamespace], "Hyperlink", Constants.OPENSILVER_ASSEMBLY_NAME,
-                processedAssemblyName);
-        }
-
-        public static bool IsApplicationStartupUriProperty(string propertyName, string namespaceName, string typeName, string assemblyName, string processedAssemblyName)
+        public static bool IsApplicationStartupUriProperty(string propertyName, TypeReference type)
         {
             if (propertyName != "StartupUri")
             {
                 return false;
             }
 
-            return IsOfType(
-                namespaceName, typeName, assemblyName,
-                KnownNamespaces.SystemWindows, [DefaultXamlNamespace, LegacyXamlNamespace], "Application", Constants.OPENSILVER_ASSEMBLY_NAME,
-                processedAssemblyName);
+            return type.Name == "Application" &&
+                   type.Namespace == KnownNamespaces.SystemWindows &&
+                   type.GetAssemblyName() == Constants.OPENSILVER_ASSEMBLY_NAME;
         }
 
-        private static bool IsOfType(
-            string namespaceName, string typeName, string assemblyName,
-            string targetClrNamespace, string[] targetXmlNamespaces, string targetTypeName, string targetAssemblyName,
-            string processedAssemblyName)
+        internal static bool ShouldConvertUri(string value, string memberName, string memberTypeName, TypeReference elementType, TypeReference declaringType)
         {
-            if (typeName == targetTypeName)
+            string assemblyName = elementType.GetAssemblyName();
+
+            if (assemblyName == Constants.OPENSILVER_ASSEMBLY_NAME)
             {
-                for (int i = 0; i < targetXmlNamespaces.Length; i++)
+                if (elementType.Name == "Hyperlink" && elementType.Namespace == KnownNamespaces.SystemWindowsDocuments)
                 {
-                    if (namespaceName == targetXmlNamespaces[i])
-                    {
-                        return true;
-                    }
+                    return false;
                 }
 
-                if (namespaceName == targetClrNamespace)
+                if (elementType.Name == "HyperlinkButton" && elementType.Namespace == KnownNamespaces.SystemWindowsControls)
                 {
-                    return assemblyName == targetAssemblyName || (assemblyName == null && processedAssemblyName == targetAssemblyName);
+                    return false;
                 }
             }
 
-            return false;
+            if (assemblyName == Constants.OPENSILVER_CONTROLS_NAVIGATION_ASSEMBLY_NAME)
+            {
+                if (elementType.Name == "UriMapping" && elementType.Namespace == KnownNamespaces.SystemWindowsNavigation)
+                {
+                    return false;
+                }
+
+                if (elementType.Name == "Frame" && elementType.Namespace == KnownNamespaces.SystemWindowsControls)
+                {
+                    return false;
+                }
+            }
+
+            if (IsUriAbsolute(value))
+            {
+                return false;
+            }
+
+            if (IsComponentUri(value))
+            {
+                return false;
+            }
+
+            if (IsApplicationStartupUriProperty(memberName, declaringType))
+            {
+                return true;
+            }
+
+            if (value.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (memberTypeName != "System.Uri" &&
+                memberTypeName != $"{KnownNamespaces.SystemWindowsMedia}.ImageSource" &&
+                (memberName != "FontFamily" || !value.Contains(".")))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static string GetCSharpEquivalentOfXamlTypeAsString(XElement element, ConversionSettings settings)
+        {
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(
+                element.Name,
+                out string namespaceName,
+                out string typeName,
+                out string assemblyName);
+
+            if (settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, element, false) is TypeDefinition type)
+            {
+                return $"{settings.TypeReferenceHelper.Global}{settings.TypeReferenceHelper.ConvertToString(type)}";
+            }
+
+            if (XamlNameParser.IsXmlNamespace(element.Name.NamespaceName))
+            {
+                return typeName;
+            }
+
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                return $"{settings.TypeReferenceHelper.Global}{typeName}";
+            }
+            else
+            {
+                return $"{settings.TypeReferenceHelper.Global}{namespaceName}.{typeName}";
+            }
         }
     }
 }

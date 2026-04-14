@@ -164,6 +164,11 @@ internal sealed class XamlNameParser
         }
     }
 
+    public static bool IsXmlNamespace(string namespaceName)
+    {
+        return !namespaceName.StartsWith(ClrNamespace) && !namespaceName.StartsWith(Using);
+    }
+
     public (string NamespaceName, string AssemblyName) GetClrNamespaceAndAssembly(string ns)
     {
         if (ns.StartsWith(Using, StringComparison.OrdinalIgnoreCase))

@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using Mono.Cecil;
 using System;
 using System.Xml.Linq;
 
@@ -33,21 +34,23 @@ internal static class ProcessTypeExtensionAttributes
                 out string typeName,
                 out string assemblyName);
 
-            if (settings.Inspector.IsStyle(namespaceName, typeName, assemblyName, element))
+            TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, element);
+
+            if (settings.Inspector.IsStyle(type))
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
                     ResolveTypeExtensionAttribute(element, targetType, settings);
                 }
             }
-            else if (settings.Inspector.IsControlTemplate(namespaceName, typeName, assemblyName, element))
+            else if (settings.Inspector.IsControlTemplate(type))
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
                     ResolveTypeExtensionAttribute(element, targetType, settings);
                 }
             }
-            else if (settings.Inspector.IsDataTemplate(namespaceName, typeName, assemblyName, element))
+            else if (settings.Inspector.IsDataTemplate(type))
             {
                 if (element.Attribute("DataType") is XAttribute targetType)
                 {

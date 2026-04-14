@@ -66,7 +66,11 @@ internal sealed class CommandConverter
         if (command is null && ownerType is not null) // not a known command
         {
             // Get them from Properties
-            (PropertyDefinition property, TypeReference declaringType) = _inspector.GetProperty(ownerType, localName, true, true);
+            (PropertyDefinition property, TypeReference declaringType) = _inspector.GetProperty(
+                ownerType,
+                localName,
+                MemberFlags.Public | MemberFlags.Static);
+
             if (property is not null)
             {
                 return $"{_helper.Global}{_helper.ConvertToString(declaringType)}.{property.Name}";
@@ -75,7 +79,7 @@ internal sealed class CommandConverter
             if (command is null)
             {
                 // Get them from Fields (ScrollViewer.PageDownCommand is a static readonly field
-                (FieldDefinition field, declaringType) = _inspector.GetField(ownerType, localName, true, true);
+                (FieldDefinition field, declaringType) = _inspector.GetField(ownerType, localName, MemberFlags.Public | MemberFlags.Static);
                 if (field is not null)
                 {
                     return $"{_helper.Global}{_helper.ConvertToString(declaringType)}.{field.Name}";

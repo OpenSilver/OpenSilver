@@ -16,14 +16,13 @@ using System;
 
 namespace OpenSilver.Compiler;
 
-internal static class KnownNamespaces
+[Flags]
+public enum MemberFlags
 {
-    public const string SystemWindows = "System.Windows";
-    public const string SystemWindowsData = "System.Windows.Data";
-    public const string SystemWindowsDocuments = "System.Windows.Documents";
-    public const string SystemWindowsControls = "System.Windows.Controls";
-    public const string SystemWindowsMarkup = "System.Windows.Markup";
-    public const string SystemWindowsMedia = "System.Windows.Media";
-    public const string SystemWindowsNavigation = "System.Windows.Navigation";
-    public const string SystemXaml = "System.Xaml";
+    None = 0x00,
+    IgnoreCase = 0x01,
+    Public = 0x02,
+    NonPublic = 0x04,
+    Static = 0x08,
+    Instance = 0x10,
 }

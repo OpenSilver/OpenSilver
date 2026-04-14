@@ -12,9 +12,11 @@
 *  
 \*====================================================================================*/
 
+using Mono.Cecil;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -44,7 +46,7 @@ namespace OpenSilver.Compiler
             XElement[] children = currentElement.Elements().ToArray();
 
             // Check if the current element is an object (rather than a property)
-            bool isElementAnObject = !currentElement.Name.LocalName.Contains(".");
+            bool isElementAnObject = !XamlParser.IsMemberNode(currentElement);
             var indexesMap = new List<int>(children.Length);
 
             if (isElementAnObject)
@@ -58,11 +60,10 @@ namespace OpenSilver.Compiler
                 // "<Button>" but we ignore "<Border.Child>" and "<ToolTipService.ToolTip>" because
                 // they are properties)
                 List<XElement> nodesThatAreNotPropertiesOfTheObject = new List<XElement>();
-                XElement child;
                 for (int i = 0; i < children.Length; i++)
                 {
-                    child = children[i];
-                    if (!child.Name.LocalName.Contains("."))
+                    XElement child = children[i];
+                    if (!XamlParser.IsMemberNode(child))
                     {
                         nodesThatAreNotPropertiesOfTheObject.Add(child);
                         indexesMap.Add(i);
@@ -86,12 +87,10 @@ namespace OpenSilver.Compiler
                 if (nodesThatAreNotPropertiesOfTheObject.Count > 0)
                 {
                     // Find out the name of the default children property (aka "ContentProperty") of the current element:
-                    settings.XamlNameParser.GetClrNamespaceAndLocalName(
-                        currentElement.Name,
-                        out string namespaceName,
-                        out string localName,
-                        out string assemblyNameIfAny);
-                    var contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny, currentElement);
+                    var contentPropertyName = settings.Inspector.GetContentPropertyName(
+                        GetTypeDefinition(currentElement.Name, currentElement, settings),
+                        currentElement);
+
                     XElement contentWrapper = currentElement;
                     
                     if (contentPropertyName != null)
@@ -133,24 +132,19 @@ namespace OpenSilver.Compiler
                     string contentValue = directTextContent.Value;
 
                     // Get information about the element namespace and assembly
-                    settings.XamlNameParser.GetClrNamespaceAndLocalName(
-                        currentElement.Name,
-                        out string namespaceName,
-                        out string localName,
-                        out string assemblyNameIfAny);
+                    TypeDefinition elementType = GetTypeDefinition(currentElement.Name, currentElement, settings);
+                    string elementTypeName = settings.TypeReferenceHelper.ConvertToString(elementType);
+                    string assemblyName = elementType.GetAssemblyName();
 
-                    string elementTypeInCSharp = settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                        namespaceName, localName, assemblyNameIfAny, currentElement, false);
-                                    
                     // Distinguish system types (string, double, etc.) to other types
-                    if (settings.SystemTypes.IsKnownType(elementTypeInCSharp.Substring(settings.TypeReferenceHelper.Global.Length), assemblyNameIfAny))
+                    if (settings.SystemTypes.IsKnownType(elementTypeName, assemblyName))
                     {
                         // In this case we do nothing because system types are handled
                         // later in the process. Example: "<sys:Double>50</sys:Double>"
                         // becomes "Double x = 50;"
                     }
-                    else if (settings.Inspector.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny, currentElement) ||
-                             settings.CoreTypes.IsKnownType(elementTypeInCSharp.Substring(settings.TypeReferenceHelper.Global.Length), assemblyNameIfAny))
+                    else if (settings.TypeReferenceHelper.IsEnum(elementType) ||
+                             settings.CoreTypes.IsKnownType(elementTypeName, assemblyName))
                     {
                         // Add the attribute that will tell the compiler to later
                         // intialize the type by converting from the string using the
@@ -183,7 +177,7 @@ namespace OpenSilver.Compiler
                             // cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
                             contentValue = Regex.Replace(contentValue, @"\s{2,}", " ");
 
-                            string contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny, currentElement);
+                            string contentPropertyName = settings.Inspector.GetContentPropertyName(elementType, currentElement);
 
                             if (!string.IsNullOrEmpty(contentPropertyName))
                             {
@@ -271,11 +265,10 @@ namespace OpenSilver.Compiler
                 }
                 else
                 {
-                    XElement child;
                     for (int i = 0; i < children.Length; i++)
                     {
-                        child = children[i];
-                        if (!child.Name.LocalName.Contains("."))
+                        XElement child = children[i];
+                        if (!XamlParser.IsMemberNode(child))
                         {
                             indexesMap.Add(i);
                         }
@@ -310,6 +303,21 @@ namespace OpenSilver.Compiler
 
             textNode = null;
             return false;
+        }
+
+        private static TypeDefinition GetTypeDefinition(XName xName, IXmlLineInfo lineInfo, ConversionSettings settings)
+        {
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(
+                xName,
+                out string namespaceName,
+                out string typeName,
+                out string assemblyName);
+
+            return settings.Inspector.GetTypeDefinition(
+                namespaceName,
+                typeName,
+                assemblyName,
+                lineInfo);
         }
     }
 }

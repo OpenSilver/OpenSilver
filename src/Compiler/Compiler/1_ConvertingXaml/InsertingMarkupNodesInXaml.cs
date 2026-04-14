@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,117 +31,109 @@ namespace OpenSilver.Compiler
 
         internal static void InsertMarkupNodes(XDocument doc, ConversionSettings settings)
         {
-            TraverseNextElement(doc.Root, doc.Root.GetDefaultNamespace(), settings);
+            TraverseNextElement(doc.Root, settings);
         }
 
-        private static void TraverseNextElement(XElement currentElement, XNamespace lastDefaultNamespace, ConversionSettings settings)
+        private static void TraverseNextElement(XElement element, ConversionSettings settings)
         {
-            XNamespace currentDefaultNamespace = currentElement.GetDefaultNamespace();
-            if (currentDefaultNamespace == XNamespace.None)
+            if (!XamlParser.IsMemberNode(element))
             {
-                currentDefaultNamespace = lastDefaultNamespace;
-            }
+                // We use a secondary list so that when we remove an element from the XAttributes, we don't skip the next element.
+                // We reverse the list because we want to preserve the order in which we set the object properties. Since XContainer
+                // only allow to add a child at the start or the end, we need call XContainer.AddFirst(element) while iterating on the 
+                // reverse list of attributes to do so.
+                var attributes = element.Attributes().ToArray();
+                attributes.Reverse();
 
-            List<XAttribute> attributesToRemove = new List<XAttribute>();
-            // We use a secondary list so that when we remove an element from the XAttributes, we don't skip the next element.
-            // We reverse the list because we want to preserve the order in which we set the object properties. Since XContainer
-            // only allow to add a child at the start or the end, we need call XContainer.AddFirst(element) while iterating on the 
-            // reverse list of attributes to do so.
-            var attributes = currentElement.Attributes().Reverse().ToList(); 
-            foreach (XAttribute currentAttribute in attributes)
-            {
-                if (IsMarkupExtension(currentAttribute))
+                foreach (XAttribute attribute in attributes)
                 {
-                    // Skip if the attribute has a namespace but no "dot", such as d:DataContext="{...}", so that it is in line with what we do in "GeneratingCSharpCode.cs". This is actually needed to be able to compile because something like d:DataContext="{d:ClassThatDoesNotExist ...}" where "d" is in the list of "mc:Ignorable". //todo: a better approach would be to remove all attributes that have a prefix in the list of "mc:Ignorable".
-                    if (string.IsNullOrEmpty(currentAttribute.Name.NamespaceName) || currentAttribute.Name.LocalName.Contains("."))
+                    if (GeneratingCode.SkipAttribute(attribute))
                     {
-                        string currentElementTypeName = currentElement.Name.LocalName.Split('.')[0];
-                        string currentElementNamespaceName = currentElement.Name.NamespaceName;
-                        string currentAttributeTypeName;
-                        string currentAttributeName;
-                        string currentAttributeNamespaceName = currentAttribute.Name.NamespaceName;
-                        string currentAttributeValueEscaped = EscapeCommasInQuotes(currentAttribute.Value); // This will replace for example Fallback='3,3,3,3' with Fallback='3<COMMA>3<COMMA>3<COMMA>3' (to make later parsing easier)
-                        if (currentAttribute.Name.LocalName.Contains(".")) // case where the type of the currentAttribute is mentionned (ex : <Border Border.Background="..." />)
-                        {
-                            string[] attributeSplittedLocalName = currentAttribute.Name.LocalName.Split('.');
-                            currentAttributeTypeName = attributeSplittedLocalName[0];
-                            currentAttributeName = attributeSplittedLocalName[1];
-                        }
-                        else // if the type is not mentionned, we assume the property is defined in the type of currentElement (ex : <Border Background="..." />)
-                        {
-                            currentAttributeNamespaceName = currentElementNamespaceName;
-                            currentAttributeTypeName = currentElementTypeName;
-                            currentAttributeName = currentAttribute.Name.LocalName;
-                        }
-                        if (string.IsNullOrEmpty(currentAttributeNamespaceName)) // if the namespace of the currentAttribute is still empty at this point, it means that currentAttribute is an attached property defined in the current default namespace.
-                        {
-                            currentAttributeNamespaceName = currentDefaultNamespace.NamespaceName;
-                        }
-                        if (currentElementNamespaceName == currentAttributeNamespaceName && currentElementTypeName == currentAttributeTypeName) // currentAttribute is a property defined in the type of currentElement (or one of his parents)
-                        {
-                            currentElement.AddFirst(GenerateNodeForAttribute(
-                                currentElement.Name + ("." + currentAttributeName),
-                                currentAttributeValueEscaped,
-                                currentDefaultNamespace,
-                                settings,
-                                currentElement,
-                                currentAttribute));
-                        }
-                        else // currentAttribute is an attached property
-                        {
-                            currentElement.AddFirst(GenerateNodeForAttribute(
-                                "{" + currentAttributeNamespaceName + "}" + currentAttributeTypeName + "." + currentAttributeName,
-                                currentAttributeValueEscaped,
-                                currentDefaultNamespace,
-                                settings,
-                                currentElement,
-                                currentAttribute));
-                        }
-                        currentAttribute.Remove();
+                        continue;
                     }
+
+                    if (!IsMarkupExtension(attribute))
+                    {
+                        continue;
+                    }
+
+                    // This will replace for example Fallback='3,3,3,3' with Fallback='3<COMMA>3<COMMA>3<COMMA>3' (to make later parsing easier)
+                    string valueEscaped = EscapeCommasInQuotes(attribute.Value);
+                    string elementName = element.Name.LocalName;
+
+                    XNamespace xmlns;
+                    ReadOnlySpan<char> typeName;
+                    ReadOnlySpan<char> memberName;
+
+                    int index = attribute.Name.LocalName.IndexOf('.');
+
+                    if (index == -1)
+                    {
+                        // if the type is not mentionned, we assume the property is defined in the type of the current element
+                        // (ex : <Border Background="..." />)
+                        typeName = elementName;
+                        memberName = attribute.Name.LocalName;
+                        xmlns = element.Name.Namespace;
+                    }
+                    else
+                    {
+                        // case where the type of the attribute is mentionned (ex : <Border Border.Background="..." />)
+                        typeName = attribute.Name.LocalName.AsSpan(0, index);
+                        memberName = attribute.Name.LocalName.AsSpan(index + 1);
+
+                        xmlns = attribute.Name.Namespace == XNamespace.None ?
+                            element.GetDefaultNamespace() :
+                            attribute.Name.Namespace;
+                    }
+
+                    element.AddFirst(
+                        GenerateNodeForAttribute(
+                            xmlns.GetName($"{typeName}.{memberName}"),
+                            valueEscaped,
+                            settings,
+                            element,
+                            attribute));
+
+                    attribute.Remove();
                 }
             }
 
-            // Recursion:
-            foreach (var childElements in currentElement.Elements())
+            foreach (var childElements in element.Elements())
             {
-                TraverseNextElement(childElements, currentDefaultNamespace, settings);
+                TraverseNextElement(childElements, settings);
             }
         }
 
         internal static bool IsMarkupExtension(XAttribute attribute)
         {
-            if (attribute != null)
+            ReadOnlySpan<char> value = attribute.Value;
+            if (value.StartsWith("{"))
             {
-                string value = attribute.Value;
-                if (value.StartsWith("{"))
+                int indexOfClosingBracket = value.IndexOf('}');
+                if (indexOfClosingBracket < 0)
                 {
-                    int indexOfClosingBracket = value.IndexOf('}');
-                    if (indexOfClosingBracket < 0)
+                    throw new XamlParseException(
+                        $"Invalid value for attribute '{attribute.Name}'. Use '{{}}' to escape '{{'.",
+                        attribute);
+                }
+                ReadOnlySpan<char> contentBetweenBrackets = value.Slice(1, indexOfClosingBracket - 1);
+                if (contentBetweenBrackets.Length == 0) //handle special case where '{' is escaped with "{}"
+                {
+                    return false;
+                }
+                else
+                {
+                    ReadOnlySpan<char> trimmedValue = value.Trim();
+                    if (trimmedValue.Length > 0)
+                    {
+                        char c = trimmedValue[0];
+                        return !(c >= '0' && c <= '9'); //We check whether the first character is a Number because of StringFormat (example: "{Binding ... StringFormat={0:N4}}" the "{0:N4}" part is not a MarkupExtension).
+                    }
+                    else
                     {
                         throw new XamlParseException(
                             $"Invalid value for attribute '{attribute.Name}'. Use '{{}}' to escape '{{'.",
                             attribute);
-                    }
-                    string contentBetweenBrackets = value.Substring(1, indexOfClosingBracket - 1);
-                    if (string.IsNullOrEmpty(contentBetweenBrackets)) //handle special case where '{' is escaped with "{}"
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        string trimmedValue = value.Trim();
-                        if (trimmedValue != string.Empty)
-                        {
-                            char c = trimmedValue[0];
-                            return !(c >= '0' && c <= '9'); //We check whether the first character is a Number because of StringFormat (example: "{Binding ... StringFormat={0:N4}}" the "{0:N4}" part is not a MarkupExtension).
-                        }
-                        else
-                        {
-                            throw new XamlParseException(
-                                $"Invalid value for attribute '{attribute.Name}'. Use '{{}}' to escape '{{'.",
-                                attribute);
-                        }
                     }
                 }
             }
@@ -157,7 +150,6 @@ namespace OpenSilver.Compiler
         private static XElement GenerateNodeForAttribute(
             XName nodeName,
             string attributeValue,
-            XNamespace lastDefaultNamespace,
             ConversionSettings settings,
             XElement currentElement,
             IXmlLineInfo lineInfo)
@@ -221,7 +213,7 @@ namespace OpenSilver.Compiler
                         string localName;
                         if (!TryGetNamespaceFromNameThatMayHaveAPrefix(nextClassName, currentElement, lineInfo, out ns, out localName))
                         {
-                            ns = lastDefaultNamespace;
+                            ns = currentElement.GetDefaultNamespace();
                             localName = nextClassName;
                         }
 
@@ -229,7 +221,6 @@ namespace OpenSilver.Compiler
                         XElement subXElement = GenerateNodeForAttribute(
                             ns + localName,
                             currentSubAttributeWithoutUselessPart,
-                            lastDefaultNamespace,
                             settings,
                             currentElement,
                             lineInfo);
@@ -264,7 +255,8 @@ namespace OpenSilver.Compiler
                             out string assemblyNameIfAny);
 
                         keyStringAfterPlaceHolderReplacement = settings.Inspector.GetContentPropertyName(
-                            namespaceName, localName, assemblyNameIfAny, lineInfo);
+                            settings.Inspector.GetTypeDefinition(namespaceName, localName, assemblyNameIfAny, lineInfo),
+                            lineInfo);
                     }
                     else if (keyStringAfterPlaceHolderReplacement.StartsWith("{")) //if we enter this if, it means that keyString is of the form "{Binding ElementName" so we want to remove "{Binding "
                     {
@@ -497,13 +489,9 @@ namespace OpenSilver.Compiler
         /// <summary>
         /// This will replace for example Fallback='3,3,3,3' with Fallback='3<COMMA>3<COMMA>3<COMMA>3' (to make later parsing easier)
         /// </summary>
-        static string EscapeCommasInQuotes(string markupExtension)
+        private static string EscapeCommasInQuotes(string markupExtension)
         {
-            return Regex.Replace(markupExtension, @"='[^']+'", delegate (Match match)
-            {
-                string value = match.ToString();
-                return value.Replace(",", "<COMMA>");
-            });
+            return Regex.Replace(markupExtension, @"='[^']+'", match => match.Value.Replace(",", "<COMMA>"));
         }
 
         private static bool ShouldAddExtension(string name, XElement currentElement, ConversionSettings settings, IXmlLineInfo lineInfo)
@@ -525,9 +513,9 @@ namespace OpenSilver.Compiler
 
             if (xmlns != null)
             {
-                (string clrNS, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(xmlns.NamespaceName);
+                (string namespaceName, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(xmlns.NamespaceName);
 
-                return settings.Inspector.GetAssemblyQualifiedNameOfXamlType(clrNS, typeName, assemblyName, lineInfo) == null;
+                return settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo, false) is null;
             }
 
             return false;

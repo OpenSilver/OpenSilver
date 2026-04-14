@@ -22,408 +22,153 @@ using System.Windows;
 using System.Windows.Controls;
 using Mono.Cecil;
 
-namespace Compiler.Tests
+namespace Compiler.Tests;
+
+[TestClass]
+public partial class MonoCecilAssembliesInspectorTest
 {
-    [TestClass]
-    public class MonoCecilAssembliesInspectorTest
+    private const string GlobalPrefix = "global::";
+    private const string ExperimentalSubjectName = "Experimental";
+    private const string ExperimentalSubjectDll = ExperimentalSubjectName + ".dll";
+    private const string ExperimentalNamespace = "Experimental";
+    private const string Content = "Content";
+
+    private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(ExperimentalSubjectName, SupportedLanguage.CSharp);
+    private static readonly DefaultAssemblyResolver DefaultResolver = new();
+
+    private static TypeDefinition GetClassWithMembersType() =>
+        MonoCecilVersion.FindType(
+            ExperimentalNamespace,
+            nameof(ClassWithMembers),
+            typeof(ClassWithMembers).Assembly.GetName().Name);
+
+    [ClassInitialize]
+    public static void ClassInitialize(TestContext _)
     {
-        private const string GlobalPrefix = "global::";
-        private const string ExperimentalSubjectName = "Experimental";
-        private const string ExperimentalSubjectDll = ExperimentalSubjectName + ".dll";
-        private const string ExperimentalNamespace = "Experimental";
-        private const string Content = "Content";
+        LoadAssemblyAndDependencies(ExperimentalSubjectDll);
+    }
 
-        private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(ExperimentalSubjectName, SupportedLanguage.CSharp);
-        private static readonly DefaultAssemblyResolver DefaultResolver = new();
+    [ClassCleanup]
+    public static void ClassCleanup()
+    {
+        MonoCecilVersion.Dispose();
+    }
 
-        [ClassInitialize]
-        public static void ClassInitialize(TestContext _)
+    [TestMethod]
+    public void GetEnumValue_Should_Handle_Nested_Enum_Type()
+    {
+        var enumType = MonoCecilVersion.FindType(
+            typeof(ClassWithNestedEnum).FullName,
+            nameof(ClassWithNestedEnum.InputBehavior),
+            typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name);
+
+        var res = MonoCecilVersion.GetEnumValue(enumType, nameof(ClassWithNestedEnum.InputBehavior.SelectFromList).ToLower(), true, true);
+
+        Assert.AreEqual(res, $"{GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)}.{nameof(ClassWithNestedEnum.InputBehavior.SelectFromList)}");
+    }
+
+    [TestMethod]
+    public void GetEnumValue_Should_Handle_Integer_Input_Value()
+    {
+        var enumType = MonoCecilVersion.FindType(
+            typeof(ClassWithNestedEnum).FullName,
+            nameof(ClassWithNestedEnum.InputBehavior),
+            typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name);
+
+        var res = MonoCecilVersion.GetEnumValue(enumType, "1", true, true);
+
+        Assert.AreEqual(res, $"({GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)})1");
+    }
+
+    [TestMethod]
+    public void GetEnumValue_Should_Return_Value_For_Enum_Without_Namespace()
+    {
+        var enumType = MonoCecilVersion.FindType(
+            "",
+            nameof(EnumWithoutNamespace),
+            typeof(EnumWithoutNamespace).Assembly.GetName().Name);
+
+        var res = MonoCecilVersion.GetEnumValue(enumType, nameof(EnumWithoutNamespace.Item), true, false);
+
+        Assert.AreEqual(res, $"{GlobalPrefix}{typeof(EnumWithoutNamespace).FullName}.{nameof(EnumWithoutNamespace.Item)}");
+    }
+
+    [TestMethod]
+    public void GetContentPropertyName_Should_Return_Value()
+    {
+        var type = MonoCecilVersion.FindType(
+            typeof(ContentControl).Namespace,
+            nameof(ContentControl),
+            typeof(ContentControl).Assembly.GetName().Name);
+
+        var res = MonoCecilVersion.GetContentPropertyName(type, null);
+
+        Assert.AreEqual(Content, res);
+    }
+
+    [TestMethod]
+    public void UnloadAssembly_Should_Unload_And_Remove_Associated_Types()
+    {
+        var compilerTests = "Compiler.Tests";
+        var assembly = MonoCecilVersion.LoadAssembly(compilerTests + ".dll");
+        var typeBefore = MonoCecilVersion.FindType(
+            compilerTests,
+            nameof(MonoCecilAssembliesInspectorTest),
+            compilerTests);
+        MonoCecilVersion.UnloadAssembly(assembly);
+        var typeAfter = MonoCecilVersion.FindType(
+            compilerTests,
+            nameof(MonoCecilAssembliesInspectorTest),
+            compilerTests,
+            null,
+            doNotRaiseExceptionIfNotFound: true);
+
+        Assert.AreEqual(nameof(MonoCecilAssembliesInspectorTest), typeBefore.Name);
+        Assert.IsNull(typeAfter);
+    }
+
+    private static void LoadAssemblyAndDependencies(string assemblyPath)
+    {
+        var loadedAssemblyNames = new HashSet<string>();
+        var queue = new Queue<AssemblyDefinition>();
+        queue.Enqueue(MonoCecilVersion.LoadAssembly(assemblyPath));
+        while (queue.Count > 0)
         {
-            LoadAssemblyAndDependencies(ExperimentalSubjectDll);
-        }
+            var assembly = queue.Dequeue();
+            loadedAssemblyNames.Add(assembly.Name.Name);
 
-        [ClassCleanup]
-        public static void ClassCleanup()
-        {
-            MonoCecilVersion.Dispose();
-        }
+            var referencedAssemblies = assembly.MainModule.AssemblyReferences;
 
-        [TestMethod]
-        public void GetAssemblyQualifiedNameOfXamlType_Should_Return_Name()
-        {
-            var res = MonoCecilVersion.GetAssemblyQualifiedNameOfXamlType(
-                "http://schemas.microsoft.com/winfx/2006/xaml/presentation",
-                nameof(Validation),
-                typeof(Validation).Assembly.GetName().Name,
-                null);
-
-            Assert.AreEqual(res, typeof(Validation).FullName + ", OpenSilver");
-        }
-
-        [TestMethod]
-        public void GetAttachedPropertyGetMethodInfo_Should_Find_AttachedPropertyGetMethod()
-        {
-            MonoCecilVersion.GetAttachedPropertyGetMethodInfo(
-                nameof(ToolTipService.GetPlacementTarget),
-                "http://schemas.microsoft.com/winfx/2006/xaml/presentation",
-                nameof(ToolTipService),
-                typeof(ToolTipService).Assembly.GetName().Name,
-                null,
-                out var declaringTypeName,
-                out var returnValueNamespaceName,
-                out var returnValueLocalTypeName);
-
-            Assert.AreEqual(declaringTypeName, GlobalPrefix + typeof(ToolTipService).FullName);
-            Assert.AreEqual(returnValueNamespaceName, typeof(UIElement).Namespace);
-            Assert.AreEqual(nameof(UIElement), returnValueLocalTypeName);
-        }
-
-        [TestMethod]
-        public void IsTypeAnEnum_Should_Return_True_For_Enum()
-        {
-            var res = MonoCecilVersion.IsTypeAnEnum(
-                ExperimentalSubjectName,
-                nameof(PlanetStructure),
-                typeof(PlanetStructure).Assembly.GetName().Name,
-                null);
-
-            Assert.IsTrue(res);
-        }
-
-        [TestMethod]
-        public void GetPropertyOrFieldTypeInfo_Should_Return_Info_For_Generic_Parameters()
-        {
-            MonoCecilVersion.GetPropertyOrFieldTypeInfo(
-                nameof(DerivedClassGenericType.MyProperty),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null,
-                out var propertyNamespaceName,
-                out var propertyLocalTypeName,
-                out var propertyAssemblyName,
-                out var isTypeEnum);
-
-            Assert.AreEqual(propertyNamespaceName, typeof(string).Namespace);
-            Assert.AreEqual(nameof(String), propertyLocalTypeName);
-            Assert.AreEqual(propertyAssemblyName, typeof(string).Assembly.GetName().Name);
-            Assert.IsFalse(isTypeEnum);
-        }
-
-        [TestMethod]
-        public void GetPropertyOrFieldTypeInfo_Should_Return_Info_For_Property_With_Nested_Generic()
-        {
-            MonoCecilVersion.GetPropertyOrFieldTypeInfo(
-                nameof(DerivedClassGenericType.PropertyWithNestedGeneric),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null,
-                out var propertyNamespaceName,
-                out var propertyLocalTypeName,
-                out var propertyAssemblyName,
-                out var isTypeEnum);
-
-            Assert.AreEqual(ExperimentalNamespace, propertyNamespaceName);
-            Assert.AreEqual("AnotherGenericType<global::Experimental.AnotherGenericType<global::System.Int32>>", propertyLocalTypeName);
-            Assert.AreEqual(ExperimentalSubjectName, propertyAssemblyName);
-            Assert.IsFalse(isTypeEnum);
-        }
-
-        [TestMethod]
-        public void GetPropertyOrFieldTypeInfo_Should_Return_Info_For_Nested_Enum_Field()
-        {
-            MonoCecilVersion.GetPropertyOrFieldTypeInfo(
-                nameof(ClassWithField.Behavior),
-                ExperimentalNamespace,
-                nameof(ClassWithField),
-                typeof(ClassWithField).Assembly.GetName().Name,
-                null,
-                out var propertyNamespaceName,
-                out var propertyLocalTypeName,
-                out var propertyAssemblyName,
-                out var isTypeEnum);
-
-            Assert.AreEqual(propertyNamespaceName, typeof(ClassWithNestedEnum).FullName);
-            Assert.AreEqual(nameof(ClassWithNestedEnum.InputBehavior), propertyLocalTypeName);
-            Assert.AreEqual(ExperimentalSubjectName, propertyAssemblyName);
-            Assert.IsTrue(isTypeEnum);
-        }
-
-        [TestMethod]
-        public void GetPropertyOrFieldInfo_Should_Return_Info_For_Generic_Property()
-        {
-            MonoCecilVersion.GetPropertyOrFieldInfo(
-                nameof(DerivedClassGenericType.MyProperty),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null,
-                out var memberDeclaringTypeName,
-                out var memberTypeNamespace,
-                out var memberTypeName);
-
-            Assert.AreEqual("global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>", memberDeclaringTypeName);
-            Assert.AreEqual(memberTypeNamespace, typeof(string).Namespace);
-            Assert.AreEqual(nameof(String), memberTypeName);
-        }
-
-        [TestMethod]
-        public void GetPropertyOrFieldInfo_Should_Return_Info_For_Property()
-        {
-            MonoCecilVersion.GetPropertyOrFieldInfo(
-                nameof(DerivedClassGenericType.MyNonGenericProperty),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null,
-                out var memberDeclaringTypeName,
-                out var memberTypeNamespace,
-                out var memberTypeName);
-
-            Assert.AreEqual("global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>", memberDeclaringTypeName);
-            Assert.AreEqual(memberTypeNamespace, typeof(int).Namespace);
-            Assert.AreEqual(nameof(Int32), memberTypeName);
-        }
-
-        [TestMethod]
-        public void GetFiled_Should_Return_Full_TypeName()
-        {
-            var res = MonoCecilVersion.GetField(
-                nameof(DerivedClassGenericType.MyField),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null);
-
-            Assert.AreEqual("global::Experimental.DerivedClassGenericType.MyField", res);
-        }
-
-        [TestMethod]
-        public void GetAttachedPropertyGetMethodInfo_Should_Return_Get_Method_From_Generic_Type()
-        {
-            MonoCecilVersion.GetAttachedPropertyGetMethodInfo(
-                nameof(DerivedClassGenericType.GetHasSomething),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null,
-                out var declaringTypeName,
-                out var returnValueNamespaceName,
-                out var returnValueLocalTypeName);
-
-            Assert.AreEqual("global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>", declaringTypeName);
-            Assert.AreEqual(returnValueNamespaceName, typeof(string).Namespace);
-            Assert.AreEqual(nameof(String), returnValueLocalTypeName);
-        }
-
-        [TestMethod]
-        public void GetEnumValue_Should_Handle_Nested_Enum_Type()
-        {
-            var enumType = MonoCecilVersion.FindType(
-                typeof(ClassWithNestedEnum).FullName,
-                nameof(ClassWithNestedEnum.InputBehavior),
-                typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name);
-
-            var res = MonoCecilVersion.GetEnumValue(enumType, nameof(ClassWithNestedEnum.InputBehavior.SelectFromList).ToLower(), true, true);
-
-            Assert.AreEqual(res, $"{GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)}.{nameof(ClassWithNestedEnum.InputBehavior.SelectFromList)}");
-        }
-
-        [TestMethod]
-        public void GetEnumValue_Should_Handle_Integer_Input_Value()
-        {
-            var enumType = MonoCecilVersion.FindType(
-                typeof(ClassWithNestedEnum).FullName,
-                nameof(ClassWithNestedEnum.InputBehavior),
-                typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name);
-
-            var res = MonoCecilVersion.GetEnumValue(enumType, "1", true, true);
-
-            Assert.AreEqual(res, $"({GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)})1");
-        }
-
-        [TestMethod]
-        public void GetEnumValue_Should_Return_Value_For_Enum_Without_Namespace()
-        {
-            var enumType = MonoCecilVersion.FindType(
-                "",
-                nameof(EnumWithoutNamespace),
-                typeof(EnumWithoutNamespace).Assembly.GetName().Name);
-
-            var res = MonoCecilVersion.GetEnumValue(enumType, nameof(EnumWithoutNamespace.Item), true, false);
-
-            Assert.AreEqual(res, $"{GlobalPrefix}{typeof(EnumWithoutNamespace).FullName}.{nameof(EnumWithoutNamespace.Item)}");
-        }
-
-        [TestMethod]
-        public void GetContentPropertyName_Should_Return_Value()
-        {
-            var res = MonoCecilVersion.GetContentPropertyName(
-                typeof(ContentControl).Namespace,
-                nameof(ContentControl),
-                typeof(ContentControl).Assembly.GetName().Name,
-                null);
-
-            Assert.AreEqual(Content, res);
-        }
-
-        [TestMethod]
-        public void GetMethodReturnValueTypeInfo_Should_Return_Info_For_Generic_Return_Type()
-        {
-            MonoCecilVersion.GetMethodReturnValueTypeInfo(
-                nameof(DerivedClassGenericType.MethodWithGenericReturnType),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null,
-                out var returnValueNamespace,
-                out var returnValueTypeName,
-                out var returnValueAssemblyName,
-                out var isTypeEnum);
-
-            Assert.AreEqual(returnValueNamespace, typeof(string).Namespace);
-            Assert.AreEqual(expected: nameof(String), returnValueTypeName);
-            Assert.AreEqual(returnValueAssemblyName, typeof(string).Assembly.GetName().Name);
-            Assert.IsFalse(isTypeEnum);
-        }
-
-        [TestMethod]
-        public void GetMethodReturnValueTypeInfo_Should_Return_Info_For_Method_With_GenericTypeResult()
-        {
-            MonoCecilVersion.GetMethodReturnValueTypeInfo(
-                nameof(DerivedClassGenericType.MethodReturnsAnotherGeneric),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null,
-                out var returnValueNamespace,
-                out var returnValueTypeName,
-                out var returnValueAssemblyName,
-                out var isTypeEnum);
-
-            Assert.AreEqual(ExperimentalNamespace, returnValueNamespace);
-            Assert.AreEqual("AnotherGenericType<global::System.String>", returnValueTypeName);
-            Assert.AreEqual(ExperimentalSubjectName, returnValueAssemblyName);
-            Assert.IsFalse(isTypeEnum);
-        }
-
-        [TestMethod]
-        public void IsPropertyOrFieldACollection_Should_Return_True_For_List()
-        {
-            var res = MonoCecilVersion.IsPropertyOrFieldACollection(
-                nameof(DerivedClassGenericType.ListField),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null);
-
-            Assert.IsTrue(res);
-        }
-
-        [TestMethod]
-        public void IsPropertyOrFieldACollection_Should_Return_True_For_IList()
-        {
-            var res = MonoCecilVersion.IsPropertyOrFieldACollection(
-                nameof(DerivedClassGenericType.IListField),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null);
-
-            Assert.IsTrue(res);
-        }
-
-        [TestMethod]
-        public void IsPropertyOrFieldACollection_Should_Return_True_For_Dictionary()
-        {
-            var res = MonoCecilVersion.IsPropertyOrFieldACollection(
-                nameof(DerivedClassGenericType.DictionaryField),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null);
-
-            Assert.IsTrue(res);
-        }
-
-        [TestMethod]
-        public void IsPropertyOrFieldACollection_Should_Return_False_For_String()
-        {
-            var res = MonoCecilVersion.IsPropertyOrFieldACollection(
-                nameof(DerivedClassGenericType.MyField),
-                ExperimentalNamespace,
-                nameof(DerivedClassGenericType),
-                typeof(DerivedClassGenericType).Assembly.GetName().Name,
-                null);
-
-            Assert.IsFalse(res);
-        }
-
-        [TestMethod]
-        public void UnloadAssembly_Should_Unload_And_Remove_Associated_Types()
-        {
-            var compilerTests = "Compiler.Tests";
-            var assembly = MonoCecilVersion.LoadAssembly(compilerTests + ".dll");
-            var typeBefore = MonoCecilVersion.FindType(
-                compilerTests,
-                nameof(MonoCecilAssembliesInspectorTest),
-                compilerTests);
-            MonoCecilVersion.UnloadAssembly(assembly);
-            var typeAfter = MonoCecilVersion.FindType(
-                compilerTests,
-                nameof(MonoCecilAssembliesInspectorTest),
-                compilerTests,
-                null,
-                doNotRaiseExceptionIfNotFound: true);
-
-            Assert.AreEqual(nameof(MonoCecilAssembliesInspectorTest), typeBefore.Name);
-            Assert.IsNull(typeAfter);
-        }
-
-        private static void LoadAssemblyAndDependencies(string assemblyPath)
-        {
-            var loadedAssemblyNames = new HashSet<string>();
-            var queue = new Queue<AssemblyDefinition>();
-            queue.Enqueue(MonoCecilVersion.LoadAssembly(assemblyPath));
-            while (queue.Count > 0)
+            foreach (var referencedAssembly in referencedAssemblies)
             {
-                var assembly = queue.Dequeue();
-                loadedAssemblyNames.Add(assembly.Name.Name);
-
-                var referencedAssemblies = assembly.MainModule.AssemblyReferences;
-
-                foreach (var referencedAssembly in referencedAssemblies)
+                if (loadedAssemblyNames.Contains(referencedAssembly.Name))
                 {
-                    if (loadedAssemblyNames.Contains(referencedAssembly.Name))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var assemblyFullPath = Path.Combine(Path.GetDirectoryName(assemblyPath) ?? "", referencedAssembly.Name + ".dll");
-                    if (File.Exists(assemblyFullPath))
+                var assemblyFullPath = Path.Combine(Path.GetDirectoryName(assemblyPath) ?? "", referencedAssembly.Name + ".dll");
+                if (File.Exists(assemblyFullPath))
+                {
+                    queue.Enqueue(MonoCecilVersion.LoadAssembly(assemblyFullPath));
+                }
+                else
+                {
+                    //There is not the assembly in the output folder.
+                    //Maybe it is netstandard.dll or any another core library.
+                    //Let's try to load via default resolver.
+                    try
                     {
-                        queue.Enqueue(MonoCecilVersion.LoadAssembly(assemblyFullPath));
-                    }
-                    else
-                    {
-                        //There is not the assembly in the output folder.
-                        //Maybe it is netstandard.dll or any another core library.
-                        //Let's try to load via default resolver.
-                        try
+                        var ns = DefaultResolver.Resolve(referencedAssembly);
+                        if (ns != null)
                         {
-                            var ns = DefaultResolver.Resolve(referencedAssembly);
+                            ns = MonoCecilVersion.LoadAssembly(ns.MainModule.FileName);
                             if (ns != null)
                             {
-                                ns = MonoCecilVersion.LoadAssembly(ns.MainModule.FileName);
-                                if (ns != null)
-                                {
-                                    queue.Enqueue(ns);
-                                }
+                                queue.Enqueue(ns);
                             }
                         }
-                        catch (AssemblyResolutionException) { }
                     }
+                    catch (AssemblyResolutionException) { }
                 }
             }
         }

@@ -12,7 +12,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -46,7 +45,7 @@ namespace OpenSilver.Compiler
             {
                 GetClassInformationFromXaml(_reader.Document, _settings.Inspector,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
-                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root, true);
+                string baseType = GeneratingCode.GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root, _settings);
 
                 List<string> resultingFieldsForNamedElements = new List<string>();
                 List<string> resultingMethods = new List<string>();
@@ -88,12 +87,12 @@ namespace OpenSilver.Compiler
                                 // https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-10.0/enhanced-line-directives#detailed-design
                                 string lineDirective = $"#line ({lineInfo.LineNumber}, {lineInfo.LinePosition}) - ({lineInfo.LineNumber}, {lineInfo.LinePosition + 5}) 65536 \"{_sourceFile}\"";
                                 resultingFieldsForNamedElements.Add(
-                                    $"{lineDirective}\n{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element, true)} {fieldName};\n#line default");
+                                    $"{lineDirective}\n{fieldModifier} {GeneratingCode.GetCSharpEquivalentOfXamlTypeAsString(element, _settings)} {fieldName};\n#line default");
                             }
                             else
                             {
                                 resultingFieldsForNamedElements.Add(
-                                    $"{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element, true)} {fieldName};");
+                                    $"{fieldModifier} {GeneratingCode.GetCSharpEquivalentOfXamlTypeAsString(element, _settings)} {fieldName};");
                             }
                         }
                     }
@@ -172,30 +171,6 @@ namespace OpenSilver.Compiler
                 }
                 return element;
             }
-
-            private string GetCSharpEquivalentOfXamlTypeAsString(
-                XElement element,
-                bool ifTypeNotFoundTryGuessing,
-                out string namespaceName,
-                out string typeName,
-                out string assemblyName)
-            {
-                _settings.XamlNameParser.GetClrNamespaceAndLocalName(
-                    element.Name,
-                    out namespaceName,
-                    out typeName,
-                    out assemblyName);
-
-                return _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
-                    namespaceName,
-                    typeName,
-                    assemblyName,
-                    element,
-                    ifTypeNotFoundTryGuessing);
-            }
-
-            private string GetCSharpEquivalentOfXamlTypeAsString(XElement element, bool ifTypeNotFoundTryGuessing = false)
-                => GetCSharpEquivalentOfXamlTypeAsString(element, ifTypeNotFoundTryGuessing, out _, out _, out _);
         }
     }
 }

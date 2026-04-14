@@ -125,7 +125,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"(({_componentType})({targetParam})).{_eventName} += this.{_handlerName};";
+                    return $"((global::{_componentType})({targetParam})).{_eventName} += this.{_handlerName};";
                 }
             }
 
@@ -147,7 +147,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"{_ownerType}.Add{_eventName}Handler(({_componentType})({targetParam}), this.{_handlerName});";
+                    return $"global::{_ownerType}.Add{_eventName}Handler((global::{_componentType})({targetParam}), this.{_handlerName});";
                 }
             }
 
@@ -165,7 +165,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"((global::System.Windows.EventSetter)({targetParam})).Handler = new {_handlerType}(this.{_handlerName});";
+                    return $"((global::System.Windows.EventSetter)({targetParam})).Handler = new global::{_handlerType}(this.{_handlerName});";
                 }
             }
 
@@ -183,7 +183,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"this.{_fieldName} = (({_componentType})({targetParam}));";
+                    return $"this.{_fieldName} = ((global::{_componentType})({targetParam}));";
                 }
             }
         }

@@ -121,7 +121,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"AddHandler DirectCast({targetParam}, {_componentType}).{_eventName}, AddressOf Me.{_handlerName}";
+                    return $"AddHandler DirectCast({targetParam}, Global.{_componentType}).{_eventName}, AddressOf Me.{_handlerName}";
                 }
             }
 
@@ -143,7 +143,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"{_ownerType}.Add{_eventName}Handler(DirectCast({targetParam}, {_componentType}), AddressOf Me.{_handlerName})";
+                    return $"Global.{_ownerType}.Add{_eventName}Handler(DirectCast({targetParam}, Global.{_componentType}), AddressOf Me.{_handlerName})";
                 }
             }
 
@@ -161,7 +161,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"DirectCast({targetParam}, Global.System.Windows.EventSetter).Handler = New {_handlerType}(AddressOf Me.{_handlerName})";
+                    return $"DirectCast({targetParam}, Global.System.Windows.EventSetter).Handler = New Global.{_handlerType}(AddressOf Me.{_handlerName})";
                 }
             }
 
@@ -179,7 +179,7 @@ namespace OpenSilver.Compiler
 
                 public override string ToString()
                 {
-                    return $"Me.{_fieldName} = DirectCast({targetParam}, {_componentType})";
+                    return $"Me.{_fieldName} = DirectCast({targetParam}, Global.{_componentType})";
                 }
             }
         }

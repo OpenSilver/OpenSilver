@@ -28,11 +28,19 @@ internal abstract partial class TypeReferenceHelper
 
         public override string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
         {
-            Debug.Assert(enumType is not null && enumType.IsEnum);
+            Debug.Assert(enumType is not null && IsEnum(enumType));
 
             name = name.Trim();
 
-            var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(enumType, name, out _, ignoreCase, true, true);
+            MemberFlags flags = ignoreCase ?
+                MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Static :
+                MemberFlags.Public | MemberFlags.Static;
+
+            var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+                enumType,
+                name,
+                flags,
+                out _);
 
             if (field is not null)
             {

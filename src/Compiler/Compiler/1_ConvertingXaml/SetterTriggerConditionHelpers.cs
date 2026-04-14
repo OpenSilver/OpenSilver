@@ -13,7 +13,9 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
+using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -79,19 +81,21 @@ internal static class SetterTriggerConditionHelpers
                         out string typeName,
                         out string assemblyName);
 
-                    if (settings.Inspector.IsStyle(namespaceName, typeName, assemblyName, parent))
+                    TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, parent);
+
+                    if (settings.Inspector.IsStyle(type))
                     {
                         declaringType = GetStyleTargetType(parent, settings);
                         break;
                     }
 
-                    if (settings.Inspector.IsControlTemplate(namespaceName, typeName, assemblyName, parent))
+                    if (settings.Inspector.IsControlTemplate(type))
                     {
                         declaringType = GetControlTemplateTargetType(parent, settings);
                         break;
                     }
 
-                    if (settings.Inspector.IsDataTemplate(namespaceName, typeName, assemblyName, parent))
+                    if (settings.Inspector.IsDataTemplate(type))
                     {
                         declaringType = GetDataTemplateTargetType(parent, settings);
                         break;
@@ -119,12 +123,14 @@ internal static class SetterTriggerConditionHelpers
             settings.XamlNameParser.GetClrNamespaceAndLocalName(parent.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
-            if (settings.Inspector.IsStyle(namespaceName, typeName, assemblyName, parent))
+            TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, parent);
+
+            if (settings.Inspector.IsStyle(type))
             {
                 throw new XamlParseException("TargetName property cannot be set on a Style Setter.", targetNameAttr);
             }
 
-            if (settings.Inspector.IsFrameworkTemplate(namespaceName, typeName, assemblyName, parent))
+            if (settings.Inspector.IsFrameworkTemplate(type))
             {
                 template = parent;
                 break;
@@ -178,10 +184,16 @@ internal static class SetterTriggerConditionHelpers
             settings.XamlNameParser.GetClrNamespaceAndLocalName(element.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
+            TypeDefinition type = settings.Inspector.GetTypeDefinition(
+                namespaceName,
+                typeName,
+                assemblyName,
+                element);
+
             // Skips types that create a new scope
-            if (settings.Inspector.IsStyle(namespaceName, typeName, assemblyName, element) ||
-                settings.Inspector.IsFrameworkTemplate(namespaceName, typeName, assemblyName, element) ||
-                settings.Inspector.IsResourceDictionary(namespaceName, typeName, assemblyName, element))
+            if (settings.Inspector.IsStyle(type) ||
+                settings.Inspector.IsFrameworkTemplate(type) ||
+                settings.Inspector.IsResourceDictionary(type))
             {
                 return null;
             }

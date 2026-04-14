@@ -7,9 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Compiler.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="AnotherGenericType.cs" />
     <Compile Include="ClassWithGenericEvents.cs" />
     <Compile Include="ClassWithField.cs" />
+    <Compile Include="ClassWithMembers.cs" />
     <Compile Include="ClassWithNestedEnum.cs" />
     <Compile Include="DerivedClassWithGenericEvents.cs" />
     <Compile Include="DerivedContentControl.cs" />
@@ -22,10 +31,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="file.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
 </Project>

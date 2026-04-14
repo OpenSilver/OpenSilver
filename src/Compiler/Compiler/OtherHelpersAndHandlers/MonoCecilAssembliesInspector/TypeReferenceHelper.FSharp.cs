@@ -28,12 +28,25 @@ internal abstract partial class TypeReferenceHelper
 
         public override string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
         {
-            Debug.Assert(enumType is not null && enumType.IsEnum);
+            Debug.Assert(enumType is not null && IsEnum(enumType));
 
             name = name.Trim();
 
-            MemberReference member = MonoCecilAssembliesInspectorImpl.FindFieldDeep(enumType, name, out _, ignoreCase, true, true);
-            member ??= MonoCecilAssembliesInspectorImpl.FindPropertyDeep(enumType, name, out _);
+            MemberFlags flags = ignoreCase ?
+                MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Static :
+                MemberFlags.Public | MemberFlags.Static;
+
+            MemberReference member = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+                enumType,
+                name,
+                flags,
+                out _);
+
+            member ??= MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+                enumType,
+                name,
+                MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
+                out _);
 
             if (member is not null)
             {
@@ -44,7 +57,7 @@ internal abstract partial class TypeReferenceHelper
             {
                 if (long.TryParse(name, out long l))
                 {
-                    return $"enum<{Global}{ConvertToString(enumType)}> {1}";
+                    return $"enum<{Global}{ConvertToString(enumType)}> {l}";
                 }
                 if (ulong.TryParse(name, out ulong ul))
                 {

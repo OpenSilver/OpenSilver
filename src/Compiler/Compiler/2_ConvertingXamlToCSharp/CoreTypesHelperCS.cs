@@ -1033,7 +1033,9 @@ internal sealed class CoreTypesConverterCS : CoreTypesConverter
             xamlNameParser.GetClrNamespaceAndLocalName(element.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
-            return inspector.IsStyle(namespaceName, typeName, assemblyName, element);
+            TypeDefinition type = inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, element);
+
+            return inspector.IsStyle(type);
         }
     }
 

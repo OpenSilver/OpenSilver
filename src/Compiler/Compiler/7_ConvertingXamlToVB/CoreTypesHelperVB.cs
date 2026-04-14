@@ -41,7 +41,7 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
 
     public override string ConvertFromInvariantString(string source, string destinationType)
     {
-        return $"{RuntimeHelperClass}.ConvertFromInvariantString(Of {destinationType})({Escape(source)})";
+        return $"{RuntimeHelperClass}.ConvertFromInvariantString(Of Global.{destinationType})({Escape(source)})";
     }
 
     public override string ConvertToCursor(XObject context, string source)
@@ -1035,7 +1035,9 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
             xamlNameParser.GetClrNamespaceAndLocalName(element.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
-            return inspector.IsStyle(namespaceName, typeName, assemblyName, element);
+            TypeDefinition type = inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, element);
+
+            return inspector.IsStyle(type);
         }
     }
 

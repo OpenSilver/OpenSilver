@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using Mono.Cecil;
 using System;
 using System.Xml.Linq;
 
@@ -49,11 +50,13 @@ internal static class ProcessingContentPresenterNodes
             settings.XamlNameParser.GetClrNamespaceAndLocalName(element.Name,
                 out string namespaceName, out string typeName, out string assemblyName);
 
-            if (settings.Inspector.IsControlTemplate(namespaceName, typeName, assemblyName, element))
+            TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, element);
+
+            if (settings.Inspector.IsControlTemplate(type))
             {
                 isInsideControlTemplate = IsContentControlTargetType(element, settings);
             }
-            else if (isInsideControlTemplate && settings.Inspector.IsContentPresenter(namespaceName, typeName, assemblyName, element))
+            else if (isInsideControlTemplate && settings.Inspector.IsContentPresenter(type))
             {
                 bool hasContentAttribute = HasAttribute(element, "Content", settings);
                 bool hasContentTemplateAttribute = HasAttribute(element, "ContentTemplate", settings);
@@ -129,7 +132,8 @@ internal static class ProcessingContentPresenterNodes
                 typeName = targetType.Value;
             }
 
-            return settings.Inspector.IsContentControl(namespaceName, typeName, assemblyName, element);
+            TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, element);
+            return settings.Inspector.IsContentControl(type);
         }
 
         return false;
@@ -152,10 +156,8 @@ internal static class ProcessingContentPresenterNodes
                     // First check if this is the right property.
                     if (typeAndProperty[1].Trim() == attributeName)
                     {
-                        // Then make sure this is not an attached property.
-                        bool isProperty = settings.Inspector.IsContentPresenter(namespaceName, typeAndProperty[0], assemblyName, child);
-
-                        if (isProperty)
+                        TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeAndProperty[0], assemblyName, child);
+                        if (settings.Inspector.IsContentPresenter(type))
                         {
                             found = true;
                             break;
