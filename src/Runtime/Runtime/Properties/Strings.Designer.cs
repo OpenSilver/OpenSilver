@@ -61,6 +61,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot use absolute URI..
+        /// </summary>
+        internal static string AbsoluteUriNotAllowed {
+            get {
+                return ResourceManager.GetString("AbsoluteUriNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AccessCollection for &apos;{0}&apos; collection cannot be called after shutdown..
         /// </summary>
         internal static string AccessCollectionAfterShutDown {
@@ -3072,15 +3081,6 @@ namespace OpenSilver.Internal {
         internal static string SpecialMethodMustBePublic {
             get {
                 return ResourceManager.GetString("SpecialMethodMustBePublic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to StartupUri must use the &apos;;component/&apos; syntax..
-        /// </summary>
-        internal static string StartupUriMustUseComponentSyntax {
-            get {
-                return ResourceManager.GetString("StartupUriMustUseComponentSyntax", resourceCulture);
             }
         }
         

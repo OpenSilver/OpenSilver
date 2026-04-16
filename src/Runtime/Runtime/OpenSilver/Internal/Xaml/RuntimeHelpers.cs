@@ -145,11 +145,7 @@ namespace OpenSilver.Internal.Xaml
         {
             Debug.Assert(componentUri is not null);
 
-            if (AppResourcesManager.IsComponentUri(componentUri))
-            {
-                return Application.GetXamlComponentLoaderType(componentUri);
-            }
-            return null;
+            return Application.GetXamlComponentLoaderType(componentUri);
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]

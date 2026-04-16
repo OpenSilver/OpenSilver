@@ -302,7 +302,11 @@ namespace OpenSilver.Compiler
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.Build(),
-                        $"Return CType(Global.System.Activator.CreateInstance(GetType({componentTypeFullName}), true), {componentTypeFullName})",
+                        $"""
+                        Dim component = CType(Global.System.Activator.CreateInstance(GetType({componentTypeFullName}), true), {componentTypeFullName})
+                        component.InitializeComponent()
+                        Return component
+                        """,
                         parameters.ResultingMethods,
                         $"Global.{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,
@@ -323,7 +327,11 @@ namespace OpenSilver.Compiler
                         baseType,
                         rootElementName,
                         parameters.CurrentScope.Build(),
-                        string.Join(Environment.NewLine, $"Dim {rootElementName} = New {baseType}()", $"LoadComponentImpl({rootElementName})", $"Return {rootElementName}"),
+                        $"""
+                        Dim {rootElementName} = New {baseType}()
+                        LoadComponentImpl({rootElementName})
+                        Return {rootElementName}
+                        """,
                         parameters.ResultingMethods,
                         $"Global.{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,

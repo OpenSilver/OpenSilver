@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -157,19 +158,7 @@ namespace System.Windows
                 return;
             }
 
-            string startupUri = StartupUri.ToString();
-
-            if (!AppResourcesManager.IsComponentUri(startupUri))
-            {
-                throw new ArgumentException(Strings.StartupUriMustUseComponentSyntax, nameof(StartupUri));
-            }
-
-            if (GetXamlComponentLoader(startupUri) is not IXamlComponentFactory factory)
-            {
-                throw new InvalidOperationException(string.Format(Strings.UnableToLocateResource, startupUri));
-            }
-
-            if (factory.CreateComponent() is not FrameworkElement component)
+            if (LoadComponent(StartupUri) is not FrameworkElement component)
             {
                 throw new InvalidOperationException(Strings.ApplicationRootMustBeFrameworkElement);
             }
@@ -603,31 +592,53 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Create logic tree from given resource Locator, and associate this
-        /// tree with the given component.
+        /// Loads a XAML file that is located at the specified uniform resource identifier (URI) and 
+        /// converts it to an instance of the object that is specified by the root element of the XAML
+        /// file.
         /// </summary>
-        /// <param name="component">Root Element</param>
-        /// <param name="resourceLocator">Resource Locator</param>
+        /// <param name="component">
+        /// An object of the same type as the root element of the XAML file.
+        /// </param>
+        /// <param name="resourceLocator">
+        /// A <see cref="Uri"/> that maps to a relative XAML file.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="component"/> or <paramref name="resourceLocator"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The <paramref name="resourceLocator"/> is an absolute URI.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <paramref name="component"/> is of a type that does not match the root element of the XAML file.
+        /// </exception>
         public static void LoadComponent(object component, Uri resourceLocator)
         {
             ArgumentNullException.ThrowIfNull(component);
             ArgumentNullException.ThrowIfNull(resourceLocator);
 
-            if (resourceLocator.IsAbsoluteUri)
+            if (GetXamlComponentLoader(resourceLocator) is IXamlComponentLoader loader)
             {
-                throw new ArgumentException("Uri must be relative.");
-            }
-
-            string resourceUri = resourceLocator.ToString();
-            if (AppResourcesManager.IsComponentUri(resourceUri))
-            {
-                if (GetXamlComponentLoader(resourceUri) is IXamlComponentLoader loader)
-                {
-                    loader.LoadComponent(component);
-                }
+                loader.LoadComponent(component);
             }
         }
 
+        /// <summary>
+        /// Loads a XAML file that is located at the specified uniform resource identifier (URI) and 
+        /// converts it to an instance of the object that is specified by the root element of the XAML
+        /// file.
+        /// </summary>
+        /// <param name="component">
+        /// An object of the same type as the root element of the XAML file.
+        /// </param>
+        /// <param name="loader">
+        /// A <see cref="Uri"/> that maps to a relative XAML file.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="component"/> or <paramref name="loader"/> is null.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// <paramref name="component"/> is of a type that does not match the root element of the XAML file.
+        /// </exception>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static void LoadComponent(object component, IXamlComponentLoader loader)
         {
@@ -637,19 +648,63 @@ namespace System.Windows
             loader.LoadComponent(component);
         }
 
-        internal static Type GetXamlComponentLoaderType(string componentUri)
+        /// <summary>
+        /// Loads a XAML file that is located at the specified uniform resource identifier (URI), and 
+        /// converts it to an instance of the object that is specified by the root element of the XAML 
+        /// file.
+        /// </summary>
+        /// <param name="resourceLocator">
+        /// A System.Uri that maps to a relative XAML file.
+        /// </param>
+        /// <returns>
+        /// An instance of the root element specified by the XAML file loaded.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="resourceLocator"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The resourceLocator is an absolute URI.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// The file is not a XAML file.
+        /// </exception>
+        public static object LoadComponent(Uri resourceLocator)
         {
-            string className = XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri);
-            string assemblyName = AppResourcesManager.ExtractAssemblyNameFromComponentUri(componentUri);
+            ArgumentNullException.ThrowIfNull(resourceLocator);
 
-            return Type.GetType($"{className}, {assemblyName}");
+            if (GetXamlComponentLoader(resourceLocator) is not IXamlComponentFactory factory)
+            {
+                throw new InvalidOperationException(string.Format(Strings.UnableToLocateResource, resourceLocator));
+            }
+
+            return factory.CreateComponent();
         }
 
-        private static IXamlComponentLoader GetXamlComponentLoader(string componentUri)
+        private static object GetXamlComponentLoader(Uri resourceLocator)
         {
-            if (GetXamlComponentLoaderType(componentUri) is Type loaderType)
+            Debug.Assert(resourceLocator is not null);
+
+            if (resourceLocator.IsAbsoluteUri)
             {
-                return Activator.CreateInstance(loaderType) as IXamlComponentLoader;
+                throw new ArgumentException(Strings.AbsoluteUriNotAllowed);
+            }
+
+            if (GetXamlComponentLoaderType(resourceLocator.ToString()) is Type loaderType)
+            {
+                return Activator.CreateInstance(loaderType);
+            }
+
+            return null;
+        }
+
+        internal static Type GetXamlComponentLoaderType(string componentUri)
+        {
+            if (AppResourcesManager.TryResolveUri(componentUri, out string resolvedUri))
+            {
+                string className = XamlResourcesHelper.GenerateClassNameFromComponentUri(resolvedUri);
+                string assemblyName = AppResourcesManager.ExtractAssemblyNameFromComponentUri(resolvedUri);
+
+                return Type.GetType($"{className}, {assemblyName}");
             }
 
             return null;
@@ -678,7 +733,7 @@ namespace System.Windows
 
             if (uriResource.IsAbsoluteUri)
             {
-                throw new ArgumentException("Uri must be relative.");
+                throw new ArgumentException(Strings.AbsoluteUriNotAllowed);
             }
 
             if (AppResourcesManager.GetResourceStream(uriResource.ToString()) is Stream stream)

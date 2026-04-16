@@ -1100,9 +1100,6 @@
   <data name="SpecialMethodMustBePublic" xml:space="preserve">
     <value>ShouldSerializeProperty and ResetProperty methods must be public ('{0}').</value>
   </data>
-  <data name="StartupUriMustUseComponentSyntax" xml:space="preserve">
-    <value>StartupUri must use the ';component/' syntax.</value>
-  </data>
   <data name="StopKeyDisplayString" xml:space="preserve">
     <value>Esc</value>
   </data>
@@ -1348,5 +1345,8 @@
   </data>
   <data name="ItemsControl_ParentNotFrameworkElement" xml:space="preserve">
     <value>The Parent of the container should always be a FrameworkElement</value>
+  </data>
+  <data name="AbsoluteUriNotAllowed" xml:space="preserve">
+    <value>Cannot use absolute URI.</value>
   </data>
 </root>

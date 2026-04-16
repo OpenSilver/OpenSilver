@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Resources;
+using CSHTML5.Internal;
 using OpenSilver.Runtime.CompilerServices;
 
 namespace OpenSilver.Internal;
@@ -28,6 +29,8 @@ internal static class AppResourcesManager
     public const string Http = "http://";
     public const string Https = "https://";
 
+    private static readonly Uri _baseUri = new("foo:/");
+    private static readonly Uri _httpBaseUri = new("http://foo/");
     private static Dictionary<string, AssemblyResourceManager> _resourceManagers;
 
     private static Dictionary<string, AssemblyResourceManager> ResourceManagers
@@ -41,17 +44,41 @@ internal static class AppResourcesManager
 
     public static Stream GetResourceStream(string uri)
     {
-        if (IsComponentUri(uri))
+        if (TryResolveUri(uri, out string resolvedUri))
         {
-            string assemblyName = ExtractAssemblyNameFromComponentUri(uri);
+            string assemblyName = ExtractAssemblyNameFromComponentUri(resolvedUri);
             if (ResourceManagers.TryGetValue(assemblyName, out AssemblyResourceManager resourceManager))
             {
-                string resourcePart = ExtractResourcePartFromComponentUri(uri);
+                string resourcePart = ExtractResourcePartFromComponentUri(resolvedUri);
                 return resourceManager.GetStream(resourcePart.ToLowerInvariant());
             }
         }
 
         return null;
+    }
+
+    public static bool TryResolveUri(string relativeUri, out string resolvedUri)
+    {
+        if (IsComponentUri(relativeUri))
+        {
+            resolvedUri = relativeUri;
+            return true;
+        }
+
+        if (Uri.TryCreate(_baseUri, relativeUri, out Uri absoluteUri))
+        {
+            ReadOnlySpan<char> path = absoluteUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
+            if (path.StartsWith("/"))
+            {
+                path = path.Slice(1);
+            }
+
+            resolvedUri = $"/{StartupAssemblyInfo.StartupAssemblyShortName}{Component}{path}";
+            return true;
+        }
+
+        resolvedUri = null;
+        return false;
     }
 
     private static void EnsureAssembliesLoaded()
@@ -112,7 +139,7 @@ internal static class AppResourcesManager
     }
 
     private static string FormatResourcePart(string part) =>
-        new Uri(new Uri("http://foo/"), part.Replace("#", "%23")).GetComponents(UriComponents.Path, UriFormat.UriEscaped);
+        new Uri(_httpBaseUri, part.Replace("#", "%23")).GetComponents(UriComponents.Path, UriFormat.UriEscaped);
 
     internal static bool IsMsAppxUri(string uri) => uri.StartsWith(MsAppx, StringComparison.OrdinalIgnoreCase);
 

@@ -340,7 +340,11 @@ namespace OpenSilver.Compiler
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.Build(),
-                        $"return ({componentTypeFullName})global::System.Activator.CreateInstance(typeof({componentTypeFullName}), true);",
+                        $"""
+                        var component = ({componentTypeFullName})global::System.Activator.CreateInstance(typeof({componentTypeFullName}), true);
+                        component.InitializeComponent();
+                        return component;
+                        """,
                         parameters.ResultingMethods,
                         $"global::{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,
@@ -363,7 +367,11 @@ namespace OpenSilver.Compiler
                         baseType,
                         rootElementName,
                         parameters.CurrentScope.Build(),
-                        string.Join(Environment.NewLine, $"var {rootElementName} = new {baseType}();", $"LoadComponentImpl({rootElementName});", $"return {rootElementName};"),
+                        $"""
+                        var {rootElementName} = new {baseType}();
+                        LoadComponentImpl({rootElementName});
+                        return {rootElementName};
+                        """,
                         parameters.ResultingMethods,
                         $"global::{KnownNamespaces.SystemWindows}.UIElement",
                         _settings.AssemblyName,
