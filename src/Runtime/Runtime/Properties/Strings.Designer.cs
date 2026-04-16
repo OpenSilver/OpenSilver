@@ -1312,6 +1312,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Parent of the container should always be a FrameworkElement.
+        /// </summary>
+        internal static string ItemsControl_ParentNotFrameworkElement {
+            get {
+                return ResourceManager.GetString("ItemsControl_ParentNotFrameworkElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to VisualTree of ItemsPanelTemplate must contain a Panel. &apos;{0}&apos; is not a Panel..
         /// </summary>
         internal static string ItemsPanelNotAPanel {

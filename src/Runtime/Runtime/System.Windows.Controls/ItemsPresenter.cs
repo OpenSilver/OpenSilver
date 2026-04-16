@@ -58,7 +58,7 @@ public class ItemsPresenter : FrameworkElement
     /// <summary>
     /// TemplateProperty
     /// </summary>
-    internal static readonly DependencyProperty TemplateProperty =
+    private static readonly DependencyProperty TemplateProperty =
         DependencyProperty.Register(
             nameof(Template),
             typeof(ItemsPanelTemplate),
@@ -68,7 +68,7 @@ public class ItemsPresenter : FrameworkElement
     /// <summary>
     /// Template Property
     /// </summary>
-    internal ItemsPanelTemplate Template
+    private ItemsPanelTemplate Template
     {
         get => _templateCache;
         set => SetValueInternal(TemplateProperty, value);
@@ -77,9 +77,24 @@ public class ItemsPresenter : FrameworkElement
     private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var ip = (ItemsPresenter)d;
+        var oldTemplate = (ItemsPanelTemplate)e.OldValue;
+        var newTemplate = (ItemsPanelTemplate)e.NewValue;
+
         ip.ClearPanel();
-        StyleHelper.UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+        StyleHelper.UpdateTemplateCache(ip, oldTemplate, newTemplate, TemplateProperty);
+        ip.OnTemplateChanged(oldTemplate, newTemplate);
     }
+
+    /// <summary>
+    /// Called when the control template changes.
+    /// </summary>
+    /// <param name="oldTemplate">
+    /// Value of the old template.
+    /// </param>
+    /// <param name="newTemplate">
+    /// Value of the new template.
+    /// </param>
+    protected virtual void OnTemplateChanged(ItemsPanelTemplate oldTemplate, ItemsPanelTemplate newTemplate) { }
 
     private void ClearPanel()
     {
@@ -115,17 +130,9 @@ public class ItemsPresenter : FrameworkElement
     {
         if (generator == Generator) return;
 
-        if (Generator is not null)
-        {
-            Generator.PanelChanged -= new EventHandler(OnPanelChanged);
-        }
-
+        Generator?.PanelChanged -= new EventHandler(OnPanelChanged);
         Generator = generator;
-
-        if (Generator is not null)
-        {
-            Generator.PanelChanged += new EventHandler(OnPanelChanged);
-        }
+        Generator?.PanelChanged += new EventHandler(OnPanelChanged);
     }
 
     private void OnPanelChanged(object sender, EventArgs e)
@@ -165,6 +172,7 @@ public class ItemsPresenter : FrameworkElement
         AttachToOwner();
     }
 
+    /// <inheritdoc />
     public override void OnApplyTemplate()
     {
         // verify that the template produced a panel with no children

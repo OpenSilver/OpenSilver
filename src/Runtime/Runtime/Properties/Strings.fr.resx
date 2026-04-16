@@ -1344,4 +1344,7 @@
   <data name="TemplateContentSetTwice" xml:space="preserve">
     <value>La propriété TemplateContent du modèle ne peut être définie qu'une fois.</value>
   </data>
+  <data name="ItemsControl_ParentNotFrameworkElement" xml:space="preserve">
+    <value>Le parent d'un conteneur doit toujours être un FrameworkElement</value>
+  </data>
 </root>

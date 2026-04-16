@@ -11,10 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Specialized;
-using System.ComponentModel;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace System.Windows.Controls
 {
@@ -108,6 +109,20 @@ namespace System.Windows.Controls
             RemoveAtInternal(index);
             
             VisualParent.InvalidateMeasure();
+
+            _collectionChanged?.OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldChild, index);
+        }
+
+        internal void RemoveNoVerify(UIElement uie)
+        {
+            _collectionChanged?.CheckReentrancy();
+
+            int index = IndexOf(uie);
+            UIElement oldChild = GetItemInternal(index);
+
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, VisualParent);
+            ClearVisualParent(oldChild);
+            RemoveAtInternal(index);
 
             _collectionChanged?.OnCollectionChanged(NotifyCollectionChangedAction.Remove, oldChild, index);
         }

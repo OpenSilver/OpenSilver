@@ -131,9 +131,9 @@ namespace System.Windows.Controls
             if (ip != null)
                 return ip.Generator;
 
-            //// if panel came from a style, use the main generator
-            //if (panel.TemplatedParent != null)
-                //return this;
+            // if panel came from a style, use the main generator
+            if (panel.TemplatedParent != null)
+                return this;
 
             // otherwise the panel doesn't have a generator
             return null;
@@ -1791,9 +1791,6 @@ namespace System.Windows.Controls
             // discarded.   (See Dev10 628778)
             host.ClearContainerForItem(container, item);
 
-            // Silverlight does not clear the datacontext of the containers when they are
-            // removed.
-#if WPF 
             if (container != item)
             {
                 DependencyProperty dp = FrameworkElement.DataContextProperty;
@@ -1807,7 +1804,6 @@ namespace System.Windows.Controls
 
                 container.ClearValue(dp);
             }
-#endif // WPF
         }
 
         void ValidateAndCorrectIndex(object item, ref int index)

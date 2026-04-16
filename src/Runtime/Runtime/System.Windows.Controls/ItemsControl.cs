@@ -682,6 +682,24 @@ namespace System.Windows.Controls
                 container = recycledContainer ?? GetContainerForItemOverride();
             }
 
+            if (container is UIElement visual &&
+                VisualTreeHelper.GetParent(visual) is UIElement parent)
+            {
+                switch (parent)
+                {
+                    case Panel panel:
+                        panel.Children.RemoveNoVerify(visual);
+                        break;
+
+                    case FrameworkElement frameworkElement:
+                        frameworkElement.TemplateChild = null;
+                        break;
+
+                    default:
+                        throw new InvalidOperationException(Strings.ItemsControl_ParentNotFrameworkElement);
+                }
+            }
+
             return container;
         }
 
@@ -701,7 +719,7 @@ namespace System.Windows.Controls
             // without having a logical parent (e.g. via ItemsSource) and without
             // having been generated yet. HasItem indicates if anything has been generated.
 
-            DependencyObject parent = (container as FrameworkElement)?.Parent;
+            DependencyObject parent = LogicalTreeHelper.GetParent(container);
             if (parent == null)
             {
                 return IsItemItsOwnContainerOverride(container) &&
@@ -1250,6 +1268,11 @@ namespace System.Windows.Controls
                 {
                     // if so use the element whose style begat the ItemsPresenter
                     container = ip.Owner;
+                }
+                else
+                {
+                    // otherwise use element's templated parent
+                    container = panel.TemplatedParent as ItemsControl;
                 }
             }
 
