@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace System.Windows;
 
@@ -39,6 +40,8 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     private IDisposable _resizeObserver;
+    private DispatcherOperation _contentRenderedCallback;
+    private bool _postContentRenderedFromLoadedHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
@@ -55,7 +58,10 @@ public class Window : ContentControl, IResizeObserverListener
 
     ~Window() => _resizeObserver?.Dispose();
 
-    internal TextMeasurementService TextMeasurementService { get; private set; }
+    /// <summary>
+    /// Occurs after a window's content has been rendered.
+    /// </summary>
+    public event EventHandler ContentRendered;
 
     /// <inheritdoc />
     protected internal override IEnumerator LogicalChildren => new SingleChildEnumerator(GetValue(ContentProperty));
@@ -68,6 +74,35 @@ public class Window : ContentControl, IResizeObserverListener
     internal static Window ActiveWindow { get; private set; }
 
     internal HtmlElementReference RootDomElement { get; private set; }
+
+    internal TextMeasurementService TextMeasurementService { get; private set; }
+
+    /// <inheritdoc />
+    protected override void OnContentChanged(object oldContent, object newContent)
+    {
+        base.OnContentChanged(oldContent, newContent);
+
+        if (IsLoaded)
+        {
+            PostContentRendered();
+        }
+        else
+        {
+            if (!_postContentRenderedFromLoadedHandler)
+            {
+                Loaded += new RoutedEventHandler(LoadedHandler);
+                _postContentRenderedFromLoadedHandler = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Raises the <see cref="ContentRendered"/> event.
+    /// </summary>
+    /// <param name="e">
+    /// An <see cref="EventArgs"/> that contains the event data.
+    /// </param>
+    protected virtual void OnContentRendered(EventArgs e) => ContentRendered?.Invoke(this, e);
 
     /// <summary>
     /// Set the DOM element that will host the window. This can be set only to new windows. The MainWindow looks for a DIV that has the ID "cshtml5-root" or "opensilver-root".
@@ -121,6 +156,31 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     private static void OnPreviewMouseDown(object sender, MouseEventArgs e) => PopupService.HandleMouseButton();
+
+    private void LoadedHandler(object sender, RoutedEventArgs e)
+    {
+        if (_postContentRenderedFromLoadedHandler)
+        {
+            PostContentRendered();
+            _postContentRenderedFromLoadedHandler = false;
+            Loaded -= new RoutedEventHandler(LoadedHandler);
+        }
+    }
+
+    private void PostContentRendered()
+    {
+        _contentRenderedCallback?.Abort();
+        _contentRenderedCallback = Dispatcher.BeginInvoke(
+            DispatcherPriority.Input,
+            new DispatcherOperationCallback(arg =>
+            {
+                Window thisRef = (Window)arg;
+                thisRef._contentRenderedCallback = null;
+                thisRef.OnContentRendered(EventArgs.Empty);
+                return null;
+            }),
+            this);
+    }
 
     #region Bounds and SizeChanged event
 
