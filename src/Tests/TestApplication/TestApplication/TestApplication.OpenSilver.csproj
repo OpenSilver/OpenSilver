@@ -293,6 +293,9 @@
       <DependentUpon>TriggerTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\TriggerTestControl.cs" />
+    <Compile Include="Tests\GroupBoxTest.xaml.cs">
+      <DependentUpon>GroupBoxTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\TwoTextBoxesHorizontallyTest.xaml.cs">
       <DependentUpon>TwoTextBoxesHorizontallyTest.xaml</DependentUpon>
     </Compile>
@@ -624,6 +627,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="Tests\TriggerTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Tests\GroupBoxTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>

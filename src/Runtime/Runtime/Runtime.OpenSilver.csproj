@@ -169,6 +169,8 @@
     <Compile Include="System.Windows.Controls\ContextMenu.cs" />
     <Compile Include="System.Windows.Controls\ContextMenuService.cs" />
     <Compile Include="System.Windows.Controls\DataTemplateSelector.cs" />
+    <Compile Include="System.Windows.Controls\GroupBox.cs" />
+    <Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
     <Compile Include="System.Windows.Controls\HeaderedItemsControl.cs" />
     <Compile Include="System.Windows.Controls\InteractionHelper.cs" />
     <Compile Include="System.Windows.Controls\ItemsControlHelper.cs" />
@@ -387,6 +389,7 @@
     <Compile Include="System.ServiceModel\WORKINPROGRESS\PollingDuplexHttpSecurityMode.cs" />
     <Compile Include="System.ServiceModel\WORKINPROGRESS\CSHTML5_DuplexClientBase.cs" />
     <Compile Include="System.Windows.Automation.Peers\ComboBoxAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\GroupBoxAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\HyperlinkButtonAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\ImageAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\ListBoxAutomationPeer.cs" />

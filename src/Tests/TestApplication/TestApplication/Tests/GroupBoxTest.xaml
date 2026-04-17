@@ -1,0 +1,199 @@
+<Page x:Class="TestApplication.Tests.GroupBoxTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:TestApplication.Tests"
+      mc:Ignorable="d"
+      d:DesignHeight="1200" d:DesignWidth="800">
+
+    <Page.Resources>
+        <!-- Custom GroupBox style/template to verify developers can override it -->
+        <Style x:Key="CustomGroupBoxStyle" TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="DarkRed"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="MistyRose"
+                                CornerRadius="0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Background="DarkRed" Padding="6,2">
+                                    <ContentPresenter x:Name="CustomHeader"
+                                                      Content="{TemplateBinding Header}"
+                                                      ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                                      TextElement.Foreground="White"
+                                                      TextElement.FontWeight="Bold"/>
+                                </Border>
+                                <ContentPresenter Grid.Row="1"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- DataTemplate used for HeaderTemplate -->
+        <DataTemplate x:Key="PersonHeaderTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="👤 " FontSize="14"/>
+                <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="DarkBlue"/>
+                <TextBlock Text=" (" Foreground="Gray"/>
+                <TextBlock Text="{Binding Role}" Foreground="Gray"/>
+                <TextBlock Text=")" Foreground="Gray"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- DataTemplate used for ContentTemplate -->
+        <DataTemplate x:Key="PersonContentTemplate">
+            <StackPanel>
+                <TextBlock>
+                    <Run Text="Email: "/>
+                    <Run Text="{Binding Email}" FontStyle="Italic"/>
+                </TextBlock>
+                <TextBlock>
+                    <Run Text="Phone: "/>
+                    <Run Text="{Binding Phone}" FontStyle="Italic"/>
+                </TextBlock>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="15">
+            <TextBlock Text="GroupBox Tests" FontSize="22" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 1: BASIC USAGE -->
+            <!-- ============================================================ -->
+            <TextBlock Text="1. Basic usage (string header, text content)"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox Header="Basic Header" Margin="0,0,0,10">
+                <TextBlock Text="This is the content of a simple GroupBox."/>
+            </GroupBox>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 2: NO HEADER (HasHeader should be false) -->
+            <!-- ============================================================ -->
+            <TextBlock Text="2. No header set (HasHeader=False, no header visible)"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox x:Name="NoHeaderGroupBox" Margin="0,0,0,4">
+                <TextBlock Text="Content only, no header."/>
+            </GroupBox>
+            <TextBlock>
+                <Run Text="HasHeader = "/>
+                <Run Text="{Binding HasHeader, ElementName=NoHeaderGroupBox, Mode=OneWay}"
+                     FontWeight="Bold"/>
+            </TextBlock>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 3: COMPLEX HEADER AND CONTENT (UIElements) -->
+            <!-- ============================================================ -->
+            <TextBlock Text="3. Complex UIElement header and content"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox Margin="0,0,0,10">
+                <GroupBox.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox x:Name="EnableOptionsCheckBox" IsChecked="True"
+                                  VerticalAlignment="Center"/>
+                        <TextBlock Text=" Options"
+                                   FontWeight="Bold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </GroupBox.Header>
+                <StackPanel IsEnabled="{Binding IsChecked, ElementName=EnableOptionsCheckBox}">
+                    <CheckBox Content="Option 1"/>
+                    <CheckBox Content="Option 2"/>
+                    <RadioButton Content="Radio A"/>
+                    <RadioButton Content="Radio B"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 4: HEADER TEMPLATE + CONTENT TEMPLATE WITH DATA BINDING -->
+            <!-- ============================================================ -->
+            <TextBlock Text="4. HeaderTemplate + ContentTemplate + DataContext"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox x:Name="TemplatedGroupBox"
+                      Header="{Binding}"
+                      HeaderTemplate="{StaticResource PersonHeaderTemplate}"
+                      Content="{Binding}"
+                      ContentTemplate="{StaticResource PersonContentTemplate}"
+                      Margin="0,0,0,10"/>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 5: BORDER / PADDING / BACKGROUND / FOREGROUND -->
+            <!-- ============================================================ -->
+            <TextBlock Text="5. Border / Padding / Background / Foreground"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox Header="Styled"
+                      BorderBrush="Navy"
+                      BorderThickness="2"
+                      Background="AliceBlue"
+                      Foreground="Navy"
+                      Padding="12"
+                      Margin="0,0,0,10">
+                <TextBlock Text="BorderBrush, BorderThickness, Background, Foreground and Padding all applied."
+                           TextWrapping="Wrap"/>
+            </GroupBox>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 6: FULL CUSTOM TEMPLATE (developer override) -->
+            <!-- ============================================================ -->
+            <TextBlock Text="6. Custom Style / ControlTemplate (developer override)"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox Header="Custom Template"
+                      Style="{StaticResource CustomGroupBoxStyle}"
+                      Margin="0,0,0,10">
+                <TextBlock Text="This GroupBox uses a custom ControlTemplate."
+                           TextWrapping="Wrap"/>
+            </GroupBox>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 7: RUNTIME HEADER / CONTENT MUTATION -->
+            <!-- ============================================================ -->
+            <TextBlock Text="7. Runtime mutation (change Header / Content / clear Header)"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox x:Name="MutableGroupBox"
+                      Header="Initial Header"
+                      Margin="0,0,0,6">
+                <TextBlock x:Name="MutableContent" Text="Initial content."/>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="ChangeHeaderButton" Content="Change Header"
+                        Click="ChangeHeaderButton_Click" Margin="0,0,6,0"/>
+                <Button x:Name="ClearHeaderButton" Content="Clear Header"
+                        Click="ClearHeaderButton_Click" Margin="0,0,6,0"/>
+                <Button x:Name="ChangeContentButton" Content="Change Content"
+                        Click="ChangeContentButton_Click"/>
+            </StackPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 8: FOCUSABILITY (GroupBox must not be a tab stop) -->
+            <!-- ============================================================ -->
+            <TextBlock Text="8. Focus/TabStop defaults (GroupBox is not focusable / not a tab stop)"
+                       FontSize="14" FontWeight="Bold" Margin="0,10,0,4"/>
+            <GroupBox x:Name="FocusableCheckGroupBox" Header="Focus check"
+                      Margin="0,0,0,4">
+                <TextBox Text="Try tabbing: focus should skip the GroupBox and go to this TextBox."/>
+            </GroupBox>
+            <TextBlock>
+                <Run Text="Focusable = "/>
+                <Run Text="{Binding Focusable, ElementName=FocusableCheckGroupBox, Mode=OneWay}"
+                     FontWeight="Bold"/>
+                <Run Text=" , IsTabStop = "/>
+                <Run Text="{Binding IsTabStop, ElementName=FocusableCheckGroupBox, Mode=OneWay}"
+                     FontWeight="Bold"/>
+            </TextBlock>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -96,7 +96,6 @@
     <Compile Include="TreeView\TreeViewConnectingLines.cs" />
     <Compile Include="TreeView\TreeViewItemCheckBox.cs" />
     <Compile Include="TreeView\TreeViewExtensions.cs" />
-    <Compile Include="HeaderedContentControl\HeaderedContentControl.cs" />
     <Compile Include="Common\ObjectCollection.cs" />
     <Compile Include="TreeView\TreeViewItemIndentationConverter.cs" />
     <Compile Include="WrapPanel\WrapPanel.cs" />
@@ -126,7 +125,6 @@
 
   <ItemGroup>
     <None Include="Expander\Expander.xaml" />
-    <None Include="HeaderedContentControl\HeaderedContentControl.xaml" />
     <None Include="DragDrop\DragDecorator.xaml" />
     <None Include="DragDrop\ListBoxDragDropTarget.xaml" />
     <None Include="DragDrop\TreeViewDragDropTarget.xaml" />

@@ -1230,35 +1230,6 @@
         </Setter>
     </Style>
 
-    <!--  controls:HeaderedContentControl  -->
-    <Style TargetType="controls:HeaderedContentControl">
-        <Setter Property="Foreground"
-                Value="{x:Static Brushes.Black}" />
-        <!-- <Setter Property="FontSize" Value="11" /> -->
-        <Setter Property="HorizontalContentAlignment"
-                Value="Left" />
-        <Setter Property="VerticalContentAlignment"
-                Value="Top" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="controls:HeaderedContentControl">
-                    <StackPanel>
-                        <ContentPresenter Content="{TemplateBinding Property={x:Static HeaderedContentControl.HeaderProperty}}"
-                                          ContentTemplate="{TemplateBinding Property={x:Static HeaderedContentControl.HeaderTemplateProperty}}"
-                                          Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
-                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
-                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
-                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
-                        <ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
-                                          Margin="{TemplateBinding Property={x:Static Control.PaddingProperty}}"
-                                          HorizontalAlignment="{TemplateBinding Property={x:Static Control.HorizontalContentAlignmentProperty}}"
-                                          VerticalAlignment="{TemplateBinding Property={x:Static Control.VerticalContentAlignmentProperty}}" />
-                    </StackPanel>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <!--  controls:ListBoxDragDropTarget  -->
     <Style TargetType="controls:ListBoxDragDropTarget"
            xmlns="http://schemas.microsoft.com/client/2007">
