@@ -1,3 +1,4 @@
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,8 +14,62 @@
 namespace System.Windows.Media.Animation;
 
 /// <summary>
-/// Groups child timelines that execute in parallel.
+/// Defines a segment of time that may contain child <see cref="Timeline"/> objects. These 
+/// child timelines become active according to their respective <see cref="Timeline.BeginTime"/>
+/// properties. Also, child timelines are able to overlap (run in parallel) with each other.
 /// </summary>
 public class ParallelTimeline : TimelineGroup
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParallelTimeline"/> class.
+    /// </summary>
+    public ParallelTimeline()
+        : base()
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParallelTimeline"/> class with the specified 
+    /// <see cref="Timeline.BeginTime"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The <see cref="Timeline.BeginTime"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    public ParallelTimeline(TimeSpan? beginTime)
+        : base(beginTime)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParallelTimeline"/> class with the specified 
+    /// <see cref="Timeline.BeginTime"/> and <see cref="Timeline.Duration"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The <see cref="Timeline.BeginTime"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    /// <param name="duration">
+    /// The <see cref="Timeline.Duration"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    public ParallelTimeline(TimeSpan? beginTime, Duration duration)
+        : base(beginTime, duration)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParallelTimeline"/> class with the specified 
+    /// <see cref="Timeline.BeginTime"/>, <see cref="Timeline.Duration"/>, and <see cref="Timeline.RepeatBehavior"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The <see cref="Timeline.BeginTime"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    /// <param name="duration">
+    /// The <see cref="Timeline.Duration"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    /// <param name="repeatBehavior">
+    /// The <see cref="Timeline.RepeatBehavior"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    public ParallelTimeline(TimeSpan? beginTime, Duration duration, RepeatBehavior repeatBehavior)
+        : base(beginTime, duration, repeatBehavior)
+    {
+    }
 }

@@ -18,11 +18,11 @@ using System.Windows.Media.Animation;
 
 namespace OpenSilver.Internal.Media.Animation;
 
-internal sealed class TimelineGroupClock : TimelineClock
+internal sealed class ClockGroup : TimelineClock
 {
-    private readonly List<TimelineClock> _children = new();
+    private readonly List<TimelineClock> _children = [];
 
-    public TimelineGroupClock(TimelineGroup owner)
+    public ClockGroup(TimelineGroup owner)
         : base(owner)
     {
     }

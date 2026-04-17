@@ -16,17 +16,74 @@ using OpenSilver.Internal.Media.Animation;
 namespace System.Windows.Media.Animation;
 
 /// <summary>
-/// Provides a base class for timelines that group child timelines.
+/// Abstract class that, when implemented represents a <see cref="Timeline"/> that may contain 
+/// a collection of child <see cref="Timeline"/> objects.
 /// </summary>
 [ContentProperty(nameof(Children))]
-public class TimelineGroup : Timeline
+public abstract class TimelineGroup : Timeline
 {
     private TimelineCollection _children;
 
     /// <summary>
-    /// Gets the collection of child <see cref="Timeline"/> objects.
+    /// Initializes a new instance of the <see cref="TimelineGroup"/> class, with default properties.
     /// </summary>
+    protected TimelineGroup()
+        : base()
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TimelineGroup"/> class with the specified 
+    /// <see cref="Timeline.BeginTime"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The <see cref="Timeline.BeginTime"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    protected TimelineGroup(TimeSpan? beginTime)
+        : base(beginTime)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TimelineGroup"/> class with the specified 
+    /// <see cref="Timeline.BeginTime"/> and <see cref="Timeline.Duration"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The <see cref="Timeline.BeginTime"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    /// <param name="duration">
+    /// The <see cref="Timeline.Duration"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    protected TimelineGroup(TimeSpan? beginTime, Duration duration)
+        : base(beginTime, duration)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TimelineGroup"/> class with the specified 
+    /// <see cref="Timeline.BeginTime"/>, <see cref="Timeline.Duration"/>, and <see cref="Timeline.RepeatBehavior"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The <see cref="Timeline.BeginTime"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    /// <param name="duration">
+    /// The <see cref="Timeline.Duration"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    /// <param name="repeatBehavior">
+    /// The <see cref="Timeline.RepeatBehavior"/> for this <see cref="TimelineGroup"/>.
+    /// </param>
+    protected TimelineGroup(TimeSpan? beginTime, Duration duration, RepeatBehavior repeatBehavior)
+        : base(beginTime, duration, repeatBehavior)
+    {
+    }
+
+    /// <summary>
+    /// Gets the collection of direct child <see cref="Timeline"/> objects of the <see cref="TimelineGroup"/>.
+    /// </summary>
+    /// <returns>
+    /// Child <see cref="Timeline"/> objects of the <see cref="TimelineGroup"/>.
+    /// </returns>
     public TimelineCollection Children => _children ??= new TimelineCollection(this);
 
-    internal override TimelineClock CreateClock() => new TimelineGroupClock(this);
+    internal override TimelineClock CreateClock() => new ClockGroup(this);
 }

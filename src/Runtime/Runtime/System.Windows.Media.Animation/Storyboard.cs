@@ -25,7 +25,6 @@ namespace System.Windows.Media.Animation;
 /// </summary>
 public class Storyboard : ParallelTimeline
 {
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Storyboard"/> class.
     /// </summary>
@@ -774,7 +773,7 @@ public class Storyboard : ParallelTimeline
         }
         else
         {
-            if (currentClock is not TimelineGroupClock timelineGroupClock)
+            if (currentClock is not ClockGroup timelineGroupClock)
             {
                 return;
             }

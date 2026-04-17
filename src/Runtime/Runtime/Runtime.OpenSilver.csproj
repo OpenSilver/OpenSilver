@@ -98,7 +98,7 @@
     <Compile Include="OpenSilver\Internal\Media\Animation\KeyFramesAnimator.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\ResolvedKeyFrameEntry.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\TimelineClock.cs" />
-    <Compile Include="OpenSilver\Internal\Media\Animation\TimelineGroupClock.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\ClockGroup.cs" />
     <Compile Include="OpenSilver\Internal\Media\ISvgBrush.cs" />
     <Compile Include="OpenSilver\Internal\NamedObject.cs" />
     <Compile Include="OpenSilver\Internal\SynchronyzedStore.cs" />

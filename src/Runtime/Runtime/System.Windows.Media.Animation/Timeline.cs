@@ -27,6 +27,61 @@ public abstract class Timeline : DependencyObject
     protected Timeline() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="Timeline"/> class with the specified 
+    /// <see cref="BeginTime"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The time at which this <see cref="Timeline"/> should begin. See the <see cref="BeginTime"/> 
+    /// property for more information.
+    /// </param>
+    protected Timeline(TimeSpan? beginTime)
+    {
+        BeginTime = beginTime;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Timeline"/> class with the specified 
+    /// <see cref="BeginTime"/> and <see cref="Duration"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The time at which this <see cref="Timeline"/> should begin. See the <see cref="BeginTime"/> 
+    /// property for more information.
+    /// </param>
+    /// <param name="duration">
+    /// The length of time for which this timeline plays, not counting repetitions. See the 
+    /// <see cref="Duration"/> property for more information.
+    /// </param>
+    protected Timeline(TimeSpan? beginTime, Duration duration)
+    {
+        BeginTime = beginTime;
+        Duration = duration;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Timeline"/> class with the specified 
+    /// <see cref="BeginTime"/>, <see cref="Duration"/>, and <see cref="RepeatBehavior"/>.
+    /// </summary>
+    /// <param name="beginTime">
+    /// The time at which this <see cref="Timeline"/> should begin. See the <see cref="BeginTime"/> 
+    /// property for more information.
+    /// </param>
+    /// <param name="duration">
+    /// The length of time for which this timeline plays, not counting repetitions. See the 
+    /// <see cref="Duration"/> property for more information.
+    /// </param>
+    /// <param name="repeatBehavior">
+    /// The repeating behavior of this timeline, either as an iteration <see cref="RepeatBehavior.Count"/> 
+    /// or a repeat <see cref="RepeatBehavior.Duration"/>. See the <see cref="RepeatBehavior"/> property 
+    /// for more information.
+    /// </param>
+    protected Timeline(TimeSpan? beginTime, Duration duration, RepeatBehavior repeatBehavior)
+    {
+        BeginTime = beginTime;
+        Duration = duration;
+        RepeatBehavior = repeatBehavior;
+    }
+
+    /// <summary>
     /// Occurs when the <see cref="Storyboard"/> object has completed playing.
     /// </summary>
     public event EventHandler Completed;
