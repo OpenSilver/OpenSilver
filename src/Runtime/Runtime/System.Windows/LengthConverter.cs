@@ -1,209 +1,210 @@
-// (c) Copyright Microsoft Corporation.
-// This source is subject to the Microsoft Public License (Ms-PL).
-// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
-// All other rights reserved.
 
-using System;
-using System.Collections.Generic;
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+using OpenSilver.Internal;
 using System.ComponentModel;
 using System.Globalization;
-using System.Windows.Controls;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Converts instances of other types to and from instances of a <see cref="double"/> that represent 
+/// an object's length.
+/// </summary> 
+public class LengthConverter : TypeConverter
 {
     /// <summary>
-    /// Converts instances of other types to and from instances of a double that
-    /// represent an object measurement such as a height or width.
+    /// Determines whether conversion is possible from a specified type to a <see cref="double"/> that 
+    /// represents an object's length.
     /// </summary>
-    /// <QualityBand>Stable</QualityBand>
-    public partial class LengthConverter : TypeConverter
+    /// <param name="typeDescriptorContext">
+    /// Provides contextual information about a component.
+    /// </param>
+    /// <param name="sourceType">
+    /// Identifies the data type to evaluate for conversion.
+    /// </param>
+    /// <returns>
+    /// true if conversion is possible; otherwise, false.
+    /// </returns>
+    public override bool CanConvertFrom(ITypeDescriptorContext typeDescriptorContext, Type sourceType)
     {
-        /// <summary>
-        /// Conversions from units to pixels.
-        /// </summary>
-        private static Dictionary<string, double> UnitToPixelConversions = new Dictionary<string, double>
+        // We can only handle strings, integral and floating types
+        TypeCode tc = Type.GetTypeCode(sourceType);
+        switch (tc)
         {
-            { "px", 1.0 },
-            { "in", 96.0 },
-            { "cm", 37.795275590551178 },
-            { "pt", 1.3333333333333333 }
-        };
+            case TypeCode.String:
+            case TypeCode.Decimal:
+            case TypeCode.Single:
+            case TypeCode.Double:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+                return true;
+            default:
+                return false;
+        }
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.LengthConverter" /> class.
-        /// </summary>
-        public LengthConverter()
+    /// <summary>
+    /// Determines whether conversion is possible to a specified type from a <see cref="double"/> that 
+    /// represents an object's length.
+    /// </summary>
+    /// <param name="typeDescriptorContext">
+    /// Provides contextual information about a component.
+    /// </param>
+    /// <param name="destinationType">
+    /// Identifies the data type to evaluate for conversion.
+    /// </param>
+    /// <returns>
+    /// true if conversion to the destinationType is possible; otherwise, false.
+    /// </returns>
+    public override bool CanConvertTo(ITypeDescriptorContext typeDescriptorContext, Type destinationType)
+        => destinationType == typeof(string);
+
+    /// <summary>
+    /// Converts instances of other data types into instances of <see cref="double"/> that represent an 
+    /// object's length.
+    /// </summary>
+    /// <param name="typeDescriptorContext">
+    /// Provides contextual information about a component.
+    /// </param>
+    /// <param name="cultureInfo">
+    /// Represents culture-specific information that is maintained during a conversion.
+    /// </param>
+    /// <param name="source">
+    /// Identifies the object that is being converted to <see cref="double"/>.
+    /// </param>
+    /// <returns>
+    /// An instance of <see cref="double"/> that is the value of the conversion.
+    /// </returns>
+    public override object ConvertFrom(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object source)
+    {
+        if (source is not null)
         {
+            if (source is string str)
+            {
+                return FromString(str, cultureInfo);
+            }
+            else
+            {
+                return Convert.ToDouble(source, cultureInfo);
+            }
         }
 
-        /// <summary>
-        /// Determines whether conversion is possible from a specified type to a
-        /// <see cref="T:System.Double" /> that represents an object
-        /// measurement.
-        /// </summary>
-        /// <param name="typeDescriptorContext">
-        /// An <see cref="T:System.ComponentModel.ITypeDescriptorContext" />
-        /// that provides a format context.
-        /// </param>
-        /// <param name="sourceType">
-        /// A <see cref="T:System.Type" /> that represents the type you want to
-        /// convert from.
-        /// </param>
-        /// <returns>
-        /// True if this converter can perform the conversion; otherwise, false.
-        /// </returns>
-        public override bool CanConvertFrom(ITypeDescriptorContext typeDescriptorContext, Type sourceType)
+        throw GetConvertFromException(source);
+    }
+
+    /// <summary>
+    /// Converts other types into instances of <see cref="double"/> that represent an object's length.
+    /// </summary>
+    /// <param name="typeDescriptorContext">
+    /// Describes context information of a component, such as its container and <see cref="PropertyDescriptor"/>.
+    /// </param>
+    /// <param name="cultureInfo">
+    /// Identifies culture-specific information, including the writing system and the calendar that is used.
+    /// </param>
+    /// <param name="value">
+    /// Identifies the <see cref="object"/> that is being converted.
+    /// </param>
+    /// <param name="destinationType">
+    /// The data type that this instance of <see cref="double"/> is being converted to.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="object"/> that is the value of the conversion.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// Occurs if the <paramref name="value"/> is null.
+    /// </exception>
+    public override object ConvertTo(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object value, Type destinationType)
+    {
+        ArgumentNullException.ThrowIfNull(destinationType);
+
+        if (value is double l && destinationType == typeof(string))
         {
-            // Convert numeric types and strings
-            switch (Type.GetTypeCode(sourceType))
+            if (double.IsNaN(l))
             {
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                case TypeCode.Int64:
-                case TypeCode.UInt64:
-                case TypeCode.Single:
-                case TypeCode.Double:
-                case TypeCode.Decimal:
-                case TypeCode.String:
-                    return true;
-                default:
-                    return false;
+                return "Auto";
             }
+
+            return Convert.ToString(l, cultureInfo);
         }
 
-        /// <summary>
-        /// Converts from the specified value to values of the
-        /// <see cref="T:System.Double" /> type.
-        /// </summary>
-        /// <param name="typeDescriptorContext">
-        /// An <see cref="T:System.ComponentModel.ITypeDescriptorContext" />
-        /// that provides a format context.
-        /// </param>
-        /// <param name="cultureInfo">
-        /// The <see cref="T:System.Globalization.CultureInfo" /> to use as the
-        /// current culture.
-        /// </param>
-        /// <param name="source">The value to convert.</param>
-        /// <returns>The converted value.</returns>
-        public override object ConvertFrom(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object source)
+        throw GetConvertToException(value, destinationType);
+    }
+
+    // Parse a Length from a string given the CultureInfo.
+    internal static double FromString(string s, CultureInfo cultureInfo)
+    {
+        string valueString = s.Trim();
+
+        //Auto is represented and Double.NaN
+        //properties that do not want Auto and NaN to be in their ligit values,
+        //should disallow NaN in validation callbacks (same goes for negative values)
+        if (valueString.Equals("auto", StringComparison.OrdinalIgnoreCase))
         {
-            if (source == null)
-            {
-                throw GetConvertFromException(source);
-            }
-
-            string text = source as string;
-            if (text != null)
-            {
-                // Convert Auto to NaN
-                if (string.Compare(text, "Auto", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    return double.NaN;
-                }
-
-                // Get the unit conversion factor
-                string number = text;
-                double conversionFactor = 1.0;
-                foreach (KeyValuePair<string, double> conversion in UnitToPixelConversions)
-                {
-                    if (number.EndsWith(conversion.Key, StringComparison.Ordinal))
-                    {
-                        conversionFactor = conversion.Value;
-                        number = text.Substring(0, number.Length - conversion.Key.Length);
-                        break;
-                    }
-                }
-
-                // Convert the value
-                try
-                {
-                    return conversionFactor * Convert.ToDouble(number, cultureInfo);
-                }
-                catch (FormatException)
-                {
-                    string message = string.Format(
-                        CultureInfo.CurrentCulture,
-                        "'{0}' is unable to convert '{1}' to '{2}'.",
-                        GetType().Name,
-                        text,
-                        typeof(double).Name);
-                    throw new FormatException(message);
-                }
-            }
-
-            return Convert.ToDouble(source, cultureInfo);
+            return double.NaN;
         }
 
-        /// <summary>
-        /// Returns whether the type converter can convert a measurement to the
-        /// specified type.
-        /// </summary>
-        /// <param name="typeDescriptorContext">
-        /// An <see cref="T:System.ComponentModel.ITypeDescriptorContext" />
-        /// that provides a format context.
-        /// </param>
-        /// <param name="destinationType">
-        /// A <see cref="T:System.Type" /> that represents the type you want to
-        /// convert to.
-        /// </param>
-        /// <returns>
-        /// True if this converter can perform the conversion; otherwise, false.
-        /// </returns>
-        public override bool CanConvertTo(ITypeDescriptorContext typeDescriptorContext, Type destinationType)
-        {
-            ArgumentNullException.ThrowIfNull(destinationType);
+        (string length, double unitFactor) = ParseLength(valueString);
 
-            return destinationType == typeof(string) || destinationType.IsAssignableFrom(typeof(double));
+        if (string.IsNullOrEmpty(length))
+        {
+            return 0;
         }
 
-        /// <summary>
-        /// Converts the specified measurement to the specified type.
-        /// </summary>
-        /// <param name="typeDescriptorContext">
-        /// An object that provides a format context.
-        /// </param>
-        /// <param name="cultureInfo">
-        /// The <see cref="T:System.Globalization.CultureInfo" /> to use as the
-        /// current culture.
-        /// </param>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="destinationType">
-        /// A <see cref="T:System.Type" /> that represents the type you want to
-        /// convert to.
-        /// </param>
-        /// <returns>The converted value.</returns>
-        public override object ConvertTo(ITypeDescriptorContext typeDescriptorContext, CultureInfo cultureInfo, object value, Type destinationType)
+        return ParseDouble(length, cultureInfo) * unitFactor;
+    }
+
+    private static (string Length, double UnitFactor) ParseLength(string value)
+    {
+        if (value.EndsWith("px", StringComparison.OrdinalIgnoreCase))
         {
-            ArgumentNullException.ThrowIfNull(destinationType);
+            return (value.Substring(0, value.Length - 2), 1.0);
+        }
 
-            // Convert the length to a String
-            if (value is double)
-            {
-                double length = (double) value;
-                if (destinationType == typeof(string))
-                {
-                    return double.IsNaN(length) ?
-                        "Auto" :
-                        Convert.ToString(length, cultureInfo);
-                }
-            }
+        if (value.EndsWith("in", StringComparison.OrdinalIgnoreCase))
+        {
+            return (value.Substring(0, value.Length - 2), 96.0);
+        }
 
-            // Just return the value if it is already an instance of the
-            // destination type
-            if (value == null && !destinationType.IsValueType)
-            {
-                return null;
-            }
-            else if (value != null && destinationType.IsAssignableFrom(value.GetType()))
-            {
-                return value;
-            }
+        if (value.EndsWith("cm", StringComparison.OrdinalIgnoreCase))
+        {
+            return (value.Substring(0, value.Length - 2), 96.0 / 2.54);
+        }
 
-            // Otherwise throw an error
-            throw GetConvertToException(value, destinationType);
+        if (value.EndsWith("pt", StringComparison.OrdinalIgnoreCase))
+        {
+            return (value.Substring(0, value.Length - 2), 96.0 / 72.0);
+        }
+
+        return (value, 1.0);
+    }
+
+    private static double ParseDouble(string value, CultureInfo cultureInfo)
+    {
+        // FormatException errors thrown by Convert.ToDouble are pretty uninformative.
+        // Throw a more meaningful error in this case that tells that we were attempting
+        // to create a Length instance from a string.  This addresses windows bug 968884
+        try
+        {
+            return double.Parse(value, cultureInfo);
+        }
+        catch (FormatException)
+        {
+            throw new FormatException(string.Format(Strings.LengthFormatError, value));
         }
     }
 }

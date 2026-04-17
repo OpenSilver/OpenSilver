@@ -83,79 +83,107 @@ namespace OpenSilver.Compiler
 
         public override string ConvertToDouble(string source)
         {
-            string value = source.Trim().ToLower();
+            ReadOnlySpan<char> value = source.AsSpan().Trim();
 
             // special cases
-            switch (value)
+
+            if (value.Equals("auto", StringComparison.OrdinalIgnoreCase) || value.Equals("nan", StringComparison.OrdinalIgnoreCase))
             {
-                case "auto":
-                case "nan":
-                    return "global.System.Double.NaN";
-
-                case "infinity":
-                case "+infinity":
-                    return "global.System.Double.PositiveInfinity";
-
-                case "-infinity":
-                    return "global.System.Double.NegativeInfinity";
+                return "global.System.Double.NaN";
             }
 
-            if (value.EndsWith("d"))
+            if (value.Equals("infinity", StringComparison.OrdinalIgnoreCase) || value.Equals("+infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "global.System.Double.PositiveInfinity";
             }
 
-            int i = value.IndexOf('.');
-            if (i == -1)
+            if (value.Equals("-infinity", StringComparison.OrdinalIgnoreCase))
             {
-                return $"{value}.0";
+                return "global.System.Double.NegativeInfinity";
             }
-            else if (i == value.Length - 1)
+
+            if (TryParseLengthWithUnit(value, out string length, out double unitFactor) &&
+                double.TryParse(length, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double l))
             {
-                return $"{value}0";
+                l *= unitFactor;
+                return ToDoubleString(l.ToString("R", CultureInfo.InvariantCulture));
             }
-            else
+
+            if (value.EndsWith("d", StringComparison.OrdinalIgnoreCase))
             {
-                return value;
+                value = value.Slice(0, value.Length - 1);
+            }
+
+            return ToDoubleString(value);
+
+            static string ToDoubleString(ReadOnlySpan<char> value)
+            {
+                int i = value.IndexOf(".", StringComparison.OrdinalIgnoreCase);
+                if (i == -1)
+                {
+                    return $"{value}.0";
+                }
+                else if (i == value.Length - 1)
+                {
+                    return $"{value}0";
+                }
+                else
+                {
+                    return value.ToString();
+                }
             }
         }
 
         public override string ConvertToSingle(string source)
         {
-            string value = source.Trim().ToLower();
+            ReadOnlySpan<char> value = source.AsSpan().Trim();
 
             // special cases
-            switch (value)
+
+            if (value.Equals("auto", StringComparison.OrdinalIgnoreCase) || value.Equals("nan", StringComparison.OrdinalIgnoreCase))
             {
-                case "auto":
-                case "nan":
-                    return "global.System.Single.NaN";
-
-                case "infinity":
-                case "+infinity":
-                    return "global.System.Single.PositiveInfinity";
-
-                case "-infinity":
-                    return "global.System.Single.NegativeInfinity";                    
+                return "global.System.Single.NaN";
             }
 
-            if (value.EndsWith("f"))
+            if (value.Equals("infinity", StringComparison.OrdinalIgnoreCase) || value.Equals("+infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "global.System.Single.PositiveInfinity";
             }
 
-            int i = value.IndexOf('.');
-            if (i == -1)
+            if (value.Equals("-infinity", StringComparison.OrdinalIgnoreCase))
             {
-                return $"{value}.0F";
+                return "global.System.Single.NegativeInfinity";
             }
-            else if (i == value.Length - 1)
+
+            if (TryParseLengthWithUnit(value, out string length, out double unitFactor) &&
+                float.TryParse(length, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out float l))
             {
-                return $"{value}0F";
+                l = (float)(l * unitFactor);
+                return ToSingleString(l.ToString("R", CultureInfo.InvariantCulture));
             }
-            else
+
+            if (value.EndsWith("f", StringComparison.OrdinalIgnoreCase))
             {
-                return $"{value}F";
+                value = value.Slice(0, value.Length - 1);
+            }
+
+            return ToSingleString(value);
+
+            static string ToSingleString(ReadOnlySpan<char> value)
+            {
+                int i = value.IndexOf(".", StringComparison.OrdinalIgnoreCase);
+                if (i == -1)
+                {
+                    return $"{value}.0F";
+                }
+                else if (i == value.Length - 1)
+                {
+                    return $"{value}0F";
+                }
+                else
+                {
+                    return $"{value}F";
+                }
             }
         }
 

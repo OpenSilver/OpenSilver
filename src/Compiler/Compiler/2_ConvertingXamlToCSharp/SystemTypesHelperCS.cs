@@ -83,31 +83,40 @@ namespace OpenSilver.Compiler
 
         public override string ConvertToDouble(string source)
         {
-            string value = source.Trim().ToLower();
+            ReadOnlySpan<char> value = source.AsSpan().Trim();
 
             // special cases
-            switch (value)
+
+            if (value.Equals("auto", StringComparison.OrdinalIgnoreCase) || value.Equals("nan", StringComparison.OrdinalIgnoreCase))
             {
-                case "auto":
-                case "nan":
-                    return "double.NaN";
-
-                case "infinity":
-                case "+infinity":
-                    return "double.PositiveInfinity";
-
-                case "-infinity":
-                    return "double.NegativeInfinity";
+                return "double.NaN";
             }
 
-            if (value.EndsWith("d"))
+            if (value.Equals("infinity", StringComparison.OrdinalIgnoreCase) || value.Equals("+infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "double.PositiveInfinity";
             }
 
-            if (value.EndsWith("."))
+            if (value.Equals("-infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "double.NegativeInfinity";
+            }
+
+            if (TryParseLengthWithUnit(value, out string length, out double unitFactor) &&
+                double.TryParse(length, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double l))
+            {
+                l *= unitFactor;
+                return $"{l.ToString("R", CultureInfo.InvariantCulture)}D";
+            }
+
+            if (value.EndsWith("d", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
+            }
+
+            if (value.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
             }
 
             if (value.Length == 0)
@@ -120,31 +129,41 @@ namespace OpenSilver.Compiler
 
         public override string ConvertToSingle(string source)
         {
-            string value = source.Trim().ToLower();
+            ReadOnlySpan<char> value = source.AsSpan().Trim();
 
             // special cases
-            switch (value)
+
+            if (value.Equals("auto", StringComparison.OrdinalIgnoreCase) || value.Equals("nan", StringComparison.OrdinalIgnoreCase))
             {
-                case "auto":
-                case "nan":
-                    return "float.NaN";
-
-                case "infinity":
-                case "+infinity":
-                    return "float.PositiveInfinity";
-
-                case "-infinity":
-                    return "float.NegativeInfinity";                    
+                return "float.NaN";
             }
 
-            if (value.EndsWith("f"))
+            if (value.Equals("infinity", StringComparison.OrdinalIgnoreCase) || value.Equals("+infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "float.PositiveInfinity";
             }
 
-            if (value.EndsWith("."))
+            if (value.Equals("-infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "float.NegativeInfinity";
+            }
+
+
+            if (TryParseLengthWithUnit(value, out string length, out double unitFactor) &&
+                float.TryParse(length, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out float l))
+            {
+                l = (float)(l * unitFactor);
+                return $"{l.ToString("R", CultureInfo.InvariantCulture)}F";
+            }
+
+            if (value.EndsWith("f", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
+            }
+
+            if (value.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
             }
 
             if (value.Length == 0)

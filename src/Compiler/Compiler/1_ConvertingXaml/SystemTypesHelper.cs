@@ -122,6 +122,40 @@ internal abstract class SystemTypesHelper
 
     public abstract string ConvertToObject(string source);
 
+    internal static bool TryParseLengthWithUnit(ReadOnlySpan<char> value, out string length, out double unitFactor)
+    {
+        if (value.EndsWith("px", StringComparison.OrdinalIgnoreCase))
+        {
+            length = value.Slice(0, value.Length - 2).ToString();
+            unitFactor = 1.0;
+            return true;
+        }
+        else if (value.EndsWith("in", StringComparison.OrdinalIgnoreCase))
+        {
+            length = value.Slice(0, value.Length - 2).ToString();
+            unitFactor = 96.0;
+            return true;
+        }
+        else if (value.EndsWith("cm", StringComparison.OrdinalIgnoreCase))
+        {
+            length = value.Slice(0, value.Length - 2).ToString();
+            unitFactor = 96.0 / 2.54;
+            return true;
+        }
+        else if (value.EndsWith("pt", StringComparison.OrdinalIgnoreCase))
+        {
+            length = value.Slice(0, value.Length - 2).ToString();
+            unitFactor = 96.0 / 72.0;
+            return true;
+        }
+        else
+        {
+            length = default;
+            unitFactor = 0;
+            return false;
+        }
+    }
+
     internal sealed class StringTupleComparer : IEqualityComparer<(string Namespace, string Type)>
     {
         public static StringTupleComparer Instance { get; } = new();

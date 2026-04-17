@@ -520,7 +520,6 @@
     <Compile Include="System.Windows\IUIElement.cs" />
     <Compile Include="System.Windows.Controls\IUserControl.cs" />
     <Compile Include="System.Windows\LayoutCycleException.cs" />
-    <Compile Include="OpenSilver\Internal\LengthConverter.cs" />
     <Compile Include="System.Windows\PointConverter.cs" />
     <Compile Include="System.Windows\PropertyPathConverter.cs" />
     <Compile Include="System.Windows\ReadOnlyPropertyMetadata.cs" />
