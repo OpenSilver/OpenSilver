@@ -27,7 +27,7 @@ public sealed class TimelineCollection : PresentationFrameworkCollection<Timelin
     {
     }
 
-    internal TimelineCollection(Storyboard owner)
+    internal TimelineCollection(TimelineGroup owner)
     {
         Debug.Assert(owner != null);
         owner.ProvideSelfAsInheritanceContext(this, null);
