@@ -88,7 +88,7 @@ public sealed class InlineImageContainer : Inline
     /// for the special <see cref="double.NaN"/> value, this value must be equal to or greater
     /// than 0.
     /// </returns>
-    [TypeConverter(typeof(OpenSilver.Internal.LengthConverter))]
+    [TypeConverter(typeof(LengthConverter))]
     public double Width
     {
         get => (double)GetValue(WidthProperty);
@@ -114,7 +114,7 @@ public sealed class InlineImageContainer : Inline
     /// for the special <see cref="double.NaN"/> value, this value must be equal to or greater
     /// than 0.
     /// </returns>
-    [TypeConverter(typeof(OpenSilver.Internal.LengthConverter))]
+    [TypeConverter(typeof(LengthConverter))]
     public double Height
     {
         get => (double)GetValue(HeightProperty);

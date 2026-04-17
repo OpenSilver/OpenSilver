@@ -83,36 +83,40 @@ namespace OpenSilver.Compiler
 
         public override string ConvertToDouble(string source)
         {
-            string value = source.Trim().ToLower();
+            ReadOnlySpan<char> value = source.AsSpan().Trim();
 
             // special cases
-            switch (value)
+
+            if (value.Equals("auto", StringComparison.OrdinalIgnoreCase) || value.Equals("nan", StringComparison.OrdinalIgnoreCase))
             {
-                case "auto":
-                case "nan":
-                    return "double.NaN";
-
-                case "infinity":
-                case "+infinity":
-                    return "double.PositiveInfinity";
-
-                case "-infinity":
-                    return "double.NegativeInfinity";
+                return "double.NaN";
             }
 
-            if (TryConvertLengthWithUnit(value, out double convertedLength))
+            if (value.Equals("infinity", StringComparison.OrdinalIgnoreCase) || value.Equals("+infinity", StringComparison.OrdinalIgnoreCase))
             {
-                return $"{convertedLength.ToString("R", CultureInfo.InvariantCulture)}D";
+                return "double.PositiveInfinity";
             }
 
-            if (value.EndsWith("d"))
+            if (value.Equals("-infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "double.NegativeInfinity";
             }
 
-            if (value.EndsWith("."))
+            if (TryParseLengthWithUnit(value, out string length, out double unitFactor) &&
+                double.TryParse(length, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double l))
             {
-                value = value.Substring(0, value.Length - 1);
+                l *= unitFactor;
+                return $"{l.ToString("R", CultureInfo.InvariantCulture)}D";
+            }
+
+            if (value.EndsWith("d", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
+            }
+
+            if (value.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
             }
 
             if (value.Length == 0)
@@ -125,36 +129,41 @@ namespace OpenSilver.Compiler
 
         public override string ConvertToSingle(string source)
         {
-            string value = source.Trim().ToLower();
+            ReadOnlySpan<char> value = source.AsSpan().Trim();
 
             // special cases
-            switch (value)
+
+            if (value.Equals("auto", StringComparison.OrdinalIgnoreCase) || value.Equals("nan", StringComparison.OrdinalIgnoreCase))
             {
-                case "auto":
-                case "nan":
-                    return "float.NaN";
-
-                case "infinity":
-                case "+infinity":
-                    return "float.PositiveInfinity";
-
-                case "-infinity":
-                    return "float.NegativeInfinity";                    
+                return "float.NaN";
             }
 
-            if (TryConvertLengthWithUnit(value, out double convertedLength))
+            if (value.Equals("infinity", StringComparison.OrdinalIgnoreCase) || value.Equals("+infinity", StringComparison.OrdinalIgnoreCase))
             {
-                return $"{convertedLength.ToString("R", CultureInfo.InvariantCulture)}F";
+                return "float.PositiveInfinity";
             }
 
-            if (value.EndsWith("f"))
+            if (value.Equals("-infinity", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Substring(0, value.Length - 1);
+                return "float.NegativeInfinity";
             }
 
-            if (value.EndsWith("."))
+
+            if (TryParseLengthWithUnit(value, out string length, out double unitFactor) &&
+                float.TryParse(length, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out float l))
             {
-                value = value.Substring(0, value.Length - 1);
+                l = (float)(l * unitFactor);
+                return $"{l.ToString("R", CultureInfo.InvariantCulture)}F";
+            }
+
+            if (value.EndsWith("f", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
+            }
+
+            if (value.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Slice(0, value.Length - 1);
             }
 
             if (value.Length == 0)
@@ -336,33 +345,6 @@ namespace OpenSilver.Compiler
             }
 
             return Escape(source);
-        }
-
-        private static bool TryConvertLengthWithUnit(string value, out double convertedValue)
-        {
-            const double PixelsPerInch = 96D;
-
-            convertedValue = default;
-
-            double multiplier = value.EndsWith("px", StringComparison.Ordinal) ? 1D
-                : value.EndsWith("in", StringComparison.Ordinal) ? PixelsPerInch
-                : value.EndsWith("cm", StringComparison.Ordinal) ? PixelsPerInch / 2.54D
-                : value.EndsWith("pt", StringComparison.Ordinal) ? PixelsPerInch / 72D
-                : double.NaN;
-
-            if (double.IsNaN(multiplier))
-            {
-                return false;
-            }
-
-            string numericPortion = value.Substring(0, value.Length - 2);
-            if (!double.TryParse(numericPortion, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed))
-            {
-                return false;
-            }
-
-            convertedValue = parsed * multiplier;
-            return true;
         }
 
         private static string Escape(string s) => string.Concat("@\"", s.Replace("\"", "\"\""), "\"");
