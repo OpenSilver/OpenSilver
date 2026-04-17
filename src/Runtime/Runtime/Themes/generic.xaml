@@ -4824,6 +4824,13 @@
     </Style>
 
     <!--  controls:GroupBox  -->
+    <!--
+        The header is vertically centered on the top border line, with the top border
+        split into two segments (left of header / right of header) so that the header
+        creates a real gap in the border (matching WPF's visual look). BorderThickness
+        here is fixed to 1 on each segment to match WPF's default; developers needing
+        a thicker or customized border can retemplate the control.
+    -->
     <Style TargetType="controls:GroupBox">
         <Setter Property="BorderBrush"
                 Value="#D5DFE5" />
@@ -4853,16 +4860,38 @@
                                          controls:Grid.RowSpan="3"
                                          controls:Grid.Column="0"
                                          controls:Grid.ColumnSpan="4"
-                                         CornerRadius="4"
-                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
-                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
                                          Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}" />
+                        <controls:Border controls:Grid.Row="1"
+                                         controls:Grid.RowSpan="3"
+                                         controls:Grid.Column="0"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="1,0,0,0" />
+                        <controls:Border controls:Grid.Row="1"
+                                         controls:Grid.RowSpan="3"
+                                         controls:Grid.Column="3"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="0,0,1,0" />
+                        <controls:Border controls:Grid.Row="3"
+                                         controls:Grid.Column="0"
+                                         controls:Grid.ColumnSpan="4"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="0,0,0,1" />
+                        <controls:Border controls:Grid.Row="1"
+                                         controls:Grid.Column="0"
+                                         VerticalAlignment="Top"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="0,1,0,0" />
+                        <controls:Border controls:Grid.Row="1"
+                                         controls:Grid.Column="2"
+                                         controls:Grid.ColumnSpan="2"
+                                         VerticalAlignment="Top"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                         BorderThickness="0,1,0,0" />
                         <controls:Border x:Name="Header"
                                          controls:Grid.Row="0"
                                          controls:Grid.RowSpan="2"
                                          controls:Grid.Column="1"
-                                         Padding="3,1,3,0"
-                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
+                                         Padding="3,1,3,0">
                             <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:HeaderedContentControl.HeaderProperty}}"
                                                        ContentTemplate="{TemplateBinding Property={x:Static controls:HeaderedContentControl.HeaderTemplateProperty}}" />
                         </controls:Border>
