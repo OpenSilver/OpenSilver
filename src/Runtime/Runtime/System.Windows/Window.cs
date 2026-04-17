@@ -407,7 +407,8 @@ public class Window : ContentControl, IResizeObserverListener
             nameof(Title),
             typeof(string),
             typeof(Window),
-            new FrameworkPropertyMetadata(string.Empty), ValidateTitle);
+            new FrameworkPropertyMetadata(string.Empty),
+            ValidateTitle);
 
     /// <summary>
     /// Gets or sets a window's title.
@@ -589,7 +590,8 @@ public class Window : ContentControl, IResizeObserverListener
             nameof(WindowStyle),
             typeof(WindowStyle),
             typeof(Window),
-            new FrameworkPropertyMetadata(WindowStyle.SingleBorderWindow), ValidateWindowStyle);
+            new FrameworkPropertyMetadata(WindowStyle.SingleBorderWindow),
+            ValidateWindowStyle);
 
     /// <summary>
     /// Gets or sets a window's border style.
@@ -622,7 +624,8 @@ public class Window : ContentControl, IResizeObserverListener
             nameof(WindowState),
             typeof(WindowState),
             typeof(Window),
-            new FrameworkPropertyMetadata(WindowState.Normal), ValidateWindowState);
+            new FrameworkPropertyMetadata(WindowState.Normal),
+            ValidateWindowState);
 
     /// <summary>
     /// Gets or sets a value that indicates whether a window is restored, minimized, or maximized.
@@ -655,16 +658,30 @@ public class Window : ContentControl, IResizeObserverListener
             nameof(SizeToContent),
             typeof(SizeToContent),
             typeof(Window),
-            new FrameworkPropertyMetadata(SizeToContent.Manual));
+            new FrameworkPropertyMetadata(SizeToContent.Manual),
+            IsValidSizeToContent);
 
     /// <summary>
-    /// Gets or sets a value that indicates whether a window automatically sizes to fit its content.
+    /// Gets or sets a value that indicates whether a window will automatically size itself to fit the size 
+    /// of its content.
     /// </summary>
+    /// <returns>
+    /// A <see cref="Windows.SizeToContent"/> value. The default is <see cref="SizeToContent.Manual"/>.
+    /// </returns>
     [NotImplemented]
     public SizeToContent SizeToContent
     {
         get => (SizeToContent)GetValue(SizeToContentProperty);
         set => SetValueInternal(SizeToContentProperty, value);
+    }
+
+    private static bool IsValidSizeToContent(object o)
+    {
+        var value = (SizeToContent)o;
+        return value == SizeToContent.Manual ||
+               value == SizeToContent.Width ||
+               value == SizeToContent.Height ||
+               value == SizeToContent.WidthAndHeight;
     }
 
     /// <summary>
@@ -695,10 +712,10 @@ public class Window : ContentControl, IResizeObserverListener
     private static bool ValidateResizeMode(object value)
     {
         var mode = (ResizeMode)value;
-        return mode is ResizeMode.NoResize
-                    or ResizeMode.CanMinimize
-                    or ResizeMode.CanResize
-                    or ResizeMode.CanResizeWithGrip;
+        return mode == ResizeMode.NoResize ||
+               mode == ResizeMode.CanMinimize ||
+               mode == ResizeMode.CanResize ||
+               mode == ResizeMode.CanResizeWithGrip;
     }
 
     [NotImplemented]
