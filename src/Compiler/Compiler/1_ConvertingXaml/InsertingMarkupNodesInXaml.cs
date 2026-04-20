@@ -227,7 +227,20 @@ namespace OpenSilver.Compiler
                         XElement subXElement1 = subXElement;
                         if (!nodeName.LocalName.Contains('.'))
                         {
-                            var e = new ExtendedXElement(nodeName + "." + keyString, subXElement);
+                            string wrapperPropertyName = keyString;
+                            if (wrapperPropertyName == "_placeHolderForDefaultValue")
+                            {
+                                settings.XamlNameParser.GetClrNamespaceAndLocalName(
+                                    nodeName,
+                                    out string namespaceName,
+                                    out string outerLocalName,
+                                    out string assemblyNameIfAny);
+
+                                wrapperPropertyName = settings.Inspector.GetContentPropertyName(
+                                    namespaceName, outerLocalName, assemblyNameIfAny, lineInfo);
+                            }
+
+                            var e = new ExtendedXElement(nodeName + "." + wrapperPropertyName, subXElement);
                             e.SetLineInfo(lineInfo);
 
                             subXElement1 = e;
