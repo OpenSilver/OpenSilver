@@ -30,7 +30,7 @@ namespace System.Windows
             OverLine = new TextDecorationCollection(TextDecorationLocation.OverLine);
 
             ////Baseline
-            //Baseline = new TextDecorationCollection(TextDecorationLocation.Baseline);
+            Baseline = new TextDecorationCollection(TextDecorationLocation.Baseline);
         }
 
         /// <summary>
@@ -48,7 +48,11 @@ namespace System.Windows
         /// </summary>
         public static TextDecorationCollection OverLine { get; }
 
-        //public static TextDecorationCollection Baseline { get; }
+        /// <summary>
+        /// Specifies a baseline text decoration.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static TextDecorationCollection Baseline { get; }
     }
 
     /// <summary>
@@ -74,6 +78,7 @@ namespace System.Windows
         ///// <summary>
         ///// The vertical position of a baseline.
         ///// </summary>
-        //Baseline = 3,
+        [OpenSilver.NotImplemented]
+        Baseline = 3,
     }
 }

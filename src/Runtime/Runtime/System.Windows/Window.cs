@@ -725,7 +725,7 @@ public class Window : ContentControl, IResizeObserverListener
     public void Show() { }
 
     [NotImplemented]
-    public void ShowDialog() { }
+    public bool? ShowDialog() => DialogResult;
 
     [NotImplemented]
     public void Close() { }

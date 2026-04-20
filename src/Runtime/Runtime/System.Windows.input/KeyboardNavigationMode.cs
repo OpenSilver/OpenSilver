@@ -14,22 +14,46 @@
 namespace System.Windows.Input;
 
 /// <summary>
-/// Specifies the tabbing behavior across tab stops for a Silverlight tabbing sequence
-/// within a container.
+/// Specifies the possible values for changes in focus when logical and directional navigation occurs.
 /// </summary>
 public enum KeyboardNavigationMode
 {
     /// <summary>
-    /// Tab indexes are considered on the local subtree only inside this container.
+    /// The container does not handle the keyboard navigation;
+    /// each element receives keyboard focus as long as it is a key navigation stop.
     /// </summary>
-    Local = 0,
+    [OpenSilver.NotImplemented]
+    Continue,
+
     /// <summary>
-    /// Focus returns to the first or the last keyboard navigation stop inside of a container
-    /// when the first or last keyboard navigation stop is reached.
+    /// The container and all of its child elements as a whole only receive focus once.
+    /// Either the first tree child or the ActiveElement receive focus
     /// </summary>
-    Cycle = 1,
+    Once,
+
     /// <summary>
-    /// The container and all of its child elements as a whole receive focus only once.
+    /// Depending on the direction of the navigation,
+    /// the focus returns to the first or the last item when the end or
+    /// the beginning of the container is reached, respectively.
     /// </summary>
-    Once = 2
+    Cycle,
+
+    /// <summary>
+    /// No keyboard navigation is allowed inside this container
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    None,
+
+    /// <summary>
+    /// Like cycle but does not move past the beginning or end of the container.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    Contained,
+
+    /// <summary>
+    /// TabIndexes are considered on local subtree only inside this container
+    /// </summary>
+    Local,
+
+    // NOTE: if you add or remove any values in this enum, be sure to update KeyboardNavigation.IsValidKeyNavigationMode()
 }

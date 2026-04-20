@@ -13,7 +13,6 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Data;
-using System.Xml.Linq;
 
 namespace System.Windows.Controls
 {
@@ -155,6 +154,49 @@ namespace System.Windows.Controls
             ArgumentNullException.ThrowIfNull(element);
 
             return (bool)element.GetValue(HasErrorProperty);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ControlTemplate"/> used to generate validation error feedback on the adorner layer.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty ErrorTemplateProperty =
+            DependencyProperty.RegisterAttached(
+                "ErrorTemplate",
+                typeof(ControlTemplate),
+                typeof(Validation),
+                new FrameworkPropertyMetadata(
+                    null,
+                    FrameworkPropertyMetadataOptions.NotDataBindable));
+
+
+        /// <summary>
+        /// Gets the value of the <see cref="ErrorTemplateProperty"/> attached property of the specified element.
+        /// </summary>
+        /// <param name="element">The <see cref="UIElement"/> or ContentElement object to read the value from.</param>
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+        [OpenSilver.NotImplemented]
+        public static ControlTemplate GetErrorTemplate(DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            return element.GetValue(ErrorTemplateProperty) as ControlTemplate;
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="ErrorTemplateProperty"/> attached property to the specified element.
+        /// </summary>
+        /// <param name="element">The <see cref="UIElement"/> or ContentElement object to set <paramref name="value"/> on.</param>
+        /// <param name="value">The <see cref="ControlTemplate"> to use to generate validation error feedback on the adorner layer.</param>
+        [OpenSilver.NotImplemented]
+        public static void SetErrorTemplate(DependencyObject element, ControlTemplate value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            // (perf) don't set if the existing value is already correct
+            object oldValue = element.ReadLocalValue(ErrorTemplateProperty);
+            if (!Equals(oldValue, value))
+                element.SetValueInternal(ErrorTemplateProperty, value);
         }
 
         /// <summary>

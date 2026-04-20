@@ -172,6 +172,57 @@ public sealed class KeyboardNavigation
     }
 
     /// <summary>
+    /// Gets or sets the directional navigation behavior for the children of the element that this property is set on.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty DirectionalNavigationProperty =
+        DependencyProperty.RegisterAttached(
+            "DirectionalNavigation",
+            typeof(KeyboardNavigationMode),
+            typeof(KeyboardNavigation),
+            new FrameworkPropertyMetadata(KeyboardNavigationMode.Continue),
+            new ValidateValueCallback(IsValidKeyNavigationMode));
+
+    /// <summary>
+    /// Sets the value of the <see cref="DirectionalNavigationProperty"/> attached property for the specified element.
+    /// </summary>
+    /// <param name="element">Element on which to set the attached property.</param>
+    /// <param name="mode">Property value to set.</param>
+    /// <seealso cref="DirectionalNavigationProperty" />
+    [OpenSilver.NotImplemented]
+    public static void SetDirectionalNavigation(DependencyObject element, KeyboardNavigationMode mode)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        element.SetValueInternal(DirectionalNavigationProperty, mode);
+    }
+
+    /// <summary>
+    /// Gets the value of the <see cref="DirectionalNavigationProperty"/> attached property for the specified element.
+    /// </summary>
+    /// <param name="element">Element from which to get the attached property.</param>
+    /// <returns>The value of the <see cref="DirectionalNavigationProperty"/> property.</returns>
+    /// <seealso cref="DirectionalNavigationProperty" />
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+    [OpenSilver.NotImplemented]
+    public static KeyboardNavigationMode GetDirectionalNavigation(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        return (KeyboardNavigationMode)element.GetValue(DirectionalNavigationProperty);
+    }
+
+    private static bool IsValidKeyNavigationMode(object o)
+    {
+        var value = (KeyboardNavigationMode)o;
+        return value
+            is KeyboardNavigationMode.Contained
+            or KeyboardNavigationMode.Continue
+            or KeyboardNavigationMode.Cycle
+            or KeyboardNavigationMode.None
+            or KeyboardNavigationMode.Once
+            or KeyboardNavigationMode.Local;
+    }
+
+    /// <summary>
     /// Identifies the KeyboardNavigation.AcceptsReturn attached property.
     /// </summary>
     public static readonly DependencyProperty AcceptsReturnProperty =
@@ -391,7 +442,7 @@ public sealed class KeyboardNavigation
         // If parent is UIElement - return visual sibling
         DependencyObject parentAsUIElement = parent as UIElement;
         DependencyObject elementAsVisual = e as UIElement;
-        
+
         if (parentAsUIElement != null && elementAsVisual != null)
         {
             int count = VisualTreeHelper.GetChildrenCount(parentAsUIElement);
@@ -456,7 +507,7 @@ public sealed class KeyboardNavigation
                 {
                     // Verify if focusedElement is a visual descendant of e
                     UIElement visualFocusedElement = focusedElement as UIElement;
-                    
+
                     if (visualFocusedElement != null && visualFocusedElement != e && visualFocusedElement.IsDescendantOf(e))
                     {
                         return focusedElement;
