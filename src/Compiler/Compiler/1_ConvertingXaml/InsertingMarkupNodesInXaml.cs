@@ -236,8 +236,8 @@ namespace OpenSilver.Compiler
                                     out string outerLocalName,
                                     out string assemblyNameIfAny);
 
-                                wrapperPropertyName = settings.Inspector.GetContentPropertyName(
-                                    namespaceName, outerLocalName, assemblyNameIfAny, lineInfo);
+                                var typeDefinition = settings.Inspector.GetTypeDefinition(namespaceName, outerLocalName, assemblyNameIfAny, lineInfo);
+                                wrapperPropertyName = settings.Inspector.GetContentPropertyName(typeDefinition, lineInfo);
                             }
 
                             var e = new ExtendedXElement(nodeName + "." + wrapperPropertyName, subXElement);
