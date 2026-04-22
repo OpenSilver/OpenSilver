@@ -962,9 +962,12 @@ namespace OpenSilver.Compiler
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
                     out declaringType);
 
-                memberKind = MemberKind.Event;
-                memberType = eventDefinition.EventType.PopulateGeneric(fromType, declaringType);
-                return eventDefinition;
+                if (eventDefinition is not null)
+                {
+                    memberKind = MemberKind.Event;
+                    memberType = eventDefinition.EventType.PopulateGeneric(fromType, declaringType);
+                    return eventDefinition;
+                }
             }
 
             if (TestFlag(lookupFlags, MemberKind.AttachedEvent))
@@ -991,9 +994,12 @@ namespace OpenSilver.Compiler
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
                     out declaringType);
 
-                memberKind = MemberKind.Field;
-                memberType = fieldDefinition.FieldType.PopulateGeneric(fromType, declaringType);
-                return fieldDefinition;
+                if (fieldDefinition is not null)
+                {
+                    memberKind = MemberKind.Field;
+                    memberType = fieldDefinition.FieldType.PopulateGeneric(fromType, declaringType);
+                    return fieldDefinition;
+                }
             }
 
             memberKind = MemberKind.Unknown;
