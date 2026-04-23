@@ -20,6 +20,9 @@ namespace System.Windows.Media
     /// </summary>
     public sealed class EllipseGeometry : Geometry
     {
+        // Approximating a 1/4 circle with a Bezier curve
+        internal const double c_arcAsBezier = 0.5522847498307933984;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EllipseGeometry"/> class.
         /// </summary>
@@ -158,17 +161,16 @@ namespace System.Windows.Media
             get
             {
                 Point currentCenter = Center;
-                double currentRadiusX = RadiusX;
-                double currentRadiusY = RadiusY;
+                double currentRadiusX = Math.Abs(RadiusX);
+                double currentRadiusY = Math.Abs(RadiusY);
 
-                Rect boundsRect = new Rect(
-                    currentCenter.X - Math.Abs(currentRadiusX),
-                    currentCenter.Y - Math.Abs(currentRadiusY),
-                    2.0 * Math.Abs(currentRadiusX),
-                    2.0 * Math.Abs(currentRadiusY));
+                var boundsRect = new Rect(
+                    currentCenter.X - currentRadiusX,
+                    currentCenter.Y - currentRadiusY,
+                    2.0 * currentRadiusX,
+                    2.0 * currentRadiusY);
 
-                Transform transform = Transform;
-                if (transform is not null && !Transform.IsIdentityTransform(transform))
+                if (Transform is Transform transform && !Transform.IsIdentityTransform(transform))
                 {
                     boundsRect = transform.TransformBounds(boundsRect);
                 }
@@ -179,48 +181,50 @@ namespace System.Windows.Media
 
         internal override string ToPathData(IFormatProvider formatProvider)
         {
-            var cx = Center.X;
-            var cy = Center.Y;
-            var rx = Math.Abs(RadiusX);
-            var ry = Math.Abs(RadiusY);
+            Span<Point> points = stackalloc Point[13];
 
-            if (rx == 0 || ry == 0)
+            double radiusX = Math.Abs(RadiusX);
+            double radiusY = Math.Abs(RadiusY);
+            Point center = Center;
+
+            // Set the X coordinates
+            double mid = radiusX * c_arcAsBezier;
+
+            points[0].X = points[1].X = points[11].X = points[12].X = center.X + radiusX;
+            points[2].X = points[10].X = center.X + mid;
+            points[3].X = points[9].X = center.X;
+            points[4].X = points[8].X = center.X - mid;
+            points[5].X = points[6].X = points[7].X = center.X - radiusX;
+
+            // Set the Y coordinates
+            mid = radiusY * c_arcAsBezier;
+
+            points[2].Y = points[3].Y = points[4].Y = center.Y + radiusY;
+            points[1].Y = points[5].Y = center.Y + mid;
+            points[0].Y = points[6].Y = points[12].Y = center.Y;
+            points[7].Y = points[11].Y = center.Y - mid;
+            points[8].Y = points[9].Y = points[10].Y = center.Y - radiusY;
+
+            if (Transform is Transform transform && !Transform.IsIdentityTransform(transform))
             {
-                return string.Empty;
+                Matrix matrix = transform.Matrix;
+                for (int i = 0; i < points.Length; i++)
+                {
+                    points[i] *= matrix;
+                }
             }
 
-            Transform transform = Transform;
-            if (transform is null || Transform.IsIdentityTransform(transform))
-            {
-                return $"M{cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy + ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} Z";
-            }
+            var sb = StringBuilderCache.Acquire();
 
-            // Use four cubic Beziers so any affine transform on the ellipse is preserved in the emitted path data.
-            const double kappa = 0.5522847498307936;
-            double cpx = rx * kappa;
-            double cpy = ry * kappa;
+            sb.Append($"M {Format(points[0], formatProvider)} ")
+              .Append($"C {Format(points[1], formatProvider)} {Format(points[2], formatProvider)} {Format(points[3], formatProvider)} ")
+              .Append($"C {Format(points[4], formatProvider)} {Format(points[5], formatProvider)} {Format(points[6], formatProvider)} ")
+              .Append($"C {Format(points[7], formatProvider)} {Format(points[8], formatProvider)} {Format(points[9], formatProvider)} ")
+              .Append($"C {Format(points[10], formatProvider)} {Format(points[11], formatProvider)} {Format(points[12], formatProvider)} Z");
 
-            Point TransformPoint(double x, double y) => transform.Transform(new Point(x, y));
-            string FormatPoint(Point p) => $"{p.X.ToString(formatProvider)},{p.Y.ToString(formatProvider)}";
+            return StringBuilderCache.GetStringAndRelease(sb);
 
-            Point top = TransformPoint(cx, cy - ry);
-            Point topRightControl1 = TransformPoint(cx + cpx, cy - ry);
-            Point topRightControl2 = TransformPoint(cx + rx, cy - cpy);
-            Point right = TransformPoint(cx + rx, cy);
-            Point bottomRightControl1 = TransformPoint(cx + rx, cy + cpy);
-            Point bottomRightControl2 = TransformPoint(cx + cpx, cy + ry);
-            Point bottom = TransformPoint(cx, cy + ry);
-            Point bottomLeftControl1 = TransformPoint(cx - cpx, cy + ry);
-            Point bottomLeftControl2 = TransformPoint(cx - rx, cy + cpy);
-            Point left = TransformPoint(cx - rx, cy);
-            Point topLeftControl1 = TransformPoint(cx - rx, cy - cpy);
-            Point topLeftControl2 = TransformPoint(cx - cpx, cy - ry);
-
-            return $"M{FormatPoint(top)} " +
-                   $"C{FormatPoint(topRightControl1)} {FormatPoint(topRightControl2)} {FormatPoint(right)} " +
-                   $"C{FormatPoint(bottomRightControl1)} {FormatPoint(bottomRightControl2)} {FormatPoint(bottom)} " +
-                   $"C{FormatPoint(bottomLeftControl1)} {FormatPoint(bottomLeftControl2)} {FormatPoint(left)} " +
-                   $"C{FormatPoint(topLeftControl1)} {FormatPoint(topLeftControl2)} {FormatPoint(top)} Z";
+            static string Format(Point p, IFormatProvider formatProvider) => $"{p.X.ToString(formatProvider)} {p.Y.ToString(formatProvider)}";
         }
     }
 }
