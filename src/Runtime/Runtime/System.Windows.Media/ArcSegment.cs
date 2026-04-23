@@ -26,6 +26,41 @@ namespace System.Windows.Media
         public ArcSegment() { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ArcSegment"/> class.
+        /// </summary>
+        /// <param name="point">
+        /// The destination point of the arc; the start point of the arc is defined as the current point of the 
+        /// <see cref="PathFigure"/> to which the <see cref="ArcSegment"/> is added.
+        /// </param>
+        /// <param name="size">
+        /// The x- and y-radius of the arc. The x-radius is specified by the <see cref="Windows.Size"/> structure's 
+        /// <see cref="Size.Width"/> property, and the y-radius is specified by the <see cref="Windows.Size"/> 
+        /// structure's <see cref="Size.Height"/> property.
+        /// </param>
+        /// <param name="rotationAngle">
+        /// The x-axis rotation of the ellipse.
+        /// </param>
+        /// <param name="isLargeArc">
+        /// Whether the arc should be greater than 180 degrees.
+        /// </param>
+        /// <param name="sweepDirection">
+        /// Set to <see cref="SweepDirection.Clockwise"/> to draw the arc in a positive angle direction; set to 
+        /// <see cref="SweepDirection.Counterclockwise"/> to draw the arc in a negative angle direction.
+        /// </param>
+        /// <param name="isStroked">
+        /// Set to true to stroke the arc when a <see cref="Pen"/> is used to render the segment; otherwise, false.
+        /// </param>
+        public ArcSegment(Point point, Size size, double rotationAngle, bool isLargeArc, SweepDirection sweepDirection, bool isStroked)
+        {
+            Point = point;
+            Size = size;
+            RotationAngle = rotationAngle;
+            IsLargeArc = isLargeArc;
+            SweepDirection = sweepDirection;
+            IsStroked = isStroked;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="IsLargeArc"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsLargeArcProperty =

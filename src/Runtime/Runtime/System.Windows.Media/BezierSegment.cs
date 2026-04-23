@@ -26,6 +26,30 @@ namespace System.Windows.Media
         public BezierSegment() { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="BezierSegment"/> class with the specified control 
+        /// points, end point, and stroke option.
+        /// </summary>
+        /// <param name="point1">
+        /// The first control point, which determines the beginning portion of the curve.
+        /// </param>
+        /// <param name="point2">
+        /// The second control point, which determines the ending portion of the curve.
+        /// </param>
+        /// <param name="point3">
+        /// The point to which the curve is drawn.
+        /// </param>
+        /// <param name="isStroked">
+        /// true to stroke the curve when a <see cref="Pen"/> is used to render the segment; otherwise, false.
+        /// </param>
+        public BezierSegment(Point point1, Point point2, Point point3, bool isStroked)
+        {
+            Point1 = point1;
+            Point2 = point2;
+            Point3 = point3;
+            IsStroked = isStroked;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="Point1"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty Point1Property =

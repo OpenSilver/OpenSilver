@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Media
 {
     /// <summary>
@@ -100,13 +102,12 @@ namespace System.Windows.Media
         /// <summary>
         /// Identifies the <see cref="RadiusX"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusXProperty =
             DependencyProperty.Register(
                 nameof(RadiusX),
                 typeof(double),
                 typeof(RectangleGeometry),
-                new PropertyMetadata(0.0));
+                new PropertyMetadata(0.0, OnPathChanged));
 
         /// <summary>
         /// Gets or sets the x-radius of the ellipse that is used to round the corners of
@@ -116,7 +117,6 @@ namespace System.Windows.Media
         /// The x-radius of the ellipse used to round the corners of the rectangle geometry.
         /// The default is 0.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double RadiusX
         {
             get => (double)GetValue(RadiusXProperty);
@@ -126,13 +126,12 @@ namespace System.Windows.Media
         /// <summary>
         /// Identifies the <see cref="RadiusY" /> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RadiusYProperty =
             DependencyProperty.Register(
                 nameof(RadiusY),
                 typeof(double),
                 typeof(RectangleGeometry),
-                new PropertyMetadata(0.0));
+                new PropertyMetadata(0.0, OnPathChanged));
 
         /// <summary>
         /// Gets or sets the y-radius of the ellipse that is used to round the corners of
@@ -142,7 +141,6 @@ namespace System.Windows.Media
         /// The y-radius of the ellipse used to round the corners of the rectangle geometry.
         /// The default is 0.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public double RadiusY
         {
             get => (double)GetValue(RadiusYProperty);
@@ -162,7 +160,7 @@ namespace System.Windows.Media
                 {
                     boundsRect = Rect.Empty;
                 }
-                else if (transform == null || Transform.IsIdentityTransform(transform))
+                else if (transform is null || Transform.IsIdentityTransform(transform))
                 {
                     boundsRect = currentRect;
                 }
@@ -177,14 +175,76 @@ namespace System.Windows.Media
 
         internal override string ToPathData(IFormatProvider formatProvider)
         {
-            var rect = Rect;
+            Rect rect = Rect;
 
-            var left = rect.Left.ToString(formatProvider);
-            var top = rect.Top.ToString(formatProvider);
-            var right = rect.Right.ToString(formatProvider);
-            var bottom = rect.Bottom.ToString(formatProvider);
+            if (rect.IsEmpty)
+            {
+                return string.Empty;
+            }
 
-            return $"M{left},{top} L{right},{top} {right},{bottom} {left},{bottom} Z";
+            double radiusX = RadiusX;
+            double radiusY = RadiusY;
+
+            Matrix matrix = Transform?.Matrix ?? Matrix.Identity;
+
+            if (IsRounded(radiusX, radiusY))
+            {
+                radiusX = Math.Min(rect.Width * (1.0 / 2.0), Math.Abs(radiusX));
+                radiusY = Math.Min(rect.Height * (1.0 / 2.0), Math.Abs(radiusY));
+
+                Span<Point> points = stackalloc Point[16];
+
+                double bezierX = (1.0 - EllipseGeometry.c_arcAsBezier) * radiusX;
+                double bezierY = (1.0 - EllipseGeometry.c_arcAsBezier) * radiusY;
+
+                points[1].X = points[0].X = points[15].X = points[14].X = rect.X;
+                points[2].X = points[13].X = rect.X + bezierX;
+                points[3].X = points[12].X = rect.X + radiusX;
+                points[4].X = points[11].X = rect.Right - radiusX;
+                points[5].X = points[10].X = rect.Right - bezierX;
+                points[6].X = points[7].X = points[8].X = points[9].X = rect.Right;
+
+                points[2].Y = points[3].Y = points[4].Y = points[5].Y = rect.Y;
+                points[1].Y = points[6].Y = rect.Y + bezierY;
+                points[0].Y = points[7].Y = rect.Y + radiusY;
+                points[15].Y = points[8].Y = rect.Bottom - radiusY;
+                points[14].Y = points[9].Y = rect.Bottom - bezierY;
+                points[13].Y = points[12].Y = points[11].Y = points[10].Y = rect.Bottom;
+
+                if (!matrix.IsIdentity)
+                {
+                    for (int i = 0; i < points.Length; i++)
+                    {
+                        points[i] *= matrix;
+                    }
+                }
+
+                var sb = StringBuilderCache.Acquire();
+
+                sb.Append($"M {Format(points[0], formatProvider)} ")
+                  .Append($"C {Format(points[1], formatProvider)} {Format(points[2], formatProvider)} {Format(points[3], formatProvider)} ")
+                  .Append($"L {Format(points[4], formatProvider)} ")
+                  .Append($"C {Format(points[5], formatProvider)} {Format(points[6], formatProvider)} {Format(points[7], formatProvider)} ")
+                  .Append($"L {Format(points[8], formatProvider)} ")
+                  .Append($"C {Format(points[9], formatProvider)} {Format(points[10], formatProvider)} {Format(points[11], formatProvider)} ")
+                  .Append($"L {Format(points[12], formatProvider)} ")
+                  .Append($"C {Format(points[13], formatProvider)} {Format(points[14], formatProvider)} {Format(points[15], formatProvider)} Z");
+
+                return StringBuilderCache.GetStringAndRelease(sb);
+            }
+            else
+            {
+                Point topLeft = rect.TopLeft * matrix;
+                Point topRight = rect.TopRight * matrix;
+                Point bottomRight = rect.BottomRight * matrix;
+                Point bottomLeft = rect.BottomLeft * matrix;
+
+                return $"M {Format(topLeft, formatProvider)} L {Format(topRight, formatProvider)} {Format(bottomRight, formatProvider)} {Format(bottomLeft, formatProvider)} Z";
+            }
+
+            static string Format(Point p, IFormatProvider formatProvider) => $"{p.X.ToString(formatProvider)} {p.Y.ToString(formatProvider)}";
         }
+
+        private static bool IsRounded(double radiusX, double radiusY) => radiusX != 0.0 && radiusY != 0.0;
     }
 }
