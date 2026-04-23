@@ -734,6 +734,9 @@ public class Window : ContentControl, IResizeObserverListener
     public void Close() { }
 
     [NotImplemented]
+    public void Hide() { }
+
+    [NotImplemented]
     public void DragMove() { }
 
     [NotImplemented]
