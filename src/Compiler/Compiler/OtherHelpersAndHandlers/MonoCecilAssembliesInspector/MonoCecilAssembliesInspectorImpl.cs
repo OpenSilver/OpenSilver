@@ -101,6 +101,7 @@ namespace OpenSilver.Compiler
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
+        private const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
         private const string Using = "using:";
         private const string ClrNamespace = "clr-namespace:";
@@ -824,12 +825,10 @@ namespace OpenSilver.Compiler
 
             if (IsCollection(type) || IsDictionary(type))
             {
-                return null;
+                return string.Empty;
             }
 
-            throw new XamlParseException(
-                $"No default content property exists for element: '{_typeReferenceHelper.ConvertToString(type)}'.",
-                lineInfo);
+            return null;
         }
 
         public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue, IXmlLineInfo lineInfo)
@@ -861,31 +860,35 @@ namespace OpenSilver.Compiler
 
         public static bool HasTypeConverter(MemberReference member)
         {
-            const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
-
-            if (member is PropertyDefinition property)
+            return member switch
             {
-                return property.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName) &&
-                    !ShouldIgnoreTypeConverter(property);
-            }
-            return false;
+                PropertyDefinition property => HasTypeConverter(property),
+                TypeDefinition type => HasTypeConverter(type),
+                _ => false,
+            };
         }
 
-        private static bool ShouldIgnoreTypeConverter(PropertyDefinition propertyInfo)
+        private static bool HasTypeConverter(PropertyDefinition property)
         {
-            var declaringType = propertyInfo.DeclaringType;
+            return property.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName) &&
+                !ShouldIgnoreTypeConverter(property);
 
-            if (declaringType.GetAssemblyName() == Constants.OPENSILVER_ASSEMBLY_NAME)
+            static bool ShouldIgnoreTypeConverter(PropertyDefinition propertyInfo)
             {
-                return declaringType.FullName switch
-                {
-                    $"{KnownNamespaces.SystemWindows}.FrameworkElement" => ShouldIgnoreFrameworkElementProperty(propertyInfo.Name),
-                    $"{KnownNamespaces.SystemWindowsDocuments}.InlineImageContainer" => ShouldIgnoreInlineImageContainerProperty(propertyInfo.Name),
-                    _ => false,
-                };
-            }
+                var declaringType = propertyInfo.DeclaringType;
 
-            return false;
+                if (declaringType.GetAssemblyName() == Constants.OPENSILVER_ASSEMBLY_NAME)
+                {
+                    return declaringType.FullName switch
+                    {
+                        $"{KnownNamespaces.SystemWindows}.FrameworkElement" => ShouldIgnoreFrameworkElementProperty(propertyInfo.Name),
+                        $"{KnownNamespaces.SystemWindowsDocuments}.InlineImageContainer" => ShouldIgnoreInlineImageContainerProperty(propertyInfo.Name),
+                        _ => false,
+                    };
+                }
+
+                return false;
+            }
 
             static bool ShouldIgnoreFrameworkElementProperty(string propertyName)
             {
@@ -896,6 +899,28 @@ namespace OpenSilver.Compiler
             {
                 return propertyName is "Width" or "Height";
             }
+        }
+
+        private static bool HasTypeConverter(TypeDefinition type)
+        {
+            TypeDefinition t = type;
+
+            do
+            {
+                if (t.CustomAttributes.Any(p => p.AttributeType.FullName == TypeConverterAttributeFullName))
+                {
+                    return true;
+                }
+
+                if (t.BaseType is null)
+                {
+                    break;
+                }
+
+                t = t.BaseType.ResolveOrThrow();
+            } while (t is not null);
+
+            return false;
         }
 
         public MemberReference GetMemberFromType(

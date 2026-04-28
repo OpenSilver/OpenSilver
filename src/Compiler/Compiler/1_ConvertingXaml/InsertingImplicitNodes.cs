@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -46,10 +47,9 @@ namespace OpenSilver.Compiler
             XElement[] children = currentElement.Elements().ToArray();
 
             // Check if the current element is an object (rather than a property)
-            bool isElementAnObject = !XamlParser.IsMemberNode(currentElement);
             var indexesMap = new List<int>(children.Length);
 
-            if (isElementAnObject)
+            if (!XamlParser.IsMemberNode(currentElement))
             {
                 //----------------------------------
                 // CASE: OBJECT (e.g. <Button> or <TextBlock>)
@@ -87,13 +87,21 @@ namespace OpenSilver.Compiler
                 if (nodesThatAreNotPropertiesOfTheObject.Count > 0)
                 {
                     // Find out the name of the default children property (aka "ContentProperty") of the current element:
+                    TypeDefinition type = GetTypeDefinition(currentElement.Name, currentElement, settings);
                     var contentPropertyName = settings.Inspector.GetContentPropertyName(
-                        GetTypeDefinition(currentElement.Name, currentElement, settings),
+                        type,
                         currentElement);
+
+                    if (contentPropertyName is null)
+                    {
+                        throw new XamlParseException(
+                            $"Cannot add content to object of type '{settings.TypeReferenceHelper.ConvertToString(type)}'.",
+                            currentElement);
+                    }
 
                     XElement contentWrapper = currentElement;
                     
-                    if (contentPropertyName != null)
+                    if (!string.IsNullOrEmpty(contentPropertyName))
                     {
                         // Wrap the child elements
                         var wrapper = new ExtendedXElement(currentElement.Name + "." + contentPropertyName);
@@ -125,40 +133,25 @@ namespace OpenSilver.Compiler
                 // (for instance Thickness, Rect, Size...), we also ignore it because later it will
                 // be transformed into a call to the "TypeFromStringConverters" class.
                 //-------------------------------------------------------------
-                XText directTextContent;
-                if (ContainsTextNode(currentElement, out directTextContent))
+                if (ContainsTextNode(currentElement, out XText directTextContent))
                 {
-                    // Read the content
-                    string contentValue = directTextContent.Value;
+                    bool initializeFromString = true;
 
                     // Get information about the element namespace and assembly
                     TypeDefinition elementType = GetTypeDefinition(currentElement.Name, currentElement, settings);
                     string elementTypeName = settings.TypeReferenceHelper.ConvertToString(elementType);
                     string assemblyName = elementType.GetAssemblyName();
 
-                    // Distinguish system types (string, double, etc.) to other types
-                    if (settings.SystemTypes.IsKnownType(elementTypeName, assemblyName))
+                    string contentValue = directTextContent.Value;
+
+                    if (!string.IsNullOrWhiteSpace(contentValue))
                     {
-                        // In this case we do nothing because system types are handled
-                        // later in the process. Example: "<sys:Double>50</sys:Double>"
-                        // becomes "Double x = 50;"
-                    }
-                    else if (settings.TypeReferenceHelper.IsEnum(elementType) ||
-                             settings.CoreTypes.IsKnownType(elementTypeName, assemblyName))
-                    {
-                        // Add the attribute that will tell the compiler to later
-                        // intialize the type by converting from the string using the
-                        // "TypeFromStringConverters" class
-                        currentElement.SetAttributeValue(InitializedFromStringAttribute, contentValue);
-                        
-                        // Remove the direct text content
-                        directTextContent.Remove();
-                    }
-                    else
-                    {
-                        // Ensure the content is not empty
-                        if (!string.IsNullOrWhiteSpace(contentValue)) //todo: do we really need this?
+                        string contentPropertyName = settings.Inspector.GetContentPropertyName(elementType, currentElement);
+
+                        if (!string.IsNullOrEmpty(contentPropertyName))
                         {
+                            initializeFromString = false;
+
                             List<int> siblings = indexesMapper.Peek();
 
                             // If it is the first child, we want to trim the start of the string. (Silverlight behavior)
@@ -173,41 +166,42 @@ namespace OpenSilver.Compiler
                                 contentValue = contentValue.TrimEnd();
                             }
 
-                            // Replace multiple spaces (and line returns) with just one space (same behavior as in WPF)
-                            // cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
-                            contentValue = Regex.Replace(contentValue, @"\s{2,}", " ");
+                            contentValue = CollapseWhitespaces(contentValue);
 
-                            string contentPropertyName = settings.Inspector.GetContentPropertyName(elementType, currentElement);
-
-                            if (!string.IsNullOrEmpty(contentPropertyName))
+                            // Verify that the attribute is not already set
+                            if (currentElement.Attribute(contentPropertyName) is not null)
                             {
-                                // Verify that the attribute is not already set
-                                if (currentElement.Attribute(contentPropertyName) != null)
-                                {
-                                    throw new XamlParseException($"The property '{contentPropertyName}' is set more than once.", directTextContent);
-                                }
-
-                                // SPECIAL CASE: If we are in a TextBlock, we want to set the
-                                // property "TextBlock.Text" instead of "TextBlock.Inlines"
-                                if (GeneratingCode.IsTextBlock(currentElement, settings) || GeneratingCode.IsRun(currentElement, settings))
-                                {
-                                    contentPropertyName = "Text";
-                                }
-
-                                // Add the Content attribute
-                                var attribute = new ExtendedXAttribute(contentPropertyName, contentValue);
-                                attribute.SetLineInfo(directTextContent);
-
-                                currentElement.Add(attribute);
-
-                                // Remove the direct text content
-                                directTextContent.Remove();
+                                throw new XamlParseException(
+                                    $"'{elementTypeName}.{contentPropertyName}' property has already been set and can be set only once.",
+                                    directTextContent);
                             }
-                            else
+
+                            // SPECIAL CASE: If we are in a TextBlock, we want to set the
+                            // property "TextBlock.Text" instead of "TextBlock.Inlines"
+                            if (GeneratingCode.IsTextBlock(currentElement, settings))
                             {
-                                throw new XamlParseException($"The element '{currentElement.Name}' does not support direct content.", directTextContent);
+                                contentPropertyName = "Text";
                             }
+
+                            // Add the Content attribute
+                            var attribute = new ExtendedXAttribute(contentPropertyName, contentValue);
+                            attribute.SetLineInfo(directTextContent);
+
+                            currentElement.Add(attribute);
+
+                            // Remove the direct text content
+                            directTextContent.Remove();
                         }
+                    }
+
+                    if (initializeFromString && (
+                        settings.CoreTypes.IsKnownType(elementTypeName, assemblyName) ||
+                        settings.SystemTypes.IsKnownType(elementTypeName, assemblyName) ||
+                        settings.TypeReferenceHelper.IsEnum(elementType) ||
+                        settings.Inspector.HasTypeConverter(elementType)))
+                    {
+                        currentElement.SetAttributeValue(InitializedFromStringAttribute, contentValue.Trim());
+                        directTextContent.Remove();
                     }
                 }
             }
@@ -222,33 +216,31 @@ namespace OpenSilver.Compiler
                 // (such as <Button Visibility="Collapsed"></Button> or <Button ToolTipService.ToolTip="Test></Button>)
                 if (ContainsTextNode(currentElement, out XText directTextContent))
                 {
-                    // Check if we are on a direct object property (such as <Button.Visibility>) or an attached property
-                    // (such as <ToolTipService.ToolTip>). For example, if the current element is <TextBlock.Text> and
-                    // the parent is <TextBlock>, the result is true. Conversely, if the current element is
-                    // <ToolTipService.ToolTip> and the parent is <Border>, the result is false.
-                    bool isAttachedProperty =
-                        currentElement.Parent.Name != (currentElement.Name.Namespace + currentElement.Name.LocalName.Substring(0, currentElement.Name.LocalName.IndexOf(".")));
+                    XElement parent = currentElement.Parent;
 
-                    // Read the content
-                    string contentValue = directTextContent.Value;
-
-                    // Get the property name
-                    XName xName = isAttachedProperty ?
-                        currentElement.Name :
-                        XName.Get(currentElement.Name.LocalName.Substring(currentElement.Name.LocalName.IndexOf(".") + 1), string.Empty);
+                    XName xName = currentElement.Name;
+                    if (parent.Name.Namespace == currentElement.Name.Namespace)
+                    {
+                        int index = currentElement.Name.LocalName.IndexOf('.');
+                        if (parent.Name.LocalName.Equals(currentElement.Name.LocalName.AsSpan(0, index), StringComparison.Ordinal))
+                        {
+                            xName = XNamespace.None.GetName(currentElement.Name.LocalName.Substring(index + 1));
+                        }
+                    }
 
                     // Replace multiple spaces (and line returns) with just one space (same behavior as in WPF): 
                     //cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
-                    contentValue = Regex.Replace(contentValue, @"\s{2,}", " ").Trim();
-                    if (!string.IsNullOrEmpty(contentValue))
+                    string contentValue = CollapseWhitespaces(directTextContent.Value).Trim();
+
+                    if (contentValue.StartsWith("{"))
                     {
-                        contentValue = contentValue[0] == '{' ? "{}" + contentValue : contentValue;
+                        contentValue = "{}" + contentValue;
                     }
 
                     // Verify that the attribute is not already set:
-                    if (currentElement.Attribute(xName.LocalName) != null)
+                    if (currentElement.Attribute(xName.LocalName) is not null)
                     {
-                        throw new XamlParseException($"The property '{xName.LocalName}' is set more than once.", currentElement);
+                        throw new XamlParseException($"'{xName.LocalName}' property has already been set and can be set only once.", currentElement);
                     }
 
                     // Add the attribute
@@ -289,6 +281,10 @@ namespace OpenSilver.Compiler
                 indexesMapper.Pop();
             }
         }
+
+        // Replace multiple spaces (and line returns) with just one space (same behavior as in WPF)
+        // cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
+        private static string CollapseWhitespaces(string s) => Regex.Replace(s, @"\s{2,}", " ");
 
         private static bool ContainsTextNode(XElement element, out XText textNode)
         {

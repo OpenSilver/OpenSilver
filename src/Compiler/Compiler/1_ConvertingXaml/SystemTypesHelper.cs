@@ -86,9 +86,7 @@ internal abstract class SystemTypesHelper
 
     public abstract bool IsNullableType(string fullTypeName, string assembly, out string underlyingType);
 
-    public abstract string GetDefaultValue(string namespaceName, string typeName, string assemblyIfAny);
-
-    public abstract string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny);
+    public abstract string GetDefaultValue(string fullTypeName);
 
     public abstract string ConvertToDouble(string source);
 

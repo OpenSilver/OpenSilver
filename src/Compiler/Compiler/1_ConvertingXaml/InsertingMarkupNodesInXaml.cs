@@ -254,9 +254,18 @@ namespace OpenSilver.Compiler
                             out string localName,
                             out string assemblyNameIfAny);
 
-                        keyStringAfterPlaceHolderReplacement = settings.Inspector.GetContentPropertyName(
-                            settings.Inspector.GetTypeDefinition(namespaceName, localName, assemblyNameIfAny, lineInfo),
-                            lineInfo);
+                        TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, localName, assemblyNameIfAny, lineInfo);
+
+                        string contentPropertyName = settings.Inspector.GetContentPropertyName(type, lineInfo);
+
+                        if (string.IsNullOrEmpty(contentPropertyName))
+                        {
+                            throw new XamlParseException(
+                                $"Cannot add content to object of type '{settings.TypeReferenceHelper.ConvertToString(type)}'.",
+                                lineInfo);
+                        }
+
+                        keyStringAfterPlaceHolderReplacement = contentPropertyName;
                     }
                     else if (keyStringAfterPlaceHolderReplacement.StartsWith("{")) //if we enter this if, it means that keyString is of the form "{Binding ElementName" so we want to remove "{Binding "
                     {

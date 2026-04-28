@@ -442,43 +442,13 @@ namespace OpenSilver.Compiler
                 }
                 else
                 {
-                    if (_settings.SystemTypes.IsKnownType(elementType, assemblyName))
+                    if (element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) is XAttribute initFromStringAttribute)
                     {
-                        //------------------------------------------------
-                        // Add the type initialization from literal value:
-                        //------------------------------------------------
-                        string directContent;
-                        if (element.FirstNode is XText xText)
-                        {
-                            directContent = xText.Value;
-                        }
-                        else
-                        {
-                            // If the direct content is not specified, we use the type's
-                            // default value (ex: <sys:String></sys:String>)
-                            directContent = _settings.SystemTypes.GetDefaultValue(
-                                elementTypeDefinition.Namespace,
-                                elementTypeDefinition.Name,
-                                assemblyName);
-                        }
+                        string stringValue = initFromStringAttribute.Value;
 
-                        string preparedValue = _settings.SystemTypes.ConvertKnownType(directContent, elementType);
-
-                        using (parameters.CreateLineScope(element))
-                        {
-                            parameters.AppendLine(
-                                $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue});");
-                        }
-                    }
-                    else if (element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null)
-                    {
-                        //------------------------------------------------
-                        // Add the type initialization from string:
-                        //------------------------------------------------
-
-                        string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
+                        bool isKnownSystemType = _settings.SystemTypes.IsKnownType(elementType, assemblyName);
                         bool isKnownCoreType = _settings.CoreTypes.IsKnownType(elementType, assemblyName);
-                        string preparedValue = ConvertFromInvariantString(stringValue, element, elementType, isKnownCoreType, false);
+                        string preparedValue = ConvertFromInvariantString(stringValue, element, elementType, isKnownCoreType, isKnownSystemType);
 
                         using (parameters.CreateLineScope(element))
                         {
@@ -488,10 +458,14 @@ namespace OpenSilver.Compiler
                     }
                     else
                     {
+                        string value = _settings.SystemTypes.IsKnownType(elementType, assemblyName) ?
+                            _settings.SystemTypes.GetDefaultValue(elementType) :
+                            $"new global::{elementType}()";
+
                         using (parameters.CreateLineScope(element))
                         {
                             parameters.AppendLine(
-                                $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new global::{elementType}());");
+                                $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {value});");
                         }
 
                         if (element.Attribute("Source") is XAttribute sourceAttribute)

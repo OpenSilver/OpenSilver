@@ -23,25 +23,25 @@ namespace OpenSilver.Compiler
     {
         private const string InvariantCulture = "global.System.Globalization.CultureInfo.InvariantCulture";
         
-        private static readonly Dictionary<(string Namespace, string Type), string> _supportIntrinsicTypesDefaultValues =
-            new(16, StringTupleComparer.Instance)
+        private static readonly Dictionary<string, string> _supportIntrinsicTypesDefaultValues =
+            new(16, StringComparer.OrdinalIgnoreCase)
             {
-                [("System", "Double")] = "0.0",
-                [("System", "Single")] = "0F",
-                [("System", "TimeSpan")] = "new global.System.TimeSpan()",
-                [("System", "String")] = "",
-                [("System", "Boolean")] = "false",
-                [("System", "Byte")] = "0uy",
-                [("System", "Int16")] = "0s",
-                [("System", "Int32")] = "0",
-                [("System", "Int64")] = "0L",
-                [("System", "UInt16")] = "0us",
-                [("System", "UInt32")] = "0u",
-                [("System", "UInt64")] = "0UL",
-                [("System", "SByte")] = "0y",
-                [("System", "Char")] = "char(0)",
-                [("System", "Decimal")] = "0M",
-                [("System", "Object")] = "\"\"",
+                ["System.Double"] = "0.0",
+                ["System.Single"] = "0F",
+                ["System.TimeSpan"] = "new global.System.TimeSpan()",
+                ["System.String"] = "\"\"",
+                ["System.Boolean"] = "false",
+                ["System.Byte"] = "0uy",
+                ["System.Int16"] = "0s",
+                ["System.Int32"] = "0",
+                ["System.Int64"] = "0L",
+                ["System.UInt16"] = "0us",
+                ["System.UInt32"] = "0u",
+                ["System.UInt64"] = "0UL",
+                ["System.SByte"] = "0y",
+                ["System.Char"] = "char(0)",
+                ["System.Decimal"] = "0M",
+                ["System.Object"] = "\"\"",
             };
 
         public override bool IsNullableType(string fullTypeName, string assembly, out string underlyingType)
@@ -60,22 +60,11 @@ namespace OpenSilver.Compiler
             return false;
         }
 
-        public override string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny)
+        public override string GetDefaultValue(string fullTypeName)
         {
-            Debug.Assert(IsCoreLibraryOrNull(assemblyIfAny));
-            Debug.Assert(namespaceName == "System");
-
-            return $"global.{namespaceName}.{typeName}";
-        }
-
-        public override string GetDefaultValue(string namespaceName, string typeName, string assemblyIfAny)
-        {
-            if (IsCoreLibraryOrNull(assemblyIfAny))
+            if (_supportIntrinsicTypesDefaultValues.TryGetValue(fullTypeName, out string value))
             {
-                if (_supportIntrinsicTypesDefaultValues.TryGetValue((namespaceName, typeName), out string value))
-                {
-                    return value;
-                }
+                return value;
             }
 
             return null;
@@ -193,7 +182,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "timespan")];
+                return _supportIntrinsicTypesDefaultValues["System.TimeSpan"];
             }
 
             // Optimization to avoid parsing at runtime
@@ -213,7 +202,7 @@ namespace OpenSilver.Compiler
             
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "boolean")];
+                return _supportIntrinsicTypesDefaultValues["System.Boolean"];
             }
 
             return value.ToLower();
@@ -225,7 +214,7 @@ namespace OpenSilver.Compiler
         
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "byte")];
+                return _supportIntrinsicTypesDefaultValues["System.Byte"];
             }
 
             if (value.EndsWith("uy", StringComparison.OrdinalIgnoreCase))
@@ -242,7 +231,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "int16")];
+                return _supportIntrinsicTypesDefaultValues["System.Int16"];
             }
 
             if (value.EndsWith("s", StringComparison.OrdinalIgnoreCase))
@@ -259,7 +248,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "int32")];
+                return _supportIntrinsicTypesDefaultValues["System.Int32"];
             }
 
             return value;
@@ -271,7 +260,7 @@ namespace OpenSilver.Compiler
         
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "int64")];
+                return _supportIntrinsicTypesDefaultValues["System.Int64"];
             }
 
             if (value.EndsWith("L", StringComparison.OrdinalIgnoreCase))
@@ -288,7 +277,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "uint16")];
+                return _supportIntrinsicTypesDefaultValues["System.UInt16"];
             }
 
             if (value.EndsWith("us", StringComparison.OrdinalIgnoreCase))
@@ -305,7 +294,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "uint32")];
+                return _supportIntrinsicTypesDefaultValues["System.UInt32"];
             }
 
             if (value.EndsWith("u", StringComparison.OrdinalIgnoreCase))
@@ -322,7 +311,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "uint64")];
+                return _supportIntrinsicTypesDefaultValues["System.UInt64"];
             }
 
             if (value.EndsWith("UL", StringComparison.OrdinalIgnoreCase))
@@ -339,7 +328,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "sbyte")];
+                return _supportIntrinsicTypesDefaultValues["System.SByte"];
             }
 
             if (value.EndsWith("y", StringComparison.OrdinalIgnoreCase))
@@ -357,7 +346,7 @@ namespace OpenSilver.Compiler
                 return $"'{source}'";
             }
 
-            return _supportIntrinsicTypesDefaultValues[("system", "char")];
+            return _supportIntrinsicTypesDefaultValues["System.Char"];
         }
 
         public override string ConvertToDecimal(string source)
@@ -376,7 +365,7 @@ namespace OpenSilver.Compiler
 
             if (value.Length == 0)
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "decimal")];
+                return _supportIntrinsicTypesDefaultValues["System.Decimal"];
             }
 
             return $"{value}M";
@@ -386,7 +375,7 @@ namespace OpenSilver.Compiler
         {
             if (string.IsNullOrEmpty(source))
             {
-                return _supportIntrinsicTypesDefaultValues[("system", "object")];
+                return _supportIntrinsicTypesDefaultValues["System.Object"];
             }
 
             return Escape(source);
