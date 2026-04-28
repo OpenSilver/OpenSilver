@@ -1051,7 +1051,15 @@ namespace OpenSilver.Compiler
                         }
                         else
                         {
-                            parameters.AppendLine($"((global::System.Collections.IList){codeToAccessTheEnumerable}).Add({valueUid});");
+                            if (_settings.Inspector.IsTypeExtension(valueTypeDefinition))
+                            {
+                                string resolvedTypeName = ResolveTypeExtension(valueElement);
+                                parameters.AppendLine($"((global::System.Collections.IList){codeToAccessTheEnumerable}).Add(typeof(global::{resolvedTypeName}));");
+                            }
+                            else
+                            {
+                                parameters.AppendLine($"((global::System.Collections.IList){codeToAccessTheEnumerable}).Add({valueUid});");
+                            }
                         }
                     }
                     else
