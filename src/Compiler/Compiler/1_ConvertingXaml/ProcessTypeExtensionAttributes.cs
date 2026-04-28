@@ -28,6 +28,16 @@ internal static class ProcessTypeExtensionAttributes
     {
         if (!XamlParser.IsMemberNode(element))
         {
+            // Normalize <x:Type> element to <x:TypeExtension> so the compiler handles it the same way:
+            if (element.Name.LocalName == "Type")
+            {
+                XName typeExtName = element.Name.Namespace + "TypeExtension";
+                if (GeneratingCode.IsTypeExtension(typeExtName, settings))
+                {
+                    element.Name = typeExtName;
+                }
+            }
+
             settings.XamlNameParser.GetClrNamespaceAndLocalName(
                 element.Name,
                 out string namespaceName,
