@@ -20,7 +20,8 @@ namespace OpenSilver.Compiler
     {
         // Note: we use '.' to make sure this attribute is not colliding with
         // any property defined by the user.
-        public const string PathInXamlAttribute = "__.PathInXaml.__";
+        public static readonly XName PathInXamlAttribute = GeneratingCode.xNamespace.GetName("__.PathInXaml.__");
+
         public static void ProcessDocument(XDocument doc)
         {
             TraverseNextElement(doc.Root, "0");

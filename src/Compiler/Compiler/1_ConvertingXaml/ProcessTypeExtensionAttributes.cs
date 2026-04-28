@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using System;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler;
@@ -40,21 +39,21 @@ internal static class ProcessTypeExtensionAttributes
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(element, targetType, settings);
+                    ResolveTypeExtensionAttribute(targetType);
                 }
             }
             else if (settings.Inspector.IsControlTemplate(type))
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(element, targetType, settings);
+                    ResolveTypeExtensionAttribute(targetType);
                 }
             }
             else if (settings.Inspector.IsDataTemplate(type))
             {
                 if (element.Attribute("DataType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(element, targetType, settings);
+                    ResolveTypeExtensionAttribute(targetType);
                 }
             }
         }
@@ -65,72 +64,41 @@ internal static class ProcessTypeExtensionAttributes
         }
     }
 
-    private static void ResolveTypeExtensionAttribute(XElement element, XAttribute attribute, ConversionSettings settings)
+    private static void ResolveTypeExtensionAttribute(XAttribute attribute)
     {
-        string value = attribute.Value;
-
-        if (value.StartsWith("{}") || !(value.StartsWith("{") && value.EndsWith("}")))
+        if (MarkupExtensionDescriptor.TryParse(attribute.Value, out MarkupExtensionDescriptor markupExtension) &&
+            TryExtractTypeName(markupExtension, out string typeName))
         {
-            return;
-        }
-
-        ReadOnlySpan<char> content = value.AsSpan(1, value.Length - 2).Trim();
-
-        int separatorIndex = IndexOfWhiteSpace(content);
-        if (separatorIndex == -1)
-        {
-            return;
-        }
-
-        ReadOnlySpan<char> markupExtensionName = content.Slice(0, separatorIndex);
-
-        if (IsTypeExtension(markupExtensionName, element, settings))
-        {
-            attribute.Value = content.Slice(separatorIndex + 1).Trim().ToString();
+            attribute.Value = typeName;
         }
     }
 
-    private static bool IsTypeExtension(ReadOnlySpan<char> span, XElement element, ConversionSettings settings)
+    private static bool TryExtractTypeName(MarkupExtensionDescriptor markupExtension, out string typeName)
     {
-        XName xname = null;
-
-        XNamespace xmlns;
-        ReadOnlySpan<char> name;
-
-        int columnIndex = span.IndexOf(':');
-        if (columnIndex == -1)
+        if (markupExtension.Name != "Type" && markupExtension.Name != "TypeExtension")
         {
-            xmlns = element.GetDefaultNamespace();
-            name = span;
-        }
-        else
-        {
-            string prefix = span.Slice(0, columnIndex).ToString();
-            xmlns = element.GetNamespaceOfPrefix(prefix);
-            name = span.Slice(columnIndex + 1);
+            typeName = null;
+            return false;
         }
 
-        if (xmlns is not null)
+        if (markupExtension.ContentProperty is string content && markupExtension.Properties.Count == 0)
         {
-            if (name.Equals("Type", StringComparison.Ordinal) || name.Equals("TypeExtension", StringComparison.Ordinal))
+            typeName = content;
+            return true;
+        }
+
+        if (markupExtension.ContentProperty is null && markupExtension.Properties.Count == 1)
+        {
+            (string propertyName, object propertyValue) = markupExtension.Properties[0];
+
+            if (propertyName == "TypeName" && propertyValue is string value)
             {
-                xname = xmlns.GetName("TypeExtension");
+                typeName = value;
+                return true;
             }
         }
 
-        return xname is not null && GeneratingCode.IsTypeExtension(xname, settings);
-    }
-
-    private static int IndexOfWhiteSpace(ReadOnlySpan<char> span)
-    {
-        for (int i = 0; i < span.Length; i++)
-        {
-            if (char.IsWhiteSpace(span[i]))
-            {
-                return i;
-            }
-        }
-
-        return -1;
+        typeName = null;
+        return false;
     }
 }

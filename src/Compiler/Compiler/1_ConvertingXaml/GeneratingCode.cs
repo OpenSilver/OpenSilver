@@ -14,6 +14,8 @@
 
 using Mono.Cecil;
 using System;
+using System.Diagnostics;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -32,6 +34,10 @@ namespace OpenSilver.Compiler
         internal static readonly XNamespace[] DefaultXamlNamespaces = [DefaultXamlNamespace, LegacyXamlNamespace];
         internal static readonly XNamespace xNamespace = "http://schemas.microsoft.com/winfx/2006/xaml"; // Used for example for "x:Name" attributes and {x:Null} markup extensions.
 
+        internal static readonly XName XKeyAttribute = xNamespace.GetName("Key");
+        internal static readonly XName XNameAttribute = xNamespace.GetName("Name");
+        internal static readonly XName XFieldModifierAttribute = xNamespace.GetName("FieldModifier");
+
         internal static string GetAttributeValue(XAttribute attribute)
         {
             string value = attribute.Value;
@@ -46,7 +52,7 @@ namespace OpenSilver.Compiler
 
         internal static bool SkipAttribute(XAttribute attribute)
         {
-            if (IsReservedAttribute(attribute.Name.LocalName) || attribute.IsNamespaceDeclaration)
+            if (IsReservedAttribute(attribute.Name) || attribute.IsNamespaceDeclaration)
             {
                 return true;
             }
@@ -66,7 +72,7 @@ namespace OpenSilver.Compiler
             return false;
         }
 
-        internal static bool IsReservedAttribute(string attributeName)
+        internal static bool IsReservedAttribute(XName attributeName)
         {
             return attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
                    attributeName == InsertingImplicitNodes.InitializedFromStringAttribute ||
@@ -321,6 +327,16 @@ namespace OpenSilver.Compiler
             {
                 return $"{settings.TypeReferenceHelper.Global}{namespaceName}.{typeName}";
             }
+        }
+
+        internal static TypeDefinition GetTypeDefinitionFromString(string value, XElement xmlnsResolver, IXmlLineInfo lineInfo, ConversionSettings settings, bool throwIfNull = true)
+        {
+            Debug.Assert(value is not null);
+
+            settings.XamlNameParser.GetClrNamespaceAndLocalName(
+                value, xmlnsResolver, out string namespaceName, out string typeName, out string assemblyName);
+
+            return settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo, throwIfNull);
         }
     }
 }

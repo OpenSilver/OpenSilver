@@ -13,13 +13,7 @@
 *  
 \*====================================================================================*/
 
-
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -28,7 +22,7 @@ namespace OpenSilver.Compiler
     {
         // Note: we use '.' to make sure this attribute is not colliding with
         // any property defined by the user.
-        public const string UniqueNameAttribute = "__.UniqueName.__";
+        public static readonly XName UniqueNameAttribute = GeneratingCode.xNamespace.GetName("__.UniqueName.__");
 
         public static void ProcessDocument(XDocument doc)
         {

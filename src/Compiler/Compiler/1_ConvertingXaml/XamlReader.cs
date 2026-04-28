@@ -59,6 +59,24 @@ namespace OpenSilver.Compiler
 
             return _it.Current.NodeType != XamlNodeType.None;
         }
+
+        public void SkipObject()
+        {
+            if (NodeType != XamlNodeType.StartObject)
+            {
+                throw new InvalidOperationException();
+            }
+
+            XElement element = ObjectData.Element;
+
+            while (Read())
+            {
+                if (NodeType == XamlNodeType.EndObject && ObjectData.Element == element)
+                {
+                    break;
+                }
+            }
+        }
     }
 
     internal static class XamlParser

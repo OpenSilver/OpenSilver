@@ -26,7 +26,7 @@ namespace OpenSilver.Compiler
     {
         // Note: we use '.' to make sure this attribute is not colliding with
         // any property defined by the user.
-        public const string InitializedFromStringAttribute = "__.InitializeFromString.__";
+        public static readonly XName InitializedFromStringAttribute = GeneratingCode.xNamespace.GetName("__.InitializeFromString.__");
 
         public static void InsertImplicitNodes(XDocument doc, ConversionSettings settings)
         {

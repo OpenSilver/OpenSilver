@@ -16,7 +16,6 @@ using Mono.Cecil;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -260,17 +259,17 @@ namespace OpenSilver.Compiler
                     switch (_reader.NodeType)
                     {
                         case XamlNodeType.StartObject:
-                            if (!ShouldSkipObject(_reader.ObjectData.Element))
+                            if (ShouldSkipObject(_reader.ObjectData.Element))
                             {
-                                TryCatch(OnWriteStartObject, parameters);
+                                _reader.SkipObject();
+                                continue;
                             }
+
+                            TryCatch(OnWriteStartObject, parameters);
                             break;
 
                         case XamlNodeType.EndObject:
-                            if (!ShouldSkipObject(_reader.ObjectData.Element))
-                            {
-                                TryCatch(OnWriteEndObject, parameters);
-                            }
+                            TryCatch(OnWriteEndObject, parameters);
                             break;
 
                         case XamlNodeType.StartMember:
@@ -437,15 +436,8 @@ namespace GlobalResource
 
                     // EventSetter only support the Event, Handler and HandledEventsToo properties. WriteEventSetter
                     // already takes care of these properties, so we just skip everything.
-                    while (_reader.Read())
-                    {
-                        if (_reader.NodeType == XamlNodeType.EndObject && _reader.ObjectData.Element == element)
-                        {
-                            OnWriteEndObject(parameters);
-                            break;
-                        }
-                    }
-
+                    _reader.SkipObject();
+                    OnWriteEndObject(parameters);
                     return;
                 }
 
@@ -538,7 +530,7 @@ namespace GlobalResource
                         if (!parameters.IsInsideTemplate && parameters.GenerateFieldsForNamedElements)
                         {
                             string fieldModifier = "let mutable";
-                            XAttribute attr = element.Attribute(GeneratingCode.xNamespace + "FieldModifier");
+                            XAttribute attr = element.Attribute(GeneratingCode.XFieldModifierAttribute);
                             if (attr != null)
                             {
                                 fieldModifier = (attr.Value ?? "").ToLower();
@@ -1016,23 +1008,8 @@ namespace GlobalResource
 
                         if (isDictionary)
                         {
-                            string childKey = GetElementXKey(valueElement, out bool isImplicitStyle, out bool isImplicitDataTemplate);
-                            if (isImplicitStyle)
-                            {
-                                // System.Collections.IDictionary
-                                parameters.AppendLine($"{codeToAccessTheEnumerable}.Add(typeof<{childKey}>, {valueUid}) |> ignore");
-                            }
-                            else if (isImplicitDataTemplate)
-                            {
-                                string key = $"new global.{KnownNamespaces.SystemWindows}.DataTemplateKey(typeof<{childKey}>)";
-                                // System.Collections.IDictionary
-                                parameters.AppendLine($"{codeToAccessTheEnumerable}.Add({key}, {valueUid}) |> ignore");
-                            }
-                            else
-                            {
-                                // System.Collections.IDictionary
-                                parameters.AppendLine($"{codeToAccessTheEnumerable}.Add(\"{childKey}\", {valueUid}) |> ignore");
-                            }
+                            string childKey = GetElementXKey(valueElement);
+                            parameters.AppendLine($"{codeToAccessTheEnumerable}.Add({childKey}, {valueUid}) |> ignore");
                         }
                         else
                         {
@@ -1216,7 +1193,7 @@ namespace GlobalResource
                             }
                             else if (_settings.Inspector.IsStaticExtension(valueTypeDefinition))
                             {
-                                string staticMemberName = ResolveStaticExtension(valueElement);
+                                string staticMemberName = ResolveStaticExtension(valueElement, valueElement);
                                 string propertyType = _settings.TypeReferenceHelper.ConvertToString(memberType);
 
                                 if (isAttachedProperty)
@@ -1234,7 +1211,7 @@ namespace GlobalResource
                             }
                             else if (_settings.Inspector.IsTypeExtension(valueTypeDefinition))
                             {
-                                string resolvedTypeName = ResolveTypeExtension(valueElement);
+                                string resolvedTypeName = ResolveTypeExtension(valueElement, valueElement);
                                 string propertyType = _settings.TypeReferenceHelper.ConvertToString(memberType);
 
                                 if (isAttachedProperty)
@@ -1320,23 +1297,8 @@ namespace GlobalResource
 
                 if (_settings.Inspector.IsIDictionary(targetTypeDefinition))
                 {
-                    string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
-                    if (isImplicitStyle)
-                    {
-                        // System.Collections.IDictionary
-                        parameters.AppendLine($"{targetUid}.Add(typeof<{childKey}>, {childUid}) |> ignore");
-                    }
-                    else if (isImplicitDataTemplate)
-                    {
-                        string key = $"new global.{KnownNamespaces.SystemWindows}.DataTemplateKey(typeof<{childKey}>)";
-                        // System.Collections.IDictionary
-                        parameters.AppendLine($"{targetUid}.Add({key}, {childUid}) |> ignore");
-                    }
-                    else
-                    {
-                        // System.Collections.IDictionary
-                        parameters.AppendLine($"{targetUid}.Add(\"{childKey}\", {childUid}) |> ignore");
-                    }
+                    string childKey = GetElementXKey(child);
+                    parameters.AppendLine($"{targetUid}.Add({childKey}, {childUid}) |> ignore");
                 }
                 else
                 {
@@ -1393,37 +1355,54 @@ namespace GlobalResource
                 return $"global.{_settings.TypeReferenceHelper.ConvertToString(type)}";
             }
 
-            private string GetElementXKey(XElement element,
-                out bool isImplicitStyle,
-                out bool isImplicitDataTemplate)
+            private string GetElementXKey(XElement element)
             {
-                isImplicitStyle = false;
-                isImplicitDataTemplate = false;
+                if (element.Attribute(GeneratingCode.XKeyAttribute) is XAttribute keyAttribute)
+                {
+                    if (!MarkupExtensionDescriptor.IsMarkupExtension(keyAttribute.Value))
+                    {
+                        return EscapeString(GeneratingCode.GetAttributeValue(keyAttribute));
+                    }
 
-                if (element.Attribute(GeneratingCode.xNamespace + "Key") != null)
-                {
-                    return element.Attribute(GeneratingCode.xNamespace + "Key").Value;
+                    var markupExtension = MarkupExtensionDescriptor.Parse(keyAttribute.Value, keyAttribute);
+                    var markupExtensionElement = InsertingMarkupNodesInXaml.GenerateExtensionElement(markupExtension, _settings, element, keyAttribute);
+                    var type = GetTypeDefinition(markupExtensionElement.Name, keyAttribute);
+
+                    if (_settings.Inspector.IsTypeExtension(type))
+                    {
+                        string resolvedTypeName = ResolveTypeExtension(markupExtensionElement, element);
+                        return $"typeof<global.{resolvedTypeName}>";
+                    }
+                    else if (_settings.Inspector.IsStaticExtension(type))
+                    {
+                        return ResolveStaticExtension(markupExtensionElement, element);
+                    }
+                    else
+                    {
+                        throw new XamlParseException(
+                            $"A key for a dictionary cannot be of type '{_settings.TypeReferenceHelper.ConvertToString(type)}'. Only String, TypeExtension, and StaticExtension are supported.",
+                            keyAttribute);
+                    }
                 }
-                else if (element.Attribute(GeneratingCode.xNamespace + "Name") != null)
+
+                if (element.Attribute(GeneratingCode.XNameAttribute) is XAttribute nameAttribute)
                 {
-                    return element.Attribute(GeneratingCode.xNamespace + "Name").Value;
+                    return EscapeString(nameAttribute.Value);
                 }
-                else if (GeneratingCode.IsStyle(element, _settings))
+
+                if (GeneratingCode.IsStyle(element, _settings))
                 {
-                    isImplicitStyle = true;
-                    return GetCSharpFullTypeNameFromTargetTypeString(element);
+                    return $"typeof<{GetCSharpFullTypeNameFromTargetTypeString(element)}>";
                 }
-                else if (GeneratingCode.IsDataTemplate(element, _settings) && element.Attribute("DataType") != null)
+
+                if (GeneratingCode.IsDataTemplate(element, _settings) && element.Attribute("DataType") != null)
                 {
-                    isImplicitDataTemplate = true;
-                    return GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true);
+                    return $"new global.{KnownNamespaces.SystemWindows}.DataTemplateKey(typeof<{GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true)}>)";
                 }
-                else
-                {
-                    throw new XamlParseException(
-                        $"Each dictionary entry must have an associated key. The element named '{element.Name.LocalName}' does not have a key.",
-                        element);
-                }
+
+                throw new XamlParseException(
+                    $"Each dictionary entry must have an associated key. The element named '{element.Name.LocalName}' does not have a key.",
+                    element);
             }
 
             private string GenerateCodeForInstantiatingAttributeValue(
@@ -1732,7 +1711,7 @@ namespace GlobalResource
                     throwIfNull);
             }
 
-            private string ResolveStaticExtension(XElement element)
+            private string ResolveStaticExtension(XElement element, XElement xmlnsResolver)
             {
                 if (element.Attribute("Member") is not XAttribute member)
                 {
@@ -1745,7 +1724,7 @@ namespace GlobalResource
 
                 if (element.Attribute("MemberType") is XAttribute typeAttribute)
                 {
-                    type = GetTypeDefinitionFromString(element, typeAttribute.Value, typeAttribute);
+                    type = GetTypeDefinitionFromString(typeAttribute.Value, xmlnsResolver, typeAttribute);
                     fieldString = member.Value;
                     typeNameForError = _settings.TypeReferenceHelper.ConvertToString(type);
                 }
@@ -1768,7 +1747,7 @@ namespace GlobalResource
                             member);
                     }
 
-                    type = GetTypeDefinitionFromString(element, typeString, member);
+                    type = GetTypeDefinitionFromString(typeString, xmlnsResolver, member);
 
                     // Get the member name substring.
                     fieldString = member.Value.Substring(dotIndex + 1, member.Value.Length - dotIndex - 1);
@@ -1822,11 +1801,11 @@ namespace GlobalResource
                     member);
             }
 
-            private string ResolveTypeExtension(XElement element)
+            private string ResolveTypeExtension(XElement element, XElement xmlnsResolver)
             {
                 if (element.Attribute("Type") is XAttribute typeAttribute)
                 {
-                    return _settings.TypeReferenceHelper.ConvertToString(GetTypeDefinitionFromString(element, typeAttribute.Value, typeAttribute));
+                    return _settings.TypeReferenceHelper.ConvertToString(GetTypeDefinitionFromString(typeAttribute.Value, xmlnsResolver, typeAttribute));
                 }
 
                 if (element.Attribute("TypeName") is not XAttribute typeNameAttribute)
@@ -1834,18 +1813,11 @@ namespace GlobalResource
                     throw new XamlParseException("TypeExtension must have TypeName property set.", element);
                 }
 
-                return _settings.TypeReferenceHelper.ConvertToString(GetTypeDefinitionFromString(element, typeNameAttribute.Value, typeNameAttribute));
+                return _settings.TypeReferenceHelper.ConvertToString(GetTypeDefinitionFromString(typeNameAttribute.Value, xmlnsResolver, typeNameAttribute));
             }
 
-            private TypeDefinition GetTypeDefinitionFromString(XElement element, string value, IXmlLineInfo lineInfo)
-            {
-                Debug.Assert(value is not null);
-
-                _settings.XamlNameParser.GetClrNamespaceAndLocalName(
-                    value, element, out string namespaceName, out string typeName, out string assemblyName);
-
-                return _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
-            }
+            private TypeDefinition GetTypeDefinitionFromString(string value, XElement xmlnsResolver, IXmlLineInfo lineInfo)
+                => GeneratingCode.GetTypeDefinitionFromString(value, xmlnsResolver, lineInfo, _settings);
 
             private string GenerateCodeForSetterValue(XAttribute value) => GenerateCodeForSetterOrTriggerOrConditionValue(value, "Setter", "TargetName");
 
