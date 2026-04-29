@@ -1909,6 +1909,13 @@ namespace GlobalResource
                     out TypeReference memberType,
                     out _);
 
+                if (memberReference is null)
+                {
+                    throw new XamlParseException(
+                        $"Cannot find the Style Property '{propertyName}' on the type '{_settings.TypeReferenceHelper.ConvertToString(fromType)}'.",
+                        property);
+                }
+
                 return GenerateCodeForInstantiatingAttributeValue(
                     propertyName,
                     memberReference,
