@@ -1909,6 +1909,11 @@ namespace GlobalResource
                     out TypeReference memberType,
                     out _);
 
+                if (memberReference is null)
+                {
+                    throw new XamlParseException($"Property or field '{propertyName}' not found in type '{fromType}'.", property);
+                }
+
                 return GenerateCodeForInstantiatingAttributeValue(
                     propertyName,
                     memberReference,
