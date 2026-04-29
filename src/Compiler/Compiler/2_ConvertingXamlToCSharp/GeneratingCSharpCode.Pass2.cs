@@ -1876,7 +1876,9 @@ namespace OpenSilver.Compiler
 
                 if (memberReference is null)
                 {
-                    throw new XamlParseException($"Property or field '{propertyName}' not found in type '{fromType}'.", property);
+                    throw new XamlParseException(
+                        $"Cannot find the Style Property '{propertyName}' on the type '{_settings.TypeReferenceHelper.ConvertToString(fromType)}'.",
+                        property);
                 }
 
                 return GenerateCodeForInstantiatingAttributeValue(
