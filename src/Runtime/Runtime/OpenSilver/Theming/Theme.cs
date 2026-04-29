@@ -250,15 +250,22 @@ public abstract class Theme : IResourceDictionaryOwner
         return false;
     }
 
-    internal object GetTypedResource(Type typeKey) => _cache.GetOrAddResource(typeKey, FindDictionaryResource);
+    internal object GetThemeResource(object key) => _cache.GetOrAddResource(key, FindDictionaryResource);
 
-    private object FindDictionaryResource(Type typeKey)
+    private object FindDictionaryResource(object key)
     {
-        Debug.Assert(typeKey is not null);
+        Debug.Assert(key is not null);
 
-        if (GetOrCreateResourceDictionary(typeKey.Assembly) is ResourceDictionary resources)
+        Assembly assembly = key switch
         {
-            return FetchResource(resources, typeKey);
+            Type typeKey => typeKey.Assembly,
+            ResourceKey resourceKey => resourceKey.Assembly,
+            _ => null,
+        };
+
+        if (assembly is not null && GetOrCreateResourceDictionary(assembly) is ResourceDictionary resources)
+        {
+            return FetchResource(resources, key);
         }
 
         return null;
@@ -350,11 +357,11 @@ public abstract class Theme : IResourceDictionaryOwner
     private sealed class Cache
     {
         private readonly ConcurrentDictionary<Assembly, ResourceDictionary> _dictionaries = new();
-        private readonly ConcurrentDictionary<Type, object> _resources = new();
+        private readonly ConcurrentDictionary<object, object> _resources = new();
 
         public ResourceDictionary GetOrAddResourceDictionary(Assembly assembly, Func<Assembly, ResourceDictionary> valueFactory)
             => _dictionaries.GetOrAdd(assembly, valueFactory);
 
-        public object GetOrAddResource(Type typeKey, Func<Type, object> valueFactory) => _resources.GetOrAdd(typeKey, valueFactory);
+        public object GetOrAddResource(object key, Func<object, object> valueFactory) => _resources.GetOrAdd(key, valueFactory);
     }
 }

@@ -11,105 +11,34 @@
 *  
 \*====================================================================================*/
 
-using System.Runtime.CompilerServices;
+using System.Xml;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Represents the resource key for the <see cref="DataTemplate"/> class.
+/// </summary>
+public class DataTemplateKey : TemplateKey
 {
     /// <summary>
-    /// Represents the resource key for the <see cref="DataTemplate"/> class.
+    /// Initializes a new instance of the <see cref="DataTemplateKey"/> class.
     /// </summary>
-    public class DataTemplateKey
+    public DataTemplateKey()
+        : base(TemplateType.DataTemplate)
     {
-        private object _dataType;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataTemplateKey"/> class without
-        /// initializing the <see cref="DataType"/> property.
-        /// </summary>
-        public DataTemplateKey() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataTemplateKey"/> class, setting
-        /// the <see cref="DataType"/> property to the specified value.
-        /// </summary>
-        /// <param name="dataType">
-        /// The initial value of the <see cref="DataTemplate.DataType"/> property.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// dataType is not of type <see cref="Type"/>.
-        /// </exception>
-        public DataTemplateKey(object dataType)
-        {
-            DataType = dataType;
-        }
-
-        /// <summary>
-        /// Gets or sets the type for which the template is intended.
-        /// </summary>
-        /// <returns>
-        /// The type of object to which the template is applied.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// When setting this property, the specified value is not of type <see cref="Type"/>.
-        /// </exception>
-        public object DataType
-        {
-            get => _dataType;
-            set
-            {
-                if (ValidateDataType(value) is Exception ex)
-                {
-                    throw ex;
-                }
-
-                _dataType = value;
-            }
-        }
-
-        /// <summary>
-        /// Returns a value that indicates whether the specified object is a <see cref="DataTemplateKey"/>
-        /// that has the same <see cref="DataType"/> property value as the current <see cref="DataTemplateKey"/>.
-        /// </summary>
-        /// <param name="o">
-        /// The object to compare to the current object.
-        /// </param>
-        /// <returns>
-        /// true if o is equivalent to the current object; otherwise, false.
-        /// </returns>
-        public override bool Equals(object o) => o is DataTemplateKey key && key._dataType == _dataType;
-
-        /// <summary>
-        /// Returns the hash code of the <see cref="DataType"/> property
-        /// value.
-        /// </summary>
-        /// <returns>
-        /// The hash code of the <see cref="DataType"/> property value,
-        /// or 0 if <see cref="DataType"/> is null.
-        /// </returns>
-        public override int GetHashCode() => _dataType?.GetHashCode() ?? 0;
-
-        // Validate against these rules
-        //  1. dataType must not be null (except at initialization)
-        //  2. dataType must be a Type (object data)
-        internal static Exception ValidateDataType(object dataType, [CallerArgumentExpression(nameof(dataType))] string argName = null)
-        {
-            Exception result = null;
-
-            if (dataType == null)
-            {
-                result = new ArgumentNullException(argName);
-            }
-            else if (dataType is not Type)
-            {
-                result = new ArgumentException(
-                    $"'{dataType.GetType().Name}' is not a valid type for DataTemplate.DataType; it must be 'Type'.",
-                    argName);
-            }
-
-            return result;
-        }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTemplateKey"/> class with the specified type.
+    /// </summary>
+    /// <param name="dataType">
+    /// The type for which this template is designed. This is either a <see cref="Type"/> (to indicate that 
+    /// the <see cref="DataTemplate"/> is used to display items of the given type), or a string (to indicate 
+    /// that the <see cref="DataTemplate"/> is used to display <see cref="XmlNode"/> elements with the given 
+    /// tag name).
+    /// </param>
+    public DataTemplateKey(object dataType)
+        : base(TemplateType.DataTemplate, dataType)
+    {
     }
 }

@@ -141,7 +141,10 @@
     <Compile Include="System.Windows.Input\KeyboardFocusChangedEventArgs.cs" />
     <Compile Include="System.Windows.Input\KeyboardInputProviderAcquireFocusEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseDevice.cs" />
+    <Compile Include="System.Windows\ComponentResourceKey.cs" />
+    <Compile Include="System.Windows\ResourceKey.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
+    <Compile Include="System.Windows\TemplateKey.cs" />
     <Compile Include="System.Windows\TextMarkerStyle.cs" />
     <Compile Include="System.Windows.Input\GestureEventArgs.cs" />
     <Compile Include="System.Windows.Input\ManipulationCompletedEventArgs.cs" />

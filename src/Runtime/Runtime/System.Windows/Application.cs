@@ -375,7 +375,7 @@ namespace System.Windows
                         }
                         else
                         {
-                            _implicitResourcesCache ??= new();
+                            _implicitResourcesCache ??= [];
                             _implicitResourcesCache[info.Key] = resource;
                         }
                         break;
@@ -578,14 +578,14 @@ namespace System.Windows
         /// </returns>
         public object TryFindResource(object resourceKey)
         {
-            if (resourceKey is Type typeKey && XamlResources.FindStyleResourceInGenericXaml(typeKey) is object resource)
+            if (HasResources && Resources.TryGetResource(resourceKey, out object resource))
             {
                 return resource;
             }
 
-            if (HasResources && Resources.TryGetResource(resourceKey, out resource))
+            if (XamlResources.FindResourceInGenericXaml(resourceKey) is object genericResource)
             {
-                return resource;
+                return genericResource;
             }
 
             return XamlResources.FindBuiltInResource(resourceKey);

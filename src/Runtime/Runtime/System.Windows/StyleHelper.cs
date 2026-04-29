@@ -196,20 +196,31 @@ namespace System.Windows
 
             // Don't lookup properties from the themes if user has specified OverridesDefaultStyle or
             // DefaultStyleKey is null.
-            if (!overridesDefaultStyle && themeStyleKey is Type typeKey)
+            if (themeStyleKey is not null && !overridesDefaultStyle)
             {
                 // Regular lookup based on the DefaultStyleKey. Involves locking and Hashtable lookup
-                newThemeStyle = XamlResources.FindStyleResourceInGenericXaml(typeKey);
+                if (XamlResources.FindResourceInGenericXaml(themeStyleKey) is object styleLookup)
+                {
+                    if (styleLookup is not Style style)
+                    {
+                        throw new InvalidOperationException(string.Format(Strings.SystemResourceForTypeIsNotStyle, themeStyleKey));
+                    }
+
+                    newThemeStyle = style;
+                }
 
                 if (newThemeStyle is null)
                 {
                     // No style in system resources, try to retrieve the default
                     // style for the target type.
 
-                    if (FrameworkElement.StyleProperty.GetMetadata(typeKey) is PropertyMetadata styleMetadata)
+                    if (themeStyleKey is Type typeKey)
                     {
-                        // Have a metadata object, get the default style (if any)
-                        newThemeStyle = styleMetadata.DefaultValue as Style;
+                        if (FrameworkElement.StyleProperty.GetMetadata(typeKey) is PropertyMetadata styleMetadata)
+                        {
+                            // Have a metadata object, get the default style (if any)
+                            newThemeStyle = styleMetadata.DefaultValue as Style;
+                        }
                     }
                 }
             }

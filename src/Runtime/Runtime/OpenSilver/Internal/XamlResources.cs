@@ -55,18 +55,18 @@ internal static class XamlResources
     /// <summary>
     /// Tries to find the resourceKey in the Generic.xaml resources of the assembly. Note: the resource currently need to be defined in Project/Themes/generic.xaml
     /// </summary>
-    /// <param name="typeKey">The resource to find in the Assembly's resources.</param>
+    /// <param name="key">The resource to find in the Assembly's resources.</param>
     /// <returns>The resource associated with the given key in the given assembly's resources.</returns>
-    internal static Style FindStyleResourceInGenericXaml(Type typeKey)
+    internal static object FindResourceInGenericXaml(object key)
     {
-        Debug.Assert(typeKey is not null);
+        Debug.Assert(key is not null);
 
-        if (Application.Current?.Theme is Theme theme && theme.GetTypedResource(typeKey) is Style themeStyle)
+        if (Application.Current?.Theme is Theme theme && theme.GetThemeResource(key) is object resource)
         {
-            return themeStyle;
+            return resource;
         }
 
-        return _genericTheme.GetTypedResource(typeKey) as Style;
+        return _genericTheme.GetThemeResource(key);
     }
 
     internal static object FindBuiltInResource(object key)

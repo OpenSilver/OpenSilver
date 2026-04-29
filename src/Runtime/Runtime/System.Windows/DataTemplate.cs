@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
 using System.Windows.Controls;
 
 namespace System.Windows
@@ -44,7 +43,7 @@ namespace System.Windows
             get => _dataType;
             set
             {
-                if (Windows.DataTemplateKey.ValidateDataType(value) is Exception ex)
+                if (TemplateKey.ValidateDataType(value) is Exception ex)
                 {
                     throw ex;
                 }
@@ -54,7 +53,12 @@ namespace System.Windows
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        /// <summary>
+        /// Gets the default key of the <see cref="DataTemplate"/>.
+        /// </summary>
+        /// <returns>
+        /// The default key of the <see cref="DataTemplate"/>.
+        /// </returns>
         public object DataTemplateKey => DataType is not null ? new DataTemplateKey(DataType) : null;
 
         /// <summary>

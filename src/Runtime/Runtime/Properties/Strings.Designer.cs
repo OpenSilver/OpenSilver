@@ -475,6 +475,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot change ResourceId after it has been set..
+        /// </summary>
+        internal static string ChangingIdNotAllowed {
+            get {
+                return ResourceManager.GetString("ChangingIdNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot change TypeInTargetAssembly after it has been set..
+        /// </summary>
+        internal static string ChangingTypeNotAllowed {
+            get {
+                return ResourceManager.GetString("ChangingTypeNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Child node identifier used for Target property cannot be an empty string..
         /// </summary>
         internal static string ChildNameMustBeNonEmpty {
@@ -2095,6 +2113,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid type for DataTemplate.DataType; it must be String or Type..
+        /// </summary>
+        internal static string MustBeTypeOrString {
+            get {
+                return ResourceManager.GetString("MustBeTypeOrString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a type derived from FrameworkElement..
         /// </summary>
         internal static string NamedObjectMustBeFrameworkElement {
@@ -2455,6 +2482,33 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property of the &apos;{1}&apos; type cannot be changed after it has been set..
+        /// </summary>
+        internal static string PropertyIsImmutable {
+            get {
+                return ResourceManager.GetString("PropertyIsImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property of the &apos;{1}&apos; type can be set only during initialization..
+        /// </summary>
+        internal static string PropertyIsInitializeOnly {
+            get {
+                return ResourceManager.GetString("PropertyIsInitializeOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property of the &apos;{1}&apos; type must be set during initialization..
+        /// </summary>
+        internal static string PropertyMustHaveValue {
+            get {
+                return ResourceManager.GetString("PropertyMustHaveValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; property cannot be data-bound..
         /// </summary>
         internal static string PropertyNotBindable {
@@ -2703,51 +2757,6 @@ namespace OpenSilver.Internal {
         internal static string ResourceDictionaryIsReadOnly {
             get {
                 return ResourceManager.GetString("ResourceDictionaryIsReadOnly", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Key must be a Type, a DataTemplateKey or a String..
-        /// </summary>
-        internal static string ResourceDictionaryKeyMustBeTypeOrString {
-            get {
-                return ResourceManager.GetString("ResourceDictionaryKeyMustBeTypeOrString", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Null value not supported in a ResourceDictionary..
-        /// </summary>
-        internal static string ResourceDictionaryNullValueNotSupported {
-            get {
-                return ResourceManager.GetString("ResourceDictionaryNullValueNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to For a key of the type DataTemplateKey, value must be a DataTemplate..
-        /// </summary>
-        internal static string ResourceDictionaryValueMustBeDataTemplate {
-            get {
-                return ResourceManager.GetString("ResourceDictionaryValueMustBeDataTemplate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to For a Type key the value must be a Style..
-        /// </summary>
-        internal static string ResourceDictionaryValueMustBeStyle {
-            get {
-                return ResourceManager.GetString("ResourceDictionaryValueMustBeStyle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to For a Type key the Style value must have TargetType which is equals to key..
-        /// </summary>
-        internal static string ResourceDictionaryValueMustBeStyleWithCorrectTargetType {
-            get {
-                return ResourceManager.GetString("ResourceDictionaryValueMustBeStyleWithCorrectTargetType", resourceCulture);
             }
         }
         
@@ -3270,6 +3279,15 @@ namespace OpenSilver.Internal {
         internal static string StyleValueOfExpressionNotSupported {
             get {
                 return ResourceManager.GetString("StyleValueOfExpressionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System resource for type &apos;{0}&apos; is not a Style object..
+        /// </summary>
+        internal static string SystemResourceForTypeIsNotStyle {
+            get {
+                return ResourceManager.GetString("SystemResourceForTypeIsNotStyle", resourceCulture);
             }
         }
         

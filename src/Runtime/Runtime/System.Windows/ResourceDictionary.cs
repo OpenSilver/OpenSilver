@@ -106,11 +106,6 @@ namespace System.Windows
         public object this[object key]
         {
             get => GetItem(key);
-            //
-            // Note: In Silverlight setting a value through the indexer property
-            // is not implemented and throw a NotImplementedException.
-            // The behavior implemented below is taken from WPF.
-            //
             set
             {
                 // Seal styles and templates within App and Theme dictionary
@@ -177,9 +172,9 @@ namespace System.Windows
         /// </summary>
         public ICollection Keys => _baseDictionary.Keys;
 
-        ///<summary>
+        /// <summary>
         /// List of ResourceDictionaries merged into this Resource Dictionary
-        ///</summary>
+        /// </summary>
         public PresentationFrameworkCollection<ResourceDictionary> MergedDictionaries
         {
             get
@@ -213,9 +208,6 @@ namespace System.Windows
         /// </summary>
         /// <param name="key">The string key of the item to add.</param>
         /// <param name="value">The item value to add.</param>
-        /// <exception cref="NotSupportedException">
-        /// Attempted to add null as a value.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Attempted to add an item with a key that already exists in this <see cref="ResourceDictionary"/>.-or-Attempted
         /// to use a key that is not a string.
@@ -227,44 +219,19 @@ namespace System.Windows
                 throw new InvalidOperationException(Strings.ResourceDictionaryIsReadOnly);
             }
 
-            bool isImplicitStyle = false;
-            bool isImplicitDataTemplate = false;
+            // Seal styles and templates within App and Theme dictionary
+            SealValue(value);
 
-            switch (key)
-            {
-                case Type type:
-                    if (value is not Style style)
-                    {
-                        throw new ArgumentException(Strings.ResourceDictionaryValueMustBeStyle);
-                    }
-                    if (style.TargetType != type)
-                    {
-                        throw new ArgumentException(Strings.ResourceDictionaryValueMustBeStyleWithCorrectTargetType);
-                    }
-                    isImplicitStyle = true;
-                    break;
+            _baseDictionary.Add(key, value);
 
-                case DataTemplateKey:
-                    if (value is not DataTemplate)
-                    {
-                        throw new ArgumentException(Strings.ResourceDictionaryValueMustBeDataTemplate);
-                    }
-                    isImplicitDataTemplate = true;
-                    break;
+            // Update the HasImplicitKey flag
+            UpdateHasImplicitStyles(key);
 
-                case string:
-                    break;
+            // Update the HasImplicitDataTemplates flag
+            UpdateHasImplicitDataTemplates(key);
 
-                default:
-                    throw new ArgumentException(Strings.ResourceDictionaryKeyMustBeTypeOrString);
-            }
-
-            if (value is null)
-            {
-                throw new NotSupportedException(Strings.ResourceDictionaryNullValueNotSupported);
-            }
-
-            AddInternal(key, value, isImplicitStyle, isImplicitDataTemplate);
+            // Notify owners of the change and fire invalidate if already initialized
+            NotifyOwners(new ResourcesChangeInfo(key));
         }
 
         /// <summary>
@@ -276,26 +243,10 @@ namespace System.Windows
         /// <param name="value">
         /// The item value to add.
         /// </param>
-        /// <exception cref="NotSupportedException">
-        /// Attempted to add null as a value.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Attempted to add an item with a key that already exists in this <see cref="ResourceDictionary"/>.
         /// </exception>
-        public void Add(string key, object value)
-        {
-            if (IsReadOnly)
-            {
-                throw new InvalidOperationException(Strings.ResourceDictionaryIsReadOnly);
-            }
-
-            if (value is null)
-            {
-                throw new NotSupportedException(Strings.ResourceDictionaryNullValueNotSupported);
-            }
-
-            AddInternal(key, value, false, false);
-        }
+        public void Add(string key, object value) => Add((object)key, value);
 
         /// <summary>
         /// Removes all items from this <see cref="ResourceDictionary"/>.
@@ -872,6 +823,11 @@ namespace System.Windows
         //  (Not yet) 2. Seals the style/template that is to be placed in an App/Theme/Style/Template ResourceDictionary
         private void SealValue(object value)
         {
+            if (value is null)
+            {
+                return;
+            }
+
             DependencyObject inheritanceContext = InheritanceContext;
             if (inheritanceContext != null)
             {
@@ -949,51 +905,36 @@ namespace System.Windows
 
         internal bool IsEmpty => Count == 0 && (_mergedDictionaries is null || _mergedDictionaries.InternalCount == 0);
 
-        internal bool TryGetResource(object key, out object value) => (value = GetItem(key)) != null;
-
-        internal object GetItem(object key)
+        internal bool TryGetResource(object key, out object value)
         {
-            if (_baseDictionary.TryGetValue(key, out object value))
+            if (_baseDictionary.TryGetValue(key, out value))
             {
-                return value;
+                return true;
             }
-            else
+
+            if (_mergedDictionaries != null)
             {
-                //Search for the value in the Merged Dictionaries
-                if (_mergedDictionaries != null)
+                List<ResourceDictionary> mergedDictionaries = _mergedDictionaries.InternalItems;
+                for (int i = mergedDictionaries.Count - 1; i > -1; i--)
                 {
-                    //
-                    // Note: we do the search in reversed order as it is the 
-                    // Silverlight and WPF behavior.
-                    //
-                    List<ResourceDictionary> mergedDictionaries = _mergedDictionaries.InternalItems;
-                    for (int i = mergedDictionaries.Count - 1; (i > -1); i--)
+                    if (mergedDictionaries[i].TryGetResource(key, out value))
                     {
-                        value = mergedDictionaries[i].GetItem(key);
-                        if (value != null)
-                        {
-                            break;
-                        }
+                        return true;
                     }
                 }
             }
-            return value;
+
+            value = null;
+            return false;
         }
+
+        private object GetItem(object key) => TryGetResource(key, out object value) ? value : null;
 
         private void SetItem(object key, object value)
         {
             if (IsReadOnly)
             {
                 throw new InvalidOperationException(Strings.ResourceDictionaryIsReadOnly);
-            }
-
-            if (value is null)
-            {
-                //
-                // Note: Silverlight does not support null values in a 
-                // ResourceDictionary but WPF does.
-                //
-                throw new NotSupportedException(Strings.ResourceDictionaryNullValueNotSupported);
             }
 
             if (!_baseDictionary.TryGetValue(key, out object oldItem) || oldItem != value)
@@ -1014,27 +955,6 @@ namespace System.Windows
                     UnloadResource(oldItem);
                 }
             }
-        }
-
-        private void AddInternal(object key, object value, bool isImplicitStyle, bool isImplicitDataTemplate)
-        {
-            // Seal styles and templates within App and Theme dictionary
-            SealValue(value);
-
-            _baseDictionary.Add(key, value);
-
-            if (isImplicitStyle)
-            {
-                HasImplicitStyles = true;
-            }
-
-            if (isImplicitDataTemplate)
-            {
-                HasImplicitDataTemplates = true;
-            }
-
-            // Notify owners of the change and fire invalidate if already initialized
-            NotifyOwners(new ResourcesChangeInfo(key));
         }
 
         internal void LoadResources()
@@ -1277,12 +1197,10 @@ namespace System.Windows
                         switch (kvp.Key)
                         {
                             case Type type:
-                                Debug.Assert(kvp.Value is Style);
                                 cache[type] = kvp.Value;
                                 break;
 
                             case DataTemplateKey templateKey:
-                                Debug.Assert(kvp.Value is DataTemplate);
                                 cache[templateKey] = kvp.Value;
                                 break;
                         }

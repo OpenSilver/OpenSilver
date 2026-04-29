@@ -980,21 +980,6 @@
   <data name="ResourceDictionaryIsReadOnly" xml:space="preserve">
     <value>ResourceDictionary is read-only and cannot be modified.</value>
   </data>
-  <data name="ResourceDictionaryKeyMustBeTypeOrString" xml:space="preserve">
-    <value>Key must be a Type, a DataTemplateKey or a String.</value>
-  </data>
-  <data name="ResourceDictionaryNullValueNotSupported" xml:space="preserve">
-    <value>Null value not supported in a ResourceDictionary.</value>
-  </data>
-  <data name="ResourceDictionaryValueMustBeDataTemplate" xml:space="preserve">
-    <value>For a key of the type DataTemplateKey, value must be a DataTemplate.</value>
-  </data>
-  <data name="ResourceDictionaryValueMustBeStyle" xml:space="preserve">
-    <value>For a Type key the value must be a Style.</value>
-  </data>
-  <data name="ResourceDictionaryValueMustBeStyleWithCorrectTargetType" xml:space="preserve">
-    <value>For a Type key the Style value must have TargetType which is equals to key.</value>
-  </data>
   <data name="ResponsiveThreshold_Invalid" xml:space="preserve">
     <value>'{0}' must be greater than '{1}'.</value>
   </data>
@@ -1348,5 +1333,26 @@
   </data>
   <data name="AbsoluteUriNotAllowed" xml:space="preserve">
     <value>Cannot use absolute URI.</value>
+  </data>
+  <data name="SystemResourceForTypeIsNotStyle" xml:space="preserve">
+    <value>System resource for type '{0}' is not a Style object.</value>
+  </data>
+  <data name="ChangingIdNotAllowed" xml:space="preserve">
+    <value>Cannot change ResourceId after it has been set.</value>
+  </data>
+  <data name="ChangingTypeNotAllowed" xml:space="preserve">
+    <value>Cannot change TypeInTargetAssembly after it has been set.</value>
+  </data>
+  <data name="MustBeTypeOrString" xml:space="preserve">
+    <value>'{0}' is not a valid type for DataTemplate.DataType; it must be String or Type.</value>
+  </data>
+  <data name="PropertyIsInitializeOnly" xml:space="preserve">
+    <value>The '{0}' property of the '{1}' type can be set only during initialization.</value>
+  </data>
+  <data name="PropertyIsImmutable" xml:space="preserve">
+    <value>The '{0}' property of the '{1}' type cannot be changed after it has been set.</value>
+  </data>
+  <data name="PropertyMustHaveValue" xml:space="preserve">
+    <value>The '{0}' property of the '{1}' type must be set during initialization.</value>
   </data>
 </root>
