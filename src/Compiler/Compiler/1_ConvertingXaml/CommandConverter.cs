@@ -22,11 +22,13 @@ internal sealed class CommandConverter
 {
     private readonly AssembliesInspector _inspector;
     private readonly TypeReferenceHelper _helper;
+    private readonly XamlNameParser _xamlNameParser;
 
-    public CommandConverter(AssembliesInspector inspector, TypeReferenceHelper helper)
+    public CommandConverter(AssembliesInspector inspector, TypeReferenceHelper helper, XamlNameParser xamlNameParser)
     {
         _inspector = inspector;
         _helper = helper;
+        _xamlNameParser = xamlNameParser;
     }
 
     public string Convert(XObject context, string source)
@@ -110,21 +112,24 @@ internal sealed class CommandConverter
         // Parser Context must exist to get the namespace info from prefix, if not, we assume it is known command.
         if (context is not null && typeName is not null)
         {
-            string xmlns;
+            string namespaceName;
+            string assemblyName;
 
             int offset = typeName.IndexOf(':');
             if (offset >= 0)
             {
                 string prefix = typeName.Substring(0, offset);
-                xmlns = nsProvider.GetNamespaceOfPrefix(prefix).NamespaceName;
                 typeName = typeName.Substring(offset + 1);
+                (namespaceName, assemblyName) = _xamlNameParser.GetClrNamespaceAndAssembly(
+                    nsProvider.GetNamespaceOfPrefix(prefix).NamespaceName);
             }
             else
             {
-                xmlns = nsProvider.GetDefaultNamespace().NamespaceName;
+                (namespaceName, assemblyName) = _xamlNameParser.GetClrNamespaceAndAssembly(
+                    nsProvider.GetDefaultNamespace().NamespaceName);
             }
 
-            return _inspector.GetTypeDefinition(xmlns, typeName, null, context, throwIfNull: false);
+            return _inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, context, throwIfNull: false);
         }
 
         return null;

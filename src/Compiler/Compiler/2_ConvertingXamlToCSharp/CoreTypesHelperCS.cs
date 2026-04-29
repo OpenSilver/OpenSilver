@@ -29,14 +29,14 @@ internal sealed class CoreTypesConverterCS : CoreTypesConverter
     private static readonly char[] _repeatBehaviorConverterIterationCharacter = ['x', 'X'];
 
     private readonly AssembliesInspector _inspector;
-    private readonly CommandConverter _commandConverter;
     private readonly XamlNameParser _xamlNameParser;
+    private readonly CommandConverter _commandConverter;
 
     public CoreTypesConverterCS(AssembliesInspector inspector, string assemblyName)
     {
         _inspector = inspector;
-        _commandConverter = new CommandConverter(inspector, TypeReferenceHelper.CSharp);
         _xamlNameParser = new XamlNameParser(assemblyName);
+        _commandConverter = new CommandConverter(inspector, TypeReferenceHelper.CSharp, _xamlNameParser);
     }
 
     public override string ConvertFromInvariantString(string source, string destinationType)
@@ -71,7 +71,7 @@ internal sealed class CoreTypesConverterCS : CoreTypesConverter
                 return modifier;
             }
 
-            TypeDefinition modifierKeysType = _inspector.GetTypeDefinition("System.Windows.Input", "ModifierKeys", "OpenSilver", context);
+            TypeDefinition modifierKeysType = _inspector.GetKnownTypeDefinition("System.Windows.Input", "ModifierKeys", "OpenSilver");
             return string.Join(" | ", _inspector.GetEnumValues(modifierKeysType, modifiersToken, true, true, context));
         }
 
@@ -211,12 +211,12 @@ internal sealed class CoreTypesConverterCS : CoreTypesConverter
             //_ when keyToken.Equals("PLAY", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Play",
             //_ when keyToken.Equals("ZOOM", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Zoom",
             //_ when keyToken.Equals("PA1", StringComparison.OrdinalIgnoreCase) => "global::System.Windows.Input.Key.Pa1",
-            _ => Parse(keyToken, context, _inspector) ?? throw GetConvertException(source, "System.Windows.Input.Key", context),
+            _ => Parse(keyToken, _inspector) ?? throw GetConvertException(source, "System.Windows.Input.Key", context),
         };
 
-        static string Parse(string source, IXmlLineInfo lineInfo, AssembliesInspector inspector)
+        static string Parse(string source, AssembliesInspector inspector)
         {
-            TypeDefinition keyType = inspector.GetTypeDefinition("System.Windows.Input", "Key", "OpenSilver", lineInfo);
+            TypeDefinition keyType = inspector.GetKnownTypeDefinition("System.Windows.Input", "Key", "OpenSilver");
             return inspector.GetEnumValue(keyType, source, true, true);
         }
     }

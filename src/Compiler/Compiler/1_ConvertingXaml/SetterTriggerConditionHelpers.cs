@@ -13,9 +13,7 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using System.IO;
 using System.Linq;
-using System.Runtime;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -97,7 +95,7 @@ internal static class SetterTriggerConditionHelpers
 
                     if (settings.Inspector.IsDataTemplate(type))
                     {
-                        declaringType = GetDataTemplateTargetType(parent, settings);
+                        declaringType = GetDataTemplateTargetType(settings);
                         break;
                     }
                 }
@@ -271,12 +269,12 @@ internal static class SetterTriggerConditionHelpers
         return settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
     }
 
-    private static TypeDefinition GetDataTemplateTargetType(XElement template, ConversionSettings settings)
+    private static TypeDefinition GetDataTemplateTargetType(ConversionSettings settings)
     {
         string namespaceName = KnownNamespaces.SystemWindowsControls;
         string typeName = "ContentPresenter";
         string assemblyName = Constants.OPENSILVER_ASSEMBLY_NAME;
 
-        return settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, template);
+        return settings.Inspector.GetKnownTypeDefinition(namespaceName, typeName, assemblyName);
     }
 }

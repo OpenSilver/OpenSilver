@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler;
@@ -39,21 +40,21 @@ internal static class ProcessTypeExtensionAttributes
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(targetType);
+                    ResolveTypeExtensionAttribute(targetType, element, settings);
                 }
             }
             else if (settings.Inspector.IsControlTemplate(type))
             {
                 if (element.Attribute("TargetType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(targetType);
+                    ResolveTypeExtensionAttribute(targetType, element, settings);
                 }
             }
             else if (settings.Inspector.IsDataTemplate(type))
             {
                 if (element.Attribute("DataType") is XAttribute targetType)
                 {
-                    ResolveTypeExtensionAttribute(targetType);
+                    ResolveTypeExtensionAttribute(targetType, element, settings);
                 }
             }
         }
@@ -64,18 +65,24 @@ internal static class ProcessTypeExtensionAttributes
         }
     }
 
-    private static void ResolveTypeExtensionAttribute(XAttribute attribute)
+    private static void ResolveTypeExtensionAttribute(XAttribute attribute, XElement xmlnsResolver, ConversionSettings settings)
     {
         if (MarkupExtensionDescriptor.TryParse(attribute.Value, out MarkupExtensionDescriptor markupExtension) &&
-            TryExtractTypeName(markupExtension, out string typeName))
+            TryExtractTypeName(markupExtension, xmlnsResolver, attribute, settings, out string typeName))
         {
             attribute.Value = typeName;
         }
     }
 
-    private static bool TryExtractTypeName(MarkupExtensionDescriptor markupExtension, out string typeName)
+    private static bool TryExtractTypeName(
+        MarkupExtensionDescriptor markupExtension,
+        XElement xmlnsResolver,
+        IXmlLineInfo lineInfo,
+        ConversionSettings settings,
+        out string typeName)
     {
-        if (markupExtension.Name != "Type" && markupExtension.Name != "TypeExtension")
+        var type = ResolveTypeDefinition(markupExtension.Name, xmlnsResolver, lineInfo, settings);
+        if (!settings.Inspector.IsTypeExtension(type))
         {
             typeName = null;
             return false;
@@ -91,7 +98,7 @@ internal static class ProcessTypeExtensionAttributes
         {
             (string propertyName, object propertyValue) = markupExtension.Properties[0];
 
-            if (propertyName == "TypeName" && propertyValue is string value)
+            if ((propertyName == "TypeName" || propertyName == "Type") && propertyValue is string value)
             {
                 typeName = value;
                 return true;
@@ -100,5 +107,13 @@ internal static class ProcessTypeExtensionAttributes
 
         typeName = null;
         return false;
+    }
+
+    private static TypeDefinition ResolveTypeDefinition(string value, XElement xmlnsResolver, IXmlLineInfo lineInfo, ConversionSettings settings)
+    {
+        settings.XamlNameParser.GetClrNamespaceAndLocalName(
+            value, xmlnsResolver, out string namespaceName, out string typeName, out string assemblyName);
+
+        return settings.Inspector.GetMarkupExtensionTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
     }
 }

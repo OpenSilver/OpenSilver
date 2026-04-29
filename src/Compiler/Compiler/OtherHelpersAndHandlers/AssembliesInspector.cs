@@ -41,7 +41,21 @@ namespace OpenSilver.Compiler
         public bool IsElementAMarkupExtension(TypeDefinition type) => _monoCecilVersion.IsElementAMarkupExtension(type);
 
         public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-            => _monoCecilVersion.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName, assemblyName, lineInfo);
+        {
+            if (propertyName != "Template")
+            {
+                return false;
+            }
+
+            var type = GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
+            var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+                type,
+                "Template",
+                MemberFlags.Public | MemberFlags.Instance,
+                out _);
+
+            return property is not null && IsFrameworkTemplateTemplateProperty(property);
+        }
 
         public bool IsFrameworkTemplateTemplateProperty(MemberReference memberReference)
             => _monoCecilVersion.IsFrameworkTemplateTemplateProperty(memberReference);
@@ -97,7 +111,35 @@ namespace OpenSilver.Compiler
         public bool IsIUIElement(TypeDefinition type) => _monoCecilVersion.IsIUIElement(type);
 
         public TypeDefinition GetTypeDefinition(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo, bool throwIfNull = true)
-            => _monoCecilVersion.FindType(namespaceName, typeName, assemblyName, lineInfo, !throwIfNull);
+        {
+            TypeDefinition type =
+                _monoCecilVersion.FindType(namespaceName, typeName, assemblyName, lineInfo, false) ??
+                _monoCecilVersion.FindType(namespaceName, $"{typeName}Extension", assemblyName, lineInfo, false);
+
+            if (throwIfNull && type is null)
+            {
+                throw MonoCecilAssembliesInspectorImpl.GetTypeNotFoundError(namespaceName, typeName, assemblyName, lineInfo);
+            }
+
+            return type;
+        }
+
+        public TypeDefinition GetMarkupExtensionTypeDefinition(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo, bool throwIfNull = true)
+        {
+            TypeDefinition type =
+                _monoCecilVersion.FindType(namespaceName, $"{typeName}Extension", assemblyName, lineInfo, false) ??
+                _monoCecilVersion.FindType(namespaceName, typeName, assemblyName, lineInfo, false);
+
+            if (throwIfNull && type is null)
+            {
+                throw MonoCecilAssembliesInspectorImpl.GetTypeNotFoundError(namespaceName, typeName, assemblyName, lineInfo);
+            }
+
+            return type;
+        }
+
+        public TypeDefinition GetKnownTypeDefinition(string namespaceName, string typeName, string assemblyName)
+            => _monoCecilVersion.GetKnownType(namespaceName, typeName, assemblyName);
 
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
             => _monoCecilVersion.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);

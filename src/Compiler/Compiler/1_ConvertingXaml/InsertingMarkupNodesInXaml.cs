@@ -113,9 +113,7 @@ internal static class InsertingMarkupNodesInXaml
         XElement xmlnsResolver,
         IXmlLineInfo lineInfo)
     {
-        TypeDefinition markupExtensionType =
-            GeneratingCode.GetTypeDefinitionFromString($"{descriptor.Name}Extension", xmlnsResolver, lineInfo, settings, false) ??
-            GeneratingCode.GetTypeDefinitionFromString(descriptor.Name, xmlnsResolver, lineInfo, settings, true);
+        var markupExtensionType = ResolveTypeDefinition(descriptor.Name, xmlnsResolver, lineInfo, settings);
 
         var markupExtensionElement = new ExtendedXElement(
             ResolveNamespace(descriptor.Name, xmlnsResolver).GetName(markupExtensionType.Name));
@@ -162,6 +160,14 @@ internal static class InsertingMarkupNodesInXaml
 
             element.Add(attribute);
         }
+    }
+
+    private static TypeDefinition ResolveTypeDefinition(string value, XElement xmlnsResolver, IXmlLineInfo lineInfo, ConversionSettings settings)
+    {
+        settings.XamlNameParser.GetClrNamespaceAndLocalName(
+            value, xmlnsResolver, out string namespaceName, out string typeName, out string assemblyName);
+
+        return settings.Inspector.GetMarkupExtensionTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
     }
 
     private static string ResolveContentPropertyName(

@@ -11,14 +11,11 @@
 *
 \*====================================================================================*/
 
-
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Experimental;
 using OpenSilver.Compiler;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows;
 using System.Windows.Controls;
 using Mono.Cecil;
 
@@ -40,7 +37,8 @@ public partial class MonoCecilAssembliesInspectorTest
         MonoCecilVersion.FindType(
             ExperimentalNamespace,
             nameof(ClassWithMembers),
-            typeof(ClassWithMembers).Assembly.GetName().Name);
+            typeof(ClassWithMembers).Assembly.GetName().Name,
+            null);
 
     [ClassInitialize]
     public static void ClassInitialize(TestContext _)
@@ -60,7 +58,8 @@ public partial class MonoCecilAssembliesInspectorTest
         var enumType = MonoCecilVersion.FindType(
             typeof(ClassWithNestedEnum).FullName,
             nameof(ClassWithNestedEnum.InputBehavior),
-            typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name);
+            typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name,
+            null);
 
         var res = MonoCecilVersion.GetEnumValue(enumType, nameof(ClassWithNestedEnum.InputBehavior.SelectFromList).ToLower(), true, true);
 
@@ -73,7 +72,8 @@ public partial class MonoCecilAssembliesInspectorTest
         var enumType = MonoCecilVersion.FindType(
             typeof(ClassWithNestedEnum).FullName,
             nameof(ClassWithNestedEnum.InputBehavior),
-            typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name);
+            typeof(ClassWithNestedEnum.InputBehavior).Assembly.GetName().Name,
+            null);
 
         var res = MonoCecilVersion.GetEnumValue(enumType, "1", true, true);
 
@@ -86,7 +86,8 @@ public partial class MonoCecilAssembliesInspectorTest
         var enumType = MonoCecilVersion.FindType(
             "",
             nameof(EnumWithoutNamespace),
-            typeof(EnumWithoutNamespace).Assembly.GetName().Name);
+            typeof(EnumWithoutNamespace).Assembly.GetName().Name,
+            null);
 
         var res = MonoCecilVersion.GetEnumValue(enumType, nameof(EnumWithoutNamespace.Item), true, false);
 
@@ -99,7 +100,8 @@ public partial class MonoCecilAssembliesInspectorTest
         var type = MonoCecilVersion.FindType(
             typeof(ContentControl).Namespace,
             nameof(ContentControl),
-            typeof(ContentControl).Assembly.GetName().Name);
+            typeof(ContentControl).Assembly.GetName().Name,
+            null);
 
         var res = MonoCecilVersion.GetContentPropertyName(type, null);
 
@@ -114,7 +116,8 @@ public partial class MonoCecilAssembliesInspectorTest
         var typeBefore = MonoCecilVersion.FindType(
             compilerTests,
             nameof(MonoCecilAssembliesInspectorTest),
-            compilerTests);
+            compilerTests,
+            null);
         MonoCecilVersion.UnloadAssembly(assembly);
         var typeAfter = MonoCecilVersion.FindType(
             compilerTests,

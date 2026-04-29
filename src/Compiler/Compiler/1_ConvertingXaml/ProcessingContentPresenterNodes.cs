@@ -141,33 +141,37 @@ internal static class ProcessingContentPresenterNodes
 
     private static bool HasAttribute(XElement cp, string attributeName, ConversionSettings settings)
     {
-        bool found = cp.Attribute(attributeName) != null;
-        if (!found)
+        if (cp.Attribute(attributeName) is not null)
         {
-            foreach (var child in cp.Elements())
+            return true;
+        }
+
+        foreach (var child in cp.Elements())
+        {
+            int index = child.Name.LocalName.IndexOf('.');
+
+            if (index == -1)
             {
-                (string namespaceName, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
-                    child.Name.NamespaceName);
+                continue;
+            }
 
-                string[] typeAndProperty = child.Name.LocalName.Split('.');
+            // First check if this is the right property.
+            if (child.Name.LocalName.AsSpan(index + 1).Trim().Equals(attributeName, StringComparison.Ordinal))
+            {
+                (string namespaceName, string assemblyName) =
+                    settings.XamlNameParser.GetClrNamespaceAndAssembly(child.Name.NamespaceName);
 
-                if (typeAndProperty.Length == 2)
+                TypeDefinition type = settings.Inspector.GetTypeDefinition(
+                    namespaceName, child.Name.LocalName.Substring(0, index), assemblyName, child);
+
+                if (settings.Inspector.IsContentPresenter(type))
                 {
-                    // First check if this is the right property.
-                    if (typeAndProperty[1].Trim() == attributeName)
-                    {
-                        TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeAndProperty[0], assemblyName, child);
-                        if (settings.Inspector.IsContentPresenter(type))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
+                    return true;
                 }
             }
         }
 
-        return found;
+        return false;
     }
 
     private static void SetTemplateBinding(XElement element, string propertyName, string systemWindowsPrefix, string systemWindowsControlsPrefix, string xPrefix)

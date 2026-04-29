@@ -103,10 +103,6 @@ namespace OpenSilver.Compiler
 
         private const string TypeConverterAttributeFullName = "System.ComponentModel.TypeConverterAttribute";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
-        private const string Using = "using:";
-        private const string ClrNamespace = "clr-namespace:";
-        private const string StaticRes = "StaticResource";
-        private const string StaticResExtension = "StaticResourceExtension";
 
         private readonly MonoCecilAssemblyStorage _storage;
         private readonly Dictionary<AssemblyDefinition, AssemblyData> _assemblies = [];
@@ -114,7 +110,6 @@ namespace OpenSilver.Compiler
         private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<TypeKey>> _typesPerAssembly = [];
 
         private readonly TypeReferenceHelper _typeReferenceHelper;
-        private readonly XamlNameParser _xamlNameParser;
 
         private TypeDefinition _iListType;
         private TypeDefinition _iDictionaryType;
@@ -145,87 +140,85 @@ namespace OpenSilver.Compiler
         private TypeDefinition _iMarkupExtensionType;
 
         private TypeDefinition IListType =>
-            _iListType ??= FindType(typeof(IList).Namespace, nameof(IList));
+            _iListType ??= GetKnownType(typeof(IList).Namespace, nameof(IList), null);
 
         private TypeDefinition IDictionaryType =>
-            _iDictionaryType ??= FindType(typeof(IDictionary).Namespace, nameof(IDictionary));
+            _iDictionaryType ??= GetKnownType(typeof(IDictionary).Namespace, nameof(IDictionary), null);
 
         private TypeDefinition DependencyObjectType =>
-            _dependencyObjectType ??= FindType(KnownNamespaces.SystemWindows, "DependencyObject", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _dependencyObjectType ??= GetKnownType(KnownNamespaces.SystemWindows, "DependencyObject", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition ApplicationType =>
-            _applicationType ??= FindType(KnownNamespaces.SystemWindows, "Application", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _applicationType ??= GetKnownType(KnownNamespaces.SystemWindows, "Application", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition ResourceDictionaryType =>
-            _resourceDictionaryType ??= FindType(KnownNamespaces.SystemWindows, "ResourceDictionary", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _resourceDictionaryType ??= GetKnownType(KnownNamespaces.SystemWindows, "ResourceDictionary", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition StyleType =>
-            _styleType ??= FindType(KnownNamespaces.SystemWindows, "Style", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _styleType ??= GetKnownType(KnownNamespaces.SystemWindows, "Style", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition FrameworkTemplateType =>
-            _frameworkTemplateType ??= FindType(KnownNamespaces.SystemWindows, "FrameworkTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _frameworkTemplateType ??= GetKnownType(KnownNamespaces.SystemWindows, "FrameworkTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition DataTemplateType =>
-            _dataTemplateType ??= FindType(KnownNamespaces.SystemWindows, "DataTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _dataTemplateType ??= GetKnownType(KnownNamespaces.SystemWindows, "DataTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition ControlTemplateType =>
-            _controlTemplateType ??= FindType(KnownNamespaces.SystemWindowsControls, "ControlTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _controlTemplateType ??= GetKnownType(KnownNamespaces.SystemWindowsControls, "ControlTemplate", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition ContentPresenterType =>
-            _contentPresenterType ??= FindType(KnownNamespaces.SystemWindowsControls, "ContentPresenter", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _contentPresenterType ??= GetKnownType(KnownNamespaces.SystemWindowsControls, "ContentPresenter", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition ContentControlType =>
-            _contentControlType ??= FindType(KnownNamespaces.SystemWindowsControls, "ContentControl", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _contentControlType ??= GetKnownType(KnownNamespaces.SystemWindowsControls, "ContentControl", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition RelativeSourceType =>
-            _relativeSourceType ??= FindType(KnownNamespaces.SystemWindowsData, "RelativeSource", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _relativeSourceType ??= GetKnownType(KnownNamespaces.SystemWindowsData, "RelativeSource", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition BindingBaseType =>
-            _bindingBaseType ??= FindType(KnownNamespaces.SystemWindowsData, "BindingBase", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _bindingBaseType ??= GetKnownType(KnownNamespaces.SystemWindowsData, "BindingBase", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition BindingType =>
-            _bindingType ??= FindType(KnownNamespaces.SystemWindowsData, "Binding", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _bindingType ??= GetKnownType(KnownNamespaces.SystemWindowsData, "Binding", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition MultiBindingType =>
-            _multiBindingType ??= FindType(KnownNamespaces.SystemWindowsData, "MultiBinding", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _multiBindingType ??= GetKnownType(KnownNamespaces.SystemWindowsData, "MultiBinding", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition TemplateBindingExtensionType =>
-            _templateBindingExtensionType ??= FindType(KnownNamespaces.SystemWindows, "TemplateBindingExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _templateBindingExtensionType ??= GetKnownType(KnownNamespaces.SystemWindows, "TemplateBindingExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition NullExtensionType =>
-            _nullExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "NullExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _nullExtensionType ??= GetKnownType(KnownNamespaces.SystemWindowsMarkup, "NullExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition StaticExtensionType =>
-            _staticExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "StaticExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _staticExtensionType ??= GetKnownType(KnownNamespaces.SystemWindowsMarkup, "StaticExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition TypeExtensionType =>
-            _typeExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "TypeExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _typeExtensionType ??= GetKnownType(KnownNamespaces.SystemWindowsMarkup, "TypeExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition StaticResourceExtensionType =>
-            _staticResourceExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "StaticResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _staticResourceExtensionType ??= GetKnownType(KnownNamespaces.SystemWindowsMarkup, "StaticResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition ThemeResourceExtensionType =>
-            _themeResourceExtensionType ??= FindType(KnownNamespaces.SystemWindowsMarkup, "ThemeResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _themeResourceExtensionType ??= GetKnownType(KnownNamespaces.SystemWindowsMarkup, "ThemeResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition DynamicResourceExtensionType =>
-            _dynamicResourceExtensionType ??= FindType(KnownNamespaces.SystemWindows, "DynamicResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _dynamicResourceExtensionType ??= GetKnownType(KnownNamespaces.SystemWindows, "DynamicResourceExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition ResponsiveExtensionType =>
-            _responsiveExtensionType ??= FindType(KnownNamespaces.SystemWindows, "ResponsiveExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _responsiveExtensionType ??= GetKnownType(KnownNamespaces.SystemWindows, "ResponsiveExtension", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition IUIElementType =>
-            _iUIElementType ??= FindType(KnownNamespaces.SystemWindows, "IUIElement", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _iUIElementType ??= GetKnownType(KnownNamespaces.SystemWindows, "IUIElement", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition IFrameworkElementType =>
-            _iFrameworkElementType ??= FindType(KnownNamespaces.SystemWindows, "IFrameworkElement", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _iFrameworkElementType ??= GetKnownType(KnownNamespaces.SystemWindows, "IFrameworkElement", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         private TypeDefinition IMarkupExtensionType =>
-            _iMarkupExtensionType ??= FindType(KnownNamespaces.SystemXaml, "IMarkupExtension`1", Constants.OPENSILVER_ASSEMBLY_NAME);
+            _iMarkupExtensionType ??= GetKnownType(KnownNamespaces.SystemXaml, "IMarkupExtension`1", Constants.OPENSILVER_ASSEMBLY_NAME);
 
         public MonoCecilAssembliesInspectorImpl(string assemblyName, SupportedLanguage compilerType)
         {
-            _xamlNameParser = new XamlNameParser(assemblyName);
-
             _typeReferenceHelper = compilerType switch
             {
                 SupportedLanguage.CSharp => TypeReferenceHelper.CSharp,
@@ -271,33 +264,11 @@ namespace OpenSilver.Compiler
             _assemblies.Clear();
         }
 
-        private TypeDefinition FindType(string namespaceName, string typeName) => FindType(namespaceName, typeName, null, null);
-
-        internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName)
+        internal TypeDefinition GetKnownType(string namespaceName, string typeName, string assemblyName)
             => FindType(namespaceName, typeName, assemblyName, null);
 
-        internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo,
-            bool doNotRaiseExceptionIfNotFound = false)
+        internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo, bool throwIfNull = true)
         {
-            // Fix the namespace:
-            if (namespaceName.StartsWith(Using, StringComparison.CurrentCultureIgnoreCase))
-            {
-                namespaceName = namespaceName.Substring(Using.Length);
-            }
-            else if (namespaceName.StartsWith(ClrNamespace, StringComparison.CurrentCultureIgnoreCase))
-            {
-                // Override assemblyName
-                _xamlNameParser.ParseClrNamespaceDeclaration(namespaceName, out string ns, out assemblyName);
-                namespaceName = ns;
-                XamlNameParser.FixNamespaceForCompatibility(ref assemblyName, ref namespaceName);
-            }
-
-            // Handle special cases:
-            if (typeName == StaticRes)
-            {
-                typeName = StaticResExtension;
-            }
-
             var typeKey = new TypeKey(namespaceName, typeName);
 
             // Start by looking in the cache dictionary:
@@ -359,15 +330,15 @@ namespace OpenSilver.Compiler
                 }
             }
 
-            if (doNotRaiseExceptionIfNotFound)
+            if (throwIfNull)
             {
-                return null;
+                throw GetTypeNotFoundError(namespaceName, typeName, assemblyName, lineInfo);
             }
 
-            throw GetTypeNotFoundError(namespaceName, typeName, assemblyName, lineInfo);
+            return null;
         }
 
-        private static XamlParseException GetTypeNotFoundError(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
+        internal static XamlParseException GetTypeNotFoundError(string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
         {
             if (IsNamespaceAnXmlNamespace(namespaceName))
             {
@@ -776,23 +747,6 @@ namespace OpenSilver.Compiler
         public bool IsIFrameworkElement(TypeDefinition type)
         {
             return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || type.DoesAnySubTypeImplementInterface(IFrameworkElementType);
-        }
-
-        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName, string assemblyName, IXmlLineInfo lineInfo)
-        {
-            if (propertyName != "Template")
-            {
-                return false;
-            }
-
-            var type = FindType(namespaceName, typeName, assemblyName, lineInfo);
-            var property = FindPropertyDeep(
-                type,
-                "Template",
-                MemberFlags.Public | MemberFlags.Instance,
-                out _);
-
-            return property is not null && IsFrameworkTemplateTemplateProperty(property);
         }
 
         public bool IsFrameworkTemplateTemplateProperty(MemberReference memberReference)
