@@ -124,7 +124,7 @@ public partial class MonoCecilAssembliesInspectorTest
             nameof(MonoCecilAssembliesInspectorTest),
             compilerTests,
             null,
-            doNotRaiseExceptionIfNotFound: true);
+            throwIfNull: false);
 
         Assert.AreEqual(nameof(MonoCecilAssembliesInspectorTest), typeBefore.Name);
         Assert.IsNull(typeAfter);

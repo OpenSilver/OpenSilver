@@ -36,6 +36,11 @@
     <Compile Include="1_ConvertingXaml\GeneratingPathInXaml.cs" />
     <Compile Include="1_ConvertingXaml\GeneratingUniqueNames.cs" />
     <Compile Include="1_ConvertingXaml\MarkupExtensionDescriptor.cs" />
+    <Compile Include="1_ConvertingXaml\MarkupExtensionParser\KnownStrings.cs" />
+    <Compile Include="1_ConvertingXaml\MarkupExtensionParser\MarkupExtensionParser.cs" />
+    <Compile Include="1_ConvertingXaml\MarkupExtensionParser\MeScanner.cs" />
+    <Compile Include="1_ConvertingXaml\MarkupExtensionParser\Errors.cs" />
+    <Compile Include="1_ConvertingXaml\MarkupExtensionParser\XamlParserContext.cs" />
     <Compile Include="1_ConvertingXaml\XamlNameParser.cs" />
     <Compile Include="1_ConvertingXaml\KnownNamespaces.cs" />
     <Compile Include="1_ConvertingXaml\InsertingImplicitNodes.cs" />

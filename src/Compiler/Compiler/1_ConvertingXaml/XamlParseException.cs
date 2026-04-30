@@ -21,6 +21,12 @@ public class XamlParseException : Exception
 {
     private readonly LineInfo _lineInfo;
 
+    internal XamlParseException(MeScanner meScanner, string message)
+        : base(message)
+    {
+        _lineInfo = new LineInfo(meScanner.LineNumber, meScanner.LinePosition);
+    }
+
     public XamlParseException(string message)
         : this(message, null, null)
     {

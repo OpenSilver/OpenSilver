@@ -53,7 +53,7 @@ internal static class InsertingMarkupNodesInXaml
                 continue;
             }
 
-            if (!MarkupExtensionDescriptor.IsMarkupExtension(attribute.Value))
+            if (!MarkupExtensionDescriptor.LooksLikeAMarkupExtension(attribute.Value))
             {
                 continue;
             }
@@ -120,11 +120,11 @@ internal static class InsertingMarkupNodesInXaml
         markupExtensionElement.SetAttributeValue(GeneratedMarkupExtensionAttribute, "True");
         markupExtensionElement.SetLineInfo(lineInfo);
 
-        if (descriptor.ContentProperty is not null)
+        if (descriptor.ConstructorArguments.Count > 0)
         {
             string contentPropertyName = ResolveContentPropertyName(markupExtensionType, settings, lineInfo);
 
-            AddProperty(markupExtensionElement, contentPropertyName, descriptor.ContentProperty, settings, xmlnsResolver, lineInfo);
+            AddProperty(markupExtensionElement, contentPropertyName, descriptor.ConstructorArguments[0], settings, xmlnsResolver, lineInfo);
         }
 
         foreach (var (propName, propValue) in descriptor.Properties)

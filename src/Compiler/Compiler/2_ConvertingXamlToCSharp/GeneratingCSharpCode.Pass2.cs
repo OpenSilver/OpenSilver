@@ -1327,7 +1327,7 @@ namespace OpenSilver.Compiler
             {
                 if (element.Attribute(GeneratingCode.XKeyAttribute) is XAttribute keyAttribute)
                 {
-                    if (!MarkupExtensionDescriptor.IsMarkupExtension(keyAttribute.Value))
+                    if (!MarkupExtensionDescriptor.LooksLikeAMarkupExtension(keyAttribute.Value))
                     {
                         return EscapeString(GeneratingCode.GetAttributeValue(keyAttribute));
                     }

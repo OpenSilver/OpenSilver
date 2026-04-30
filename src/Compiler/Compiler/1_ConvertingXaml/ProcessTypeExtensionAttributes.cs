@@ -67,8 +67,14 @@ internal static class ProcessTypeExtensionAttributes
 
     private static void ResolveTypeExtensionAttribute(XAttribute attribute, XElement xmlnsResolver, ConversionSettings settings)
     {
-        if (MarkupExtensionDescriptor.TryParse(attribute.Value, out MarkupExtensionDescriptor markupExtension) &&
-            TryExtractTypeName(markupExtension, xmlnsResolver, attribute, settings, out string typeName))
+        if (!MarkupExtensionDescriptor.LooksLikeAMarkupExtension(attribute.Value))
+        {
+            return;
+        }
+
+        var markupExtension = MarkupExtensionDescriptor.Parse(attribute.Value, attribute);
+
+        if (TryExtractTypeName(markupExtension, xmlnsResolver, attribute, settings, out string typeName))
         {
             attribute.Value = typeName;
         }
@@ -88,13 +94,16 @@ internal static class ProcessTypeExtensionAttributes
             return false;
         }
 
-        if (markupExtension.ContentProperty is string content && markupExtension.Properties.Count == 0)
+        if (markupExtension.ConstructorArguments.Count > 0 &&
+            markupExtension.ConstructorArguments[0] is string content &&
+            markupExtension.Properties.Count == 0)
         {
             typeName = content;
             return true;
         }
 
-        if (markupExtension.ContentProperty is null && markupExtension.Properties.Count == 1)
+        if (markupExtension.ConstructorArguments.Count == 0 &&
+            markupExtension.Properties.Count == 1)
         {
             (string propertyName, object propertyValue) = markupExtension.Properties[0];
 
