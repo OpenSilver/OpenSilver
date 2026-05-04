@@ -507,6 +507,8 @@ namespace GlobalResource
                     parameters.AppendLine($"{XamlDesignerBridgeClass}.SetFilePath({elementUid}, \"{_sourceFile}\")");
                 }
 
+                var deferredInitializers = new List<Action>();
+
                 foreach (XAttribute attribute in element.Attributes())
                 {
                     //-------------
@@ -631,110 +633,117 @@ namespace GlobalResource
                         case MemberKind.Property:
                         case MemberKind.Field:
                             {
-                                string value = null;
+                                deferredInitializers.Add(() =>
+                                {
+                                    string value = null;
 
-                                if (elementType == $"{KnownNamespaces.SystemWindows}.Setter")
-                                {
-                                    value = memberName switch
+                                    if (elementType == $"{KnownNamespaces.SystemWindows}.Setter")
                                     {
-                                        "Property" => GenerateCodeForSetterProperty(attribute),
-                                        "Value" => GenerateCodeForSetterValue(attribute),
-                                        "TargetName" => _settings.SystemTypes.ConvertToString(attributeValue),
-                                        _ => throw new XamlParseException(
-                                            "The '<Setter />' element cannot have attributes other than 'Property', 'Value' and 'TargetName'.",
-                                            element),
-                                    };
-                                }
-                                else if (elementType == $"{KnownNamespaces.SystemWindows}.Trigger")
-                                {
-                                    value = memberName switch
-                                    {
-                                        "Property" => GenerateCodeForTriggerProperty(attribute),
-                                        "Value" => GenerateCodeForTriggerValue(attribute),
-                                        "SourceName" => _settings.SystemTypes.ConvertToString(attributeValue),
-                                        _ => throw new XamlParseException(
-                                            "The '<Trigger />' element cannot have attributes other than 'Property', 'Value' and 'SourceName'.",
-                                            element),
-                                    };
-                                }
-                                else if (elementType == $"{KnownNamespaces.SystemWindows}.Condition")
-                                {
-                                    value = memberName switch
-                                    {
-                                        "Property" => GenerateCodeForConditionProperty(attribute),
-                                        "Value" => GenerateCodeForConditionValue(attribute),
-                                        "SourceName" => _settings.SystemTypes.ConvertToString(attributeValue),
-                                        _ => throw new XamlParseException(
-                                            "The '<Condition />' element cannot have attributes other than 'Property', 'Value' and 'SourceName'.",
-                                            element),
-                                    };
-                                }
-                                else if (elementType == $"{KnownNamespaces.SystemWindowsData}.Binding" && memberName == "Path")
-                                {
-                                    if (TryResolvePathForBinding(attributeValue, element, attribute, out string resolvedPath))
-                                    {
-                                        string xamlPath = _settings.SystemTypes.ConvertToString(resolvedPath);
-                                        parameters.AppendLine($"{elementUid}.XamlPath <- {xamlPath}");
+                                        value = memberName switch
+                                        {
+                                            "Property" => GenerateCodeForSetterProperty(attribute),
+                                            "Value" => GenerateCodeForSetterValue(attribute),
+                                            "TargetName" => _settings.SystemTypes.ConvertToString(attributeValue),
+                                            _ => throw new XamlParseException(
+                                                "The '<Setter />' element cannot have attributes other than 'Property', 'Value' and 'TargetName'.",
+                                                element),
+                                        };
                                     }
-
-                                    value = GenerateCodeForInstantiatingAttributeValue(
-                                        memberName,
-                                        memberReference,
-                                        declaringType,
-                                        memberType,
-                                        elementTypeDefinition,
-                                        attributeValue,
-                                        element,
-                                        attribute);
-                                }
-                                else if (elementType == $"{KnownNamespaces.SystemWindows}.TemplateBindingExtension" && memberName == "Path")
-                                {
-                                    ResolvePathForTemplateBinding(attributeValue, element, out TypeDefinition ownerType, out string propertyName);
-                                    parameters.AppendLine(
-                                        $"{elementUid}.DependencyPropertyName <- {_settings.SystemTypes.ConvertToString(propertyName)}");
-
-                                    if (ownerType is not null)
+                                    else if (elementType == $"{KnownNamespaces.SystemWindows}.Trigger")
                                     {
+                                        value = memberName switch
+                                        {
+                                            "Property" => GenerateCodeForTriggerProperty(attribute),
+                                            "Value" => GenerateCodeForTriggerValue(attribute),
+                                            "SourceName" => _settings.SystemTypes.ConvertToString(attributeValue),
+                                            _ => throw new XamlParseException(
+                                                "The '<Trigger />' element cannot have attributes other than 'Property', 'Value' and 'SourceName'.",
+                                                element),
+                                        };
+                                    }
+                                    else if (elementType == $"{KnownNamespaces.SystemWindows}.Condition")
+                                    {
+                                        value = memberName switch
+                                        {
+                                            "Property" => GenerateCodeForConditionProperty(attribute),
+                                            "Value" => GenerateCodeForConditionValue(attribute),
+                                            "SourceName" => _settings.SystemTypes.ConvertToString(attributeValue),
+                                            _ => throw new XamlParseException(
+                                                "The '<Condition />' element cannot have attributes other than 'Property', 'Value' and 'SourceName'.",
+                                                element),
+                                        };
+                                    }
+                                    else if (elementType == $"{KnownNamespaces.SystemWindowsData}.Binding" && memberName == "Path")
+                                    {
+                                        if (TryResolvePathForBinding(attributeValue, element, attribute, out string resolvedPath))
+                                        {
+                                            string xamlPath = _settings.SystemTypes.ConvertToString(resolvedPath);
+                                            parameters.AppendLine($"{elementUid}.XamlPath <- {xamlPath}");
+                                        }
+
+                                        value = GenerateCodeForInstantiatingAttributeValue(
+                                            memberName,
+                                            memberReference,
+                                            declaringType,
+                                            memberType,
+                                            elementTypeDefinition,
+                                            attributeValue,
+                                            element,
+                                            attribute);
+                                    }
+                                    else if (elementType == $"{KnownNamespaces.SystemWindows}.TemplateBindingExtension" && memberName == "Path")
+                                    {
+                                        ResolvePathForTemplateBinding(attributeValue, element, out TypeDefinition ownerType, out string propertyName);
                                         parameters.AppendLine(
-                                            $"{elementUid}.DependencyPropertyOwnerType <- typeof<global.{_settings.TypeReferenceHelper.ConvertToString(ownerType)}>");
+                                            $"{elementUid}.DependencyPropertyName <- {_settings.SystemTypes.ConvertToString(propertyName)}");
+
+                                        if (ownerType is not null)
+                                        {
+                                            parameters.AppendLine(
+                                                $"{elementUid}.DependencyPropertyOwnerType <- typeof<global.{_settings.TypeReferenceHelper.ConvertToString(ownerType)}>");
+                                        }
+
+                                        value = null;
+                                    }
+                                    else
+                                    {
+                                        value = GenerateCodeForInstantiatingAttributeValue(
+                                            memberName,
+                                            memberReference,
+                                            declaringType,
+                                            memberType,
+                                            elementTypeDefinition,
+                                            attributeValue,
+                                            element,
+                                            attribute);
                                     }
 
-                                    value = null;
-                                }
-                                else
-                                {
-                                    value = GenerateCodeForInstantiatingAttributeValue(
-                                        memberName,
-                                        memberReference,
-                                        declaringType,
-                                        memberType,
-                                        elementTypeDefinition,
-                                        attributeValue,
-                                        element,
-                                        attribute);
-                                }
+                                    if (value is not null)
+                                    {
+                                        parameters.AppendLine($"{elementUid}.{memberName} <- {value}");
+                                    }
+                                });
 
-                                if (value is not null)
-                                {
-                                    parameters.AppendLine($"{elementUid}.{memberName} <- {value}");
-                                }
                             }
                             break;
 
                         case MemberKind.AttachedPropertySet:
                             {
-                                string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-                                string value = GenerateCodeForInstantiatingAttributeValue(
-                                    memberName,
-                                    memberReference,
-                                    declaringType,
-                                    memberType,
-                                    elementTypeDefinition,
-                                    attributeValue,
-                                    element,
-                                    attribute);
+                                deferredInitializers.Add(() =>
+                                {
+                                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
+                                    string value = GenerateCodeForInstantiatingAttributeValue(
+                                        memberName,
+                                        memberReference,
+                                        declaringType,
+                                        memberType,
+                                        elementTypeDefinition,
+                                        attributeValue,
+                                        element,
+                                        attribute);
 
-                                parameters.AppendLine($"global.{ownerType}.Set{memberName}({elementUid}, {value})");
+                                    parameters.AppendLine($"global.{ownerType}.Set{memberName}({elementUid}, {value})");
+                                });
                             }
                             break;
 
@@ -771,6 +780,11 @@ namespace GlobalResource
                                     attribute);
                             }
                     }
+                }
+
+                foreach (var initializer in deferredInitializers)
+                {
+                    initializer();
                 }
             }
 
