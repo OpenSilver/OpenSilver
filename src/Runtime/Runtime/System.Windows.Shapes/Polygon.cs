@@ -42,7 +42,8 @@ public sealed class Polygon : Shape
             new PropertyMetadata(FillRule.EvenOdd)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Polygon)d).SetFillRuleAttribute((FillRule)newValue),
-            });
+            },
+            ValidateEnums.IsFillRuleValid);
 
     /// <summary>
     /// Gets or sets a value that specifies how the interior fill of the shape is determined.

@@ -28,9 +28,13 @@
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
     <Compile Include="OpenSilver\Internal\Documents\TextContainerList.cs" />
+    <Compile Include="OpenSilver\Internal\Media\ByteStreamGeometryContext.cs" />
+    <Compile Include="OpenSilver\Internal\Media\PathStreamGeometryContext.cs" />
+    <Compile Include="OpenSilver\Internal\Media\wgx_core_types.cs" />
     <Compile Include="OpenSilver\Internal\StyleTriggerStorage.cs" />
     <Compile Include="OpenSilver\Internal\TemplateTriggerStorage.cs" />
     <Compile Include="OpenSilver\Internal\TriggerStorage.cs" />
+    <Compile Include="OpenSilver\Internal\ValidateEnums.cs" />
     <Compile Include="OpenSilver\OpenSilverCompatibilityPreferences.cs" />
     <Compile Include="OpenSilver\Internal\Commands\CommandHelpers.cs" />
     <Compile Include="OpenSilver\Internal\CommandLibraryHelper.cs" />
@@ -134,6 +138,10 @@
     <Compile Include="System.Windows.Documents\List.cs" />
     <Compile Include="System.Windows.Documents\ListItem.cs" />
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
+    <Compile Include="OpenSilver\Internal\Media\GeometryUtils.cs" />
+    <Compile Include="OpenSilver\Internal\Media\CapacityStreamGeometryContext.cs" />
+    <Compile Include="System.Windows.Media\DashStyle.cs" />
+    <Compile Include="System.Windows.Media\DashStyles.cs" />
     <Compile Include="System.Windows.Media\DrawingContext.cs" />
     <Compile Include="System.Windows.Media\FormattedText.cs" />
     <Compile Include="System.Windows.Input\InputDevice.cs" />
@@ -141,6 +149,10 @@
     <Compile Include="System.Windows.Input\KeyboardFocusChangedEventArgs.cs" />
     <Compile Include="System.Windows.Input\KeyboardInputProviderAcquireFocusEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseDevice.cs" />
+    <Compile Include="System.Windows.Media\Pen.cs" />
+    <Compile Include="System.Windows.Media\StreamGeometry.cs" />
+    <Compile Include="System.Windows.Media\StreamGeometryContext.cs" />
+    <Compile Include="OpenSilver\Internal\Media\StringStreamGeometryContext.cs" />
     <Compile Include="System.Windows\ComponentResourceKey.cs" />
     <Compile Include="System.Windows\ResourceKey.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />

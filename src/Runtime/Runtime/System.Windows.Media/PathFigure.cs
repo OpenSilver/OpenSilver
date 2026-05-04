@@ -203,5 +203,24 @@ namespace System.Windows.Media
         }
 
         private void InvalidateParentGeometry() => _parentGeometry?.RaisePathChanged();
+
+        /// <summary>
+        /// Determines whether this <see cref="PathFigure"/> object may have curved segments.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="PathFigure"/> object may have curved segments; otherwise, false.
+        /// </returns>
+        public bool MayHaveCurves()
+        {
+            foreach (PathSegment segment in Segments.InternalItems)
+            {
+                if (segment.IsCurved())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

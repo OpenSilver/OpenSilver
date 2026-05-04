@@ -108,12 +108,12 @@ namespace System.ComponentModel.Tests
         }
 
         [TestMethod]
-        public void GetConverter_When_PathGeometry()
+        public void GetConverter_When_PathFigureCollection()
         {
-            TypeConverter converter = TypeConverterHelper.GetConverter(typeof(PathGeometry));
+            TypeConverter converter = TypeConverterHelper.GetConverter(typeof(PathFigureCollection));
 
             Assert.IsNotNull(converter);
-            Assert.IsInstanceOfType<GeometryConverter>(converter);
+            Assert.IsInstanceOfType<PathFigureCollectionConverter>(converter);
         }
 
         [TestMethod]

@@ -589,11 +589,6 @@ internal sealed class CoreTypesConverterCS : CoreTypesConverter
         return $"global::System.Windows.Media.Geometry.Parse({Escape(source)})";
     }
 
-    public override string ConvertToPathGeometry(XObject context, string source)
-    {
-        return $"(global::System.Windows.Media.PathGeometry)global::System.Windows.Media.Geometry.Parse({Escape(source)})";
-    }
-
     public override string ConvertToPathFigureCollection(XObject context, string source)
     {
         return $"global::System.Windows.Media.PathFigureCollection.Parse({Escape(source)})";

@@ -11,10 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Markup;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
+using System.Collections.Generic;
+using System.Windows.Markup;
 
 namespace System.Windows.Media
 {
@@ -106,7 +106,8 @@ namespace System.Windows.Media
                 nameof(FillRule),
                 typeof(FillRule),
                 typeof(GeometryGroup),
-                new PropertyMetadata(FillRule.EvenOdd, OnFillRuleChanged));
+                new PropertyMetadata(FillRule.EvenOdd, OnFillRuleChanged),
+                ValidateEnums.IsFillRuleValid);
 
         /// <summary>
         /// Gets or sets how the intersecting areas of the objects contained in this <see cref="GeometryGroup"/>
@@ -120,6 +121,44 @@ namespace System.Windows.Media
         {
             get => (FillRule)GetValue(FillRuleProperty);
             set => SetValueInternal(FillRuleProperty, value);
+        }
+
+        /// <summary>
+        /// Determines whether this <see cref="GeometryGroup"/> object is empty.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="GeometryGroup"/> is empty; otherwise, false.
+        /// </returns>
+        public override bool IsEmpty()
+        {
+            foreach (Geometry child in Children.InternalItems)
+            {
+                if (!child.IsEmpty())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether this <see cref="GeometryGroup"/> object may have curved segments.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="GeometryGroup"/> object may have curved segments; otherwise, false.
+        /// </returns>
+        public override bool MayHaveCurves()
+        {
+            foreach (Geometry child in Children.InternalItems)
+            {
+                if (child.MayHaveCurves())
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal override Rect BoundsInternal
@@ -141,17 +180,14 @@ namespace System.Windows.Media
             }
         }
 
-        internal override string ToPathData(IFormatProvider formatProvider)
+        internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)
         {
-            var sb = new StringBuilder();
+            Matrix matrix = GetCombinedMatrix(transform);
 
             foreach (var child in Children.InternalItems)
             {
-                var childData = child.ToPathData(formatProvider);
-                sb.Append(childData);
+                child.SerializeData(context, matrix);
             }
-
-            return sb.ToString();
         }
 
         internal override FillRule GetFillRule() => FillRule;

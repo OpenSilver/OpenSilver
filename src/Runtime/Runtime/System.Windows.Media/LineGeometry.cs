@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Media;
+
 namespace System.Windows.Media
 {
     /// <summary>
@@ -100,15 +102,29 @@ namespace System.Windows.Media
             set => SetValueInternal(StartPointProperty, value);
         }
 
+        /// <summary>
+        /// Determines whether this <see cref="LineGeometry"/> object is empty.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="LineGeometry"/> is empty; otherwise, false.
+        /// </returns>
+        public override bool IsEmpty() => false;
+
+        /// <summary>
+        /// Determines whether this <see cref="LineGeometry"/> object can have curved segments.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="LineGeometry"/> object can have curved segments; otherwise, false.
+        /// </returns>
+        public override bool MayHaveCurves() => false;
+
         internal override Rect BoundsInternal
         {
             get
             {
-                Rect rect = new Rect(StartPoint, EndPoint);
+                var rect = new Rect(StartPoint, EndPoint);
 
-                Transform transform = Transform;
-
-                if (transform != null && !Transform.IsIdentityTransform(transform))
+                if (Transform is Transform transform && !Transform.IsIdentityTransform(transform))
                 {
                     rect = transform.TransformBounds(rect);
                 }
@@ -117,12 +133,20 @@ namespace System.Windows.Media
             }
         }
 
-        internal override string ToPathData(IFormatProvider formatProvider)
+        internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)
         {
-            var p1 = StartPoint;
-            var p2 = EndPoint;
+            Point startPoint = StartPoint;
+            Point endPoint = EndPoint;
 
-            return $"M {p1.X.ToString(formatProvider)},{p1.Y.ToString(formatProvider)} L {p2.X.ToString(formatProvider)}, {p2.Y.ToString(formatProvider)} Z";
+            Matrix matrix = GetCombinedMatrix(transform);
+            if (!matrix.IsIdentity)
+            {
+                startPoint *= matrix;
+                endPoint *= matrix;
+            }
+
+            context.BeginFigure(startPoint, true, false);
+            context.LineTo(endPoint, true, false);
         }
     }
 }

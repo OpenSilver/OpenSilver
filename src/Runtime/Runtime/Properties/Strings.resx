@@ -1355,4 +1355,7 @@
   <data name="PropertyMustHaveValue" xml:space="preserve">
     <value>The '{0}' property of the '{1}' type must be set during initialization.</value>
   </data>
+  <data name="StreamGeometry_NeedBeginFigure" xml:space="preserve">
+    <value>BeginFigure must be called before this API.</value>
+  </data>
 </root>

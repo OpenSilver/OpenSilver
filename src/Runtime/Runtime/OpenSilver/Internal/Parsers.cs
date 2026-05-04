@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Media;
 using System;
 using System.Diagnostics;
 using System.Windows.Media;

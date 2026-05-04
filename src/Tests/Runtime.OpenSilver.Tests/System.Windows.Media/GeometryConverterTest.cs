@@ -48,24 +48,13 @@ namespace System.Windows.Media.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_Should_Return_PathGeometry()
+        public void ConvertFrom_String_Should_Return_StreamGeometry()
         {
             var test = Converter.ConvertFrom("M 10,10 20,0 20,10 L 50,30 50,40 20,40");
 
-            var pg = (PathGeometry)test;
+            var streamGeometry = Assert.IsExactInstanceOfType<StreamGeometry>(test);
 
-            Assert.AreEqual(1, pg.Figures.Count);
-            Assert.AreEqual(1, pg.Figures[0].Segments.Count);
-            Assert.IsInstanceOfType<PolyLineSegment>(pg.Figures[0].Segments[0]);
-
-            var segments = (PolyLineSegment)pg.Figures[0].Segments[0];
-            
-            Assert.AreEqual(5, segments.Points.Count);
-            Assert.AreEqual(segments.Points[0], new Point(20, 0));
-            Assert.AreEqual(segments.Points[1], new Point(20, 10));
-            Assert.AreEqual(segments.Points[2], new Point(50, 30));
-            Assert.AreEqual(segments.Points[3], new Point(50, 40));
-            Assert.AreEqual(segments.Points[4], new Point(20, 40));
+            Assert.IsFalse(streamGeometry.IsEmpty());
         }
 
         [TestMethod]

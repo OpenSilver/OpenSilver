@@ -62,7 +62,6 @@ internal abstract class CoreTypesConverter
             ["System.Windows.Media.DoubleCollection"] = ConvertToDoubleCollection,
             ["System.Windows.Media.FontFamily"] = ConvertToFontFamily,
             ["System.Windows.Media.Geometry"] = ConvertToGeometry,
-            ["System.Windows.Media.PathGeometry"] = ConvertToPathGeometry,
             ["System.Windows.Media.PathFigureCollection"] = ConvertToPathFigureCollection,
             ["System.Windows.Media.Matrix"] = ConvertToMatrix,
             ["System.Windows.Media.PointCollection"] = ConvertToPointCollection,
@@ -123,8 +122,6 @@ internal abstract class CoreTypesConverter
     public abstract string ConvertToFontFamily(XObject context, string source);
 
     public abstract string ConvertToGeometry(XObject context, string source);
-
-    public abstract string ConvertToPathGeometry(XObject context, string source);
 
     public abstract string ConvertToPathFigureCollection(XObject context, string source);
 

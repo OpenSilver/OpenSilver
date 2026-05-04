@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Media
 {
@@ -147,6 +147,22 @@ namespace System.Windows.Media
             set => SetValueInternal(RadiusYProperty, value);
         }
 
+        /// <summary>
+        /// Determines whether this <see cref="RectangleGeometry"/> object is empty.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="RectangleGeometry"/> is empty; otherwise, false.
+        /// </returns>
+        public override bool IsEmpty() => Rect.IsEmpty;
+
+        /// <summary>
+        /// Determines whether this <see cref="RectangleGeometry"/> object may have curved segments.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="RectangleGeometry"/> object may have curved segments; otherwise, false.
+        /// </returns>
+        public override bool MayHaveCurves() => IsRounded(RadiusX, RadiusY);
+
         internal override Rect BoundsInternal
         {
             get
@@ -173,19 +189,19 @@ namespace System.Windows.Media
             }
         }
 
-        internal override string ToPathData(IFormatProvider formatProvider)
+        internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)
         {
             Rect rect = Rect;
 
             if (rect.IsEmpty)
             {
-                return string.Empty;
+                return;
             }
 
             double radiusX = RadiusX;
             double radiusY = RadiusY;
 
-            Matrix matrix = Transform?.Matrix ?? Matrix.Identity;
+            Matrix matrix = GetCombinedMatrix(transform);
 
             if (IsRounded(radiusX, radiusY))
             {
@@ -219,30 +235,35 @@ namespace System.Windows.Media
                     }
                 }
 
-                var sb = StringBuilderCache.Acquire();
-
-                sb.Append($"M {Format(points[0], formatProvider)} ")
-                  .Append($"C {Format(points[1], formatProvider)} {Format(points[2], formatProvider)} {Format(points[3], formatProvider)} ")
-                  .Append($"L {Format(points[4], formatProvider)} ")
-                  .Append($"C {Format(points[5], formatProvider)} {Format(points[6], formatProvider)} {Format(points[7], formatProvider)} ")
-                  .Append($"L {Format(points[8], formatProvider)} ")
-                  .Append($"C {Format(points[9], formatProvider)} {Format(points[10], formatProvider)} {Format(points[11], formatProvider)} ")
-                  .Append($"L {Format(points[12], formatProvider)} ")
-                  .Append($"C {Format(points[13], formatProvider)} {Format(points[14], formatProvider)} {Format(points[15], formatProvider)} Z");
-
-                return StringBuilderCache.GetStringAndRelease(sb);
+                context.BeginFigure(points[0], true, true);
+                context.BezierTo(points[1], points[2], points[3], true, false);
+                context.LineTo(points[4], true, false);
+                context.BezierTo(points[5], points[6], points[7], true, false);
+                context.LineTo(points[8], true, false);
+                context.BezierTo(points[9], points[10], points[11], true, false);
+                context.LineTo(points[12], true, false);
+                context.BezierTo(points[13], points[14], points[15], true, false);
             }
             else
             {
-                Point topLeft = rect.TopLeft * matrix;
-                Point topRight = rect.TopRight * matrix;
-                Point bottomRight = rect.BottomRight * matrix;
-                Point bottomLeft = rect.BottomLeft * matrix;
+                Point topLeft = rect.TopLeft;
+                Point topRight = rect.TopRight;
+                Point bottomLeft = rect.BottomLeft;
+                Point bottomRight = rect.BottomRight;
 
-                return $"M {Format(topLeft, formatProvider)} L {Format(topRight, formatProvider)} {Format(bottomRight, formatProvider)} {Format(bottomLeft, formatProvider)} Z";
+                if (!matrix.IsIdentity)
+                {
+                    topLeft *= matrix;
+                    topRight *= matrix;
+                    bottomLeft *= matrix;
+                    bottomRight *= matrix;
+                }
+
+                context.BeginFigure(topLeft, true, true);
+                context.LineTo(topRight, true, false);
+                context.LineTo(bottomRight, true, false);
+                context.LineTo(bottomLeft, true, false);
             }
-
-            static string Format(Point p, IFormatProvider formatProvider) => $"{p.X.ToString(formatProvider)} {p.Y.ToString(formatProvider)}";
         }
 
         private static bool IsRounded(double radiusX, double radiusY) => radiusX != 0.0 && radiusY != 0.0;

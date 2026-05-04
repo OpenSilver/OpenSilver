@@ -333,7 +333,6 @@ namespace System.ComponentModel
         {
             var commandConverter = new CommandConverter();
             var brushConverter = new BrushConverter();
-            var geometryConverter = new GeometryConverter();
             var transformConverter = new TransformConverter();
 
             return new Dictionary<Type, TypeConverter>(42)
@@ -354,8 +353,7 @@ namespace System.ComponentModel
                 [typeof(Color)] = new ColorConverter(),
                 [typeof(DoubleCollection)] = new DoubleCollectionConverter(),
                 [typeof(FontFamily)] = new FontFamilyConverter(),
-                [typeof(Geometry)] = geometryConverter,
-                [typeof(PathGeometry)] = geometryConverter,
+                [typeof(Geometry)] = new GeometryConverter(),
                 [typeof(PathFigureCollection)] = new PathFigureCollectionConverter(),
                 [typeof(Matrix)] = new MatrixConverter(),
                 [typeof(Matrix3D)] = new Matrix3DConverter(),

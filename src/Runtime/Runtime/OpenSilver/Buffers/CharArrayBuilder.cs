@@ -17,7 +17,7 @@ using System.Diagnostics;
 
 namespace OpenSilver.Buffers;
 
-internal sealed class CharArrayBuilder
+internal sealed class CharArrayBuilder : IDisposable
 {
     private const int DefaultCapacity = 2 * 1024 * 1024;
     private const int MaxArrayLength = 0X7FFFFFC7;
@@ -83,7 +83,24 @@ internal sealed class CharArrayBuilder
     public string ToStringAndClear()
     {
         (int length, _length) = (_length, 0);
-        return _buffer.AsSpan(0, length).ToString();
+        return new string(_buffer, 0, length);
+    }
+
+    public override string ToString() => new string(_buffer, 0, _length);
+
+    public void Dispose()
+    {
+        char[] toReturn = _buffer;
+
+        if (toReturn is null)
+        {
+            return;
+        }
+
+        Reset();
+        _buffer = null;
+
+        ArrayPool<char>.Shared.Return(toReturn);
     }
 
     private void EnsureCapacity(int minimum)

@@ -3247,6 +3247,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BeginFigure must be called before this API..
+        /// </summary>
+        internal static string StreamGeometry_NeedBeginFigure {
+            get {
+                return ResourceManager.GetString("StreamGeometry_NeedBeginFigure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A style intended for type &apos;{0}&apos; cannot be applied to type &apos;{1}&apos;..
         /// </summary>
         internal static string StyleForWrongType {

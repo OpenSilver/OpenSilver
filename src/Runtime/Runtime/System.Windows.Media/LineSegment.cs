@@ -11,51 +11,57 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
 using System.Windows.Shapes;
 
-namespace System.Windows.Media
+namespace System.Windows.Media;
+
+/// <summary>
+/// Represents a line drawn between two points, which can be part of a <see cref="PathFigure"/>
+/// within <see cref="Path"/> data.
+/// </summary>
+public sealed class LineSegment : PathSegment
 {
     /// <summary>
-    /// Represents a line drawn between two points, which can be part of a <see cref="PathFigure"/>
-    /// within <see cref="Path"/> data.
+    /// Initializes a new instance of the <see cref="LineSegment"/> class.
     /// </summary>
-    public sealed class LineSegment : PathSegment
+    public LineSegment() { }
+
+    /// <summary>
+    /// Identifies the <see cref="Point"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty PointProperty =
+        DependencyProperty.Register(
+            nameof(Point),
+            typeof(Point),
+            typeof(LineSegment),
+            new PropertyMetadata(new Point(), PropertyChanged));
+
+    /// <summary>
+    /// Gets or sets the end point of the line segment.
+    /// </summary>
+    /// <returns>
+    /// The end point of the line segment. The default is a <see cref="Point"/> with 
+    /// value 0,0.
+    /// </returns>
+    public Point Point
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LineSegment"/> class.
-        /// </summary>
-        public LineSegment() { }
-
-        /// <summary>
-        /// Identifies the <see cref="Point"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PointProperty =
-            DependencyProperty.Register(
-                nameof(Point),
-                typeof(Point),
-                typeof(LineSegment),
-                new PropertyMetadata(new Point(), PropertyChanged));
-
-        /// <summary>
-        /// Gets or sets the end point of the line segment.
-        /// </summary>
-        /// <returns>
-        /// The end point of the line segment. The default is a <see cref="Point"/> with 
-        /// value 0,0.
-        /// </returns>
-        public Point Point
-        {
-            get => (Point)GetValue(PointProperty);
-            set => SetValueInternal(PointProperty, value);
-        }
-
-        internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)
-        {
-            // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#lineto_path_commands
-            yield return "L";
-            yield return Point.X.ToString(formatProvider);
-            yield return Point.Y.ToString(formatProvider);
-        }
+        get => (Point)GetValue(PointProperty);
+        set => SetValueInternal(PointProperty, value);
     }
+
+    internal override void SerializeData(StreamGeometryContext context, Matrix transform, ref Point current)
+    {
+        Point point = Point;
+
+        current = point;
+
+        if (!transform.IsIdentity)
+        {
+            point *= transform;
+        }
+
+        context.LineTo(point, IsStroked, IsSmoothJoin);
+    }
+
+    internal override bool IsCurved() => false;
 }

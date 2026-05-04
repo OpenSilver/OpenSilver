@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Media
 {
@@ -156,6 +157,22 @@ namespace System.Windows.Media
             set => SetValueInternal(RadiusYProperty, value);
         }
 
+        /// <summary>
+        /// Determines whether this <see cref="EllipseGeometry"/> object is empty.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="EllipseGeometry"/> is empty; otherwise, false.
+        /// </returns>
+        public override bool IsEmpty() => false;
+
+        /// <summary>
+        /// Determines whether this <see cref="EllipseGeometry"/> object can have curved segments.
+        /// </summary>
+        /// <returns>
+        /// true if this <see cref="EllipseGeometry"/> object can have curved segments; otherwise, false.
+        /// </returns>
+        public override bool MayHaveCurves() => true;
+
         internal override Rect BoundsInternal
         {
             get
@@ -179,7 +196,7 @@ namespace System.Windows.Media
             }
         }
 
-        internal override string ToPathData(IFormatProvider formatProvider)
+        internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)
         {
             Span<Point> points = stackalloc Point[13];
 
@@ -205,26 +222,21 @@ namespace System.Windows.Media
             points[7].Y = points[11].Y = center.Y - mid;
             points[8].Y = points[9].Y = points[10].Y = center.Y - radiusY;
 
-            if (Transform is Transform transform && !Transform.IsIdentityTransform(transform))
+            Matrix matrix = GetCombinedMatrix(transform);
+            if (!matrix.IsIdentity)
             {
-                Matrix matrix = transform.Matrix;
                 for (int i = 0; i < points.Length; i++)
                 {
                     points[i] *= matrix;
                 }
             }
 
-            var sb = StringBuilderCache.Acquire();
+            context.BeginFigure(points[0], true, true);
 
-            sb.Append($"M {Format(points[0], formatProvider)} ")
-              .Append($"C {Format(points[1], formatProvider)} {Format(points[2], formatProvider)} {Format(points[3], formatProvider)} ")
-              .Append($"C {Format(points[4], formatProvider)} {Format(points[5], formatProvider)} {Format(points[6], formatProvider)} ")
-              .Append($"C {Format(points[7], formatProvider)} {Format(points[8], formatProvider)} {Format(points[9], formatProvider)} ")
-              .Append($"C {Format(points[10], formatProvider)} {Format(points[11], formatProvider)} {Format(points[12], formatProvider)} Z");
-
-            return StringBuilderCache.GetStringAndRelease(sb);
-
-            static string Format(Point p, IFormatProvider formatProvider) => $"{p.X.ToString(formatProvider)} {p.Y.ToString(formatProvider)}";
+            for (int i = 0; i < 4; i++)
+            {
+                context.BezierTo(points[3 * i + 1], points[3 * i + 2], points[3 * i + 3], true, true);
+            }
         }
     }
 }

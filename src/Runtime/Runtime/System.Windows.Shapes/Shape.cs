@@ -293,7 +293,8 @@ namespace System.Windows.Shapes
 
                         shape.SetSvgAttribute("stroke-linecap", value);
                     },
-                });
+                },
+                ValidateEnums.IsPenLineCapValid);
 
         /// <summary>
         /// Gets or sets a <see cref="PenLineCap"/> enumeration value that specifies
@@ -364,7 +365,8 @@ namespace System.Windows.Shapes
 
                         shape.SetSvgAttribute("stroke-linecap", value);
                     },
-                });
+                },
+                ValidateEnums.IsPenLineCapValid);
 
         /// <summary>
         /// Gets or sets a <see cref="PenLineCap" /> enumeration value that describes the <see cref="Shape"/> 
@@ -389,7 +391,8 @@ namespace System.Windows.Shapes
                 nameof(StrokeStartLineCap),
                 typeof(PenLineCap),
                 typeof(Shape),
-                new PropertyMetadata(PenLineCap.Flat));
+                new PropertyMetadata(PenLineCap.Flat),
+                ValidateEnums.IsPenLineCapValid);
 
         /// <summary>
         /// Gets or sets a <see cref="PenLineCap"/> enumeration value that describes
@@ -415,7 +418,8 @@ namespace System.Windows.Shapes
                 nameof(StrokeEndLineCap),
                 typeof(PenLineCap),
                 typeof(Shape),
-                new PropertyMetadata(PenLineCap.Flat));
+                new PropertyMetadata(PenLineCap.Flat),
+                ValidateEnums.IsPenLineCapValid);
 
         /// <summary>
         /// Gets or sets a <see cref="PenLineCap"/> enumeration value that describes
@@ -455,7 +459,8 @@ namespace System.Windows.Shapes
                         
                         shape.SetSvgAttribute("stroke-linejoin", value);
                     },
-                });
+                },
+                ValidateEnums.IsPenLineJoinValid);
 
         /// <summary>
         /// Gets or sets a <see cref="PenLineJoin"/> enumeration value that specifies
