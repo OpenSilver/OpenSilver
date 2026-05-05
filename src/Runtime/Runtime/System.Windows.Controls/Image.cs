@@ -17,7 +17,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Automation.Peers;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
 using OpenSilver;
 
 namespace System.Windows.Controls
@@ -118,31 +117,25 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="Stretch"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty StretchProperty =
-            DependencyProperty.Register(
-                nameof(Stretch),
-                typeof(Stretch),
-                typeof(Image),
-                new FrameworkPropertyMetadata(Stretch.Uniform, FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = UpdateDomOnStretchChanged,
-                });
+        public static readonly DependencyProperty StretchProperty = Viewbox.StretchProperty.AddOwner(typeof(Image));
 
-        private static void UpdateDomOnStretchChanged(DependencyObject d, object oldValue, object newValue)
+        /// <summary>
+        /// Gets or sets a value that indicates how the image is scaled.
+        /// </summary>
+        /// <returns>
+        /// One of the <see cref="Controls.StretchDirection"/> values. The default is 
+        /// <see cref="StretchDirection.Both"/>.
+        /// </returns>
+        public StretchDirection StretchDirection
         {
-            Image img = (Image)d;
-
-            img._imageDiv.SetCssStyleProperty(CssPropertyNames.ObjectFit, (Stretch)newValue switch
-            {
-                Stretch.None => "none",
-                Stretch.Fill => "fill",
-                Stretch.Uniform => "contain",
-                Stretch.UniformToFill => "cover",
-                _ => string.Empty,
-            });
-
-            img.SetObjectPosition();
+            get => (StretchDirection)GetValue(StretchDirectionProperty);
+            set => SetValueInternal(StretchDirectionProperty, value);
         }
+
+        /// <summary>
+        /// Identifies the <see cref="StretchDirection"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty StretchDirectionProperty = Viewbox.StretchDirectionProperty.AddOwner(typeof(Image));
 
         /// <summary>
         /// Occurs when there is an error associated with image retrieval or format.
@@ -180,7 +173,7 @@ namespace System.Windows.Controls
         /// <returns>Image's desired size.</returns>
         private Size MeasureArrangeHelper(Size inputSize)
         {
-            if (Source == null)
+            if (Source is null)
             {
                 return new Size();
             }
@@ -191,48 +184,10 @@ namespace System.Windows.Controls
             Size scaleFactor = Viewbox.ComputeScaleFactor(inputSize,
                 naturalSize,
                 Stretch,
-                StretchDirection.Both);
+                StretchDirection);
 
             // Returns our minimum size & sets DesiredSize.
             return new Size(naturalSize.Width * scaleFactor.Width, naturalSize.Height * scaleFactor.Height);
-        }
-
-        private void SetObjectPosition()
-        {
-            if (!_imageDiv.IsConnected) return;
-
-            string hPos, vPos;
-
-            switch (Stretch)
-            {
-                case Stretch.None:
-                case Stretch.Uniform:
-                    hPos = HorizontalAlignment switch
-                    {
-                        HorizontalAlignment.Left => "left",
-                        HorizontalAlignment.Right => "right",
-                        _ => "center",
-                    };
-                    vPos = VerticalAlignment switch
-                    {
-                        VerticalAlignment.Top => "top",
-                        VerticalAlignment.Bottom => "bottom",
-                        _ => "center",
-                    };
-                    break;
-
-                case Stretch.Fill:
-                case Stretch.UniformToFill:
-                    hPos = "left";
-                    vPos = "top";
-                    break;
-
-                default:
-                    hPos = vPos = "center";
-                    break;
-            }
-
-            _imageDiv.SetCssStyleProperty(CssPropertyNames.ObjectPosition, $"{hPos} {vPos}");
         }
 
         private void OnSourceChanged(object sender, EventArgs e)

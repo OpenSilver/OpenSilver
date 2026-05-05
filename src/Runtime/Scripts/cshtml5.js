@@ -41,6 +41,7 @@ Object.defineProperty(window, 'osjs', {
             TEXTBLOCK: 'opensilver-textblock',
             BORDER: 'opensilver-border',
             SHAPE: 'opensilver-shape',
+            IMAGE: 'opensilver-image',
             TEXTBOXVIEW: 'opensilver-textboxview',
             PASSWORDBOXVIEW: 'opensilver-passwordboxview',
             INLINE: 'opensilver-inline',
@@ -1704,23 +1705,18 @@ Object.defineProperty(window, 'osjs', {
                     if (!parent) return;
 
                     const element = createLayoutElement('div', id, parent.windowid);
-                    element.style.lineHeight = '0px';
 
                     const img = createVisualElement('img', imgId, parent.windowid);
+                    img.classList.add(CSS_CLASS.IMAGE);
                     img.setAttribute('draggable', false);
                     img.setAttribute('alt', ' ');
                     img.style.display = 'none';
-                    img.style.width = 'inherit';
-                    img.style.height = 'inherit';
-                    img.style.lineHeight = '0px';
-                    img.style.objectFit = 'contain';
-                    img.style.objectPosition = 'left top';
                     img.addEventListener('load', function (e) {
-                        this.style.display = '';
+                        e.currentTarget.style.display = '';
                         _callbacks.imageLoad(id);
                     })
                     img.addEventListener('error', function (e) {
-                        this.style.display = 'none';
+                        e.currentTarget.style.display = 'none';
                         _callbacks.imageError(id);
                     });
 
