@@ -658,7 +658,8 @@ namespace OpenSilver.Compiler
 
                                     if (value is not null)
                                     {
-                                        parameters.AppendLine($"{elementUid}.{memberName} = {value}");
+                                        parameters.AppendLine(
+                                            $"DirectCast({elementUid}, Global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}).{memberName} = {value}");
                                     }
                                 });
 
@@ -938,6 +939,8 @@ namespace OpenSilver.Compiler
                     bool isList = _settings.Inspector.IsIList(memberTypeDefinition);
                     bool isDictionary = _settings.Inspector.IsIDictionary(memberTypeDefinition);
 
+                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
+
                     // Check if the property is a collection, in which case we must use ".Add(...)", otherwise a simple "=" is enough:
                     if ((isList || isDictionary) && IsPropertyACollection(memberElement, memberTypeDefinition))
                     {
@@ -948,12 +951,11 @@ namespace OpenSilver.Compiler
                         string codeToAccessTheEnumerable;
                         if (isAttachedProperty)
                         {
-                            codeToAccessTheEnumerable =
-                                $"Global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}.Get{memberName}({targetUid})";
+                            codeToAccessTheEnumerable = $"Global.{ownerType}.Get{memberName}({targetUid})";
                         }
                         else
                         {
-                            codeToAccessTheEnumerable = $"{targetUid}.{memberName}";
+                            codeToAccessTheEnumerable = $"DirectCast({targetUid}, Global.{ownerType}).{memberName}";
                         }
 
                         if (isDictionary)
@@ -980,12 +982,11 @@ namespace OpenSilver.Compiler
                         {
                             if (isAttachedProperty)
                             {
-                                parameters.AppendLine(
-                                    $"Global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}.Set{memberName}({targetUid}, {valueUid})");
+                                parameters.AppendLine($"Global.{ownerType}.Set{memberName}({targetUid}, {valueUid})");
                             }
                             else
                             {
-                                parameters.AppendLine($"{targetUid}.{memberName} = {valueUid}");
+                                parameters.AppendLine($"DirectCast({targetUid}, Global.{ownerType}).{memberName} = {valueUid}");
                             }
                         }
                         else
@@ -1005,15 +1006,13 @@ namespace OpenSilver.Compiler
 
                                 if (isAttachedProperty)
                                 {
-                                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-
                                     parameters.AppendLine(
                                         $"Global.{ownerType}.Set{memberName}({targetUid}, CType({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {valueUid}), Global.{propertyType}))");
                                 }
                                 else
                                 {
                                     parameters.AppendLine(
-                                        $"{targetUid}.{memberName} = CType({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {valueUid}), Global.{propertyType})");
+                                        $"DirectCast({targetUid}, Global.{ownerType}).{memberName} = CType({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {valueUid}), Global.{propertyType})");
                                 }
                             }
                             else if (_settings.Inspector.IsBinding(valueTypeDefinition) ||
@@ -1030,7 +1029,7 @@ namespace OpenSilver.Compiler
                                 // case we should directly assign the value instead of calling "SetBinding"
                                 if (dpDefinition is null || memberType == valueTypeDefinition || _settings.Inspector.IsBindingBase(memberType))
                                 {
-                                    parameters.AppendLine($"{targetUid}.{memberName} = {valueUid}");
+                                    parameters.AppendLine($"DirectCast({targetUid}, Global.{ownerType}).{memberName} = {valueUid}");
                                 }
                                 else
                                 {
@@ -1051,11 +1050,9 @@ namespace OpenSilver.Compiler
 
                                 if (dpDefinition is null)
                                 {
-                                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-
                                     if (ownerType == $"{KnownNamespaces.SystemWindows}.Setter" && memberName == "Value")
                                     {
-                                        parameters.AppendLine($"{targetUid}.{memberName} = {valueUid}");
+                                        parameters.AppendLine($"DirectCast({targetUid}, Global.{ownerType}).{memberName} = {valueUid}");
                                     }
                                     else
                                     {
@@ -1074,15 +1071,13 @@ namespace OpenSilver.Compiler
                                         .AppendLine($"Dim {markupValue} As Object = Nothing")
                                         .AppendLine($"If Not {RuntimeHelperClass}.TrySetMarkupExtension({targetUid}, {dependencyPropertyName}, {valueUid}, {markupValue})");
 
-                                    if (!isAttachedProperty)
+                                    if (isAttachedProperty)
                                     {
-                                        parameters.AppendLine($"    {targetUid}.{memberName} = CType({markupValue}, Global.{propertyType})");
+                                        parameters.AppendLine($"    Global.{ownerType}.Set{memberName}({targetUid}, CType({markupValue}, Global.{propertyType}))");
                                     }
                                     else
                                     {
-                                        string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-
-                                        parameters.AppendLine($"    Global.{ownerType}.Set{memberName}({targetUid}, CType({markupValue}, Global.{propertyType}))");
+                                        parameters.AppendLine($"    DirectCast({targetUid}, Global.{ownerType}).{memberName} = CType({markupValue}, Global.{propertyType})");
                                     }
 
                                     parameters.AppendLine("End If");
@@ -1115,12 +1110,11 @@ namespace OpenSilver.Compiler
 
                                 if (isAttachedProperty)
                                 {
-                                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
                                     parameters.AppendLine($"Global.{ownerType}.Set{memberName}({targetUid}, Nothing)");
                                 }
                                 else
                                 {
-                                    parameters.AppendLine($"{targetUid}.{memberName} = Nothing");
+                                    parameters.AppendLine($"DirectCast({targetUid}, Global.{ownerType}).{memberName} = Nothing");
                                 }
                             }
                             else if (_settings.Inspector.IsStaticExtension(valueTypeDefinition))
@@ -1130,15 +1124,13 @@ namespace OpenSilver.Compiler
 
                                 if (isAttachedProperty)
                                 {
-                                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-
                                     parameters.AppendLine(
                                         $"Global.{ownerType}.Set{memberName}({targetUid}, CType(CType({staticMemberName}, Object), Global.{propertyType}))");
                                 }
                                 else
                                 {
                                     parameters.AppendLine(
-                                        $"{targetUid}.{memberName} = CType(CType({staticMemberName}, Object), Global.{propertyType})");
+                                        $"DirectCast({targetUid}, Global.{ownerType}).{memberName} = CType(CType({staticMemberName}, Object), Global.{propertyType})");
                                 }
                             }
                             else if (_settings.Inspector.IsTypeExtension(valueTypeDefinition))
@@ -1148,15 +1140,13 @@ namespace OpenSilver.Compiler
 
                                 if (isAttachedProperty)
                                 {
-                                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-
                                     parameters.AppendLine(
                                         $"Global.{ownerType}.Set{memberName}({targetUid}, CType(CType(GetType(Global.{resolvedTypeName}), Object), Global.{propertyType}))");
                                 }
                                 else
                                 {
                                     parameters.AppendLine(
-                                        $"{targetUid}.{memberName} = CType(CType(GetType(Global.{resolvedTypeName}), Object), Global.{propertyType})");
+                                        $"DirectCast({targetUid}, Global.{ownerType}).{memberName} = CType(CType(GetType(Global.{resolvedTypeName}), Object), Global.{propertyType})");
                                 }
                             }
                             else
@@ -1180,12 +1170,11 @@ namespace OpenSilver.Compiler
 
                                     if (isAttachedProperty)
                                     {
-                                        string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
                                         parameters.AppendLine($"    Global.{ownerType}.Set{memberName}({targetUid}, CType({markupValue}, Global.{propertyType}))");
                                     }
                                     else
                                     {
-                                        parameters.AppendLine($"    {targetUid}.{memberName} = CType({markupValue}, Global.{propertyType})");
+                                        parameters.AppendLine($"    DirectCast({targetUid}, Global.{ownerType}).{memberName} = CType({markupValue}, Global.{propertyType})");
                                     }
 
                                     parameters.AppendLine("End If");
@@ -1197,14 +1186,12 @@ namespace OpenSilver.Compiler
 
                                     if (isAttachedProperty)
                                     {
-                                        string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-
                                         parameters.AppendLine(
                                             $"Global.{ownerType}.Set{memberName}({targetUid}, CType({markupExtension}, Global.{propertyType}))");
                                     }
                                     else
                                     {
-                                        parameters.AppendLine($"{targetUid}.{memberName} = CType({markupExtension}, Global.{propertyType})");
+                                        parameters.AppendLine($"DirectCast({targetUid}, Global.{ownerType}).{memberName} = CType({markupExtension}, Global.{propertyType})");
                                     }
                                 }
                             }
