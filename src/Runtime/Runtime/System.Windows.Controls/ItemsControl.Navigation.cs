@@ -96,15 +96,12 @@ public partial class ItemsControl
 
     internal int NavigateToStart()
     {
-        int newFocusedIndex = -1;
-        if (Items.Count > 0)
+        int newFocusedIndex = GetNextSelectableIndex(0, 1, Items.Count);
+
+        if (newFocusedIndex > -1 && newFocusedIndex != FocusedIndex)
         {
-            newFocusedIndex = 0;
-            if (newFocusedIndex != FocusedIndex)
-            {
-                ScrollIntoViewImpl(newFocusedIndex);
-                ScrollHost?.UpdateLayout();
-            }
+            ScrollIntoViewImpl(newFocusedIndex);
+            ScrollHost?.UpdateLayout();
         }
 
         return newFocusedIndex;
@@ -112,15 +109,12 @@ public partial class ItemsControl
 
     internal int NavigateToEnd()
     {
-        int newFocusedIndex = -1;
-        if (Items.Count > 0)
+        int newFocusedIndex = GetNextSelectableIndex(Items.Count - 1, -1, -1);
+
+        if (newFocusedIndex > -1 && newFocusedIndex != FocusedIndex)
         {
-            newFocusedIndex = Items.Count - 1;
-            if (newFocusedIndex != FocusedIndex)
-            {
-                ScrollIntoViewImpl(newFocusedIndex);
-                ScrollHost?.UpdateLayout();
-            }
+            ScrollIntoViewImpl(newFocusedIndex);
+            ScrollHost?.UpdateLayout();
         }
 
         return newFocusedIndex;

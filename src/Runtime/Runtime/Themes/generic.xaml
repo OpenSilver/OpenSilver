@@ -4162,171 +4162,583 @@
     </Style>
 
     <!--  controls:MenuItem  -->
+    <controls:ControlTemplate x:Key="{x:Static controls:MenuItem.TopLevelItemTemplateKey}"
+                              TargetType="controls:MenuItem">
+        <controls:Grid>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Presenter"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="0.5" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+                <VisualStateGroup x:Name="FocusStates">
+                    <VisualState x:Name="Unfocused" />
+                    <VisualState x:Name="Focused">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Bg"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="1" />
+                            <animation:ColorAnimation Duration="0"
+                                                      animation:Storyboard.TargetName="InnerBorder"
+                                                      animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                      To="#40FFFFFF" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <controls:Border CornerRadius="2"
+                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                             BorderThickness="1" />
+            <controls:Border x:Name="Bg"
+                             CornerRadius="2"
+                             BorderBrush="#8071CBF1"
+                             BorderThickness="1"
+                             Opacity="0">
+                <controls:Border.Background>
+                    <media:LinearGradientBrush StartPoint="0,0"
+                                               EndPoint="0,1">
+                        <media:LinearGradientBrush.GradientStops>
+                            <media:GradientStop Color="#34C5EBFF"
+                                                Offset="0" />
+                            <media:GradientStop Color="#3481D8FF"
+                                                Offset="1" />
+                        </media:LinearGradientBrush.GradientStops>
+                    </media:LinearGradientBrush>
+                </controls:Border.Background>
+            </controls:Border>
+            <controls:Border x:Name="InnerBorder"
+                             CornerRadius="2"
+                             BorderBrush="{x:Static media:Brushes.Transparent}"
+                             BorderThickness="1"
+                             Margin="1" />
+            <controls:Grid VerticalAlignment="Center">
+                <controls:Grid.ColumnDefinitions>
+                    <controls:ColumnDefinition Width="Auto" />
+                    <controls:ColumnDefinition Width="Auto" />
+                </controls:Grid.ColumnDefinitions>
+                <controls:ContentPresenter x:Name="Icon"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
+                                           ContentTemplate="{markup:Null}"
+                                           ContentTemplateSelector="{markup:Null}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Width="16"
+                                           Height="16"
+                                           Margin="3" />
+                <controls:Border x:Name="GlyphPanel"
+                                 Width="16"
+                                 Height="16"
+                                 Margin="3"
+                                 Visibility="Collapsed"
+                                 VerticalAlignment="Center">
+                    <shapes:Path x:Name="Glyph"
+                                 Data="F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z"
+                                 FlowDirection="LeftToRight"
+                                 Fill="#FF0C12A1"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Center" />
+                </controls:Border>
+                <controls:ContentPresenter x:Name="Presenter"
+                                           controls:Grid.Column="1"
+                                           VerticalAlignment="Center"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
+                                           ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
+                                           Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
+                <!--<controls:TextBlock
+                        Text="{TemplateBinding InputGestureText}"
+                        Margin="{TemplateBinding Padding}"
+                        controls:Grid.Column="4"/>-->
+            </controls:Grid>
+        </controls:Grid>
+        <controls:ControlTemplate.Triggers>
+            <Trigger Property="Icon"
+                     Value="{x:Null}">
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsChecked"
+                     Value="true">
+                <Setter TargetName="GlyphPanel"
+                        Property="Visibility"
+                        Value="Visible" />
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+        </controls:ControlTemplate.Triggers>
+    </controls:ControlTemplate>
+
+    <controls:ControlTemplate x:Key="{x:Static controls:MenuItem.TopLevelHeaderTemplateKey}"
+                              TargetType="controls:MenuItem">
+        <controls:Grid>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Presenter"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="0.5" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+                <VisualStateGroup x:Name="FocusStates">
+                    <VisualState x:Name="Unfocused" />
+                    <VisualState x:Name="Focused">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Bg"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="1" />
+                            <animation:ColorAnimation Duration="0"
+                                                      animation:Storyboard.TargetName="InnerBorder"
+                                                      animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                      To="#40FFFFFF" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <controls:Border CornerRadius="2"
+                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                             BorderThickness="1" />
+            <controls:Border x:Name="Bg"
+                             CornerRadius="2"
+                             BorderBrush="#8071CBF1"
+                             BorderThickness="1"
+                             Opacity="0">
+                <controls:Border.Background>
+                    <media:LinearGradientBrush StartPoint="0,0"
+                                               EndPoint="0,1">
+                        <media:LinearGradientBrush.GradientStops>
+                            <media:GradientStop Color="#34C5EBFF"
+                                                Offset="0" />
+                            <media:GradientStop Color="#3481D8FF"
+                                                Offset="1" />
+                        </media:LinearGradientBrush.GradientStops>
+                    </media:LinearGradientBrush>
+                </controls:Border.Background>
+            </controls:Border>
+            <controls:Border x:Name="InnerBorder"
+                             CornerRadius="2"
+                             BorderBrush="{x:Static media:Brushes.Transparent}"
+                             BorderThickness="1"
+                             Margin="1" />
+            <controls:Grid VerticalAlignment="Center">
+                <controls:Grid.ColumnDefinitions>
+                    <controls:ColumnDefinition Width="Auto" />
+                    <controls:ColumnDefinition Width="Auto" />
+                </controls:Grid.ColumnDefinitions>
+                <controls:ContentPresenter x:Name="Icon"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
+                                           ContentTemplate="{markup:Null}"
+                                           ContentTemplateSelector="{markup:Null}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Width="16"
+                                           Height="16"
+                                           Margin="3" />
+                <controls:Border x:Name="GlyphPanel"
+                                 Width="16"
+                                 Height="16"
+                                 Margin="3"
+                                 Visibility="Collapsed"
+                                 VerticalAlignment="Center">
+                    <shapes:Path x:Name="Glyph"
+                                 Data="F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z"
+                                 FlowDirection="LeftToRight"
+                                 Fill="#FF0C12A1"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Center" />
+                </controls:Border>
+                <controls:ContentPresenter x:Name="Presenter"
+                                           controls:Grid.Column="1"
+                                           VerticalAlignment="Center"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
+                                           ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
+                                           Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
+                <!--<controls:TextBlock
+                        Text="{TemplateBinding InputGestureText}"
+                        Margin="{TemplateBinding Padding}"
+                        controls:Grid.Column="4"/>-->
+            </controls:Grid>
+            <!-- Submenu Popup -->
+            <primitives:Popup x:Name="PART_Popup"
+                              Placement="Bottom"
+                              StayOpen="False"
+                              StaysWithinScreenBounds="True"
+                              IsOpen="{TemplateBinding Property={x:Static controls:MenuItem.IsSubmenuOpenProperty}}">
+                <controls:Border Background="#FFF5F5F5"
+                                 BorderBrush="#FF959595"
+                                 BorderThickness="1"
+                                 CornerRadius="2">
+                    <controls:Border.Effect>
+                        <effects:DropShadowEffect Color="LightGray"
+                                                  ShadowDepth="3" />
+                    </controls:Border.Effect>
+                    <controls:Grid>
+                        <controls:Border CornerRadius="2"
+                                         Background="#FFF1F1F1"
+                                         Width="28"
+                                         Margin="2"
+                                         HorizontalAlignment="Left" />
+                        <controls:Border Background="#FFE2E3E3"
+                                         Width="1"
+                                         Margin="30,2,0,2"
+                                         HorizontalAlignment="Left" />
+                        <controls:Border Background="{x:Static media:Brushes.White}"
+                                         Width="1"
+                                         Margin="31,2,0,2"
+                                         HorizontalAlignment="Left" />
+                        <controls:ItemsPresenter Margin="2" />
+                    </controls:Grid>
+                </controls:Border>
+            </primitives:Popup>
+        </controls:Grid>
+        <controls:ControlTemplate.Triggers>
+            <Trigger Property="Icon"
+                     Value="{x:Null}">
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsChecked"
+                     Value="True">
+                <Setter TargetName="GlyphPanel"
+                        Property="Visibility"
+                        Value="Visible" />
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+        </controls:ControlTemplate.Triggers>
+    </controls:ControlTemplate>
+
+    <controls:ControlTemplate x:Key="{x:Static controls:MenuItem.SubmenuItemTemplateKey}"
+                              TargetType="controls:MenuItem">
+        <controls:Grid>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Presenter"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="0.5" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+                <VisualStateGroup x:Name="FocusStates">
+                    <VisualState x:Name="Unfocused" />
+                    <VisualState x:Name="Focused">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Bg"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="1" />
+                            <animation:ColorAnimation Duration="0"
+                                                      animation:Storyboard.TargetName="InnerBorder"
+                                                      animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                      To="#40FFFFFF" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <controls:Border CornerRadius="2"
+                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                             BorderThickness="1" />
+            <controls:Border x:Name="Bg"
+                             CornerRadius="2"
+                             BorderBrush="#8071CBF1"
+                             BorderThickness="1"
+                             Opacity="0">
+                <controls:Border.Background>
+                    <media:LinearGradientBrush StartPoint="0,0"
+                                               EndPoint="0,1">
+                        <media:LinearGradientBrush.GradientStops>
+                            <media:GradientStop Color="#34C5EBFF"
+                                                Offset="0" />
+                            <media:GradientStop Color="#3481D8FF"
+                                                Offset="1" />
+                        </media:LinearGradientBrush.GradientStops>
+                    </media:LinearGradientBrush>
+                </controls:Border.Background>
+            </controls:Border>
+            <controls:Border x:Name="InnerBorder"
+                             CornerRadius="2"
+                             BorderBrush="{x:Static media:Brushes.Transparent}"
+                             BorderThickness="1"
+                             Margin="1" />
+            <controls:Grid>
+                <controls:Grid.ColumnDefinitions>
+                    <controls:ColumnDefinition Width="Auto"
+                                               MinWidth="24" />
+                    <controls:ColumnDefinition Width="4" />
+                    <controls:ColumnDefinition Width="*" />
+                </controls:Grid.ColumnDefinitions>
+                <controls:ContentPresenter x:Name="Icon"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
+                                           ContentTemplate="{markup:Null}"
+                                           ContentTemplateSelector="{markup:Null}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Width="16"
+                                           Height="16"
+                                           Margin="3" />
+                <controls:Border x:Name="GlyphPanel"
+                                 Visibility="Collapsed"
+                                 Height="22"
+                                 Width="22"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Center"
+                                 BorderBrush="#FFCDD3E6"
+                                 Background="#FFE6EFF4"
+                                 BorderThickness="1"
+                                 CornerRadius="3"
+                                 Margin="-1,0,0,0">
+                    <shapes:Path x:Name="Glyph"
+                                 Data="F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z"
+                                 FlowDirection="LeftToRight"
+                                 Height="11"
+                                 Width="10"
+                                 Fill="#FF0C12A1" />
+                </controls:Border>
+                <controls:ContentPresenter x:Name="Presenter"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
+                                           ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
+                                           Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                           controls:Grid.Column="2"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+                <!--<controls:TextBlock
+                        Text="{TemplateBinding InputGestureText}"
+                        Margin="{TemplateBinding Padding}"
+                        controls:Grid.Column="4"/>-->
+            </controls:Grid>
+        </controls:Grid>
+        <controls:ControlTemplate.Triggers>
+            <Trigger Property="Icon"
+                     Value="{x:Null}">
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsChecked"
+                     Value="True">
+                <Setter TargetName="GlyphPanel"
+                        Property="Visibility"
+                        Value="Visible" />
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+        </controls:ControlTemplate.Triggers>
+    </controls:ControlTemplate>
+
+    <controls:ControlTemplate x:Key="{x:Static controls:MenuItem.SubmenuHeaderTemplateKey}"
+                              TargetType="controls:MenuItem">
+        <controls:Grid>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Presenter"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="0.5" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+                <VisualStateGroup x:Name="FocusStates">
+                    <VisualState x:Name="Unfocused" />
+                    <VisualState x:Name="Focused">
+                        <animation:Storyboard>
+                            <animation:DoubleAnimation Duration="0"
+                                                       animation:Storyboard.TargetName="Bg"
+                                                       animation:Storyboard.TargetProperty="Opacity"
+                                                       To="1" />
+                            <animation:ColorAnimation Duration="0"
+                                                      animation:Storyboard.TargetName="InnerBorder"
+                                                      animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                      To="#40FFFFFF" />
+                        </animation:Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <controls:Border CornerRadius="2"
+                             Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                             BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                             BorderThickness="1" />
+            <controls:Border x:Name="Bg"
+                             CornerRadius="2"
+                             BorderBrush="#8071CBF1"
+                             BorderThickness="1"
+                             Opacity="0">
+                <controls:Border.Background>
+                    <media:LinearGradientBrush StartPoint="0,0"
+                                               EndPoint="0,1">
+                        <media:LinearGradientBrush.GradientStops>
+                            <media:GradientStop Color="#34C5EBFF"
+                                                Offset="0" />
+                            <media:GradientStop Color="#3481D8FF"
+                                                Offset="1" />
+                        </media:LinearGradientBrush.GradientStops>
+                    </media:LinearGradientBrush>
+                </controls:Border.Background>
+            </controls:Border>
+            <controls:Border x:Name="InnerBorder"
+                             CornerRadius="2"
+                             BorderBrush="{x:Static media:Brushes.Transparent}"
+                             BorderThickness="1"
+                             Margin="1" />
+            <controls:Grid>
+                <controls:Grid.ColumnDefinitions>
+                    <controls:ColumnDefinition Width="Auto"
+                                               MinWidth="24" />
+                    <controls:ColumnDefinition Width="4" />
+                    <controls:ColumnDefinition Width="*" />
+                    <!--<controls:ColumnDefinition Width="37"/>
+                        <controls:ColumnDefinition Width="Auto"/>-->
+                    <controls:ColumnDefinition Width="Auto" />
+                </controls:Grid.ColumnDefinitions>
+                <controls:ContentPresenter x:Name="Icon"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
+                                           ContentTemplate="{markup:Null}"
+                                           ContentTemplateSelector="{markup:Null}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Width="16"
+                                           Height="16"
+                                           Margin="3" />
+                <controls:Border x:Name="GlyphPanel"
+                                 BorderThickness="1"
+                                 Width="22"
+                                 Height="22"
+                                 Visibility="Collapsed"
+                                 VerticalAlignment="Center"
+                                 Margin="-1,0,0,0"
+                                 BorderBrush="#FFCDD3E6"
+                                 Background="#FFE6EFF4"
+                                 CornerRadius="3">
+                    <shapes:Path x:Name="Glyph"
+                                 Data="F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z"
+                                 FlowDirection="LeftToRight"
+                                 Height="11"
+                                 Width="9"
+                                 Fill="#FF0C12A1" />
+                </controls:Border>
+                <controls:ContentPresenter x:Name="Presenter"
+                                           Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
+                                           ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
+                                           Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                           controls:Grid.Column="2" />
+                <!--<controls:TextBlock
+                        Text="{TemplateBinding InputGestureText}"
+                        Margin="{TemplateBinding Padding}"
+                        controls:Grid.Column="4"/>-->
+                <!-- Submenu arrow indicator -->
+                <shapes:Path x:Name="Arrow"
+                             controls:Grid.Column="3"
+                             Margin="4,0,6,0"
+                             VerticalAlignment="Center"
+                             Fill="#FF333333"
+                             Data="M 0 0 L 4 3.5 L 0 7 Z" />
+            </controls:Grid>
+            <!-- Submenu Popup -->
+            <primitives:Popup x:Name="PART_Popup"
+                              Placement="Right"
+                              StayOpen="True"
+                              StaysWithinScreenBounds="True"
+                              IsOpen="{TemplateBinding Property={x:Static controls:MenuItem.IsSubmenuOpenProperty}}">
+                <controls:Border Background="#FFF5F5F5"
+                                 BorderBrush="#FF959595"
+                                 BorderThickness="1"
+                                 CornerRadius="2">
+                    <controls:Border.Effect>
+                        <effects:DropShadowEffect Color="LightGray"
+                                                  ShadowDepth="3" />
+                    </controls:Border.Effect>
+                    <controls:Grid>
+                        <controls:Border CornerRadius="2"
+                                         Background="#FFF1F1F1"
+                                         Width="28"
+                                         Margin="2"
+                                         HorizontalAlignment="Left" />
+                        <controls:Border Background="#FFE2E3E3"
+                                         Width="1"
+                                         Margin="30,2,0,2"
+                                         HorizontalAlignment="Left" />
+                        <controls:Border Background="{x:Static media:Brushes.White}"
+                                         Width="1"
+                                         Margin="31,2,0,2"
+                                         HorizontalAlignment="Left" />
+                        <controls:ItemsPresenter Margin="2" />
+                    </controls:Grid>
+                </controls:Border>
+            </primitives:Popup>
+        </controls:Grid>
+        <controls:ControlTemplate.Triggers>
+            <Trigger Property="Icon"
+                     Value="{x:Null}">
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsChecked"
+                     Value="True">
+                <Setter TargetName="GlyphPanel"
+                        Property="Visibility"
+                        Value="Visible" />
+                <Setter TargetName="Icon"
+                        Property="Visibility"
+                        Value="Collapsed" />
+            </Trigger>
+        </controls:ControlTemplate.Triggers>
+    </controls:ControlTemplate>
+
     <Style TargetType="controls:MenuItem">
         <Setter Property="Background"
                 Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="BorderBrush"
                 Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="Padding"
-                Value="4,3,2,3" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <controls:ControlTemplate TargetType="controls:MenuItem">
-                    <controls:Grid>
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal" />
-                                <VisualState x:Name="Disabled">
-                                    <animation:Storyboard>
-                                        <animation:DoubleAnimation Duration="0"
-                                                                   animation:Storyboard.TargetName="Presenter"
-                                                                   animation:Storyboard.TargetProperty="Opacity"
-                                                                   To="0.5" />
-                                    </animation:Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                            <VisualStateGroup x:Name="FocusStates">
-                                <VisualState x:Name="Unfocused" />
-                                <VisualState x:Name="Focused">
-                                    <animation:Storyboard>
-                                        <animation:DoubleAnimation Duration="0"
-                                                                   animation:Storyboard.TargetName="Bg"
-                                                                   animation:Storyboard.TargetProperty="Opacity"
-                                                                   To="1" />
-                                        <animation:ColorAnimation Duration="0"
-                                                                  animation:Storyboard.TargetName="InnerBorder"
-                                                                  animation:Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
-                                                                  To="#40FFFFFF" />
-                                    </animation:Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                            <VisualStateGroup>
-                                <VisualState>
-                                    <VisualState.StateTriggers>
-                                        <StateTrigger IsActive="{data:Binding HasItems, RelativeSource={data:RelativeSource Mode=TemplatedParent}}" />
-                                    </VisualState.StateTriggers>
-                                    <animation:Storyboard>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="Arrow"
-                                                                                 animation:Storyboard.TargetProperty="Visibility">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0"
-                                                                              Value="Visible" />
-                                        </animation:ObjectAnimationUsingKeyFrames>
-                                    </animation:Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <controls:Border CornerRadius="2"
-                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
-                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
-                                         BorderThickness="1" />
-                        <controls:Border x:Name="Bg"
-                                         CornerRadius="2"
-                                         BorderBrush="#8071CBF1"
-                                         BorderThickness="1"
-                                         Opacity="0">
-                            <controls:Border.Background>
-                                <media:LinearGradientBrush StartPoint="0,0"
-                                                           EndPoint="0,1">
-                                    <media:LinearGradientBrush.GradientStops>
-                                        <media:GradientStop Color="#34C5EBFF"
-                                                            Offset="0" />
-                                        <media:GradientStop Color="#3481D8FF"
-                                                            Offset="1" />
-                                    </media:LinearGradientBrush.GradientStops>
-                                </media:LinearGradientBrush>
-                            </controls:Border.Background>
-                        </controls:Border>
-                        <controls:Border x:Name="InnerBorder"
-                                         CornerRadius="2"
-                                         BorderBrush="{x:Static media:Brushes.Transparent}"
-                                         BorderThickness="1"
-                                         Margin="1" />
-                        <controls:Grid>
-                            <controls:Grid.ColumnDefinitions>
-                                <controls:ColumnDefinition Width="Auto"
-                                                           MinWidth="24" />
-                                <controls:ColumnDefinition Width="4" />
-                                <controls:ColumnDefinition Width="*" />
-                                <!--<controls:ColumnDefinition Width="37"/>
-                        <controls:ColumnDefinition Width="Auto"/>-->
-                                <controls:ColumnDefinition Width="Auto" />
-                            </controls:Grid.ColumnDefinitions>
-                            <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
-                                                       ContentTemplate="{markup:Null}"
-                                                       ContentTemplateSelector="{markup:Null}"
-                                                       Margin="1"
-                                                       VerticalAlignment="Center" />
-                            <!--<controls:Border
-                        BorderThickness="1"
-                        CornerRadius="3"
-                        BorderBrush="#FFCDD3E6"
-                        Background="#FFE6EFF4"
-                        x:Name="GlyphPanel"
-                        Width="22"
-                        Height="22"
-                        Margin="1"
-                        Visibility="Collapsed">
-                        <shapes:Path
-                            Data="M0,5.1L1.7,5.2 3.4,7.1 8,0.4 9.2,0 3.3,10.8z"
-                            Fill="#FF0C12A1"
-                            x:Name="Glyph"
-                            Width="9"
-                            Height="11"
-                            FlowDirection="LeftToRight"/>
-                    </controls:Border>-->
-                            <controls:ContentPresenter x:Name="Presenter"
-                                                       Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
-                                                       ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
-                                                       Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
-                                                       controls:Grid.Column="2" />
-                            <!--<controls:TextBlock
-                        Text="{TemplateBinding InputGestureText}"
-                        Margin="{TemplateBinding Padding}"
-                        controls:Grid.Column="4"/>-->
-                            <!-- Submenu arrow indicator -->
-                            <shapes:Path x:Name="Arrow"
-                                         controls:Grid.Column="3"
-                                         Margin="4,0,6,0"
-                                         VerticalAlignment="Center"
-                                         Fill="#FF333333"
-                                         Data="M 0 0 L 4 3.5 L 0 7 Z"
-                                         Visibility="Collapsed" />
-                        </controls:Grid>
-                        <!-- Submenu Popup -->
-                        <primitives:Popup x:Name="PART_Popup"
-                                          Placement="Right"
-                                          StaysWithinScreenBounds="True"
-                                          IsOpen="{TemplateBinding Property={x:Static controls:MenuItem.IsSubmenuOpenProperty}}">
-                            <controls:Border Background="#FFF5F5F5"
-                                             BorderBrush="#FF959595"
-                                             BorderThickness="1"
-                                             CornerRadius="2">
-                                <controls:Border.Effect>
-                                    <effects:DropShadowEffect Color="LightGray"
-                                                              ShadowDepth="3" />
-                                </controls:Border.Effect>
-                                <controls:Grid>
-                                    <controls:Border CornerRadius="2"
-                                                     Background="#FFF1F1F1"
-                                                     Width="28"
-                                                     Margin="2"
-                                                     HorizontalAlignment="Left" />
-                                    <controls:Border Background="#FFE2E3E3"
-                                                     Width="1"
-                                                     Margin="30,2,0,2"
-                                                     HorizontalAlignment="Left" />
-                                    <controls:Border Background="{x:Static media:Brushes.White}"
-                                                     Width="1"
-                                                     Margin="31,2,0,2"
-                                                     HorizontalAlignment="Left" />
-                                    <controls:ItemsPresenter Margin="2" />
-                                </controls:Grid>
-                            </controls:Border>
-                        </primitives:Popup>
-                    </controls:Grid>
-                </controls:ControlTemplate>
-            </Setter.Value>
-        </Setter>
+                Value="4,3" />
+        <Setter Property="Template"
+                Value="{x:StaticResource {x:Static controls:MenuItem.SubmenuItemTemplateKey}}" />
+        <Style.Triggers>
+            <Trigger Property="Role"
+                     Value="TopLevelHeader">
+                <Setter Property="Template"
+                        Value="{x:StaticResource {x:Static controls:MenuItem.TopLevelHeaderTemplateKey}}" />
+                <Setter Property="Padding"
+                        Value="6,3" />
+            </Trigger>
+            <Trigger Property="Role"
+                     Value="TopLevelItem">
+                <Setter Property="Template"
+                        Value="{x:StaticResource {x:Static controls:MenuItem.TopLevelItemTemplateKey}}" />
+                <Setter Property="Padding"
+                        Value="6,3" />
+            </Trigger>
+            <Trigger Property="Role"
+                     Value="SubmenuHeader">
+                <Setter Property="Template"
+                        Value="{x:StaticResource {x:Static controls:MenuItem.SubmenuHeaderTemplateKey}}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!--  controls:Separator  -->

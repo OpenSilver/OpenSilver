@@ -8,6 +8,7 @@ using OpenSilver.Internal.Commands;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -55,6 +56,11 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
 {
     private const string SubMenuPopupPartName = "PART_Popup";
 
+    private static ComponentResourceKey _topLevelItemTemplateKey;
+    private static ComponentResourceKey _topLevelHeaderTemplateKey;
+    private static ComponentResourceKey _submenuItemTemplateKey;
+    private static ComponentResourceKey _submenuHeaderTemplateKey;
+
     private Popup _submenuPopup;
     private PopupRoot _submenuPopupRoot;
     private MenuItem _currentSelection;
@@ -72,6 +78,102 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     /// Initializes a new instance of the <see cref="MenuItem"/> class.
     /// </summary>
     public MenuItem() { }
+
+    /// <summary>
+    /// Gets the resource key for a style applied to a <see cref="MenuItem"/> when 
+    /// it is a top-level <see cref="MenuItem"/> that can invoke commands. 
+    /// </summary>
+    /// <returns>
+    /// The resource key for a style applied to a <see cref="MenuItem"/> when it is 
+    /// a top-level <see cref="MenuItem"/> that can invoke commands.
+    /// </returns>
+    public static ResourceKey TopLevelItemTemplateKey
+    {
+        get
+        {
+            if (_topLevelItemTemplateKey is null)
+            {
+                Interlocked.CompareExchange(
+                    ref _topLevelItemTemplateKey,
+                    new ComponentResourceKey(typeof(MenuItem), nameof(TopLevelItemTemplateKey)),
+                    null);
+            }
+
+            return _topLevelItemTemplateKey;
+        }
+    }
+
+    /// <summary>
+    /// Gets the resource key for a style applied to a <see cref="MenuItem"/> when 
+    /// the <see cref="MenuItem"/> is a header of a top-level menu. 
+    /// </summary>
+    /// <returns>
+    /// The resource key for a style applied to a <see cref="MenuItem"/> when the 
+    /// <see cref="MenuItem"/> is a header of a top-level menu.
+    /// </returns>
+    public static ResourceKey TopLevelHeaderTemplateKey
+    {
+        get
+        {
+            if (_topLevelHeaderTemplateKey is null)
+            {
+                Interlocked.CompareExchange(
+                    ref _topLevelHeaderTemplateKey,
+                    new ComponentResourceKey(typeof(MenuItem), nameof(TopLevelHeaderTemplateKey)),
+                    null);
+            }
+
+            return _topLevelHeaderTemplateKey;
+        }
+    }
+
+    /// <summary>
+    /// Gets the resource key for a style applied to a <see cref="MenuItem"/> when 
+    /// the <see cref="MenuItem"/> is a submenu.
+    /// </summary>
+    /// <returns>
+    /// The resource key for a style applied to a <see cref="MenuItem"/> when the 
+    /// <see cref="MenuItem"/> is a submenu.
+    /// </returns>
+    public static ResourceKey SubmenuItemTemplateKey
+    {
+        get
+        {
+            if (_submenuItemTemplateKey is null)
+            {
+                Interlocked.CompareExchange(
+                    ref _submenuItemTemplateKey,
+                    new ComponentResourceKey(typeof(MenuItem), nameof(SubmenuItemTemplateKey)),
+                    null);
+            }
+
+            return _submenuItemTemplateKey;
+        }
+    }
+
+    /// <summary>
+    /// Gets the resource key for a style applied to a <see cref="MenuItem"/> when 
+    /// the <see cref="MenuItem"/> is a header of a submenu.
+    /// </summary>
+    /// <returns>
+    /// The resource key for a style applied to a <see cref="MenuItem"/> when the 
+    /// <see cref="MenuItem"/> is a header of a submenu.
+    /// </returns>
+    public static ResourceKey SubmenuHeaderTemplateKey
+    {
+        get
+        {
+            if (_submenuHeaderTemplateKey is null)
+            {
+                Interlocked.CompareExchange(
+                    ref _submenuHeaderTemplateKey,
+                    new ComponentResourceKey(typeof(MenuItem), nameof(SubmenuHeaderTemplateKey)),
+                    null);
+            }
+
+            return _submenuHeaderTemplateKey;
+        }
+    }
 
     /// <summary>
     /// Identifies the <see cref="Click"/> routed event.
@@ -128,6 +230,44 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     {
         add => AddHandler(SubmenuClosedEvent, value);
         remove => RemoveHandler(SubmenuClosedEvent, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="Checked"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent CheckedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(Checked),
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MenuItem));
+
+    /// <summary>
+    /// Occurs when a menu item is checked.
+    /// </summary>
+    public event RoutedEventHandler Checked
+    {
+        add => AddHandler(CheckedEvent, value);
+        remove => RemoveHandler(CheckedEvent, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="Unchecked"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent UncheckedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(Unchecked),
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MenuItem));
+
+    /// <summary>
+    /// Occurs when a <see cref="MenuItem"/> is unchecked.
+    /// </summary>
+    public event RoutedEventHandler Unchecked
+    {
+        add => AddHandler(UncheckedEvent, value);
+        remove => RemoveHandler(UncheckedEvent, value);
     }
 
     /// <summary>
@@ -193,7 +333,7 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     {
         MenuItemRole type;
 
-        if (HasItems)
+        if (!IsCheckable && HasItems)
         {
             if (LogicalParent is Menu)
             {
@@ -388,6 +528,71 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
         }
 
         menuItem.ChangeVisualState(true);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="IsCheckable"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsCheckableProperty =
+        DependencyProperty.Register(
+            nameof(IsCheckable),
+            typeof(bool),
+            typeof(MenuItem),
+            new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, OnIsCheckableChanged));
+
+    /// <summary>
+    /// Gets a value that indicates whether a <see cref="MenuItem"/> can be checked.
+    /// </summary>
+    /// <returns>
+    /// true if the menu item can be checked; otherwise, false. The default is false.
+    /// </returns>
+    public bool IsCheckable
+    {
+        get => (bool)GetValue(IsCheckableProperty);
+        set => SetValueInternal(IsCheckableProperty, value);
+    }
+
+    private static void OnIsCheckableChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
+    {
+        ((MenuItem)target).UpdateRole();
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="IsChecked"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsCheckedProperty =
+        DependencyProperty.Register(
+            nameof(IsChecked),
+            typeof(bool),
+            typeof(MenuItem),
+            new FrameworkPropertyMetadata(
+                BooleanBoxes.FalseBox,
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                OnIsCheckedChanged));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the <see cref="MenuItem"/> is checked.
+    /// </summary>
+    /// <returns>
+    /// true if a <see cref="MenuItem"/> is checked; otherwise, false. The default is false.
+    /// </returns>
+    public bool IsChecked
+    {
+        get => (bool)GetValue(IsCheckedProperty);
+        set => SetValueInternal(IsCheckedProperty, value);
+    }
+
+    private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var menuItem = (MenuItem)d;
+        if ((bool)e.NewValue)
+        {
+            menuItem.OnChecked(new RoutedEventArgs(CheckedEvent));
+        }
+        else
+        {
+            menuItem.OnUnchecked(new RoutedEventArgs(UncheckedEvent));
+        }
     }
 
     private static readonly DependencyPropertyKey IsHighlightedPropertyKey =
@@ -884,6 +1089,11 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     /// </summary>
     protected virtual void OnClick()
     {
+        if (IsCheckable)
+        {
+            SetCurrentValueInternal(IsCheckedProperty, !IsChecked);
+        }
+
         if (!_isFocused)
         {
             FocusOrSelect();
@@ -916,6 +1126,24 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     /// The event data for the <see cref="SubmenuClosed"/> event.
     /// </param>
     protected virtual void OnSubmenuClosed(RoutedEventArgs e) => RaiseEvent(e);
+
+    /// <summary>
+    /// Called when the <see cref="IsChecked"/> property becomes true. This method raises 
+    /// the <see cref="Checked"/> routed event.
+    /// </summary>
+    /// <param name="e">
+    /// The event data for the <see cref="Checked"/> event.
+    /// </param>
+    protected virtual void OnChecked(RoutedEventArgs e) => RaiseEvent(e);
+
+    /// <summary>
+    /// Called when the <see cref="IsChecked"/> property becomes false. This method raises 
+    /// the <see cref="Unchecked"/> routed event.
+    /// </summary>
+    /// <param name="e">
+    /// The event data for the <see cref="Unchecked"/> event.
+    /// </param>
+    protected virtual void OnUnchecked(RoutedEventArgs e) => RaiseEvent(e);
 
     /// <summary>
     /// Changes to the correct visual state(s) for the control.
@@ -1135,14 +1363,10 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
 
         if (IsTopLevel)
         {
-            _submenuPopup.StayOpen = false;
-            _submenuPopup.Placement = PlacementMode.Bottom;
             _submenuPopup.OutsideClick += new EventHandler<CancelEventArgs>(OnSubmenuOutsideClick);
         }
         else
         {
-            _submenuPopup.StayOpen = true;
-            _submenuPopup.Placement = PlacementMode.Right;
             _submenuPopup.OutsideClick -= new EventHandler<CancelEventArgs>(OnSubmenuOutsideClick);
         }
     }
