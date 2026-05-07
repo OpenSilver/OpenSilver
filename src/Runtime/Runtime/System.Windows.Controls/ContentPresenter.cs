@@ -194,6 +194,28 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="ContentSource"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentSourceProperty =
+            DependencyProperty.Register(
+                nameof(ContentSource),
+                typeof(string),
+                typeof(ContentPresenter),
+                new PropertyMetadata(nameof(Content)));
+
+        /// <summary>
+        /// Gets or sets the base name to use during automatic aliasing.
+        /// </summary>
+        /// <returns>
+        /// The base name to use during automatic aliasing. The default is "Content".
+        /// </returns>
+        public string ContentSource
+        {
+            get => (string)GetValue(ContentSourceProperty);
+            set => SetValueInternal(ContentSourceProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="RecognizesAccessKey"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]

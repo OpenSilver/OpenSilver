@@ -14,6 +14,7 @@
 
 using Mono.Cecil;
 using System;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler;
@@ -37,12 +38,13 @@ internal static class ProcessingContentPresenterNodes
 
     public static void Process(XDocument doc, ConversionSettings settings)
     {
-        TraverseNextElement(doc.Root, false, settings);
+        TraverseNextElement(doc.Root, false, null, settings);
     }
 
     private static void TraverseNextElement(
         XElement element,
         bool isInsideControlTemplate,
+        TargetTypeData targetType,
         ConversionSettings settings)
     {
         if (!XamlParser.IsMemberNode(element))
@@ -54,88 +56,306 @@ internal static class ProcessingContentPresenterNodes
 
             if (settings.Inspector.IsControlTemplate(type))
             {
-                isInsideControlTemplate = IsContentControlTargetType(element, settings);
+                targetType = GetTargetTypeData(element, settings);
+                isInsideControlTemplate = targetType is not null && settings.Inspector.IsContentControl(targetType.Type);
             }
             else if (isInsideControlTemplate && settings.Inspector.IsContentPresenter(type))
             {
-                bool hasContentAttribute = HasAttribute(element, "Content", settings);
-                bool hasContentTemplateAttribute = HasAttribute(element, "ContentTemplate", settings);
-                bool hasContentTemplateSelectorAttribute = HasAttribute(element, "ContentTemplateSelector", settings);
+                (string contentSource, bool isContentSourceSet) = GetContentSource(element, settings);
+                bool isContentPropertyDefined = HasAttribute(element, "Content", settings);
+                bool isContentTemplatePropertyDefined = HasAttribute(element, "ContentTemplate", settings);
+                bool isContentTemplateSelectorPropertyDefined = HasAttribute(element, "ContentTemplateSelector", settings);
 
-                if (!hasContentAttribute || (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute))
+                if (!isContentSourceSet)
                 {
-                    string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
-
-                    // First look for the default namespace, it should cover 99% of cases.
-                    if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, element.GetDefaultNamespace()) == -1)
-                    {
-                        systemWindowsPrefix = GenerateXmlnsPrefix(element);
-                        element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), SystemWindowsClrNamespace);
-
-                        systemWindowsControlsPrefix = GenerateXmlnsPrefix(element);
-                        element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), SystemWindowsControlsClrNamespace);
-                    }
-
-                    string xPrefix = element.GetPrefixOfNamespace(GeneratingCode.xNamespace);
-                    if (xPrefix is null)
-                    {
-                        xPrefix = GenerateXmlnsPrefix(element);
-                        element.SetAttributeValue(XNamespace.Xmlns.GetName(xPrefix), GeneratingCode.xNamespace.NamespaceName);
-                    }
-
-                    if (!hasContentAttribute)
-                    {
-                        SetTemplateBinding(element, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                    }
-
-                    if (!hasContentTemplateAttribute && !hasContentTemplateSelectorAttribute)
-                    {
-                        SetTemplateBinding(element, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                        SetTemplateBinding(element, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
-                    }
+                    SetDefaultTemplateBindings(element,
+                        isContentPropertyDefined,
+                        isContentTemplatePropertyDefined,
+                        isContentTemplateSelectorPropertyDefined);
+                }
+                else
+                {
+                    SetTemplateBindings(element,
+                        targetType,
+                        contentSource,
+                        isContentPropertyDefined,
+                        isContentTemplatePropertyDefined,
+                        isContentTemplateSelectorPropertyDefined);
                 }
             }
         }
 
-        // Recursion:
         foreach (var childElements in element.Elements())
         {
-            TraverseNextElement(childElements, isInsideControlTemplate, settings);
+            TraverseNextElement(childElements, isInsideControlTemplate, targetType, settings);
         }
     }
 
-    private static bool IsContentControlTargetType(XElement element, ConversionSettings settings)
+    private static void SetDefaultTemplateBindings(XElement element,
+        bool isContentPropertyDefined,
+        bool isContentTemplatePropertyDefined,
+        bool isContentTemplateSelectorPropertyDefined)
+    {
+        if (!isContentPropertyDefined || (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined))
+        {
+            string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
+
+            // First look for the default namespace, it should cover 99% of cases.
+            if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, element.GetDefaultNamespace()) == -1)
+            {
+                systemWindowsPrefix = GenerateXmlnsPrefix(element);
+                element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), SystemWindowsClrNamespace);
+
+                systemWindowsControlsPrefix = GenerateXmlnsPrefix(element);
+                element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), SystemWindowsControlsClrNamespace);
+            }
+
+            string xPrefix = element.GetPrefixOfNamespace(GeneratingCode.xNamespace);
+            if (xPrefix is null)
+            {
+                xPrefix = GenerateXmlnsPrefix(element);
+                element.SetAttributeValue(XNamespace.Xmlns.GetName(xPrefix), GeneratingCode.xNamespace.NamespaceName);
+            }
+
+            if (!isContentPropertyDefined)
+            {
+                SetTemplateBinding(element, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+            }
+
+            if (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined)
+            {
+                SetTemplateBinding(element, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                SetTemplateBinding(element, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+            }
+        }
+
+        static void SetTemplateBinding(XElement element,
+            string propertyName,
+            string systemWindowsPrefix,
+            string systemWindowsControlsPrefix,
+            string xPrefix)
+        {
+            var attribute = new ExtendedXAttribute(
+                systemWindowsControlsPrefix switch
+                {
+                    null or "" => XNamespace.None.GetName($"ContentPresenter.{propertyName}"),
+                    _ => element.GetNamespaceOfPrefix(systemWindowsControlsPrefix).GetName($"ContentPresenter.{propertyName}"),
+                },
+                (systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix) switch
+                {
+                    (null or "", null or "", null or "") => $"{{TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
+                    (null or "", null or "", _) => $"{{TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
+                    (null or "", _, null or "") => $"{{TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+                    (_, null or "", null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
+                    (null or "", _, _) => $"{{TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+                    (_, null or "", _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
+                    (_, _, null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+                    (_, _, _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
+                });
+
+            attribute.SetLineInfo(element);
+
+            element.Add(attribute);
+        }
+    }
+
+    private static void SetTemplateBindings(XElement element,
+        TargetTypeData targetType,
+        string contentSource,
+        bool isContentPropertyDefined,
+        bool isContentTemplatePropertyDefined,
+        bool isContentTemplateSelectorPropertyDefined)
+    {
+        if (!isContentPropertyDefined || (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined))
+        {
+            string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
+
+            // First look for the default namespace, it should cover 99% of cases.
+            if (Array.IndexOf(GeneratingCode.DefaultXamlNamespaces, element.GetDefaultNamespace()) == -1)
+            {
+                systemWindowsPrefix = GenerateXmlnsPrefix(element);
+                element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsPrefix), SystemWindowsClrNamespace);
+
+                systemWindowsControlsPrefix = GenerateXmlnsPrefix(element);
+                element.SetAttributeValue(XNamespace.Xmlns.GetName(systemWindowsControlsPrefix), SystemWindowsControlsClrNamespace);
+            }
+
+            string targetTypePrefix = element.GetPrefixOfNamespace(targetType.XmlNamespace);
+
+            if (targetTypePrefix is null && element.GetDefaultNamespace() != targetType.XmlNamespace)
+            {
+                targetTypePrefix = GenerateXmlnsPrefix(element);
+                element.SetAttributeValue(XNamespace.Xmlns.GetName(targetTypePrefix), targetType.XmlNamespace.NamespaceName);
+            }
+
+            if (!isContentPropertyDefined)
+            {
+                SetTemplateBinding(element,
+                    "Content",
+                    contentSource,
+                    systemWindowsPrefix,
+                    systemWindowsControlsPrefix,
+                    targetTypePrefix,
+                    targetType.Type.Name);
+            }
+
+            if (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined)
+            {
+                SetTemplateBinding(element,
+                    "ContentTemplate",
+                    $"{contentSource}Template",
+                    systemWindowsPrefix,
+                    systemWindowsControlsPrefix,
+                    targetTypePrefix,
+                    targetType.Type.Name);
+
+                SetTemplateBinding(element,
+                    "ContentTemplateSelector",
+                    $"{contentSource}TemplateSelector",
+                    systemWindowsPrefix,
+                    systemWindowsControlsPrefix,
+                    targetTypePrefix,
+                    targetType.Type.Name);
+            }
+        }
+
+        static void SetTemplateBinding(XElement element,
+            string propertyName,
+            string contentSourceProperty,
+            string systemWindowsPrefix,
+            string systemWindowsControlsPrefix,
+            string targetTypePrefix,
+            string targetTypeName)
+        {
+            var attribute = new ExtendedXAttribute(
+                systemWindowsControlsPrefix switch
+                {
+                    null or "" => XNamespace.None.GetName($"ContentPresenter.{propertyName}"),
+                    _ => element.GetNamespaceOfPrefix(systemWindowsControlsPrefix).GetName($"ContentPresenter.{propertyName}"),
+                },
+                (systemWindowsPrefix, targetTypePrefix) switch
+                {
+                    (null or "", null or "") => $"{{TemplateBinding DependencyPropertyName={contentSourceProperty}, DependencyPropertyOwnerType={targetTypeName}}}",
+                    (null or "", _) => $"{{TemplateBinding DependencyPropertyName={contentSourceProperty}, DependencyPropertyOwnerType={targetTypePrefix}:{targetTypeName}}}",
+                    (_, null or "") => $"{{{systemWindowsPrefix}:TemplateBinding DependencyPropertyName={contentSourceProperty}, DependencyPropertyOwnerType={targetTypeName}}}",
+                    (_, _) => $"{{{systemWindowsPrefix}:TemplateBinding DependencyPropertyName={contentSourceProperty}, DependencyPropertyOwnerType={targetTypePrefix}:{targetTypeName}}}",
+                });
+
+            attribute.SetLineInfo(element);
+
+            element.Add(attribute);
+        }
+    }
+
+    private static TargetTypeData GetTargetTypeData(XElement element, ConversionSettings settings)
     {
         if (element.Attribute("TargetType") is XAttribute targetType)
         {
-            string namespaceName, typeName, assemblyName;
+            XNamespace xmlns;
+            string typeName;
 
             int index = targetType.Value.IndexOf(':');
             if (index > -1)
             {
                 string prefix = targetType.Value.Substring(0, index);
-                if (element.GetNamespaceOfPrefix(prefix) is not XNamespace xmlns)
-                {
-                    throw new XamlParseException($"'{prefix}' is an undeclared prefix.", targetType);
-                }
-
-                (namespaceName, assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
-                    xmlns.NamespaceName);
-
+                xmlns = element.GetNamespaceOfPrefix(prefix) ?? throw new XamlParseException($"'{prefix}' is an undeclared prefix.", targetType);
                 typeName = targetType.Value.Substring(index + 1);
             }
             else
             {
-                (namespaceName, assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
-                    element.GetDefaultNamespace().NamespaceName);
-
+                xmlns = element.GetDefaultNamespace();
                 typeName = targetType.Value;
             }
 
+            (string namespaceName, string assemblyName) = settings.XamlNameParser.GetClrNamespaceAndAssembly(
+                xmlns.NamespaceName);
+
             TypeDefinition type = settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName, element);
-            return settings.Inspector.IsContentControl(type);
+            return new TargetTypeData(type, xmlns);
         }
 
+        return null;
+    }
+
+    private static (string Value, bool IsSet) GetContentSource(XElement cp, ConversionSettings settings)
+    {
+        if (cp.Attribute("ContentSource") is XAttribute contentSourceAttribute)
+        {
+            if (MarkupExtensionDescriptor.LooksLikeAMarkupExtension(contentSourceAttribute.Value))
+            {
+                return (null, true);
+            }
+
+            return (GeneratingCode.GetAttributeValue(contentSourceAttribute), true);
+        }
+
+        foreach (var child in cp.Elements())
+        {
+            int index = child.Name.LocalName.IndexOf('.');
+
+            if (index == -1)
+            {
+                continue;
+            }
+
+            // First check if this is the right property.
+            if (child.Name.LocalName.AsSpan(index + 1).Trim().Equals("ContentSource", StringComparison.Ordinal))
+            {
+                (string namespaceName, string assemblyName) =
+                    settings.XamlNameParser.GetClrNamespaceAndAssembly(child.Name.NamespaceName);
+
+                TypeDefinition type = settings.Inspector.GetTypeDefinition(
+                    namespaceName, child.Name.LocalName.Substring(0, index), assemblyName, child);
+
+                if (settings.Inspector.IsContentPresenter(type))
+                {
+                    if (child.Elements().Count() == 1 &&
+                        TryReadStringElement(child.Elements().First(), settings, out string value))
+                    {
+                        return (value, true);
+                    }
+
+                    return (null, true);
+                }
+            }
+        }
+
+        return (null, false);
+    }
+
+    private static bool TryReadStringElement(XElement element, ConversionSettings settings, out string value)
+    {
+        settings.XamlNameParser.GetClrNamespaceAndLocalName(
+            element.Name,
+            out string namespaceName,
+            out string typeName,
+            out string assemblyName);
+
+        TypeDefinition type = settings.Inspector.GetTypeDefinition(
+            namespaceName,
+            typeName,
+            assemblyName,
+            element);
+
+        if (type.IsString())
+        {
+            // This code runs after the InsertingImplicitNodes step, so a string element can only be initalized
+            // from string (direct content is converted to the InitializedFromStringAttribute attribute), or be
+            // empty.
+
+            if (element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) is XAttribute initAttribute)
+            {
+                value = GeneratingCode.GetAttributeValue(initAttribute);
+            }
+            else
+            {
+                value = string.Empty;
+            }
+
+            return true;
+        }
+
+        value = null;
         return false;
     }
 
@@ -174,21 +394,6 @@ internal static class ProcessingContentPresenterNodes
         return false;
     }
 
-    private static void SetTemplateBinding(XElement element, string propertyName, string systemWindowsPrefix, string systemWindowsControlsPrefix, string xPrefix)
-    {
-        element.SetAttributeValue(propertyName, (systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix) switch
-        {
-            (null or "", null or "", null or "") => $"{{TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
-            (null or "", null or "", _) => $"{{TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
-            (null or "", _, null or "") => $"{{TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-            (_, null or "", null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static ContentControl.{propertyName}Property}}}}",
-            (null or "", _, _) => $"{{TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-            (_, null or "", _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static ContentControl.{propertyName}Property}}}}",
-            (_, _, null or "") => $"{{{systemWindowsPrefix}:TemplateBinding Property={{Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-            (_, _, _) => $"{{{systemWindowsPrefix}:TemplateBinding Property={{{xPrefix}:Static {systemWindowsControlsPrefix}:ContentControl.{propertyName}Property}}}}",
-        });
-    }
-
     private static string GenerateXmlnsPrefix(XElement element)
     {
         string prefix = GenerateXmlnsPrefix();
@@ -211,5 +416,17 @@ internal static class ProcessingContentPresenterNodes
         }
 
         return items.ToString();
+    }
+
+    private sealed class TargetTypeData
+    {
+        public TargetTypeData(TypeDefinition type, XNamespace xmlNamespace)
+        {
+            Type = type;
+            XmlNamespace = xmlNamespace;
+        }
+
+        public readonly TypeDefinition Type;
+        public readonly XNamespace XmlNamespace;
     }
 }
