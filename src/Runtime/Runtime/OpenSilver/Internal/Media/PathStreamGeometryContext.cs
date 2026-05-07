@@ -49,25 +49,16 @@ internal sealed class PathStreamGeometryContext : CapacityStreamGeometryContext
         s_defaultValueForArcSegmentRotationAngle = (double)ArcSegment.RotationAngleProperty.GetDefaultValue(arcSegmentType);
     }
 
-    internal PathStreamGeometryContext()
-    {
-        _pathGeometry = new PathGeometry();
-    }
+    internal PathStreamGeometryContext() { }
 
     internal PathStreamGeometryContext(FillRule fillRule, Transform transform)
     {
-        _pathGeometry = new PathGeometry();
+        _fillRule = fillRule;
 
-        if (fillRule != s_defaultFillRule)
+        if (transform is not null && !transform.IsIdentity)
         {
-            _pathGeometry.FillRule = fillRule;
+            _transform = new MatrixTransform(transform.Matrix);
         }
-
-        //todo: PathGeometry.Transform is not supported yet, Transform.Identity is not supported yet.
-        //if ((transform != null) && !transform.IsIdentity)
-        //{
-        //    _pathGeometry.Transform = transform.Clone();
-        //}
     }
 
     internal override void SetFigureCount(int figureCount)
@@ -76,7 +67,6 @@ internal sealed class PathStreamGeometryContext : CapacityStreamGeometryContext
         Debug.Assert(figureCount > 0);
 
         _figures = new PathFigureCollection(figureCount);
-        _pathGeometry.Figures = _figures;
     }
 
     internal override void SetSegmentCount(int segmentCount)
@@ -122,7 +112,6 @@ internal sealed class PathStreamGeometryContext : CapacityStreamGeometryContext
                 // it's more efficient to create the collection ourselves and set it explicitly.
 
                 _figures = new PathFigureCollection();
-                _pathGeometry.Figures = _figures;
             }
         }
 
@@ -294,16 +283,32 @@ internal sealed class PathStreamGeometryContext : CapacityStreamGeometryContext
         Debug.Assert(false);
     }
 
-    /// <summary>
-    /// GetPathGeometry - Retrieves the PathGeometry built by this Context.
-    /// </summary>
     internal PathGeometry GetPathGeometry()
+    {
+        var pathGeometry = new PathGeometry();
+
+        if (_fillRule != s_defaultFillRule)
+        {
+            pathGeometry.FillRule = _fillRule;
+        }
+
+        if (_transform is not null)
+        {
+            pathGeometry.Transform = _transform;
+        }
+
+        pathGeometry.Figures = GetPathFigures();
+
+        return pathGeometry;
+    }
+
+    internal PathFigureCollection GetPathFigures()
     {
         FinishSegment();
 
         Debug.Assert(_currentSegmentPoints == null);
 
-        return _pathGeometry;
+        return _figures;
     }
 
     private void GenericPolyTo(IList<Point> points, bool isStroked, bool isSmoothJoin, MIL_SEGMENT_TYPE segmentType)
@@ -443,7 +448,9 @@ internal sealed class PathStreamGeometryContext : CapacityStreamGeometryContext
         }
     }
 
-    private readonly PathGeometry _pathGeometry;
+    private readonly FillRule _fillRule;
+    private readonly Transform _transform;
+
     private PathFigureCollection _figures;
     private PathFigure _currentFigure;
     private PathSegmentCollection _segments;

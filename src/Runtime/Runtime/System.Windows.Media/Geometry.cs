@@ -151,7 +151,7 @@ public abstract class Geometry : DependencyObject
 
         if (Transform is Transform internalTransform && !Transform.IsIdentityTransform(internalTransform))
         {
-            matrix = internalTransform.Value;
+            matrix = internalTransform.Matrix;
 
             if (!transform.IsIdentity)
             {

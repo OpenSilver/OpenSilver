@@ -173,7 +173,6 @@ internal static partial class Parsers
         var context = new PathStreamGeometryContext();
         var parser = new AbbreviatedGeometryParser();
         parser.ParseToGeometryContext(context, pathString, 0 /* curIndex */);
-        PathGeometry pathGeometry = context.GetPathGeometry();
-        return pathGeometry.Figures;
+        return context.GetPathFigures();
     }
 }
