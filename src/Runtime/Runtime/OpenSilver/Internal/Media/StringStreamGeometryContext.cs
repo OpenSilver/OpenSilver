@@ -178,7 +178,7 @@ internal sealed class StringStreamGeometryContext : CapacityStreamGeometryContex
 
     internal override void SetClosedState(bool closed)
     {
-        Debug.Assert(false);
+        _isClosed = closed;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

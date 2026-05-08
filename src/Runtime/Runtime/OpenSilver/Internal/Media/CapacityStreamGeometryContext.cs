@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Windows;
 using System.Windows.Media;
 
 namespace OpenSilver.Internal.Media;
@@ -19,4 +20,27 @@ internal abstract class CapacityStreamGeometryContext : StreamGeometryContext
 {
     internal virtual void SetFigureCount(int figureCount) { }
     internal virtual void SetSegmentCount(int segmentCount) { }
+
+    internal void AddRect(Rect rect) => AddRect(rect, Matrix.Identity);
+
+    internal virtual void AddRect(Rect rect, Matrix transform)
+    {
+        Point topLeft = rect.TopLeft;
+        Point topRight = rect.TopRight;
+        Point bottomLeft = rect.BottomLeft;
+        Point bottomRight = rect.BottomRight;
+
+        if (!transform.IsIdentity)
+        {
+            topLeft *= transform;
+            topRight *= transform;
+            bottomLeft *= transform;
+            bottomRight *= transform;
+        }
+
+        BeginFigure(topLeft, true, true);
+        LineTo(topRight, true, false);
+        LineTo(bottomRight, true, false);
+        LineTo(bottomLeft, true, false);
+    }
 }

@@ -250,6 +250,13 @@ internal class ByteStreamGeometryContext : CapacityStreamGeometryContext
         _currentPathFigureData.Flags |= isClosed ? MilPathFigureFlags.IsClosed : 0;
     }
 
+    internal override void AddRect(Rect rect, Matrix transform)
+    {
+        base.AddRect(rect, transform);
+
+        _currentPathFigureData.Flags |= MilPathFigureFlags.IsRectangleData;
+    }
+
     /// <summary>
     /// This verifies that the API can be called at this time. 
     /// </summary>

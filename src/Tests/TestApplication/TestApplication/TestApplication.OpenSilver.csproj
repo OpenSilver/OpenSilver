@@ -32,6 +32,8 @@
     <Compile Include="LinqSamples.cs" />
     <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="Tests\AccordionTest.xaml.cs" />
+    <Compile Include="Tests\CombinedGeometry\CombinedGeometryTest.xaml.cs" />
+    <Compile Include="Tests\CombinedGeometry\CombinedGeometryViewer.xaml.cs" />
     <Compile Include="Tests\PerformanceTest.xaml.cs">
       <DependentUpon>PerformanceTest.xaml</DependentUpon>
     </Compile>
@@ -627,6 +629,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Page Include="Tests\CombinedGeometry\CombinedGeometryTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\CombinedGeometry\CombinedGeometryViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

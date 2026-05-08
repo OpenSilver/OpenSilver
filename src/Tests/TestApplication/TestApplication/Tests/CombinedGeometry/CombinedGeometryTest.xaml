@@ -1,0 +1,1955 @@
+﻿<Page x:Class="TestApplication.Tests.CombinedGeometryTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:TestApplication.Tests">
+
+    <ScrollViewer>
+        <StackPanel Margin="20"
+                    Background="White">
+            <TextBlock Text="CombinedGeometry Test Suite"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="DarkRed"
+                       Margin="0,0,0,20" />
+            <TextBlock Text="Click 'Show/Hide' to toggle between input geometries (blue+red) and combined result (green)"
+                       FontSize="14"
+                       Foreground="Gray"
+                       Margin="0,0,0,20" />
+
+            <!-- ============================================================ -->
+            <!-- SECTION 1: Two Rectangles -->
+            <!-- ============================================================ -->
+            <TextBlock Text="1. Two Overlapping Rectangles"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,10,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,60,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,60,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,60,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,60,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 2: Two Ellipses -->
+            <!-- ============================================================ -->
+            <TextBlock Text="2. Two Overlapping Ellipses"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="45,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="80,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="45,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="80,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="45,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="80,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="45,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="80,45"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 3: Rectangle + Ellipse -->
+            <!-- ============================================================ -->
+            <TextBlock Text="3. Rectangle + Ellipse"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,20,80,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="40"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,20,80,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="40"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,20,80,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="40"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,20,80,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="40"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 4: Non-overlapping Rectangles -->
+            <!-- ============================================================ -->
+            <TextBlock Text="4. Non-overlapping Rectangles (disjoint)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="70,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect (empty)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="70,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="70,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="70,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 5: Contained -->
+            <!-- ============================================================ -->
+            <TextBlock Text="5. Small Rectangle Inside Large Rectangle"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,40,30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,40,30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor (donut)"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,40,30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude (hole)"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,40,30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 6: Ellipse Inside Rectangle -->
+            <!-- ============================================================ -->
+            <TextBlock Text="6. Ellipse Inside Rectangle"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,110,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="30"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,110,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="30"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,110,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="30"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,110,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,45"
+                                         RadiusX="30"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 7: Two Ellipses (different sizes) -->
+            <!-- ============================================================ -->
+            <TextBlock Text="7. Large Ellipse + Small Ellipse (partial overlap)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="50,45"
+                                         RadiusX="45"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="90,45"
+                                         RadiusX="20"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="50,45"
+                                         RadiusX="45"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="90,45"
+                                         RadiusX="20"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="50,45"
+                                         RadiusX="45"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="90,45"
+                                         RadiusX="20"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="50,45"
+                                         RadiusX="45"
+                                         RadiusY="35" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="90,45"
+                                         RadiusX="20"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 8: Rounded Rectangle + Ellipse -->
+            <!-- ============================================================ -->
+            <TextBlock Text="8. Rounded Rectangle + Ellipse"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,80,60"
+                                           RadiusX="10"
+                                           RadiusY="10" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="85,45"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,80,60"
+                                           RadiusX="10"
+                                           RadiusY="10" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="85,45"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,80,60"
+                                           RadiusX="10"
+                                           RadiusY="10" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="85,45"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,80,60"
+                                           RadiusX="10"
+                                           RadiusY="10" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="85,45"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 9: Triangle + Ellipse -->
+            <!-- ============================================================ -->
+            <TextBlock Text="9. Triangle (PathGeometry) + Ellipse"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 105,80 5,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,60"
+                                         RadiusX="35"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 105,80 5,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,60"
+                                         RadiusX="35"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 105,80 5,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,60"
+                                         RadiusX="35"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 105,80 5,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,60"
+                                         RadiusX="35"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 10: Star + Diamond -->
+            <!-- ============================================================ -->
+            <TextBlock Text="10. Star + Diamond (PathGeometry)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 65,35 100,35 72,52 82,82 55,65 28,82 38,52 10,35 45,35 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <PathGeometry Figures="M 55,15 L 85,45 55,75 25,45 Z" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 65,35 100,35 72,52 82,82 55,65 28,82 38,52 10,35 45,35 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <PathGeometry Figures="M 55,15 L 85,45 55,75 25,45 Z" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 65,35 100,35 72,52 82,82 55,65 28,82 38,52 10,35 45,35 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <PathGeometry Figures="M 55,15 L 85,45 55,75 25,45 Z" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 65,35 100,35 72,52 82,82 55,65 28,82 38,52 10,35 45,35 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <PathGeometry Figures="M 55,15 L 85,45 55,75 25,45 Z" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 11: Bezier + Rectangle -->
+            <!-- ============================================================ -->
+            <TextBlock Text="11. Bezier Curve PathGeometry + Rectangle"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 5,80 C 5,5 105,5 105,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,40,70,45" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 5,80 C 5,5 105,5 105,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,40,70,45" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 5,80 C 5,5 105,5 105,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,40,70,45" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 5,80 C 5,5 105,5 105,80 Z" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,40,70,45" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 12: LineGeometry + Rectangle -->
+            <!-- ============================================================ -->
+            <TextBlock Text="12. LineGeometry + Rectangle (line has no area)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <LineGeometry StartPoint="10,10"
+                                      EndPoint="100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <LineGeometry StartPoint="10,10"
+                                      EndPoint="100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <LineGeometry StartPoint="10,10"
+                                      EndPoint="100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <LineGeometry StartPoint="10,10"
+                                      EndPoint="100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 13: Identical Rectangles -->
+            <!-- ============================================================ -->
+            <TextBlock Text="13. Two Identical Rectangles"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor (empty)"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude (empty)"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 14: Edge-touching Rectangles -->
+            <!-- ============================================================ -->
+            <TextBlock Text="14. Edge-touching Rectangles"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="55,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="55,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="55,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="55,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 15: Nested CombinedGeometry -->
+            <!-- ============================================================ -->
+            <TextBlock Text="15. Nested CombinedGeometry"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="(Rect1 Union Rect2) Exclude Ellipse"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <CombinedGeometry GeometryCombineMode="Union">
+                            <CombinedGeometry.Geometry1>
+                                <RectangleGeometry Rect="5,10,70,50" />
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <RectangleGeometry Rect="50,30,70,50" />
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="65,45"
+                                         RadiusX="25"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Rect Intersect (Ellipse1 Union Ellipse2)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,120,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <CombinedGeometry GeometryCombineMode="Union">
+                            <CombinedGeometry.Geometry1>
+                                <EllipseGeometry Center="50,50"
+                                                 RadiusX="35"
+                                                 RadiusY="35" />
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <EllipseGeometry Center="90,50"
+                                                 RadiusX="35"
+                                                 RadiusY="35" />
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 16: Very Small Geometries -->
+            <!-- ============================================================ -->
+            <TextBlock Text="16. Very Small Geometries (precision test, scaled 10x for visibility)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union (tiny rects)"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,50,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,30,50,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect (tiny ellipses)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="40,40"
+                                         RadiusX="30"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,40"
+                                         RadiusX="30"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- TRANSFORM TESTS -->
+            <!-- ============================================================ -->
+            <TextBlock Text="TRANSFORM TESTS"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="DarkBlue"
+                       Margin="0,40,0,10" />
+
+            <!-- T1: Translate on Geometry1 -->
+            <TextBlock Text="T1. TranslateTransform on Geometry1"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,10,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="0,0,50,40">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="10"
+                                                    Y="15" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="0,0,50,40">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="10"
+                                                    Y="15" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="0,0,50,40">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="10"
+                                                    Y="15" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T2: Rotate on Geometry1 -->
+            <TextBlock Text="T2. RotateTransform on Geometry1 (45° rotated rect + ellipse)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="30,30,50,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="45"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,55"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="30,30,50,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="45"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,55"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="30,30,50,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="45"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,55"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T3: Scale on both geometries -->
+            <TextBlock Text="T3. ScaleTransform on both geometries"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union (2x + 0.5x)"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,30,25">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="2"
+                                                ScaleY="1.5" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="90,40"
+                                         RadiusX="50"
+                                         RadiusY="40">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="0.5"
+                                                ScaleY="0.8" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect (2x + 0.5x)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,30,25">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="2"
+                                                ScaleY="1.5" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="90,40"
+                                         RadiusX="50"
+                                         RadiusY="40">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="0.5"
+                                                ScaleY="0.8" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T4: Rotate on both geometries -->
+            <TextBlock Text="T4. RotateTransform on both geometries (±30°)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="20,25,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="30"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,25,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="-30"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="20,25,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="30"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,25,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="-30"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="20,25,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="30"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,25,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="-30"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T5: TransformGroup (Scale + Rotate) -->
+            <TextBlock Text="T5. TransformGroup (Scale + Rotate) on Geometry1"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="25,25,60,40">
+                            <RectangleGeometry.Transform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="0.8"
+                                                    ScaleY="1.2" />
+                                    <RotateTransform Angle="20"
+                                                     CenterX="55"
+                                                     CenterY="45" />
+                                </TransformGroup>
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="65,55"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="25,25,60,40">
+                            <RectangleGeometry.Transform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="0.8"
+                                                    ScaleY="1.2" />
+                                    <RotateTransform Angle="20"
+                                                     CenterX="55"
+                                                     CenterY="45" />
+                                </TransformGroup>
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="65,55"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T6: Skew on Geometry1 -->
+            <TextBlock Text="T6. SkewTransform on Geometry1"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,20,70,50">
+                            <RectangleGeometry.Transform>
+                                <SkewTransform AngleX="20"
+                                               AngleY="0" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="70,50"
+                                         RadiusX="25"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,20,70,50">
+                            <RectangleGeometry.Transform>
+                                <SkewTransform AngleX="20"
+                                               AngleY="0" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="70,50"
+                                         RadiusX="25"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,20,70,50">
+                            <RectangleGeometry.Transform>
+                                <SkewTransform AngleX="20"
+                                               AngleY="0" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="70,50"
+                                         RadiusX="25"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T7: Rotated PathGeometry + rect -->
+            <TextBlock Text="T7. Transform on PathGeometry (180° rotated triangle + rect)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 105,80 5,80 Z">
+                            <PathGeometry.Transform>
+                                <RotateTransform Angle="180"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="25,20,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 105,80 5,80 Z">
+                            <PathGeometry.Transform>
+                                <RotateTransform Angle="180"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="25,20,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 105,80 5,80 Z">
+                            <PathGeometry.Transform>
+                                <RotateTransform Angle="180"
+                                                 CenterX="55"
+                                                 CenterY="45" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="25,20,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T8: Scaled + Rotated ellipses -->
+            <TextBlock Text="T8. Scaled ellipse + 90° rotated ellipse"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="55,50"
+                                         RadiusX="40"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="1"
+                                                ScaleY="1.5"
+                                                CenterX="55"
+                                                CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,50"
+                                         RadiusX="40"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <RotateTransform Angle="90"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="55,50"
+                                         RadiusX="40"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="1"
+                                                ScaleY="1.5"
+                                                CenterX="55"
+                                                CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,50"
+                                         RadiusX="40"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <RotateTransform Angle="90"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Xor"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="55,50"
+                                         RadiusX="40"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="1"
+                                                ScaleY="1.5"
+                                                CenterX="55"
+                                                CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,50"
+                                         RadiusX="40"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <RotateTransform Angle="90"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T9: MatrixTransform -->
+            <TextBlock Text="T9. MatrixTransform (general affine) on Geometry1"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,15,60,50">
+                            <RectangleGeometry.Transform>
+                                <MatrixTransform Matrix="0.866,0.5,-0.5,0.866,30,-10" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,55"
+                                         RadiusX="35"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Intersect"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,15,60,50">
+                            <RectangleGeometry.Transform>
+                                <MatrixTransform Matrix="0.866,0.5,-0.5,0.866,30,-10" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,55"
+                                         RadiusX="35"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,15,60,50">
+                            <RectangleGeometry.Transform>
+                                <MatrixTransform Matrix="0.866,0.5,-0.5,0.866,30,-10" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,55"
+                                         RadiusX="35"
+                                         RadiusY="30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T10: Nested CombinedGeometry with transforms -->
+            <TextBlock Text="T10. Nested CombinedGeometry with transforms on inner geometries"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="(RotatedRect Union ScaledEllipse) Exclude Circle"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <CombinedGeometry GeometryCombineMode="Union">
+                            <CombinedGeometry.Geometry1>
+                                <RectangleGeometry Rect="20,20,60,40">
+                                    <RectangleGeometry.Transform>
+                                        <RotateTransform Angle="25"
+                                                         CenterX="50"
+                                                         CenterY="40" />
+                                    </RectangleGeometry.Transform>
+                                </RectangleGeometry>
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <EllipseGeometry Center="80,50"
+                                                 RadiusX="30"
+                                                 RadiusY="20">
+                                    <EllipseGeometry.Transform>
+                                        <ScaleTransform ScaleX="1.2"
+                                                        ScaleY="1.5"
+                                                        CenterX="80"
+                                                        CenterY="50" />
+                                    </EllipseGeometry.Transform>
+                                </EllipseGeometry>
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="60,50"
+                                         RadiusX="20"
+                                         RadiusY="20" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T11: CombinedGeometry.Transform -->
+            <TextBlock Text="T11. Transform on CombinedGeometry itself (output transform)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Rotate CG 15°"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Transform>
+                        <RotateTransform Angle="15"
+                                         CenterX="60"
+                                         CenterY="50" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Scale CG 0.7x"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Transform>
+                        <ScaleTransform ScaleX="0.7"
+                                        ScaleY="0.7" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <EllipseGeometry Center="50,50"
+                                         RadiusX="40"
+                                         RadiusY="40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="80,50"
+                                         RadiusX="40"
+                                         RadiusY="40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Translate CG"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Transform>
+                        <TranslateTransform X="10"
+                                            Y="5" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,50,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,40"
+                                         RadiusX="30"
+                                         RadiusY="25" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T12: All three transforms -->
+            <TextBlock Text="T12. Transforms on G1 + G2 + CombinedGeometry"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Rotate G1, Scale G2, Translate CG"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Transform>
+                        <TranslateTransform X="5"
+                                            Y="5" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,15,50,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="20"
+                                                 CenterX="40"
+                                                 CenterY="35" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="70,50"
+                                         RadiusX="25"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="1.3"
+                                                ScaleY="1.3"
+                                                CenterX="70"
+                                                CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Rotate G1, Scale G2, Rotate CG"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Transform>
+                        <RotateTransform Angle="-10"
+                                         CenterX="60"
+                                         CenterY="50" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,70,60">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="15"
+                                                 CenterX="45"
+                                                 CenterY="40" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="55,45"
+                                         RadiusX="35"
+                                         RadiusY="30">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="1.2"
+                                                ScaleY="0.8"
+                                                CenterX="55"
+                                                CenterY="45" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Skew G1, Rotate G2, Scale CG"
+                                              GeometryCombineMode="Xor">
+                    <local:CombinedGeometryViewer.Transform>
+                        <ScaleTransform ScaleX="0.8"
+                                        ScaleY="0.8" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,15,70,50">
+                            <RectangleGeometry.Transform>
+                                <SkewTransform AngleX="15"
+                                               AngleY="0" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <EllipseGeometry Center="65,45"
+                                         RadiusX="30"
+                                         RadiusY="25">
+                            <EllipseGeometry.Transform>
+                                <RotateTransform Angle="30"
+                                                 CenterX="65"
+                                                 CenterY="45" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- T13: All transforms + PathGeometry -->
+            <TextBlock Text="T13. All transforms + PathGeometry inputs"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Union"
+                                              GeometryCombineMode="Union">
+                    <local:CombinedGeometryViewer.Transform>
+                        <RotateTransform Angle="10"
+                                         CenterX="55"
+                                         CenterY="50" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 100,75 10,75 Z">
+                            <PathGeometry.Transform>
+                                <RotateTransform Angle="-15"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <PathGeometry Figures="M 55,15 L 90,50 55,85 20,50 Z">
+                            <PathGeometry.Transform>
+                                <ScaleTransform ScaleX="0.9"
+                                                ScaleY="0.9"
+                                                CenterX="55"
+                                                CenterY="50" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Exclude"
+                                              GeometryCombineMode="Exclude">
+                    <local:CombinedGeometryViewer.Transform>
+                        <RotateTransform Angle="10"
+                                         CenterX="55"
+                                         CenterY="50" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <PathGeometry Figures="M 55,5 L 100,75 10,75 Z">
+                            <PathGeometry.Transform>
+                                <RotateTransform Angle="-15"
+                                                 CenterX="55"
+                                                 CenterY="50" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <PathGeometry Figures="M 55,15 L 90,50 55,85 20,50 Z">
+                            <PathGeometry.Transform>
+                                <ScaleTransform ScaleX="0.9"
+                                                ScaleY="0.9"
+                                                CenterX="55"
+                                                CenterY="50" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- RECTANGLE FAST PATH TESTS -->
+            <!-- ============================================================ -->
+            <TextBlock Text="RECTANGLE FAST PATH TESTS (Intersect)"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="DarkGreen"
+                       Margin="0,40,0,10" />
+
+            <!-- FP1: Basic cases -->
+            <TextBlock Text="FP1. Basic rectangle intersections (no transforms)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,10,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Overlapping"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,60,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Contained"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,100,80" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,20,40,30" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Disjoint (empty)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="70,20,40,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Identical"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- FP2: Translate -->
+            <TextBlock Text="FP2. Translate on geometries"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Translate G1"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="0,0,60,50">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="15"
+                                                    Y="10" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="40,30,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Translate both"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="0,0,50,40">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="10"
+                                                    Y="10" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="0,0,50,40">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="30"
+                                                    Y="25" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- FP3: Scale -->
+            <TextBlock Text="FP3. Scale on geometries (axis-aligned preserving)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Scale G1 (2x)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,30,25">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="2"
+                                                ScaleY="1.5" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="20,15,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Scale both (flip G2)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,40,40">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="1.5"
+                                                ScaleY="1.5" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="-80,10,40,40">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="-1"
+                                                ScaleY="1" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- FP4: Rotation (falls through to sweep-line) -->
+            <TextBlock Text="FP4. Rotation on geometries (falls through to sweep-line)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Rotate G1 45°"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="20,20,60,50">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="45"
+                                                 CenterX="50"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="15,15,80,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Rotate both ±30°"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="15,20,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="30"
+                                                 CenterX="50"
+                                                 CenterY="40" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="15,20,70,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="-30"
+                                                 CenterX="50"
+                                                 CenterY="40" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- FP5: CombinedGeometry.Transform -->
+            <TextBlock Text="FP5. Output transform on CombinedGeometry"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Translate CG"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Transform>
+                        <TranslateTransform X="10"
+                                            Y="5" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,10,60,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,25,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Scale CG 0.8x"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Transform>
+                        <ScaleTransform ScaleX="0.8"
+                                        ScaleY="0.8" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,70,60" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,20,70,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Rotate CG 20°"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Transform>
+                        <RotateTransform Angle="20"
+                                         CenterX="55"
+                                         CenterY="45" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,60,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="35,25,60,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- FP6: All three transforms -->
+            <TextBlock Text="FP6. Transforms on G1 + G2 + CombinedGeometry"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Translate G1, Scale G2, Translate CG"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Transform>
+                        <TranslateTransform X="5"
+                                            Y="5" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="0,0,50,40">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="10"
+                                                    Y="10" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="10,10,30,25">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="1.5"
+                                                ScaleY="1.5" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Scale G1, Translate G2, Rotate CG"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Transform>
+                        <RotateTransform Angle="15"
+                                         CenterX="55"
+                                         CenterY="45" />
+                    </local:CombinedGeometryViewer.Transform>
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,40,35">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="1.8"
+                                                ScaleY="1.3" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="0,0,60,50">
+                            <RectangleGeometry.Transform>
+                                <TranslateTransform X="20"
+                                                    Y="15" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- FP7: Edge cases -->
+            <TextBlock Text="FP7. Edge cases"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Edge-touching"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="55,20,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Corner-touching"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,45,40" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="50,45,50,40" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Very small (scaled 10x)"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="10,10,50,50" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,30,50,50" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+            <!-- FP8: Rounded rects (should NOT use fast path) -->
+            <TextBlock Text="FP8. Rounded rectangles (should NOT use fast path)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,5" />
+            <WrapPanel>
+                <local:CombinedGeometryViewer Title="Rounded + Normal"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,80,60"
+                                           RadiusX="15"
+                                           RadiusY="15" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,20,80,60" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+                <local:CombinedGeometryViewer Title="Both rounded"
+                                              GeometryCombineMode="Intersect">
+                    <local:CombinedGeometryViewer.Geometry1>
+                        <RectangleGeometry Rect="5,5,70,55"
+                                           RadiusX="10"
+                                           RadiusY="10" />
+                    </local:CombinedGeometryViewer.Geometry1>
+                    <local:CombinedGeometryViewer.Geometry2>
+                        <RectangleGeometry Rect="30,20,70,55"
+                                           RadiusX="10"
+                                           RadiusY="10" />
+                    </local:CombinedGeometryViewer.Geometry2>
+                </local:CombinedGeometryViewer>
+            </WrapPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

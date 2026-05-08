@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal.Media;
+using OpenSilver.Internal.Media.Geometry.Core;
 
 namespace System.Windows.Media;
 
@@ -226,7 +226,7 @@ public sealed partial class ArcSegment : PathSegment
     {
         Span<Point> points = stackalloc Point[12];
 
-        GeometryUtils.ArcToBezier(
+        Utils.ArcToBezier(
             current.X,
             current.Y,
             size.Width,

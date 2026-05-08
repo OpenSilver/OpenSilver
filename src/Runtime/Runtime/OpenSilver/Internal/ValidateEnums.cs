@@ -40,4 +40,13 @@ internal static class ValidateEnums
                value == PenLineJoin.Bevel ||
                value == PenLineJoin.Round;
     }
+
+    public static bool IsGeometryCombineModeValid(object o)
+    {
+        var value = (GeometryCombineMode)o;
+        return value == GeometryCombineMode.Union ||
+               value == GeometryCombineMode.Intersect ||
+               value == GeometryCombineMode.Xor ||
+               value == GeometryCombineMode.Exclude;
+    }
 }

@@ -28,7 +28,7 @@ namespace System.Windows.Media;
 /// and rectangles.
 /// </summary>
 [ContentProperty(nameof(Figures))]
-public sealed class PathGeometry : Geometry
+public sealed partial class PathGeometry : Geometry
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="PathGeometry"/> class.

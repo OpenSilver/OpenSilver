@@ -115,6 +115,8 @@ public sealed class StreamGeometry : Geometry
     /// </returns>
     public StreamGeometryContext Open() => new StreamGeometryCallbackContext(this);
 
+    internal override FillRule GetFillRule() => FillRule;
+
     internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)
     {
         Matrix matrix = GetCombinedMatrix(transform);
@@ -125,7 +127,7 @@ public sealed class StreamGeometry : Geometry
     /// GetPathGeometryData - returns a struct which contains this Geometry represented
     /// as a path geometry's serialized format.
     /// </summary>
-    private PathGeometryData GetPathGeometryData()
+    internal override PathGeometryData GetPathGeometryData()
     {
         if (IsEmpty())
         {
@@ -135,10 +137,10 @@ public sealed class StreamGeometry : Geometry
         return new PathGeometryData
         {
             FillRule = FillRule,
+            Matrix = Transform.ToMatrix(Transform),
             SerializedData = _data
         };
     }
-
 
     private void SetPathData(byte[] data)
     {

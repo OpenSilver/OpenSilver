@@ -2,8 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Media;
 
 namespace OpenSilver.Internal.Media;
 
@@ -68,6 +70,72 @@ internal enum MilPathFigureFlags
     Mask = 0x0000001F,
 
     FORCE_DWORD = unchecked((int)0xffffffff)
+}
+
+[DebuggerDisplay("X = {X}, Y = {Y}")]
+[StructLayout(LayoutKind.Sequential)]
+internal struct MilPoint2D
+{
+    public double X;
+    public double Y;
+
+    public MilPoint2D(double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public MilPoint2D(in MilPoint2D a, in MilPoint2D b)
+    {
+        X = b.X - a.X;
+        Y = b.Y - a.Y;
+    }
+
+    public readonly double Norm() => Math.Sqrt(X * X + Y * Y);
+
+    public readonly double ApproxNorm() => Math.Max(Math.Abs(X), Math.Abs(Y));
+
+    public void TurnRight()
+    {
+        double r = -Y;
+        Y = X;
+        X = r;
+    }
+
+    public readonly override bool Equals(object obj) => obj is MilPoint2D other && this == other;
+
+    public readonly override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
+
+    public static MilPoint2D operator *(in MilPoint2D p, double k) => new(p.X * k, p.Y * k);
+
+    public static MilPoint2D operator *(double k, in MilPoint2D p) => new(p.X * k, p.Y * k);
+
+    public static MilPoint2D operator /(in MilPoint2D p, double k)
+    {
+        k = 1.0 / k;
+        return new MilPoint2D(k * p.X, k * p.Y);
+    }
+
+    public static double operator *(in MilPoint2D a, in MilPoint2D b) => a.X * b.X + a.Y * b.Y;
+
+    public static MilPoint2D operator *(in MilPoint2D p, in Matrix m)
+    {
+        MilPoint2D newPoint = p;
+        m.MultiplyPoint(ref newPoint.X, ref newPoint.Y);
+        return newPoint;
+    }
+
+    public static MilPoint2D operator +(in MilPoint2D a, in MilPoint2D b) => new(a.X + b.X, a.Y + b.Y);
+
+    public static MilPoint2D operator -(in MilPoint2D a, in MilPoint2D b) => new(a.X - b.X, a.Y - b.Y);
+
+    public static MilPoint2D operator -(in MilPoint2D p) => new(-p.X, -p.Y);
+
+    public static bool operator ==(in MilPoint2D a, in MilPoint2D b) => a.X == b.X && a.Y == b.Y;
+
+    public static bool operator !=(in MilPoint2D a, in MilPoint2D b) => a.X != b.X || a.Y != b.Y;
+
+    public static implicit operator MilPoint2D(Point p) => new(p.X, p.Y);
 }
 
 [StructLayout(LayoutKind.Explicit)]

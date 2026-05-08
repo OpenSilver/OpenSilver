@@ -1,30 +1,31 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// Port of utils.h / utils.cpp
 
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 
-namespace OpenSilver.Internal.Media;
+namespace OpenSilver.Internal.Media.Geometry.Core;
 
-// Ported from WPF native code (https://github.com/dotnet/wpf/blob/main/src/Microsoft.DotNet.Wpf/src/WpfGfx/core/geometry/utils.cpp)
-internal static class GeometryUtils
+internal static class Utils
 {
-    private const double FUZZ = 1.0e-6;
-    private const double FOUR_THIRDS = 4.0 / 3.0;
-    private const double PI_OVER_180 = Math.PI / 180.0;
-    private const double TWO_PI = Math.PI * 2;
+    internal const double FUZZ = 1.0e-6;
+    internal const double FUZZ_DOUBLE = 1.0e-12;
+    internal const double MIN_TOLERANCE = 1.0e-6;
+    internal const double DEFAULT_FLATTENING_TOLERANCE = 0.25;
+    internal const double TWICE_MIN_BEZIER_STEP_SIZE = 1.0e-3;
+    internal const double MIN_GPREAL = 1.0e-30;
+    internal const double MAX_GPREAL = 1.0e+30;
+    internal const double SQ_LENGTH_FUZZ = 1.0e-4;
+    internal const double ARC_AS_BEZIER = 0.5522847498307933984; // (sqrt(2) - 1) * 4/3
+    internal const double ONE_THIRD = 1.0 / 3.0;
+    internal const double TWO_THIRDS = 2.0 / 3.0;
+    internal const double FOUR_THIRDS = 4.0 / 3.0;
+    internal const double PI_OVER_180 = Math.PI / 180.0;
+    internal const double TWO_PI = Math.PI * 2;
+    internal const double SQRT_2 = 1.4142135623730950;
 
     internal static void ArcToBezier(
         double xStart,
@@ -342,5 +343,170 @@ internal static class GeometryUtils
             }
         }
         return fAccept;
+    }
+}
+
+internal sealed class CBounds
+{
+    private double _xMin = double.MaxValue;
+    private double _xMax = double.MinValue;
+    private double _yMin = double.MaxValue;
+    private double _yMax = double.MinValue;
+    private bool _encounteredNaN;
+
+    internal bool NotUpdated => _xMax < _xMin && _yMax < _yMin;
+
+    internal Rect GetRect()
+    {
+        if (_encounteredNaN)
+        {
+            return new Rect(double.NaN, double.NaN, double.NaN, double.NaN);
+        }
+        else if (_xMin <= _xMax && _yMin <= _yMax)
+        {
+            return new Rect(_xMin, _yMin, _xMax - _xMin, _yMax - _yMin);
+        }
+        else
+        {
+            return new Rect(0, 0, 0, 0);
+        }
+    }
+
+    internal void UpdateWithPoint(in MilPoint2D pt)
+    {
+        if (pt.X < _xMin) _xMin = pt.X;
+        if (pt.X > _xMax) _xMax = pt.X;
+        if (pt.Y < _yMin) _yMin = pt.Y;
+        if (pt.Y > _yMax) _yMax = pt.Y;
+        UpdateNaN(pt);
+    }
+
+    internal void UpdateWithBezier(in MilPoint2D pt0, in MilPoint2D pt1, in MilPoint2D pt2, in MilPoint2D pt3)
+    {
+        UpdateWithPoint(pt3);
+
+        UpdateNaN(pt1);
+        UpdateNaN(pt2);
+
+        Span<double> r = stackalloc double[2];
+
+        int nZeros = GetDerivativeZeros(pt0.X, pt1.X, pt2.X, pt3.X, r);
+        for (int j = 0; j < nZeros; j++)
+        {
+            double x = GetBezierPolynomValue(pt0.X, pt1.X, pt2.X, pt3.X, r[j]);
+            if (x < _xMin)
+            {
+                _xMin = x;
+            }
+            else if (x > _xMax)
+            {
+                _xMax = x;
+            }
+            UpdateNaN(x);
+        }
+
+        nZeros = GetDerivativeZeros(pt0.Y, pt1.Y, pt2.Y, pt3.Y, r);
+        for (int j = 0; j < nZeros; j++)
+        {
+            double y = GetBezierPolynomValue(pt0.Y, pt1.Y, pt2.Y, pt3.Y, r[j]);
+            if (y < _yMin)
+            {
+                _yMin = y;
+            }
+            else if (y > _yMax)
+            {
+                _yMax = y;
+            }
+            UpdateNaN(y);
+        }
+    }
+
+    private void UpdateNaN(double x)
+    {
+        _encounteredNaN = _encounteredNaN || double.IsNaN(x);
+    }
+
+    private void UpdateNaN(in MilPoint2D pt)
+    {
+        _encounteredNaN = _encounteredNaN || double.IsNaN(pt.X) || double.IsNaN(pt.Y);
+    }
+
+    private int SolveSpecialQuadratic(double a, double b, double c, Span<double> r)
+    {
+        int nZeros = 0;
+        double d = b * b - a * c;
+
+        UpdateNaN(d);
+
+        if (d > 0)
+        {
+            d = Math.Sqrt(d);
+            b = -b;
+            r[nZeros] = (b - d) / a;
+            UpdateNaN(r[nZeros]);
+            if (r[nZeros] > 0)
+            {
+                nZeros++;
+            }
+            r[nZeros] = (b + d) / a;
+            UpdateNaN(r[nZeros]);
+            if (r[nZeros] > 0)
+            {
+                nZeros++;
+            }
+        }
+
+        return nZeros;
+    }
+
+    private int GetDerivativeZeros(double a, double b, double c, double d, Span<double> r)
+    {
+        int nZeros = 0;
+
+        if ((b - a) * (d - b) >= 0 && (c - a) * (d - c) >= 0)
+        {
+            return nZeros;
+        }
+
+        a = b - a;
+        b = c - b;
+        c = d - c;
+        double fa = Math.Abs(a);
+        double fb = Math.Abs(b);
+        double fc = Math.Abs(c);
+        double fuzz = fb * Utils.FUZZ;
+
+        if (fa < fuzz && fc < fuzz)
+        {
+            return nZeros;
+        }
+
+        if (fa > fc)
+        {
+            nZeros = SolveSpecialQuadratic(a, b, c, r);
+            for (int i = 0; i < nZeros; i++)
+            {
+                r[i] = 1.0 / (1 + r[i]);
+            }
+        }
+        else
+        {
+            nZeros = SolveSpecialQuadratic(c, b, a, r);
+            for (int i = 0; i < nZeros; i++)
+            {
+                r[i] = r[i] / (1 + r[i]);
+            }
+        }
+
+        return nZeros;
+    }
+
+    private static double GetBezierPolynomValue(double a, double b, double c, double d, double t)
+    {
+        double t2 = t * t;
+        double s = 1 - t;
+        double s2 = s * s;
+
+        return a * s * s2 + 3 * b * t * s2 + 3 * c * t2 * s + d * t * t2;
     }
 }

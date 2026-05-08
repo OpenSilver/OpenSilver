@@ -64,6 +64,16 @@ namespace System.Windows.Media
 
         internal Matrix Matrix => _matrix ??= Value;
 
+        internal static Matrix ToMatrix(Transform transform)
+        {
+            if (transform is null)
+            {
+                return Matrix.Identity;
+            }
+
+            return transform.Matrix;
+        }
+
         /// <summary>
         /// Returns true if transformation if the transformation is definitely an identity.  There are cases where it will
         /// return false because of computational error or presence of animations (And we're interpolating through a

@@ -246,23 +246,7 @@ namespace System.Windows.Media
             }
             else
             {
-                Point topLeft = rect.TopLeft;
-                Point topRight = rect.TopRight;
-                Point bottomLeft = rect.BottomLeft;
-                Point bottomRight = rect.BottomRight;
-
-                if (!matrix.IsIdentity)
-                {
-                    topLeft *= matrix;
-                    topRight *= matrix;
-                    bottomLeft *= matrix;
-                    bottomRight *= matrix;
-                }
-
-                context.BeginFigure(topLeft, true, true);
-                context.LineTo(topRight, true, false);
-                context.LineTo(bottomRight, true, false);
-                context.LineTo(bottomLeft, true, false);
+                context.AddRect(rect, matrix);
             }
         }
 

@@ -142,6 +142,8 @@ namespace System.Windows.Media
             return true;
         }
 
+        internal override bool IsObviouslyEmpty() => Children.InternalCount == 0;
+
         /// <summary>
         /// Determines whether this <see cref="GeometryGroup"/> object may have curved segments.
         /// </summary>

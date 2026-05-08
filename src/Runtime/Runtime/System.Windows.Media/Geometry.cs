@@ -13,6 +13,7 @@
 
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
+using OpenSilver.Internal.Media.Geometry.Core;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -44,6 +45,85 @@ public abstract class Geometry : DependencyObject
     /// A new <see cref="Geometry"/> instance created from the specified string.
     /// </returns>
     public static Geometry Parse(string source) => Parsers.ParseGeometry(source, CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Combines the two geometries using the specified <see cref="GeometryCombineMode"/> and tolerance 
+    /// factor, and applies the specified transform to the resulting geometry.
+    /// </summary>
+    /// <param name="geometry1">
+    /// The first geometry to combine.
+    /// </param>
+    /// <param name="geometry2">
+    /// The second geometry to combine.
+    /// </param>
+    /// <param name="mode">
+    /// One of the enumeration values that specifies how the geometries are combined.
+    /// </param>
+    /// <param name="transform">
+    /// A transformation to apply to the combined geometry, or null.
+    /// </param>
+    /// <param name="tolerance">
+    /// The maximum bounds on the distance between points in the polygonal approximation of the geometries.
+    /// Smaller values produce more accurate results but cause slower execution. If tolerance is less than 
+    /// .000001, .000001 is used instead.
+    /// </param>
+    /// <param name="type">
+    /// One of the <see cref="ToleranceType"/> values that specifies whether the tolerance factor is an 
+    /// absolute value or relative to the area of the geometry.
+    /// </param>
+    /// <returns>
+    /// The combined geometry.
+    /// </returns>
+    public static PathGeometry Combine(
+        Geometry geometry1,
+        Geometry geometry2,
+        GeometryCombineMode mode,
+        Transform transform,
+        double tolerance,
+        ToleranceType type)
+    {
+        return PathGeometry.InternalCombine(
+            geometry1,
+            geometry2,
+            mode,
+            transform,
+            tolerance,
+            type);
+    }
+
+    /// <summary>
+    /// Combines the two geometries using the specified <see cref="GeometryCombineMode"/> and applies 
+    /// the specified transform to the resulting geometry.
+    /// </summary>
+    /// <param name="geometry1">
+    /// The first geometry to combine.
+    /// </param>
+    /// <param name="geometry2">
+    /// The second geometry to combine.
+    /// </param>
+    /// <param name="mode">
+    /// One of the enumeration values that specifies how the geometries are combined.
+    /// </param>
+    /// <param name="transform">
+    /// A transformation to apply to the combined geometry, or null.
+    /// </param>
+    /// <returns>
+    /// The combined geometry.
+    /// </returns>
+    public static PathGeometry Combine(
+        Geometry geometry1,
+        Geometry geometry2,
+        GeometryCombineMode mode,
+        Transform transform)
+    {
+        return PathGeometry.InternalCombine(
+            geometry1,
+            geometry2,
+            mode,
+            transform,
+            StandardFlatteningTolerance,
+            ToleranceType.Absolute);
+    }
 
     /// <summary>
     /// Gets an empty geometry object.
@@ -83,8 +163,7 @@ public abstract class Geometry : DependencyObject
     /// <returns>
     /// The standard tolerance. The default value is 0.25.
     /// </returns>
-    [OpenSilver.NotImplemented]
-    public static double StandardFlatteningTolerance { get; } = 0.25;
+    public static double StandardFlatteningTolerance { get; } = Utils.DEFAULT_FLATTENING_TOLERANCE;
 
     /// <summary>
     /// Gets a <see cref="Rect"/> that specifies the axis-aligned bounding box of the
@@ -113,6 +192,11 @@ public abstract class Geometry : DependencyObject
     public abstract bool MayHaveCurves();
 
     internal static PathGeometryData GetEmptyPathGeometryData() => _emptyPathGeometryData;
+
+    // This method is used for eliminating unnecessary work when the geometry is obviously empty.
+    // For most Geometry types the definite IsEmpty() query is just as cheap.  The exceptions will 
+    // be CombinedGeometry and GeometryGroup.
+    internal virtual bool IsObviouslyEmpty() => IsEmpty();
 
     internal virtual Rect BoundsInternal => new Rect();
 
@@ -143,6 +227,32 @@ public abstract class Geometry : DependencyObject
 
     internal abstract void SerializeData(CapacityStreamGeometryContext context, Matrix transform);
 
+    /// <summary>
+    /// GetPathGeometryData - returns a struct which contains this Geometry represented
+    /// as a path geometry's serialized format.
+    /// </summary>
+    internal virtual PathGeometryData GetPathGeometryData()
+    {
+        if (IsObviouslyEmpty())
+        {
+            return GetEmptyPathGeometryData();
+        }
+
+        var data = new PathGeometryData
+        {
+            FillRule = GetFillRule(),
+            Matrix = Matrix.Identity,
+        };
+
+        var context = new ByteStreamGeometryContext();
+        SerializeData(context, Matrix.Identity);
+        context.Close();
+
+        data.SerializedData = context.GetData();
+
+        return data;
+    }
+
     internal virtual FillRule GetFillRule() => FillRule.EvenOdd;
 
     internal Matrix GetCombinedMatrix(Matrix transform)
@@ -168,27 +278,30 @@ public abstract class Geometry : DependencyObject
 
     private static PathGeometryData MakeEmptyPathGeometryData()
     {
+        int size = Unsafe.SizeOf<MIL_PATHGEOMETRY>();
+
         var data = new PathGeometryData
         {
             FillRule = FillRule.EvenOdd,
+            Matrix = Matrix.Identity,
+            SerializedData = new byte[size],
         };
 
-        int size = Unsafe.SizeOf<MIL_PATHGEOMETRY>();
+        // implicitly set pPathGeometry.Flags = 0;
+        var pPathGeometry = new MIL_PATHGEOMETRY
+        {
+            FigureCount = 0,
+            Size = (uint)size,
+        };
 
-        data.SerializedData = new byte[size];
-
-        MIL_PATHGEOMETRY pPathGeometry = MemoryMarshal.Read<MIL_PATHGEOMETRY>(data.SerializedData);
-
-        // implicitly set pPathGeometry->Flags = 0;
-        pPathGeometry.FigureCount = 0;
-        pPathGeometry.Size = (UInt32)size;
+        MemoryMarshal.Write(data.SerializedData, ref pPathGeometry);
 
         return data;
     }
 
     internal struct PathGeometryData
     {
-        internal bool IsEmpty()
+        internal readonly bool IsEmpty()
         {
             if (SerializedData is null || SerializedData.Length <= 0)
             {
@@ -200,9 +313,10 @@ public abstract class Geometry : DependencyObject
         }
 
         internal FillRule FillRule;
+        internal Matrix Matrix;
         internal byte[] SerializedData;
 
-        internal uint Size
+        internal readonly uint Size
         {
             get
             {
