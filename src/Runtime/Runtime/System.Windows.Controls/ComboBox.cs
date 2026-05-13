@@ -90,7 +90,8 @@ namespace System.Windows.Controls
             DataTemplate selectionBoxItemTemplate;
 
             int index = SelectedIndex;
-            if (index <= -1 || (IsDropDownOpen && SelectedItem is FrameworkElement))
+            if (index <= -1 ||
+                ((IsDropDownOpen && SelectedItem is FrameworkElement) && !UseWpfBehavior))
             {
                 content = _emptyContent;
                 selectionBoxItem = null;
@@ -115,6 +116,16 @@ namespace System.Windows.Controls
                     else
                     {
                         template = selectionBoxItemTemplate = ItemTemplate ?? GetDisplayMemberPathTemplate(this);
+                    }
+                }
+
+                if (UseWpfBehavior)
+                {
+                    if (IsDropDownOpen && content is UIElement)
+                    {
+                        content = _emptyContent;
+                        selectionBoxItem = null;
+                        template = selectionBoxItemTemplate = null;
                     }
                 }
             }
@@ -796,6 +807,22 @@ namespace System.Windows.Controls
             get { return (bool)GetValue(IsSelectionBoxHighlightedProperty); }
             private set { SetValueInternal(IsSelectionBoxHighlightedProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(ComboBox), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Defines whether the ComboBox should behave like the Silverlight or the Wpf version of the ComboBox.
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
+        }
+
 
         internal override void UpdateVisualStates(bool useTransitions)
         {
