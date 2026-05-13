@@ -17,10 +17,15 @@ using OpenSilver.Internal;
 namespace System.Windows.Controls
 {
     /// <summary>
-    /// Represents the container for an item in a ListBox control.
+    /// Represents the container for an item in a ComboBox control.
     /// </summary>
     public class ComboBoxItem : ListBoxItem
     {
+        static ComboBoxItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboBoxItem), new PropertyMetadata(typeof(ComboBoxItem)));
+        }
+
         private static readonly DependencyPropertyKey IsHighlightedPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(IsHighlighted),
