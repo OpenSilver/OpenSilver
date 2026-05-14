@@ -109,6 +109,24 @@ namespace OpenSilver.Compiler
         private readonly ConcurrentDictionary<TypeKey, TypeDefinition> _typeNameToType = [];
         private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<TypeKey>> _typesPerAssembly = [];
 
+        // All per-compile memorization caches live in a dedicated helper; UnloadAssembly resets
+        // them in one call. See MonoCecilLookupCache for the cache layout and rationale.
+        private readonly MonoCecilLookupCache _caches = new();
+
+        // Method-group delegates cached once so the per-call cache wrappers don't allocate a
+        // fresh delegate on every invocation. The static Find*Deep helpers stay on this class;
+        // only the memorization moved out.
+        private static readonly FindMemberDeepFunc<PropertyDefinition> s_findPropertyDeep = FindPropertyDeep;
+        private static readonly FindMemberDeepFunc<FieldDefinition> s_findFieldDeep = FindFieldDeep;
+        private static readonly FindMemberDeepFunc<EventDefinition> s_findEventDeep = FindEventDeep;
+        private static readonly FindMemberDeepFunc<MethodDefinition> s_findMethodDeep = FindMethodDeep;
+        private static readonly Func<TypeDefinition, TypeDefinition, bool> s_isSubclassOf = TypeDefinitionExtensions.IsSubclassOf;
+        private static readonly Func<TypeDefinition, TypeDefinition, bool> s_doesAnySubTypeImplementInterface = TypeDefinitionExtensions.DoesAnySubTypeImplementInterface;
+
+        // _typeReferenceHelper.GetEnumValue captured once as a delegate so the enum-value cache
+        // path doesn't allocate a closure on every call.
+        private readonly Func<TypeDefinition, string, bool, bool, string> _getEnumValueFromHelper;
+
         private readonly TypeReferenceHelper _typeReferenceHelper;
 
         private TypeDefinition _iListType;
@@ -227,6 +245,7 @@ namespace OpenSilver.Compiler
                 _ => throw new InvalidCompilerTypeException(),
             };
 
+            _getEnumValueFromHelper = _typeReferenceHelper.GetEnumValue;
             _storage = new MonoCecilAssemblyStorage();
         }
 
@@ -256,6 +275,11 @@ namespace OpenSilver.Compiler
                 _typeNameToType.TryRemove(t, out _);
             }
             _typesPerAssembly.Remove(assemblyDefinition);
+
+            // Per-compile caches key on TypeDefinition references that may belong to the
+            // unloaded assembly. Reset them to avoid stale references and memory leaks; they
+            // rebuild quickly during the next compile.
+            _caches.Clear();
         }
 
         public void Dispose()
@@ -600,11 +624,40 @@ namespace OpenSilver.Compiler
             return null;
         }
 
+        // Instance-cached wrappers around the static Find*Deep helpers. Memoization is delegated
+        // to _caches; the inspector just supplies the cached method-group delegate so the
+        // generic miss path knows which Find*Deep to call.
+        internal PropertyDefinition FindPropertyDeepCached(
+            TypeDefinition elementType, string propertyName, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindProperty(elementType, propertyName, flags, s_findPropertyDeep, out ownerElementType);
+
+        internal FieldDefinition FindFieldDeepCached(
+            TypeDefinition elementType, string name, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindField(elementType, name, flags, s_findFieldDeep, out ownerElementType);
+
+        internal EventDefinition FindEventDeepCached(
+            TypeDefinition elementType, string eventName, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindEvent(elementType, eventName, flags, s_findEventDeep, out ownerElementType);
+
+        internal MethodDefinition FindMethodDeepCached(
+            TypeDefinition elementType, string methodName, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindMethod(elementType, methodName, flags, s_findMethodDeep, out ownerElementType);
+
         private bool IsCollection(TypeDefinition type) =>
-            TypeDefinitionExtensions.Equals(type, IListType) || type.DoesAnySubTypeImplementInterface(IListType);
+            TypeDefinitionExtensions.Equals(type, IListType) || DoesAnySubTypeImplementInterfaceCached(type, IListType);
 
         private bool IsDictionary(TypeDefinition type) =>
-            TypeDefinitionExtensions.Equals(type, IDictionaryType) || type.DoesAnySubTypeImplementInterface(IDictionaryType);
+            TypeDefinitionExtensions.Equals(type, IDictionaryType) || DoesAnySubTypeImplementInterfaceCached(type, IDictionaryType);
+
+        // Cached wrappers for the two inheritance-walk primitives. Each IsXxx predicate (and a few
+        // internal helpers like IsCollection / IsDictionary) ultimately calls one of these against
+        // a fixed target type. The walks are deterministic per (source, target) pair, so we memoize
+        // through _caches for the lifetime of the inspector.
+        private bool IsSubclassOfCached(TypeDefinition type, TypeDefinition target)
+            => _caches.IsSubclassOf(type, target, s_isSubclassOf);
+
+        private bool DoesAnySubTypeImplementInterfaceCached(TypeDefinition type, TypeDefinition iface)
+            => _caches.DoesAnySubTypeImplementInterface(type, iface, s_doesAnySubTypeImplementInterface);
 
         private static CustomAttribute GetCustomAttributeDeep(TypeDefinition type, string fullName)
         {
@@ -626,47 +679,47 @@ namespace OpenSilver.Compiler
 
         public bool IsDependencyObject(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, DependencyObjectType) || type.IsSubclassOf(DependencyObjectType);
+            return TypeDefinitionExtensions.Equals(type, DependencyObjectType) || IsSubclassOfCached(type, DependencyObjectType);
         }
 
         public bool IsApplication(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ApplicationType) || type.IsSubclassOf(ApplicationType);
+            return TypeDefinitionExtensions.Equals(type, ApplicationType) || IsSubclassOfCached(type, ApplicationType);
         }
 
         public bool IsResourceDictionary(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ResourceDictionaryType) || type.IsSubclassOf(ResourceDictionaryType);
+            return TypeDefinitionExtensions.Equals(type, ResourceDictionaryType) || IsSubclassOfCached(type, ResourceDictionaryType);
         }
 
         public bool IsStyle(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, StyleType) || type.IsSubclassOf(StyleType);
+            return TypeDefinitionExtensions.Equals(type, StyleType) || IsSubclassOfCached(type, StyleType);
         }
 
         public bool IsFrameworkTemplate(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, FrameworkTemplateType) || type.IsSubclassOf(FrameworkTemplateType);
+            return TypeDefinitionExtensions.Equals(type, FrameworkTemplateType) || IsSubclassOfCached(type, FrameworkTemplateType);
         }
 
         public bool IsDataTemplate(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, DataTemplateType) || type.IsSubclassOf(DataTemplateType);
+            return TypeDefinitionExtensions.Equals(type, DataTemplateType) || IsSubclassOfCached(type, DataTemplateType);
         }
 
         public bool IsControlTemplate(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ControlTemplateType) || type.IsSubclassOf(ControlTemplateType);
+            return TypeDefinitionExtensions.Equals(type, ControlTemplateType) || IsSubclassOfCached(type, ControlTemplateType);
         }
 
         public bool IsContentPresenter(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ContentPresenterType) || type.IsSubclassOf(ContentPresenterType);
+            return TypeDefinitionExtensions.Equals(type, ContentPresenterType) || IsSubclassOfCached(type, ContentPresenterType);
         }
 
         public bool IsContentControl(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ContentControlType) || type.IsSubclassOf(ContentControlType);
+            return TypeDefinitionExtensions.Equals(type, ContentControlType) || IsSubclassOfCached(type, ContentControlType);
         }
 
         public bool IsRelativeSource(TypeDefinition type)
@@ -741,12 +794,12 @@ namespace OpenSilver.Compiler
 
         public bool IsIUIElement(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, IUIElementType) || type.DoesAnySubTypeImplementInterface(IUIElementType);
+            return TypeDefinitionExtensions.Equals(type, IUIElementType) || DoesAnySubTypeImplementInterfaceCached(type, IUIElementType);
         }
 
         public bool IsIFrameworkElement(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || type.DoesAnySubTypeImplementInterface(IFrameworkElementType);
+            return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || DoesAnySubTypeImplementInterfaceCached(type, IFrameworkElementType);
         }
 
         public bool IsFrameworkTemplateTemplateProperty(MemberReference memberReference)
@@ -758,7 +811,7 @@ namespace OpenSilver.Compiler
 
         public bool IsElementAMarkupExtension(TypeDefinition type)
         {
-            return type.DoesAnySubTypeImplementInterface(IMarkupExtensionType);
+            return DoesAnySubTypeImplementInterfaceCached(type, IMarkupExtensionType);
         }
 
         public string GetContentPropertyName(TypeDefinition type, IXmlLineInfo lineInfo)
@@ -809,7 +862,14 @@ namespace OpenSilver.Compiler
 
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
         {
-            return _typeReferenceHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
+            // Bypass the cache when enumType is null so we don't pollute it with null keys;
+            // the helper handles that case itself.
+            if (enumType is null)
+            {
+                return _typeReferenceHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
+            }
+
+            return _caches.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue, _getEnumValueFromHelper);
         }
 
         public static bool HasTypeConverter(MemberReference member)
@@ -887,7 +947,7 @@ namespace OpenSilver.Compiler
         {
             if (TestFlag(lookupFlags, MemberKind.Property))
             {
-                PropertyDefinition propertyDefinition = FindPropertyDeep(
+                PropertyDefinition propertyDefinition = FindPropertyDeepCached(
                     fromType,
                     memberName,
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
@@ -903,7 +963,7 @@ namespace OpenSilver.Compiler
 
             if (TestFlag(lookupFlags, MemberKind.AttachedPropertyGet))
             {
-                MethodDefinition attachedGetter = FindMethodDeep(
+                MethodDefinition attachedGetter = FindMethodDeepCached(
                     fromType,
                     $"Get{memberName}",
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
@@ -919,7 +979,7 @@ namespace OpenSilver.Compiler
 
             if (TestFlag(lookupFlags, MemberKind.AttachedPropertySet))
             {
-                MethodDefinition attachedSetter = FindMethodDeep(
+                MethodDefinition attachedSetter = FindMethodDeepCached(
                     fromType,
                     $"Set{memberName}",
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
@@ -935,7 +995,7 @@ namespace OpenSilver.Compiler
 
             if (TestFlag(lookupFlags, MemberKind.Event))
             {
-                EventDefinition eventDefinition = FindEventDeep(
+                EventDefinition eventDefinition = FindEventDeepCached(
                     fromType,
                     memberName,
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
@@ -951,7 +1011,7 @@ namespace OpenSilver.Compiler
 
             if (TestFlag(lookupFlags, MemberKind.AttachedEvent))
             {
-                MethodDefinition attachedAddHandler = FindMethodDeep(
+                MethodDefinition attachedAddHandler = FindMethodDeepCached(
                     fromType,
                     $"Add{memberName}Handler",
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
@@ -967,7 +1027,7 @@ namespace OpenSilver.Compiler
 
             if (TestFlag(lookupFlags, MemberKind.Field))
             {
-                FieldDefinition fieldDefinition = FindFieldDeep(
+                FieldDefinition fieldDefinition = FindFieldDeepCached(
                     fromType,
                     memberName,
                     MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
