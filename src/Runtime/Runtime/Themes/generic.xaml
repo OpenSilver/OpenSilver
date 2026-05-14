@@ -1800,6 +1800,10 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
+    <!-- ComboBoxItem -->
+    <Style TargetType="controls:ComboBoxItem"
+           BasedOn="{markup:StaticResource {x:Type controls:ListBoxItem}}" />
 
     <!--  ToolTip  -->
     <Style TargetType="controls:ToolTip">
@@ -1987,98 +1991,8 @@
             </Setter.Value>
         </Setter>
     </Style>
-  
-    <!--  ComboBoxItem  -->
-  <Style TargetType="controls:ComboBoxItem">
-    <Setter Property="Padding"
-            Value="3" />
-    <Setter Property="HorizontalContentAlignment"
-            Value="Left" />
-    <Setter Property="VerticalContentAlignment"
-            Value="Top" />
-    <Setter Property="Background"
-            Value="{x:Static media:Brushes.Transparent}" />
-    <Setter Property="BorderThickness"
-            Value="1" />
-    <Setter Property="TabNavigation"
-            Value="Local" />
-    <Setter Property="Template">
-      <Setter.Value>
-        <controls:ControlTemplate TargetType="controls:ComboBoxItem">
-          <controls:Grid Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}">
-            <VisualStateManager.VisualStateGroups>
-              <VisualStateGroup x:Name="CommonStates">
-                <VisualState x:Name="Normal" />
-                <VisualState x:Name="MouseOver">
-                  <animation:Storyboard>
-                    <animation:DoubleAnimation animation:Storyboard.TargetName="fillColor"
-                                                               animation:Storyboard.TargetProperty="Opacity"
-                                                               Duration="0"
-                                                               To=".35" />
-                  </animation:Storyboard>
-                </VisualState>
-                <VisualState x:Name="Disabled">
-                  <animation:Storyboard>
-                    <animation:DoubleAnimation animation:Storyboard.TargetName="contentPresenter"
-                                                               animation:Storyboard.TargetProperty="Opacity"
-                                                               Duration="0"
-                                                               To=".55" />
-                  </animation:Storyboard>
-                </VisualState>
-              </VisualStateGroup>
-              <VisualStateGroup x:Name="SelectionStates">
-                <VisualState x:Name="Unselected" />
-                <VisualState x:Name="Selected">
-                  <animation:Storyboard>
-                    <animation:DoubleAnimation animation:Storyboard.TargetName="fillColor2"
-                                                               animation:Storyboard.TargetProperty="Opacity"
-                                                               Duration="0"
-                                                               To=".75" />
-                  </animation:Storyboard>
-                </VisualState>
-              </VisualStateGroup>
-              <VisualStateGroup x:Name="FocusStates">
-                <VisualState x:Name="Focused">
-                  <animation:Storyboard>
-                    <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="FocusVisualElement"
-                                                                             animation:Storyboard.TargetProperty="Visibility"
-                                                                             Duration="0">
-                      <animation:DiscreteObjectKeyFrame KeyTime="0">
-                        <animation:DiscreteObjectKeyFrame.Value>
-                          <Visibility>Visible</Visibility>
-                        </animation:DiscreteObjectKeyFrame.Value>
-                      </animation:DiscreteObjectKeyFrame>
-                    </animation:ObjectAnimationUsingKeyFrames>
-                  </animation:Storyboard>
-                </VisualState>
-                <VisualState x:Name="Unfocused" />
-              </VisualStateGroup>
-            </VisualStateManager.VisualStateGroups>
-            <controls:Border x:Name="fillColor"
-                                     Opacity="0"
-                                     Background="#FFBADDE9"
-                                     IsHitTestVisible="False"
-                                     CornerRadius="1" />
-            <controls:Border x:Name="fillColor2"
-                                     Opacity="0"
-                                     Background="#FFBADDE9"
-                                     IsHitTestVisible="False"
-                                     CornerRadius="1" />
-            <controls:ContentPresenter x:Name="contentPresenter"
-                                               HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
-                                               Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
-            <controls:Border x:Name="FocusVisualElement"
-                                     BorderBrush="#FF6DBDD1"
-                                     BorderThickness="1"
-                                     Visibility="Collapsed"
-                                     CornerRadius="1" />
-          </controls:Grid>
-        </controls:ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
 
-  <!--  ComboBox  -->
+    <!--  ComboBox  -->
     <Style TargetType="controls:ComboBox">
         <Setter Property="Padding"
                 Value="6,2,25,2" />
