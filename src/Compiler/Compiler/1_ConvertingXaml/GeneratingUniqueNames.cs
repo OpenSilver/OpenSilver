@@ -14,6 +14,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
@@ -24,8 +25,12 @@ namespace OpenSilver.Compiler
         // any property defined by the user.
         public static readonly XName UniqueNameAttribute = GeneratingCode.xNamespace.GetName("__.UniqueName.__");
 
+        [ThreadStatic]
+        private static Dictionary<string, int> _nextCounterPerPrefix;
+
         public static void ProcessDocument(XDocument doc)
         {
+            _nextCounterPerPrefix ??= [];
             TraverseNextElement(doc.Root);
         }
 
@@ -58,7 +63,13 @@ namespace OpenSilver.Compiler
             }
 
             // Because of f# warning, makes the first letter lower case
-            return $"{char.ToLower(prefix[0])}{prefix.Slice(1)}_{Guid.NewGuid():N}"; // Example: Button_4541C363579C48A981219C392BF8ACD5
+            string typeName = $"{char.ToLower(prefix[0])}{prefix.Slice(1)}";
+
+            _nextCounterPerPrefix ??= [];
+            _nextCounterPerPrefix.TryGetValue(typeName, out int n);
+            _nextCounterPerPrefix[typeName] = ++n;
+
+            return $"{typeName}{n}"; // Example: button1, button2, ...
         }
     }
 }
