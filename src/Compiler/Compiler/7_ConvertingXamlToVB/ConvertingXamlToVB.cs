@@ -55,7 +55,7 @@ namespace OpenSilver.Compiler
             }
 
             // Generate unique names for XAML elements:
-            GeneratingUniqueNames.ProcessDocument(doc);
+            GeneratingUniqueNames.ProcessDocument(doc, settings);
 
             // Generate Vb code from the tree:
             return GeneratingVBCode.GenerateCode(
