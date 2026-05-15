@@ -41,6 +41,7 @@
     <Compile Include="1_ConvertingXaml\MarkupExtensionParser\MeScanner.cs" />
     <Compile Include="1_ConvertingXaml\MarkupExtensionParser\Errors.cs" />
     <Compile Include="1_ConvertingXaml\MarkupExtensionParser\XamlParserContext.cs" />
+    <Compile Include="1_ConvertingXaml\NameProvider.cs" />
     <Compile Include="1_ConvertingXaml\XamlNameParser.cs" />
     <Compile Include="1_ConvertingXaml\KnownNamespaces.cs" />
     <Compile Include="1_ConvertingXaml\InsertingImplicitNodes.cs" />

@@ -32,10 +32,10 @@ namespace OpenSilver.Compiler
             {
                 private readonly StringBuilder _stringBuilder = new();
 
-                protected GeneratorScope(string rootElement)
+                protected GeneratorScope(string rootElement, string xamlContext)
                 {
                     Root = rootElement;
-                    XamlContext = GeneratingUniqueNames.GenerateUniqueName("xamlContext");
+                    XamlContext = xamlContext;
                 }
 
                 public string Root { get; }
@@ -55,8 +55,8 @@ namespace OpenSilver.Compiler
             {
                 private readonly bool _buildNamescope;
 
-                public RootScope(string rootElementName, bool createNameScope)
-                    : base(rootElementName)
+                public RootScope(string rootElementName, string xamlContext, bool createNameScope)
+                    : base(rootElementName, xamlContext)
                 {
                     _buildNamescope = createNameScope;
 
@@ -80,8 +80,8 @@ namespace OpenSilver.Compiler
 
             private sealed class NewObjectScope : GeneratorScope
             {
-                public NewObjectScope(string objectName, string objectType)
-                    : base(objectName)
+                public NewObjectScope(string objectName, string xamlContext, string objectType)
+                    : base(objectName, xamlContext)
                 {
                     ObjectType = objectType;
                     MethodName = $"New_{objectName}";
@@ -112,8 +112,8 @@ namespace OpenSilver.Compiler
 
             private sealed class FrameworkTemplateScope : GeneratorScope
             {
-                public FrameworkTemplateScope(string templateName, string templateRoot)
-                    : base(templateRoot)
+                public FrameworkTemplateScope(string templateName, string xamlContext, string templateRoot)
+                    : base(templateRoot, xamlContext)
                 {
                     Name = templateName;
                     TemplateOwner = $"templateOwner_{templateName}";
@@ -263,6 +263,7 @@ namespace OpenSilver.Compiler
                 parameters.PushScope(
                     new RootScope(
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
+                        _settings.NameProvider.GetName("xamlContext"),
                         _settings.Inspector.IsIFrameworkElement(type)));
 
                 // Traverse the tree in "post order" (ie. start with child elements then traverse parent elements):
@@ -408,7 +409,10 @@ namespace OpenSilver.Compiler
 
                 if (_nodeSelector.IsMatch(element))
                 {
-                    var objectScope = new NewObjectScope(elementUid, elementType);
+                    var objectScope = new NewObjectScope(
+                        elementUid,
+                        _settings.NameProvider.GetName("xamlContext"),
+                        elementType);
 
                     parameters.AppendLine(
                         $"var {elementUid} = {objectScope.MethodName}({parameters.CurrentXamlContext});");
@@ -925,7 +929,10 @@ namespace OpenSilver.Compiler
 
                     string frameworkTemplateName = GeneratingCode.GetUniqueName(element);
 
-                    var scope = new FrameworkTemplateScope(frameworkTemplateName, GeneratingCode.GetUniqueName(member.Elements().First()));
+                    var scope = new FrameworkTemplateScope(
+                        frameworkTemplateName,
+                        _settings.NameProvider.GetName("xamlContext"),
+                        GeneratingCode.GetUniqueName(member.Elements().First()));
 
                     parameters.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, {scope.MethodName});");
 
@@ -1119,7 +1126,7 @@ namespace OpenSilver.Compiler
                                 }
                                 else
                                 {
-                                    string markupValue = GeneratingUniqueNames.GenerateUniqueName("tmp");
+                                    string markupValue = _settings.NameProvider.GetName("tmp");
                                     string dependencyPropertyName = $"global::{_settings.TypeReferenceHelper.ConvertToString(dpDeclaringType)}.{dpDefinition.Name}";
                                     string propertyType = _settings.TypeReferenceHelper.ConvertToString(memberType);
 
@@ -1218,7 +1225,7 @@ namespace OpenSilver.Compiler
 
                                 if (dpDefinition is not null)
                                 {
-                                    string markupValue = GeneratingUniqueNames.GenerateUniqueName("tmp");
+                                    string markupValue = _settings.NameProvider.GetName("tmp");
                                     string dpName = $"global::{_settings.TypeReferenceHelper.ConvertToString(dpDeclaringType)}.{dpDefinition.Name}";
 
                                     parameters

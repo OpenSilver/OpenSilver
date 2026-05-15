@@ -30,6 +30,7 @@ internal sealed class ConversionSettings
         SystemTypes = systemTypes;
         TypeReferenceHelper = typeReferenceHelper;
         XamlNameParser = new XamlNameParser(assemblyName);
+        NameProvider = new();
         Options = options;
     }
 
@@ -44,6 +45,8 @@ internal sealed class ConversionSettings
     public TypeReferenceHelper TypeReferenceHelper { get; }
 
     public XamlNameParser XamlNameParser { get; }
+
+    public NameProvider NameProvider { get; }
 
     public XamlPreprocessorOptions Options { get; }
 }
