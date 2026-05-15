@@ -1289,37 +1289,38 @@ namespace System.Windows
         IsThemeStyleUpdateInProgress = 0x00000004,
 
         NeedsClipBounds = 0x00000008,
+        HasLayoutTransformData = 0x00000010,
 
         // Has this instance been initialized
-        IsInitialized = 0x00000010,
+        IsInitialized = 0x00000020,
 
         // Set on BeginInit and reset on EndInit
-        InitPending = 0x00000020,
+        InitPending = 0x00000040,
 
-        IsStyleSetFromGenerator = 0x00000040,
+        IsStyleSetFromGenerator = 0x00000080,
 
-        HasThemeStyleEverBeenFetched = 0x00000080,
+        HasThemeStyleEverBeenFetched = 0x00000100,
 
-        HasLocalStyle = 0x00000100,
+        HasLocalStyle = 0x00000200,
 
-        HasStyleInvalidated = 0x00000200,
+        HasStyleInvalidated = 0x00000400,
 
-        HasLogicalChildren = 0x00000400,
+        HasLogicalChildren = 0x00000800,
 
         // Are we in the process of iterating the logical children.
         // This flag is set during a descendents walk, for property invalidation.
-        IsLogicalChildrenIterationInProgress = 0x00000800,
+        IsLogicalChildrenIterationInProgress = 0x000001000,
 
         // FlowDirection is set to RightToLeft (0 == LeftToRight, 1 == RightToLeft)
         // This is an optimization to speed reading the FlowDirection property
-        IsRightToLeft = 0x00001000,
+        IsRightToLeft = 0x00002000,
 
-        ShouldLookupImplicitStyles = 0x00002000,
+        ShouldLookupImplicitStyles = 0x00004000,
 
-        IsLoadedInResourceDictionary = 0x00004000,
+        IsLoadedInResourceDictionary = 0x00008000,
 
-        HasStyleTriggers = 0x00008000,
-        HasThemeStyleTriggers = 0x00010000,
-        HasTemplateTriggers = 0x00020000,
+        HasStyleTriggers = 0x000010000,
+        HasThemeStyleTriggers = 0x00020000,
+        HasTemplateTriggers = 0x00040000,
     }
 }

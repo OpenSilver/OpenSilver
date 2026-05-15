@@ -321,7 +321,7 @@ namespace System.Windows
 
             using (Dispatcher.DisableProcessing())
             {
-                //enforce that Arrange can not come with Infinity size or NaN
+                // enforce that Arrange can not come with Infinity size or NaN
                 if (double.IsPositiveInfinity(finalRect.Width)
                     || double.IsPositiveInfinity(finalRect.Height)
                     || double.IsNaN(finalRect.Width)
@@ -337,15 +337,15 @@ namespace System.Windows
 
                 if (!IsRenderable || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
-                    //reset arrange request.
+                    // reset arrange request.
                     if (ArrangeRequest != null)
                     {
                         LayoutManager.Current.ArrangeQueue.Remove(this);
                     }
 
-                    //  remember though that parent tried to arrange at this rect
-                    //  in case when later this element is called to arrange incrementally
-                    //  it has up-to-date information stored in _finalRect
+                    // remember though that parent tried to arrange at this rect
+                    // in case when later this element is called to arrange incrementally
+                    // it has up-to-date information stored in _finalRect
                     PreviousArrangeRect = finalRect;
 
                     return;
@@ -356,12 +356,12 @@ namespace System.Windows
                     try
                     {
                         MeasureDuringArrange = true;
-                        //If never measured - that means "set size", arrange-only scenario
-                        //Otherwise - the parent previously measured the element at constriant
-                        //and the fact that we are arranging the measure-dirty element now means
-                        //we are not in the UpdateLayout loop but rather in manual sequence of Measure/Arrange
-                        //(like in HwndSource when new RootVisual is attached) so there are no loops and there could be
-                        //measure-dirty elements left after previous single Measure pass) - so need to use cached constraint
+                        // If never measured - that means "set size", arrange-only scenario
+                        // Otherwise - the parent previously measured the element at constriant
+                        // and the fact that we are arranging the measure-dirty element now means
+                        // we are not in the UpdateLayout loop but rather in manual sequence of Measure/Arrange
+                        // (like in HwndSource when new RootVisual is attached) so there are no loops and there could be
+                        // measure-dirty elements left after previous single Measure pass) - so need to use cached constraint
                         if (NeverMeasured)
                         {
                             Measure(finalRect.Size);
@@ -377,7 +377,7 @@ namespace System.Windows
                     }
                 }
 
-                //bypass - if clean and rect is the same, no need to re-arrange
+                // bypass - if clean and rect is the same, no need to re-arrange
                 if (!IsArrangeValid || NeverArranged || !DoubleUtil.AreClose(finalRect, PreviousArrangeRect))
                 {
                     bool firstArrange = NeverArranged;
@@ -388,7 +388,6 @@ namespace System.Windows
 
                     Size oldSize = RenderSize;
                     Vector oldOffset = VisualOffset;
-                    Rect? oldLayoutClip = LayoutClip;
                     bool sizeChanged = false;
                     bool gotException = true;
 
@@ -396,17 +395,16 @@ namespace System.Windows
                     {
                         layoutManager.EnterArrange();
 
-                        //This has to update RenderSize
+                        // This has to update RenderSize
                         ArrangeCore(finalRect);
 
-                        //to make sure Clip is tranferred to Visual
-                        LayoutClip = GetLayoutClip(finalRect.Size);
+                        // to make sure Clip is tranferred to Visual
+                        EnsureClip(finalRect.Size);
 
                         // see if we need to call OnRenderSizeChanged on this element
                         sizeChanged = MarkForSizeChangedIfNeeded(oldSize, RenderSize);
 
-                        sizeChanged |= !DoubleUtil.AreClose(oldOffset, VisualOffset)
-                                    || !DoubleUtil.AreClose(oldLayoutClip, LayoutClip);
+                        sizeChanged |= !DoubleUtil.AreClose(oldOffset, VisualOffset);
 
                         gotException = false;
                     }
@@ -429,7 +427,7 @@ namespace System.Windows
 
                     ArrangeDirty = false;
 
-                    //reset request.
+                    // reset request.
                     if (ArrangeRequest != null)
                     {
                         LayoutManager.Current.ArrangeQueue.Remove(this);
@@ -493,9 +491,28 @@ namespace System.Windows
             }
         }
 
-        internal virtual Rect? GetLayoutClip(Size layoutSlotSize)
+        /// <summary>
+        /// Returns an alternative clipping geometry that represents the region that would be 
+        /// clipped if <see cref="ClipToBounds" /> were set to true.
+        /// </summary>
+        /// <param name="layoutSlotSize">
+        /// The available size provided by the element.
+        /// </param>
+        /// <returns>
+        /// The potential clipping geometry.
+        /// </returns>
+        protected virtual Geometry GetLayoutClip(Size layoutSlotSize)
         {
-            return null;
+            if (ClipToBounds)
+            {
+                var rect = new RectangleGeometry(new Rect(RenderSize));
+                rect.Seal();
+                return rect;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -651,6 +668,30 @@ namespace System.Windows
             return false;
         }
 
+        private void EnsureClip(Size layoutSlotSize)
+        {
+            Geometry clipGeometry = GetLayoutClip(layoutSlotSize);
+
+            if (Clip is Geometry clip)
+            {
+                if (clipGeometry is null)
+                {
+                    clipGeometry = clip;
+                }
+                else
+                {
+                    var cg = new CombinedGeometry(
+                        GeometryCombineMode.Intersect,
+                        clipGeometry,
+                        clip);
+
+                    clipGeometry = cg;
+                }
+            }
+
+            VisualClip = clipGeometry;
+        }
+
         /// <summary>
         /// Ensures that all positions of child objects of a <see cref="UIElement"/> are
         /// properly updated for layout.
@@ -663,7 +704,7 @@ namespace System.Windows
         {
             if (!BypassLayoutPolicies)
             {
-                INTERNAL_HtmlDomManager.ArrangeNative(OuterDiv.Uid, VisualOffset, RenderSize, LayoutClip);
+                INTERNAL_HtmlDomManager.ArrangeNative(OuterDiv.Uid, VisualOffset, RenderSize);
             }
         }
 
@@ -675,7 +716,6 @@ namespace System.Windows
             e.PreviousArrangeRect = new Rect();
             e.PreviousAvailableSize = new Size();
             e.VisualOffset = new Vector();
-            e.LayoutClip = null;
             e._desiredSize = new Size();
             e.RenderSize = new Size();
         }
@@ -760,8 +800,6 @@ namespace System.Windows
         }
 
         internal Vector VisualOffset { get; set; }
-
-        internal Rect? LayoutClip { get; private set; }
 
         internal Rect PreviousArrangeRect { get; private set; }
 

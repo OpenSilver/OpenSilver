@@ -1,0 +1,600 @@
+<sdk:Page x:Class="TestApplication.Tests.LayoutTransformTest"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          mc:Ignorable="d"
+          xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical"
+                    Margin="10">
+
+            <TextBlock Text="LayoutTransform &amp; Clipping Tests"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10" />
+
+            <!-- ================================================================ -->
+            <!-- CASE 1: Basic LayoutTransform (RotateTransform) — no clipping     -->
+            <!-- The rotated element should affect layout: siblings shift to make   -->
+            <!-- room for the transformed bounds.                                   -->
+            <!-- ================================================================ -->
+            <TextBlock Text="1. Basic LayoutTransform (RotateTransform) — layout participation"
+                       FontWeight="Bold"
+                       Margin="0,10,0,4" />
+            <Border BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="10"
+                    HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <Border Background="CornflowerBlue"
+                            Width="80"
+                            Height="40">
+                        <Border.LayoutTransform>
+                            <RotateTransform Angle="30" />
+                        </Border.LayoutTransform>
+                        <TextBlock Text="Rotated 30°"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10" />
+                    </Border>
+                    <Border Background="Coral"
+                            Width="80"
+                            Height="40"
+                            Margin="4,0,0,0">
+                        <TextBlock Text="Sibling"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 2: LayoutTransform (ScaleTransform) — no clipping            -->
+            <!-- Scaling up should push siblings further apart.                     -->
+            <!-- ================================================================ -->
+            <TextBlock Text="2. LayoutTransform (ScaleTransform 2x) — layout participation"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <Border BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="10"
+                    HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <Border Background="MediumSeaGreen"
+                            Width="60"
+                            Height="30">
+                        <Border.LayoutTransform>
+                            <ScaleTransform ScaleX="2"
+                                            ScaleY="2" />
+                        </Border.LayoutTransform>
+                        <TextBlock Text="Scale 2x"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10" />
+                    </Border>
+                    <Border Background="Coral"
+                            Width="60"
+                            Height="30"
+                            Margin="4,0,0,0">
+                        <TextBlock Text="Sibling"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 3: LayoutTransform inside a fixed-size parent (layout clip)  -->
+            <!-- The parent Border is 100x60 and the child, after LayoutTransform, -->
+            <!-- exceeds that size. Layout clipping should clip the overflow.       -->
+            <!-- ================================================================ -->
+            <TextBlock Text="3. LayoutTransform inside fixed-size parent — layout clipping"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Parent is 120×60. Scaled child (2x) would be 160×60. Overflow should be clipped by layout."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    Width="120"
+                    Height="60"
+                    HorizontalAlignment="Left">
+                <Border Background="DodgerBlue"
+                        Width="80"
+                        Height="30">
+                    <Border.LayoutTransform>
+                        <ScaleTransform ScaleX="2"
+                                        ScaleY="2" />
+                    </Border.LayoutTransform>
+                    <TextBlock Text="Scaled 2x"
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="10" />
+                </Border>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 4: LayoutTransform + ClipToBounds on parent                  -->
+            <!-- The StackPanel has ClipToBounds=True. Rotated child extends       -->
+            <!-- beyond bounds and should be clipped.                               -->
+            <!-- ================================================================ -->
+            <TextBlock Text="4. LayoutTransform + ClipToBounds=True on parent"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="StackPanel is 200×80 with ClipToBounds=True. Rotated element should be clipped at parent boundary."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal"
+                            Width="200"
+                            Height="80"
+                            ClipToBounds="True"
+                            Background="LightYellow">
+                    <Border Background="Purple"
+                            Width="100"
+                            Height="60">
+                        <Border.LayoutTransform>
+                            <RotateTransform Angle="45" />
+                        </Border.LayoutTransform>
+                        <TextBlock Text="Rot 45°"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10" />
+                    </Border>
+                    <Border Background="Orange"
+                            Width="60"
+                            Height="40">
+                        <TextBlock Text="Next"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 5: LayoutTransform + UIElement.Clip (RectangleGeometry)      -->
+            <!-- The Clip is set on the transformed element itself. The clip rect  -->
+            <!-- is in the element's local coordinate space (before transform).     -->
+            <!-- ================================================================ -->
+            <TextBlock Text="5. LayoutTransform + UIElement.Clip (RectangleGeometry)"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Element has Clip=RectangleGeometry(0,0,40,40) and LayoutTransform=Scale(2). Clip is in local coords."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="10"
+                    HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <Border Background="Crimson"
+                            Width="80"
+                            Height="80">
+                        <Border.Clip>
+                            <RectangleGeometry Rect="0,0,40,40" />
+                        </Border.Clip>
+                        <Border.LayoutTransform>
+                            <ScaleTransform ScaleX="2"
+                                            ScaleY="2" />
+                        </Border.LayoutTransform>
+                        <TextBlock Text="Clip+Scale"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10" />
+                    </Border>
+                    <Border Background="LightGray"
+                            Width="40"
+                            Height="40"
+                            Margin="8,0,0,0">
+                        <TextBlock Text="Ref 40×40"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="9" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 6: UIElement.Clip (EllipseGeometry) + LayoutTransform        -->
+            <!-- Elliptical clip combined with rotation.                            -->
+            <!-- ================================================================ -->
+            <TextBlock Text="6. UIElement.Clip (EllipseGeometry) + LayoutTransform (Rotate)"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Element clipped to an ellipse and rotated 25°. The ellipse clip should rotate with the element."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="10"
+                    HorizontalAlignment="Left">
+                <Border Background="Teal"
+                        Width="120"
+                        Height="80">
+                    <Border.Clip>
+                        <EllipseGeometry Center="60,40"
+                                         RadiusX="60"
+                                         RadiusY="40" />
+                    </Border.Clip>
+                    <Border.LayoutTransform>
+                        <RotateTransform Angle="25" />
+                    </Border.LayoutTransform>
+                    <TextBlock Text="Ellipse Clip + Rotate"
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="10" />
+                </Border>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 7: Nested LayoutTransforms with parent ClipToBounds          -->
+            <!-- Outer element is scaled, inner element is rotated. The outermost  -->
+            <!-- container clips with ClipToBounds.                                -->
+            <!-- ================================================================ -->
+            <TextBlock Text="7. Nested LayoutTransforms + ClipToBounds on ancestor"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Outer container (180×100) clips. Middle is scaled 1.5x, inner is rotated 30°."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    Width="180"
+                    Height="100"
+                    HorizontalAlignment="Left"
+                    ClipToBounds="True">
+                <Border Background="LightBlue"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <Border.LayoutTransform>
+                        <ScaleTransform ScaleX="1.5"
+                                        ScaleY="1.5" />
+                    </Border.LayoutTransform>
+                    <Border Background="SlateBlue"
+                            Width="80"
+                            Height="50">
+                        <Border.LayoutTransform>
+                            <RotateTransform Angle="30" />
+                        </Border.LayoutTransform>
+                        <TextBlock Text="Inner"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10" />
+                    </Border>
+                </Border>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 8: LayoutTransform (SkewTransform) + ClipToBounds            -->
+            <!-- Skewed element inside a clipping container.                        -->
+            <!-- ================================================================ -->
+            <TextBlock Text="8. LayoutTransform (SkewTransform) + ClipToBounds"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Container (160×60) clips. Child is skewed 20° on X."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    Width="160"
+                    Height="60"
+                    HorizontalAlignment="Left"
+                    ClipToBounds="True">
+                <Border Background="DarkOrange"
+                        Width="100"
+                        Height="40"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <Border.LayoutTransform>
+                        <SkewTransform AngleX="20" />
+                    </Border.LayoutTransform>
+                    <TextBlock Text="Skewed 20°"
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="10" />
+                </Border>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 9: LayoutTransform on multiple children inside a Grid        -->
+            <!-- Two overlapping cells, each with LayoutTransform, parent clips.   -->
+            <!-- ================================================================ -->
+            <TextBlock Text="9. Multiple LayoutTransforms in a Grid + ClipToBounds"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Grid (200×100) clips. Cell 0: Scale 1.8x. Cell 1: Rotate 40°."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    HorizontalAlignment="Left">
+                <Grid Width="200"
+                      Height="100"
+                      ClipToBounds="True"
+                      Background="Beige">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0"
+                            Background="SteelBlue"
+                            Width="60"
+                            Height="40">
+                        <Border.LayoutTransform>
+                            <ScaleTransform ScaleX="1.8"
+                                            ScaleY="1.8" />
+                        </Border.LayoutTransform>
+                        <TextBlock Text="1.8x"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10" />
+                    </Border>
+                    <Border Grid.Column="1"
+                            Background="IndianRed"
+                            Width="60"
+                            Height="40">
+                        <Border.LayoutTransform>
+                            <RotateTransform Angle="40" />
+                        </Border.LayoutTransform>
+                        <TextBlock Text="Rot 40°"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 10: LayoutTransform + UIElement.Clip + ClipToBounds combined -->
+            <!-- All three clipping mechanisms at once.                             -->
+            <!-- ================================================================ -->
+            <TextBlock Text="10. LayoutTransform + UIElement.Clip + ClipToBounds (all combined)"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Container clips (150×80). Element has Clip=Rect(0,0,50,50) and is scaled 2x."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    Width="150"
+                    Height="80"
+                    HorizontalAlignment="Left"
+                    ClipToBounds="True"
+                    Background="Lavender">
+                <Border Background="DarkGreen"
+                        Width="60"
+                        Height="60"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <Border.Clip>
+                        <RectangleGeometry Rect="0,0,50,50" />
+                    </Border.Clip>
+                    <Border.LayoutTransform>
+                        <ScaleTransform ScaleX="2"
+                                        ScaleY="2" />
+                    </Border.LayoutTransform>
+                    <TextBlock Text="All 3"
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="10" />
+                </Border>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 11: LayoutTransform vs RenderTransform comparison            -->
+            <!-- Side-by-side to highlight the difference in layout behavior.       -->
+            <!-- ================================================================ -->
+            <TextBlock Text="11. LayoutTransform vs RenderTransform comparison"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Left uses LayoutTransform (affects layout). Right uses RenderTransform (does not affect layout)."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="10"
+                    HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="0,0,20,0">
+                        <TextBlock Text="LayoutTransform"
+                                   FontSize="10"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,2" />
+                        <Border BorderBrush="DarkGray"
+                                BorderThickness="1"
+                                Padding="4"
+                                Width="140"
+                                Height="80">
+                            <StackPanel Orientation="Horizontal">
+                                <Border Background="RoyalBlue"
+                                        Width="50"
+                                        Height="30">
+                                    <Border.LayoutTransform>
+                                        <RotateTransform Angle="45" />
+                                    </Border.LayoutTransform>
+                                    <TextBlock Text="45°"
+                                               Foreground="White"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               FontSize="9" />
+                                </Border>
+                                <Border Background="Tomato"
+                                        Width="40"
+                                        Height="20"
+                                        Margin="4,0,0,0">
+                                    <TextBlock Text="Next"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               FontSize="9" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="RenderTransform"
+                                   FontSize="10"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,2" />
+                        <Border BorderBrush="DarkGray"
+                                BorderThickness="1"
+                                Padding="4"
+                                Width="140"
+                                Height="80">
+                            <StackPanel Orientation="Horizontal">
+                                <Border Background="RoyalBlue"
+                                        Width="50"
+                                        Height="30">
+                                    <Border.RenderTransform>
+                                        <RotateTransform Angle="45" />
+                                    </Border.RenderTransform>
+                                    <TextBlock Text="45°"
+                                               Foreground="White"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               FontSize="9" />
+                                </Border>
+                                <Border Background="Tomato"
+                                        Width="40"
+                                        Height="20"
+                                        Margin="4,0,0,0">
+                                    <TextBlock Text="Next"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               FontSize="9" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 12: LayoutTransform with CompositeTransform                  -->
+            <!-- ================================================================ -->
+            <TextBlock Text="12. LayoutTransform with CompositeTransform + ClipToBounds"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Container (200×80) clips. Child uses CompositeTransform: Scale 1.3 + Rotate 15°."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    Width="200"
+                    Height="80"
+                    HorizontalAlignment="Left"
+                    ClipToBounds="True"
+                    Background="MistyRose">
+                <Border Background="MediumVioletRed"
+                        Width="80"
+                        Height="40"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <Border.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.3"
+                                            ScaleY="1.3" />
+                            <RotateTransform Angle="15" />
+                        </TransformGroup>
+                    </Border.LayoutTransform>
+                    <TextBlock Text="Composite"
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="10" />
+                </Border>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 13: LayoutTransform on a TextBlock with large text           -->
+            <!-- The text content drives the size; LayoutTransform scales it up.   -->
+            <!-- ClipToBounds on the parent clips the result.                      -->
+            <!-- ================================================================ -->
+            <TextBlock Text="13. LayoutTransform on TextBlock + parent ClipToBounds"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Container (200×40) clips. TextBlock is scaled 3x by LayoutTransform."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    Width="200"
+                    Height="40"
+                    HorizontalAlignment="Left"
+                    ClipToBounds="True"
+                    Background="Honeydew">
+                <TextBlock Text="Hello!"
+                           FontSize="12"
+                           Foreground="DarkGreen"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                    <TextBlock.LayoutTransform>
+                        <ScaleTransform ScaleX="3"
+                                        ScaleY="3" />
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+            </Border>
+
+            <!-- ================================================================ -->
+            <!-- CASE 14: LayoutTransform on an Image/Shape inside clipping parent -->
+            <!-- ================================================================ -->
+            <TextBlock Text="14. LayoutTransform on Rectangle shape + Clip + ClipToBounds"
+                       FontWeight="Bold"
+                       Margin="0,14,0,4" />
+            <TextBlock Text="Outer clips (150×80). Rectangle (80×50) rotated 35° with Clip=Rect(0,0,60,40)."
+                       FontSize="11"
+                       Foreground="Gray"
+                       Margin="0,0,0,4" />
+            <Border BorderBrush="Red"
+                    BorderThickness="2"
+                    Width="150"
+                    Height="80"
+                    HorizontalAlignment="Left"
+                    ClipToBounds="True"
+                    Background="AliceBlue">
+                <Rectangle Width="80"
+                           Height="50"
+                           Fill="DarkSlateBlue"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                    <Rectangle.Clip>
+                        <RectangleGeometry Rect="0,0,60,40" />
+                    </Rectangle.Clip>
+                    <Rectangle.LayoutTransform>
+                        <RotateTransform Angle="35" />
+                    </Rectangle.LayoutTransform>
+                </Rectangle>
+            </Border>
+
+            <TextBlock Text=""
+                       Height="20" />
+
+        </StackPanel>
+    </ScrollViewer>
+</sdk:Page>

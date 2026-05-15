@@ -29,9 +29,6 @@ namespace System.Windows.Controls
         /// </summary>
         private const string PresenterName = "Presenter";
 
-#if !SILVERLIGHT
-        new  // Hide base class property of same name
-#endif
         /// <summary>
         /// Gets or sets the layout transform to apply on the LayoutTransformer 
         /// control content.
@@ -39,19 +36,16 @@ namespace System.Windows.Controls
         /// <remarks>
         /// Corresponds to UIElement.LayoutTransform.
         /// </remarks>
-        public Transform LayoutTransform
+        public new Transform LayoutTransform
         {
             get { return (Transform)GetValue(LayoutTransformProperty); }
             set { SetValue(LayoutTransformProperty, value); }
         }
 
-#if !SILVERLIGHT
-        new  // Hide base class property of same name
-#endif
         /// <summary>
         /// Identifies the LayoutTransform DependencyProperty.
         /// </summary>
-        public static readonly DependencyProperty LayoutTransformProperty = DependencyProperty.Register(
+        public new static readonly DependencyProperty LayoutTransformProperty = DependencyProperty.Register(
             "LayoutTransform", typeof(Transform), typeof(LayoutTransformer), new PropertyMetadata(LayoutTransformChanged));
 
         /// <summary>

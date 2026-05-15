@@ -546,29 +546,14 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return OpenSilver.Interop.IsNull(jsObject) || OpenSilver.Interop.IsUndefined(jsObject);
         }
 
-        internal static void ArrangeNative(string htmlId, Vector offset, Size size, Rect? clip)
+        internal static void ArrangeNative(string htmlId, Vector offset, Size size)
         {
             string left = Math.Round(offset.X, 2).ToInvariantString();
             string top = Math.Round(offset.Y, 2).ToInvariantString();
             string width = Math.Round(size.Width, 2).ToInvariantString();
             string height = Math.Round(size.Height, 2).ToInvariantString();
-            
-            if (clip.HasValue)
-            {
-                Rect clipRect = clip.Value;
-                string clipLeft = Math.Round(clipRect.Left, 2).ToInvariantString();
-                string clipTop = Math.Round(clipRect.Top, 2).ToInvariantString();
-                string clipRight = Math.Round(clipRect.Right, 2).ToInvariantString();
-                string clipBottom = Math.Round(clipRect.Bottom, 2).ToInvariantString();
 
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"osjs.arrange('{htmlId}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})");
-            }
-            else
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"osjs.arrange('{htmlId}',{left},{top},{width},{height})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.arrange('{htmlId}',{left},{top},{width},{height})");
         }
     }
 }

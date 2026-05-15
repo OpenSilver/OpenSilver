@@ -48,6 +48,7 @@ namespace TestApplication
             Tests.Add(new Test("Behavior", "Behavior"));
             Tests.Add(new Test("Binding", "Binding"));
             Tests.Add(new Test("Transform", "Transform"));
+            Tests.Add(new Test("LayoutTransform", "LayoutTransform"));
             Tests.Add(new Test("Animation", "Animation"));
             Tests.Add(new Test("MouseMove/MouseCapture", "MouseMove_MouseCapture"));
             Tests.Add(new Test("Cursor", "Cursor"));

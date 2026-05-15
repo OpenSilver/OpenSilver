@@ -510,7 +510,7 @@ namespace System.Windows
                 nameof(ClipToBounds),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(false, OnClipToBoundsChanged));
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnClipToBoundsChanged));
 
         private static void OnClipToBoundsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -535,10 +535,7 @@ namespace System.Windows
                 nameof(Clip),
                 typeof(Geometry),
                 typeof(UIElement),
-                new PropertyMetadata(null, OnClipChanged)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetClipPath((Geometry)newValue),
-                });
+                new PropertyMetadata(null, OnClipChanged));
 
         /// <summary>
         /// Gets or sets the <see cref="Geometry"/> used to define the outline of 
@@ -557,32 +554,59 @@ namespace System.Windows
         {
             UIElement uie = (UIElement)d;
 
-            if (uie._weakClipChangedEventToken is not null)
+            // if never measured, then nothing to do, it should be measured at some point
+            if (!uie.NeverMeasured || !uie.NeverArranged)
             {
-                uie._weakClipChangedEventToken.Dispose();
-                uie._weakClipChangedEventToken = null;
+                uie.InvalidateArrange();
+            }
+        }
+
+        private static readonly DependencyProperty VisualClipProperty =
+            DependencyProperty.Register(
+                nameof(VisualClip),
+                typeof(Geometry),
+                typeof(UIElement),
+                new PropertyMetadata(null, OnVisualClipChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetClipPath((Geometry)newValue),
+                });
+
+        internal Geometry VisualClip
+        {
+            get => (Geometry)GetValue(VisualClipProperty);
+            set => SetValueInternal(VisualClipProperty, value);
+        }
+
+        private static void OnVisualClipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uie = (UIElement)d;
+
+            if (uie._weakVisualClipChangedEventToken != null)
+            {
+                uie._weakVisualClipChangedEventToken.Dispose();
+                uie._weakVisualClipChangedEventToken = null;
             }
 
-            if (e.NewValue is Geometry clipGeo)
+            if (e.NewValue is Geometry newClip)
             {
-                uie._weakClipChangedEventToken = WeakEvent.Subscribe<UIElement, Geometry, GeometryInvalidatedEventsArgs>(
+                uie._weakVisualClipChangedEventToken = WeakEvent.Subscribe<UIElement, Geometry, GeometryInvalidatedEventsArgs>(
                     uie,
-                    clipGeo,
-                    static (instance, sender, args) => instance.OnClipGeometryChanged(sender, args),
+                    newClip,
+                    static (instance, sender, args) => instance.OnVisualClipChanged(sender, args),
                     static (handler, source) => source.Invalidated -= new EventHandler<GeometryInvalidatedEventsArgs>(handler),
                     static (handler, source) => source.Invalidated += new EventHandler<GeometryInvalidatedEventsArgs>(handler));
             }
         }
 
-        private void OnClipGeometryChanged(object sender, GeometryInvalidatedEventsArgs e)
+        private void OnVisualClipChanged(object sender, GeometryInvalidatedEventsArgs e)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && e.AffectsMeasure)
             {
-                this.SetClipPath(Clip);
+                this.SetClipPath((Geometry)sender);
             }
         }
 
-        private WeakEventToken _weakClipChangedEventToken;
+        private WeakEventToken _weakVisualClipChangedEventToken;
 
         #endregion
 

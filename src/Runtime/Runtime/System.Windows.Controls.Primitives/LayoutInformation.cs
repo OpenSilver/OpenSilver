@@ -38,16 +38,8 @@ namespace System.Windows.Controls.Primitives
 		{
             ArgumentNullException.ThrowIfNull(element);
 
-            if (element.LayoutClip is Rect layoutClip)
-            {
-                return new RectangleGeometry
-                {
-                    Rect = layoutClip,
-                };
-            }
-
-            return null;
-		}
+            return element.GetLayoutClipInternal();
+        }
 
         /// <summary>
         /// Returns the element that was being processed by the layout system at the moment

@@ -363,10 +363,8 @@ namespace System.Windows.Controls
             return arrangeSize;
         }
 
-        internal override Rect? GetLayoutClip(Size layoutSlotSize)
-        {
-            return base.GetLayoutClip(layoutSlotSize) ?? new Rect(RenderSize);
-        }
+        /// <inheritdoc />
+        protected override Geometry GetLayoutClip(Size layoutSlotSize) => new RectangleGeometry(new Rect(RenderSize));
 
         private void UpdateExtents(Size viewport, Size extents)
         {

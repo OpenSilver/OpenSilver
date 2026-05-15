@@ -1067,18 +1067,13 @@ Object.defineProperty(window, 'osjs', {
                     element.classList.add(CSS_CLASS.UIELEMENT_HIDDEN);
                 }
             },
-            arrange: function (id, left, top, width, height, clip, clipLeft, clipTop, clipRight, clipBottom) {
+            arrange: function (id, left, top, width, height) {
                 const element = document.getElementById(id);
                 if (element) {
                     element.style.left = left + 'px';
                     element.style.top = top + 'px';
                     element.style.width = width + 'px';
                     element.style.height = height + 'px';
-                    if (clip) {
-                        element.style.clip = `rect(${clipTop}px ${clipRight}px ${clipBottom}px ${clipLeft}px)`;
-                    } else {
-                        element.style.clip = '';
-                    }
                     element.classList.remove(CSS_CLASS.UIELEMENT_UNARRANGED);
                 }
             },

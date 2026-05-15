@@ -290,11 +290,22 @@ public class Canvas : Panel
         return arrangeSize;
     }
 
-    internal override Rect? GetLayoutClip(Size layoutSlotSize)
+    /// <summary>
+    /// Returns a clipping geometry that indicates the area that will be clipped if the 
+    /// <see cref="UIElement.ClipToBounds"/> property is set to true.
+    /// </summary>
+    /// <param name="layoutSlotSize">
+    /// The available size of the element.
+    /// </param>
+    /// <returns>
+    /// A <see cref="Geometry"/> that represents the area that is clipped if 
+    /// <see cref="UIElement.ClipToBounds"/> is true.
+    /// </returns>
+    protected override Geometry GetLayoutClip(Size layoutSlotSize)
     {
         if (ClipToBounds)
         {
-            return new Rect(RenderSize);
+            return new RectangleGeometry(new Rect(RenderSize));
         }
         else
         {

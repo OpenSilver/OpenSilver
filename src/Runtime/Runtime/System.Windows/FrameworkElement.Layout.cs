@@ -11,10 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
-using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Media;
 
 namespace System.Windows;
 
@@ -97,6 +98,28 @@ public partial class FrameworkElement
     }
 
     /// <summary>
+    /// Identifies the <see cref="LayoutTransform"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty LayoutTransformProperty =
+        DependencyProperty.Register(
+            nameof(LayoutTransform),
+            typeof(Transform),
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(Transform.Identity, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTransformDirty));
+
+    /// <summary>
+    /// Gets or sets a graphics transformation that should apply to this element when layout is performed.
+    /// </summary>
+    /// <returns>
+    /// The transform this element should use. The default is <see cref="Transform.Identity"/>.
+    /// </returns>
+    public Transform LayoutTransform
+    {
+        get => (Transform)GetValue(LayoutTransformProperty);
+        set => SetValueInternal(LayoutTransformProperty, value);
+    }
+
+    /// <summary>
     /// Identifies the <see cref="Width"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty WidthProperty =
@@ -104,7 +127,7 @@ public partial class FrameworkElement
             nameof(Width),
             typeof(double),
             typeof(FrameworkElement),
-            new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure),
+            new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTransformDirty),
             IsWidthHeightValid);
 
     /// <summary>
@@ -130,7 +153,7 @@ public partial class FrameworkElement
             nameof(MinWidth),
             typeof(double),
             typeof(FrameworkElement),
-            new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure),
+            new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTransformDirty),
             IsMinWidthHeightValid);
 
     /// <summary>
@@ -154,7 +177,7 @@ public partial class FrameworkElement
             nameof(MaxWidth),
             typeof(double),
             typeof(FrameworkElement),
-            new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure),
+            new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTransformDirty),
             IsMaxWidthHeightValid);
 
     /// <summary>
@@ -178,7 +201,7 @@ public partial class FrameworkElement
             nameof(Height),
             typeof(double),
             typeof(FrameworkElement),
-            new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure),
+            new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTransformDirty),
             IsWidthHeightValid);
 
     /// <summary>
@@ -204,7 +227,7 @@ public partial class FrameworkElement
             nameof(MinHeight),
             typeof(double),
             typeof(FrameworkElement),
-            new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure),
+            new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTransformDirty),
             IsMinWidthHeightValid);
 
     /// <summary>
@@ -228,7 +251,7 @@ public partial class FrameworkElement
             nameof(MaxHeight),
             typeof(double),
             typeof(FrameworkElement),
-            new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure),
+            new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTransformDirty),
             IsMaxWidthHeightValid);
 
     /// <summary>
@@ -260,6 +283,12 @@ public partial class FrameworkElement
     {
         double v = (double)value;
         return !double.IsNaN(v) && v >= 0.0;
+    }
+
+    private static void OnTransformDirty(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        // Callback for MinWidth, MaxWidth, Width, MinHeight, MaxHeight, Height, and LayoutTransform
+        ((FrameworkElement)d).AreTransformsClean = false;
     }
 
     private static readonly PropertyMetadata _actualWidthMetadata = new ReadOnlyPropertyMetadata(0d, GetActualWidth);
@@ -327,7 +356,7 @@ public partial class FrameworkElement
     /// </returns>
     protected sealed override Size MeasureCore(Size availableSize)
     {
-        //build the visual tree from styles first
+        // build the visual tree from styles first
         if (!ApplyTemplate() && TemplateChild is not null)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(TemplateChild, this, 0);
@@ -343,33 +372,72 @@ public partial class FrameworkElement
             double marginWidth = margin.Left + margin.Right;
             double marginHeight = margin.Top + margin.Bottom;
 
-            //  parent size is what parent want us to be
+            // parent size is what parent want us to be
             Size frameworkAvailableSize = new Size(
                 Math.Max(availableSize.Width - marginWidth, 0),
                 Math.Max(availableSize.Height - marginHeight, 0));
 
             MinMax mm = new MinMax(this);
 
+            LayoutTransformData ltd = LayoutTransformData.GetData(this);
+            Transform layoutTransform = LayoutTransform;
+
+            // check that LayoutTransform is non-trivial
+            if (layoutTransform is not null && !Transform.IsIdentityTransform(layoutTransform))
+            {
+                // allocate and store ltd if needed
+                ltd ??= LayoutTransformData.CreateData(this);
+
+                ltd.CreateTransformSnapshot(layoutTransform);
+                ltd.UntransformedDS = new Size();
+            }
+            else if (ltd is not null)
+            {
+                // clear ltd storage
+                ltd = null;
+                LayoutTransformData.ClearData(this);
+            }
+
+            if (ltd is not null)
+            {
+                // Find the maximal area rectangle in local (child) space that we can fit, post-transform
+                // in the decorator's measure constraint.
+                frameworkAvailableSize = FindMaximalAreaLocalSpaceRect(ltd.Transform, frameworkAvailableSize);
+            }
+
             frameworkAvailableSize.Width = Math.Max(mm.minWidth, Math.Min(frameworkAvailableSize.Width, mm.maxWidth));
             frameworkAvailableSize.Height = Math.Max(mm.minHeight, Math.Min(frameworkAvailableSize.Height, mm.maxHeight));
 
-            //  call to specific layout to measure
+            // call to specific layout to measure
             Size desiredSize = MeasureOverride(frameworkAvailableSize);
 
-            //  maximize desiredSize with user provided min size
+            // maximize desiredSize with user provided min size
             desiredSize = new Size(
                 Math.Max(desiredSize.Width, mm.minWidth),
                 Math.Max(desiredSize.Height, mm.minHeight));
 
-            //here is the "true minimum" desired size - the one that is
-            //for sure enough for the control to render its content.
+            // here is the "true minimum" desired size - the one that is
+            // for sure enough for the control to render its content.
             Size unclippedDesiredSize = desiredSize;
+
+            if (ltd is not null)
+            {
+                // need to store unclipped, untransformed desired size to be able to arrange later
+                ltd.UntransformedDS = unclippedDesiredSize;
+
+                // transform unclipped desired size
+                Rect unclippedBoundsTransformed = Rect.Transform(
+                    new Rect(0, 0, unclippedDesiredSize.Width, unclippedDesiredSize.Height), ltd.Transform);
+
+                unclippedDesiredSize.Width = unclippedBoundsTransformed.Width;
+                unclippedDesiredSize.Height = unclippedBoundsTransformed.Height;
+            }
 
             bool clipped = false;
 
             // User-specified max size starts to "clip" the control here.
-            //Starting from this point desiredSize could be smaller then actually
-            //needed to render the whole control
+            // Starting from this point desiredSize could be smaller then actually
+            // needed to render the whole control
             if (desiredSize.Width > mm.maxWidth)
             {
                 desiredSize.Width = mm.maxWidth;
@@ -382,9 +450,19 @@ public partial class FrameworkElement
                 clipped = true;
             }
 
-            //  because of negative margins, clipped desired size may be negative.
-            //  need to keep it as doubles for that reason and maximize with 0 at the
-            //  very last point - before returning desired size to the parent.
+            // transform desired size to layout slot space
+            if (ltd is not null)
+            {
+                Rect childBoundsTransformed = Rect.Transform(
+                    new Rect(0, 0, desiredSize.Width, desiredSize.Height), ltd.Transform);
+
+                desiredSize.Width = childBoundsTransformed.Width;
+                desiredSize.Height = childBoundsTransformed.Height;
+            }
+
+            // because of negative margins, clipped desired size may be negative.
+            // need to keep it as doubles for that reason and maximize with 0 at the
+            // very last point - before returning desired size to the parent.
             double clippedDesiredWidth = desiredSize.Width + marginWidth;
             double clippedDesiredHeight = desiredSize.Height + marginHeight;
 
@@ -403,17 +481,17 @@ public partial class FrameworkElement
                 clipped = true;
             }
 
-            //  Note: unclippedDesiredSize is needed in ArrangeCore,
-            //  because due to the layout protocol, arrange should be called
-            //  with constraints greater or equal to child's desired size
-            //  returned from MeasureOverride. But in most circumstances
-            //  it is possible to reconstruct original unclipped desired size.
-            //  In such cases we want to optimize space and save 16 bytes by
-            //  not storing it on each FrameworkElement.
+            // Note: unclippedDesiredSize is needed in ArrangeCore,
+            // because due to the layout protocol, arrange should be called
+            // with constraints greater or equal to child's desired size
+            // returned from MeasureOverride. But in most circumstances
+            // it is possible to reconstruct original unclipped desired size.
+            // In such cases we want to optimize space and save 16 bytes by
+            // not storing it on each FrameworkElement.
             //
-            //  The if statement conditions below lists the cases when
-            //  it is NOT possible to recalculate unclipped desired size later
-            //  in ArrangeCore, thus we save it...
+            // The if statement conditions below lists the cases when
+            // it is NOT possible to recalculate unclipped desired size later
+            // in ArrangeCore, thus we save it...
             if (clipped
                 || clippedDesiredWidth < 0
                 || clippedDesiredHeight < 0)
@@ -454,12 +532,14 @@ public partial class FrameworkElement
     /// </param>
     protected sealed override void ArrangeCore(Rect finalRect)
     {
+        LayoutTransformData ltd = LayoutTransformData.GetData(this);
+
         if (BypassLayoutPolicies)
         {
             Size oldRenderSize = RenderSize;
             Size inkSize = ArrangeOverride(finalRect.Size);
             RenderSize = inkSize;
-            SetLayoutOffset(new Vector(finalRect.X, finalRect.Y), oldRenderSize);
+            SetLayoutOffset(new Vector(finalRect.X, finalRect.Y), oldRenderSize, ltd);
         }
         else
         {
@@ -528,11 +608,53 @@ public partial class FrameworkElement
                 arrangeSize.Height = unclippedDesiredSize.Height;
             }
 
+            // if LayoutTransform is set, arrange at untransformed DS always
+            // alignments apply to the BoundingBox after transform
+            if (ltd is not null)
+            {
+                // Repeat the measure-time algorithm for finding a best fit local rect.
+                // This essentially implements Stretch in case of LayoutTransform
+                Size potentialArrangeSize = FindMaximalAreaLocalSpaceRect(ltd.Transform, arrangeSize);
+                arrangeSize = potentialArrangeSize;
+
+                // If using layout rounding, round untransformed desired size - in MeasureCore, this value is first transformed and clipped
+                // before rounding, and hence saved unrounded.
+                unclippedDesiredSize = ltd.UntransformedDS;
+
+                // only use max area rect if both dimensions of it are larger then
+                // desired size - replace with desired size otherwise
+                if (!DoubleUtil.IsZero(potentialArrangeSize.Width) && !DoubleUtil.IsZero(potentialArrangeSize.Height))
+                {
+                    // Use less precise comparision - otherwise FP jitter may cause drastic jumps here
+                    if (LayoutDoubleUtil.LessThan(potentialArrangeSize.Width, unclippedDesiredSize.Width) ||
+                        LayoutDoubleUtil.LessThan(potentialArrangeSize.Height, unclippedDesiredSize.Height))
+                    {
+                        arrangeSize = unclippedDesiredSize;
+                    }
+                }
+
+                // if pre-transformed into local space arrangeSize is smaller in any dimension then
+                // unclipped local DesiredSize of the element, extend the arrangeSize but
+                // remember that we potentially need to clip the result of such arrange.
+                if (DoubleUtil.LessThan(arrangeSize.Width, unclippedDesiredSize.Width))
+                {
+                    NeedsClipBounds = true;
+                    arrangeSize.Width = unclippedDesiredSize.Width;
+                }
+
+                if (DoubleUtil.LessThan(arrangeSize.Height, unclippedDesiredSize.Height))
+                {
+                    NeedsClipBounds = true;
+                    arrangeSize.Height = unclippedDesiredSize.Height;
+                }
+
+            }
+
             MinMax mm = new MinMax(this);
 
-            //we have to choose max between UnclippedDesiredSize and Max here, because
-            //otherwise setting of max property could cause arrange at less then unclippedDS.
-            //Clipping by Max is needed to limit stretch here
+            // we have to choose max between UnclippedDesiredSize and Max here, because
+            // otherwise setting of max property could cause arrange at less then unclippedDS.
+            // Clipping by Max is needed to limit stretch here
             double effectiveMaxWidth = Math.Max(unclippedDesiredSize.Width, mm.maxWidth);
             if (DoubleUtil.LessThan(effectiveMaxWidth, arrangeSize.Width))
             {
@@ -550,26 +672,37 @@ public partial class FrameworkElement
             Size oldRenderSize = RenderSize;
             Size innerInkSize = ArrangeOverride(arrangeSize);
 
-            //Here we use un-clipped InkSize because element does not know that it is
-            //clipped by layout system and it shoudl have as much space to render as
-            //it returned from its own ArrangeOverride
+            // Here we use un-clipped InkSize because element does not know that it is
+            // clipped by layout system and it shoudl have as much space to render as
+            // it returned from its own ArrangeOverride
             RenderSize = innerInkSize;
 
-            //clippedInkSize differs from InkSize only what MaxWidth/Height explicitly clip the
-            //otherwise good arrangement. For ex, DS<clientSize but DS>MaxWidth - in this
-            //case we should initiate clip at MaxWidth and only show Top-Left portion
-            //of the element limited by Max properties. It is Top-left because in case when we
-            //are clipped by container we also degrade to Top-Left, so we are consistent.
+            // clippedInkSize differs from InkSize only what MaxWidth/Height explicitly clip the
+            // otherwise good arrangement. For ex, DS<clientSize but DS>MaxWidth - in this
+            // case we should initiate clip at MaxWidth and only show Top-Left portion
+            // of the element limited by Max properties. It is Top-left because in case when we
+            // are clipped by container we also degrade to Top-Left, so we are consistent.
             Size clippedInkSize = new Size(Math.Min(innerInkSize.Width, mm.maxWidth),
                                            Math.Min(innerInkSize.Height, mm.maxHeight));
 
-            //remember we have to clip if Max properties limit the inkSize
+            // remember we have to clip if Max properties limit the inkSize
             NeedsClipBounds |=
                     DoubleUtil.LessThan(clippedInkSize.Width, innerInkSize.Width)
                 || DoubleUtil.LessThan(clippedInkSize.Height, innerInkSize.Height);
 
-            //Note that inkSize now can be bigger then layoutSlotSize-margin (because of layout
-            //squeeze by the parent or LayoutConstrained=true, which clips desired size in Measure).
+            // if LayoutTransform is set, get the "outer bounds" - the alignments etc work on them
+            if (ltd is not null)
+            {
+                Rect inkRectTransformed = Rect.Transform(
+                    new Rect(0, 0, clippedInkSize.Width, clippedInkSize.Height),
+                    ltd.Transform);
+
+                clippedInkSize.Width = inkRectTransformed.Width;
+                clippedInkSize.Height = inkRectTransformed.Height;
+            }
+
+            // Note that inkSize now can be bigger then layoutSlotSize-margin (because of layout
+            // squeeze by the parent or LayoutConstrained=true, which clips desired size in Measure).
 
             // The client size is the size of layout slot decreased by margins.
             // This is the "window" through which we see the content of the child.
@@ -588,34 +721,54 @@ public partial class FrameworkElement
             offset.X += finalRect.X + margin.Left;
             offset.Y += finalRect.Y + margin.Top;
 
-            SetLayoutOffset(offset, oldRenderSize);
+            SetLayoutOffset(offset, oldRenderSize, ltd);
         }
     }
 
-    internal override Rect? GetLayoutClip(Size layoutSlotSize)
+    /// <summary>
+    /// Returns a geometry for a clipping mask. The mask applies if the layout system attempts 
+    /// to arrange an element that is larger than the available display space.
+    /// </summary>
+    /// <param name="layoutSlotSize">
+    /// The size of the part of the element that does visual presentation.
+    /// </param>
+    /// <returns>
+    /// The clipping geometry.
+    /// </returns>
+    protected override Geometry GetLayoutClip(Size layoutSlotSize)
     {
         if (NeedsClipBounds || ClipToBounds)
         {
             // see if  MaxWidth/MaxHeight limit the element
             var mm = new MinMax(this);
 
-            //this is in element's local rendering coord system
+            // this is in element's local rendering coord system
             Size inkSize = RenderSize;
 
             double maxWidthClip = double.IsPositiveInfinity(mm.maxWidth) ? inkSize.Width : mm.maxWidth;
             double maxHeightClip = double.IsPositiveInfinity(mm.maxHeight) ? inkSize.Height : mm.maxHeight;
 
-            //need to clip because the computed sizes exceed MaxWidth/MaxHeight/Width/Height
+            // need to clip because the computed sizes exceed MaxWidth/MaxHeight/Width/Height
             bool needToClipLocally =
                  ClipToBounds //need to clip at bounds even if inkSize is less then maxSize
               || DoubleUtil.LessThan(maxWidthClip, inkSize.Width)
               || DoubleUtil.LessThan(maxHeightClip, inkSize.Height);
 
-            //now lets say we already clipped by MaxWidth/MaxHeight, lets see if further clipping is needed
+            // now lets say we already clipped by MaxWidth/MaxHeight, lets see if further clipping is needed
             inkSize.Width = Math.Min(inkSize.Width, mm.maxWidth);
             inkSize.Height = Math.Min(inkSize.Height, mm.maxHeight);
 
-            //now see if layout slot should clip the element
+            // if LayoutTransform is set, convert RenderSize to "outer bounds"
+            LayoutTransformData ltd = LayoutTransformData.GetData(this);
+            var inkRectTransformed = new Rect();
+            if (ltd is not null)
+            {
+                inkRectTransformed = Rect.Transform(new Rect(0, 0, inkSize.Width, inkSize.Height), ltd.Transform);
+                inkSize.Width = inkRectTransformed.Width;
+                inkSize.Height = inkRectTransformed.Height;
+            }
+
+            // now see if layout slot should clip the element
             Thickness margin = Margin;
             double marginWidth = margin.Left + margin.Right;
             double marginHeight = margin.Top + margin.Bottom;
@@ -624,45 +777,109 @@ public partial class FrameworkElement
                                         Math.Max(0, layoutSlotSize.Height - marginHeight));
 
             bool needToClipSlot =
-                ClipToBounds //forces clip at layout slot bounds even if reported sizes are ok
+                ClipToBounds // forces clip at layout slot bounds even if reported sizes are ok
              || DoubleUtil.LessThan(clippingSize.Width, inkSize.Width)
              || DoubleUtil.LessThan(clippingSize.Height, inkSize.Height);
+
+            Matrix? rtlMirror = GetFlowDirectionMatrix();
 
             if (needToClipSlot)
             {
                 Vector offset = ComputeAlignmentOffset(clippingSize, inkSize);
 
-                var slotRect = new Rect(Math.Max(-offset.X, 0), Math.Max(-offset.Y, 0), clippingSize.Width, clippingSize.Height);
-
-                if (needToClipLocally) //intersect 2 rects
+                if (ltd is not null)
                 {
-                    slotRect.Intersect(new Rect(0, 0, maxWidthClip, maxHeightClip));
-                }
+                    var slotClipRect = new Rect(-offset.X + inkRectTransformed.X,
+                                                -offset.Y + inkRectTransformed.Y,
+                                                clippingSize.Width,
+                                                clippingSize.Height);
 
-                if (GetFlowDirectionMatrix() is Matrix rtlMirror)
+                    var slotClip = new RectangleGeometry(slotClipRect);
+
+                    Matrix layoutTransform = Matrix.Identity;
+                    if (ltd.Transform.HasInverse)
+                    {
+                        layoutTransform = ltd.Transform;
+                        layoutTransform.Invert();
+                    }
+
+                    if (needToClipLocally)
+                    {
+                        if (!layoutTransform.IsIdentity)
+                        {
+                            slotClip.Transform = new MatrixTransform(layoutTransform);
+                        }
+
+                        var localClip = new RectangleGeometry(new Rect(0, 0, maxWidthClip, maxHeightClip));
+                        var combinedClip = Geometry.Combine(localClip, slotClip, GeometryCombineMode.Intersect, null);
+                        if (rtlMirror.HasValue)
+                        {
+                            combinedClip.Transform = new MatrixTransform(rtlMirror.Value);
+                        }
+
+                        return combinedClip;
+                    }
+                    else
+                    {
+                        Matrix m = rtlMirror.HasValue ? layoutTransform * rtlMirror.Value : layoutTransform;
+                        if (!m.IsIdentity)
+                        {
+                            slotClip.Transform = new MatrixTransform(m);
+                        }
+                        
+                        return slotClip;
+                    }
+                }
+                else
                 {
-                    slotRect.Transform(rtlMirror);
-                }
+                    var slotRect = new Rect(-offset.X + inkRectTransformed.X,
+                                            -offset.Y + inkRectTransformed.Y,
+                                            clippingSize.Width,
+                                            clippingSize.Height);
 
-                return slotRect;
+                    if (needToClipLocally) // intersect 2 rects
+                    {
+                        slotRect.Intersect(new Rect(0, 0, maxWidthClip, maxHeightClip));
+                    }
+
+                    var combinedClip = new RectangleGeometry(slotRect);
+                    if (rtlMirror.HasValue)
+                    {
+                        combinedClip.Transform = new MatrixTransform(rtlMirror.Value);
+                    }
+                    return combinedClip;
+                }
             }
 
             if (needToClipLocally)
             {
                 var clipRect = new Rect(0, 0, maxWidthClip, maxHeightClip);
-
-                if (GetFlowDirectionMatrix() is Matrix rtlMirror)
+                
+                var localClip = new RectangleGeometry(clipRect);
+                if (rtlMirror.HasValue)
                 {
-                    clipRect.Transform(rtlMirror);
+                    localClip.Transform = new MatrixTransform(rtlMirror.Value);
                 }
-
-                return clipRect;
+                return localClip;
             }
 
             return null;
         }
 
         return base.GetLayoutClip(layoutSlotSize);
+    }
+
+    // see LayoutInformation
+    internal Geometry GetLayoutClipInternal()
+    {
+        if (IsMeasureValid && IsArrangeValid)
+        {
+            return GetLayoutClip(PreviousArrangeRect.Size);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -728,6 +945,185 @@ public partial class FrameworkElement
         SizeChanged?.Invoke(this, new SizeChangedEventArgs(info));
     }
 
+    // Method FindMaximalAreaLocalSpaceRect - used only if LayoutTransform is specified
+    // Summary:
+    //   Given the transform currently applied to child, this method finds (in
+    //     axis-aligned local space) the largest rectangle that, after transform,
+    //   fits within transformSpaceBounds.  Largest rectangle means rectangle
+    //   of greatest area in local space (although maximal area in local space
+    //   implies maximal area in transform space).
+    // Parameters:
+    //   transformSpaceBounds: the bounds (in destination/transform space) that
+    //   the
+    // Returns:
+    //   The dimensions, in local space, of the maximal area rectangle found.
+    private Size FindMaximalAreaLocalSpaceRect(Matrix trMatrix, Size transformSpaceBounds)
+    {
+        // X (width) and Y (height) constraints for axis-aligned bounding box in dest. space
+        double xConstr = transformSpaceBounds.Width;
+        double yConstr = transformSpaceBounds.Height;
+
+        //if either of the sizes is 0, return 0,0 to avoid doing math on an empty rect (bug 963569)
+        if (DoubleUtil.IsZero(xConstr) || DoubleUtil.IsZero(yConstr))
+        {
+            return new Size(0, 0);
+        }
+
+        bool xConstrInfinite = double.IsInfinity(xConstr);
+        bool yConstrInfinite = double.IsInfinity(yConstr);
+
+        if (xConstrInfinite && yConstrInfinite)
+        {
+            return new Size(double.PositiveInfinity, double.PositiveInfinity);
+        }
+        else if (xConstrInfinite) //assume square for one-dimensional constraint
+        {
+            xConstr = yConstr;
+        }
+        else if (yConstrInfinite)
+        {
+            yConstr = xConstr;
+        }
+
+        // We only deal with nonsingular matrices here. The nonsingular matrix is the one
+        // that has inverse (determinant != 0).
+        if (!trMatrix.HasInverse)
+        {
+            return new Size(0, 0);
+        }
+
+        double a = trMatrix.M11;
+        double b = trMatrix.M12;
+        double c = trMatrix.M21;
+        double d = trMatrix.M22;
+
+        // Result width and height (in child/local space)
+        double w, h;
+
+        // because we are dealing with nonsingular transform matrices,
+        // we have (b==0 || c==0) XOR (a==0 || d==0)
+
+        if (DoubleUtil.IsZero(b) || DoubleUtil.IsZero(c))
+        {
+            // (b==0 || c==0) ==> a!=0 && d!=0
+
+            double yCoverD = yConstrInfinite ? double.PositiveInfinity : Math.Abs(yConstr / d);
+            double xCoverA = xConstrInfinite ? double.PositiveInfinity : Math.Abs(xConstr / a);
+
+            if (DoubleUtil.IsZero(b))
+            {
+                if (DoubleUtil.IsZero(c))
+                {
+                    // Case: b=0, c=0, a!=0, d!=0
+
+                    // No constraint relation; use maximal width and height
+
+                    h = yCoverD;
+                    w = xCoverA;
+                }
+                else
+                {
+                    // Case: b==0, a!=0, c!=0, d!=0
+
+                    // Maximizing under line (hIntercept=xConstr/c, wIntercept=xConstr/a)
+                    // BUT we still have constraint: h <= yConstr/d
+
+                    h = Math.Min(0.5 * Math.Abs(xConstr / c), yCoverD);
+                    w = xCoverA - (c * h / a);
+                }
+            }
+            else
+            {
+                // Case: c==0, a!=0, b!=0, d!=0
+
+                // Maximizing under line (hIntercept=yConstr/d, wIntercept=yConstr/b)
+                // BUT we still have constraint: w <= xConstr/a
+
+                w = Math.Min(0.5 * Math.Abs(yConstr / b), xCoverA);
+                h = yCoverD - (b * w / d);
+            }
+        }
+        else if (DoubleUtil.IsZero(a) || DoubleUtil.IsZero(d))
+        {
+            // (a==0 || d==0) ==> b!=0 && c!=0
+
+            double yCoverB = Math.Abs(yConstr / b);
+            double xCoverC = Math.Abs(xConstr / c);
+
+            if (DoubleUtil.IsZero(a))
+            {
+                if (DoubleUtil.IsZero(d))
+                {
+                    // Case: a=0, d=0, b!=0, c!=0
+
+                    // No constraint relation; use maximal width and height
+
+                    h = xCoverC;
+                    w = yCoverB;
+                }
+                else
+                {
+                    // Case: a==0, b!=0, c!=0, d!=0
+
+                    // Maximizing under line (hIntercept=yConstr/d, wIntercept=yConstr/b)
+                    // BUT we still have constraint: h <= xConstr/c
+
+                    h = Math.Min(0.5 * Math.Abs(yConstr / d), xCoverC);
+                    w = yCoverB - (d * h / b);
+                }
+            }
+            else
+            {
+                // Case: d==0, a!=0, b!=0, c!=0
+
+                // Maximizing under line (hIntercept=xConstr/c, wIntercept=xConstr/a)
+                // BUT we still have constraint: w <= yConstr/b
+
+                w = Math.Min(0.5 * Math.Abs(xConstr / a), yCoverB);
+                h = xCoverC - (a * w / c);
+            }
+        }
+        else
+        {
+            double xCoverA = Math.Abs(xConstr / a);        // w-intercept of x-constraint line.
+            double xCoverC = Math.Abs(xConstr / c);        // h-intercept of x-constraint line.
+
+            double yCoverB = Math.Abs(yConstr / b);        // w-intercept of y-constraint line.
+            double yCoverD = Math.Abs(yConstr / d);        // h-intercept of y-constraint line.
+
+            // The tighest constraint governs, so we pick the lowest constraint line.
+            //
+            //   The optimal point (w,h) for which Area = w*h is maximized occurs halfway
+            //   to each intercept.
+
+            w = Math.Min(yCoverB, xCoverA) * 0.5;
+            h = Math.Min(xCoverC, yCoverD) * 0.5;
+
+            if ((DoubleUtil.GreaterThanOrClose(xCoverA, yCoverB) && DoubleUtil.LessThanOrClose(xCoverC, yCoverD)) ||
+                (DoubleUtil.LessThanOrClose(xCoverA, yCoverB) && DoubleUtil.GreaterThanOrClose(xCoverC, yCoverD)))
+            {
+                // Constraint lines cross; since the most restrictive constraint wins,
+                // we have to maximize under two line segments, which together are discontinuous.
+                // Instead, we maximize w*h under the line segment from the two smallest endpoints.
+
+                // Since we are not (except for in corner cases) on the original constraint lines,
+                // we are not using up all the available area in transform space.  So scale our shape up
+                // until it does in at least one dimension.
+
+                Rect childBoundsTr = Rect.Transform(new Rect(0, 0, w, h), trMatrix);
+                double expandFactor = Math.Min(xConstr / childBoundsTr.Width, yConstr / childBoundsTr.Height);
+
+                if (!double.IsNaN(expandFactor) && !double.IsInfinity(expandFactor))
+                {
+                    w *= expandFactor;
+                    h *= expandFactor;
+                }
+            }
+        }
+
+        return new Size(w, h);
+    }
+
     private Vector ComputeAlignmentOffset(Size clientSize, Size inkSize)
     {
         var offset = new Vector();
@@ -786,7 +1182,7 @@ public partial class FrameworkElement
     /// relative to parent's visual as a result of layout. Typically, this is called
     /// by the parent inside of its ArrangeOverride implementation after calling Arrange on a child.
     /// </summary>
-    private void SetLayoutOffset(Vector offset, Size oldRenderSize)
+    private void SetLayoutOffset(Vector offset, Size oldRenderSize, LayoutTransformData ltd)
     {
         if (!AreTransformsClean || !DoubleUtil.AreClose(RenderSize, oldRenderSize))
         {
@@ -800,7 +1196,7 @@ public partial class FrameworkElement
             TransformGroup t = null;
 
             // arbitrary transform, create a collection
-            if (additionalTransform is not null || renderTransform is not null)
+            if (additionalTransform is not null || renderTransform is not null || ltd is not null)
             {
                 // Create a TransformGroup and make sure it does not participate
                 // in the InheritanceContext treeness because it is internal operation only.
@@ -811,6 +1207,25 @@ public partial class FrameworkElement
                 if (additionalTransform is not null)
                 {
                     t.Children.Add(additionalTransform);
+                }
+
+                if (ltd is not null)
+                {
+                    t.Children.Add(new MatrixTransform(ltd.Transform));
+
+                    // see if MaxWidth/MaxHeight limit the element
+                    var mm = new MinMax(this);
+
+                    // this is in element's local rendering coord system
+                    Size inkSize = RenderSize;
+
+                    // get the size clipped by the MaxWidth/MaxHeight/Width/Height
+                    inkSize.Width = Math.Min(inkSize.Width, mm.maxWidth);
+                    inkSize.Height = Math.Min(inkSize.Height, mm.maxHeight);
+
+                    Rect inkRectTransformed = Rect.Transform(new Rect(inkSize), ltd.Transform);
+
+                    t.Children.Add(new TranslateTransform(-inkRectTransformed.X, -inkRectTransformed.Y));
                 }
 
                 if (renderTransform is not null)
@@ -892,8 +1307,14 @@ public partial class FrameworkElement
 
     private bool NeedsClipBounds
     {
-        get { return ReadInternalFlag(InternalFlags.NeedsClipBounds); }
-        set { WriteInternalFlag(InternalFlags.NeedsClipBounds, value); }
+        get => ReadInternalFlag(InternalFlags.NeedsClipBounds);
+        set => WriteInternalFlag(InternalFlags.NeedsClipBounds, value);
+    }
+
+    private bool HasLayoutTransformData
+    {
+        get => ReadInternalFlag(InternalFlags.HasLayoutTransformData);
+        set => WriteInternalFlag(InternalFlags.HasLayoutTransformData, value);
     }
 
     private Size _unclippedDesiredSize;
@@ -927,6 +1348,54 @@ public partial class FrameworkElement
         internal double maxWidth;
         internal double minHeight;
         internal double maxHeight;
+    }
+
+    // LayoutTransform property may be animated and its value change in time,
+    // LayoutTransformData is used to store a snapshot of LayoutTransform
+    // property value to avoid layout / render inconsistencies caused by
+    // animated LayoutTransforms...
+    private sealed class LayoutTransformData
+    {
+        private static readonly UncommonField<LayoutTransformData> LayoutTransformDataField = new();
+
+        internal static LayoutTransformData GetData(FrameworkElement fe)
+        {
+            if (fe.HasLayoutTransformData)
+            {
+                return LayoutTransformDataField.GetValue(fe);
+            }
+
+            return null;
+        }
+
+        internal static LayoutTransformData CreateData(FrameworkElement fe)
+        {
+            Debug.Assert(!fe.HasLayoutTransformData);
+
+            fe.HasLayoutTransformData = true;
+            var data = new LayoutTransformData();
+            LayoutTransformDataField.SetValue(fe, data);
+            return data;
+        }
+
+        internal static void ClearData(FrameworkElement fe)
+        {
+            Debug.Assert(fe.HasLayoutTransformData);
+
+            fe.HasLayoutTransformData = false;
+            LayoutTransformDataField.ClearValue(fe);
+        }
+
+        private LayoutTransformData() { }
+
+        internal Size UntransformedDS;
+        internal Matrix Transform;
+
+        internal void CreateTransformSnapshot(Transform sourceTransform)
+        {
+            Debug.Assert(sourceTransform is not null);
+            Transform = sourceTransform.Matrix;
+        }
     }
 
     /// <summary>
@@ -1005,4 +1474,29 @@ public partial class FrameworkElement
     [Obsolete(Helper.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     protected virtual void OnAfterApplyVerticalAlignmentAndWidth() { }
+}
+
+// LayoutDoubleUtil, uses fixed eps unlike DoubleUtil which uses relative one.
+// This is more suitable for some layout comparisons because the computation
+// paths in layout may easily be quite long so DoubleUtil method gives a lot of false
+// results, while bigger absolute deviation is normally harmless in layout.
+// Note that FP noise is a big problem and using any of these compare methods is
+// not a complete solution, but rather the way to reduce the probability
+// of the dramatically bad-looking results.
+internal static class LayoutDoubleUtil
+{
+    private const double eps = 0.00000153; // more or less random more or less small number
+
+    internal static bool AreClose(double value1, double value2)
+    {
+        if (value1 == value2) return true;
+
+        double diff = value1 - value2;
+        return (diff < eps) && (diff > -eps);
+    }
+
+    internal static bool LessThan(double value1, double value2)
+    {
+        return (value1 < value2) && !AreClose(value1, value2);
+    }
 }
