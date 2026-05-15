@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="TestApplication.Tests.GeometryBoundsViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:local="clr-namespace:TestApplication.Tests"
+             Width="170"
+             Margin="4">
+
+    <UserControl.Resources>
+        <local:BooleanToAnyConverter x:Key="booleanToOpacityConverter">
+            <local:BooleanToAnyConverter.TrueValue>
+                <sys:Double>1</sys:Double>
+            </local:BooleanToAnyConverter.TrueValue>
+            <local:BooleanToAnyConverter.FalseValue>
+                <sys:Double>0</sys:Double>
+            </local:BooleanToAnyConverter.FalseValue>
+        </local:BooleanToAnyConverter>
+        <local:BooleanToAnyConverter x:Key="toggleLabelConverter">
+            <local:BooleanToAnyConverter.TrueValue>
+                <sys:String>Hide</sys:String>
+            </local:BooleanToAnyConverter.TrueValue>
+            <local:BooleanToAnyConverter.FalseValue>
+                <sys:String>Show</sys:String>
+            </local:BooleanToAnyConverter.FalseValue>
+        </local:BooleanToAnyConverter>
+    </UserControl.Resources>
+
+    <Border BorderBrush="#DDDDDD"
+            BorderThickness="1"
+            CornerRadius="4"
+            Background="#FAFAFA">
+        <StackPanel>
+            <Grid Background="#F0F0F0"
+                  Height="26">
+                <TextBlock Text="{Binding Title}"
+                           ToolTip="{Binding Title}"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="#333333"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           Margin="8,0" />
+            </Grid>
+
+            <Border BorderBrush="#EEEEEE"
+                    BorderThickness="0,1,0,0"
+                    Background="White"
+                    Height="120"
+                    Margin="6,4,6,6">
+                <Grid HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+                    <Path Data="{Binding Geometry}"
+                          Stroke="#FF4477BB"
+                          StrokeThickness="1"
+                          StrokeDashArray="3 2"
+                          Fill="#384080C0" />
+                    <Path Stroke="Red"
+                          StrokeThickness="1"
+                          Fill="Transparent">
+                        <Path.Data>
+                            <RectangleGeometry Rect="{Binding Bounds}" />
+                        </Path.Data>
+                    </Path>
+                </Grid>
+            </Border>
+
+        </StackPanel>
+    </Border>
+
+</UserControl>

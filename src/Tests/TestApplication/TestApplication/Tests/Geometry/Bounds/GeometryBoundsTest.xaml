@@ -1,0 +1,554 @@
+<sdk:Page x:Class="TestApplication.Tests.GeometryBoundsTest"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+          xmlns:tk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+          xmlns:local="clr-namespace:TestApplication.Tests">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical"
+                    Margin="10">
+
+            <TextBlock Text="Geometry.Bounds Test"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Margin="0,0,0,4" />
+            <TextBlock Text="Each sample shows a geometry (blue dashed) with its Bounds rectangle overlaid (red solid)."
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,15"
+                       Foreground="#555555" />
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- LineGeometry -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextBlock Text="LineGeometry"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,10,0,4" />
+            <tk:WrapPanel Orientation="Horizontal">
+
+                <local:GeometryBoundsViewer Title="Horizontal line">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <LineGeometry StartPoint="10,50"
+                                      EndPoint="90,50" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Vertical line">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <LineGeometry StartPoint="50,10"
+                                      EndPoint="50,90" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Diagonal line">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <LineGeometry StartPoint="10,80"
+                                      EndPoint="90,20" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Line + TranslateTransform">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <LineGeometry StartPoint="0,0"
+                                      EndPoint="60,40">
+                            <LineGeometry.Transform>
+                                <TranslateTransform X="20"
+                                                    Y="15" />
+                            </LineGeometry.Transform>
+                        </LineGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Line + RotateTransform(30)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <LineGeometry StartPoint="10,50"
+                                      EndPoint="90,50">
+                            <LineGeometry.Transform>
+                                <RotateTransform Angle="30"
+                                                 CenterX="50"
+                                                 CenterY="50" />
+                            </LineGeometry.Transform>
+                        </LineGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Line + ScaleTransform">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <LineGeometry StartPoint="20,20"
+                                      EndPoint="60,60">
+                            <LineGeometry.Transform>
+                                <ScaleTransform ScaleX="1.3"
+                                                ScaleY="0.7" />
+                            </LineGeometry.Transform>
+                        </LineGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+            </tk:WrapPanel>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- RectangleGeometry -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextBlock Text="RectangleGeometry"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,16,0,4" />
+            <tk:WrapPanel Orientation="Horizontal">
+
+                <local:GeometryBoundsViewer Title="Simple rectangle">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <RectangleGeometry Rect="10,20,80,50" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Square">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <RectangleGeometry Rect="20,20,60,60" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Rounded corners">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <RectangleGeometry Rect="10,15,80,55"
+                                           RadiusX="12"
+                                           RadiusY="12" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Rect + RotateTransform(45)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <RectangleGeometry Rect="25,25,50,40">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="45"
+                                                 CenterX="50"
+                                                 CenterY="45" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Rect + ScaleTransform(1.5,0.8)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <RectangleGeometry Rect="15,20,50,40">
+                            <RectangleGeometry.Transform>
+                                <ScaleTransform ScaleX="1.5"
+                                                ScaleY="0.8" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Rect + SkewTransform">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <RectangleGeometry Rect="20,20,50,40">
+                            <RectangleGeometry.Transform>
+                                <SkewTransform AngleX="20"
+                                               AngleY="0" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Rounded + RotateTransform(25)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <RectangleGeometry Rect="15,20,70,45"
+                                           RadiusX="10"
+                                           RadiusY="10">
+                            <RectangleGeometry.Transform>
+                                <RotateTransform Angle="25"
+                                                 CenterX="50"
+                                                 CenterY="42" />
+                            </RectangleGeometry.Transform>
+                        </RectangleGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+            </tk:WrapPanel>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- EllipseGeometry -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextBlock Text="EllipseGeometry"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,16,0,4" />
+            <tk:WrapPanel Orientation="Horizontal">
+
+                <local:GeometryBoundsViewer Title="Circle">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <EllipseGeometry Center="50,50"
+                                         RadiusX="35"
+                                         RadiusY="35" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Wide ellipse">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <EllipseGeometry Center="50,50"
+                                         RadiusX="45"
+                                         RadiusY="20" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Tall ellipse">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <EllipseGeometry Center="50,50"
+                                         RadiusX="20"
+                                         RadiusY="45" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Ellipse + RotateTransform(45)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <EllipseGeometry Center="50,50"
+                                         RadiusX="45"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <RotateTransform Angle="45"
+                                                 CenterX="50"
+                                                 CenterY="50" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Ellipse + ScaleTransform(1.2,0.6)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <EllipseGeometry Center="50,50"
+                                         RadiusX="30"
+                                         RadiusY="30">
+                            <EllipseGeometry.Transform>
+                                <ScaleTransform ScaleX="1.2"
+                                                ScaleY="0.6" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Ellipse + TranslateTransform">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <EllipseGeometry Center="30,30"
+                                         RadiusX="25"
+                                         RadiusY="15">
+                            <EllipseGeometry.Transform>
+                                <TranslateTransform X="20"
+                                                    Y="25" />
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Ellipse + TransformGroup">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <EllipseGeometry Center="50,50"
+                                         RadiusX="40"
+                                         RadiusY="20">
+                            <EllipseGeometry.Transform>
+                                <TransformGroup>
+                                    <RotateTransform Angle="30"
+                                                     CenterX="50"
+                                                     CenterY="50" />
+                                    <ScaleTransform ScaleX="0.8"
+                                                    ScaleY="1.2" />
+                                </TransformGroup>
+                            </EllipseGeometry.Transform>
+                        </EllipseGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+            </tk:WrapPanel>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- PathGeometry -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextBlock Text="PathGeometry"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,16,0,4" />
+            <tk:WrapPanel Orientation="Horizontal">
+
+                <local:GeometryBoundsViewer Title="Triangle">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 50,10 L 90,80 10,80 Z" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Quadratic Bezier">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 10,80 Q 50,5 90,80" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Cubic Bezier">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 10,80 C 30,10 70,10 90,80" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="S-curve (cubic)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 10,70 C 30,10 50,10 50,50 C 50,90 70,90 90,30" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Star shape">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 50,5 L 61,40 98,40 68,60 79,95 50,73 21,95 32,60 2,40 39,40 Z" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Arc segment">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 10,50 A 40,30 0 1 1 90,50" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Multiple figures">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 10,10 L 40,10 40,40 10,40 Z M 55,50 L 90,50 90,85 55,85 Z" />
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Path + RotateTransform(20)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 20,20 L 80,20 80,70 20,70 Z">
+                            <PathGeometry.Transform>
+                                <RotateTransform Angle="20"
+                                                 CenterX="50"
+                                                 CenterY="45" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Bezier + ScaleTransform">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <PathGeometry Figures="M 10,70 C 30,10 70,10 90,70">
+                            <PathGeometry.Transform>
+                                <ScaleTransform ScaleX="0.9"
+                                                ScaleY="1.2" />
+                            </PathGeometry.Transform>
+                        </PathGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+            </tk:WrapPanel>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- GeometryGroup -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextBlock Text="GeometryGroup"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,16,0,4" />
+            <tk:WrapPanel Orientation="Horizontal">
+
+                <local:GeometryBoundsViewer Title="Two ellipses">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <GeometryGroup>
+                            <EllipseGeometry Center="35,50"
+                                             RadiusX="25"
+                                             RadiusY="25" />
+                            <EllipseGeometry Center="65,50"
+                                             RadiusX="25"
+                                             RadiusY="25" />
+                        </GeometryGroup>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Rect + Ellipse">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="10,30,35,40" />
+                            <EllipseGeometry Center="70,45"
+                                             RadiusX="20"
+                                             RadiusY="30" />
+                        </GeometryGroup>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Line + Rect + Ellipse">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <GeometryGroup>
+                            <LineGeometry StartPoint="5,5"
+                                          EndPoint="95,95" />
+                            <RectangleGeometry Rect="30,30,40,40" />
+                            <EllipseGeometry Center="50,50"
+                                             RadiusX="10"
+                                             RadiusY="10" />
+                        </GeometryGroup>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Disjoint shapes">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <GeometryGroup>
+                            <EllipseGeometry Center="20,20"
+                                             RadiusX="15"
+                                             RadiusY="10" />
+                            <RectangleGeometry Rect="60,60,30,25" />
+                        </GeometryGroup>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Group + RotateTransform(15)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <GeometryGroup>
+                            <GeometryGroup.Transform>
+                                <RotateTransform Angle="15"
+                                                 CenterX="50"
+                                                 CenterY="50" />
+                            </GeometryGroup.Transform>
+                            <RectangleGeometry Rect="20,25,60,45" />
+                            <EllipseGeometry Center="50,48"
+                                             RadiusX="15"
+                                             RadiusY="15" />
+                        </GeometryGroup>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Group + ScaleTransform(1.3,0.7)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <GeometryGroup>
+                            <GeometryGroup.Transform>
+                                <ScaleTransform ScaleX="1.3"
+                                                ScaleY="0.7" />
+                            </GeometryGroup.Transform>
+                            <EllipseGeometry Center="40,50"
+                                             RadiusX="25"
+                                             RadiusY="25" />
+                            <EllipseGeometry Center="60,50"
+                                             RadiusX="25"
+                                             RadiusY="25" />
+                        </GeometryGroup>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+            </tk:WrapPanel>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- StreamGeometry (via Path mini-language) -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextBlock Text="StreamGeometry"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,16,0,4" />
+            <tk:WrapPanel Orientation="Horizontal">
+
+                <local:GeometryBoundsViewer Title="Rectangle path"
+                                            Geometry="M 10,20 L 90,20 90,70 10,70 Z" />
+
+                <local:GeometryBoundsViewer Title="Diamond"
+                                            Geometry="M 50,5 L 95,50 50,95 5,50 Z" />
+
+                <local:GeometryBoundsViewer Title="Cubic Bezier curve"
+                                            Geometry="M 5,80 C 25,10 75,10 95,80" />
+
+                <local:GeometryBoundsViewer Title="Quadratic arc"
+                                            Geometry="M 10,90 Q 50,5 90,90" />
+
+                <local:GeometryBoundsViewer Title="Arc (large sweep)"
+                                            Geometry="M 20,50 A 35,35 0 1 1 80,50" />
+
+                <local:GeometryBoundsViewer Title="Complex path"
+                                            Geometry="M 10,50 C 10,20 40,5 50,5 C 60,5 90,20 90,50 C 90,75 50,95 50,95 C 50,95 10,75 10,50 Z" />
+
+            </tk:WrapPanel>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- CombinedGeometry -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextBlock Text="CombinedGeometry"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,16,0,4" />
+            <tk:WrapPanel Orientation="Horizontal">
+
+                <local:GeometryBoundsViewer Title="Union (two circles)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <CombinedGeometry GeometryCombineMode="Union">
+                            <CombinedGeometry.Geometry1>
+                                <EllipseGeometry Center="35,50"
+                                                 RadiusX="28"
+                                                 RadiusY="28" />
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <EllipseGeometry Center="65,50"
+                                                 RadiusX="28"
+                                                 RadiusY="28" />
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Intersect (two circles)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <CombinedGeometry GeometryCombineMode="Intersect">
+                            <CombinedGeometry.Geometry1>
+                                <EllipseGeometry Center="35,50"
+                                                 RadiusX="30"
+                                                 RadiusY="30" />
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <EllipseGeometry Center="65,50"
+                                                 RadiusX="30"
+                                                 RadiusY="30" />
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Xor (rect + ellipse)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <CombinedGeometry GeometryCombineMode="Xor">
+                            <CombinedGeometry.Geometry1>
+                                <RectangleGeometry Rect="15,20,70,55" />
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <EllipseGeometry Center="50,48"
+                                                 RadiusX="30"
+                                                 RadiusY="30" />
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Exclude (rect - ellipse)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <CombinedGeometry GeometryCombineMode="Exclude">
+                            <CombinedGeometry.Geometry1>
+                                <RectangleGeometry Rect="10,15,80,60" />
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <EllipseGeometry Center="50,45"
+                                                 RadiusX="25"
+                                                 RadiusY="25" />
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+                <local:GeometryBoundsViewer Title="Union + RotateTransform(30)">
+                    <local:GeometryBoundsViewer.Geometry>
+                        <CombinedGeometry GeometryCombineMode="Union">
+                            <CombinedGeometry.Transform>
+                                <RotateTransform Angle="30"
+                                                 CenterX="50"
+                                                 CenterY="50" />
+                            </CombinedGeometry.Transform>
+                            <CombinedGeometry.Geometry1>
+                                <RectangleGeometry Rect="20,30,25,40" />
+                            </CombinedGeometry.Geometry1>
+                            <CombinedGeometry.Geometry2>
+                                <RectangleGeometry Rect="55,30,25,40" />
+                            </CombinedGeometry.Geometry2>
+                        </CombinedGeometry>
+                    </local:GeometryBoundsViewer.Geometry>
+                </local:GeometryBoundsViewer>
+
+            </tk:WrapPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</sdk:Page>

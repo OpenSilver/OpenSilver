@@ -172,8 +172,7 @@ public abstract class Geometry : DependencyObject
     /// <returns>
     /// The axis-aligned bounding box of the <see cref="Geometry"/>.
     /// </returns>
-    [OpenSilver.NotImplemented]
-    public Rect Bounds => BoundsInternal;
+    public Rect Bounds => GetBoundsInternal();
 
     /// <summary>
     /// Determines whether the object is empty.
@@ -198,7 +197,33 @@ public abstract class Geometry : DependencyObject
     // be CombinedGeometry and GeometryGroup.
     internal virtual bool IsObviouslyEmpty() => IsEmpty();
 
-    internal virtual Rect BoundsInternal => new Rect();
+    internal virtual Rect GetBoundsInternal()
+    {
+        // Do not skip non-fillable figures
+        return GetPathBounds(GetPathGeometryData(), Matrix.Identity, false);
+    }
+
+    /// <summary>
+    /// Gets the bounds of this PathGeometry as an axis-aligned bounding box with pen and/or transform
+    /// </summary>
+    internal static Rect GetPathBounds(PathGeometryData pathData, Matrix worldMatrix, bool skipHollows)
+    {
+        if (pathData.IsEmpty())
+        {
+            return Rect.Empty;
+        }
+
+        var shape = new PathGeometryWrapper(pathData.SerializedData, pathData.FillRule, pathData.Matrix);
+
+        Rect bounds = shape.GetTightBounds(worldMatrix, skipHollows);
+
+        if (double.IsNaN(bounds.X) || double.IsNaN(bounds.Y) || double.IsNaN(bounds.Width) || double.IsNaN(bounds.Height))
+        {
+            return Rect.Empty;
+        }
+
+        return bounds;
+    }
 
     internal event EventHandler<GeometryInvalidatedEventsArgs> Invalidated;
 

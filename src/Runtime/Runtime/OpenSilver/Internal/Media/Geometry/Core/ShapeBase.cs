@@ -51,19 +51,27 @@ internal abstract class CShapeBase
     /// <summary>
     /// Compute tight axis-aligned bounds for this shape.
     /// </summary>
-    internal Rect GetTightBounds(Matrix transform)
+    internal Rect GetTightBounds(Matrix transform, bool fSkipHollows = true)
     {
         var bounds = new CBounds();
 
         for (int i = 0; i < GetFigureCount(); i++)
         {
             IFigureData figure = GetFigure(i);
-            if (!figure.IsEmpty())
+
+            if (fSkipHollows && !figure.IsFillable())
             {
-                MilPoint2D startPt = figure.GetStartPoint();
-                var boundsTask = new CBoundsTask(bounds, startPt);
-                boundsTask.TraverseForward(figure);
+                continue;
             }
+
+            if (figure.IsEmpty())
+            {
+                continue;
+            }
+
+            MilPoint2D startPt = figure.GetStartPoint();
+            var boundsTask = new CBoundsTask(bounds, startPt);
+            boundsTask.TraverseForward(figure);
         }
 
         Rect rect = bounds.GetRect();

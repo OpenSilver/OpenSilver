@@ -173,27 +173,22 @@ namespace System.Windows.Media
         /// </returns>
         public override bool MayHaveCurves() => true;
 
-        internal override Rect BoundsInternal
+        internal override Rect GetBoundsInternal()
         {
-            get
-            {
-                Point currentCenter = Center;
-                double currentRadiusX = Math.Abs(RadiusX);
-                double currentRadiusY = Math.Abs(RadiusY);
+            Point currentCenter = Center;
+            double currentRadiusX = Math.Abs(RadiusX);
+            double currentRadiusY = Math.Abs(RadiusY);
 
-                var boundsRect = new Rect(
+            if (Transform is not Transform transform || Transform.IsIdentityTransform(transform))
+            {
+                return new Rect(
                     currentCenter.X - currentRadiusX,
                     currentCenter.Y - currentRadiusY,
                     2.0 * currentRadiusX,
                     2.0 * currentRadiusY);
-
-                if (Transform is Transform transform && !Transform.IsIdentityTransform(transform))
-                {
-                    boundsRect = transform.TransformBounds(boundsRect);
-                }
-
-                return boundsRect;
             }
+
+            return base.GetBoundsInternal();
         }
 
         internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)

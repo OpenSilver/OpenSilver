@@ -163,30 +163,37 @@ namespace System.Windows.Media
         /// </returns>
         public override bool MayHaveCurves() => IsRounded(RadiusX, RadiusY);
 
-        internal override Rect BoundsInternal
+        internal override Rect GetBoundsInternal()
         {
-            get
+            Rect boundsRect;
+
+            Rect currentRect = Rect;
+            Transform transform = Transform;
+
+            if (currentRect.IsEmpty)
             {
-                Rect boundsRect;
+                boundsRect = Rect.Empty;
+            }
+            else if (transform is null || Transform.IsIdentityTransform(transform))
+            {
+                boundsRect = currentRect;
+            }
+            else
+            {
+                double radiusX = RadiusX;
+                double radiusY = RadiusY;
 
-                Rect currentRect = Rect;
-                Transform transform = Transform;
-
-                if (currentRect.IsEmpty)
-                {
-                    boundsRect = Rect.Empty;
-                }
-                else if (transform is null || Transform.IsIdentityTransform(transform))
-                {
-                    boundsRect = currentRect;
-                }
-                else
+                if (radiusX == 0 && radiusY == 0)
                 {
                     boundsRect = transform.TransformBounds(currentRect);
                 }
-
-                return boundsRect;
+                else
+                {
+                    boundsRect = base.GetBoundsInternal();
+                }
             }
+
+            return boundsRect;
         }
 
         internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)

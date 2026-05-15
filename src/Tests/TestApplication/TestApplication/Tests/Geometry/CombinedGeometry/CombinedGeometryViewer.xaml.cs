@@ -1,8 +1,5 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -97,24 +94,6 @@ namespace TestApplication.Tests
         private void Toggle_Click(object sender, MouseButtonEventArgs e)
         {
             ShowResult = !ShowResult;
-        }
-    }
-
-    public sealed class BooleanToAnyConverter : IValueConverter
-    {
-        public object TrueValue { get; set; }
-
-        public object FalseValue { get; set; }
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            bool b = value is bool v && v;
-            return b ? TrueValue : FalseValue;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

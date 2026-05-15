@@ -13,7 +13,6 @@
 
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
-using System.Collections.Generic;
 using System.Windows.Markup;
 
 namespace System.Windows.Media
@@ -161,25 +160,6 @@ namespace System.Windows.Media
             }
 
             return false;
-        }
-
-        internal override Rect BoundsInternal
-        {
-            get
-            {
-                Rect boundsRect = Rect.Empty;
-
-                List<Geometry> children = Children.InternalItems;
-                if (children.Count > 0)
-                {
-                    for (int i = 0; i < children.Count; i++)
-                    {
-                        boundsRect.Union(children[i].Bounds);
-                    }
-                }
-
-                return boundsRect;
-            }
         }
 
         internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)

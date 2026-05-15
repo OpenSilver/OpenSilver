@@ -118,19 +118,16 @@ namespace System.Windows.Media
         /// </returns>
         public override bool MayHaveCurves() => false;
 
-        internal override Rect BoundsInternal
+        internal override Rect GetBoundsInternal()
         {
-            get
+            var rect = new Rect(StartPoint, EndPoint);
+
+            if (Transform is Transform transform && !Transform.IsIdentityTransform(transform))
             {
-                var rect = new Rect(StartPoint, EndPoint);
-
-                if (Transform is Transform transform && !Transform.IsIdentityTransform(transform))
-                {
-                    rect = transform.TransformBounds(rect);
-                }
-
-                return rect;
+                rect = transform.TransformBounds(rect);
             }
+
+            return rect;
         }
 
         internal override void SerializeData(CapacityStreamGeometryContext context, Matrix transform)

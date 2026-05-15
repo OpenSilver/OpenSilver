@@ -88,6 +88,11 @@ namespace TestApplication
             gradientBrushes.Add(new Test("RadialGradientBrush", "GradientBrushes/RadialGradientBrush"));
             Tests.Add(gradientBrushes);
 
+            TestCategory geometryCategory = new TestCategory("Geometry");
+            geometryCategory.Add(new Test("CombinedGeometry", "Geometry/CombinedGeometry/CombinedGeometry"));
+            geometryCategory.Add(new Test("Bounds", "Geometry/Bounds/GeometryBounds"));
+            Tests.Add(geometryCategory);
+
             TestCategory paths = new TestCategory("Paths");
             paths.Add(new Test("Path", "Paths/Path"));
             paths.Add(new Test("Path Change", "Paths/PathChange"));
@@ -149,7 +154,6 @@ namespace TestApplication
             Tests.Add(new Test("ResourceDictionary", "ResourceDictionary/ResourceDictionary"));
             Tests.Add(new Test("DataTemplate", "DataTemplate"));
             Tests.Add(new Test("Trigger", "Trigger"));
-            Tests.Add(new Test("CombinedGeometry", "CombinedGeometry/CombinedGeometry"));
         }
     }
 }

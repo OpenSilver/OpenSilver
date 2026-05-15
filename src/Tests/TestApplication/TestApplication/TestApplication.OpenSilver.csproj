@@ -32,8 +32,10 @@
     <Compile Include="LinqSamples.cs" />
     <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="Tests\AccordionTest.xaml.cs" />
-    <Compile Include="Tests\CombinedGeometry\CombinedGeometryTest.xaml.cs" />
-    <Compile Include="Tests\CombinedGeometry\CombinedGeometryViewer.xaml.cs" />
+    <Compile Include="Tests\Geometry\BooleanToAnyConverter.cs" />
+    <Compile Include="Tests\Geometry\Bounds\GeometryBoundsViewer.xaml.cs" />
+    <Compile Include="Tests\Geometry\CombinedGeometry\CombinedGeometryTest.xaml.cs" />
+    <Compile Include="Tests\Geometry\CombinedGeometry\CombinedGeometryViewer.xaml.cs" />
     <Compile Include="Tests\PerformanceTest.xaml.cs">
       <DependentUpon>PerformanceTest.xaml</DependentUpon>
     </Compile>
@@ -232,6 +234,9 @@
     </Compile>
     <Compile Include="Tests\Paths\PathChangeTest.xaml.cs">
       <DependentUpon>PathChangeTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tests\Geometry\Bounds\GeometryBoundsTest.xaml.cs">
+      <DependentUpon>GeometryBoundsTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\Paths\PathTest.xaml.cs">
       <DependentUpon>PathTest.xaml</DependentUpon>
@@ -564,6 +569,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Content Include="Tests\Geometry\Bounds\GeometryBoundsTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
     <Content Include="Tests\Paths\PathTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -636,10 +645,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
-    <Page Include="Tests\CombinedGeometry\CombinedGeometryTest.xaml">
+    <Page Include="Tests\Geometry\Bounds\GeometryBoundsViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tests\CombinedGeometry\CombinedGeometryViewer.xaml">
+    <Page Include="Tests\Geometry\CombinedGeometry\CombinedGeometryTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\Geometry\CombinedGeometry\CombinedGeometryViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\generic.xaml">
