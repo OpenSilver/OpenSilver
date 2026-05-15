@@ -1800,6 +1800,10 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
+    <!-- ComboBoxItem -->
+    <Style TargetType="controls:ComboBoxItem"
+           BasedOn="{markup:StaticResource {x:Type controls:ListBoxItem}}" />
 
     <!--  ToolTip  -->
     <Style TargetType="controls:ToolTip">
