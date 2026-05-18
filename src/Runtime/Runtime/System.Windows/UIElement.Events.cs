@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -1651,8 +1652,12 @@ namespace System.Windows
 
         internal virtual HtmlElementReference GetFocusTarget() => OuterDiv;
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void INTERNAL_AttachToDomEvents() { }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void INTERNAL_DetachFromDomEvents() { }
     }
 }

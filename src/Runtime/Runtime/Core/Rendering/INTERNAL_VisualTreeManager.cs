@@ -131,7 +131,9 @@ namespace CSHTML5.Internal
                 element.INTERNAL_OnDetachedFromVisualTree();
 
                 //We detach the events from the dom element:
+#pragma warning disable CS0618 // Type or member is obsolete
                 element.INTERNAL_DetachFromDomEvents();
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 // Call the "Unloaded" event: (note: in XAML, the "unloaded" event of the parent is called
                 // before the "unloaded" event of the children)
@@ -243,7 +245,9 @@ namespace CSHTML5.Internal
             //--------------------------------------------------------
 
             // Register DOM events if any:
+#pragma warning disable CS0618 // Type or member is obsolete
             child.INTERNAL_AttachToDomEvents();
+#pragma warning restore CS0618 // Type or member is obsolete
 
             //--------------------------------------------------------
             // SET "ISLOADED" PROPERTY AND CALL "ONATTACHED" EVENT:
