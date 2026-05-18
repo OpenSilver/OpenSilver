@@ -56,10 +56,8 @@ public class Span : Inline
         ((Span)d)._inlines = (InlineCollection)e.NewValue;
     }
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    protected internal sealed override void AttachVisualChildrenInternal()
     {
-        base.INTERNAL_OnAttachedToVisualTree();
-
         foreach (Inline child in Inlines.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);

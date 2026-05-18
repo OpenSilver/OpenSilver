@@ -150,9 +150,8 @@ namespace System.Windows.Controls
             border.InvalidateMeasure();
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        protected internal sealed override void AttachVisualChildrenInternal()
         {
-            base.INTERNAL_OnAttachedToVisualTree();
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
         }
 

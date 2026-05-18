@@ -11,11 +11,9 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Reflection;
 
 namespace System.Windows.Controls
 {
@@ -47,7 +45,6 @@ namespace System.Windows.Controls
 
             SetLogicalParent(value);
             SetVisualParent(value);
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, VisualParent);
 
             AddInternal(value);
 
@@ -67,7 +64,6 @@ namespace System.Windows.Controls
 
                 for (int i = 0; i < count; ++i)
                 {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(uies[i], VisualParent);
                     ClearVisualParent(uies[i]);
                     ClearLogicalParent(uies[i]);
                 }
@@ -88,7 +84,6 @@ namespace System.Windows.Controls
 
             SetLogicalParent(value);
             SetVisualParent(value);
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, VisualParent);
 
             InsertInternal(index, value);
 
@@ -103,7 +98,6 @@ namespace System.Windows.Controls
 
             UIElement oldChild = GetItemInternal(index);
 
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, VisualParent);
             ClearVisualParent(oldChild);
             ClearLogicalParent(oldChild);
             RemoveAtInternal(index);
@@ -120,7 +114,6 @@ namespace System.Windows.Controls
             int index = IndexOf(uie);
             UIElement oldChild = GetItemInternal(index);
 
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, VisualParent);
             ClearVisualParent(oldChild);
             RemoveAtInternal(index);
 
@@ -134,7 +127,6 @@ namespace System.Windows.Controls
             UIElement oldChild = GetItemInternal(index);
             if (oldChild != value)
             {
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, VisualParent);
                 ClearVisualParent(oldChild);
                 ClearLogicalParent(oldChild);
 
@@ -142,7 +134,6 @@ namespace System.Windows.Controls
 
                 SetLogicalParent(value);
                 SetVisualParent(value);
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, VisualParent);
 
                 VisualParent.InvalidateMeasure();
             }

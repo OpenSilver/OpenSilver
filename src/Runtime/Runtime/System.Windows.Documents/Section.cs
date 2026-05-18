@@ -62,9 +62,8 @@ public sealed class Section : Block
     [OpenSilver.NotImplemented]
     public bool HasTrailingParagraphBreakOnPaste { get; set; }
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    protected internal sealed override void AttachVisualChildrenInternal()
     {
-        base.INTERNAL_OnAttachedToVisualTree();
         foreach (var block in Blocks.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);

@@ -462,7 +462,10 @@ namespace System.Windows.Controls
             base.INTERNAL_OnAttachedToVisualTree();
 
             this.SetTextSelection(IsTextSelectionEnabled);
+        }
 
+        protected internal sealed override void AttachVisualChildrenInternal()
+        {
             foreach (var block in Blocks.InternalItems)
             {
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);

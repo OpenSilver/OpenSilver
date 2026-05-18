@@ -116,6 +116,20 @@ namespace System.Windows
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
         }
 
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            AttachVisualChildrenInternal();
+        }
+
+        internal protected virtual void AttachVisualChildrenInternal()
+        {
+            for (int i = 0; i < VisualChildrenCount; i++)
+            {
+                var child = GetVisualChild(i);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+            }
+        }
+
         /// <summary>
         /// Helper method to provide access to <see cref="AddVisualChild(UIElement)"/> for visual 
         /// collections such as UIElementCollection or TextElementCollection.

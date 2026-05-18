@@ -998,10 +998,8 @@ namespace System.Windows.Controls
             return INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parent, this);
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        protected internal sealed override void AttachVisualChildrenInternal()
         {
-            base.INTERNAL_OnAttachedToVisualTree();
-
             foreach (Inline child in Inlines.InternalItems)
             {
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);

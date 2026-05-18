@@ -1238,8 +1238,6 @@ namespace System.Windows
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            base.INTERNAL_OnAttachedToVisualTree();
-
             // Fetch the implicit style
             HasStyleInvalidated = false;
             UpdateStyleProperty();
@@ -1249,16 +1247,7 @@ namespace System.Windows
                 UpdateThemeStyleProperty();
             }
 
-            AttachVisualChildrenInternal();
-        }
-
-        internal virtual void AttachVisualChildrenInternal()
-        {
-            for (int i = 0; i < VisualChildrenCount; i++)
-            {
-                var child = GetVisualChild(i);
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
-            }
+            base.INTERNAL_OnAttachedToVisualTree();
         }
 
         internal bool HasTriggers =>

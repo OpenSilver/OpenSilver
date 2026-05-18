@@ -651,7 +651,7 @@ namespace System.Windows.Controls
             GenerateChildren();
         }
 
-        internal sealed override void AttachVisualChildrenInternal()
+        protected internal sealed override void AttachVisualChildrenInternal()
         {
             if (!HasChildren)
             {
