@@ -44,6 +44,8 @@ namespace OpenSilver.Compiler
 
                 public void AppendLine(string value) => _stringBuilder.AppendLine(value);
 
+                public void Append(string value) => _stringBuilder.Append(value);
+
                 public abstract void RegisterName(string name, string scopedElement);
 
                 public string Build() => BuildCore(_stringBuilder);
@@ -204,6 +206,12 @@ namespace OpenSilver.Compiler
                 public GeneratorContext AppendLine(string value)
                 {
                     CurrentScope.AppendLine(value);
+                    return this;
+                }
+
+                public GeneratorContext Append(string value)
+                {
+                    CurrentScope.Append(value);
                     return this;
                 }
             }
@@ -724,8 +732,7 @@ namespace GlobalResource
 
                                     if (value is not null)
                                     {
-                                        parameters.AppendLine(
-                                            $"({elementUid} :?> global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}).{memberName} <- {value}");
+                                        parameters.AppendLine(SetMember(elementUid, declaringType, memberName, value, false));
                                     }
                                 });
 
@@ -747,7 +754,7 @@ namespace GlobalResource
                                         element,
                                         attribute);
 
-                                    parameters.AppendLine($"global.{ownerType}.Set{memberName}({elementUid}, {value})");
+                                    parameters.AppendLine(SetMember(elementUid, declaringType, memberName, value, true));
                                 });
                             }
                             break;
@@ -1010,8 +1017,6 @@ namespace GlobalResource
                     bool isList = _settings.Inspector.IsIList(memberTypeDefinition);
                     bool isDictionary = _settings.Inspector.IsIDictionary(memberTypeDefinition);
 
-                    string ownerType = _settings.TypeReferenceHelper.ConvertToString(declaringType);
-
                     // Check if the property is a collection, in which case we must use ".Add(...)", otherwise a simple "=" is enough:
                     if ((isList || isDictionary) && IsPropertyACollection(memberElement, memberTypeDefinition))
                     {
@@ -1019,15 +1024,7 @@ namespace GlobalResource
                         // PROPERTY TYPE IS A COLLECTION
                         //------------------------
 
-                        string codeToAccessTheEnumerable;
-                        if (isAttachedProperty)
-                        {
-                            codeToAccessTheEnumerable = $"global.{ownerType}.Get{memberName}({targetUid})";
-                        }
-                        else
-                        {
-                            codeToAccessTheEnumerable = $"({targetUid} :?> global.{ownerType}).{memberName}";
-                        }
+                        string codeToAccessTheEnumerable = GetMemberPath(targetUid, declaringType, memberName, isAttachedProperty);
 
                         if (isDictionary)
                         {
@@ -1052,14 +1049,7 @@ namespace GlobalResource
                         // such as in: "{Binding Background, RelativeSource={RelativeSource Mode=TemplatedParent}}"
                         if (!_settings.Inspector.IsElementAMarkupExtension(valueTypeDefinition) || _settings.Inspector.IsRelativeSource(valueTypeDefinition))
                         {
-                            if (isAttachedProperty)
-                            {
-                                parameters.AppendLine($"global.{ownerType}.Set{memberName}({targetUid}, {valueUid})");
-                            }
-                            else
-                            {
-                                parameters.AppendLine($"({targetUid} :?> global.{ownerType}).{memberName} <- {valueUid}");
-                            }
+                            parameters.AppendLine(SetMember(targetUid, declaringType, memberName, valueUid, isAttachedProperty));
                         }
                         else
                         {
@@ -1075,18 +1065,9 @@ namespace GlobalResource
                                 //------------------------------
 
                                 string propertyType = _settings.TypeReferenceHelper.ConvertToString(memberType);
+                                string value = $"({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {valueUid}) :?> global.{propertyType})";
 
-                                // Attached property
-                                if (isAttachedProperty)
-                                {
-                                    parameters.AppendLine(
-                                        $"global.{ownerType}.Set{memberName}({targetUid}, ({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {valueUid}) :?> global.{propertyType}))");
-                                }
-                                else
-                                {
-                                    parameters.AppendLine(
-                                        $"({targetUid} :?> global.{ownerType}).{memberName} <- ({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {valueUid}) :?> global.{propertyType})");
-                                }
+                                parameters.AppendLine(SetMember(targetUid, declaringType, memberName, value, isAttachedProperty));
                             }
                             else if (_settings.Inspector.IsBinding(valueTypeDefinition) ||
                                      _settings.Inspector.IsMultiBinding(valueTypeDefinition))
@@ -1108,7 +1089,7 @@ namespace GlobalResource
                                 // case we should directly assign the value instead of calling "SetBinding"
                                 if (dpDefinition is null || memberType == valueTypeDefinition || _settings.Inspector.IsBindingBase(memberType))
                                 {
-                                    parameters.AppendLine($"({targetUid} :?> global.{ownerType}).{memberName} <- {valueUid}");
+                                    parameters.AppendLine(SetMember(targetUid, declaringType, memberName, valueUid, false));
                                 }
                                 else
                                 {
@@ -1135,14 +1116,17 @@ namespace GlobalResource
 
                                 if (dpDefinition is null)
                                 {
-                                    if (ownerType == $"{KnownNamespaces.SystemWindows}.Setter" && memberName == "Value")
+                                    if (declaringType.Namespace == KnownNamespaces.SystemWindows &&
+                                        declaringType.Name == "Setter" &&
+                                        declaringType.GetAssemblyName() == Constants.OPENSILVER_ASSEMBLY_NAME &&
+                                        memberName == "Value")
                                     {
-                                        parameters.AppendLine($"({targetUid} :?> global.{ownerType}).{memberName} <- {valueUid}");
+                                        parameters.AppendLine(SetMember(targetUid, declaringType, memberName, valueUid, false));
                                     }
                                     else
                                     {
                                         throw new XamlParseException(
-                                            $"A '{memberElement.Name.LocalName}' cannot be set on the '{memberName}' property of type '{ownerType}'. A '{memberElement.Name.LocalName}' can only be set on a DependencyProperty of a DependencyObject, or the Setter.Value property.",
+                                            $"A '{memberElement.Name.LocalName}' cannot be set on the '{memberName}' property of type '{_settings.TypeReferenceHelper.ConvertToString(declaringType)}'. A '{memberElement.Name.LocalName}' can only be set on a DependencyProperty of a DependencyObject, or the Setter.Value property.",
                                             memberElement);
                                     }
                                 }
@@ -1154,16 +1138,9 @@ namespace GlobalResource
 
                                     parameters
                                         .AppendLine($"let mutable {markupValue}: obj = null")
-                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({targetUid}, {dependencyPropertyName}, {valueUid}, ref {markupValue})) then");
-
-                                    if (isAttachedProperty)
-                                    {
-                                        parameters.AppendLine($"    global.{ownerType}.Set{memberName}({targetUid}, ({markupValue} :?> global.{propertyType}))");
-                                    }
-                                    else
-                                    {
-                                        parameters.AppendLine($"    ({targetUid} :?> global.{ownerType}).{memberName} <- ({markupValue} :?> global.{propertyType})");
-                                    }
+                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({targetUid}, {dependencyPropertyName}, {valueUid}, ref {markupValue})) then")
+                                        .Append("    ")
+                                        .AppendLine(SetMember(targetUid, declaringType, memberName, $"({markupValue} :?> global.{propertyType})", isAttachedProperty));
                                 }
                             }
                             else if (_settings.Inspector.IsTemplateBindingExtension(valueTypeDefinition))
@@ -1197,46 +1174,23 @@ namespace GlobalResource
                                 // {x:Null}
                                 //------------------------------
 
-                                if (isAttachedProperty)
-                                {
-                                    parameters.AppendLine($"global.{ownerType}.Set{memberName}({targetUid}, null)");
-                                }
-                                else
-                                {
-                                    parameters.AppendLine($"({targetUid} :?> global.{ownerType}).{memberName} <- null");
-                                }
+                                parameters.AppendLine(SetMember(targetUid, declaringType, memberName, "null", isAttachedProperty));
                             }
                             else if (_settings.Inspector.IsStaticExtension(valueTypeDefinition))
                             {
                                 string staticMemberName = ResolveStaticExtension(valueElement, valueElement);
                                 string propertyType = _settings.TypeReferenceHelper.ConvertToString(memberType);
 
-                                if (isAttachedProperty)
-                                {
-                                    parameters.AppendLine(
-                                        $"global.{ownerType}.Set{memberName}({targetUid}, ({staticMemberName} :> obj) :?> global.{propertyType})");
-                                }
-                                else
-                                {
-                                    parameters.AppendLine(
-                                        $"({targetUid} :?> global.{ownerType}).{memberName} <- ({staticMemberName} :> obj) :?> global.{propertyType}");
-                                }
+                                parameters.AppendLine(
+                                    SetMember(targetUid, declaringType, memberName, $"(({staticMemberName} :> obj) :?> global.{propertyType})", isAttachedProperty));
                             }
                             else if (_settings.Inspector.IsTypeExtension(valueTypeDefinition))
                             {
                                 string resolvedTypeName = ResolveTypeExtension(valueElement, valueElement);
                                 string propertyType = _settings.TypeReferenceHelper.ConvertToString(memberType);
 
-                                if (isAttachedProperty)
-                                {
-                                    parameters.AppendLine(
-                                        $"global.{ownerType}.Set{memberName}({targetUid}, (typeof<global.{resolvedTypeName}> :> obj) :?> global.{propertyType})");
-                                }
-                                else
-                                {
-                                    parameters.AppendLine(
-                                        $"({targetUid} :?> global.{ownerType}).{memberName} <- (typeof<global.{resolvedTypeName}> :> obj) :?> global.{propertyType}");
-                                }
+                                parameters.AppendLine(
+                                    SetMember(targetUid, declaringType, memberName, $"((typeof<global.{resolvedTypeName}> :> obj) :?> global.{propertyType})", isAttachedProperty));
                             }
                             else
                             {
@@ -1262,32 +1216,16 @@ namespace GlobalResource
 
                                     parameters
                                         .AppendLine($"let mutable {markupValue}: obj = null")
-                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({targetUid}, {dpName}, {valueUid}, ref {markupValue})) then");
-
-                                    if (isAttachedProperty)
-                                    {
-                                        parameters.AppendLine($"    global.{ownerType}.Set{memberName}({targetUid}, ({markupValue} :?> global.{propertyType}))");
-                                    }
-                                    else
-                                    {
-                                        parameters.AppendLine($"    ({targetUid} :?> global.{ownerType}).{memberName} <- ({markupValue} :?> global.{propertyType})");
-                                    }
+                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({targetUid}, {dpName}, {valueUid}, ref {markupValue})) then")
+                                        .Append("    ")
+                                        .AppendLine(SetMember(targetUid, declaringType, memberName, $"({markupValue} :?> global.{propertyType})", isAttachedProperty));
                                 }
                                 else
                                 {
                                     string markupExtension =
                                         $"({valueUid} :> {IMarkupExtensionClass}).ProvideValue(new global.System.ServiceProvider({targetUid}, null))";
 
-                                    if (isAttachedProperty)
-                                    {
-                                        parameters.AppendLine(
-                                            $"global.{ownerType}.Set{memberName}({targetUid}, ({markupExtension} :?> global.{propertyType}))");
-                                    }
-                                    else
-                                    {
-                                        parameters.AppendLine(
-                                            $"({targetUid} :?> global.{ownerType}).{memberName} <- ({markupExtension} :?> global.{propertyType})");
-                                    }
+                                    parameters.AppendLine(SetMember(targetUid, declaringType, memberName, $"({markupExtension} :?> global.{propertyType})", isAttachedProperty));
                                 }
                             }
                         }
@@ -1901,6 +1839,33 @@ namespace GlobalResource
                 }
 
                 return $"global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}.{propertyName}Property";
+            }
+
+            private string GetMemberPath(string elementUid, TypeReference declaringType, string memberName, bool isAttached)
+            {
+                if (isAttached)
+                {
+                    return $"global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}.Get{memberName}({elementUid})";
+                }
+
+                if (declaringType.IsValueType)
+                {
+                    return $"{elementUid}.{memberName}";
+                }
+                else
+                {
+                    return $"({elementUid} :?> global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}).{memberName}";
+                }
+            }
+
+            private string SetMember(string elementUid, TypeReference declaringType, string memberName, string value, bool isAttached)
+            {
+                if (isAttached)
+                {
+                    return $"global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}.Set{memberName}({elementUid}, {value})";
+                }
+
+                return $"{GetMemberPath(elementUid, declaringType, memberName, false)} <- {value}";
             }
         }
     }
