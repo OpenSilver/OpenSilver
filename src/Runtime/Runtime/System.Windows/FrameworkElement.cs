@@ -1249,6 +1249,11 @@ namespace System.Windows
                 UpdateThemeStyleProperty();
             }
 
+            AttachVisualChildrenInternal();
+        }
+
+        internal virtual void AttachVisualChildrenInternal()
+        {
             for (int i = 0; i < VisualChildrenCount; i++)
             {
                 var child = GetVisualChild(i);
