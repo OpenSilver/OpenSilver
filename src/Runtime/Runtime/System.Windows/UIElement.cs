@@ -112,6 +112,8 @@ namespace System.Windows
             // Fire notifications
             OnVisualChildrenChanged(child, null);
             child.OnVisualParentChanged(null);
+
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
         }
 
         /// <summary>
@@ -128,6 +130,8 @@ namespace System.Windows
         /// </param>
         protected void RemoveVisualChild(UIElement child)
         {
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
+
             if (child is null || child.InternalVisualParent is null)
             {
                 return;

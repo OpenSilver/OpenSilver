@@ -368,11 +368,9 @@ namespace System.Windows
             {
                 if (_templateChild != value)
                 {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_templateChild, this);
                     RemoveVisualChild(_templateChild);
                     _templateChild = value;
-                    AddVisualChild(_templateChild);
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
+                    AddVisualChild(_templateChild);                    
                 }
             }
         }
@@ -1230,6 +1228,12 @@ namespace System.Windows
             // Fetch the implicit style
             HasStyleInvalidated = false;
             UpdateStyleProperty();
+
+            for (int i = 0; i < VisualChildrenCount; i++)
+            {
+                var child = GetVisualChild(i);
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
+            }
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
@@ -1243,6 +1247,12 @@ namespace System.Windows
             if (!HasThemeStyleEverBeenFetched)
             {
                 UpdateThemeStyleProperty();
+            }
+
+            for (int i = 0; i < VisualChildrenCount; i++)
+            {
+                var child = GetVisualChild(i);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
             }
         }
 

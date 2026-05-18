@@ -142,14 +142,10 @@ namespace System.Windows.Controls
 
             border._child = newChild;
 
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, border);
-
             border.RemoveVisualChild(oldChild);
             border.RemoveLogicalChild(oldChild);
             border.AddLogicalChild(newChild);
             border.AddVisualChild(newChild);
-
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, border);
 
             border.InvalidateMeasure();
         }
