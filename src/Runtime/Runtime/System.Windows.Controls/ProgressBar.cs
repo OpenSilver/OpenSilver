@@ -13,7 +13,10 @@
 
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Automation.Peers;
+using System.Windows.Shapes;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -26,13 +29,21 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = StateDeterminate, GroupName = VisualStates.GroupCommon)]
     public class ProgressBar : RangeBase
     {
+        // Silverlight part names
         private const string ProgressBarIndicatorName = "ProgressBarIndicator";
         private const string ProgressBarTrackName = "ProgressBarTrack";
+
+        // WPF part names
+        private const string WpfTrackName = "PART_Track";
+        private const string WpfIndicatorName = "PART_Indicator";
+        private const string WpfGlowRectName = "PART_GlowRect";
+
         private const string StateIndeterminate = "Indeterminate";
         private const string StateDeterminate = "Determinate";
 
         private FrameworkElement _track;
         private FrameworkElement _indicator;
+        private FrameworkElement _glow;
 
         static ProgressBar()
         {
@@ -43,6 +54,22 @@ namespace System.Windows.Controls
         /// Initializes a new instance of the <see cref="ProgressBar"/> class.
         /// </summary>
         public ProgressBar() { }
+
+        /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(ProgressBar), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Defines whether the ProgressBar should use WPF-style template parts (PART_Track, PART_Indicator,
+        /// PART_GlowRect) and indeterminate animation, or the Silverlight-style parts and behavior.
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
+        }
 
         /// <summary>
         /// Identifies the <see cref="IsIndeterminate"/> dependency property.
@@ -72,7 +99,13 @@ namespace System.Windows.Controls
 
         private static void IsIndeterminatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ProgressBar)d).UpdateVisualStates();
+            var pb = (ProgressBar)d;
+            if (pb.UseWpfBehavior)
+            {
+                pb.SetProgressBarIndicatorLength();
+                pb.SetProgressBarGlowElementBrush();
+            }
+            pb.UpdateVisualStates();
         }
 
         /// <summary>
@@ -88,12 +121,27 @@ namespace System.Windows.Controls
                 _track.SizeChanged -= new SizeChangedEventHandler(OnTrackSizeChanged);
             }
 
-            _indicator = GetTemplateChild(ProgressBarIndicatorName) as FrameworkElement;
-            _track = GetTemplateChild(ProgressBarTrackName) as FrameworkElement;
+            if (UseWpfBehavior)
+            {
+                _indicator = GetTemplateChild(WpfIndicatorName) as FrameworkElement;
+                _track = GetTemplateChild(WpfTrackName) as FrameworkElement;
+                _glow = GetTemplateChild(WpfGlowRectName) as FrameworkElement;
+            }
+            else
+            {
+                _indicator = GetTemplateChild(ProgressBarIndicatorName) as FrameworkElement;
+                _track = GetTemplateChild(ProgressBarTrackName) as FrameworkElement;
+                _glow = null;
+            }
 
             if (_indicator != null && _track != null)
             {
                 _track.SizeChanged += new SizeChangedEventHandler(OnTrackSizeChanged);
+            }
+
+            if (UseWpfBehavior && IsIndeterminate)
+            {
+                SetProgressBarGlowElementBrush();
             }
 
             UpdateVisualStates();
@@ -166,27 +214,102 @@ namespace System.Windows.Controls
 
         private void SetProgressBarIndicatorLength()
         {
-            if (_track != null && _indicator != null &&
-                VisualTreeHelper.GetParent(_indicator) is FrameworkElement parent)
+            if (_track == null || _indicator == null)
+                return;
+
+            double min = Minimum;
+            double max = Maximum;
+            double val = Value;
+
+            if (UseWpfBehavior)
             {
-                double widthOffset = _indicator.Margin.Left + _indicator.Margin.Right;
-                double min = Minimum;
-                double max = Maximum;
-                double val = Value;
-
-                switch (parent)
+                double percent = IsIndeterminate || max <= min ? 1.0 : (val - min) / (max - min);
+                _indicator.Width = percent * _track.ActualWidth;
+                UpdateGlowAnimation();
+            }
+            else
+            {
+                if (VisualTreeHelper.GetParent(_indicator) is FrameworkElement parent)
                 {
-                    case Border border:
-                        widthOffset += border.Padding.Left + border.Padding.Right;
-                        break;
-                    case Control control:
-                        widthOffset += control.Padding.Left + control.Padding.Right;
-                        break;
-                }
+                    double widthOffset = _indicator.Margin.Left + _indicator.Margin.Right;
 
-                double percent = IsIndeterminate || max == min ? 1.0 : (val - min) / (max - min);
-                double parentWidth = Math.Max(0, parent.ActualWidth - widthOffset);
-                _indicator.Width = percent * parentWidth;
+                    switch (parent)
+                    {
+                        case Border border:
+                            widthOffset += border.Padding.Left + border.Padding.Right;
+                            break;
+                        case Control control:
+                            widthOffset += control.Padding.Left + control.Padding.Right;
+                            break;
+                    }
+
+                    double percent = IsIndeterminate || max == min ? 1.0 : (val - min) / (max - min);
+                    double parentWidth = Math.Max(0, parent.ActualWidth - widthOffset);
+                    _indicator.Width = percent * parentWidth;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets up or updates the glow animation for WPF indeterminate mode.
+        /// The glow rectangle slides from left to right across the indicator, repeating forever.
+        /// </summary>
+        private void UpdateGlowAnimation()
+        {
+            if (!UseWpfBehavior || _glow == null)
+                return;
+
+            if (IsIndeterminate && _glow.Width > 0 && _indicator.Width > 0)
+            {
+                double endPos = _indicator.Width + _glow.Width;
+                double startPos = -1 * _glow.Width;
+                double speed = 200.0; // pixels per second
+
+                TimeSpan translateTime = TimeSpan.FromSeconds((endPos - startPos) / speed);
+                TimeSpan pauseTime = TimeSpan.FromSeconds(1.0);
+
+                var animation = new ThicknessAnimation
+                {
+                    From = new Thickness(startPos, 0, 0, 0),
+                    To = new Thickness(endPos, 0, 0, 0),
+                    Duration = new Duration(translateTime + pauseTime),
+                    RepeatBehavior = RepeatBehavior.Forever
+                };
+
+                _glow.BeginAnimation(FrameworkElement.MarginProperty, animation);
+            }
+            else
+            {
+                _glow.BeginAnimation(FrameworkElement.MarginProperty, null);
+            }
+        }
+
+        /// <summary>
+        /// Sets up the glow brush for WPF indeterminate mode.
+        /// Creates a gradient from transparent to the foreground color and back.
+        /// </summary>
+        private void SetProgressBarGlowElementBrush()
+        {
+            if (_glow == null)
+                return;
+
+            if (IsIndeterminate && Foreground is SolidColorBrush scb)
+            {
+                Color color = scb.Color;
+                var brush = new LinearGradientBrush
+                {
+                    StartPoint = new Point(0, 0),
+                    EndPoint = new Point(1, 0)
+                };
+                brush.GradientStops.Add(new GradientStop { Color = Colors.Transparent, Offset = 0.0 });
+                brush.GradientStops.Add(new GradientStop { Color = color, Offset = 0.4 });
+                brush.GradientStops.Add(new GradientStop { Color = color, Offset = 0.6 });
+                brush.GradientStops.Add(new GradientStop { Color = Colors.Transparent, Offset = 1.0 });
+
+                if (_glow is Shape shape)
+                {
+                    shape.Fill = brush;
+                }
             }
         }
     }
