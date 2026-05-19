@@ -21,7 +21,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
-using System.Windows.Markup;
 
 namespace System.Windows.Data
 {
@@ -979,7 +978,7 @@ namespace System.Windows.Data
                         mentor = FrameworkElement.FindMentor(Target);
                         if (mentor != null)
                         {
-                            source = FindAncestor(mentor, ParentBinding.RelativeSource);
+                            source = FindAncestorOftype(mentor, ParentBinding.RelativeSource.AncestorType, ParentBinding.RelativeSource.AncestorLevel);
                             if (source == null && !lastAttempt)
                             {
                                 mentor.Loaded += new RoutedEventHandler(OnMentorLoaded);
@@ -1112,42 +1111,41 @@ namespace System.Windows.Data
             return o;
         }
 
-        private static object FindAncestor(IInternalFrameworkElement mentor, RelativeSource relativeSource)
+        private static object FindAncestorOftype(IInternalFrameworkElement mentor, Type type, int level)
         {
-            // todo: support bindings in style setters and then remove the following test.
-            // To reproduce the issue:
-            // <Style x:Key="LegendItemControlStyle"
-            //        TargetType="legend:LegendItemControl">
-            //   <Setter Property="DefaultMarkerGeometry"
-            //           Value="{Binding DefaultMarkerGeometry, RelativeSource={RelativeSource AncestorType=telerik:RadLegend}}"/>
-            // </Style>
-            if (mentor == null)
-                return null;
+            Debug.Assert(mentor is not null);
 
-            // make sure the target is in the visual tree:
-            if (!mentor.IsConnectedToLiveTree)
-                return null;
-
-            // get the AncestorLevel and AncestorType:
-            int ancestorLevel = relativeSource.AncestorLevel;
-            Type ancestorType = relativeSource.AncestorType;
-            if (ancestorLevel < 1 || ancestorType == null)
-                return null;
-
-            // look for the target's ancestor:
-            var currentParent = VisualTreeHelper.GetParent(mentor);
-            if (currentParent == null)
-                return null;
-
-            while (!ancestorType.IsAssignableFrom(currentParent.GetType()) || --ancestorLevel > 0)
+            if (type is null || level < 1)
             {
-                currentParent = VisualTreeHelper.GetParent(currentParent);
-                if (currentParent == null)
-                    return null;
+                return null;
             }
-            if (ancestorLevel == 0)
-                return currentParent;
-            return null;
+
+            DependencyObject ancestor = GetAncestor(mentor.AsDependencyObject());
+
+            while (ancestor is not null)
+            {
+                if (type.IsInstanceOfType(ancestor))
+                {
+                    if (--level <= 0)
+                    {
+                        break;
+                    }
+                }
+
+                ancestor = GetAncestor(ancestor);
+            }
+
+            return ancestor;
+
+            static DependencyObject GetAncestor(DependencyObject d)
+            {
+                if (d is null)
+                {
+                    return null;
+                }
+
+                return VisualTreeHelper.GetParent(d) ?? LogicalTreeHelper.GetParent(d) ?? d.InheritanceContext;
+            }
         }
     }
 }
