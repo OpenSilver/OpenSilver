@@ -218,9 +218,8 @@ public class List : Block
         return INTERNAL_HtmlDomManager.CreateListDomElementAndAppendIt(parent, this);
     }
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    internal sealed override void AttachVisualChildren()
     {
-        base.INTERNAL_OnAttachedToVisualTree();
         foreach (var listItem in ListItems.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(listItem, this);

@@ -304,9 +304,8 @@ public class ListItem : TextElement
         return INTERNAL_HtmlDomManager.CreateListItemDomElementAndAppendIt(parent, this);
     }
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    internal sealed override void AttachVisualChildren()
     {
-        base.INTERNAL_OnAttachedToVisualTree();
         foreach (var block in Blocks.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);

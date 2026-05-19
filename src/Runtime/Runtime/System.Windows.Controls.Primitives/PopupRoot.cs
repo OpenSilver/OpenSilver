@@ -221,13 +221,9 @@ internal sealed class PopupRoot : FrameworkElement
             {
                 if (_child == value) return;
 
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
                 RemoveVisualChild(_child);
-
                 _child = value;
-
                 AddVisualChild(_child);
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
 
                 InvalidateMeasure();
             }
@@ -245,11 +241,7 @@ internal sealed class PopupRoot : FrameworkElement
             return child;
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-        }
+        internal override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
 
         protected override Size MeasureOverride(Size availableSize)
         {

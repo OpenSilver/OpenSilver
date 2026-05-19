@@ -90,9 +90,8 @@ public sealed class Paragraph : Block
         ((Block)d).TextContainer.OnTextContentChanged();
     }
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    internal sealed override void AttachVisualChildren()
     {
-        base.INTERNAL_OnAttachedToVisualTree();
         foreach (var inline in Inlines.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(inline, this);

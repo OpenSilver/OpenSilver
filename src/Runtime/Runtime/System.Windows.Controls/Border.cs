@@ -142,23 +142,15 @@ namespace System.Windows.Controls
 
             border._child = newChild;
 
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, border);
-
             border.RemoveVisualChild(oldChild);
             border.RemoveLogicalChild(oldChild);
             border.AddLogicalChild(newChild);
             border.AddVisualChild(newChild);
 
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, border);
-
             border.InvalidateMeasure();
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
-        }
+        internal sealed override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
 
         /// <summary>
         /// Identifies the <see cref="Background"/> dependency property.

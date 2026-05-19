@@ -368,11 +368,9 @@ namespace System.Windows
             {
                 if (_templateChild != value)
                 {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_templateChild, this);
                     RemoveVisualChild(_templateChild);
                     _templateChild = value;
-                    AddVisualChild(_templateChild);
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
+                    AddVisualChild(_templateChild);                    
                 }
             }
         }
@@ -1234,8 +1232,6 @@ namespace System.Windows
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
-            base.INTERNAL_OnAttachedToVisualTree();
-
             // Fetch the implicit style
             HasStyleInvalidated = false;
             UpdateStyleProperty();
@@ -1244,6 +1240,8 @@ namespace System.Windows
             {
                 UpdateThemeStyleProperty();
             }
+
+            base.INTERNAL_OnAttachedToVisualTree();
         }
 
         internal bool HasTriggers =>

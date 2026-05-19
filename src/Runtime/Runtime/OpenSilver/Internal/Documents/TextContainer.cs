@@ -11,14 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Documents;
-
 namespace OpenSilver.Internal.Documents;
 
 internal interface ITextContainer
 {
     string Text { get; }
     void OnTextContentChanged();
-    void OnTextAdded(TextElement textElement, int index);
-    void OnTextRemoved(TextElement textElement);
 }

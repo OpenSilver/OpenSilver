@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
-using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Documents;
 
@@ -30,22 +29,6 @@ internal sealed class TextContainerSection : ITextContainer
     }
 
     public string Text => string.Join("\n", _section.Blocks.InternalItems.Select(b => b.TextContainer.Text));
-
-    public void OnTextAdded(TextElement textElement, int index)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_section))
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, _section, index);
-        }
-    }
-
-    public void OnTextRemoved(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_section))
-        {
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, _section);
-        }
-    }
 
     public void OnTextContentChanged()
     {

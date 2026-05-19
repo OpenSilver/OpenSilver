@@ -14,8 +14,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Documents;
 
@@ -32,20 +30,4 @@ internal sealed class TextContainerTextBlock : ITextContainer
     public string Text => string.Join(string.Empty, _textblock.Inlines.InternalItems.Select(i => i.TextContainer.Text));
 
     public void OnTextContentChanged() => _textblock.OnTextContentChanged();
-
-    public void OnTextAdded(TextElement textElement, int index)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_textblock))
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, _textblock, index);
-        }
-    }
-
-    public void OnTextRemoved(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_textblock))
-        {
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, _textblock);
-        }
-    }
 }

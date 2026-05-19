@@ -357,10 +357,7 @@ public partial class FrameworkElement
     protected sealed override Size MeasureCore(Size availableSize)
     {
         // build the visual tree from styles first
-        if (!ApplyTemplate() && TemplateChild is not null)
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(TemplateChild, this, 0);
-        }
+        ApplyTemplate();
 
         if (BypassLayoutPolicies)
         {

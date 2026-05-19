@@ -651,10 +651,8 @@ namespace System.Windows.Controls
             GenerateChildren();
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        internal sealed override void AttachVisualChildren()
         {
-            base.INTERNAL_OnAttachedToVisualTree();
-
             if (!HasChildren)
             {
                 return;

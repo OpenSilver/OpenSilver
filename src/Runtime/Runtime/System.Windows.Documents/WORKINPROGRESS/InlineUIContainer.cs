@@ -45,11 +45,6 @@ namespace System.Windows.Documents
             }
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-        }
+        internal sealed override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
     }
 }

@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -37,8 +36,4 @@ internal sealed class TextContainerRun : ITextContainer
             parent.OnTextContentChanged();
         }
     }
-
-    public void OnTextAdded(TextElement textElement, int index) => throw new NotSupportedException();
-
-    public void OnTextRemoved(TextElement textElement) => throw new NotSupportedException();
 }
