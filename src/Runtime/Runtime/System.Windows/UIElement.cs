@@ -116,20 +116,6 @@ namespace System.Windows
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            AttachVisualChildrenInternal();
-        }
-
-        internal protected virtual void AttachVisualChildrenInternal()
-        {
-            for (int i = 0; i < VisualChildrenCount; i++)
-            {
-                var child = GetVisualChild(i);
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
-            }
-        }
-
         /// <summary>
         /// Helper method to provide access to <see cref="AddVisualChild(UIElement)"/> for visual 
         /// collections such as UIElementCollection or TextElementCollection.
@@ -1823,6 +1809,19 @@ namespace System.Windows
         {
             get => ReadVisualFlag(VisualFlags.IsVisualTreeRoot);
             set => WriteVisualFlag(VisualFlags.IsVisualTreeRoot, value);
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree() => AttachVisualChildren();
+
+        internal virtual void AttachVisualChildren()
+        {
+            for (int i = 0; i < VisualChildrenCount; i++)
+            {
+                if (GetVisualChild(i) is UIElement child)
+                {
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
+                }
+            }
         }
 
         internal void RenderVisual()

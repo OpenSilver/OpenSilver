@@ -100,12 +100,6 @@ namespace Runtime.OpenSilver.Tests
             return new JsonElement();
         }
 
-        public static void AttachVisualChild(UIElement element)
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(element,
-                Window.Current);
-        }
-
         public static void SleepWhile(Func<bool> condition, string description = null, int timeoutInMs = 2000)
         {
             const int interval = 100;

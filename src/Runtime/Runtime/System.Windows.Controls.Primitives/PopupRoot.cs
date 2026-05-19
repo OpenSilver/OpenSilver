@@ -241,10 +241,7 @@ internal sealed class PopupRoot : FrameworkElement
             return child;
         }
 
-        protected internal sealed override void AttachVisualChildrenInternal()
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-        }
+        internal override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
 
         protected override Size MeasureOverride(Size availableSize)
         {

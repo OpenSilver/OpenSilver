@@ -56,7 +56,7 @@ public class Span : Inline
         ((Span)d)._inlines = (InlineCollection)e.NewValue;
     }
 
-    protected internal sealed override void AttachVisualChildrenInternal()
+    internal sealed override void AttachVisualChildren()
     {
         foreach (Inline child in Inlines.InternalItems)
         {

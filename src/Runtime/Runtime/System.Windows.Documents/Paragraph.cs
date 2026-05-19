@@ -90,7 +90,7 @@ public sealed class Paragraph : Block
         ((Block)d).TextContainer.OnTextContentChanged();
     }
 
-    protected internal sealed override void AttachVisualChildrenInternal()
+    internal sealed override void AttachVisualChildren()
     {
         foreach (var inline in Inlines.InternalItems)
         {

@@ -304,7 +304,7 @@ public class ListItem : TextElement
         return INTERNAL_HtmlDomManager.CreateListItemDomElementAndAppendIt(parent, this);
     }
 
-    protected internal sealed override void AttachVisualChildrenInternal()
+    internal sealed override void AttachVisualChildren()
     {
         foreach (var block in Blocks.InternalItems)
         {

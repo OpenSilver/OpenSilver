@@ -464,7 +464,7 @@ namespace System.Windows.Controls
             this.SetTextSelection(IsTextSelectionEnabled);
         }
 
-        protected internal sealed override void AttachVisualChildrenInternal()
+        internal sealed override void AttachVisualChildren()
         {
             foreach (var block in Blocks.InternalItems)
             {

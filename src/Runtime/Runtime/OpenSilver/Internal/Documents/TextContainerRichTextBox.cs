@@ -13,7 +13,6 @@
 
 using System.Diagnostics;
 using System.Windows.Controls;
-using System.Windows.Documents;
 
 namespace OpenSilver.Internal.Documents;
 
@@ -30,8 +29,4 @@ internal sealed class TextContainerRichTextBox : ITextContainer
     public string Text => string.Empty;
 
     public void OnTextContentChanged() => _richTextBox.InvalidateUI();
-
-    public void OnTextAdded(TextElement textElement, int index) { }
-
-    public void OnTextRemoved(TextElement textElement) { }
 }

@@ -998,7 +998,7 @@ namespace System.Windows.Controls
             return INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parent, this);
         }
 
-        protected internal sealed override void AttachVisualChildrenInternal()
+        internal sealed override void AttachVisualChildren()
         {
             foreach (Inline child in Inlines.InternalItems)
             {

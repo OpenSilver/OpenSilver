@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Documents;
@@ -30,22 +29,6 @@ internal sealed class TextContainerList : ITextContainer
     }
 
     public string Text => string.Join("\n", _list.ListItems.Select(li => li.TextContainer.Text));
-
-    public void OnTextAdded(TextElement textElement, int index)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_list))
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, _list, index);
-        }
-    }
-
-    public void OnTextRemoved(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_list))
-        {
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, _list);
-        }
-    }
 
     public void OnTextContentChanged()
     {
@@ -67,22 +50,6 @@ internal sealed class TextContainerListItem : ITextContainer
     }
 
     public string Text => string.Join("\n", _listItem.Blocks.Select(block => block.TextContainer.Text));
-
-    public void OnTextAdded(TextElement textElement, int index)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_listItem))
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, _listItem, index);
-        }
-    }
-
-    public void OnTextRemoved(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_listItem))
-        {
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, _listItem);
-        }
-    }
 
     public void OnTextContentChanged()
     {

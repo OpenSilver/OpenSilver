@@ -218,7 +218,7 @@ public class List : Block
         return INTERNAL_HtmlDomManager.CreateListDomElementAndAppendIt(parent, this);
     }
 
-    protected internal sealed override void AttachVisualChildrenInternal()
+    internal sealed override void AttachVisualChildren()
     {
         foreach (var listItem in ListItems.InternalItems)
         {

@@ -60,7 +60,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         AddDependencyObjectInternal(value);
         SetVisualParent(value);
         value.IsModel = IsModel;
-        OnAdd(value, InternalCount);
+        Invalidate();
     }
 
     internal sealed override void ClearOverride()
@@ -76,20 +76,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
                 item.IsModel = false;
             }
 
-            if (TextContainer is ITextContainer textContainer)
-            {
-                try
-                {
-                    foreach (T item in oldItems)
-                    {
-                        textContainer.OnTextRemoved(item);
-                    }
-                }
-                finally
-                {
-                    textContainer.OnTextContentChanged();
-                }
-            }
+            TextContainer?.OnTextContentChanged();
         }
     }
 
@@ -100,7 +87,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         InsertDependencyObjectInternal(index, value);
         SetVisualParent(value);
         value.IsModel = IsModel;
-        OnAdd(value, index);
+        Invalidate();
     }
 
     internal sealed override void RemoveAtOverride(int index)
@@ -109,7 +96,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         RemoveAtDependencyObjectInternal(index);
         ClearVisualParent(item);
         item.IsModel = false;
-        OnRemove(item);
+        Invalidate();
     }
 
     internal sealed override void SetItemOverride(int index, T value)
@@ -118,41 +105,12 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         SetItemDependencyObjectInternal(index, value);
         ClearVisualParent(oldItem);
         oldItem.IsModel = false;
-        OnRemove(oldItem);
         SetVisualParent(value);
         value.IsModel = IsModel;
-        OnAdd(value, index);
+        Invalidate();
     }
 
-    private void OnAdd(T item, int index)
-    {
-        if (TextContainer is ITextContainer textContainer)
-        {
-            try
-            {
-                textContainer.OnTextAdded(item, index);
-            }
-            finally
-            {
-                textContainer.OnTextContentChanged();
-            }
-        }
-    }
-
-    private void OnRemove(T item)
-    {
-        if (TextContainer is ITextContainer textContainer)
-        {
-            try
-            {
-                textContainer.OnTextRemoved(item);
-            }
-            finally
-            {
-                textContainer.OnTextContentChanged();
-            }
-        }
-    }
+    private void Invalidate() => TextContainer?.OnTextContentChanged();
 
     private void SetVisualParent(T item) => _owner.InternalAddVisualChild(item);
 

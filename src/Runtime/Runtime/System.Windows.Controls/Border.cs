@@ -150,10 +150,7 @@ namespace System.Windows.Controls
             border.InvalidateMeasure();
         }
 
-        protected internal sealed override void AttachVisualChildrenInternal()
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
-        }
+        internal sealed override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
 
         /// <summary>
         /// Identifies the <see cref="Background"/> dependency property.

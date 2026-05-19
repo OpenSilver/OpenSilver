@@ -1228,12 +1228,6 @@ namespace System.Windows
             // Fetch the implicit style
             HasStyleInvalidated = false;
             UpdateStyleProperty();
-
-            for (int i = 0; i < VisualChildrenCount; i++)
-            {
-                var child = GetVisualChild(i);
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
-            }
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()

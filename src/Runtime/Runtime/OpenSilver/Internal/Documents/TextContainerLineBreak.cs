@@ -13,8 +13,6 @@
 
 using System;
 
-using System.Windows.Documents;
-
 namespace OpenSilver.Internal.Documents;
 
 internal sealed class TextContainerLineBreak : ITextContainer
@@ -26,8 +24,4 @@ internal sealed class TextContainerLineBreak : ITextContainer
     public string Text => "\n";
 
     public void OnTextContentChanged() => throw new NotSupportedException();
-
-    public void OnTextAdded(TextElement textElement, int index) => throw new NotSupportedException();
-
-    public void OnTextRemoved(TextElement textElement) => throw new NotSupportedException();
 }

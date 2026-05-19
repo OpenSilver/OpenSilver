@@ -62,7 +62,7 @@ public sealed class Section : Block
     [OpenSilver.NotImplemented]
     public bool HasTrailingParagraphBreakOnPaste { get; set; }
 
-    protected internal sealed override void AttachVisualChildrenInternal()
+    internal sealed override void AttachVisualChildren()
     {
         foreach (var block in Blocks.InternalItems)
         {

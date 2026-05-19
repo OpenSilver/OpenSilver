@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
-using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Documents;
 
@@ -36,22 +35,6 @@ internal sealed class TextContainerSpan : ITextContainer
         if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_span)) is ITextContainer parent)
         {
             parent.OnTextContentChanged();
-        }
-    }
-
-    public void OnTextAdded(TextElement textElement, int index)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_span))
-        {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, _span, index);
-        }
-    }
-
-    public void OnTextRemoved(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_span))
-        {
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, _span);
         }
     }
 }
