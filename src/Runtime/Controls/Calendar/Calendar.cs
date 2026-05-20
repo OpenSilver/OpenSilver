@@ -127,6 +127,24 @@ namespace System.Windows.Controls
         private const string ElementMonth = "CalendarItem";
 
         /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(Calendar), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Defines whether the Calendar should use WPF-style template parts
+        /// (PART_ prefix) or the Silverlight-style parts.
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
+        }
+
+        private string PartPrefix => UseWpfBehavior ? "PART_" : "";
+
+        /// <summary>
         /// Gets or sets Inherited code: Requires comment.
         /// </summary>
         internal Panel Root { get; set; }
@@ -1452,14 +1470,16 @@ namespace System.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            Root = GetTemplateChild(ElementRoot) as Panel;
+            string p = PartPrefix;
+
+            Root = GetTemplateChild(p + ElementRoot) as Panel;
 
             SelectedMonth = DisplayDate;
             SelectedYear = DisplayDate;
 
             if (Root != null)
             {
-                CalendarItem month = GetTemplateChild(ElementMonth) as CalendarItem;
+                CalendarItem month = GetTemplateChild(p + ElementMonth) as CalendarItem;
 
                 if (month != null)
                 {

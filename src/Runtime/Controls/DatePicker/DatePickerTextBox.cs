@@ -29,6 +29,24 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         private const string ElementContentName = "Watermark";
 
+        /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(DatePickerTextBox), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Defines whether the DatePickerTextBox should use WPF-style template parts
+        /// (PART_ prefix) or the Silverlight-style parts.
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
+        }
+
+        private string PartPrefix => UseWpfBehavior ? "PART_" : "";
+
         static DatePickerTextBox()
         {
             EventManager.RegisterClassHandler<DatePickerTextBox>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
@@ -137,7 +155,7 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnApplyTemplate();
 
-            ElementContent = ExtractTemplatePart<ContentControl>(ElementContentName);
+            ElementContent = ExtractTemplatePart<ContentControl>(PartPrefix + ElementContentName);
 
             OnWatermarkChanged();
 
