@@ -802,6 +802,26 @@ namespace System.Windows.Controls
         }
         #endregion Text
 
+        #region UseWpfBehavior
+        /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(DatePicker), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Defines whether the DatePicker should use WPF-style template parts
+        /// (PART_ prefix) or the Silverlight-style parts.
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
+        }
+
+        private string PartPrefix => UseWpfBehavior ? "PART_" : "";
+        #endregion
+
         /// <summary>
         /// Builds the visual tree for the <see cref="DatePicker" /> control when a
         /// new template is applied.
@@ -810,12 +830,14 @@ namespace System.Windows.Controls
         {
             base.OnApplyTemplate();
 
+            string p = PartPrefix;
+
             if (_popUp != null)
             {
                 _popUp.Child = null;
             }
 
-            _popUp = GetTemplateChild(ElementPopup) as Popup;
+            _popUp = GetTemplateChild(p + ElementPopup) as Popup;
 
             if (_popUp != null)
             {
@@ -830,7 +852,7 @@ namespace System.Windows.Controls
                 }
 
                 _popUp.Child = this._outsideCanvas;
-                _root = GetTemplateChild(ElementRoot) as FrameworkElement;
+                _root = GetTemplateChild(p + ElementRoot) as FrameworkElement;
             }
 
             if (_dropDownButton != null)
@@ -838,7 +860,7 @@ namespace System.Windows.Controls
                 _dropDownButton.Click -= new RoutedEventHandler(DropDownButton_Click);
             }
 
-            _dropDownButton = GetTemplateChild(ElementButton) as Button;
+            _dropDownButton = GetTemplateChild(p + ElementButton) as Button;
             if (_dropDownButton != null)
             {
                 _dropDownButton.Click += new RoutedEventHandler(DropDownButton_Click);
@@ -861,7 +883,7 @@ namespace System.Windows.Controls
                 _textBox.GotFocus -= new RoutedEventHandler(TextBox_GotFocus);
             }
 
-            _textBox = GetTemplateChild(ElementTextBox) as DatePickerTextBox;
+            _textBox = GetTemplateChild(p + ElementTextBox) as DatePickerTextBox;
 
             UpdateDisabledVisual();
             if (this.SelectedDate == null)

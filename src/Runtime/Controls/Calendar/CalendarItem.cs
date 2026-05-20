@@ -78,6 +78,24 @@ namespace System.Windows.Controls.Primitives
         private const string ElementDisabledVisual = "DisabledVisual";
 
         /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(CalendarItem), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Defines whether the CalendarItem should use WPF-style template parts
+        /// (PART_ prefix) or the Silverlight-style parts.
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
+        }
+
+        private string PartPrefix => UseWpfBehavior ? "PART_" : "";
+
+        /// <summary>
         /// The button that allows switching between month mode, year mode, and
         /// decade mode. 
         /// </summary>
@@ -342,13 +360,15 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnApplyTemplate();
 
-            HeaderButton = GetTemplateChild(ElementHeaderButton) as Button;
-            PreviousButton = GetTemplateChild(ElementPreviousButton) as Button;
-            NextButton = GetTemplateChild(ElementNextButton) as Button;
+            string p = PartPrefix;
+
+            HeaderButton = GetTemplateChild(p + ElementHeaderButton) as Button;
+            PreviousButton = GetTemplateChild(p + ElementPreviousButton) as Button;
+            NextButton = GetTemplateChild(p + ElementNextButton) as Button;
             _dayTitleTemplate = GetTemplateChild(ElementDayTitleTemplate) as DataTemplate;
-            MonthView = GetTemplateChild(ElementMonthView) as Grid;
-            YearView = GetTemplateChild(ElementYearView) as Grid;
-            _disabledVisual = GetTemplateChild(ElementDisabledVisual) as FrameworkElement;
+            MonthView = GetTemplateChild(p + ElementMonthView) as Grid;
+            YearView = GetTemplateChild(p + ElementYearView) as Grid;
+            _disabledVisual = GetTemplateChild(p + ElementDisabledVisual) as FrameworkElement;
 
             if (Owner != null)
             {
