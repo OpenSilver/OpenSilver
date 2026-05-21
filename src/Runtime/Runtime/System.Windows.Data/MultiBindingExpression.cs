@@ -260,9 +260,9 @@ public sealed class MultiBindingExpression : BindingExpressionBase
 
     internal override object GetValue(DependencyObject d, DependencyProperty dp)
     {
-        for (int i = 0; i < _values.Length; i++)
+        if (!TryUpdateChildValues())
         {
-            _values[i] = _mutableBindingExpressions[i].GetValue(Target, TargetProperty);
+            return DependencyProperty.UnsetValue;
         }
 
         object value = _values;
@@ -331,6 +331,7 @@ public sealed class MultiBindingExpression : BindingExpressionBase
         }
 
         TransferIsDeferred = false;
+        Transfer();
     }
 
     internal override void DetachOverride()
@@ -374,14 +375,31 @@ public sealed class MultiBindingExpression : BindingExpressionBase
     // transfer a value from the source to the target
     private void TransferValue()
     {
+        if (!TryUpdateChildValues())
+        {
+            return;
+        }
+
         IsInTransfer = true;
         NeedsDataTransfer = false;
 
         RaiseValueChanged();
-
         Invalidate();
-
         IsInTransfer = false;
+    }
+
+    private bool TryUpdateChildValues()
+    {
+        for (int i = 0; i < _values.Length; i++)
+        {
+            _values[i] = _mutableBindingExpressions[i].GetValue(Target, TargetProperty);
+            if (_values[i] == DependencyProperty.UnsetValue)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Create a BindingExpression for position i

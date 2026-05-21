@@ -320,7 +320,10 @@ namespace System.Windows.Data
 
             if (ParentBindingExpressionBase != null)
             {
-                ParentBindingExpressionBase.InvalidateChild(this);
+                if (!IsInMultiBindingExpression || newValue != DependencyProperty.UnsetValue)
+                {
+                    ParentBindingExpressionBase.InvalidateChild(this);
+                }
             }
             else
             {
