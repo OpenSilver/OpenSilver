@@ -172,6 +172,8 @@ public partial class FrameworkElement
         return resource;
     }
 
+    internal static object FindResourceFromAppOrSystem(object resourceKey) => FindResourceInternal(null, null, resourceKey, null, false);
+
     internal static object FindResourceInternal(
         FrameworkElement fe,
         DependencyProperty dp,
@@ -179,19 +181,23 @@ public partial class FrameworkElement
         DependencyObject boundaryElement,
         bool isImplicitStyleLookup)
     {
-        Debug.Assert(fe is not null);
+        object value;
+        InheritanceBehavior inheritanceBehavior = InheritanceBehavior.Default;
 
-        // First try to find the resource in the tree
-        object value = FindResourceInTree(
-            fe,
-            dp,
-            resourceKey,
-            boundaryElement,
-            out InheritanceBehavior inheritanceBehavior);
-
-        if (value != DependencyProperty.UnsetValue)
+        if (fe is not null)
         {
-            return value;
+            // First try to find the resource in the tree
+            value = FindResourceInTree(
+                fe,
+                dp,
+                resourceKey,
+                boundaryElement,
+                out inheritanceBehavior);
+
+            if (value != DependencyProperty.UnsetValue)
+            {
+                return value;
+            }
         }
 
         if ((inheritanceBehavior == InheritanceBehavior.Default || inheritanceBehavior == InheritanceBehavior.SkipToAppNow) &&
@@ -206,6 +212,18 @@ public partial class FrameworkElement
                 {
                     return value;
                 }
+            }
+        }
+
+        // Then we try to find the resource in the SystemResources but that is only if we aren't
+        // doing an implicit style lookup. Implicit style lookup will stop at the app.
+        if (!isImplicitStyleLookup &&
+            inheritanceBehavior != InheritanceBehavior.SkipAllNow)
+        {
+            value = XamlResources.FindResourceInGenericXaml(resourceKey);
+            if (value is not null)
+            {
+                return value;
             }
         }
 

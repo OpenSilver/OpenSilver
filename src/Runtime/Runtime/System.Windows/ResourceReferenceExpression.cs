@@ -131,7 +131,7 @@ internal sealed class ResourceReferenceExpression : Expression
             FrameworkElement fe => FrameworkElement.FindResourceInternal(fe, dp, _resourceKey, null, false),
             IInternalFrameworkElement ife => FindResourceInTree(ife, _resourceKey),
             // If there is no mentor then simply search the App and the Themes for the right resource
-            _ => FindResourceFromApp(_resourceKey),
+            _ => FrameworkElement.FindResourceFromAppOrSystem(_resourceKey),
         };
 
         // Assuming that null means the value doesn't exist in the resources section
@@ -161,10 +161,8 @@ internal sealed class ResourceReferenceExpression : Expression
 
         // Then we try to find the resource in the App's Resources
         // if we can't find it in the parents.
-        return FindResourceFromApp(resourceKey);
+        return FrameworkElement.FindResourceFromAppOrSystem(resourceKey);
     }
-
-    private static object FindResourceFromApp(object resourceKey) => Application.Current?.FindResourceInternal(resourceKey);
 
     /// <summary>
     ///     This event handler is called to invalidate the cached value held in

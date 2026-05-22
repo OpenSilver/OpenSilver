@@ -50,7 +50,7 @@ public class ThemeResourceExtension : MarkupExtension
     /// Gets or sets the key value passed by this theme resource reference. They key is used to return 
     /// the object matching that key in resource dictionaries.
     /// </summary>
-    public string ResourceKey { get; set; }
+    public object ResourceKey { get; set; }
 
     /// <summary>
     /// Returns the object found in a resource dictionary, where the object to find is identified by the 
@@ -180,17 +180,9 @@ public class ThemeResourceExtension : MarkupExtension
 
     private object FindResourceInAppOrSystem()
     {
-        if (Application.Current is Application app)
+        if (FrameworkElement.FindResourceFromAppOrSystem(ResourceKey) is object resource)
         {
-            if (app.HasResources && app.Resources.TryGetResource(ResourceKey, out object resource))
-            {
-                return resource;
-            }
-
-            if (app.Theme is Theme theme && theme.TryGetResource(ResourceKey, out resource))
-            {
-                return resource;
-            }
+            return resource;
         }
 
         // Look in the built-in resources (eg. "SystemAccentColor")

@@ -27,6 +27,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Resources;
 using System.Windows.Threading;
 using System.Xaml.Markup;
@@ -569,12 +570,37 @@ namespace System.Windows
         }
 
         /// <summary>
+        /// Searches for a user interface (UI) resource, such as a <see cref="Style"/> or <see cref="Brush"/>, with the specified key,
+        /// and throws an exception if the requested resource is not found (see XAML Resources).
+        /// </summary>
+        /// <param name="resourceKey">
+        /// The name of the resource to find.
+        /// </param>
+        /// <returns>
+        /// The requested resource object. If the requested resource is not found, a <see cref="ResourceReferenceKeyNotFoundException"/>
+        /// is thrown.
+        /// </returns>
+        /// <exception cref="ResourceReferenceKeyNotFoundException">
+        /// The resource cannot be found.
+        /// </exception>
+        public object FindResource(object resourceKey)
+        {
+            if (TryFindResource(resourceKey) is object resource)
+            {
+                return resource;
+            }
+
+            throw new ResourceReferenceKeyNotFoundException(Strings.MarkupExtensionResourceNotFound, resourceKey);
+        }
+
+        /// <summary>
         /// Searches for the specified resource.
         /// </summary>
-        /// <param name="resourceKey">The name of the resource to find.</param>
+        /// <param name="resourceKey">
+        /// The name of the resource to find.
+        /// </param>
         /// <returns>
-        /// The requested resource object. If the requested resource is not found, a
-        /// null reference is returned.
+        /// The requested resource object. If the requested resource is not found, a null reference is returned.
         /// </returns>
         public object TryFindResource(object resourceKey)
         {

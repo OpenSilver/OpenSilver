@@ -162,17 +162,9 @@ public class StaticResourceExtension : MarkupExtension
 
     private object FindResourceInAppOrSystem()
     {
-        if (Application.Current is Application app)
+        if (FrameworkElement.FindResourceFromAppOrSystem(ResourceKey) is object resource)
         {
-            if (app.HasResources && app.Resources.TryGetResource(ResourceKey, out object resource))
-            {
-                return resource;
-            }
-
-            if (app.Theme is Theme theme && theme.TryGetResource(ResourceKey, out resource))
-            {
-                return resource;
-            }
+            return resource;
         }
 
         // Look in the built-in resources (eg. "SystemAccentColor")
