@@ -21,6 +21,10 @@
       <Link>js_css\cshtml5.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\html-to-image.js">
+      <Link>js_css\html-to-image.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="$(OpenSilverSimulatorPkgDirectory)contentFiles\any\any\js_css\FileSaver.min.js">
       <Link>js_css\FileSaver.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

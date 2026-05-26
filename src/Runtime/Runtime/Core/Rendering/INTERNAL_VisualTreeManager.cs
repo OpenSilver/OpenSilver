@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls.Primitives;
@@ -54,17 +53,9 @@ namespace CSHTML5.Internal
             {
                 if (IsElementInVisualTree(child))
                 {
-                    // Verify that the child is really a child of the specified control:
-                    if (parent.VisualChildrenInformation != null && parent.VisualChildrenInformation.Contains(child))
+                    if (parent.VisualChildrenInformation is not null && parent.VisualChildrenInformation.Remove(child))
                     {
-                        // Remove the element from the DOM:
-                        INTERNAL_HtmlDomManager.RemoveFromDom(child.OuterDiv);
-
-                        // Remove the element from the parent's children collection:
-                        parent.VisualChildrenInformation.Remove(child);
-
-                        //Detach Element  
-                        UnloadSubTree(child);
+                        InternalDetachVisual(child);
                     }
                     else
                     {
@@ -74,16 +65,20 @@ namespace CSHTML5.Internal
                                           parent.GetType().ToString()));
                     }
                 }
-                else if (parent.VisualChildrenInformation != null && parent.VisualChildrenInformation.Contains(child))
+                else if (parent.VisualChildrenInformation is not null && parent.VisualChildrenInformation.Remove(child))
                 {
-                    // Remove the element from the parent's children collection:
-                    parent.VisualChildrenInformation.Remove(child);
                     UnloadVisual(child);
                 }
             }
 #if PERFSTAT
             Performance.Counter("DetachVisualChildIfNotNull", t);
 #endif
+        }
+
+        internal static void InternalDetachVisual(UIElement element)
+        {
+            INTERNAL_HtmlDomManager.RemoveFromDom(element.OuterDiv);
+            UnloadSubTree(element);
         }
 
         private static void UnloadSubTree(UIElement element)
@@ -172,7 +167,8 @@ namespace CSHTML5.Internal
                         Profiler.ConsoleTime(label);
                     }
 
-                    AttachVisualChild_Private(child, parent);
+                    (parent.VisualChildrenInformation ??= []).Add(child);
+                    InternalAttachVisual(child, parent.ParentWindow, parent.OuterDiv);
 
                     if (EnablePerformanceLogging)
                     {
@@ -183,54 +179,30 @@ namespace CSHTML5.Internal
                 {
                     throw new InvalidOperationException("The element already has a parent. An element cannot appear in multiple locations in the Visual Tree. Remove the element from the Visual Tree before adding it elsewhere.");
                 }
-                else
-                {
-                    // Nothing to do: the element is already attached to the specified parent.
-                    return; //prevent from useless call to INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE().
-                }
             }
         }
 
-        static void AttachVisualChild_Private(UIElement child, UIElement parent)
-        {
-            //--------------------------------------------------------
-            // PREPARE THE PARENT:
-            //--------------------------------------------------------
-
-            // Remember the information about the "VisualChildren"
-            parent.VisualChildrenInformation ??= new HashSet<UIElement>();
-            parent.VisualChildrenInformation.Add(child);
-
-            //--------------------------------------------------------
-            // CONTINUE WITH THE OTHER STEPS
-            //--------------------------------------------------------
-            
-            AttachVisualChild_Private_MainSteps(
-                child,
-                parent);
-        }
-
-        static void AttachVisualChild_Private_MainSteps(UIElement child, UIElement parent)
+        internal static void InternalAttachVisual(UIElement element, Window window, HtmlElementReference parentDiv)
         {
             //--------------------------------------------------------
             // PREPARE THE CHILD:
             //--------------------------------------------------------
 
-            var childFE = child as FrameworkElement;
+            var childFE = element as FrameworkElement;
 
-            child.IsConnectedToLiveTree = true;
+            element.IsConnectedToLiveTree = true;
 
             // Set the "ParentWindow" property so that the element knows where to display popups:
-            child.ParentWindow = parent.ParentWindow;
+            element.ParentWindow = window;
 
             // Create and append the DOM structure of the Child:
-            var outerDomElement = child.CreateDomElement(parent.OuterDiv);
+            var outerDomElement = element.CreateDomElement(parentDiv);
 
             // For debugging purposes (to better read the output html), add a class to the outer DIV
             // that tells us the corresponding type of the element (Border, StackPanel, etc.):
             if (Features.DOM.AssignClass)
             {
-                INTERNAL_HtmlDomManager.AddCSSClass(outerDomElement, child.GetType().ToString());
+                INTERNAL_HtmlDomManager.AddCSSClass(outerDomElement, element.GetType().ToString());
             }
 
             //--------------------------------------------------------
@@ -238,7 +210,7 @@ namespace CSHTML5.Internal
             //--------------------------------------------------------
 
             // Remember the DIVs:
-            child.OuterDiv = outerDomElement;
+            element.OuterDiv = outerDomElement;
 
             //--------------------------------------------------------
             // HANDLE EVENTS:
@@ -246,7 +218,7 @@ namespace CSHTML5.Internal
 
             // Register DOM events if any:
 #pragma warning disable CS0618 // Type or member is obsolete
-            child.INTERNAL_AttachToDomEvents();
+            element.INTERNAL_AttachToDomEvents();
 #pragma warning restore CS0618 // Type or member is obsolete
 
             //--------------------------------------------------------
@@ -256,16 +228,16 @@ namespace CSHTML5.Internal
             childFE?.LoadResources();
 
             // Tell the control that it is now present into the visual tree:
-            child.IsLoadedCache = true;
+            element.IsLoadedCache = true;
 
             // Raise the "OnAttached" event:
-            child.INTERNAL_OnAttachedToVisualTree(); // IMPORTANT: Must be done BEFORE "RaiseChangedEventOnAllDependencyProperties" (for example, the ItemsControl uses this to initialize its visual)
+            element.INTERNAL_OnAttachedToVisualTree(); // IMPORTANT: Must be done BEFORE "RaiseChangedEventOnAllDependencyProperties" (for example, the ItemsControl uses this to initialize its visual)
 
             // INTERNAL_OnAttachedToVisualTree will fire the Loaded event on children, so we need to make
             // sure that 'child' has not been disconnected from the visual tree in the process.
             // We check outer div rather than _isLoaded because 'child' may have been removed and added back,
             // in which case the code below would run twice.
-            if (child.OuterDiv != outerDomElement)
+            if (element.OuterDiv != outerDomElement)
             {
                 return;
             }
@@ -274,17 +246,17 @@ namespace CSHTML5.Internal
             // RENDER THE ELEMENTS BY APPLYING THE CSS PROPERTIES:
             //--------------------------------------------------------
 
-            if (EnableOptimizationWhereCollapsedControlsAreNotRendered && !child.IsRenderable)
+            if (EnableOptimizationWhereCollapsedControlsAreNotRendered && !element.IsRenderable)
             {
-                child.SuspendRendering();
-                if (child.Visibility == Visibility.Collapsed)
+                element.SuspendRendering();
+                if (element.Visibility == Visibility.Collapsed)
                 {
-                    INTERNAL_HtmlDomManager.SetVisibility(child.OuterDiv, Visibility.Collapsed);
+                    INTERNAL_HtmlDomManager.SetVisibility(element.OuterDiv, Visibility.Collapsed);
                 }
             }
             else
             {
-                child.RenderVisual();
+                element.RenderVisual();
             }
 
             //--------------------------------------------------------

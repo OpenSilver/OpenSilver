@@ -1,0 +1,484 @@
+﻿<Page x:Class="TestApplication.Tests.VisualBrushTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:TestApplication.Tests">
+
+    <Page.Resources>
+        <VisualBrush x:Key="vb"
+                     Stretch="Fill"
+                     Viewport="0.1 0.1 0.25 0.21"
+                     TileMode="Tile">
+            <VisualBrush.Visual>
+                <Grid Width="150"
+                      Height="150">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Background="Red"
+                            CornerRadius="5"
+                            Grid.Row="0"
+                            Grid.Column="0">
+                        <TextBlock VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="16"
+                                   Text="Child 1"
+                                   Foreground="White" />
+                    </Border>
+                    <Border Background="Blue"
+                            CornerRadius="5"
+                            Grid.Row="0"
+                            Grid.Column="1">
+                        <TextBlock VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="16"
+                                   Text="Child 2"
+                                   Foreground="White" />
+                    </Border>
+                    <Border Background="Green"
+                            CornerRadius="5"
+                            Grid.Row="1"
+                            Grid.Column="0">
+                        <TextBlock VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="16"
+                                   Text="Child 3"
+                                   Foreground="White" />
+                    </Border>
+                    <Border Background="Magenta"
+                            CornerRadius="5"
+                            Grid.Row="1"
+                            Grid.Column="1">
+                        <TextBlock VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="16"
+                                   Text="Child 4"
+                                   Foreground="White" />
+                    </Border>
+                </Grid>
+            </VisualBrush.Visual>
+        </VisualBrush>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Orientation="Vertical"
+                    Width="1500">
+
+            <Button Content="change brush"
+                    Click="Button_Click" />
+
+            <TextBlock Text="1. Stretch modes — Simple Grid with 4 children on SHAPES"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill (default)"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1"
+                               Fill="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1"
+                               Fill="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1"
+                               Fill="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1"
+                               Fill="{StaticResource vb}" />
+                </StackPanel>
+            </WrapPanel>
+
+            <TextBlock Text="1. Stretch modes — Simple Grid with 4 children on BORDERS"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill (default)"
+                               FontSize="11" />
+                    <Border Width="350"
+                            Height="450"
+                            BorderBrush="Gray"
+                            BorderThickness="1"
+                            Background="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Border Width="350"
+                            Height="450"
+                            BorderBrush="Gray"
+                            BorderThickness="1"
+                            Background="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Border Width="350"
+                            Height="450"
+                            BorderBrush="Gray"
+                            BorderThickness="1"
+                            Background="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Border Width="350"
+                            Height="450"
+                            BorderBrush="Gray"
+                            BorderThickness="1"
+                            Background="{StaticResource vb}" />
+                </StackPanel>
+            </WrapPanel>
+
+            <TextBlock Text="1. Stretch modes — Simple Grid with 4 children on PANELS"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill (default)"
+                               FontSize="11" />
+                    <StackPanel Width="350"
+                                Height="450"
+                                BorderBrush="Gray"
+                                BorderThickness="1"
+                                Background="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Grid Width="350"
+                          Height="450"
+                          BorderBrush="Gray"
+                          BorderThickness="1"
+                          Background="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <StackPanel Width="350"
+                                Height="450"
+                                BorderBrush="Gray"
+                                BorderThickness="1"
+                                Background="{StaticResource vb}" />
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Grid Width="350"
+                          Height="450"
+                          BorderBrush="Gray"
+                          BorderThickness="1"
+                          Background="{StaticResource vb}" />
+                </StackPanel>
+            </WrapPanel>
+
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill (default)"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <VisualBrush Stretch="Fill"
+                                         Viewport="0.1 0.1 0.25 0.21"
+                                         TileMode="Tile">
+                                <VisualBrush.Visual>
+                                    <Grid Width="150"
+                                          Height="150">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Background="Red"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 1"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Blue"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 2"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Green"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 3"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Magenta"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 4"
+                                                       Foreground="White" />
+                                        </Border>
+                                    </Grid>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <VisualBrush Stretch="Uniform"
+                                         Viewport="0.1 0.1 0.25 0.21"
+                                         TileMode="Tile">
+                                <VisualBrush.Visual>
+                                    <Grid Width="150"
+                                          Height="150">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Background="Magenta"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 1"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Red"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 2"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Blue"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 3"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Green"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 4"
+                                                       Foreground="White" />
+                                        </Border>
+                                    </Grid>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <VisualBrush Stretch="UniformToFill"
+                                         Viewport="0.1 0.1 0.25 0.21"
+                                         TileMode="Tile">
+                                <VisualBrush.Visual>
+                                    <Grid Width="150"
+                                          Height="150">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Background="Green"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 1"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Magenta"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 2"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Red"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 3"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Blue"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 4"
+                                                       Foreground="White" />
+                                        </Border>
+                                    </Grid>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Rectangle Width="350"
+                               Height="450"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <VisualBrush Stretch="None"
+                                         Viewport="0.1 0.1 0.25 0.21"
+                                         TileMode="Tile">
+                                <VisualBrush.Visual>
+                                    <Grid Width="150"
+                                          Height="150">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Background="Blue"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 1"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Green"
+                                                CornerRadius="5"
+                                                Grid.Row="0"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 2"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Magenta"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="0">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 3"
+                                                       Foreground="White" />
+                                        </Border>
+                                        <Border Background="Red"
+                                                CornerRadius="5"
+                                                Grid.Row="1"
+                                                Grid.Column="1">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="Child 4"
+                                                       Foreground="White" />
+                                        </Border>
+                                    </Grid>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</Page>

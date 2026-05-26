@@ -408,7 +408,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
-        private static string NewId() => $"id{_idGenerator.NewId()}";
+        internal static string NewId() => $"id{_idGenerator.NewId()}";
 
         internal static string EscapeStringForUseInJavaScript(string s)
         {
