@@ -886,60 +886,278 @@ Object.defineProperty(window, 'osjs', {
                     }
                 }
             },
-            setSvgPatternNaturalSize: function (patternId, imageId, renderTargetId, alignX, alignY) {
-                const pattern = document.getElementById(patternId);
-                const image = document.getElementById(imageId);
-                const renderTarget = document.getElementById(renderTargetId);
-
-                if (!pattern || !image || !renderTarget) return;
-
-                const img = document.createElement('img');
-                img.src = image.getAttribute('href');
-                img.onload = function () {
-                    const naturalWidth = img.naturalWidth;
-                    const naturalHeight = img.naturalHeight;
-
-                    image.setAttribute('width', naturalWidth);
-                    image.setAttribute('height', naturalHeight);
-
-                    const bounds = renderTarget.getBoundingClientRect();
-                    const width = bounds.width;
-                    const height = bounds.height;
-
-                    switch (alignX) {
-                        case 0: // AlignmentX.Left
-                            viewBoxAlignX = 0;
-                            break;
-                        case 1: // AlignmentX.Center
-                            viewBoxAlignX = (naturalWidth - width) / 2;
-                            break;
-                        case 2: // AlignmentX.Right
-                            viewBoxAlignX = naturalWidth - width;
-                            break;
-                        default:
-                            viewBoxAlignX = 0;
-                            break;
-                    }
-
-                    let viewBoxAlignY;
-                    switch (alignY) {
-                        case 0: // AlignmentY.Top
-                            viewBoxAlignY = 0;
-                            break;
-                        case 1: // AlignmentY.Center
-                            viewBoxAlignY = (naturalHeight - height) / 2;
-                            break;
-                        case 2: // AlignmentY.Bottom
-                            viewBoxAlignY = naturalHeight - height;
-                            break;
-                        default:
-                            viewBoxAlignY = 0;
-                            break;
-                    }
-
-                    pattern.setAttribute('viewBox', `${viewBoxAlignX} ${viewBoxAlignY} ${width} ${height}`);
+            drawSvgPattern: (function () {
+                const TileMode = {
+                    None: 0,
+                    FlipX: 1,
+                    FlipY: 2,
+                    FlipXY: 3,
+                    Tile: 4,
                 };
-            },
+
+                const AlignmentX = {
+                    Left: 0,
+                    Center: 1,
+                    Right: 2,
+                };
+
+                const AlignmentY = {
+                    Top: 0,
+                    Center: 1,
+                    Bottom: 2,
+                };
+
+                const BrushMappingMode = {
+                    Absolute: 0,
+                    RelativeToBoundingBox: 1,
+                };
+
+                const Stretch = {
+                    None: 0,
+                    Fill: 1,
+                    Uniform: 2,
+                    UniformToFill: 3,
+                };
+
+                function clear(element) {
+                    element.setAttribute('width', 0);
+                    element.setAttribute('height', 0);
+                }
+
+                return function (patternId, cropId, imageId, shapeId, tileMode, vpUnits, vpXr, vpYr, vpWr, vpHr, vbUnits, vbXr, vbYr, vbWr, vbHr, stretch, alignX, alignY) {
+                    // ImageBrush.SvgPattern DOM layout:
+                    //   <pattern>        tile placement + tiling rule (TileMode + Viewport*Units)
+                    //     <svg id=crop>  Viewport bounds + Viewbox->Viewport mapping (Stretch + Alignment).
+                    //                    Its overflow="hidden" (default) clips the source content to the
+                    //                    Viewport edges.
+                    //       <image>      natural-size source bitmap (preserveAspectRatio="none", set in C#)
+                    //
+                    // Per WPF semantics (TileBrush docs):
+                    //   "TileBrush contents are never clipped to the Viewbox. However, TileBrush
+                    //    contents are clipped to the edges of the Viewport, which sets the values for
+                    //    the base tile."
+                    // So the Viewbox only defines the *source rectangle that maps to the Viewport*;
+                    // image content outside the Viewbox region still appears (as long as it falls
+                    // inside the Viewport after the Stretch/Alignment-driven mapping). The only
+                    // clipping that happens is at the Viewport edges, which is exactly what the
+                    // crop <svg>'s default overflow="hidden" provides.
+                    //
+                    // Coordinate systems:
+                    //   - user space:    the shape's parent <svg> user space (DIPs).
+                    //   - content space: the pattern's content coordinate system. With
+                    //                    patternContentUnits="userSpaceOnUse", per the SVG spec the
+                    //                    content origin is *translated to the top-left corner of each
+                    //                    tile*. So content (0, 0) sits at user-space (pattern.x,
+                    //                    pattern.y) for every tile, NOT at the SVG origin.
+                    //   - image-pixel space: set up by crop's viewBox, scaled by crop's
+                    //                    preserveAspectRatio rule onto the crop bounds.
+                    //
+                    // We always use patternUnits=patternContentUnits="userSpaceOnUse" and pre-compute
+                    // every coordinate in DIPs from the shape's getBBox(); a nested <svg> inside a
+                    // pattern with objectBoundingBox content units is not reliable across browsers.
+                    //
+                    // Property enum values (must match the C# enums):
+                    //   TileMode:        0=None, 4=Tile  (FlipX/FlipY/FlipXY not implemented)
+                    //   BrushMappingMode (viewportUnits/viewboxUnits): 0=Absolute, 1=RelativeToBoundingBox
+                    //   Stretch:         0=None, 1=Fill, 2=Uniform, 3=UniformToFill
+                    //   AlignmentX:      0=Left, 1=Center, 2=Right
+                    //   AlignmentY:      0=Top,  1=Center, 2=Bottom
+
+                    const pattern = document.getElementById(patternId);
+                    const crop = document.getElementById(cropId);
+                    const image = document.getElementById(imageId);
+                    const shape = document.getElementById(shapeId);
+
+                    if (!pattern || !crop || !image || !shape) return;
+
+                    // Tag this invocation with a monotonically increasing token stored on the
+                    // <pattern> node. A late onload from an earlier call would otherwise be
+                    // able to overwrite the attributes written by a later call (the order in
+                    // which load events on different <img> instances fire is not guaranteed
+                    // by the HTML spec, especially for the same URL hitting the memory cache),
+                    // so any apply() whose token no longer matches the latest one is dropped.
+                    const token = (pattern._drawToken | 0) + 1;
+                    pattern._drawToken = token;
+
+                    const src = image.getAttribute('href');
+                    if (!src) {
+                        clear(crop);
+                        return;
+                    }
+
+                    const img = new Image();
+                    img.src = src;
+
+                    const apply = function () {
+                        if (pattern._drawToken !== token) return; // superseded by a newer call
+
+                        const natW = img.naturalWidth;
+                        const natH = img.naturalHeight;
+                        if (natW <= 0 || natH <= 0) {
+                            clear(crop);
+                            return;
+                        }
+
+                        // 1. Resolve Viewbox to absolute image-pixel coordinates.
+                        let vbX, vbY, vbW, vbH;
+                        if (vbUnits === BrushMappingMode.RelativeToBoundingBox) {
+                            vbX = vbXr * natW;
+                            vbY = vbYr * natH;
+                            vbW = vbWr * natW;
+                            vbH = vbHr * natH;
+                        } else {
+                            vbX = vbXr;
+                            vbY = vbYr;
+                            vbW = vbWr;
+                            vbH = vbHr;
+                        }
+
+                        if (vbW <= 0 || vbH <= 0) {
+                            clear(crop);
+                            return;
+                        }
+
+                        // 2. Shape bounding box (in the shape's parent <svg> user space, in DIPs).
+                        let bboxX = 0, bboxY = 0, bboxW = 0, bboxH = 0;
+                        try {
+                            const b = shape.getBBox();
+                            bboxX = b.x;
+                            bboxY = b.y;
+                            bboxW = b.width;
+                            bboxH = b.height;
+                        } catch (e) {
+                            // getBBox may throw before the element is laid out; treat as empty.
+                        }
+
+                        // 3. Resolve Viewport to DIPs relative to the shape bbox's top-left.
+                        let vpX, vpY, vpW, vpH;
+                        if (vpUnits === BrushMappingMode.RelativeToBoundingBox) {
+                            vpX = vpXr * bboxW;
+                            vpY = vpYr * bboxH;
+                            vpW = vpWr * bboxW;
+                            vpH = vpHr * bboxH;
+                        } else {
+                            vpX = vpXr;
+                            vpY = vpYr;
+                            vpW = vpWr;
+                            vpH = vpHr;
+                        }
+
+                        if (vpW <= 0 || vpH <= 0) {
+                            clear(crop);
+                            return;
+                        }
+
+                        // 4. <pattern> bounds in user space, and crop <svg> origin in pattern content
+                        //    space (which has its origin at the tile's top-left in user space).
+                        //
+                        //    TileMode.Tile -> tile = Viewport (so it repeats across the shape).
+                        //                     Tile origin in user space = (bboxX+vpX, bboxY+vpY), so
+                        //                     the crop <svg> sits at content (0, 0) to fill the tile.
+                        //    TileMode.None -> tile = full shape bbox (so it never repeats; the base
+                        //                     tile is placed inside it by the crop <svg>).
+                        //                     Tile origin = shape bbox top-left, so the crop <svg>
+                        //                     sits at content (vpX, vpY) inside the shape.
+                        pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+                        pattern.setAttribute('patternContentUnits', 'userSpaceOnUse');
+
+                        let cropOriginX, cropOriginY;
+                        if (tileMode === TileMode.None) {
+                            pattern.setAttribute('x', bboxX);
+                            pattern.setAttribute('y', bboxY);
+                            pattern.setAttribute('width', bboxW);
+                            pattern.setAttribute('height', bboxH);
+                            cropOriginX = vpX;
+                            cropOriginY = vpY;
+                        } else {
+                            // Tile (any not-yet-supported flip mode falls back to Tile)
+                            pattern.setAttribute('x', bboxX + vpX);
+                            pattern.setAttribute('y', bboxY + vpY);
+                            pattern.setAttribute('width', vpW);
+                            pattern.setAttribute('height', vpH);
+                            cropOriginX = 0;
+                            cropOriginY = 0;
+                        }
+
+                        // 5. Crop <svg> bounds are always exactly the Viewport (so overflow="hidden"
+                        //    clips at the Viewport edges, matching WPF). The viewBox defines the
+                        //    image-pixel rectangle that maps to those bounds.
+                        //
+                        //    - Stretch != None: viewBox = the Viewbox. preserveAspectRatio implements
+                        //      Fill ("none"), Uniform ("<align> meet"), UniformToFill ("<align> slice").
+                        //      Image content outside the Viewbox is *not* clipped at the Viewbox -- it
+                        //      simply maps to crop-output coordinates outside the [0..vpW, 0..vpH]
+                        //      window and is then trimmed by overflow="hidden".
+                        //
+                        //    - Stretch = None: viewBox spans the Viewport in image-pixel units, shifted
+                        //      so that the Viewbox's top-left lands at (alignDipX, alignDipY) inside
+                        //      the Viewport. preserveAspectRatio="none" plus matching viewBox/output
+                        //      sizes gives a 1:1 DIP-to-pixel mapping (the brush's "natural size"
+                        //      behavior). Image content outside the Viewbox naturally appears wherever
+                        //      it lands inside the Viewport.
+                        let cropVbX, cropVbY, cropVbW, cropVbH, preserveAR;
+
+                        if (stretch === Stretch.None) {
+                            let alignDipX, alignDipY;
+
+                            if (alignX === AlignmentX.Left) {
+                                alignDipX = 0;
+                            } else if (alignX === AlignmentX.Right) {
+                                alignDipX = vpW - vbW;
+                            } else {
+                                alignDipX = (vpW - vbW) / 2;
+                            }
+
+                            if (alignY === AlignmentY.Top) {
+                                alignDipY = 0;
+                            } else if (alignY === AlignmentY.Bottom) {
+                                alignDipY = vpH - vbH;
+                            } else {
+                                alignDipY = (vpH - vbH) / 2;
+                            }
+
+                            cropVbX = vbX - alignDipX;
+                            cropVbY = vbY - alignDipY;
+                            cropVbW = vpW;
+                            cropVbH = vpH;
+                            preserveAR = 'none';
+                        } else {
+                            cropVbX = vbX;
+                            cropVbY = vbY;
+                            cropVbW = vbW;
+                            cropVbH = vbH;
+
+                            const xa = alignX === AlignmentX.Left ? 'xMin' : (alignX === AlignmentX.Right ? 'xMax' : 'xMid');
+                            const ya = alignY === AlignmentY.Top ? 'YMin' : (alignY === AlignmentY.Bottom ? 'YMax' : 'YMid');
+
+                            if (stretch === Stretch.Fill) {
+                                preserveAR = 'none';
+                            } else if (stretch === Stretch.Uniform) {
+                                preserveAR = `${xa}${ya} meet`;
+                            } else if (stretch === Stretch.UniformToFill) {
+                                preserveAR = `${xa}${ya} slice`;
+                            } else {
+                                preserveAR = 'none';
+                            }
+                        }
+
+                        crop.setAttribute('x', cropOriginX);
+                        crop.setAttribute('y', cropOriginY);
+                        crop.setAttribute('width', vpW);
+                        crop.setAttribute('height', vpH);
+                        crop.setAttribute('viewBox', `${cropVbX} ${cropVbY} ${cropVbW} ${cropVbH}`);
+                        crop.setAttribute('preserveAspectRatio', preserveAR);
+
+                        // 6. Image always at natural size at the origin of the image-pixel coord system.
+                        image.setAttribute('x', 0);
+                        image.setAttribute('y', 0);
+                        image.setAttribute('width', natW);
+                        image.setAttribute('height', natH);
+                    };
+
+                    img.decode().then(apply, apply);
+                };
+            })(),
             arrangeRectangle: function (id, x, y, width, height) {
                 const rect = document.getElementById(id);
                 if (rect) {

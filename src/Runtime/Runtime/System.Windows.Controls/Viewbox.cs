@@ -103,18 +103,7 @@ namespace System.Windows.Controls
                 typeof(Stretch),
                 typeof(Viewbox),
                 new FrameworkPropertyMetadata(Stretch.Uniform, FrameworkPropertyMetadataOptions.AffectsMeasure),
-                IsValidStretchValue);
-
-        /// <summary>
-        /// Check whether the passed in object value is a valid Stretch enum value.
-        /// </summary>
-        /// <param name="o">The object typed value to be checked.</param>
-        /// <returns>True if o is a valid Stretch enum value, false o/w.</returns>
-        private static bool IsValidStretchValue(object o)
-        {
-            Stretch s = (Stretch)o;
-            return s == Stretch.None || s == Stretch.Uniform || s == Stretch.Fill || s == Stretch.UniformToFill;
-        }
+                ValidateEnums.IsStretchValid);
 
         /// <summary>
         /// Gets or sets the <see cref="Controls.StretchDirection"/>, which determines how
@@ -139,18 +128,7 @@ namespace System.Windows.Controls
                 typeof(StretchDirection),
                 typeof(Viewbox),
                 new FrameworkPropertyMetadata(StretchDirection.Both, FrameworkPropertyMetadataOptions.AffectsMeasure),
-                IsValidStretchDirectionValue);
-
-        /// <summary>
-        /// Check whether the passed in object value is a valid StretchDirection enum value.
-        /// </summary>
-        /// <param name="o">The object typed value to be checked.</param>
-        /// <returns>True if o is a valid StretchDirection enum value, false o/w.</returns>
-        private static bool IsValidStretchDirectionValue(object o)
-        {
-            StretchDirection sd = (StretchDirection)o;
-            return sd == StretchDirection.UpOnly || sd == StretchDirection.DownOnly || sd == StretchDirection.Both;
-        }
+                ValidateEnums.IsStretchDirectionValid);
 
         /// <summary>
         /// Builds the visual tree for the <see cref="Viewbox"/> control when a new
