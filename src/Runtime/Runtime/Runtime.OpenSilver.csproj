@@ -172,6 +172,7 @@
     <Compile Include="OpenSilver\Internal\Media\StringStreamGeometryContext.cs" />
     <Compile Include="System.Windows.Media\TileMode.cs" />
     <Compile Include="System.Windows.Media\ToleranceType.cs" />
+    <Compile Include="System.Windows.Media\VisualBrush.cs" />
     <Compile Include="System.Windows\ComponentResourceKey.cs" />
     <Compile Include="System.Windows\ResourceKey.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
