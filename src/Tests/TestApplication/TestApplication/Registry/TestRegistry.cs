@@ -91,6 +91,10 @@ namespace TestApplication
             Tests.Add(new Test("ScrollViewer", "ScrollViewer"));
             Tests.Add(new Test("ShadowDropEffect", "ShadowDropEffect"));
 
+            TestCategory tileBrushes = new TestCategory("TileBrush");
+            tileBrushes.Add(new Test("ImageBrush", "TileBrush/ImageBrush"));
+            Tests.Add(tileBrushes);
+
             TestCategory gradientBrushes = new TestCategory("GradientBrushes");
             gradientBrushes.Add(new Test("LinearGradientBrush", "GradientBrushes/LinearGradientBrush"));
             gradientBrushes.Add(new Test("RadialGradientBrush", "GradientBrushes/RadialGradientBrush"));

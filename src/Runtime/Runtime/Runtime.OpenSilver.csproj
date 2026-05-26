@@ -193,6 +193,7 @@
     <Compile Include="System.Windows.Media\StreamGeometry.cs" />
     <Compile Include="System.Windows.Media\StreamGeometryContext.cs" />
     <Compile Include="OpenSilver\Internal\Media\StringStreamGeometryContext.cs" />
+    <Compile Include="System.Windows.Media\TileMode.cs" />
     <Compile Include="System.Windows.Media\ToleranceType.cs" />
     <Compile Include="System.Windows\ComponentResourceKey.cs" />
     <Compile Include="System.Windows\CoreCompatibilityPreferences.cs" />

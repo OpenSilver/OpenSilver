@@ -1,0 +1,2708 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.ImageBrushTest"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+          xmlns:local="clr-namespace:TestApplication.Tests">
+
+    <!--
+      ImageBrush / TileBrush test page.
+
+      Image assets available (Width x Height):
+        Logo1.png                  174 x 197  (near-square)
+        flower.jpg                 440 x 306  (wide landscape)
+        back_1.jpg                 190 x 300  (tall portrait)
+        arrow_left.png              84 x  29  (very wide / thin)
+        arrow_right.png             84 x  29
+        arrow_right_and_left.png    84 x  29
+        icon_open.png               16 x  16  (tiny square)
+        Background.jpg            1033 x 705  (large landscape)
+
+      Each test cell has a small label and a 150x100 (or larger when noted) Rectangle
+      with a single ImageBrush property combination, so that the visual output can be
+      diff-checked against WPF.
+    -->
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical"
+                    Width="1500">
+
+            <!-- ============================================================ -->
+            <!-- 1. Stretch modes (Logo1, near-square)                         -->
+            <!-- ============================================================ -->
+            <TextBlock Text="1. Stretch modes — Logo1.png (174x197)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill (default)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="Uniform" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="UniformToFill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 2. Stretch modes — wide image (flower.jpg 440x306)        -->
+            <!-- ============================================================ -->
+            <TextBlock Text="2. Stretch modes — wide landscape (flower.jpg 440x306)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="Fill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="Uniform" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None (image bigger than shape)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 3. Stretch modes — tall image (back_1.jpg 190x300)            -->
+            <!-- ============================================================ -->
+            <TextBlock Text="3. Stretch modes — tall portrait (back_1.jpg 190x300)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Fill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="UniformToFill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 4. Stretch modes — very wide thin (arrow_left.png 84x29)      -->
+            <!-- ============================================================ -->
+            <TextBlock Text="4. Stretch modes — very wide (arrow_left.png 84x29)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="Fill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="Uniform" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="UniformToFill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None (smaller than shape)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 5. Stretch modes — tiny image (icon_open.png 16x16)           -->
+            <!-- ============================================================ -->
+            <TextBlock Text="5. Stretch modes — tiny image (icon_open.png 16x16)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/icon_open.png"
+                                        Stretch="Fill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/icon_open.png"
+                                        Stretch="Uniform" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/icon_open.png"
+                                        Stretch="UniformToFill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/icon_open.png"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 6. Stretch modes — very large image (Background.jpg 1033x705)-->
+            <!-- ============================================================ -->
+            <TextBlock Text="6. Stretch modes — large image (Background.jpg 1033x705)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="Fill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="Uniform" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="UniformToFill" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None (huge image, center crop)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 7. AlignmentX × AlignmentY — Stretch=Uniform                  -->
+            <!--    Shape has wider aspect than image, so empty bars appear    -->
+            <!--    on the left/right depending on alignment.                  -->
+            <!-- ============================================================ -->
+            <TextBlock Text="7. AlignmentX × AlignmentY with Stretch=Uniform (back_1.jpg, shape wider than image aspect)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Left"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Center"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Right"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Center"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Left"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Center"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Center"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Center"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Right"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Left"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Center"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform"
+                                        AlignmentX="Right"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 8. AlignmentX × AlignmentY — Stretch=UniformToFill            -->
+            <!--    Image is clipped on one axis depending on alignment.       -->
+            <!-- ============================================================ -->
+            <TextBlock Text="8. AlignmentX × AlignmentY with Stretch=UniformToFill (flower.jpg)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Top"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill"
+                                        AlignmentX="Left"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Top"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill"
+                                        AlignmentX="Center"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Top"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill"
+                                        AlignmentX="Right"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Center"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill"
+                                        AlignmentX="Left"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Center"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill"
+                                        AlignmentX="Center"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill"
+                                        AlignmentX="Right"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 9. AlignmentX × AlignmentY — Stretch=None, image SMALLER     -->
+            <!--    than shape: empty space appears around the image.          -->
+            <!-- ============================================================ -->
+            <TextBlock Text="9. AlignmentX × AlignmentY with Stretch=None — small image (arrow_left.png 84x29)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None"
+                                        AlignmentX="Left"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None"
+                                        AlignmentX="Center"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None"
+                                        AlignmentX="Right"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Center"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None"
+                                        AlignmentX="Left"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Center"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None"
+                                        AlignmentX="Center"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None"
+                                        AlignmentX="Right"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 10. AlignmentX × AlignmentY — Stretch=None, image LARGER     -->
+            <!--     than shape: the image is clipped, alignment chooses       -->
+            <!--     which portion is visible.                                 -->
+            <!-- ============================================================ -->
+            <TextBlock Text="10. AlignmentX × AlignmentY with Stretch=None — large image (Background.jpg 1033x705)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="None"
+                                        AlignmentX="Left"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="None"
+                                        AlignmentX="Center"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="None"
+                                        AlignmentX="Right"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center / Center"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="None"
+                                        AlignmentX="Center"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right / Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="None"
+                                        AlignmentX="Right"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 11. Viewport (Relative, TileMode=None)                        -->
+            <!-- ============================================================ -->
+            <TextBlock Text="11. Viewport (Relative, TileMode=None) — picks where the single tile sits"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.5,0.5) — top-left quarter"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.5,0,0.5,0.5) — top-right quarter"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0.5,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0.5,0.5,0.5) — bottom-left quarter"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0,0.5,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.5,0.5,0.5,0.5) — bottom-right quarter"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0.5,0.5,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.25,0.25,0.5,0.5) — centered half"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0.25,0.25,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.1,0.2,0.8,0.6) — inset"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0.1,0.2,0.8,0.6" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.1,1) — thin strip on left"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0,0,0.1,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,1,0.1) — thin strip on top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0,0,1,0.1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 12. Viewport (Absolute, TileMode=None)                        -->
+            <!-- ============================================================ -->
+            <TextBlock Text="12. Viewport (Absolute = DIPs, TileMode=None) — Shape is 200x150"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,100,75) — top-left half"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,100,75" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(20,20,80,60)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewportUnits="Absolute"
+                                        Viewport="20,20,80,60" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(50,30,150,100) — bigger than shape"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewportUnits="Absolute"
+                                        Viewport="50,30,150,100" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,400,300) — way bigger"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,400,300" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 13. Viewport — out-of-range Relative values                   -->
+            <!-- ============================================================ -->
+            <TextBlock Text="13. Viewport — unexpected values (relative outside [0..1])"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(-0.5,-0.5,1,1) — half outside top-left"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="-0.5,-0.5,1,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,2,2) — 2x bigger than shape"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0,0,2,2" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(-1,-1,3,3) — fully overhangs"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="-1,-1,3,3" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.7,0.7,0.5,0.5) — partly past bottom-right"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0.7,0.7,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(2,2,0.5,0.5) — fully outside"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="2,2,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 14. TileMode=Tile + Viewport (Relative)                       -->
+            <!-- ============================================================ -->
+            <TextBlock Text="14. TileMode=Tile + Viewport (Relative)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.5,0.5) — 2x2 grid"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.333,0.333) — 3x3 grid"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.333,0.333" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.25,0.25) — 4x4 grid"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.25,0.25" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.2,0.3) — non-square tile"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.2,0.3" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.1,0.1,0.5,0.5) — offset tile origin"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0.1,0.1,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.05,0.05,0.2,0.2) — small offset tile"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0.05,0.05,0.2,0.2" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 15. TileMode=Tile + Viewport (Absolute)                       -->
+            <!-- ============================================================ -->
+            <TextBlock Text="15. TileMode=Tile + Viewport (Absolute, DIPs)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,50,50)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,50,50" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,80,60) — non-square"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,80,60" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(10,10,60,60) — offset"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        ViewportUnits="Absolute"
+                                        Viewport="10,10,60,60" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(-25,-25,50,50) — negative offset"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        ViewportUnits="Absolute"
+                                        Viewport="-25,-25,50,50" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,30,90) — tall strips"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,30,90" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 16. Viewbox (Relative) — picks the source rectangle           -->
+            <!-- ============================================================ -->
+            <TextBlock Text="16. Viewbox (Relative, default Stretch=Fill)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.5,1) — left half of image"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewbox="0,0,0.5,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.5,0,0.5,1) — right half"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewbox="0.5,0,0.5,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,1,0.5) — top half"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewbox="0,0,1,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0.5,1,0.5) — bottom half"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewbox="0,0.5,1,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.25,0.25,0.5,0.5) — centered half"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewbox="0.25,0.25,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.4,0.4,0.2,0.2) — small center crop"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewbox="0.4,0.4,0.2,0.2" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,0.25,1) — narrow left strip"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewbox="0,0,0.25,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 17. Viewbox (Absolute — image-pixel coords)                   -->
+            <!-- ============================================================ -->
+            <TextBlock Text="17. Viewbox (Absolute, image-pixel coords) — Logo1 = 174x197"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,87,98) — top-left quarter"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="0,0,87,98" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(87,98,87,99) — bottom-right quarter"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="87,98,87,99" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(50,50,80,80) — center crop"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,80,80" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,300,500) — bigger than image"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="0,0,300,500" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 18. Viewbox — out-of-range values                              -->
+            <!-- ============================================================ -->
+            <TextBlock Text="18. Viewbox — unexpected values (relative outside [0..1] or negative)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(-0.5,-0.5,1,1) — half outside image"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewbox="-0.5,-0.5,1,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0,0,2,2) — 2x bigger than image"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewbox="0,0,2,2" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(-1,-1,3,3) — fully oversized"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewbox="-1,-1,3,3" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(0.5,0.5,1,1) — extends past image"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewbox="0.5,0.5,1,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="(2,2,1,1) — fully outside image"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewbox="2,2,1,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 19. Stretch=None + non-default Viewbox                        -->
+            <!--     The Viewbox region renders at natural pixel size aligned   -->
+            <!--     within the Viewport, clipped to the Viewport edges.        -->
+            <!-- ============================================================ -->
+            <TextBlock Text="19. Stretch=None + Viewbox combinations"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewbox=(0,0,0.5,1) rel"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        Viewbox="0,0,0.5,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewbox=(0,0,87,99) abs"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="0,0,87,99" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewbox=(0.25,0.25,0.5,0.5) rel"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        Viewbox="0.25,0.25,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewbox=(37.5,25,60,60) abs"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="37.5,25,60,60" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewbox=(0,0,200,350) abs — larger than image"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="0,0,200,350" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewbox=(50,50,30,30) abs — tiny center"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,30,30" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 20. Stretch=None + Viewbox + Alignment                        -->
+            <!--     Showing how alignment positions the Viewbox-natural-sized -->
+            <!--     content inside the Viewport.                              -->
+            <!-- ============================================================ -->
+            <TextBlock Text="20. Stretch=None + Viewbox=(50,50,80,80) abs + Alignment combos"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left/Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,80,80"
+                                        AlignmentX="Left"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Center/Center"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,80,80"
+                                        AlignmentX="Center"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right/Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,80,80"
+                                        AlignmentX="Right"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Right/Top"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,80,80"
+                                        AlignmentX="Right"
+                                        AlignmentY="Top" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Left/Bottom"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,80,80"
+                                        AlignmentX="Left"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 21. Viewbox + Viewport (no Tile)                              -->
+            <!-- ============================================================ -->
+            <TextBlock Text="21. Viewbox + Viewport combinations (TileMode=None, default Stretch=Fill)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0.25,0.25,0.5,0.5)&#10;vb=(0,0,0.5,0.5)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewport="0.25,0.25,0.5,0.5"
+                                        Viewbox="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0,0,0.5,1)&#10;vb=(0.5,0,0.5,1)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewport="0,0,0.5,1"
+                                        Viewbox="0.5,0,0.5,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0.5,0,0.5,1)&#10;vb=(0,0,0.5,1)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewport="0.5,0,0.5,1"
+                                        Viewbox="0,0,0.5,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0,0,1,0.5)&#10;vb=(0,0.5,1,0.5)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewport="0,0,1,0.5"
+                                        Viewbox="0,0.5,1,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0.1,0.1,0.8,0.8)&#10;vb=(0.2,0.2,0.6,0.6)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Viewport="0.1,0.1,0.8,0.8"
+                                        Viewbox="0.2,0.2,0.6,0.6" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 22. Viewbox + Viewport + TileMode=Tile                        -->
+            <!-- ============================================================ -->
+            <TextBlock Text="22. Viewbox + Viewport + TileMode=Tile"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0,0,0.5,0.5) vb=(0,0,0.5,0.5)"
+                               FontSize="11" />
+                    <Rectangle Width="300"
+                               Height="200"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5"
+                                        Viewbox="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0,0,0.25,0.25) vb=(0.5,0,0.5,1)"
+                               FontSize="11" />
+                    <Rectangle Width="300"
+                               Height="200"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.25,0.25"
+                                        Viewbox="0.5,0,0.5,1" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0,0,0.333,0.333) vb=(0.25,0.25,0.5,0.5)"
+                               FontSize="11" />
+                    <Rectangle Width="300"
+                               Height="200"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.333,0.333"
+                                        Viewbox="0.25,0.25,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="vp=(0.1,0.1,0.4,0.4) vb=(0,0,0.5,0.5)"
+                               FontSize="11" />
+                    <Rectangle Width="300"
+                               Height="200"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0.1,0.1,0.4,0.4"
+                                        Viewbox="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 23. Tile + Stretch (Fill/Uniform/UniformToFill/None) interplay-->
+            <!-- ============================================================ -->
+            <TextBlock Text="23. TileMode=Tile + every Stretch + Viewport=(0,0,0.5,0.5)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Fill"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Stretch="Fill"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Uniform"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Stretch="Uniform"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="UniformToFill"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Stretch="UniformToFill"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Stretch="None"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 24. Brush.Transform — RotateTransform / ScaleTransform /     -->
+            <!--     TranslateTransform / SkewTransform / MatrixTransform.    -->
+            <!--     Applied to the WHOLE tiled pattern (not the source).     -->
+            <!-- ============================================================ -->
+            <TextBlock Text="24. Brush.Transform (patternTransform — applied to the tiled pattern)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="RotateTransform 30°"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.4,0.4">
+                                <ImageBrush.Transform>
+                                    <RotateTransform Angle="30" />
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="RotateTransform 45° (no tile)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png">
+                                <ImageBrush.Transform>
+                                    <RotateTransform Angle="45"
+                                                     CenterX="100"
+                                                     CenterY="75" />
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="ScaleTransform 0.5x0.5"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile">
+                                <ImageBrush.Transform>
+                                    <ScaleTransform ScaleX="0.5"
+                                                    ScaleY="0.5" />
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="TranslateTransform (30, 20)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5">
+                                <ImageBrush.Transform>
+                                    <TranslateTransform X="30"
+                                                        Y="20" />
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="SkewTransform 20°"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5">
+                                <ImageBrush.Transform>
+                                    <SkewTransform AngleX="20"
+                                                   AngleY="0" />
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="TransformGroup (rotate+scale)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5">
+                                <ImageBrush.Transform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="0.6"
+                                                        ScaleY="0.6" />
+                                        <RotateTransform Angle="15" />
+                                    </TransformGroup>
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="MatrixTransform"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5">
+                                <ImageBrush.Transform>
+                                    <MatrixTransform Matrix="0.866,0.5,-0.5,0.866,40,10" />
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 25. Brush.Opacity                                             -->
+            <!-- ============================================================ -->
+            <TextBlock Text="25. Brush.Opacity"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Opacity=1.0 (default)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Opacity="1.0" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Opacity=0.75"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Opacity="0.75" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Opacity=0.5"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Opacity="0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Opacity=0.25"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Opacity="0.25" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Opacity=0.5 + Tile"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Opacity="0.5"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 26. Different shapes                                          -->
+            <!-- ============================================================ -->
+            <TextBlock Text="26. ImageBrush on different shape types"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Rectangle Fill"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Ellipse Fill"
+                               FontSize="11" />
+                    <Ellipse Width="150"
+                             Height="100"
+                             Stroke="Gray"
+                             StrokeThickness="1">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Ellipse Tile"
+                               FontSize="11" />
+                    <Ellipse Width="200"
+                             Height="150"
+                             Stroke="Gray"
+                             StrokeThickness="1">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Polygon (triangle) Fill"
+                               FontSize="11" />
+                    <Polygon Points="75,0 150,100 0,100"
+                             Stroke="Gray"
+                             StrokeThickness="1">
+                        <Polygon.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Polygon.Fill>
+                    </Polygon>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Polygon (triangle) Tile"
+                               FontSize="11" />
+                    <Polygon Points="100,0 200,150 0,150"
+                             Stroke="Gray"
+                             StrokeThickness="1">
+                        <Polygon.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.4,0.4" />
+                        </Polygon.Fill>
+                    </Polygon>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Polygon (diamond)"
+                               FontSize="11" />
+                    <Polygon Points="75,0 150,50 75,100 0,50"
+                             Stroke="Gray"
+                             StrokeThickness="1">
+                        <Polygon.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="Uniform" />
+                        </Polygon.Fill>
+                    </Polygon>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Path (rounded rect)"
+                               FontSize="11" />
+                    <Path Stroke="Gray"
+                          StrokeThickness="1"
+                          Data="M20,0 L130,0 Q150,0 150,20 L150,80 Q150,100 130,100 L20,100 Q0,100 0,80 L0,20 Q0,0 20,0 Z">
+                        <Path.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Path.Fill>
+                    </Path>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Path (star)"
+                               FontSize="11" />
+                    <Path Stroke="Gray"
+                          StrokeThickness="1"
+                          Data="M75,0 L92,55 L150,55 L102,90 L120,150 L75,115 L30,150 L48,90 L0,55 L58,55 Z">
+                        <Path.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="UniformToFill" />
+                        </Path.Fill>
+                    </Path>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 27. Stroked shapes (stroke does not affect ImageBrush bbox)  -->
+            <!-- ============================================================ -->
+            <TextBlock Text="27. Stroke thickness should not shift the image"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Stroke=0"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Stroke=1"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Black"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Stroke=5"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Black"
+                               StrokeThickness="5">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Stroke=10"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Black"
+                               StrokeThickness="10">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Stroke=10 + Tile"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Black"
+                               StrokeThickness="10">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.5,0.5" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Stroke=10 + Tile abs"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="150"
+                               Stroke="Black"
+                               StrokeThickness="10">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        ViewportUnits="Absolute"
+                                        Viewport="10,10,60,60" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 28. Heavy combinations (everything at once)                   -->
+            <!-- ============================================================ -->
+            <TextBlock Text="28. Heavy combinations"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Tile + Uniform + Viewport(rel) + Viewbox(rel)"
+                               FontSize="11" />
+                    <Rectangle Width="250"
+                               Height="180"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Stretch="Uniform"
+                                        Viewport="0,0,0.4,0.4"
+                                        Viewbox="0.1,0.1,0.8,0.8"
+                                        AlignmentX="Center"
+                                        AlignmentY="Center" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Tile + UniformToFill + Viewbox + Transform"
+                               FontSize="11" />
+                    <Rectangle Width="250"
+                               Height="180"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        TileMode="Tile"
+                                        Stretch="UniformToFill"
+                                        Viewport="0,0,0.25,0.25"
+                                        Viewbox="0,0,0.5,0.5">
+                                <ImageBrush.Transform>
+                                    <RotateTransform Angle="20" />
+                                </ImageBrush.Transform>
+                            </ImageBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="None + Viewbox abs + Viewport abs + Opacity"
+                               FontSize="11" />
+                    <Rectangle Width="250"
+                               Height="180"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None"
+                                        ViewportUnits="Absolute"
+                                        Viewport="30,30,180,120"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="20,20,120,160"
+                                        Opacity="0.7" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Tile + None Stretch + Viewbox(abs) + Alignment"
+                               FontSize="11" />
+                    <Rectangle Width="250"
+                               Height="180"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Stretch="None"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,80,80"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="20,20,60,60"
+                                        AlignmentX="Right"
+                                        AlignmentY="Bottom" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Tile + Fill + Viewport-Abs offset + Viewbox-Abs"
+                               FontSize="11" />
+                    <Rectangle Width="250"
+                               Height="180"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Stretch="Fill"
+                                        ViewportUnits="Absolute"
+                                        Viewport="10,10,60,60"
+                                        ViewboxUnits="Absolute"
+                                        Viewbox="50,50,100,100" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 29. Degenerate / no-op cases                                  -->
+            <!-- ============================================================ -->
+            <TextBlock Text="29. Degenerate cases (renders nothing)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewport=(0,0,0,0)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewport="0,0,0,0" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewbox=(0,0,0,0)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Viewbox="0,0,0,0" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="No ImageSource"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Viewport(abs)=(0,0,0,0)"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,0,0" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 30. Dynamic property changes — multiple brushes back-to-back  -->
+            <!--     to exercise the "stale onload" guard on a single brush:    -->
+            <!--     each Rectangle uses a brand-new brush so behavior matches  -->
+            <!--     the one on the left after the user resizes the window.    -->
+            <!--     See also the brush in section 27 with thick stroke.       -->
+            <!-- ============================================================ -->
+            <TextBlock Text="30. Same brush, several shapes (each gets its own pattern)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Rect 1"
+                               FontSize="11" />
+                    <Rectangle Width="120"
+                               Height="80"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.4,0.4" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Rect 2 (different size)"
+                               FontSize="11" />
+                    <Rectangle Width="200"
+                               Height="120"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.4,0.4" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Ellipse"
+                               FontSize="11" />
+                    <Ellipse Width="150"
+                             Height="100"
+                             Stroke="Gray"
+                             StrokeThickness="1">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.4,0.4" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Path"
+                               FontSize="11" />
+                    <Path Stroke="Gray"
+                          StrokeThickness="1"
+                          Data="M0,40 L40,0 L160,0 L200,40 L200,80 L160,120 L40,120 L0,80 Z">
+                        <Path.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.4,0.4" />
+                        </Path.Fill>
+                    </Path>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 31. Stretch=None on every Stretch with various image sizes    -->
+            <!--     to compare empty vs cropped behavior visually.            -->
+            <!-- ============================================================ -->
+            <TextBlock Text="31. Stretch=None — image sizes vs shape size (no Viewbox/Viewport tweaks)"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="icon (16x16) in 150x100"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/icon_open.png"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="arrow (84x29) in 150x100"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/arrow_left.png"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Logo (174x197) in 150x100 — crops"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="templates (440x306) in 150x100 — crops"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/flower.jpg"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="Background (1033x705) in 150x100 — heavy crop"
+                               FontSize="11" />
+                    <Rectangle Width="150"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Background.jpg"
+                                        Stretch="None" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- ============================================================ -->
+            <!-- 32. Large shapes (stress the renderer on bigger output)       -->
+            <!-- ============================================================ -->
+            <TextBlock Text="32. Larger shapes"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4" />
+            <WrapPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="400x300 Tile (Logo)"
+                               FontSize="11" />
+                    <Rectangle Width="400"
+                               Height="300"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        Viewport="0,0,0.2,0.2" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="400x300 Tile abs(60x40)"
+                               FontSize="11" />
+                    <Rectangle Width="400"
+                               Height="300"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/Logo1.png"
+                                        TileMode="Tile"
+                                        ViewportUnits="Absolute"
+                                        Viewport="0,0,60,40" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+                <StackPanel Margin="4">
+                    <TextBlock Text="500x100 Uniform tall image"
+                               FontSize="11" />
+                    <Rectangle Width="500"
+                               Height="100"
+                               Stroke="Gray"
+                               StrokeThickness="1">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/Tests/TileBrush/Images/back_1.jpg"
+                                        Stretch="Uniform" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </WrapPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</sdk:Page>

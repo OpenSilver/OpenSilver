@@ -82,29 +82,50 @@ public sealed class ImageBrush : TileBrush
     /// <summary>
     /// Occurs when there is an error associated with image retrieval or format.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public event EventHandler<ExceptionRoutedEventArgs> ImageFailed;
 
     /// <summary>
     /// Occurs when the image source is downloaded and decoded with no failure. You can
     /// use this event to determine the size of an image before rendering it.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    [NotImplemented]
     public event EventHandler<RoutedEventArgs> ImageOpened;
 
     internal async override ValueTask<string> GetDataStringAsync(UIElement parent)
     {
-        ImageSource source = ImageSource;
-        if (source != null)
+        if (ImageSource is ImageSource source)
         {
             string url = await source.GetDataStringAsync(parent);
             if (!string.IsNullOrEmpty(url))
             {
+                Rect viewport = Viewport;
+                BrushMappingMode viewportUnits = ViewportUnits;
+
+                string position;
+                string size;
                 string opacity = (1.0 - Opacity).ToInvariantString();
-                string positionX = ConvertAlignmentX(AlignmentX);
-                string positionY = ConvertAlignmentX(AlignmentY);
-                string stretch = ConvertStretch(Stretch);
-                return $"linear-gradient(to right, rgba(255, 255, 255, {opacity}) 0 100%), url({url}) {positionX} {positionY} / {stretch} no-repeat";
+                string repeat = ConvertTileMode(TileMode);
+
+                if (viewportUnits == BrushMappingMode.Absolute)
+                {
+                    position = $"{viewport.X.ToInvariantString()}px {viewport.Y.ToInvariantString()}px";
+                    size = $"{viewport.Width.ToInvariantString()}px {viewport.Height.ToInvariantString()}px";
+                }
+                else if (IsDefaultViewport(viewport))
+                {
+                    position = $"{ConvertAlignmentX(AlignmentX)} {ConvertAlignmentY(AlignmentY)}";
+                    size = ConvertStretch(Stretch);
+                }
+                else
+                {
+                    string x = viewport.Width == 1.0 ? "0%" : $"{(viewport.X / (1.0 - viewport.Width) * 100.0).ToInvariantString()}%";
+                    string y = viewport.Height == 1.0 ? "0%" : $"{(viewport.Y / (1.0 - viewport.Height) * 100.0).ToInvariantString()}%";
+                    position = $"{x} {y}";
+                    size = $"{(viewport.Width * 100.0).ToInvariantString()}% {(viewport.Height * 100.0).ToInvariantString()}%";
+                }
+
+                return $"linear-gradient(to right, rgba(255, 255, 255, {opacity}) 0 100%), url({url}) {position} / {size} {repeat}";
             }
         }
 
@@ -112,6 +133,15 @@ public sealed class ImageBrush : TileBrush
     }
 
     internal override ISvgBrush GetSvgElement(Shape shape) => new SvgPattern(shape, this);
+
+    private static bool IsDefaultViewport(Rect vp) => vp.X == 0.0 && vp.Y == 0.0 && vp.Width == 1.0 && vp.Height == 1.0;
+
+    private string ConvertTileMode(TileMode tileMode)
+        => tileMode switch
+        {
+            TileMode.None => "no-repeat",
+            _ => "repeat",
+        };
 
     private static string ConvertAlignmentX(AlignmentX alignmentX)
         => alignmentX switch
@@ -121,7 +151,7 @@ public sealed class ImageBrush : TileBrush
             _ => "center",
         };
 
-    private static string ConvertAlignmentX(AlignmentY alignmentY)
+    private static string ConvertAlignmentY(AlignmentY alignmentY)
         => alignmentY switch
         {
             AlignmentY.Bottom => "bottom",
@@ -142,6 +172,7 @@ public sealed class ImageBrush : TileBrush
     {
         private readonly ImageBrush _imageBrush;
         private readonly HtmlElementReference _pattern;
+        private readonly HtmlElementReference _crop;
         private readonly HtmlElementReference _image;
         private readonly WeakEventToken _weakTransformChangedEventToken;
         private readonly WeakEventToken _weakSizeChangedEventToken;
@@ -150,11 +181,13 @@ public sealed class ImageBrush : TileBrush
         {
             _imageBrush = imageBrush;
             _pattern = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(shape.DefsElement, "pattern");
-            _image = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(_pattern, "image");
-            _pattern.SetAttribute("x", "0");
-            _pattern.SetAttribute("y", "0");
-            _pattern.SetAttribute("width", "100%");
-            _pattern.SetAttribute("height", "100%");
+            _crop = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(_pattern, "svg");
+            _image = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(_crop, "image");
+
+            // <image> is always rendered at its natural pixel size; the crop <svg>
+            // does all Viewbox/Viewport/Stretch/Alignment work via its viewBox + preserveAspectRatio,
+            // and the JS helper writes the per-property layout.
+            _image.SetAttribute("preserveAspectRatio", "none");
 
             DrawPattern(shape);
 
@@ -200,10 +233,9 @@ public sealed class ImageBrush : TileBrush
 
         private void OnRenderSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_imageBrush.Stretch == Stretch.None)
-            {
-                SetPreserveAspectRatio((Shape)sender);
-            }
+            // The layout can depend on the shape's bounding box (for Stretch.None and
+            // for ViewportUnits.Absolute), so always re-run the JS helper on size changes.
+            UpdateLayout((Shape)sender);
         }
 
         private void DrawPattern(Shape shape)
@@ -227,68 +259,40 @@ public sealed class ImageBrush : TileBrush
             {
                 _pattern.SetAttribute("patternTransform", MatrixTransform.MatrixToHtmlString(t.Matrix));
             }
+            else
+            {
+                _pattern.RemoveAttribute("patternTransform");
+            }
 
             _image.SetCssStyleProperty(CssPropertyNames.Opacity, Math.Round(_imageBrush.Opacity, 2).ToInvariantString());
 
-            SetPreserveAspectRatio(shape);
+            UpdateLayout(shape);
         }
 
-        private void SetPreserveAspectRatio(Shape shape)
+        private void UpdateLayout(Shape shape)
         {
-            Stretch stretch = _imageBrush.Stretch;
+            Rect viewport = _imageBrush.Viewport;
+            Rect viewbox = _imageBrush.Viewbox;
 
-            string alignX = _imageBrush.AlignmentX switch
-            {
-                AlignmentX.Left => "xMin",
-                AlignmentX.Center => "xMid",
-                AlignmentX.Right => "xMax",
-                _ => string.Empty
-            };
+            string mode = ((int)_imageBrush.TileMode).ToInvariantString();
+            string stretch = ((int)_imageBrush.Stretch).ToInvariantString();
+            string aX = ((int)_imageBrush.AlignmentX).ToInvariantString();
+            string aY = ((int)_imageBrush.AlignmentY).ToInvariantString();
 
-            string alignY = _imageBrush.AlignmentY switch
-            {
-                AlignmentY.Top => "YMin",
-                AlignmentY.Center => "YMid",
-                AlignmentY.Bottom => "YMax",
-                _ => string.Empty
-            };
+            string vpU = ((int)_imageBrush.ViewportUnits).ToInvariantString();
+            string vpX = viewport.X.ToInvariantString();
+            string vpY = viewport.Y.ToInvariantString();
+            string vpW = viewport.Width.ToInvariantString();
+            string vpH = viewport.Height.ToInvariantString();
 
-            string preserveAspectRatio = stretch switch
-            {
-                Stretch.None => $"{alignX}{alignY}",
-                Stretch.Fill => "none",
-                Stretch.Uniform => $"{alignX}{alignY} meet",
-                Stretch.UniformToFill => $"{alignX}{alignY} slice",
-                _ => string.Empty
-            };
-
-            if (stretch == Stretch.UniformToFill)
-            {
-                _pattern.SetAttribute("preserveAspectRatio", preserveAspectRatio);
-            }
-
-            _image.SetAttribute("preserveAspectRatio", preserveAspectRatio);
-
-            if (stretch == Stretch.None)
-            {
-                SetNaturalSize(shape);
-            }
-            else
-            {
-                _image.SetAttribute("width", "100%");
-                _image.SetAttribute("height", "100%");
-                _pattern.RemoveAttribute("viewBox");
-            }
-        }
-
-        private void SetNaturalSize(Shape shape)
-        {
-            string shapeId = shape.OuterDiv.Uid;
-            string patternId = _pattern.Uid;
-            string imageId = _image.Uid;
+            string vbU = ((int)_imageBrush.ViewboxUnits).ToInvariantString();
+            string vbX = viewbox.X.ToInvariantString();
+            string vbY = viewbox.Y.ToInvariantString();
+            string vbW = viewbox.Width.ToInvariantString();
+            string vbH = viewbox.Height.ToInvariantString();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"osjs.setSvgPatternNaturalSize('{patternId}', '{imageId}', '{shapeId}', {(int)_imageBrush.AlignmentX}, {(int)_imageBrush.AlignmentY})");
+                $"osjs.drawSvgPattern('{_pattern.Uid}','{_crop.Uid}','{_image.Uid}','{shape.SvgElement.Uid}',{mode},{vpU},{vpX},{vpY},{vpW},{vpH},{vbU},{vbX},{vbY},{vbW},{vbH},{stretch},{aX},{aY})");
         }
     }
 }
