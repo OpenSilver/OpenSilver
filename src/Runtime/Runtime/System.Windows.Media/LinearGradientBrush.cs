@@ -351,14 +351,13 @@ namespace System.Windows.Media
                     //same for the EndPoint:
                     double XIEnd = kEnd / (1 + 1 / m);
 
-                    // now we get the percentage based on the distance of the IStart point to (0,0) and the size of the diagonal:
-                    // Note: (2 * XIStart * XIStart) is basically (XIStart * XIStart + YIStart * YIStart)
-                    // with XIStart = YIStart.
-                    startPointPercentage = Math.Sqrt(2 * XIStart * XIStart) / D * 100;
-                    // same for the EndPoint:
-                    // Note: (2 * XIStart * XIStart) is basically (XIStart * XIStart + YIStart * YIStart)
-                    // with XIStart = YIStart.
-                    endPointPercentage = Math.Sqrt(2 * XIEnd * XIEnd) / D * 100;
+                    // The projection's signed distance from (0,0) along the diagonal direction
+                    // (1/sqrt(2), 1/sqrt(2)) is XIStart * sqrt(2) (and analogously for end). Divided
+                    // by D = sqrt(2) and multiplied by 100, this simplifies to XIStart * 100. We
+                    // must keep the sign so that StartPoint/EndPoint outside [0,1] map to negative
+                    // or >100% CSS stop positions rather than being mirrored back into the box.
+                    startPointPercentage = XIStart * 100;
+                    endPointPercentage = XIEnd * 100;
                 }
                 else //m < 0 so we are going for the other diagonal
                 {
@@ -376,18 +375,13 @@ namespace System.Windows.Media
                     //same for the end point:
                     double XIEnd = (1 - kEnd) / (1 - 1 / m);
 
-                    //now we get the percentage based on the distance of the IStart point to (0,1) and the size of the diagonal:
-                    //      startDistance = (XIStart * XIStart) + (YIStart - 1) * (YIStart - 1);
-                    //  since (1), YIStart = 1 - XIStart:
-                    //      (XIStart * XIStart) + (1 - XIStart - 1) * (1 - XIStart - 1)
-                    //      => (XIStart * XIStart) + (- XIStart) * (- XIStart)
-                    //  startDistance = sqrt(2 * XIStart * XIStart)
-                    double startDistance = Math.Sqrt(2 * XIStart * XIStart);
-                    startPointPercentage = startDistance / D * 100;
-
-                    //same for end:
-                    double endDistance = Math.Sqrt(2 * XIEnd * XIEnd);
-                    endPointPercentage = endDistance / D * 100;
+                    // Signed distance from (0,1) along the anti-diagonal direction
+                    // (1/sqrt(2), -1/sqrt(2)) is XIStart * sqrt(2) (the vector from (0,1) to the
+                    // projection is (XIStart, -XIStart)). Divided by D = sqrt(2) and multiplied by
+                    // 100 this becomes XIStart * 100; preserving the sign is required so that
+                    // points outside [0,1] do not get mirrored back into the visible area.
+                    startPointPercentage = XIStart * 100;
+                    endPointPercentage = XIEnd * 100;
                 }
             }
             else //no difference in height between the two points:
