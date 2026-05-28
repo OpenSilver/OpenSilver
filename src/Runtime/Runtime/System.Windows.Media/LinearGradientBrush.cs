@@ -307,9 +307,6 @@ namespace System.Windows.Media
                 YVariation = -YVariation;
             }
 
-            // this will be the longest distance inside the shape for a segment with the alpha angle.
-            double D; 
-
             // test: we make the percentages by projecting the points on the diagonal with an angle
             // that is perpendicular to the line defined by StartPoint and Endpoint:
 
@@ -331,12 +328,7 @@ namespace System.Windows.Media
                 // same for EndPoint:
                 double kEnd = endY + 1 / m * endX;
 
-                // length of the diagonal = sqrt(width ^ 2 + height ^ 2) and we ignore the actual
-                // size of the element since we want relative sizes anyway
-                D = Math.Sqrt(2); 
-
                 if (m > 0)
-                //if (m != -1)
                 {
                     // now we want the intersection between these lines and the diagonal (which has the equation Y = X since it goes from (0,0) to (1,1))
                     // IStart is the intersection of the perpendicular on the start point and the diagonal, with coordinates XIStart and yIstart.
@@ -351,14 +343,8 @@ namespace System.Windows.Media
                     //same for the EndPoint:
                     double XIEnd = kEnd / (1 + 1 / m);
 
-                    // now we get the percentage based on the distance of the IStart point to (0,0) and the size of the diagonal:
-                    // Note: (2 * XIStart * XIStart) is basically (XIStart * XIStart + YIStart * YIStart)
-                    // with XIStart = YIStart.
-                    startPointPercentage = Math.Sqrt(2 * XIStart * XIStart) / D * 100;
-                    // same for the EndPoint:
-                    // Note: (2 * XIStart * XIStart) is basically (XIStart * XIStart + YIStart * YIStart)
-                    // with XIStart = YIStart.
-                    endPointPercentage = Math.Sqrt(2 * XIEnd * XIEnd) / D * 100;
+                    startPointPercentage = XIStart * 100;
+                    endPointPercentage = XIEnd * 100;
                 }
                 else //m < 0 so we are going for the other diagonal
                 {
@@ -376,18 +362,8 @@ namespace System.Windows.Media
                     //same for the end point:
                     double XIEnd = (1 - kEnd) / (1 - 1 / m);
 
-                    //now we get the percentage based on the distance of the IStart point to (0,1) and the size of the diagonal:
-                    //      startDistance = (XIStart * XIStart) + (YIStart - 1) * (YIStart - 1);
-                    //  since (1), YIStart = 1 - XIStart:
-                    //      (XIStart * XIStart) + (1 - XIStart - 1) * (1 - XIStart - 1)
-                    //      => (XIStart * XIStart) + (- XIStart) * (- XIStart)
-                    //  startDistance = sqrt(2 * XIStart * XIStart)
-                    double startDistance = Math.Sqrt(2 * XIStart * XIStart);
-                    startPointPercentage = startDistance / D * 100;
-
-                    //same for end:
-                    double endDistance = Math.Sqrt(2 * XIEnd * XIEnd);
-                    endPointPercentage = endDistance / D * 100;
+                    startPointPercentage = XIStart * 100;
+                    endPointPercentage = XIEnd * 100;
                 }
             }
             else //no difference in height between the two points:
