@@ -172,7 +172,7 @@ public sealed class KeyboardNavigation
     }
 
     /// <summary>
-    /// Gets or sets the directional navigation behavior for the children of the element that this property is set on.
+    /// Identifies the KeyboardNavigation.DirectionalNavigation attached property.
     /// </summary>
     [OpenSilver.NotImplemented]
     public static readonly DependencyProperty DirectionalNavigationProperty =
@@ -180,46 +180,47 @@ public sealed class KeyboardNavigation
             "DirectionalNavigation",
             typeof(KeyboardNavigationMode),
             typeof(KeyboardNavigation),
-            new FrameworkPropertyMetadata(KeyboardNavigationMode.Continue),
-            new ValidateValueCallback(IsValidKeyNavigationMode));
+            new FrameworkPropertyMetadata(KeyboardNavigationMode.Local));
 
     /// <summary>
-    /// Sets the value of the <see cref="DirectionalNavigationProperty"/> attached property for the specified element.
+    /// Gets the value of the KeyboardNavigation.DirectionalNavigation attached property for the specified element.
     /// </summary>
-    /// <param name="element">Element on which to set the attached property.</param>
-    /// <param name="mode">Property value to set.</param>
-    /// <seealso cref="DirectionalNavigationProperty" />
+    /// <param name="element">
+    /// Element from which to get the attached property.
+    /// </param>
+    /// <returns>
+    /// The value of the KeyboardNavigation.DirectionalNavigation property.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="element"/> is null.
+    /// </exception>
+    [OpenSilver.NotImplemented]
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+    public static KeyboardNavigationMode GetDirectionalNavigation(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        return (KeyboardNavigationMode)element.GetValue(DirectionalNavigationProperty);
+    }
+
+    /// <summary>
+    /// Sets the value of the KeyboardNavigation.DirectionalNavigation attached property for the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// Element on which to set the attached property.
+    /// </param>
+    /// <param name="mode">
+    /// Property value to set.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="element"/> is null.
+    /// </exception>
     [OpenSilver.NotImplemented]
     public static void SetDirectionalNavigation(DependencyObject element, KeyboardNavigationMode mode)
     {
         ArgumentNullException.ThrowIfNull(element);
+
         element.SetValueInternal(DirectionalNavigationProperty, mode);
-    }
-
-    /// <summary>
-    /// Gets the value of the <see cref="DirectionalNavigationProperty"/> attached property for the specified element.
-    /// </summary>
-    /// <param name="element">Element from which to get the attached property.</param>
-    /// <returns>The value of the <see cref="DirectionalNavigationProperty"/> property.</returns>
-    /// <seealso cref="DirectionalNavigationProperty" />
-    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
-    [OpenSilver.NotImplemented]
-    public static KeyboardNavigationMode GetDirectionalNavigation(DependencyObject element)
-    {
-        ArgumentNullException.ThrowIfNull(element);
-        return (KeyboardNavigationMode)element.GetValue(DirectionalNavigationProperty);
-    }
-
-    private static bool IsValidKeyNavigationMode(object o)
-    {
-        var value = (KeyboardNavigationMode)o;
-        return value
-            is KeyboardNavigationMode.Contained
-            or KeyboardNavigationMode.Continue
-            or KeyboardNavigationMode.Cycle
-            or KeyboardNavigationMode.None
-            or KeyboardNavigationMode.Once
-            or KeyboardNavigationMode.Local;
     }
 
     /// <summary>

@@ -253,15 +253,8 @@ public abstract class Timeline : DependencyObject
             "DesiredFrameRate",
             typeof(int?),
             typeof(Timeline),
-            null,
-            new ValidateValueCallback(ValidateDesiredFrameRate));
-
-    private static bool ValidateDesiredFrameRate(object value)
-    {
-        var desiredFrameRate = (int?)value;
-
-        return !desiredFrameRate.HasValue || desiredFrameRate.Value > 0;
-    }
+            new PropertyMetadata((object)null),
+            ValidateDesiredFrameRate);
 
     /// <summary>
     /// Gets the desired frame rate of the specified <see cref="Timeline"/>.
@@ -292,6 +285,13 @@ public abstract class Timeline : DependencyObject
         ArgumentNullException.ThrowIfNull(timeline);
 
         timeline.SetValueInternal(DesiredFrameRateProperty, desiredFrameRate);
+    }
+
+    private static bool ValidateDesiredFrameRate(object value)
+    {
+        var desiredFrameRate = (int?)value;
+
+        return !desiredFrameRate.HasValue || desiredFrameRate.Value > 0;
     }
 
     private static bool ValidateSpeedRatio(object value)
