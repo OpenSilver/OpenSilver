@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Controls.Primitives
 {
     /// <summary>
@@ -21,28 +23,24 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Provides base class initialization behavior for SelectorItem-derived classes.
         /// </summary>
-        protected SelectorItem()
-        {
-        }
+        protected SelectorItem() { }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the item is selected in a selector.
         /// </summary>
         public bool IsSelected
         {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValueInternal(IsSelectedProperty, value); }
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValueInternal(IsSelectedProperty, value);
         }
 
         /// <summary>
         /// Identifies the <see cref="IsSelected"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register(
-                nameof(IsSelected), 
-                typeof(bool), 
-                typeof(SelectorItem), 
-                new PropertyMetadata(false, OnIsSelectedChanged));
+            Selector.IsSelectedProperty.AddOwner(
+                typeof(SelectorItem),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectedChanged));
 
         private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

@@ -603,7 +603,7 @@ namespace System.Windows.Controls.Primitives
             //This check ensures that selection is cleared only for generated containers.
             if (!((IGeneratorHost)this).IsItemItsOwnContainer(item))
             {
-                element.ClearValue(SelectorItem.IsSelectedProperty);
+                element.ClearValue(IsSelectedProperty);
             }
         }
 
@@ -1080,20 +1080,17 @@ namespace System.Windows.Controls.Primitives
 
         private void ItemSetIsSelected(ItemInfo info, bool value)
         {
-            if (info == null)
+            if (info is null)
+            {
                 return;
+            }
 
-            DependencyObject container = info.Container;
-
-            if (container != null && container != ItemInfo.RemovedContainer)
+            if (info.Container is DependencyObject container && container != ItemInfo.RemovedContainer)
             {
                 // First check that the value is different and then set it.
-                if (container is SelectorItem selectorContainer)
+                if (GetIsSelected(container) != value)
                 {
-                    if (selectorContainer.IsSelected != value)
-                    {
-                        container.SetCurrentValueInternal(SelectorItem.IsSelectedProperty, BooleanBoxes.Box(value));
-                    }
+                    container.SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.Box(value));
                 }
             }
             else
@@ -1103,16 +1100,11 @@ namespace System.Windows.Controls.Primitives
                 object item = info.Item;
                 if (IsItemItsOwnContainerOverride(item))
                 {
-                    DependencyObject element = item as DependencyObject;
-
-                    if (element != null)
+                    if (item is DependencyObject element)
                     {
-                        if (element is SelectorItem selectorContainer)
+                        if (GetIsSelected(element) != value)
                         {
-                            if (selectorContainer.IsSelected != value)
-                            {
-                                element.SetCurrentValueInternal(SelectorItem.IsSelectedProperty, BooleanBoxes.Box(value));
-                            }
+                            element.SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.Box(value));
                         }
                     }
                 }
@@ -1347,7 +1339,7 @@ namespace System.Windows.Controls.Primitives
             DependencyObject container = info.Container;
             if (container != null)
             {
-                return (bool)container.GetValue(SelectorItem.IsSelectedProperty);
+                return (bool)container.GetValue(IsSelectedProperty);
             }
 
             // In the case where the elements added *are* the containers, read it off the item could work too
@@ -1358,8 +1350,7 @@ namespace System.Windows.Controls.Primitives
 
                 if (element != null)
                 {
-                    //return (bool)element.GetValue(Selector.IsSelectedProperty);
-                    return (bool)element.GetValue(SelectorItem.IsSelectedProperty);
+                    return (bool)element.GetValue(IsSelectedProperty);
                 }
             }
 
@@ -1497,6 +1488,49 @@ namespace System.Windows.Controls.Primitives
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Identifies the <b>Selector.IsSelected</b> attached property.
+        /// </summary>
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.RegisterAttached(
+                "IsSelected",
+                typeof(bool),
+                typeof(Selector),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets the value of the <b>Selector.IsSelected</b> attached property that indicates whether an item is selected.
+        /// </summary>
+        /// <param name="element">
+        /// Object to query concerning the <b>Selector.IsSelected</b> property.
+        /// </param>
+        /// <returns>
+        /// Boolean value, true if the <b>Selector.IsSelected</b> property is true.
+        /// </returns>
+        [AttachedPropertyBrowsableForChildren]
+        public static bool GetIsSelected(DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            return (bool)element.GetValue(IsSelectedProperty);
+        }
+
+        /// <summary>
+        /// Sets a property value that indicates whether an item in a <see cref="Selector"/> is selected.
+        /// </summary>
+        /// <param name="element">
+        /// Object on which to set the property.
+        /// </param>
+        /// <param name="isSelected">
+        /// Value to set.
+        /// </param>
+        public static void SetIsSelected(DependencyObject element, bool isSelected)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            element.SetValueInternal(IsSelectedProperty, isSelected);
         }
 
         internal static readonly DependencyPropertyKey IsSelectionActivePropertyKey =

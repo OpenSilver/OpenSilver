@@ -475,7 +475,7 @@ namespace System.Windows.Controls
 
         private void MakeToggleSelection(ListBoxItem item)
         {
-            item.SetCurrentValueInternal(SelectorItem.IsSelectedProperty, BooleanBoxes.Box(!item.IsSelected));
+            item.SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.Box(!item.IsSelected));
 
             UpdateAnchorItem(ItemInfoFromContainer(item));
         }
