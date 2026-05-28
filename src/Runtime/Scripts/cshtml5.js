@@ -472,10 +472,15 @@ Object.defineProperty(window, 'osjs', {
                 },
                 capturePointer: function (id) {
                     const element = document.getElementById(id);
-                    if (element && _activePointerId !== null && isPointerDown()) {
+                    const pointerId = _activePointerId;
+                    if (element && pointerId !== null && isPointerDown()) {
                         try {
-                            element.setPointerCapture(_activePointerId);
+                            element.setPointerCapture(pointerId);
                         } catch (error) {
+                            return false;
+                        }
+
+                        if (!element.hasPointerCapture(pointerId)) {
                             return false;
                         }
 
@@ -483,7 +488,7 @@ Object.defineProperty(window, 'osjs', {
 
                         _pointerCapture = {
                             element: element,
-                            pointerId: _activePointerId,
+                            pointerId: pointerId,
                         };
 
                         return true;
