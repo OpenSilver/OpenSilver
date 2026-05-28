@@ -118,21 +118,31 @@ public sealed class TextDecorationCollectionConverter : TypeConverter
     {
         ArgumentNullException.ThrowIfNull(source);
 
-        switch (source.Trim().ToLower())
-        {
-            case "underline":
-                return TextDecorations.Underline;
-            case "strikethrough":
-                return TextDecorations.Strikethrough;
-            case "overline":
-                return TextDecorations.OverLine;
-            //case "baseline":
-            //    return TextDecorations.Baseline;
-            case "none":
-                return null;
+        ReadOnlySpan<char> s = source.AsSpan().Trim();
 
-            default:
-                throw new FormatException(string.Format(Strings.InvalidTextDecorationCollectionString, source));
+        if (s.IsEmpty || s.Equals("None", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+        else if (s.Equals("Underline", StringComparison.OrdinalIgnoreCase))
+        {
+            return TextDecorations.Underline;
+        }
+        else if (s.Equals("Strikethrough", StringComparison.OrdinalIgnoreCase))
+        {
+            return TextDecorations.Strikethrough;
+        }
+        else if (s.Equals("OverLine", StringComparison.OrdinalIgnoreCase))
+        {
+            return TextDecorations.OverLine;
+        }
+        else if (s.Equals("Baseline", StringComparison.OrdinalIgnoreCase))
+        {
+            return TextDecorations.Baseline;
+        }
+        else
+        {
+            throw new FormatException(string.Format(Strings.InvalidTextDecorationCollectionString, source));
         }
     }
 }

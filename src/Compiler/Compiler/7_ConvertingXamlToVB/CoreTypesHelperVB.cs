@@ -919,21 +919,31 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
 
     public override string ConvertToTextDecorationCollection(XObject context, string source)
     {
-        switch (source.Trim().ToLower())
-        {
-            case "underline":
-                return "Global.System.Windows.TextDecorations.Underline";
-            case "strikethrough":
-                return "Global.System.Windows.TextDecorations.Strikethrough";
-            case "overline":
-                return "Global.System.Windows.TextDecorations.OverLine";
-            //case "baseline":
-            //    return $"{textDecorationsTypeFullName}.Baseline";
-            case "none":
-                return "Nothing";
+        ReadOnlySpan<char> s = source.AsSpan().Trim();
 
-            default:
-                throw GetConvertException(source, "System.Windows.TextDecorationCollection", context);
+        if (s.IsEmpty || s.Equals("None", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Nothing";
+        }
+        else if (s.Equals("Underline", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Global.System.Windows.TextDecorations.Underline";
+        }
+        else if (s.Equals("Strikethrough", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Global.System.Windows.TextDecorations.Strikethrough";
+        }
+        else if (s.Equals("OverLine", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Global.System.Windows.TextDecorations.OverLine";
+        }
+        else if (s.Equals("Baseline", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Global.System.Windows.TextDecorations.Baseline";
+        }
+        else
+        {
+            throw GetConvertException(source, "System.Windows.TextDecorationCollection", context);
         }
     }
 
