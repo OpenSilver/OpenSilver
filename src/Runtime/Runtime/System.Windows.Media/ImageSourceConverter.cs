@@ -56,17 +56,20 @@ namespace System.Windows.Media
         {
             if (value is string source)
             {
-                UriKind uriKind;
-                if (source.Contains(":/"))
+                if (source != string.Empty)
                 {
-                    uriKind = UriKind.Absolute;
-                }
-                else
-                {
-                    uriKind = UriKind.Relative;
-                }
+                    UriKind uriKind;
+                    if (source.Contains(":/"))
+                    {
+                        uriKind = UriKind.Absolute;
+                    }
+                    else
+                    {
+                        uriKind = UriKind.Relative;
+                    }
 
-                return new BitmapImage(new Uri(source, uriKind));
+                    return new BitmapImage(new Uri(source, uriKind));
+                }
             }
             else if (value is Uri uri)
             {
