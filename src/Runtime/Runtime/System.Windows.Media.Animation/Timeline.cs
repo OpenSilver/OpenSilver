@@ -244,6 +244,56 @@ public abstract class Timeline : DependencyObject
         set => SetValueInternal(SpeedRatioProperty, value);
     }
 
+    /// <summary>
+    /// Gets or sets the desired frame rate for this timeline and its child timelines.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty DesiredFrameRateProperty =
+        DependencyProperty.RegisterAttached(
+            "DesiredFrameRate",
+            typeof(int?),
+            typeof(Timeline),
+            new PropertyMetadata((object)null),
+            ValidateDesiredFrameRate);
+
+    /// <summary>
+    /// Gets the desired frame rate of the specified <see cref="Timeline"/>.
+    /// </summary>
+    /// <param name="timeline">The timeline from which to retrieve the desired frame rate.</param>
+    /// <returns>The desired frame rate of this timeline. The default value is <see langword="null"/>.</returns>
+    /// <seealso cref="DesiredFrameRateProperty"/>
+    [OpenSilver.NotImplemented]
+    public static int? GetDesiredFrameRate(Timeline timeline)
+    {
+        ArgumentNullException.ThrowIfNull(timeline);
+
+        return (int?)timeline.GetValue(DesiredFrameRateProperty);
+    }
+
+    /// <summary>
+    /// Sets the desired frame rate of the specified <see cref="Timeline"/>.
+    /// </summary>
+    /// <param name="timeline">The <see cref="Timeline"/> to which <paramref name="desiredFrameRate"/> is assigned.</param>
+    /// <param name="desiredFrameRate">
+    /// The maximum number of frames this timeline should generate each second,
+    /// or <see langword="null"/> if the system should control the number of frames.
+    /// </param>
+    /// <seealso cref="DesiredFrameRateProperty"/>
+    [OpenSilver.NotImplemented]
+    public static void SetDesiredFrameRate(Timeline timeline, int? desiredFrameRate)
+    {
+        ArgumentNullException.ThrowIfNull(timeline);
+
+        timeline.SetValueInternal(DesiredFrameRateProperty, desiredFrameRate);
+    }
+
+    private static bool ValidateDesiredFrameRate(object value)
+    {
+        var desiredFrameRate = (int?)value;
+
+        return !desiredFrameRate.HasValue || desiredFrameRate.Value > 0;
+    }
+
     private static bool ValidateSpeedRatio(object value)
     {
         double newValue = (double)value;

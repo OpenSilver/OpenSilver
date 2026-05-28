@@ -37,6 +37,7 @@ public sealed class TextDecorationCollection
             TextDecorationLocation.Underline => "underline",
             TextDecorationLocation.Strikethrough => "line-through",
             TextDecorationLocation.OverLine => "overline",
+            TextDecorationLocation.Baseline => "underline", // closest match
             _ => "none",
         };
     }
@@ -53,6 +54,7 @@ public sealed class TextDecorationCollection
             TextDecorationLocation.Underline => nameof(TextDecorationLocation.Underline),
             TextDecorationLocation.Strikethrough => nameof(TextDecorationLocation.Strikethrough),
             TextDecorationLocation.OverLine => nameof(TextDecorationLocation.OverLine),
+            TextDecorationLocation.Baseline => nameof(TextDecorationLocation.Baseline),
             _ => string.Empty,
         };
     }

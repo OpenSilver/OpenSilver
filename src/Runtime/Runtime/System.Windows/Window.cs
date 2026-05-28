@@ -722,13 +722,19 @@ public class Window : ContentControl, IResizeObserverListener
     public bool? DialogResult { get; set; }
 
     [NotImplemented]
+    public Window Owner { get; set; }
+
+    [NotImplemented]
     public void Show() { }
 
     [NotImplemented]
-    public void ShowDialog() { }
+    public bool? ShowDialog() => DialogResult;
 
     [NotImplemented]
     public void Close() { }
+
+    [NotImplemented]
+    public void Hide() { }
 
     [NotImplemented]
     public void DragMove() { }
@@ -747,4 +753,7 @@ public class Window : ContentControl, IResizeObserverListener
 
     [NotImplemented]
     protected virtual void OnClosed(EventArgs e) { }
+
+    [NotImplemented]
+    protected virtual void OnSourceInitialized(EventArgs e) { }
 }

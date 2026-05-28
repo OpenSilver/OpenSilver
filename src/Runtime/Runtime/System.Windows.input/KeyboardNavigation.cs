@@ -172,6 +172,58 @@ public sealed class KeyboardNavigation
     }
 
     /// <summary>
+    /// Identifies the KeyboardNavigation.DirectionalNavigation attached property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty DirectionalNavigationProperty =
+        DependencyProperty.RegisterAttached(
+            "DirectionalNavigation",
+            typeof(KeyboardNavigationMode),
+            typeof(KeyboardNavigation),
+            new FrameworkPropertyMetadata(KeyboardNavigationMode.Local));
+
+    /// <summary>
+    /// Gets the value of the KeyboardNavigation.DirectionalNavigation attached property for the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// Element from which to get the attached property.
+    /// </param>
+    /// <returns>
+    /// The value of the KeyboardNavigation.DirectionalNavigation property.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="element"/> is null.
+    /// </exception>
+    [OpenSilver.NotImplemented]
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+    public static KeyboardNavigationMode GetDirectionalNavigation(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        return (KeyboardNavigationMode)element.GetValue(DirectionalNavigationProperty);
+    }
+
+    /// <summary>
+    /// Sets the value of the KeyboardNavigation.DirectionalNavigation attached property for the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// Element on which to set the attached property.
+    /// </param>
+    /// <param name="mode">
+    /// Property value to set.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="element"/> is null.
+    /// </exception>
+    [OpenSilver.NotImplemented]
+    public static void SetDirectionalNavigation(DependencyObject element, KeyboardNavigationMode mode)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        element.SetValueInternal(DirectionalNavigationProperty, mode);
+    }
+
+    /// <summary>
     /// Identifies the KeyboardNavigation.AcceptsReturn attached property.
     /// </summary>
     public static readonly DependencyProperty AcceptsReturnProperty =
@@ -391,7 +443,7 @@ public sealed class KeyboardNavigation
         // If parent is UIElement - return visual sibling
         DependencyObject parentAsUIElement = parent as UIElement;
         DependencyObject elementAsVisual = e as UIElement;
-        
+
         if (parentAsUIElement != null && elementAsVisual != null)
         {
             int count = VisualTreeHelper.GetChildrenCount(parentAsUIElement);
@@ -456,7 +508,7 @@ public sealed class KeyboardNavigation
                 {
                     // Verify if focusedElement is a visual descendant of e
                     UIElement visualFocusedElement = focusedElement as UIElement;
-                    
+
                     if (visualFocusedElement != null && visualFocusedElement != e && visualFocusedElement.IsDescendantOf(e))
                     {
                         return focusedElement;
