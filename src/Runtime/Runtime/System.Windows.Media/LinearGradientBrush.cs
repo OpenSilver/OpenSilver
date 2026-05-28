@@ -307,9 +307,6 @@ namespace System.Windows.Media
                 YVariation = -YVariation;
             }
 
-            // this will be the longest distance inside the shape for a segment with the alpha angle.
-            double D; 
-
             // test: we make the percentages by projecting the points on the diagonal with an angle
             // that is perpendicular to the line defined by StartPoint and Endpoint:
 
@@ -331,12 +328,7 @@ namespace System.Windows.Media
                 // same for EndPoint:
                 double kEnd = endY + 1 / m * endX;
 
-                // length of the diagonal = sqrt(width ^ 2 + height ^ 2) and we ignore the actual
-                // size of the element since we want relative sizes anyway
-                D = Math.Sqrt(2); 
-
                 if (m > 0)
-                //if (m != -1)
                 {
                     // now we want the intersection between these lines and the diagonal (which has the equation Y = X since it goes from (0,0) to (1,1))
                     // IStart is the intersection of the perpendicular on the start point and the diagonal, with coordinates XIStart and yIstart.
@@ -351,11 +343,6 @@ namespace System.Windows.Media
                     //same for the EndPoint:
                     double XIEnd = kEnd / (1 + 1 / m);
 
-                    // The projection's signed distance from (0,0) along the diagonal direction
-                    // (1/sqrt(2), 1/sqrt(2)) is XIStart * sqrt(2) (and analogously for end). Divided
-                    // by D = sqrt(2) and multiplied by 100, this simplifies to XIStart * 100. We
-                    // must keep the sign so that StartPoint/EndPoint outside [0,1] map to negative
-                    // or >100% CSS stop positions rather than being mirrored back into the box.
                     startPointPercentage = XIStart * 100;
                     endPointPercentage = XIEnd * 100;
                 }
@@ -375,11 +362,6 @@ namespace System.Windows.Media
                     //same for the end point:
                     double XIEnd = (1 - kEnd) / (1 - 1 / m);
 
-                    // Signed distance from (0,1) along the anti-diagonal direction
-                    // (1/sqrt(2), -1/sqrt(2)) is XIStart * sqrt(2) (the vector from (0,1) to the
-                    // projection is (XIStart, -XIStart)). Divided by D = sqrt(2) and multiplied by
-                    // 100 this becomes XIStart * 100; preserving the sign is required so that
-                    // points outside [0,1] do not get mirrored back into the visible area.
                     startPointPercentage = XIStart * 100;
                     endPointPercentage = XIEnd * 100;
                 }
