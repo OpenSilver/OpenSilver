@@ -251,7 +251,7 @@ namespace OpenSilver.Compiler
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
             string classCodeFilled = $@"
-Partial Public Class {className}
+Partial Class {className}
     Inherits {baseType}
     Implements {IComponentConnectorClass}
 

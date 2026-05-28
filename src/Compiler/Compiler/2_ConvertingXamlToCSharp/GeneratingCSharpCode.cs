@@ -255,7 +255,7 @@ namespace OpenSilver.Compiler
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
             string classCodeFilled = $@"
-public partial class {className} :
+partial class {className} :
 #line ({rootLineInfo.LineNumber}, {rootLineInfo.LinePosition}) - ({rootLineInfo.LineNumber}, {rootLineInfo.LinePosition}) 65536 ""{sourceFile}""
     {baseType},
 #line default
