@@ -24,7 +24,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceField),
             MemberFlags.Public | MemberFlags.Instance,
@@ -43,7 +43,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicStaticField),
             MemberFlags.Public | MemberFlags.Static,
@@ -62,7 +62,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.NonPublicInstanceField),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -81,7 +81,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceField),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -96,7 +96,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicStaticField),
             MemberFlags.Public | MemberFlags.Instance,
@@ -111,7 +111,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(BaseClassWithMembers.InheritedPublicInstanceField),
             MemberFlags.Public | MemberFlags.Instance,
@@ -130,13 +130,13 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var publicField = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var publicField = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceField),
             MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
             out var declaringTypePublicField);
 
-        var nonPublicField = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var nonPublicField = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.NonPublicInstanceField),
             MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Instance,
@@ -162,7 +162,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceField).ToLowerInvariant(),
             MemberFlags.Public | MemberFlags.Instance,
@@ -177,7 +177,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceField).ToLowerInvariant(),
             MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Instance,
@@ -196,7 +196,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceField),
             MemberFlags.Public,
@@ -211,7 +211,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceField),
             MemberFlags.Instance,
@@ -226,7 +226,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+        var field = CreateMonoCecilInspector().FindFieldDeep(
             type,
             "FieldThatDoesNotExist",
             MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static | MemberFlags.Instance,

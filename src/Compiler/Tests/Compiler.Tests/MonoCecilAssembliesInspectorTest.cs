@@ -30,8 +30,10 @@ public partial class MonoCecilAssembliesInspectorTest
     private const string ExperimentalNamespace = "Experimental";
     private const string Content = "Content";
 
-    private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(ExperimentalSubjectName, SupportedLanguage.CSharp);
+    private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = CreateMonoCecilInspector();
     private static readonly DefaultAssemblyResolver DefaultResolver = new();
+
+    private static MonoCecilAssembliesInspectorImpl CreateMonoCecilInspector() => new(ExperimentalSubjectName, SupportedLanguage.CSharp);
 
     private static TypeDefinition GetClassWithMembersType() =>
         MonoCecilVersion.FindType(

@@ -197,7 +197,7 @@ namespace OpenSilver.Compiler
                     if (initializeFromString && (
                         settings.CoreTypes.IsKnownType(elementTypeName, assemblyName) ||
                         settings.SystemTypes.IsKnownType(elementTypeName, assemblyName) ||
-                        settings.TypeReferenceHelper.IsEnum(elementType) ||
+                        settings.Inspector.IsEnum(elementType) ||
                         settings.Inspector.HasTypeConverter(elementType)))
                     {
                         currentElement.SetAttributeValue(InitializedFromStringAttribute, contentValue.Trim());

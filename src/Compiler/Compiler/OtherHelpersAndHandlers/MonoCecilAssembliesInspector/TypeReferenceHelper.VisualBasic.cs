@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -25,40 +24,6 @@ internal abstract partial class TypeReferenceHelper
         public override string Global => "Global.";
 
         public override string Null => "Nothing";
-
-        public override string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
-        {
-            Debug.Assert(enumType is not null && IsEnum(enumType));
-
-            name = name.Trim();
-
-            MemberFlags flags = ignoreCase ?
-                MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Static :
-                MemberFlags.Public | MemberFlags.Static;
-
-            var field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
-                enumType,
-                name,
-                flags,
-                out _);
-
-            if (field is not null)
-            {
-                return $"{Global}{ConvertToString(enumType)}.{field.Name}";
-            }
-            if (allowIntegerValue)
-            {
-                if (long.TryParse(name, out long l))
-                {
-                    return $"CType({l}, {Global}{ConvertToString(enumType)})";
-                }
-                if (ulong.TryParse(name, out ulong ul))
-                {
-                    return $"CType({ul}, {Global}{ConvertToString(enumType)})";
-                }
-            }
-            return null;
-        }
 
         public override string GetTypeNameIncludingGenericArguments(TypeReference type, bool appendNamespace)
         {

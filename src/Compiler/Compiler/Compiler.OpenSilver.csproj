@@ -74,8 +74,10 @@
     <Compile Include="Helpers\ResourceIDHelper.cs" />
     <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferencesVB.cs" />
+    <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\EnumHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssembliesInspectorImpl.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssemblyStorage.cs" />
+    <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilLookupCache.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeDefinitionExtensions.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeReferenceExtensions.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeReferenceHelper.FSharp.cs" />

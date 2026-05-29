@@ -601,7 +601,7 @@ namespace OpenSilver.Compiler
 
                         fromType = GetTypeDefinition(xmlns.GetName(typeName), attribute);
 
-                        if (fromType.IsAssignableFrom(elementTypeDefinition))
+                        if (_settings.Inspector.IsAssignableFrom(fromType, elementTypeDefinition))
                         {
                             attachedMemberOnly = false;
                             memberLookupFlags = MemberKind.Property |
@@ -968,7 +968,7 @@ namespace OpenSilver.Compiler
                 MemberKind memberLookupFlags;
 
                 // TODO: add support for events
-                if (fromType.IsAssignableFrom(targetTypeDefinition))
+                if (_settings.Inspector.IsAssignableFrom(fromType, targetTypeDefinition))
                 {
                     memberLookupFlags = MemberKind.Property | MemberKind.AttachedPropertyGet | MemberKind.AttachedPropertySet;
                 }
@@ -1330,7 +1330,7 @@ namespace OpenSilver.Compiler
                 XObject lineInfo)
             {
                 bool hasTypeConverter = _settings.Inspector.HasTypeConverter(memberReference);
-                bool isEnum = _settings.TypeReferenceHelper.IsEnum(memberType.ResolveOrThrow());
+                bool isEnum = _settings.Inspector.IsEnum(memberType.ResolveOrThrow());
 
                 string memberTypeName = _settings.TypeReferenceHelper.ConvertToString(memberType);
                 bool isKnownSystemType = _settings.SystemTypes.IsKnownType(memberTypeName, memberType.GetAssemblyName());
@@ -1601,7 +1601,7 @@ namespace OpenSilver.Compiler
                 XElement child = memberElement.Elements().First();
                 TypeDefinition childTypeDefinition = GetTypeDefinition(child.Name, child);
 
-                return !memberType.IsAssignableFrom(childTypeDefinition) &&
+                return !_settings.Inspector.IsAssignableFrom(memberType, childTypeDefinition) &&
                        !_settings.Inspector.IsBinding(childTypeDefinition) &&
                        !_settings.Inspector.IsStaticResourceExtension(childTypeDefinition) &&
                        !_settings.Inspector.IsTemplateBindingExtension(childTypeDefinition) &&
@@ -1672,7 +1672,7 @@ namespace OpenSilver.Compiler
                     }
                 }
 
-                if (_settings.TypeReferenceHelper.IsEnum(type))
+                if (_settings.Inspector.IsEnum(type))
                 {
                     return _settings.Inspector.GetEnumValue(type, fieldString, false, false);
                 }

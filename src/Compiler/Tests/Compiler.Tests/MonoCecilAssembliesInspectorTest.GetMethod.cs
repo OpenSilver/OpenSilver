@@ -24,7 +24,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceMethod),
             MemberFlags.Public | MemberFlags.Instance,
@@ -43,7 +43,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.PublicStaticMethod),
             MemberFlags.Public | MemberFlags.Static,
@@ -62,7 +62,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.NonPublicInstanceMethod),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -81,7 +81,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.PublicStaticMethod),
             MemberFlags.Public | MemberFlags.Instance,
@@ -96,7 +96,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceMethod),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -111,7 +111,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(BaseClassWithMembers.InheritedPublicInstanceMethod),
             MemberFlags.Public | MemberFlags.Instance,
@@ -130,7 +130,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceMethod).ToLowerInvariant(),
             MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Instance,
@@ -149,7 +149,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceMethod),
             MemberFlags.Public | MemberFlags.NonPublic,
@@ -164,7 +164,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceMethod),
             MemberFlags.Static | MemberFlags.Instance,
@@ -179,7 +179,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var method = MonoCecilAssembliesInspectorImpl.FindMethodDeep(
+        var method = CreateMonoCecilInspector().FindMethodDeep(
             type,
             "MethodThatDoesNotExist",
             MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static | MemberFlags.Instance,

@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using System.Diagnostics;
 using System.Text;
 
 namespace OpenSilver.Compiler;
@@ -69,12 +68,4 @@ internal abstract partial class TypeReferenceHelper
     public abstract string Null { get; }
 
     public abstract string GetTypeNameIncludingGenericArguments(TypeReference type, bool appendNamespace);
-
-    public abstract string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue);
-
-    public virtual bool IsEnum(TypeDefinition type)
-    {
-        Debug.Assert(type is not null);
-        return type.IsEnum;
-    }
 }

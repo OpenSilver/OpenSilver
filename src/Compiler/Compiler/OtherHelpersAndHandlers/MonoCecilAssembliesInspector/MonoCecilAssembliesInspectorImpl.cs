@@ -109,6 +109,7 @@ namespace OpenSilver.Compiler
         private readonly ConcurrentDictionary<TypeKey, TypeDefinition> _typeNameToType = [];
         private readonly Dictionary<AssemblyDefinition, ConcurrentHashSet<TypeKey>> _typesPerAssembly = [];
 
+        private readonly MonoCecilLookupCache _caches;
         private readonly TypeReferenceHelper _typeReferenceHelper;
 
         private TypeDefinition _iListType;
@@ -227,6 +228,7 @@ namespace OpenSilver.Compiler
                 _ => throw new InvalidCompilerTypeException(),
             };
 
+            _caches = new(compilerType);
             _storage = new MonoCecilAssemblyStorage();
         }
 
@@ -256,6 +258,11 @@ namespace OpenSilver.Compiler
                 _typeNameToType.TryRemove(t, out _);
             }
             _typesPerAssembly.Remove(assemblyDefinition);
+
+            // Per-compile caches key on TypeDefinition references that may belong to the
+            // unloaded assembly. Reset them to avoid stale references and memory leaks; they
+            // rebuild quickly during the next compile.
+            _caches.Clear();
         }
 
         public void Dispose()
@@ -374,237 +381,41 @@ namespace OpenSilver.Compiler
             return namespaceName.StartsWith("http://"); //todo: are there other conditions possible for XML namespaces declared with xmlnsDefinitionAttribute?
         }
 
-        internal static PropertyDefinition FindPropertyDeep(
-            TypeDefinition elementType,
-            string propertyName,
-            MemberFlags flags,
-            out TypeReference ownerElementType)
-        {
-            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
-            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
-            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
-            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
-            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+        internal PropertyDefinition FindPropertyDeep(
+            TypeDefinition elementType, string propertyName, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindProperty(elementType, propertyName, flags, out ownerElementType);
 
-            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
-            {
-                ownerElementType = null;
-                return null;
-            }
+        internal FieldDefinition FindFieldDeep(
+            TypeDefinition elementType, string name, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindField(elementType, name, flags, out ownerElementType);
 
-            ownerElementType = elementType;
+        internal EventDefinition FindEventDeep(
+            TypeDefinition elementType, string eventName, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindEvent(elementType, eventName, flags, out ownerElementType);
 
-            while (ownerElementType is not null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-
-                foreach (var property in resolved.Properties)
-                {
-                    if (string.Compare(property.Name, propertyName, ignoreCaseFlag) != 0)
-                    {
-                        continue;
-                    }
-
-                    if (staticFlag != instanceFlag && staticFlag != IsStatic(property))
-                    {
-                        continue;
-                    }
-
-                    if (publicFlag != nonPublicFlag && publicFlag != IsPublic(property))
-                    {
-                        continue;
-                    }
-
-                    return property;
-                }
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
-            }
-
-            return null;
-
-            static bool IsStatic(PropertyDefinition property)
-            {
-                return property.GetMethod is not null && property.GetMethod.IsStatic ||
-                       property.SetMethod is not null && property.SetMethod.IsStatic;
-            }
-
-            static bool IsPublic(PropertyDefinition property)
-            {
-                return property.GetMethod is not null && property.GetMethod.IsPublic ||
-                       property.SetMethod is not null && property.SetMethod.IsPublic;
-            }
-        }
-
-        private static bool TestMemberFlag(MemberFlags flags, MemberFlags value) => (flags & value) == value;
-
-        internal static FieldDefinition FindFieldDeep(
-            TypeDefinition elementType,
-            string name,
-            MemberFlags flags,
-            out TypeReference ownerElementType)
-        {
-            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
-            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
-            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
-            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
-            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
-
-            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
-            {
-                ownerElementType = null;
-                return null;
-            }
-
-            ownerElementType = elementType;
-
-            while (ownerElementType is not null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-
-                foreach (var field in resolved.Fields)
-                {
-                    if (string.Compare(field.Name, name, ignoreCaseFlag) != 0)
-                    {
-                        continue;
-                    }
-
-                    if (staticFlag != instanceFlag && staticFlag != field.IsStatic)
-                    {
-                        continue;
-                    }
-
-                    if (publicFlag != nonPublicFlag && publicFlag != field.IsPublic)
-                    {
-                        continue;
-                    }
-
-                    return field;
-                }
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
-            }
-
-            return null;
-        }
-
-        internal static EventDefinition FindEventDeep(
-            TypeDefinition elementType,
-            string eventName,
-            MemberFlags flags,
-            out TypeReference ownerElementType)
-        {
-            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
-            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
-            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
-            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
-            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
-
-            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
-            {
-                ownerElementType = null;
-                return null;
-            }
-
-            ownerElementType = elementType;
-
-            while (ownerElementType is not null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-
-                foreach (var eventDefinition in resolved.Events)
-                {
-                    if (string.Compare(eventDefinition.Name, eventName, ignoreCaseFlag) != 0)
-                    {
-                        continue;
-                    }
-
-                    if (staticFlag != instanceFlag && staticFlag != IsStatic(eventDefinition))
-                    {
-                        continue;
-                    }
-
-                    if (publicFlag != nonPublicFlag && publicFlag != IsPublic(eventDefinition))
-                    {
-                        continue;
-                    }
-
-                    return eventDefinition;
-                }
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
-            }
-
-            return null;
-
-            static bool IsStatic(EventDefinition eventDefinition)
-            {
-                return eventDefinition.AddMethod is not null && eventDefinition.AddMethod.IsStatic ||
-                       eventDefinition.RemoveMethod is not null && eventDefinition.RemoveMethod.IsStatic;
-            }
-
-            static bool IsPublic(EventDefinition eventDefinition)
-            {
-                return eventDefinition.AddMethod is not null && eventDefinition.AddMethod.IsPublic ||
-                       eventDefinition.RemoveMethod is not null && eventDefinition.RemoveMethod.IsPublic;
-            }
-        }
-
-        public static MethodDefinition FindMethodDeep(
-            TypeDefinition elementType,
-            string methodName,
-            MemberFlags flags,
-            out TypeReference ownerElementType)
-        {
-            bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
-            bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
-            bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
-            bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
-            bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
-
-            if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
-            {
-                ownerElementType = null;
-                return null;
-            }
-
-            ownerElementType = elementType;
-
-            while (ownerElementType is not null)
-            {
-                var resolved = ownerElementType.ResolveOrThrow();
-
-                foreach (var method in resolved.Methods)
-                {
-                    if (string.Compare(method.Name, methodName, ignoreCaseFlag) != 0)
-                    {
-                        continue;
-                    }
-
-                    if (staticFlag != instanceFlag && staticFlag != method.IsStatic)
-                    {
-                        continue;
-                    }
-
-                    if (publicFlag != nonPublicFlag && publicFlag != method.IsPublic)
-                    {
-                        continue;
-                    }
-
-                    return method;
-                }
-
-                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
-            }
-
-            return null;
-        }
+        internal MethodDefinition FindMethodDeep(
+            TypeDefinition elementType, string methodName, MemberFlags flags, out TypeReference ownerElementType)
+            => _caches.FindMethod(elementType, methodName, flags, out ownerElementType);
 
         private bool IsCollection(TypeDefinition type) =>
-            TypeDefinitionExtensions.Equals(type, IListType) || type.DoesAnySubTypeImplementInterface(IListType);
+            TypeDefinitionExtensions.Equals(type, IListType) || DoesAnySubTypeImplementInterface(type, IListType);
 
         private bool IsDictionary(TypeDefinition type) =>
-            TypeDefinitionExtensions.Equals(type, IDictionaryType) || type.DoesAnySubTypeImplementInterface(IDictionaryType);
+            TypeDefinitionExtensions.Equals(type, IDictionaryType) || DoesAnySubTypeImplementInterface(type, IDictionaryType);
+
+        private bool IsSubclassOf(TypeDefinition type, TypeDefinition target)
+            => _caches.IsSubclassOf(type, target);
+
+        private bool DoesAnySubTypeImplementInterface(TypeDefinition type, TypeDefinition iface)
+            => _caches.DoesAnySubTypeImplementInterface(type, iface);
+
+        public bool IsAssignableFrom(TypeDefinition target, TypeDefinition source)
+        {
+            return target == source ||
+                   Equals(target, source) ||
+                   IsSubclassOf(source, target) ||
+                   target.IsInterface && DoesAnySubTypeImplementInterface(source, target);
+        }
 
         private static CustomAttribute GetCustomAttributeDeep(TypeDefinition type, string fullName)
         {
@@ -626,47 +437,47 @@ namespace OpenSilver.Compiler
 
         public bool IsDependencyObject(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, DependencyObjectType) || type.IsSubclassOf(DependencyObjectType);
+            return TypeDefinitionExtensions.Equals(type, DependencyObjectType) || IsSubclassOf(type, DependencyObjectType);
         }
 
         public bool IsApplication(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ApplicationType) || type.IsSubclassOf(ApplicationType);
+            return TypeDefinitionExtensions.Equals(type, ApplicationType) || IsSubclassOf(type, ApplicationType);
         }
 
         public bool IsResourceDictionary(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ResourceDictionaryType) || type.IsSubclassOf(ResourceDictionaryType);
+            return TypeDefinitionExtensions.Equals(type, ResourceDictionaryType) || IsSubclassOf(type, ResourceDictionaryType);
         }
 
         public bool IsStyle(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, StyleType) || type.IsSubclassOf(StyleType);
+            return TypeDefinitionExtensions.Equals(type, StyleType) || IsSubclassOf(type, StyleType);
         }
 
         public bool IsFrameworkTemplate(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, FrameworkTemplateType) || type.IsSubclassOf(FrameworkTemplateType);
+            return TypeDefinitionExtensions.Equals(type, FrameworkTemplateType) || IsSubclassOf(type, FrameworkTemplateType);
         }
 
         public bool IsDataTemplate(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, DataTemplateType) || type.IsSubclassOf(DataTemplateType);
+            return TypeDefinitionExtensions.Equals(type, DataTemplateType) || IsSubclassOf(type, DataTemplateType);
         }
 
         public bool IsControlTemplate(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ControlTemplateType) || type.IsSubclassOf(ControlTemplateType);
+            return TypeDefinitionExtensions.Equals(type, ControlTemplateType) || IsSubclassOf(type, ControlTemplateType);
         }
 
         public bool IsContentPresenter(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ContentPresenterType) || type.IsSubclassOf(ContentPresenterType);
+            return TypeDefinitionExtensions.Equals(type, ContentPresenterType) || IsSubclassOf(type, ContentPresenterType);
         }
 
         public bool IsContentControl(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, ContentControlType) || type.IsSubclassOf(ContentControlType);
+            return TypeDefinitionExtensions.Equals(type, ContentControlType) || IsSubclassOf(type, ContentControlType);
         }
 
         public bool IsRelativeSource(TypeDefinition type)
@@ -741,12 +552,12 @@ namespace OpenSilver.Compiler
 
         public bool IsIUIElement(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, IUIElementType) || type.DoesAnySubTypeImplementInterface(IUIElementType);
+            return TypeDefinitionExtensions.Equals(type, IUIElementType) || DoesAnySubTypeImplementInterface(type, IUIElementType);
         }
 
         public bool IsIFrameworkElement(TypeDefinition type)
         {
-            return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || type.DoesAnySubTypeImplementInterface(IFrameworkElementType);
+            return TypeDefinitionExtensions.Equals(type, IFrameworkElementType) || DoesAnySubTypeImplementInterface(type, IFrameworkElementType);
         }
 
         public bool IsFrameworkTemplateTemplateProperty(MemberReference memberReference)
@@ -758,7 +569,7 @@ namespace OpenSilver.Compiler
 
         public bool IsElementAMarkupExtension(TypeDefinition type)
         {
-            return type.DoesAnySubTypeImplementInterface(IMarkupExtensionType);
+            return DoesAnySubTypeImplementInterface(type, IMarkupExtensionType);
         }
 
         public string GetContentPropertyName(TypeDefinition type, IXmlLineInfo lineInfo)
@@ -807,9 +618,11 @@ namespace OpenSilver.Compiler
             }
         }
 
+        public bool IsEnum(TypeDefinition type) => _caches.IsEnum(type);
+
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
         {
-            return _typeReferenceHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
+            return _caches.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
         }
 
         public static bool HasTypeConverter(MemberReference member)
