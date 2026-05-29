@@ -39,6 +39,7 @@ namespace System.Windows.Controls
         /// The name of the ExpanderButton template part.
         /// </summary>
         private const string ElementExpanderButtonName = "ExpanderButton";
+        private const string WpfElementExpanderButtonName = "HeaderSite";
 
         /// <summary>
         /// The ExpanderButton template part is a templated ToggleButton that's used 
@@ -64,8 +65,11 @@ namespace System.Windows.Controls
 
                 if (_expanderButton != null)
                 {
-                    _expanderButton.IsChecked = IsExpanded;
-                    _expanderButton.Click += OnExpanderButtonClicked;
+                    if (!UseWpfBehavior)
+                    {
+                        _expanderButton.IsChecked = IsExpanded;
+                        _expanderButton.Click += OnExpanderButtonClicked;
+                    }
                 }
             }
         }
@@ -225,6 +229,22 @@ namespace System.Windows.Controls
         /// </summary>
         public event RoutedEventHandler Collapsed;
 
+        /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(Expander), new PropertyMetadata(false));
+
+        /// <summary>
+        /// When true, the Expander does not hook ToggleButton.Click (the IsChecked binding
+        /// in the template drives IsExpanded directly, matching WPF behavior).
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
+        }
+
         static Expander()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Expander), new PropertyMetadata(typeof(Expander)));
@@ -246,7 +266,8 @@ namespace System.Windows.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            ExpanderButton = GetTemplateChild(ElementExpanderButtonName) as ToggleButton;
+            string partName = UseWpfBehavior ? WpfElementExpanderButtonName : ElementExpanderButtonName;
+            ExpanderButton = GetTemplateChild(partName) as ToggleButton;
             Interaction.OnApplyTemplateBase();
         }
 
@@ -344,7 +365,7 @@ namespace System.Windows.Controls
         private void ToggleExpanded(RoutedEventHandler handler, RoutedEventArgs args)
         {
             ToggleButton expander = ExpanderButton;
-            if (expander != null)
+            if (expander != null && !UseWpfBehavior)
             {
                 expander.IsChecked = IsExpanded;
             }
