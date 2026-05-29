@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using Mono.Cecil;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -25,47 +24,6 @@ internal abstract partial class TypeReferenceHelper
         public override string Global => "global.";
 
         public override string Null => "null";
-
-        public override string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
-        {
-            Debug.Assert(enumType is not null && IsEnum(enumType));
-
-            name = name.Trim();
-
-            MemberFlags flags = ignoreCase ?
-                MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Static :
-                MemberFlags.Public | MemberFlags.Static;
-
-            MemberReference member = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
-                enumType,
-                name,
-                flags,
-                out _);
-
-            member ??= MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
-                enumType,
-                name,
-                MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
-                out _);
-
-            if (member is not null)
-            {
-                return $"{Global}{ConvertToString(enumType)}.{member.Name}";
-            }
-
-            if (allowIntegerValue)
-            {
-                if (long.TryParse(name, out long l))
-                {
-                    return $"enum<{Global}{ConvertToString(enumType)}> {l}";
-                }
-                if (ulong.TryParse(name, out ulong ul))
-                {
-                    return $"enum<{Global}{ConvertToString(enumType)}> {ul}";
-                }
-            }
-            return null;
-        }
 
         public override string GetTypeNameIncludingGenericArguments(TypeReference type, bool appendNamespace)
         {
@@ -103,11 +61,6 @@ internal abstract partial class TypeReferenceHelper
                 $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true)))}>");
 
             return result.ToString();
-        }
-
-        public override bool IsEnum(TypeDefinition type)
-        {
-            return base.IsEnum(type) || type.CustomAttributes.Any(attr => attr.AttributeType.FullName == "Microsoft.FSharp.Core.CompilationMappingAttribute");
         }
     }
 }

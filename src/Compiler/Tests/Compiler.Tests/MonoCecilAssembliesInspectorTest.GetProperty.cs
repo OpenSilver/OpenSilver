@@ -25,7 +25,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceProperty),
             MemberFlags.Public | MemberFlags.Instance,
@@ -44,7 +44,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.PublicStaticProperty),
             MemberFlags.Public | MemberFlags.Static,
@@ -63,7 +63,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.NonPublicInstanceProperty),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -82,7 +82,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.PublicStaticProperty),
             MemberFlags.Public | MemberFlags.Instance,
@@ -97,7 +97,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceProperty),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -112,7 +112,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(BaseClassWithMembers.InheritedPublicInstanceProperty),
             MemberFlags.Public | MemberFlags.Instance,
@@ -131,7 +131,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceProperty).ToUpperInvariant(),
             MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Instance,
@@ -150,7 +150,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceProperty),
             MemberFlags.Public | MemberFlags.NonPublic,
@@ -165,7 +165,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceProperty),
             MemberFlags.Static | MemberFlags.Instance,
@@ -180,7 +180,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+        var property = CreateMonoCecilInspector().FindPropertyDeep(
             type,
             "PropertyThatDoesNotExist",
             MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static | MemberFlags.Instance,

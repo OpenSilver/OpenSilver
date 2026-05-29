@@ -63,6 +63,9 @@ internal static class TypeDefinitionExtensions
         return false;
     }
 
+    public static bool Equals(TypeDefinition a, TypeDefinition b) =>
+        a.MetadataToken == b.MetadataToken && a.FullName == b.FullName;
+
     /// <summary>
     /// Returns true if type directly implements interfaceType.
     /// Does not test parent classes of type.
@@ -70,7 +73,7 @@ internal static class TypeDefinitionExtensions
     /// <param name="type"></param>
     /// <param name="interfaceType"></param>
     /// <returns></returns>
-    public static bool DoesSpecificTypeImplementInterface(this TypeDefinition type, TypeDefinition interfaceType)
+    private static bool DoesSpecificTypeImplementInterface(this TypeDefinition type, TypeDefinition interfaceType)
     {
         if (!interfaceType.IsInterface)
         {
@@ -95,7 +98,7 @@ internal static class TypeDefinitionExtensions
     /// <param name="type"></param>
     /// <param name="interfaceType"></param>
     /// <returns></returns>
-    public static bool DoesSpecificInterfaceImplementInterface(TypeDefinition type, TypeDefinition interfaceType)
+    private static bool DoesSpecificInterfaceImplementInterface(TypeDefinition type, TypeDefinition interfaceType)
     {
         if (!type.IsInterface)
         {
@@ -110,23 +113,11 @@ internal static class TypeDefinitionExtensions
     }
 
     /// <summary>
-    /// Is source type assignable to target type
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static bool IsAssignableFrom(this TypeDefinition target, TypeDefinition source)
-        => target == source
-          || Equals(target, source)
-          || source.IsSubclassOf(target)
-          || target.IsInterface && source.DoesAnySubTypeImplementInterface(target);
-
-    /// <summary>
     /// Enumerate the current type, it's parent and all the way to the top type
     /// </summary>
     /// <param name="classType"></param>
     /// <returns></returns>
-    public static IEnumerable<TypeDefinition> EnumerateBaseClasses(this TypeDefinition classType, bool skipSelf = false)
+    private static IEnumerable<TypeDefinition> EnumerateBaseClasses(this TypeDefinition classType, bool skipSelf = false)
     {
         if (classType == null)
         {
@@ -149,7 +140,4 @@ internal static class TypeDefinitionExtensions
             yield return td;
         }
     }
-
-    public static bool Equals(TypeDefinition a, TypeDefinition b) =>
-        a.MetadataToken == b.MetadataToken && a.FullName == b.FullName;
 }

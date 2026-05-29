@@ -13,22 +13,11 @@
 
 using Mono.Cecil;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Linq;
 
 namespace OpenSilver.Compiler;
-
-/// <summary>
-/// Signature of the static Find*Deep helpers exposed by <see cref="MonoCecilAssembliesInspectorImpl"/>.
-/// Defined at namespace scope so the inspector and the cache can share it without a cyclic
-/// reference and so static method-group conversions can be cached in <c>static readonly</c>
-/// fields (avoiding a per-call allocation).
-/// </summary>
-internal delegate T FindMemberDeepFunc<T>(
-    TypeDefinition elementType,
-    string name,
-    MemberFlags flags,
-    out TypeReference ownerElementType);
 
 /// <summary>
 /// Owns all per-compile memorization caches used by <see cref="MonoCecilAssembliesInspectorImpl"/>.
@@ -44,80 +33,60 @@ internal delegate T FindMemberDeepFunc<T>(
 /// </summary>
 internal sealed class MonoCecilLookupCache
 {
-    // Member-lookup caches. Keyed by (declaringType, name, flags). The owner TypeReference
-    // is captured alongside the member because Find*Deep walks the inheritance chain and
-    // returns the type where the member was actually defined.
+    private delegate T FindMemberDeepFunc<T>(
+        TypeDefinition elementType,
+        string name,
+        MemberFlags flags,
+        out TypeReference ownerElementType);
+
+    private readonly EnumHelper _enumHelper;
+
     private readonly ConcurrentDictionary<(TypeDefinition, string, MemberFlags), (PropertyDefinition Member, TypeReference Owner)> _propertyCache = [];
     private readonly ConcurrentDictionary<(TypeDefinition, string, MemberFlags), (FieldDefinition Member, TypeReference Owner)> _fieldCache = [];
     private readonly ConcurrentDictionary<(TypeDefinition, string, MemberFlags), (EventDefinition Member, TypeReference Owner)> _eventCache = [];
     private readonly ConcurrentDictionary<(TypeDefinition, string, MemberFlags), (MethodDefinition Member, TypeReference Owner)> _methodCache = [];
     private readonly ConcurrentDictionary<(TypeDefinition, string, bool, bool), string> _enumValueCache = [];
 
-    // Inheritance-walk caches. Each IsXxx predicate on the inspector ultimately calls one of
-    // these two primitives, which traverse the entire base-class chain (and for interfaces,
-    // every interface impl). On a single XAML file we see thousands of repeated walks over
-    // the same (type, target) pair; the cache turns those into O(1) lookups.
     private readonly ConcurrentDictionary<(TypeDefinition Source, TypeDefinition Target), bool> _isSubclassOfCache = [];
     private readonly ConcurrentDictionary<(TypeDefinition Source, TypeDefinition Interface), bool> _doesImplementInterfaceCache = [];
 
-    // Bundle of all caches above so Clear can reset them in a single loop.
-    private readonly IDictionary[] _all;
-
-    public MonoCecilLookupCache()
+    public MonoCecilLookupCache(SupportedLanguage language)
     {
-        _all =
-        [
-            _propertyCache,
-            _fieldCache,
-            _eventCache,
-            _methodCache,
-            _enumValueCache,
-            _isSubclassOfCache,
-            _doesImplementInterfaceCache,
-        ];
+        _enumHelper = EnumHelper.Create(this, language);
     }
 
     public void Clear()
     {
-        foreach (var c in _all)
-        {
-            c.Clear();
-        }
+        _propertyCache.Clear();
+        _fieldCache.Clear();
+        _eventCache.Clear();
+        _methodCache.Clear();
+        _enumValueCache.Clear();
+        _isSubclassOfCache.Clear();
+        _doesImplementInterfaceCache.Clear();
     }
 
-    public PropertyDefinition FindProperty(
-        TypeDefinition elementType, string name, MemberFlags flags,
-        FindMemberDeepFunc<PropertyDefinition> finder, out TypeReference ownerElementType)
-        => FindMember(_propertyCache, finder, elementType, name, flags, out ownerElementType);
+    public PropertyDefinition FindProperty(TypeDefinition elementType, string name, MemberFlags flags, out TypeReference ownerElementType)
+        => FindMember(_propertyCache, FindPropertyDeep, elementType, name, flags, out ownerElementType);
 
-    public FieldDefinition FindField(
-        TypeDefinition elementType, string name, MemberFlags flags,
-        FindMemberDeepFunc<FieldDefinition> finder, out TypeReference ownerElementType)
-        => FindMember(_fieldCache, finder, elementType, name, flags, out ownerElementType);
+    public FieldDefinition FindField(TypeDefinition elementType, string name, MemberFlags flags, out TypeReference ownerElementType)
+        => FindMember(_fieldCache, FindFieldDeep, elementType, name, flags, out ownerElementType);
 
-    public EventDefinition FindEvent(
-        TypeDefinition elementType, string name, MemberFlags flags,
-        FindMemberDeepFunc<EventDefinition> finder, out TypeReference ownerElementType)
-        => FindMember(_eventCache, finder, elementType, name, flags, out ownerElementType);
+    public EventDefinition FindEvent(TypeDefinition elementType, string name, MemberFlags flags, out TypeReference ownerElementType)
+        => FindMember(_eventCache, FindEventDeep, elementType, name, flags, out ownerElementType);
 
-    public MethodDefinition FindMethod(
-        TypeDefinition elementType, string name, MemberFlags flags,
-        FindMemberDeepFunc<MethodDefinition> finder, out TypeReference ownerElementType)
-        => FindMember(_methodCache, finder, elementType, name, flags, out ownerElementType);
+    public MethodDefinition FindMethod(TypeDefinition elementType, string name, MemberFlags flags, out TypeReference ownerElementType)
+        => FindMember(_methodCache, FindMethodDeep, elementType, name, flags, out ownerElementType);
 
-    public bool IsSubclassOf(
-        TypeDefinition type, TypeDefinition target,
-        Func<TypeDefinition, TypeDefinition, bool> compute)
-        => GetOrAddRelation(_isSubclassOfCache, compute, type, target);
+    public bool IsSubclassOf(TypeDefinition type, TypeDefinition target)
+        => GetOrAddRelation(_isSubclassOfCache, TypeDefinitionExtensions.IsSubclassOf, type, target);
 
-    public bool DoesAnySubTypeImplementInterface(
-        TypeDefinition type, TypeDefinition iface,
-        Func<TypeDefinition, TypeDefinition, bool> compute)
-        => GetOrAddRelation(_doesImplementInterfaceCache, compute, type, iface);
+    public bool DoesAnySubTypeImplementInterface(TypeDefinition type, TypeDefinition iface)
+        => GetOrAddRelation(_doesImplementInterfaceCache, TypeDefinitionExtensions.DoesAnySubTypeImplementInterface, type, iface);
 
-    public string GetEnumValue(
-        TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue,
-        Func<TypeDefinition, string, bool, bool, string> compute)
+    public bool IsEnum(TypeDefinition type) => _enumHelper.IsEnum(type);
+
+    public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
     {
         var key = (enumType, name, ignoreCase, allowIntegerValue);
         if (_enumValueCache.TryGetValue(key, out var cached))
@@ -125,7 +94,7 @@ internal sealed class MonoCecilLookupCache
             return cached;
         }
 
-        var result = compute(enumType, name, ignoreCase, allowIntegerValue);
+        var result = _enumHelper.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
         _enumValueCache.TryAdd(key, result);
         return result;
     }
@@ -133,7 +102,9 @@ internal sealed class MonoCecilLookupCache
     private static T FindMember<T>(
         ConcurrentDictionary<(TypeDefinition, string, MemberFlags), (T Member, TypeReference Owner)> cache,
         FindMemberDeepFunc<T> finder,
-        TypeDefinition elementType, string name, MemberFlags flags,
+        TypeDefinition elementType,
+        string name,
+        MemberFlags flags,
         out TypeReference ownerElementType) where T : class
     {
         if (elementType is null)
@@ -157,7 +128,8 @@ internal sealed class MonoCecilLookupCache
     private static bool GetOrAddRelation(
         ConcurrentDictionary<(TypeDefinition, TypeDefinition), bool> cache,
         Func<TypeDefinition, TypeDefinition, bool> compute,
-        TypeDefinition source, TypeDefinition target)
+        TypeDefinition source,
+        TypeDefinition target)
     {
         if (source is null || target is null)
         {
@@ -173,5 +145,397 @@ internal sealed class MonoCecilLookupCache
         bool result = compute(source, target);
         cache.TryAdd(key, result);
         return result;
+    }
+
+    private static PropertyDefinition FindPropertyDeep(
+        TypeDefinition elementType,
+        string propertyName,
+        MemberFlags flags,
+        out TypeReference ownerElementType)
+    {
+        bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+        bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+        bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+        bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+        bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+        if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+        {
+            ownerElementType = null;
+            return null;
+        }
+
+        ownerElementType = elementType;
+
+        while (ownerElementType is not null)
+        {
+            var resolved = ownerElementType.ResolveOrThrow();
+
+            foreach (var property in resolved.Properties)
+            {
+                if (string.Compare(property.Name, propertyName, ignoreCaseFlag) != 0)
+                {
+                    continue;
+                }
+
+                if (staticFlag != instanceFlag && staticFlag != IsStatic(property))
+                {
+                    continue;
+                }
+
+                if (publicFlag != nonPublicFlag && publicFlag != IsPublic(property))
+                {
+                    continue;
+                }
+
+                return property;
+            }
+
+            ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+        }
+
+        return null;
+
+        static bool IsStatic(PropertyDefinition property)
+        {
+            return property.GetMethod is not null && property.GetMethod.IsStatic ||
+                   property.SetMethod is not null && property.SetMethod.IsStatic;
+        }
+
+        static bool IsPublic(PropertyDefinition property)
+        {
+            return property.GetMethod is not null && property.GetMethod.IsPublic ||
+                   property.SetMethod is not null && property.SetMethod.IsPublic;
+        }
+    }
+
+    private static FieldDefinition FindFieldDeep(
+        TypeDefinition elementType,
+        string name,
+        MemberFlags flags,
+        out TypeReference ownerElementType)
+    {
+        bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+        bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+        bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+        bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+        bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+        if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+        {
+            ownerElementType = null;
+            return null;
+        }
+
+        ownerElementType = elementType;
+
+        while (ownerElementType is not null)
+        {
+            var resolved = ownerElementType.ResolveOrThrow();
+
+            foreach (var field in resolved.Fields)
+            {
+                if (string.Compare(field.Name, name, ignoreCaseFlag) != 0)
+                {
+                    continue;
+                }
+
+                if (staticFlag != instanceFlag && staticFlag != field.IsStatic)
+                {
+                    continue;
+                }
+
+                if (publicFlag != nonPublicFlag && publicFlag != field.IsPublic)
+                {
+                    continue;
+                }
+
+                return field;
+            }
+
+            ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+        }
+
+        return null;
+    }
+
+    private static EventDefinition FindEventDeep(
+        TypeDefinition elementType,
+        string eventName,
+        MemberFlags flags,
+        out TypeReference ownerElementType)
+    {
+        bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+        bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+        bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+        bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+        bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+        if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+        {
+            ownerElementType = null;
+            return null;
+        }
+
+        ownerElementType = elementType;
+
+        while (ownerElementType is not null)
+        {
+            var resolved = ownerElementType.ResolveOrThrow();
+
+            foreach (var eventDefinition in resolved.Events)
+            {
+                if (string.Compare(eventDefinition.Name, eventName, ignoreCaseFlag) != 0)
+                {
+                    continue;
+                }
+
+                if (staticFlag != instanceFlag && staticFlag != IsStatic(eventDefinition))
+                {
+                    continue;
+                }
+
+                if (publicFlag != nonPublicFlag && publicFlag != IsPublic(eventDefinition))
+                {
+                    continue;
+                }
+
+                return eventDefinition;
+            }
+
+            ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+        }
+
+        return null;
+
+        static bool IsStatic(EventDefinition eventDefinition)
+        {
+            return eventDefinition.AddMethod is not null && eventDefinition.AddMethod.IsStatic ||
+                   eventDefinition.RemoveMethod is not null && eventDefinition.RemoveMethod.IsStatic;
+        }
+
+        static bool IsPublic(EventDefinition eventDefinition)
+        {
+            return eventDefinition.AddMethod is not null && eventDefinition.AddMethod.IsPublic ||
+                   eventDefinition.RemoveMethod is not null && eventDefinition.RemoveMethod.IsPublic;
+        }
+    }
+
+    private static MethodDefinition FindMethodDeep(
+        TypeDefinition elementType,
+        string methodName,
+        MemberFlags flags,
+        out TypeReference ownerElementType)
+    {
+        bool ignoreCaseFlag = TestMemberFlag(flags, MemberFlags.IgnoreCase);
+        bool staticFlag = TestMemberFlag(flags, MemberFlags.Static);
+        bool instanceFlag = TestMemberFlag(flags, MemberFlags.Instance);
+        bool publicFlag = TestMemberFlag(flags, MemberFlags.Public);
+        bool nonPublicFlag = TestMemberFlag(flags, MemberFlags.NonPublic);
+
+        if ((!staticFlag && !instanceFlag) || (!publicFlag && !nonPublicFlag))
+        {
+            ownerElementType = null;
+            return null;
+        }
+
+        ownerElementType = elementType;
+
+        while (ownerElementType is not null)
+        {
+            var resolved = ownerElementType.ResolveOrThrow();
+
+            foreach (var method in resolved.Methods)
+            {
+                if (string.Compare(method.Name, methodName, ignoreCaseFlag) != 0)
+                {
+                    continue;
+                }
+
+                if (staticFlag != instanceFlag && staticFlag != method.IsStatic)
+                {
+                    continue;
+                }
+
+                if (publicFlag != nonPublicFlag && publicFlag != method.IsPublic)
+                {
+                    continue;
+                }
+
+                return method;
+            }
+
+            ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+        }
+
+        return null;
+    }
+
+    private static bool TestMemberFlag(MemberFlags flags, MemberFlags value) => (flags & value) == value;
+
+    private abstract partial class EnumHelper
+    {
+        private sealed class EnumHelperCS : EnumHelper
+        {
+            private readonly MonoCecilLookupCache _cache;
+
+            public EnumHelperCS(MonoCecilLookupCache cache)
+            {
+                _cache = cache;
+            }
+
+            public override string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+            {
+                Debug.Assert(enumType is not null && IsEnum(enumType));
+
+                name = name.Trim();
+
+                MemberFlags flags = ignoreCase ?
+                    MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Static :
+                    MemberFlags.Public | MemberFlags.Static;
+
+                var field = _cache.FindField(
+                    enumType,
+                    name,
+                    flags,
+                    out _);
+
+                if (field is not null)
+                {
+                    return $"global::{TypeReferenceHelper.CSharp.ConvertToString(enumType)}.{field.Name}";
+                }
+                if (allowIntegerValue)
+                {
+                    if (long.TryParse(name, out long l))
+                    {
+                        return $"(global::{TypeReferenceHelper.CSharp.ConvertToString(enumType)}){l}";
+                    }
+                    if (ulong.TryParse(name, out ulong ul))
+                    {
+                        return $"(global::{TypeReferenceHelper.CSharp.ConvertToString(enumType)}){ul}";
+                    }
+                }
+                return null;
+            }
+        }
+
+        private sealed class EnumHelperVB : EnumHelper
+        {
+            private readonly MonoCecilLookupCache _cache;
+
+            public EnumHelperVB(MonoCecilLookupCache cache)
+            {
+                _cache = cache;
+            }
+
+            public override string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+            {
+                Debug.Assert(enumType is not null && IsEnum(enumType));
+
+                name = name.Trim();
+
+                MemberFlags flags = ignoreCase ?
+                    MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Static :
+                    MemberFlags.Public | MemberFlags.Static;
+
+                var field = _cache.FindField(
+                    enumType,
+                    name,
+                    flags,
+                    out _);
+
+                if (field is not null)
+                {
+                    return $"Global.{TypeReferenceHelper.VisualBasic.ConvertToString(enumType)}.{field.Name}";
+                }
+                if (allowIntegerValue)
+                {
+                    if (long.TryParse(name, out long l))
+                    {
+                        return $"CType({l}, Global.{TypeReferenceHelper.VisualBasic.ConvertToString(enumType)})";
+                    }
+                    if (ulong.TryParse(name, out ulong ul))
+                    {
+                        return $"CType({ul}, Global.{TypeReferenceHelper.VisualBasic.ConvertToString(enumType)})";
+                    }
+                }
+                return null;
+            }
+        }
+
+        private sealed class EnumHelperFS : EnumHelper
+        {
+            private readonly MonoCecilLookupCache _cache;
+
+            public EnumHelperFS(MonoCecilLookupCache cache)
+            {
+                _cache = cache;
+            }
+
+            public override string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+            {
+                Debug.Assert(enumType is not null && IsEnum(enumType));
+
+                name = name.Trim();
+
+                MemberFlags flags = ignoreCase ?
+                    MemberFlags.IgnoreCase | MemberFlags.Public | MemberFlags.Static :
+                    MemberFlags.Public | MemberFlags.Static;
+
+                MemberReference member = _cache.FindField(
+                    enumType,
+                    name,
+                    flags,
+                    out _);
+
+                member ??= _cache.FindProperty(
+                    enumType,
+                    name,
+                    MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static,
+                    out _);
+
+                if (member is not null)
+                {
+                    return $"global.{TypeReferenceHelper.FSharp.ConvertToString(enumType)}.{member.Name}";
+                }
+
+                if (allowIntegerValue)
+                {
+                    if (long.TryParse(name, out long l))
+                    {
+                        return $"enum<global.{TypeReferenceHelper.FSharp.ConvertToString(enumType)}> {l}";
+                    }
+                    if (ulong.TryParse(name, out ulong ul))
+                    {
+                        return $"enum<global.{TypeReferenceHelper.FSharp.ConvertToString(enumType)}> {ul}";
+                    }
+                }
+                return null;
+            }
+
+            public override bool IsEnum(TypeDefinition type)
+            {
+                return base.IsEnum(type) || type.CustomAttributes.Any(attr => attr.AttributeType.FullName == "Microsoft.FSharp.Core.CompilationMappingAttribute");
+            }
+        }
+
+        public static EnumHelper Create(MonoCecilLookupCache cache, SupportedLanguage language)
+        {
+            return language switch
+            {
+                SupportedLanguage.CSharp => new EnumHelperCS(cache),
+                SupportedLanguage.VBNet => new EnumHelperVB(cache),
+                SupportedLanguage.FSharp => new EnumHelperFS(cache),
+                _ => throw new InvalidCompilerTypeException(),
+            };
+        }
+
+        public abstract string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue);
+
+        public virtual bool IsEnum(TypeDefinition type)
+        {
+            Debug.Assert(type is not null);
+            return type.IsEnum;
+        }
     }
 }

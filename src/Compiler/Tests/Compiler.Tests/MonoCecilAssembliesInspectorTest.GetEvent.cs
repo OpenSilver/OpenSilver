@@ -25,7 +25,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceEvent),
             MemberFlags.Public | MemberFlags.Instance,
@@ -44,7 +44,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(ClassWithMembers.PublicStaticEvent),
             MemberFlags.Public | MemberFlags.Static,
@@ -63,7 +63,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(ClassWithMembers.NonPublicInstanceEvent),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -82,7 +82,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceEvent),
             MemberFlags.NonPublic | MemberFlags.Instance,
@@ -97,7 +97,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(ClassWithMembers.PublicStaticEvent),
             MemberFlags.Public | MemberFlags.Instance,
@@ -112,7 +112,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(BaseClassWithMembers.InheritedPublicInstanceEvent),
             MemberFlags.Public | MemberFlags.Instance,
@@ -131,7 +131,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceEvent),
             MemberFlags.Public | MemberFlags.NonPublic,
@@ -146,7 +146,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             nameof(ClassWithMembers.PublicInstanceEvent),
             MemberFlags.Static | MemberFlags.Instance,
@@ -161,7 +161,7 @@ public partial class MonoCecilAssembliesInspectorTest
     {
         var type = GetClassWithMembersType();
 
-        var eventDefinition = MonoCecilAssembliesInspectorImpl.FindEventDeep(
+        var eventDefinition = CreateMonoCecilInspector().FindEventDeep(
             type,
             "EventThatDoesNotExist",
             MemberFlags.Public | MemberFlags.NonPublic | MemberFlags.Static | MemberFlags.Instance,

@@ -48,7 +48,7 @@ namespace OpenSilver.Compiler
             }
 
             var type = GetTypeDefinition(namespaceName, typeName, assemblyName, lineInfo);
-            var property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+            var property = _monoCecilVersion.FindPropertyDeep(
                 type,
                 "Template",
                 MemberFlags.Public | MemberFlags.Instance,
@@ -141,15 +141,20 @@ namespace OpenSilver.Compiler
         public TypeDefinition GetKnownTypeDefinition(string namespaceName, string typeName, string assemblyName)
             => _monoCecilVersion.GetKnownType(namespaceName, typeName, assemblyName);
 
+        public bool IsEnum(TypeDefinition type) => _monoCecilVersion.IsEnum(type);
+
         public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
             => _monoCecilVersion.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
 
         public IEnumerable<string> GetEnumValues(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue, IXmlLineInfo lineInfo)
             => _monoCecilVersion.GetEnumValues(enumType, name, ignoreCase, allowIntegerValue, lineInfo);
 
+        public bool IsAssignableFrom(TypeDefinition target, TypeDefinition source)
+            => _monoCecilVersion.IsAssignableFrom(target, source);
+
         public (FieldDefinition Field, TypeReference DeclaringType) GetField(TypeDefinition type, string name, MemberFlags flags)
         {
-            FieldDefinition field = MonoCecilAssembliesInspectorImpl.FindFieldDeep(
+            FieldDefinition field = _monoCecilVersion.FindFieldDeep(
                 type, name, flags, out TypeReference declaringType);
 
             return (field, declaringType);
@@ -157,17 +162,17 @@ namespace OpenSilver.Compiler
 
         public (PropertyDefinition Property, TypeReference DeclaringType) GetProperty(TypeDefinition type, string name, MemberFlags flags)
         {
-            PropertyDefinition property = MonoCecilAssembliesInspectorImpl.FindPropertyDeep(
+            PropertyDefinition property = _monoCecilVersion.FindPropertyDeep(
                 type, name, flags, out TypeReference declaringType);
 
             return (property, declaringType);
         }
 
         public EventDefinition GetEvent(TypeDefinition type, string eventName, MemberFlags flags)
-            => MonoCecilAssembliesInspectorImpl.FindEventDeep(type, eventName, flags, out _);
+            => _monoCecilVersion.FindEventDeep(type, eventName, flags, out _);
 
         public MethodDefinition GetMethod(TypeDefinition type, string methodName, MemberFlags flags)
-            => MonoCecilAssembliesInspectorImpl.FindMethodDeep(type, methodName, flags, out _);
+            => _monoCecilVersion.FindMethodDeep(type, methodName, flags, out _);
 
         public bool HasTypeConverter(MemberReference member) => MonoCecilAssembliesInspectorImpl.HasTypeConverter(member);
 
