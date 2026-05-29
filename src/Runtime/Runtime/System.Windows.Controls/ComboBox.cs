@@ -16,6 +16,8 @@ using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -46,6 +48,11 @@ namespace System.Windows.Controls
         private const string DropDownToggleTemplateName = "DropDownToggle";
         private const string ScrollViewerTemplateName = "ScrollViewer";
         private const string FocusedDropDownState = "FocusedDropDown";
+
+        private const string WpfContentPresenterName = "contentPresenter";
+        private const string WpfPopupName = "PART_Popup";
+        private const string WpfToggleButtonName = "toggleButton";
+        private const string WpfScrollViewerName = "DropDownScrollViewer";
 
         private Popup _popup;
         private UIElement _popupChild;
@@ -95,7 +102,7 @@ namespace System.Windows.Controls
             string stringFormat;
 
             int index = InternalSelectedIndex;
-            if (index <= -1 || (IsDropDownOpen && item is FrameworkElement))
+            if (index <= -1 || (!UseWpfBehavior && IsDropDownOpen && item is FrameworkElement))
             {
                 item = _emptyContent;
                 itemTemplate = null;
@@ -118,6 +125,19 @@ namespace System.Windows.Controls
                     stringFormat = ItemStringFormat;
                 }
 
+                // When dropdown is open and the content is a UIElement, it can't be in two places.
+                // In WPF mode, use a VisualBrush to paint a copy in the display area.
+                // In SL mode, show empty content (original behavior).
+                if (IsDropDownOpen && UseWpfBehavior && content is FrameworkElement fe)
+                {
+                    content = selectionBoxItem = new Rectangle
+                    {
+                        Width = fe.ActualWidth,
+                        Height = fe.ActualHeight,
+                        Fill = new VisualBrush(fe),
+                    };
+                    template = selectionBoxItemTemplate = null;
+                }
                 itemTemplateSelector = ItemTemplateSelector;
             }
 
@@ -158,11 +178,13 @@ namespace System.Windows.Controls
             }
 
             // _scrollHost must be set before calling base
-            _scrollHost = GetTemplateChild(ScrollViewerTemplateName) as ScrollViewer;
+            string scrollViewerName = UseWpfBehavior ? WpfScrollViewerName : ScrollViewerTemplateName;
+            _scrollHost = GetTemplateChild(scrollViewerName) as ScrollViewer;
 
             base.OnApplyTemplate();
 
-            _popup = GetTemplateChild(PopupTemplateName) as Popup;
+            string popupName = UseWpfBehavior ? WpfPopupName : PopupTemplateName;
+            _popup = GetTemplateChild(popupName) as Popup;
 
             //this will enable virtualization in combo box without templating the whole style
             if (_popup != null)
@@ -185,7 +207,8 @@ namespace System.Windows.Controls
                 }
             }
 
-            _contentPresenter = GetTemplateChild(ContentPresenterTemplateName) as ContentPresenter;
+            string contentPresenterName = UseWpfBehavior ? WpfContentPresenterName : ContentPresenterTemplateName;
+            _contentPresenter = GetTemplateChild(contentPresenterName) as ContentPresenter;
             if (_contentPresenter != null)
             {
                 if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
@@ -196,7 +219,8 @@ namespace System.Windows.Controls
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
             }
 
-            _dropDownToggle = GetTemplateChild(DropDownToggleTemplateName) as ToggleButton;
+            string toggleName = UseWpfBehavior ? WpfToggleButtonName : DropDownToggleTemplateName;
+            _dropDownToggle = GetTemplateChild(toggleName) as ToggleButton;
             if (_dropDownToggle != null)
             {
                 _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
@@ -808,6 +832,22 @@ namespace System.Windows.Controls
         {
             get { return (bool)GetValue(IsSelectionBoxHighlightedProperty); }
             private set { SetValueInternal(IsSelectionBoxHighlightedProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseWpfBehaviorProperty =
+            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(ComboBox), new PropertyMetadata(false));
+
+        /// <summary>
+        /// When true, the ComboBox keeps showing the selected item (via VisualBrush)
+        /// when the dropdown is open, matching WPF behavior.
+        /// </summary>
+        public bool UseWpfBehavior
+        {
+            get { return (bool)GetValue(UseWpfBehaviorProperty); }
+            set { SetValue(UseWpfBehaviorProperty, value); }
         }
 
         internal override void UpdateVisualStates(bool useTransitions)
