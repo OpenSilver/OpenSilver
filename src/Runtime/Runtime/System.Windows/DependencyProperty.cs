@@ -817,82 +817,112 @@ namespace System.Windows
         /// </returns>
         public PropertyMetadata GetMetadata(DependencyObjectType dependencyObjectType)
         {
+            if (dependencyObjectType == null)
+            {
+                return DefaultMetadata;
+            }
+
+            // Fast path: check if we have cached metadata for this type
+            if (dependencyObjectType.TryGetCachedMetadata(this, out PropertyMetadata cachedMetadata))
+            {
+                return cachedMetadata;
+            }
+
+            // Before caching, ensure the static constructor has run for this type.
+            // This guarantees that any OverrideMetadata calls in the static constructor
+            // have been executed, so we cache the correct metadata.
+            // Without this, we might cache metadata before overrides are registered,
+            // and then return stale cached metadata forever.
+            RuntimeHelpers.RunClassConstructor(dependencyObjectType.SystemType.TypeHandle);
+
+            // Slow path: compute the metadata and cache it
+            PropertyMetadata result = GetMetadataUncached(dependencyObjectType);
+            
+            // Cache the result for future lookups
+            dependencyObjectType.SetCachedMetadata(this, result);
+            
+            return result;
+        }
+
+        /// <summary>
+        /// Internal method that performs the actual metadata lookup without caching.
+        /// </summary>
+        private PropertyMetadata GetMetadataUncached(DependencyObjectType dependencyObjectType)
+        {
             // All static constructors for this DType and all base types have already
             // been run. If no overriden metadata was provided, then look up base types.
             // If no metadata found on base types, then return default
 
-            if (null != dependencyObjectType)
+            // Do we in fact have any overrides at all?
+            int index = _metadataMap.Count - 1;
+            int Id;
+            object value;
+
+            if (index < 0)
             {
-                // Do we in fact have any overrides at all?
-                int index = _metadataMap.Count - 1;
-                int Id;
-                object value;
+                // No overrides or it's the base class
+                return DefaultMetadata;
+            }
+            else if (index == 0)
+            {
+                // Only 1 override
+                _metadataMap.GetKeyValuePair(index, out Id, out value);
 
-                if (index < 0)
+                // If there is overriden metadata, then there is a base class with
+                // lower or equal Id of this class, or this class is already a base class
+                // of the overridden one. Therefore dependencyObjectType won't ever
+                // become null before we exit the while loop
+                while (dependencyObjectType.Id > Id)
                 {
-                    // No overrides or it's the base class
-                    return DefaultMetadata;
+                    dependencyObjectType = dependencyObjectType.BaseType;
                 }
-                else if (index == 0)
+
+                if (Id == dependencyObjectType.Id)
                 {
-                    // Only 1 override
-                    _metadataMap.GetKeyValuePair(index, out Id, out value);
-
-                    // If there is overriden metadata, then there is a base class with
-                    // lower or equal Id of this class, or this class is already a base class
-                    // of the overridden one. Therefore dependencyObjectType won't ever
-                    // become null before we exit the while loop
-                    while (dependencyObjectType.Id > Id)
-                    {
-                        dependencyObjectType = dependencyObjectType.BaseType;
-                    }
-
-                    if (Id == dependencyObjectType.Id)
-                    {
-                        // Return the override
-                        return (PropertyMetadata)value;
-                    }
-                    // Return default metadata
+                    // Return the override
+                    return (PropertyMetadata)value;
                 }
-                else
+                // Return default metadata
+            }
+            else
+            {
+                // We have more than 1 override for this class, so we will have to loop through
+                // both the overrides and the class Id
+                if (0 != dependencyObjectType.Id)
                 {
-                    // We have more than 1 override for this class, so we will have to loop through
-                    // both the overrides and the class Id
-                    if (0 != dependencyObjectType.Id)
+                    do
                     {
-                        do
+                        // Get the Id of the most derived class with overridden metadata
+                        _metadataMap.GetKeyValuePair(index, out Id, out value);
+                        --index;
+
+                        // If the Id of this class is less than the override, then look for an override
+                        // with an equal or lower Id until we run out of overrides
+                        while ((dependencyObjectType.Id < Id) && (index >= 0))
                         {
-                            // Get the Id of the most derived class with overridden metadata
                             _metadataMap.GetKeyValuePair(index, out Id, out value);
                             --index;
-
-                            // If the Id of this class is less than the override, then look for an override
-                            // with an equal or lower Id until we run out of overrides
-                            while ((dependencyObjectType.Id < Id) && (index >= 0))
-                            {
-                                _metadataMap.GetKeyValuePair(index, out Id, out value);
-                                --index;
-                            }
-
-                            // If there is overriden metadata, then there is a base class with
-                            // lower or equal Id of this class, or this class is already a base class
-                            // of the overridden one. Therefore dependencyObjectType won't ever
-                            // become null before we exit the while loop
-                            while (dependencyObjectType.Id > Id)
-                            {
-                                dependencyObjectType = dependencyObjectType.BaseType;
-                            }
-
-                            if (Id == dependencyObjectType.Id)
-                            {
-                                // Return the override
-                                return (PropertyMetadata)value;
-                            }
                         }
-                        while (index >= 0);
+
+                        // If there is overriden metadata, then there is a base class with
+                        // lower or equal Id of this class, or this class is already a base class
+                        // of the overridden one. Therefore dependencyObjectType won't ever
+                        // become null before we exit the while loop
+                        while (dependencyObjectType.Id > Id)
+                        {
+                            dependencyObjectType = dependencyObjectType.BaseType;
+                        }
+
+                        if (Id == dependencyObjectType.Id)
+                        {
+                            // Return the override
+                            return (PropertyMetadata)value;
+                        }
                     }
+                    while (index >= 0);
                 }
             }
+
             return DefaultMetadata;
         }
 
