@@ -228,10 +228,10 @@ namespace System.Windows.Controls
 
         /// <summary>
         /// Gets or sets a value that indicates whether the <see cref="ContentPresenter"/> should 
-        /// use AccessText in its style.
+        /// use <see cref="AccessText"/> in its style.
         /// </summary>
         /// <returns>
-        /// <see langword="true"/> if the <see cref="ContentPresenter"/> should use AccessText in 
+        /// <see langword="true"/> if the <see cref="ContentPresenter"/> should use <see cref="AccessText"/> in 
         /// its style; otherwise, <see langword="false"/>. The default is <see langword="false"/>.
         /// </returns>
         [OpenSilver.NotImplemented]
@@ -753,7 +753,10 @@ namespace System.Windows.Controls
                     return null;
                 }
 
-                var textBlock = new TextBlock();
+                var textBlock = container.RecognizesAccessKey
+                    ? new AccessText()
+                    : new TextBlock();
+
                 textBlock.SetTemplatedParent(new(container));
                 textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
 

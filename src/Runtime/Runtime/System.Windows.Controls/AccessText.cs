@@ -11,11 +11,62 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
+using System.Windows.Markup;
+
 namespace System.Windows.Controls;
 
-internal class AccessText : FrameworkElement
+/// <summary>
+/// Specifies with an underscore the character that is used as the access key.
+/// </summary>
+[ContentProperty(nameof(Text))]
+[NotImplemented]
+public class AccessText : TextBlock // FrameworkElement, IAddChild
 {
+    // Defines the character to be used in front of the access key
     internal const char AccessKeyMarker = '_';
+
+    // Cached character that immediately followed the (first non-escaped) underscore in the
+    // most recently assigned value, before stripping.
+    private char _accessKey;
+
+    static AccessText()
+    {
+        TextProperty.OverrideMetadata(
+            typeof(AccessText),
+            new FrameworkPropertyMetadata(
+                string.Empty,
+                FrameworkPropertyMetadataOptions.AffectsMeasure,
+                null,
+                CoerceAccessText));
+    }
+
+    /// <summary>
+    /// Provides read-only access to the character that follows the first underline character.
+    /// </summary>
+    public char AccessKey => _accessKey;
+
+    private static object CoerceAccessText(DependencyObject d, object baseValue)
+    {
+        var accessText = (AccessText)d;
+        return accessText.ParseAccessKey((string)baseValue);
+    }
+
+    private string ParseAccessKey(string text)
+    {
+        _accessKey = '\0';
+
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        int markerIndex = FindAccessKeyMarker(text);
+        if (markerIndex >= 0 && markerIndex + 1 < text.Length)
+        {
+            _accessKey = text[markerIndex + 1];
+        }
+
+        return RemoveAccessKeyMarker(text);
+    }
 
     // Returns the index of _ marker.
     // _ can be escaped by double _

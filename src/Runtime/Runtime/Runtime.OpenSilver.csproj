@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
@@ -907,6 +907,7 @@
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollection.cs" />
     <Compile Include="System.Windows.Controls\ComboBox.cs" />
     <Compile Include="System.Windows.Controls\ComboBoxItem.cs" />
+    <Compile Include="System.Windows.Controls\AccessText.cs" />
     <Compile Include="System.Windows.Controls\ContentControl.cs" />
     <Compile Include="System.Windows.Controls\ContentPresenter.cs" />
     <Compile Include="System.Windows.Controls\ContextMenuEventArgs.cs" />
