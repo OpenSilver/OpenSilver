@@ -22,6 +22,7 @@ namespace OpenSilver.Internal.Data;
 internal abstract class PropertyPathNode : IPropertyPathNode
 {
     private ICollectionView _icv;
+    private bool _isBroken = true;
 
     protected PropertyPathNode(BindingExpression listener)
     {
@@ -34,7 +35,15 @@ internal abstract class PropertyPathNode : IPropertyPathNode
 
     public object Value { get; set; } = DependencyProperty.UnsetValue;
 
-    public bool IsBroken { get; private set; } = true;
+    public bool IsBroken
+    {
+        get => _isBroken;
+        private set
+        {
+            _isBroken = value;
+            Listener.SetStatus(_isBroken ? BindingStatus.PathError : BindingStatus.Active);
+        }
+    }
 
     public IPropertyPathNode Next { get; set; }
 

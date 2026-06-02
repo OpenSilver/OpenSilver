@@ -15,11 +15,13 @@ using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 using System.Diagnostics;
 using System.Globalization;
-using System.Windows.Input;
 using System.Windows.Markup;
 
 namespace System.Windows.Data;
 
+/// <summary>
+/// Represents the base class for <see cref="BindingExpression"/>, and <see cref="MultiBindingExpression"/>.
+/// </summary>
 public abstract class BindingExpressionBase : Expression
 {
     [Flags]
@@ -68,6 +70,8 @@ public abstract class BindingExpressionBase : Expression
     private PropertyChangeListener _languageChangedListener;
     private object _culture = DefaultValueObject;
 
+    private BindingStatus _status;
+
     internal BindingExpressionBase(BindingBase binding, BindingExpressionBase parent)
     {
         ParentBindingBase = binding;
@@ -79,6 +83,14 @@ public abstract class BindingExpressionBase : Expression
     /// <summary> Create an untargeted BindingExpression </summary>
     internal static BindingExpressionBase CreateUntargetedBindingExpression(DependencyObject d, BindingBase binding) =>
         binding.CreateBindingExpression(d, NoTargetProperty, null);
+
+    /// <summary>
+    /// Gets the status of the binding expression.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="BindingStatus"/> value that describes the status of the binding expression.
+    /// </returns>
+    public BindingStatus Status => _status;
 
     /// <summary>
     /// Gets the <see cref="BindingBase"/> object from which this <see cref="BindingExpressionBase"/> object is created.
@@ -123,6 +135,9 @@ public abstract class BindingExpressionBase : Expression
         get => TestFlag(PrivateFlags.iDetaching);
         private set => ChangeFlag(PrivateFlags.iDetaching, value);
     }
+
+    /// <summary> True if this binding expression is detached </summary>
+    internal bool IsDetached => _status == BindingStatus.Detached;
 
     /// <summary> True if this binding expression updates the target </summary>
     internal bool IsDynamic =>
@@ -267,6 +282,8 @@ public abstract class BindingExpressionBase : Expression
         Target = d;
         TargetProperty = dp;
 
+        SetStatus(BindingStatus.Unattached);
+
         DetermineEffectiveValidatesOnNotifyDataErrors();
 
         if (UsesLanguage)
@@ -301,17 +318,11 @@ public abstract class BindingExpressionBase : Expression
     /// </summary>
     internal virtual void DetachOverride()
     {
-        if (_languageChangedListener != null)
-        {
-            _languageChangedListener.Dispose();
-            _languageChangedListener = null;
-        }
+        _languageChangedListener?.Dispose();
+        _languageChangedListener = null;
 
-        if (_targetPropertyListener != null)
-        {
-            _targetPropertyListener.Dispose();
-            _targetPropertyListener = null;
-        }
+        _targetPropertyListener?.Dispose();
+        _targetPropertyListener = null;
 
         if (IsUpdateOnLostFocus && Target is UIElement uie)
         {
@@ -322,7 +333,10 @@ public abstract class BindingExpressionBase : Expression
         TargetProperty = null;
 
         _flags = _defaultFlags;
+        SetStatus(BindingStatus.Detached);
     }
+
+    internal void SetStatus(BindingStatus status) => _status = status;
 
     private void OnLanguageChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => InvalidateCulture();
 
@@ -346,6 +360,17 @@ public abstract class BindingExpressionBase : Expression
     }
 
     private bool IsTargetFocused() => Target is UIElement uie && uie.IsKeyboardFocusWithin;
+
+    internal bool Validate(object value)
+    {
+        if (value == DependencyProperty.UnsetValue)
+        {
+            SetStatus(BindingStatus.UpdateSourceError);
+            return false;
+        }
+
+        return true;
+    }
 
     internal virtual void Update() { }
 

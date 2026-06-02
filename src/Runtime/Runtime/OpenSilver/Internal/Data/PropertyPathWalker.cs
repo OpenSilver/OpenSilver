@@ -40,8 +40,6 @@ internal sealed class PropertyPathWalker
         }
     }
 
-    internal bool IsEmpty => _head is SourcePropertyNode;
-
     internal IPropertyPathNode FinalNode => _tail;
 
     internal bool IsPathBroken

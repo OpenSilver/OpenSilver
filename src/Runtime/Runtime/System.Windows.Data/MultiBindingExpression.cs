@@ -99,21 +99,29 @@ public sealed class MultiBindingExpression : BindingExpressionBase
 
     internal override void Update()
     {
-        if (!NeedsUpdate || !IsReflective || IsInTransfer)
+        if (!NeedsUpdate || !IsReflective || IsInTransfer || Status == BindingStatus.Unattached)
         {
             return;
+        }
+
+        if (Status == BindingStatus.UpdateSourceError)
+        {
+            SetStatus(BindingStatus.Active);
         }
 
         object value = GetRawProposedValue();
 
         value = ConvertProposedValue(value);
-
-        if (value == DependencyProperty.UnsetValue)
+        if (!Validate(value))
         {
             return;
         }
 
-        UpdateSource(value);
+        value = UpdateSource(value);
+        if (!Validate(value))
+        {
+            return;
+        }
     }
 
     private object GetRawProposedValue() => Target.GetValue(TargetProperty);
@@ -135,8 +143,15 @@ public sealed class MultiBindingExpression : BindingExpressionBase
     {
         result = GetValuesForChildBindings(value);
 
+        if (IsDetached)
+        {
+            return false;   // user code detached the binding.  give up.
+        }
+
         if (result == DependencyProperty.UnsetValue)
         {
+            SetStatus(BindingStatus.UpdateSourceError);
+
             return false;
         }
 
@@ -205,8 +220,14 @@ public sealed class MultiBindingExpression : BindingExpressionBase
             GetCulture());
     }
 
-    private void UpdateSource(object convertedValue)
+    private object UpdateSource(object convertedValue)
     {
+        if (convertedValue == DependencyProperty.UnsetValue)
+        {
+            SetStatus(BindingStatus.UpdateSourceError);
+            return convertedValue;
+        }
+
         object[] values = convertedValue as object[];
         int count = Math.Min(_mutableBindingExpressions.Length, values.Length);
 
@@ -221,6 +242,11 @@ public sealed class MultiBindingExpression : BindingExpressionBase
                 if (_mutableBindingExpressions[i] is BindingExpression bindExpr)
                 {
                     bindExpr.UpdateSource(value);
+
+                    if (bindExpr.Status == BindingStatus.UpdateSourceError)
+                    {
+                        SetStatus(BindingStatus.UpdateSourceError);
+                    }
                 }
             }
         }
@@ -228,6 +254,8 @@ public sealed class MultiBindingExpression : BindingExpressionBase
         {
             EndSourceUpdate();
         }
+
+        return convertedValue;
     }
 
     // Return the object from which the given value was obtained, if possible
@@ -260,6 +288,11 @@ public sealed class MultiBindingExpression : BindingExpressionBase
 
     internal override object GetValue(DependencyObject d, DependencyProperty dp)
     {
+        if (Status == BindingStatus.Unattached)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+
         for (int i = 0; i < _values.Length; i++)
         {
             _values[i] = _mutableBindingExpressions[i].GetValue(Target, TargetProperty);
@@ -325,11 +358,37 @@ public sealed class MultiBindingExpression : BindingExpressionBase
 
         TransferIsDeferred = true;
 
-        for (int i = 0; i < ParentMultiBinding.Bindings.Count; i++)
+        for (int i = 0; i < _mutableBindingExpressions.Length; i++)
         {
             _mutableBindingExpressions[i] = AttachBindingExpression(ParentMultiBinding.Bindings[i]);
         }
 
+        AttachToContext(false);
+    }
+
+    private void AttachToContext(bool lastAttempt)
+    {
+        TransferIsDeferred = true;
+
+        bool attached = true;
+
+        for (int i = 0; i < _mutableBindingExpressions.Length; i++)
+        {
+            if (_mutableBindingExpressions[i].Status == BindingStatus.Unattached)
+            {
+                attached = false;
+                break;
+            }
+        }
+
+        // if the child bindings aren't ready yet, try again later.  Leave
+        // TransferIsDeferred set, to indicate we're not ready yet.
+        if (!attached && !lastAttempt)
+        {
+            return;
+        }
+
+        SetStatus(BindingStatus.Active);
         TransferIsDeferred = false;
     }
 
@@ -352,7 +411,10 @@ public sealed class MultiBindingExpression : BindingExpressionBase
     /// </summary>
     internal override void InvalidateChild(BindingExpressionBase bindingExpression)
     {
-        if (_values is null) return;
+        if (Status == BindingStatus.Unattached)
+        {
+            AttachToContext(false);
+        }
 
         int index = Array.IndexOf(_mutableBindingExpressions, bindingExpression);
 
@@ -365,7 +427,7 @@ public sealed class MultiBindingExpression : BindingExpressionBase
 
     private void Transfer()
     {
-        if (NeedsDataTransfer && !TransferIsDeferred)
+        if (NeedsDataTransfer && Status != BindingStatus.Unattached && !TransferIsDeferred)
         {
             TransferValue();
         }
@@ -445,6 +507,11 @@ public sealed class MultiBindingExpression : BindingExpressionBase
 
         if (value == DependencyProperty.UnsetValue)
         {
+            if (Status == BindingStatus.Active)
+            {
+                SetStatus(BindingStatus.UpdateTargetError);
+            }
+
             value = DefaultValue;
         }
 

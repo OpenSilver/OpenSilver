@@ -30,7 +30,7 @@ namespace System.Windows.Data
     public sealed class BindingExpression : BindingExpressionBase
     {
         private DynamicValueConverter _dynamicConverter;
-        private object _bindingSource;
+        private object _dataItem;
         private IInternalFrameworkElement _mentor;
         private ValidationError _baseValidationError;
         private List<ValidationError> _notifyDataErrors;
@@ -78,12 +78,7 @@ namespace System.Windows.Data
             return bindExpr;
         }
 
-        private void OnDataContextChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            BindingSource = args.NewValue;
-
-            _propertyPathWalker.AttachDataItem(BindingSource, true);
-        }
+        private void OnDataContextChanged(DependencyObject d, DependencyPropertyChangedEventArgs args) => Activate(args.NewValue);
 
         /// <summary>
         /// The binding target property of this binding expression.
@@ -101,7 +96,7 @@ namespace System.Windows.Data
         /// <returns>
         /// The binding source object that this <see cref="BindingExpression"/> uses.
         /// </returns>
-        public object DataItem => BindingSource;
+        public object DataItem => _dataItem;
 
         /// <summary>
         /// Gets the binding source object for this <see cref="BindingExpression"/>.
@@ -143,32 +138,10 @@ namespace System.Windows.Data
 
             if (_propertyPathWalker.IsPathBroken)
             {
-                //------------------------
-                // BROKEN PATH
-                //------------------------
-
-                if (_propertyPathWalker.IsEmpty)
-                {
-                    if (ParentBinding.TargetNullValue != null)
-                    {
-                        value = GetConvertedValue(null);
-                    }
-                    else
-                    {
-                        value = DefaultValue;
-                    }
-                }
-                else
-                {
-                    value = UseFallbackValue();
-                }
+                value = UseFallbackValue();
             }
             else
             {
-                //------------------------
-                // NON-BROKEN PATH
-                //------------------------
-
                 value = GetConvertedValue(_propertyPathWalker.FinalNode.Value);
             }
 
@@ -189,6 +162,12 @@ namespace System.Windows.Data
                         targetType,
                         ParentBinding.ConverterParameter,
                         GetCulture());
+
+                    if (IsDetached)
+                    {
+                        // user code detached the binding.  Give up.
+                        return DependencyProperty.UnsetValue;
+                    }
                 }
             }
 
@@ -230,6 +209,11 @@ namespace System.Windows.Data
             if (!IsInMultiBindingExpression && value != DependencyProperty.UnsetValue && !TargetProperty.IsValidValue(value))
             {
                 value = DependencyProperty.UnsetValue;
+
+                if (Status == BindingStatus.Active)
+                {
+                    SetStatus(BindingStatus.UpdateTargetError);
+                }
             }
 
             if (value == DependencyProperty.UnsetValue)
@@ -255,48 +239,35 @@ namespace System.Windows.Data
             base.AttachOverride(d, dp);
 
             AttachToContext(false);
-
-            if (BindingSource is not null)
-            {
-                _propertyPathWalker.AttachDataItem(BindingSource, false);
-            }
         }
 
         internal override void DetachOverride()
         {
-            if (_dataContextListener != null)
-            {
-                _dataContextListener.Dispose();
-                _dataContextListener = null;
-            }
+            _dataContextListener?.Dispose();
+            _dataContextListener = null;
 
             if (ValidatesOnNotifyDataErrors)
             {
-                if (_weakSourceErrorsChangedEventToken != null)
-                {
-                    _weakSourceErrorsChangedEventToken.Dispose();
-                    _weakSourceErrorsChangedEventToken = null;
-                }
+                _weakSourceErrorsChangedEventToken?.Dispose();
+                _weakSourceErrorsChangedEventToken = null;
 
-                if (_weakValueErrorsChangedEventToken != null)
-                {
-                    _weakValueErrorsChangedEventToken.Dispose();
-                    _weakValueErrorsChangedEventToken = null;
-                }
+                _weakValueErrorsChangedEventToken?.Dispose();
+                _weakValueErrorsChangedEventToken = null;
 
                 _dataErrorSource = null;
                 _dataErrorValue = null;
             }
 
-            BindingSource = null;
+            Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
+
+            SetMentor(null);
+
+            _dataItem = null;
             _propertyPathWalker.DetachDataItem();
+            SetStatus(BindingStatus.Inactive);
 
             UpdateValidationError(null);
             UpdateNotifyDataErrorValidationErrors(null);
-
-            DetachMentor();
-
-            Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
 
             base.DetachOverride();
         }
@@ -355,62 +326,9 @@ namespace System.Windows.Data
         // the name of the property that changes when we UpdateSource
         private string SourcePropertyName => _propertyPathWalker.FinalNode.PropertyName;
 
-        private object BindingSource
-        {
-            get => _bindingSource;
-            set
-            {
-                _bindingSource = value;
-                if (!ParentBinding.BindsDirectlyToSource)
-                {
-                    if (_cvsListener != null)
-                    {
-                        _cvsListener.Dispose();
-                        _cvsListener = null;
-                    }
+        private void OnCollectionViewSourceViewChanged(DependencyObject d, DependencyPropertyChangedEventArgs args) => Activate(args.NewValue);
 
-                    if (_weakDataChangedEventToken != null)
-                    {
-                        _weakDataChangedEventToken.Dispose();
-                        _weakDataChangedEventToken = null;
-                    }
-
-                    if (value is CollectionViewSource cvs)
-                    {
-                        _cvsListener = PropertyChangeListener.CreateListener(
-                            cvs,
-                            CollectionViewSource.ViewProperty,
-                            OnCollectionViewSourceViewChanged);
-                        _bindingSource = cvs.View;
-                    }
-                    else if (value is DataSourceProvider dsp)
-                    {
-                        _weakDataChangedEventToken = WeakEvent.Subscribe<BindingExpression, DataSourceProvider, EventArgs>(
-                            this,
-                            dsp,
-                            static (instance, source, args) => instance.OnDataChanged(source, args),
-                            static (handler, source) => source.DataChanged -= new EventHandler(handler),
-                            static (handler, source) => source.DataChanged += new EventHandler(handler));
-
-                        _bindingSource = dsp.Data;
-                    }
-                }
-            }
-        }
-
-        private void OnCollectionViewSourceViewChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            _bindingSource = args.NewValue;
-            _propertyPathWalker.AttachDataItem(BindingSource, true);
-        }
-
-        private void OnDataChanged(object sender, EventArgs e)
-        {
-            var dsp = (DataSourceProvider)sender;
-
-            _bindingSource = dsp.Data;
-            _propertyPathWalker.AttachDataItem(BindingSource, true);
-        }
+        private void OnDataChanged(object sender, EventArgs e) => Activate(((DataSourceProvider)sender).Data);
 
         private void UpdateNotifyDataErrors(object value)
         {
@@ -431,11 +349,8 @@ namespace System.Windows.Data
 
             if (source != _dataErrorSource)
             {
-                if (_weakSourceErrorsChangedEventToken != null)
-                {
-                    _weakSourceErrorsChangedEventToken.Dispose();
-                    _weakSourceErrorsChangedEventToken = null;
-                }
+                _weakSourceErrorsChangedEventToken?.Dispose();
+                _weakSourceErrorsChangedEventToken = null;
 
                 _dataErrorSource = source as INotifyDataErrorInfo;
 
@@ -452,11 +367,8 @@ namespace System.Windows.Data
 
             if (value != _dataErrorValue)
             {
-                if (_weakValueErrorsChangedEventToken != null)
-                {
-                    _weakValueErrorsChangedEventToken.Dispose();
-                    _weakValueErrorsChangedEventToken = null;
-                }
+                _weakValueErrorsChangedEventToken?.Dispose();
+                _weakValueErrorsChangedEventToken = null;
 
                 _dataErrorValue = null;
 
@@ -680,9 +592,13 @@ namespace System.Windows.Data
         internal void OnSourceAvailable(bool lastAttempt)
         {
             AttachToContext(lastAttempt);
-            if (BindingSource != null)
+
+            if (_dataItem is null && lastAttempt)
             {
-                _propertyPathWalker.AttachDataItem(BindingSource, true);
+                if (IsInBindingExpressionCollection && ParentBindingExpressionBase.Status == BindingStatus.Unattached)
+                {
+                    ParentBindingExpressionBase.InvalidateChild(this);
+                }
             }
         }
 
@@ -696,9 +612,15 @@ namespace System.Windows.Data
                 return;
             }
 
+            ValidationError oldValidationError = _baseValidationError;
+
+            if (Status == BindingStatus.UpdateSourceError)
+            {
+                SetStatus(BindingStatus.Active);
+            }
+
             object rawValue = GetRawProposedValue();
             Type expectedType = _propertyPathWalker.FinalNode.Type;
-            ValidationError oldValidationError = _baseValidationError;
             object convertedValue = rawValue;
 
             if (expectedType != null && ParentBinding.Converter != null)
@@ -709,7 +631,7 @@ namespace System.Windows.Data
                     ParentBinding.ConverterParameter,
                     GetCulture());
 
-                if (convertedValue == DependencyProperty.UnsetValue)
+                if (!Validate(convertedValue))
                 {
                     return;
                 }
@@ -724,7 +646,7 @@ namespace System.Windows.Data
                     GetCulture());
             }
 
-            if (convertedValue == DependencyProperty.UnsetValue)
+            if (!Validate(convertedValue))
             {
                 if (_baseValidationError == oldValidationError)
                 {
@@ -736,19 +658,10 @@ namespace System.Windows.Data
                 return;
             }
 
-            try
+            convertedValue = UpdateSource(convertedValue);
+            if (!Validate(convertedValue))
             {
-                UpdateSource(convertedValue);
-            }
-            catch (Exception ex)
-            {
-                ex = CriticalExceptions.Unwrap(ex);
-                if (CriticalExceptions.IsCriticalApplicationException(ex))
-                {
-                    throw;
-                }
-
-                ProcessException(ex, ValidatesOnExceptions);
+                return;
             }
 
             if (_baseValidationError == oldValidationError)
@@ -759,17 +672,39 @@ namespace System.Windows.Data
 
         private object GetRawProposedValue() => Target.GetValue(TargetProperty);
 
-        internal void UpdateSource(object convertedValue)
+        internal object UpdateSource(object value)
         {
+            // If there is a failure to convert, then Update failed.
+            if (value == DependencyProperty.UnsetValue)
+            {
+                SetStatus(BindingStatus.UpdateSourceError);
+                return value;
+            }
+
             BeginSourceUpdate();
+
             try
             {
-                _propertyPathWalker.FinalNode.SetValue(convertedValue);
+                _propertyPathWalker.FinalNode.SetValue(value);
+            }
+            catch (Exception ex)
+            {
+                ex = CriticalExceptions.Unwrap(ex);
+                if (CriticalExceptions.IsCriticalApplicationException(ex))
+                {
+                    throw;
+                }
+
+                ProcessException(ex, ValidatesOnExceptions);
+                SetStatus(BindingStatus.UpdateSourceError);
+                value = DependencyProperty.UnsetValue;
             }
             finally
             {
                 EndSourceUpdate();
             }
+
+            return value;
         }
 
         private object ConvertBackHelper(IValueConverter converter, object value, Type sourceType, object parameter, CultureInfo culture)
@@ -885,6 +820,11 @@ namespace System.Windows.Data
 
             if (value == DependencyProperty.UnsetValue)
             {
+                if (Status == BindingStatus.Active)
+                {
+                    SetStatus(BindingStatus.UpdateTargetError);
+                }
+
                 if (!IsInBindingExpressionCollection)
                 {
                     value = DefaultValue;
@@ -917,7 +857,6 @@ namespace System.Windows.Data
 
         private void OnTargetInheritedContextChanged(object sender, EventArgs e)
         {
-            Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
             OnSourceAvailable(false);
         }
 
@@ -938,98 +877,72 @@ namespace System.Windows.Data
 
         private void AttachToContext(bool lastAttempt)
         {
-            object source = null;
-            IInternalFrameworkElement mentor = null;
-            bool useMentor = false;
+            Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
+            _dataContextListener?.Dispose();
+            _dataContextListener = null;
+            SetMentor(null);
 
-            if (ParentBinding.Source != null)
+            IInternalFrameworkElement mentor = FrameworkElement.FindMentor(Target);
+
+            if (mentor is null)
             {
-                source = ParentBinding.Source;
+                if (lastAttempt)
+                {
+                    SetStatus(BindingStatus.PathError);
+                    return;
+                }
+
+                Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
+                return;
             }
-            else if (ParentBinding.ElementName != null)
+
+            Binding binding = ParentBinding;
+
+            object source;
+            bool useMentor;
+
+            if (binding.Source is not null)
             {
+                source = binding.Source;
+                useMentor = false;
+            }
+            else if (binding.ElementName is not null)
+            {
+                source = FindName(mentor, binding.ElementName);
                 useMentor = true;
-                mentor = FrameworkElement.FindMentor(Target);
-                if (mentor != null)
-                {
-                    source = FindName(mentor, ParentBinding.ElementName);
-                    if (source == null && !lastAttempt)
-                    {
-                        mentor.Loaded += new RoutedEventHandler(OnMentorLoaded);
-                    }
-                }
             }
-            else if (ParentBinding.RelativeSource != null)
+            else if (binding.RelativeSource is not null)
             {
-                switch (ParentBinding.RelativeSource.Mode)
+                RelativeSource relativeSource = binding.RelativeSource;
+
+                (source, useMentor) = relativeSource.Mode switch
                 {
-                    case RelativeSourceMode.Self:
-                        source = Target;
-                        break;
-
-                    case RelativeSourceMode.TemplatedParent:
-                        useMentor = true;
-                        mentor = FrameworkElement.FindMentor(Target);
-                        source = mentor?.TemplatedParent;
-                        break;
-
-                    case RelativeSourceMode.FindAncestor:
-                        useMentor = true;
-                        mentor = FrameworkElement.FindMentor(Target);
-                        if (mentor != null)
-                        {
-                            source = FindAncestorOftype(mentor, ParentBinding.RelativeSource.AncestorType, ParentBinding.RelativeSource.AncestorLevel);
-                            if (source == null && !lastAttempt)
-                            {
-                                mentor.Loaded += new RoutedEventHandler(OnMentorLoaded);
-                            }
-                        }
-                        break;
-
-                    case RelativeSourceMode.None:
-                    default:
-                        source = null;
-                        break;
-                }
+                    RelativeSourceMode.Self => (Target, false),
+                    RelativeSourceMode.TemplatedParent => (mentor.TemplatedParent, true),
+                    RelativeSourceMode.FindAncestor => (FindAncestorOftype(mentor, relativeSource.AncestorType, relativeSource.AncestorLevel), true),
+                    _ => (null, false),
+                };
             }
             else
             {
-                if (Target is IInternalFrameworkElement targetFE)
-                {
-                    DependencyObject contextElement = Target;
+                DependencyObject contextElement = mentor.AsDependencyObject();
 
-                    // special cases:
-                    // 1. if target property is DataContext, use the target's parent.
-                    //      This enables <X DataContext="{Binding...}"/>
-                    // 2. if the target is ContentPresenter and the target property
-                    //      is Content, use the parent.  This enables
-                    //          <ContentPresenter Content="{Binding...}"/>
-                    if (TargetProperty == FrameworkElement.DataContextProperty ||
-                        (TargetProperty == ContentPresenter.ContentProperty && Target is ContentPresenter))
-                    {
-                        contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
-                        if (contextElement == null && !lastAttempt)
-                        {
-                            targetFE.Loaded += new RoutedEventHandler(OnMentorLoaded);
-                        }
-                    }
-
-                    source = contextElement;
-                }
-                else
+                // special cases:
+                // 1. if target property is DataContext, use the target's parent.
+                //      This enables <X DataContext="{Binding...}"/>
+                // 2. if the target is ContentPresenter and the target property
+                //      is Content, use the parent.  This enables
+                //          <ContentPresenter Content="{Binding...}"/>
+                if (TargetProperty == FrameworkElement.DataContextProperty ||
+                    (TargetProperty == ContentPresenter.ContentProperty && Target is ContentPresenter))
                 {
-                    useMentor = true;
-                    source = mentor = FrameworkElement.FindMentor(Target);
+                    contextElement = LogicalTreeHelper.GetParent(contextElement) ?? VisualTreeHelper.GetParent(contextElement);
                 }
 
-                if (_dataContextListener != null)
+                if (contextElement is IInternalFrameworkElement sourceFE)
                 {
-                    _dataContextListener.Dispose();
-                    _dataContextListener = null;
-                }
+                    useMentor = false;
 
-                if (source is IInternalFrameworkElement sourceFE)
-                {
                     _dataContextListener = PropertyChangeListener.CreateListener(
                         sourceFE.AsDependencyObject(),
                         FrameworkElement.DataContextProperty,
@@ -1039,35 +952,83 @@ namespace System.Windows.Data
                 }
                 else
                 {
-                    Debug.Assert(source is null);
+                    useMentor = true;
+                    source = null;
                 }
             }
 
-            if (useMentor)
+            if (source is null)
             {
-                if (_mentor != mentor)
+                if (lastAttempt)
                 {
-                    DetachMentor();
+                    SetStatus(BindingStatus.PathError);
+                    return;
                 }
 
-                _mentor = mentor;
-
-                if (source == null && mentor == null)
+                if (useMentor)
                 {
-                    Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
+                    SetMentor(mentor);
+                    return;
                 }
+
+                return;
             }
 
-            BindingSource = source;
+            SetStatus(BindingStatus.Inactive);
+            Activate(source);
         }
 
-        private void DetachMentor()
+        private void Activate(object item)
         {
-            if (_mentor != null)
+            if (!ParentBinding.BindsDirectlyToSource)
             {
-                _mentor.Loaded -= new RoutedEventHandler(OnMentorLoaded);
-                _mentor = null;
+                _cvsListener?.Dispose();
+                _cvsListener = null;
+
+                _weakDataChangedEventToken?.Dispose();
+                _weakDataChangedEventToken = null;
+
+                if (item is CollectionViewSource cvs)
+                {
+                    _cvsListener = PropertyChangeListener.CreateListener(
+                        cvs,
+                        CollectionViewSource.ViewProperty,
+                        OnCollectionViewSourceViewChanged);
+
+                    item = cvs.View;
+                }
+                else if (item is DataSourceProvider dsp)
+                {
+                    _weakDataChangedEventToken = WeakEvent.Subscribe<BindingExpression, DataSourceProvider, EventArgs>(
+                        this,
+                        dsp,
+                        static (instance, source, args) => instance.OnDataChanged(source, args),
+                        static (handler, source) => source.DataChanged -= new EventHandler(handler),
+                        static (handler, source) => source.DataChanged += new EventHandler(handler));
+
+                    item = dsp.Data;
+                }
             }
+
+            _dataItem = item;
+
+            // mark the BindingExpression active
+            SetStatus(BindingStatus.Active);
+
+            // attach to data item (may set error status)
+            _propertyPathWalker.AttachDataItem(item, !IsAttaching);
+        }
+
+        private void SetMentor(IInternalFrameworkElement mentor)
+        {
+            if (_mentor == mentor)
+            {
+                return;
+            }
+
+            _mentor?.Loaded -= new RoutedEventHandler(OnMentorLoaded);
+            _mentor = mentor;
+            _mentor?.Loaded += new RoutedEventHandler(OnMentorLoaded);
         }
 
         private static object FindName(IInternalFrameworkElement mentor, string name)

@@ -157,7 +157,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ControlTemplate"/> used to generate validation error feedback on the adorner layer.
+        /// Identifies the <b>Validation.ErrorTemplate</b> attached property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ErrorTemplateProperty =
@@ -165,29 +165,42 @@ namespace System.Windows.Controls
                 "ErrorTemplate",
                 typeof(ControlTemplate),
                 typeof(Validation),
-                new FrameworkPropertyMetadata(
-                    null,
-                    FrameworkPropertyMetadataOptions.NotDataBindable));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.NotDataBindable));
 
 
         /// <summary>
-        /// Gets the value of the <see cref="ErrorTemplateProperty"/> attached property of the specified element.
+        /// Gets the value of the <b>Validation.ErrorTemplate</b> attached property of the specified element.
         /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> or ContentElement object to read the value from.</param>
-        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+        /// <param name="element">
+        /// The <see cref="UIElement"/> object to read the value from.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ControlTemplate"/> used to generate validation error feedback on the adorner layer.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="element"/> is null.
+        /// </exception>
         [OpenSilver.NotImplemented]
+        [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
         public static ControlTemplate GetErrorTemplate(DependencyObject element)
         {
             ArgumentNullException.ThrowIfNull(element);
 
-            return element.GetValue(ErrorTemplateProperty) as ControlTemplate;
+            return (ControlTemplate)element.GetValue(ErrorTemplateProperty);
         }
 
         /// <summary>
-        /// Sets the value of the <see cref="ErrorTemplateProperty"/> attached property to the specified element.
+        /// Sets the value of the <b>Validation.ErrorTemplate</b> attached property to the specified element.
         /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> or ContentElement object to set <paramref name="value"/> on.</param>
-        /// <param name="value">The <see cref="ControlTemplate"> to use to generate validation error feedback on the adorner layer.</param>
+        /// <param name="element">
+        /// The <see cref="UIElement"/> object to set value on.
+        /// </param>
+        /// <param name="value">
+        /// The <see cref="ControlTemplate"/> to use to generate validation error feedback on the adorner layer.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="element"/> is null.
+        /// </exception>
         [OpenSilver.NotImplemented]
         public static void SetErrorTemplate(DependencyObject element, ControlTemplate value)
         {

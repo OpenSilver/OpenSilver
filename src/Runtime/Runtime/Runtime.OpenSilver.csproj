@@ -150,6 +150,7 @@
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
+    <Compile Include="System.Windows.Data\BindingStatus.cs" />
     <Compile Include="System.Windows.Documents\List.cs" />
     <Compile Include="System.Windows.Documents\ListItem.cs" />
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />

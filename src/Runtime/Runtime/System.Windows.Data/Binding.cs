@@ -14,7 +14,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Markup;
-using System.Xml.Linq;
 
 namespace System.Windows.Data;
 
