@@ -36,6 +36,7 @@
     <Compile Include="Tests\Geometry\Bounds\GeometryBoundsViewer.xaml.cs" />
     <Compile Include="Tests\Geometry\CombinedGeometry\CombinedGeometryTest.xaml.cs" />
     <Compile Include="Tests\Geometry\CombinedGeometry\CombinedGeometryViewer.xaml.cs" />
+    <Compile Include="Tests\GroupBoxTest.xaml.cs" />
     <Compile Include="Tests\PerformanceTest.xaml.cs">
       <DependentUpon>PerformanceTest.xaml</DependentUpon>
     </Compile>
@@ -652,6 +653,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\Geometry\CombinedGeometry\CombinedGeometryViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\GroupBoxTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\generic.xaml">

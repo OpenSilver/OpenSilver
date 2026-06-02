@@ -5196,6 +5196,108 @@
         </Setter>
     </Style>
 
+    <!--  controls:HeaderedContentControl  -->
+    <Style TargetType="controls:HeaderedContentControl">
+        <Setter Property="Foreground"
+                Value="{x:Static media:Brushes.Black}" />
+        <!-- <Setter Property="FontSize" Value="11" /> -->
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Top" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="controls:HeaderedContentControl">
+                    <controls:StackPanel>
+                        <controls:ContentPresenter Content="{TemplateBinding Property={x:Static controls:HeaderedContentControl.HeaderProperty}}"
+                                                   ContentTemplate="{TemplateBinding Property={x:Static controls:HeaderedContentControl.HeaderTemplateProperty}}"
+                                                   Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}" />
+                        <controls:ContentPresenter Cursor="{TemplateBinding Property={x:Static FrameworkElement.CursorProperty}}"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                                   HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}" />
+                    </controls:StackPanel>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- controls:GroupBox -->
+    <controls:BorderGapClipConverter x:Key="BorderGapClipConverter" />
+    <Style TargetType="controls:GroupBox">
+        <Setter Property="BorderBrush"
+                Value="#D5DFE5" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="controls:GroupBox">
+                    <controls:Grid SnapsToDevicePixels="true">
+                        <controls:Grid.ColumnDefinitions>
+                            <controls:ColumnDefinition Width="6" />
+                            <controls:ColumnDefinition Width="Auto" />
+                            <controls:ColumnDefinition Width="*" />
+                            <controls:ColumnDefinition Width="6" />
+                        </controls:Grid.ColumnDefinitions>
+                        <controls:Grid.RowDefinitions>
+                            <controls:RowDefinition Height="Auto" />
+                            <controls:RowDefinition Height="Auto" />
+                            <controls:RowDefinition Height="*" />
+                            <controls:RowDefinition Height="6" />
+                        </controls:Grid.RowDefinitions>
+
+                        <controls:Border CornerRadius="4"
+                                         controls:Grid.Row="1"
+                                         controls:Grid.RowSpan="3"
+                                         controls:Grid.Column="0"
+                                         controls:Grid.ColumnSpan="4"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         BorderBrush="{x:Static media:Brushes.Transparent}"
+                                         Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}" />
+
+                        <controls:Border CornerRadius="4"
+                                         controls:Grid.Row="1"
+                                         controls:Grid.RowSpan="3"
+                                         controls:Grid.ColumnSpan="4"
+                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}">
+                            <controls:Border.Clip>
+                                <data:MultiBinding Converter="{markup:StaticResource BorderGapClipConverter}"
+                                                   ConverterParameter="7">
+                                    <data:Binding ElementName="Header"
+                                                  Path="ActualWidth" />
+                                    <data:Binding RelativeSource="{data:RelativeSource Self}"
+                                                  Path="ActualWidth" />
+                                    <data:Binding RelativeSource="{data:RelativeSource Self}"
+                                                  Path="ActualHeight" />
+                                </data:MultiBinding>
+                            </controls:Border.Clip>
+                        </controls:Border>
+
+                        <controls:Border x:Name="Header"
+                                         Padding="3,1,3,0"
+                                         controls:Grid.Row="0"
+                                         controls:Grid.RowSpan="2"
+                                         controls:Grid.Column="1">
+                            <controls:ContentPresenter ContentSource="Header"
+                                                       RecognizesAccessKey="True"
+                                                       SnapsToDevicePixels="{TemplateBinding Property={x:Static UIElement.SnapsToDevicePixelsProperty}}" />
+                        </controls:Border>
+
+                        <controls:ContentPresenter controls:Grid.Row="2"
+                                                   controls:Grid.Column="1"
+                                                   controls:Grid.ColumnSpan="2"
+                                                   Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                                   SnapsToDevicePixels="{TemplateBinding Property={x:Static UIElement.SnapsToDevicePixelsProperty}}" />
+                    </controls:Grid>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  controls:HeaderedItemsControl  -->
     <Style TargetType="controls:HeaderedItemsControl">
         <Setter Property="Template">

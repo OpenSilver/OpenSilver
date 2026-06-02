@@ -154,6 +154,7 @@ namespace TestApplication
             Tests.Add(new Test("ResourceDictionary", "ResourceDictionary/ResourceDictionary"));
             Tests.Add(new Test("DataTemplate", "DataTemplate"));
             Tests.Add(new Test("Trigger", "Trigger"));
+            Tests.Add(new Test("GroupBox", "GroupBox"));
         }
     }
 }

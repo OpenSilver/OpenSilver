@@ -5,6 +5,7 @@
 
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Markup;
 
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "toolkit")]
@@ -16,3 +17,4 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Controls.Primitives")]
 
 [assembly: TypeForwardedTo(typeof(LengthConverter))]
+[assembly: TypeForwardedTo(typeof(HeaderedContentControl))]

@@ -147,7 +147,12 @@
     <Compile Include="OpenSilver\Internal\ComponentModel\PropertyKey.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterAttribute.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
+    <Compile Include="System.Windows.Automation.Peers\GroupBoxAutomationPeer.cs" />
+    <Compile Include="System.Windows.Controls\AccessText.cs" />
+    <Compile Include="System.Windows.Controls\BorderGapClipConverter.cs" />
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
+    <Compile Include="System.Windows.Controls\GroupBox.cs" />
+    <Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Data\BindingStatus.cs" />
@@ -1192,6 +1197,7 @@
       <SubType>Designer</SubType>
     </Page>
     <None Include="System.Windows.Controls\ChildWindow.xaml" />
+    <None Include="System.Windows.Controls\HeaderedContentControl.xaml" />
     <None Include="System.Windows.Controls\HeaderedItemsControl.xaml" />
     <None Include="System.Windows.Controls\TreeView.xaml" />
     <None Include="System.Windows.Controls\TreeViewItem.xaml" />
