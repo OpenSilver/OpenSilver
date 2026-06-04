@@ -51,6 +51,8 @@ namespace System.Windows.Controls.Primitives
             this.TextChanged += OnTextChanged;
         }
 
+        internal new bool HasEffectiveKeyboardFocus => base.HasEffectiveKeyboardFocus;
+
         /// <summary>
         /// Gets or sets Inherited code: Requires comment.
         /// </summary>

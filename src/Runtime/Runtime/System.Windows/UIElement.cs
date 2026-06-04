@@ -328,6 +328,18 @@ namespace System.Windows
             base.OnPropertyChanged(e);
         }
 
+        internal void InvokeAccessKey(AccessKeyEventArgs e) => OnAccessKey(e);
+
+        /// <summary>
+        /// Provides class handling for when an access key that is meaningful for this element is invoked.
+        /// </summary>
+        /// <param name="e">
+        /// The event data to the access key event. The event data reports which key was invoked, and indicate 
+        /// whether the <see cref="AccessKeyManager"/> object that controls the sending of these events also 
+        /// sent this access key invocation to other elements.
+        /// </param>
+        protected virtual void OnAccessKey(AccessKeyEventArgs e) => Focus();
+
         /// <summary>
         /// Attempts to set focus to this element.
         /// </summary>
@@ -385,6 +397,14 @@ namespace System.Windows
         /// Identifies the <see cref="IsKeyboardFocused"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsKeyboardFocusedProperty = IsKeyboardFocusedPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value that indicates whether the <see cref="UIElement"/> has focus.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="UIElement"/> has focus; otherwise, false.
+        /// </returns>
+        protected internal virtual bool HasEffectiveKeyboardFocus => IsKeyboardFocused;
 
         /// <summary>
         /// Gets a value indicating whether this element has keyboard focus. This is a dependency property.

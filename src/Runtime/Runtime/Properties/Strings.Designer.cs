@@ -79,6 +79,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a single Unicode character..
+        /// </summary>
+        internal static string AccessKeyManager_NotAUnicodeCharacter {
+            get {
+                return ResourceManager.GetString("AccessKeyManager_NotAUnicodeCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added item does not appear at given index &apos;{0}&apos;..
         /// </summary>
         internal static string AddedItemNotAtIndex {

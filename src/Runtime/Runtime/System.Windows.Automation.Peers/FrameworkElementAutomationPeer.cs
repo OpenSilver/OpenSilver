@@ -11,10 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Windows.Input;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace System.Windows.Automation.Peers
@@ -132,7 +130,14 @@ namespace System.Windows.Automation.Peers
         /// The access key for the element that is associated with this <see cref="FrameworkElementAutomationPeer" />.
         /// </returns>
         protected override string GetAccessKeyCore()
-            => (string)Owner.GetValue(AutomationProperties.AccessKeyProperty);
+        {
+            string result = (string)Owner.GetValue(AutomationProperties.AccessKeyProperty);
+            if (string.IsNullOrEmpty(result))
+            {
+                return AccessKeyManager.InternalGetAccessKeyCharacter(Owner);
+            }
+            return result;
+        }
 
         /// <summary>
         /// Returns the string that uniquely identifies the <see cref="FrameworkElement" /> that is associated 

@@ -356,6 +356,7 @@ public abstract class KeyboardDevice : InputDevice
         source.RaiseTrustedEvent(keyDown);
 
         KeyboardNavigation.Current.ProcessInput(keyDown);
+        AccessKeyManager.Current.ProcessInput(keyDown);
 
         if (keyDown.Handled)
         {
@@ -455,6 +456,8 @@ public abstract class KeyboardDevice : InputDevice
         };
 
         source.RaiseTrustedEvent(textInputArgs);
+
+        AccessKeyManager.Current.ProcessInput(textInputArgs);
 
         if (textInputArgs.Cancel)
         {

@@ -1356,4 +1356,7 @@
   <data name="StreamGeometry_NeedBeginFigure" xml:space="preserve">
     <value>Appel obligatoire de BeginFigure avant cette API.</value>
   </data>
+  <data name="AccessKeyManager_NotAUnicodeCharacter" xml:space="preserve">
+    <value>'{0}' n'est pas un caractère Unicode unique.</value>
+  </data>
 </root>

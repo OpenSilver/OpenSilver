@@ -272,6 +272,28 @@ public sealed class KeyboardNavigation
         element.SetValueInternal(AcceptsReturnProperty, enabled);
     }
 
+    /// <summary>
+    /// Attached property set on elements registered with AccessKeyManager when AccessKeyCues should be shown.
+    /// </summary>
+    internal static readonly DependencyProperty IsAccessKeyModeProperty =
+        DependencyProperty.RegisterAttached(
+            "IsAccessKeyMode",
+            typeof(bool),
+            typeof(KeyboardNavigation),
+            new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, FrameworkPropertyMetadataOptions.Inherits));
+
+    internal static bool GetIsAccessKeyMode(DependencyObject d)
+    {
+        Debug.Assert(d is not null);
+        return (bool)d.GetValue(IsAccessKeyModeProperty);
+    }
+
+    private static void SetIsAccessKeyMode(DependencyObject d, bool value)
+    {
+        Debug.Assert(d is not null);
+        d.SetValueInternal(IsAccessKeyModeProperty, value);
+    }
+
     private KeyboardNavigation() { }
 
     internal static KeyboardNavigation Current { get; } = new KeyboardNavigation();
@@ -279,19 +301,39 @@ public sealed class KeyboardNavigation
     internal void ProcessInput(KeyEventArgs keyEventArgs)
     {
         if (keyEventArgs.Handled)
+        {
             return;
-
-        DependencyObject sourceElement = keyEventArgs.OriginalSource as DependencyObject;
+        }
 
         // When nothing has focus - we should start from the root of the visual tree
-        if (sourceElement == null)
+        if (keyEventArgs.OriginalSource is not DependencyObject sourceElement)
         {
             sourceElement = Window.Current?.Content;
-            if (sourceElement == null)
+            if (sourceElement is null)
+            {
                 return;
+            }
+        }
+
+        if (keyEventArgs.Key == Key.Alt)
+        {
+            ToggleKeyboardCues(sourceElement);
         }
 
         keyEventArgs.Handled = Navigate(sourceElement, keyEventArgs.Key, keyEventArgs.KeyModifiers, fromProcessInput: true);
+    }
+
+    internal static void ToggleKeyboardCues(DependencyObject element)
+    {
+        if (element is not UIElement visual)
+        {
+            return;
+        }
+
+        if (VisualTreeHelper.GetVisualRoot(visual) is DependencyObject rootVisual)
+        {
+            SetIsAccessKeyMode(rootVisual, !GetIsAccessKeyMode(rootVisual));
+        }
     }
 
     private static readonly DependencyProperty TabOnceActiveElementProperty =
@@ -307,7 +349,7 @@ public sealed class KeyboardNavigation
         if (weakRef != null && weakRef.TryGetTarget(out DependencyObject activeElement))
         {
             // Verify if the element is still in the same visual tree
-            if (GetVisualRoot(activeElement) == GetVisualRoot(d))
+            if (VisualTreeHelper.GetVisualRoot(activeElement) == VisualTreeHelper.GetVisualRoot(d))
                 return activeElement;
             else
                 d.SetValueInternal(TabOnceActiveElementProperty, null);
@@ -328,19 +370,6 @@ public sealed class KeyboardNavigation
     private void SetActiveElement(DependencyObject d, DependencyObject value)
     {
         SetTabOnceActiveElement(d, value);
-    }
-
-    internal static DependencyObject GetVisualRoot(DependencyObject d)
-    {
-        DependencyObject rootVisual = d;
-        DependencyObject parentVisual;
-
-        while (rootVisual != null && ((parentVisual = VisualTreeHelper.GetParent(rootVisual)) != null))
-        {
-            rootVisual = parentVisual;
-        }
-
-        return rootVisual;
     }
 
     internal static void UpdateFocusedElement(UIElement focusTarget)

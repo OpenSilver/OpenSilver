@@ -910,6 +910,24 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Gets a value that indicates whether the <see cref="DatePicker"/> has focus.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="DatePicker"/> has focus; otherwise, false.
+        /// </returns>
+        protected override bool HasEffectiveKeyboardFocus
+        {
+            get
+            {
+                if (_textBox is not null)
+                {
+                    return _textBox.HasEffectiveKeyboardFocus;
+                }
+                return base.HasEffectiveKeyboardFocus;
+            }
+        }
+
+        /// <summary>
         /// Returns a <see cref="DatePickerAutomationPeer" /> for use by the 
         /// Silverlight automation infrastructure.
         /// </summary>

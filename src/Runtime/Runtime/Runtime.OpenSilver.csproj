@@ -161,6 +161,9 @@
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
     <Compile Include="OpenSilver\Internal\Media\CapacityStreamGeometryContext.cs" />
     <Compile Include="System.Windows.Input\TextCompositionManager.cs" />
+    <Compile Include="System.Windows.Input\AccessKeyEventArgs.cs" />
+    <Compile Include="System.Windows.Input\AccessKeyManager.cs" />
+    <Compile Include="System.Windows.Input\AccessKeyPressedEventArgs.cs" />
     <Compile Include="System.Windows.Media\CombinedGeometry.cs" />
     <Compile Include="System.Windows.Media\DashStyle.cs" />
     <Compile Include="System.Windows.Media\DashStyles.cs" />
@@ -179,6 +182,7 @@
     <Compile Include="OpenSilver\Internal\Media\StringStreamGeometryContext.cs" />
     <Compile Include="System.Windows.Media\ToleranceType.cs" />
     <Compile Include="System.Windows\ComponentResourceKey.cs" />
+    <Compile Include="System.Windows\CoreCompatibilityPreferences.cs" />
     <Compile Include="System.Windows\ResourceKey.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
     <Compile Include="System.Windows\TemplateKey.cs" />

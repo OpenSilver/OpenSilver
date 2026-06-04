@@ -184,8 +184,7 @@ namespace System.Windows
             //walk up until we are the topmost UIElement in the tree.
             while (true)
             {
-                UIElement p = UIElement.GetLayoutParent(e);
-                if (p == null) break;
+                if (UIElement.GetLayoutParent(e) is not UIElement p) break;
                 e = p;
             }
 
@@ -357,7 +356,7 @@ namespace System.Windows
             // If we arrange the element that is temporarily disconnected
             // so it is not a top-level one, the assumption is that it will be
             // layout-invalidated and/or recomputed by the parent when reconnected.
-            if (UIElement.GetLayoutParent(element) == null)
+            if (UIElement.GetLayoutParent(element) is null)
             {
                 arrangeRect.X = arrangeRect.Y = 0;
 
@@ -457,8 +456,7 @@ namespace System.Windows
 
                 RemoveOrphans(e);
 
-                UIElement parent = UIElement.GetLayoutParent(e);
-                if (parent != null && CanRelyOnParentRecalc(parent)) return;
+                if (UIElement.GetLayoutParent(e) is UIElement parent && CanRelyOnParentRecalc(parent)) return;
 
                 LayoutManager layoutManager = Current;
 

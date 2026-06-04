@@ -260,8 +260,7 @@ namespace System.Windows
                 if (/* !MeasureDuringArrange && */
                     !DoubleUtil.AreClose(prevSize, desiredSize))
                 {
-                    UIElement p = GetLayoutParent(this);
-                    if (p != null && !p.MeasureInProgress)
+                    if (GetLayoutParent(this) is UIElement p && !p.MeasureInProgress)
                     {
                         p.OnChildDesiredSizeChanged(this);
                     }
@@ -698,7 +697,7 @@ namespace System.Windows
         /// </summary>
         public void UpdateLayout() => LayoutManager.Current.UpdateLayout();
 
-        internal static UIElement GetLayoutParent(UIElement element) => element.InternalVisualParent as UIElement;
+        internal static DependencyObject GetLayoutParent(UIElement element) => element.InternalVisualParent;
 
         private void RenderLayout()
         {

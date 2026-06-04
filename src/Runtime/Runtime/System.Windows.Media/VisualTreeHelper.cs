@@ -44,12 +44,36 @@ namespace System.Windows.Media
             DependencyObject root = reference;
 
             DependencyObject parent;
-            while ((parent = GetParent(root)) != null)
+            while ((parent = GetParent(root)) is not null)
             {
                 root = parent;
             }
 
             return root;
+        }
+
+        // Variant of GetRoot that ignore the IsVisualTreeRoot flag
+        internal static DependencyObject GetVisualRoot(DependencyObject reference)
+        {
+            DependencyObject root = reference;
+
+            DependencyObject parent;
+            while ((parent = GetParent(root)) is not null)
+            {
+                root = parent;
+            }
+
+            return root;
+
+            static DependencyObject GetParent(DependencyObject reference)
+            {
+                return reference switch
+                {
+                    UIElement uie => uie.InternalVisualParent,
+                    IInternalUIElement iuie => iuie.VisualParent,
+                    _ => null,
+                };
+            }
         }
 
         /// <summary>

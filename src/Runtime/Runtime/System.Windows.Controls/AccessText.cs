@@ -11,8 +11,10 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Globalization;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 
@@ -29,6 +31,14 @@ public class AccessText : FrameworkElement
 
     private TextBlock _textBlock;
     private Run _accessKey;
+    private string _currentlyRegistered;
+
+    static AccessText()
+    {
+        KeyboardNavigation.IsAccessKeyModeProperty.OverrideMetadata(
+            typeof(AccessText),
+            new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, FrameworkPropertyMetadataOptions.Inherits, OnIsAccessKeyModeChanged));
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AccessText"/> class.
@@ -401,6 +411,9 @@ public class AccessText : FrameworkElement
             string keyText = StringInfo.GetNextTextElement(text, index + 1);
 
             _accessKey = new Run(keyText);
+            ShowKeyboardCue();
+
+            RegisterAccessKey(keyText);
 
             if (index > 0)
             {
@@ -423,6 +436,11 @@ public class AccessText : FrameworkElement
     private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         ((AccessText)d).TextBlock.SetValue(e.Property, e.NewValue);
+    }
+
+    private static void OnIsAccessKeyModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((AccessText)d).ShowKeyboardCue();
     }
 
     // Returns the index of _ marker.
@@ -465,5 +483,37 @@ public class AccessText : FrameworkElement
             text = text.Replace(_doubleAccessKeyMarker, _accessKeyMarker);
         }
         return text;
+    }
+
+    private void RegisterAccessKey(string key)
+    {
+        if (_currentlyRegistered is not null)
+        {
+            AccessKeyManager.Unregister(_currentlyRegistered, this);
+            _currentlyRegistered = null;
+        }
+
+        if (!string.IsNullOrEmpty(key))
+        {
+            AccessKeyManager.Register(key, this);
+            _currentlyRegistered = key;
+        }
+    }
+
+    private void ShowKeyboardCue()
+    {
+        if (_accessKey is null)
+        {
+            return;
+        }
+
+        if (KeyboardNavigation.GetIsAccessKeyMode(this))
+        {
+            _accessKey.TextDecorations = Windows.TextDecorations.Underline;
+        }
+        else
+        {
+            _accessKey.TextDecorations = null;
+        }
     }
 }
