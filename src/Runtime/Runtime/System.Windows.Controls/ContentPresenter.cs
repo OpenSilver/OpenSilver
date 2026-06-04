@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml.Context;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -31,8 +32,40 @@ namespace System.Windows.Controls
 
         static ContentPresenter()
         {
+            // Default template for strings
+            var template = new DataTemplate
+            {
+                Template = new CompiledTemplateContent(
+                    new XamlContext(),
+                    static (owner, context) =>
+                    {
+                        var text = new TextBlock();
+                        text.SetTemplatedParent(context.TemplateOwnerReference);
+                        text.SetBinding(TextBlock.TextProperty, Binding.Empty);
+                        return text;
+                    })
+            };
+            template.Seal();
+            StringContentTemplate = template;
+
+            // Default template for strings when hosted in ContentPresenter with RecognizesAccessKey=true
+            template = new DataTemplate
+            {
+                Template = new CompiledTemplateContent(
+                    new XamlContext(),
+                    static (owner, context) =>
+                    {
+                        var text = new AccessText();
+                        text.SetTemplatedParent(context.TemplateOwnerReference);
+                        text.SetBinding(AccessText.TextProperty, Binding.Empty);
+                        return text;
+                    })
+            };
+            template.Seal();
+            AccessTextContentTemplate = template;
+
             // Default template
-            DataTemplate template = new DefaultTemplate();
+            template = new DefaultTemplate();
             template.Seal();
             DefaultContentTemplate = template;
 
@@ -81,6 +114,10 @@ namespace System.Windows.Controls
             {
                 mismatch = false; // explicit template - do not re-apply
             }
+            else if (ctrl.ContentTemplateSelector is not null)
+            {
+                mismatch = true; // template selector - always re-select
+            }
             else if (ctrl.Template == UIElementContentTemplate)
             {
                 mismatch = true; // direct template - always re-apply
@@ -97,6 +134,25 @@ namespace System.Windows.Controls
                 Type newDataType = e.NewValue?.GetType();
 
                 mismatch = oldDataType != newDataType;
+
+                // but mismatch if we're displaying strings via a default template
+                // and the presence of an AccessKey changes
+                if (!mismatch &&
+                    ctrl.RecognizesAccessKey &&
+                    ReferenceEquals(typeof(string), newDataType) &&
+                    ctrl.IsUsingDefaultStringTemplate)
+                {
+                    string oldString = (string)e.OldValue;
+                    string newString = (string)e.NewValue;
+
+                    bool oldHasAccessKey = oldString.IndexOf(AccessText.AccessKeyMarker) > -1;
+                    bool newHasAccessKey = newString.IndexOf(AccessText.AccessKeyMarker) > -1;
+
+                    if (oldHasAccessKey != newHasAccessKey)
+                    {
+                        mismatch = true;
+                    }
+                }
             }
 
             // if the content and (old) template don't match, reselect the template
@@ -218,7 +274,6 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="RecognizesAccessKey"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RecognizesAccessKeyProperty =
             DependencyProperty.Register(
                 nameof(RecognizesAccessKey),
@@ -234,7 +289,6 @@ namespace System.Windows.Controls
         /// <see langword="true"/> if the <see cref="ContentPresenter"/> should use AccessText in 
         /// its style; otherwise, <see langword="false"/>. The default is <see langword="false"/>.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public bool RecognizesAccessKey
         {
             get => (bool)GetValue(RecognizesAccessKeyProperty);
@@ -281,7 +335,13 @@ namespace System.Windows.Controls
 
         internal static DataTemplate DefaultContentTemplate { get; }
 
+        internal static DataTemplate StringContentTemplate { get; }
+
+        internal static DataTemplate AccessTextContentTemplate { get; }
+
         internal static DataTemplate UIElementContentTemplate { get; }
+
+        private bool IsUsingDefaultStringTemplate => Template == StringContentTemplate || Template == AccessTextContentTemplate;
 
         internal override void OnPreApplyTemplate()
         {
@@ -394,6 +454,10 @@ namespace System.Windows.Controls
                     {
                         template = UIElementContentTemplate;
                     }
+                    else if (content is string s)
+                    {
+                        template = SelectTemplateForString(s);
+                    }
                     else
                     {
                         template = DefaultContentTemplate;
@@ -402,6 +466,18 @@ namespace System.Windows.Controls
             }
 
             return template;
+        }
+
+        private DataTemplate SelectTemplateForString(string s)
+        {
+            if (RecognizesAccessKey && s.IndexOf(AccessText.AccessKeyMarker) > -1)
+            {
+                return AccessTextContentTemplate;
+            }
+            else
+            {
+                return StringContentTemplate;
+            }
         }
 
         //  Searches through resource dictionaries to find a DataTemplate

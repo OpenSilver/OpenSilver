@@ -30,14 +30,14 @@ public class InlineCollection : TextElementCollection<Inline>, IList
     {
         ArgumentNullException.ThrowIfNull(text);
 
-        Add(new Run { Text = text });
+        Add(new Run(text));
     }
 
     int IList.Add(object value)
     {
         Inline inline = value switch
         {
-            string text => new Run { Text = text ?? string.Empty },
+            string text => new Run(text ?? string.Empty),
             Inline i => i,
             _ => null,
         };

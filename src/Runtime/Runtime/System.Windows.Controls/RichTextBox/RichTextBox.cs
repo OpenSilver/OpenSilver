@@ -807,9 +807,7 @@ namespace System.Windows.Controls
 
         private Run CreateRun(QuillDelta delta)
         {
-            var run = new Run();
-
-            run.Text = delta.Text;
+            var run = new Run(delta.Text);
 
             if (delta.Attributes is QuillRangeFormat format)
             {

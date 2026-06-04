@@ -101,8 +101,7 @@ internal static class RichTextXamlParser
         {
             if (node.Name == nameof(Run))
             {
-                var element = new Run();
-                element.Text = node.InnerText;
+                var element = new Run(node.InnerText);
                 SetProperties(element, node);
                 return element;
             }
@@ -163,7 +162,7 @@ internal static class RichTextXamlParser
         else if (node.NodeType == XmlNodeType.Text ||
                  node.NodeType == XmlNodeType.SignificantWhitespace)
         {
-            return new Run { Text = node.Value };
+            return new Run(node.Value);
         }
 
         return null;

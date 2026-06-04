@@ -103,6 +103,23 @@ public sealed class Run : Inline
     private WeakEventToken _weakEventToken;
 
     /// <summary>
+    /// Initializes a new, default instance of the <see cref="Run"/> class.
+    /// </summary>
+    public Run() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Run"/> class, taking a specified string 
+    /// as the initial contents of the text run.
+    /// </summary>
+    /// <param name="text">
+    /// A string specifying the initial contents of the <see cref="Run"/> object.
+    /// </param>
+    public Run(string text)
+    {
+        Text = text;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="Text"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty TextProperty =

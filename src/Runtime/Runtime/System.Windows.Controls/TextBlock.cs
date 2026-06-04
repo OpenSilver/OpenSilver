@@ -823,7 +823,7 @@ namespace System.Windows.Controls
                 else
                 {
                     tb.Inlines.Clear();
-                    tb.Inlines.Add(new Run { Text = text });
+                    tb.Inlines.Add(new Run(text));
                 }
             }
             finally
