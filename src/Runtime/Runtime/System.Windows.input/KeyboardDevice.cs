@@ -434,9 +434,9 @@ public abstract class KeyboardDevice : InputDevice
 
         string text = ((char)nativeKeyCode).ToString();
 
-        var textInputStartArgs = new TextCompositionEventArgs
+        var textInputStartArgs = new TextCompositionEventArgs(this)
         {
-            RoutedEvent = UIElement.TextInputStartEvent,
+            RoutedEvent = TextCompositionManager.TextInputStartEvent,
             Source = source,
             Text = text,
             TextComposition = TextComposition.Empty,
@@ -445,9 +445,9 @@ public abstract class KeyboardDevice : InputDevice
 
         source.RaiseTrustedEvent(textInputStartArgs);
 
-        var textInputArgs = new TextCompositionEventArgs
+        var textInputArgs = new TextCompositionEventArgs(this)
         {
-            RoutedEvent = UIElement.TextInputEvent,
+            RoutedEvent = TextCompositionManager.TextInputEvent,
             Source = source,
             Text = text,
             TextComposition = TextComposition.Empty,

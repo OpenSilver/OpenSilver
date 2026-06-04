@@ -51,10 +51,10 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.GotMouseCaptureEvent, new MouseEventHandler(OnGotMouseCaptureThunk), true);
             EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), true);
-            EventManager.RegisterClassHandler<UIElement>(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(PreviewTextInputEvent, new TextCompositionEventHandler(OnPreviewTextInputThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
-            EventManager.RegisterClassHandler<UIElement>(TextInputUpdateEvent, new TextCompositionEventHandler(OnTextInputUpdateThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(TextCompositionManager.TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(TextCompositionManager.PreviewTextInputEvent, new TextCompositionEventHandler(OnPreviewTextInputThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(TextCompositionManager.TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
+            EventManager.RegisterClassHandler<UIElement>(TextCompositionManager.TextInputUpdateEvent, new TextCompositionEventHandler(OnTextInputUpdateThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TappedEvent, new TappedEventHandler(OnTappedThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Keyboard.PreviewKeyDownEvent, new KeyEventHandler(OnPreviewKeyDownThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Keyboard.KeyDownEvent, new KeyEventHandler(OnKeyDownThunk), false);
@@ -1126,20 +1126,15 @@ namespace System.Windows
         /// <summary>
         /// Identifies the <see cref="TextInputStart"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent TextInputStartEvent =
-            EventManager.RegisterCoreEvent(
-                nameof(TextInputStart),
-                RoutingStrategy.Bubble,
-                typeof(TextCompositionEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent TextInputStartEvent = TextCompositionManager.TextInputStartEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when a UI element initially gets text in a device-independent manner.
         /// </summary>
         public event TextCompositionEventHandler TextInputStart
         {
-            add => AddHandler(TextInputStartEvent, value, false);
-            remove => RemoveHandler(TextInputStartEvent, value);
+            add => AddHandler(TextCompositionManager.TextInputStartEvent, value, false);
+            remove => RemoveHandler(TextCompositionManager.TextInputStartEvent, value);
         }
 
         /// <summary>
@@ -1154,12 +1149,7 @@ namespace System.Windows
         /// Identifies the <see cref="PreviewTextInput"/> routed event.
         /// </summary>
         [NotImplemented]
-        public static readonly RoutedEvent PreviewTextInputEvent =
-            EventManager.RegisterRoutedEvent(
-                nameof(PreviewTextInput),
-                RoutingStrategy.Tunnel,
-                typeof(TextCompositionEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent PreviewTextInputEvent = TextCompositionManager.PreviewTextInputEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when this element gets text in a device-independent manner.
@@ -1167,8 +1157,8 @@ namespace System.Windows
         [NotImplemented]
         public event TextCompositionEventHandler PreviewTextInput
         {
-            add => AddHandler(PreviewTextInputEvent, value, false);
-            remove => RemoveHandler(PreviewTextInputEvent, value);
+            add => AddHandler(TextCompositionManager.PreviewTextInputEvent, value, false);
+            remove => RemoveHandler(TextCompositionManager.PreviewTextInputEvent, value);
         }
 
         /// <summary>
@@ -1185,12 +1175,7 @@ namespace System.Windows
         /// <summary>
         /// Identifies the <see cref="TextInput"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent TextInputEvent =
-            EventManager.RegisterCoreEvent(
-                nameof(TextInput),
-                RoutingStrategy.Bubble,
-                typeof(TextCompositionEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent TextInputEvent = TextCompositionManager.TextInputEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when a UI element gets text in a device-independent manner.
@@ -1200,8 +1185,8 @@ namespace System.Windows
         /// </summary>
         public event TextCompositionEventHandler TextInput
         {
-            add => AddHandler(TextInputEvent, value, false);
-            remove => RemoveHandler(TextInputEvent, value);
+            add => AddHandler(TextCompositionManager.TextInputEvent, value, false);
+            remove => RemoveHandler(TextCompositionManager.TextInputEvent, value);
         }
 
         /// <summary>
@@ -1215,22 +1200,17 @@ namespace System.Windows
         /// <summary>
         /// Identifies the <see cref="TextInputUpdate"/> routed event.
         /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly RoutedEvent TextInputUpdateEvent =
-            EventManager.RegisterCoreEvent(
-                nameof(TextInputUpdate),
-                RoutingStrategy.Bubble,
-                typeof(TextCompositionEventHandler),
-                typeof(UIElement));
+        [NotImplemented]
+        public static readonly RoutedEvent TextInputUpdateEvent = TextCompositionManager.TextInputUpdateEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when text continues to be composed via an input method editor (IME).
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public event TextCompositionEventHandler TextInputUpdate
         {
-            add => AddHandler(TextInputUpdateEvent, value, false);
-            remove => RemoveHandler(TextInputUpdateEvent, value);
+            add => AddHandler(TextCompositionManager.TextInputUpdateEvent, value, false);
+            remove => RemoveHandler(TextCompositionManager.TextInputUpdateEvent, value);
         }
 
         /// <summary>
@@ -1239,7 +1219,7 @@ namespace System.Windows
         /// <param name="e">
         /// A <see cref="TextCompositionEventArgs"/> that contains the event data
         /// </param>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         protected virtual void OnTextInputUpdate(TextCompositionEventArgs e) { }
 
         #endregion

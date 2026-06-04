@@ -16,9 +16,12 @@ namespace System.Windows.Input;
 /// <summary>
 /// Provides data for the <see cref="UIElement.TextInput"/> routed event.
 /// </summary>
-public sealed class TextCompositionEventArgs : RoutedEventArgs
+public sealed class TextCompositionEventArgs : InputEventArgs
 {
-    internal TextCompositionEventArgs() { }
+    internal TextCompositionEventArgs(InputDevice inputDevice)
+        : base(inputDevice, Environment.TickCount)
+    {
+    }
 
     /// <inheritdoc />
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
