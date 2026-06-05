@@ -118,8 +118,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the IsSelectionActive dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsSelectionActiveProperty =
-            IsSelectionActivePropertyKey.DependencyProperty;
+        new public static readonly DependencyProperty IsSelectionActiveProperty = Selector.IsSelectionActiveProperty;
 
         private static void OnIsSelectionActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

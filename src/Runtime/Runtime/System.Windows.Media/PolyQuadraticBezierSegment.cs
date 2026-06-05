@@ -29,6 +29,25 @@ public sealed class PolyQuadraticBezierSegment : PathSegment
     public PolyQuadraticBezierSegment() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="PolyQuadraticBezierSegment"/> class with the 
+    /// specified collection of <see cref="Point"/> objects and a value specifying whether the 
+    /// segments are stroked.
+    /// </summary>
+    /// <param name="points">
+    /// The collection of points that specify the geometry of the Bezier curve segments.
+    /// </param>
+    /// <param name="isStroked">
+    /// true to stroke the segments; otherwise, false.
+    /// </param>
+    public PolyQuadraticBezierSegment(IEnumerable<Point> points, bool isStroked)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+
+        Points = new PointCollection(points);
+        IsStroked = isStroked;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="Points"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty PointsProperty =

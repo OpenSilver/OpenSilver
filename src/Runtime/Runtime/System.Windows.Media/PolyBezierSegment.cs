@@ -29,6 +29,25 @@ public sealed class PolyBezierSegment : PathSegment
     public PolyBezierSegment() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="PolyBezierSegment"/> class with the specified 
+    /// collection of <see cref="Point"/> objects and a value specifying whether the segments are 
+    /// stroked.
+    /// </summary>
+    /// <param name="points">
+    /// The collection of points that specify the geometry of the cubic Bezier curve segments.
+    /// </param>
+    /// <param name="isStroked">
+    /// Value specifying whether the segments are stroked.
+    /// </param>
+    public PolyBezierSegment(IEnumerable<Point> points, bool isStroked)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+
+        Points = new PointCollection(points);
+        IsStroked = isStroked;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="Points"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty PointsProperty =
