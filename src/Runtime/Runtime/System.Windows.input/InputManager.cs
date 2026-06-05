@@ -20,6 +20,9 @@ using System.Windows.Threading;
 
 namespace System.Windows.Input;
 
+/// <summary>
+/// Manages all the input systems in Windows Presentation Foundation (WPF).
+/// </summary>
 public sealed class InputManager : DispatcherObject
 {
     // This must remain synchronyzed with the EVENTS enum defined in cshtml5.js.
@@ -127,8 +130,11 @@ public sealed class InputManager : DispatcherObject
     }
 
     /// <summary>
-    /// Return the input manager associated with the current context.
+    /// Gets the <see cref="InputManager"/> associated with the current thread.
     /// </summary>
+    /// <returns>
+    /// The input manager.
+    /// </returns>
     public static InputManager Current { get; } = new InputManager();
 
     /// <summary>

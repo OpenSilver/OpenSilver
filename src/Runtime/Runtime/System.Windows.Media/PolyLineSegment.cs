@@ -30,6 +30,25 @@ public sealed class PolyLineSegment : PathSegment
     public PolyLineSegment() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="PolyLineSegment"/> class with the specified list 
+    /// of points that determine the line segments and a value indicating whether the segments are 
+    /// stroked.
+    /// </summary>
+    /// <param name="points">
+    /// A collection of points that determine the line segments of the <see cref="PolyLineSegment"/>.
+    /// </param>
+    /// <param name="isStroked">
+    /// true to make the segment stroked; otherwise, false.
+    /// </param>
+    public PolyLineSegment(IEnumerable<Point> points, bool isStroked)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+
+        Points = new PointCollection(points);
+        IsStroked = isStroked;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="Points"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty PointsProperty =

@@ -1188,6 +1188,16 @@ namespace System.Windows
 
         #endregion
 
+        /// <summary>
+        /// Moves the keyboard focus away from this element and to another element in a provided traversal direction.
+        /// </summary>
+        /// <param name="request">
+        /// The direction that focus is to be moved, as a value of the enumeration.
+        /// </param>
+        /// <returns>
+        /// Returns true if focus is moved successfully; false if the target element in direction as specified does not 
+        /// exist or could not be keyboard focused.
+        /// </returns>
         public sealed override bool MoveFocus(TraversalRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);

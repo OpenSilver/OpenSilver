@@ -14,15 +14,18 @@
 using System.ComponentModel;
 
 namespace System.Windows.Input;
+
 /// <summary>
-/// Represents a request to an element to move focus to another control.
+/// Represents a request to move focus to another control.
 /// </summary>
 public sealed class TraversalRequest
 {
     /// <summary>
-    /// Constructor that requests passing FocusNavigationDirection
+    /// Initializes a new instance of the <see cref="TraversalRequest"/> class.
     /// </summary>
-    /// <param name="focusNavigationDirection">Type of focus traversal to perform</param>
+    /// <param name="focusNavigationDirection">
+    /// The intended direction of the focus traversal, as a value of the enumeration.
+    /// </param>
     public TraversalRequest(FocusNavigationDirection focusNavigationDirection)
     {
         if (focusNavigationDirection != FocusNavigationDirection.Next &&
@@ -37,38 +40,48 @@ public sealed class TraversalRequest
     }
 
     /// <summary>
-    /// true if reached the end of child elements that should have focus
+    /// Gets or sets a value that indicates whether focus traversal has reached the end of 
+    /// child elements that can have focus.
     /// </summary>
+    /// <returns>
+    /// true if this traversal has reached the end of child elements that can have focus;
+    /// otherwise, false. The default is false.
+    /// </returns>
     public bool Wrapped { get; set; }
 
     /// <summary>
-    /// Determine how to move the focus
+    /// Gets the traversal direction.
     /// </summary>
+    /// <returns>
+    /// One of the traversal direction enumeration values.
+    /// </returns>
     public FocusNavigationDirection FocusNavigationDirection { get; }
 }
 
 /// <summary>
-/// Determine how to move the focus
+/// Specifies the direction within a user interface (UI) in which a desired focus change 
+/// request is attempted. The direction is either based on tab order or by relative direction 
+/// in layout.
 /// </summary>
 public enum FocusNavigationDirection
 {
     /// <summary>
-    /// Move the focus to the next Control in Tab order.
+    /// Move focus to the next focusable element in tab order.
     /// </summary>
     Next,
 
     /// <summary>
-    /// Move the focus to the previous Control in Tab order. Shift+Tab
+    /// Move focus to the previous focusable element in tab order.
     /// </summary>
     Previous,
 
     /// <summary>
-    /// Move the focus to the first Control in Tab order inside the subtree.
+    /// Move focus to the first focusable element in tab order.
     /// </summary>
     First,
 
     /// <summary>
-    /// Move the focus to the last Control in Tab order inside the subtree.
+    /// Move focus to the last focusable element in tab order.
     /// </summary>
     Last,
 
