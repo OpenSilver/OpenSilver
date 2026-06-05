@@ -57,30 +57,40 @@ internal static class ProcessingContentPresenterNodes
             if (settings.Inspector.IsControlTemplate(type))
             {
                 targetType = GetTargetTypeData(element, settings);
-                isInsideControlTemplate = targetType is not null && settings.Inspector.IsContentControl(targetType.Type);
+                isInsideControlTemplate = targetType is not null;
             }
-            else if (isInsideControlTemplate && settings.Inspector.IsContentPresenter(type))
+            else if (isInsideControlTemplate)
             {
-                (string contentSource, bool isContentSourceSet) = GetContentSource(element, settings);
-                bool isContentPropertyDefined = HasAttribute(element, "Content", settings);
-                bool isContentTemplatePropertyDefined = HasAttribute(element, "ContentTemplate", settings);
-                bool isContentTemplateSelectorPropertyDefined = HasAttribute(element, "ContentTemplateSelector", settings);
+                bool isContentControl = settings.Inspector.IsContentControl(targetType.Type);
 
-                if (!isContentSourceSet)
+                if ((settings.HasFeature(XamlPreprocessorFeatures.AlwaysAutoAliasContentPresenter) || isContentControl) && settings.Inspector.IsContentPresenter(type))
                 {
-                    SetDefaultTemplateBindings(element,
-                        isContentPropertyDefined,
-                        isContentTemplatePropertyDefined,
-                        isContentTemplateSelectorPropertyDefined);
-                }
-                else
-                {
-                    SetTemplateBindings(element,
-                        targetType,
-                        contentSource,
-                        isContentPropertyDefined,
-                        isContentTemplatePropertyDefined,
-                        isContentTemplateSelectorPropertyDefined);
+                    (string contentSource, bool isContentSourceSet) = GetContentSource(element, settings);
+                    bool isContentPropertyDefined = HasAttribute(element, "Content", settings);
+                    bool isContentTemplatePropertyDefined = HasAttribute(element, "ContentTemplate", settings);
+                    bool isContentTemplateSelectorPropertyDefined = HasAttribute(element, "ContentTemplateSelector", settings);
+
+                    if (!isContentSourceSet && isContentControl)
+                    {
+                        SetDefaultTemplateBindings(element,
+                            isContentPropertyDefined,
+                            isContentTemplatePropertyDefined,
+                            isContentTemplateSelectorPropertyDefined);
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(contentSource) && !isContentSourceSet)
+                        {
+                            contentSource = "Content";
+                        }
+
+                        SetTemplateBindings(element,
+                            targetType,
+                            contentSource,
+                            isContentPropertyDefined,
+                            isContentTemplatePropertyDefined,
+                            isContentTemplateSelectorPropertyDefined);
+                    }
                 }
             }
         }
@@ -166,6 +176,11 @@ internal static class ProcessingContentPresenterNodes
         bool isContentTemplatePropertyDefined,
         bool isContentTemplateSelectorPropertyDefined)
     {
+        if (string.IsNullOrEmpty(contentSource))
+        {
+            return;
+        }
+
         if (!isContentPropertyDefined || (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined))
         {
             string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;

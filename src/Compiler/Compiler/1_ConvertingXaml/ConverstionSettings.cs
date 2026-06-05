@@ -1,5 +1,4 @@
-﻿
-/*===================================================================================
+﻿/*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
 *      
@@ -16,13 +15,16 @@ namespace OpenSilver.Compiler;
 
 internal sealed class ConversionSettings
 {
+    private readonly XamlPreprocessorFeatures _features;
+
     public ConversionSettings(
         string assemblyName,
         AssembliesInspector inspector,
         CoreTypesConverter coreTypes,
         SystemTypesHelper systemTypes,
         TypeReferenceHelper typeReferenceHelper,
-        XamlPreprocessorOptions options)
+        XamlPreprocessorOptions options,
+        XamlPreprocessorFeatures features)
     {
         AssemblyName = assemblyName;
         Inspector = inspector;
@@ -32,6 +34,7 @@ internal sealed class ConversionSettings
         XamlNameParser = new XamlNameParser(assemblyName);
         NameProvider = new();
         Options = options;
+        _features = features;
     }
 
     public string AssemblyName { get; }
@@ -49,4 +52,6 @@ internal sealed class ConversionSettings
     public NameProvider NameProvider { get; }
 
     public XamlPreprocessorOptions Options { get; }
+
+    public bool HasFeature(XamlPreprocessorFeatures feature) => (_features & feature) != 0;
 }

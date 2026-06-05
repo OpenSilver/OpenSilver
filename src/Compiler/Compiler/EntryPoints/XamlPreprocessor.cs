@@ -46,6 +46,7 @@ namespace OpenSilver.Compiler
         private SupportedLanguage _supportedLanguage = SupportedLanguage.Unknown;
         private string _language;
         private XamlPreprocessorOptions _options;
+        private XamlPreprocessorFeatures _features;
 
         private AssembliesInspector AssembliesInspector => _assembliesInspector.Value;
 
@@ -98,6 +99,8 @@ namespace OpenSilver.Compiler
 
         public string Options { get; set; }
 
+        public string Features { get; set; }
+
         [Required]
         public bool IsSecondPass { get; set; }
 
@@ -137,6 +140,7 @@ namespace OpenSilver.Compiler
             }
 
             _options = ParseOptions(Options, XamlPreprocessorOptions.Auto);
+            _features = ParseXamlFeatures(Features, XamlPreprocessorFeatures.None);
 
             _watch.Start();
 
@@ -259,7 +263,7 @@ namespace OpenSilver.Compiler
             };
         }
 
-        private string GenerateCode(string xaml, string sourceFile, string fileIdentity, XamlPreprocessorOptions options)
+        private string GenerateCode(string xaml, string sourceFile, string fileIdentity, XamlPreprocessorOptions options, XamlPreprocessorFeatures features)
         {
             string generatedCode = string.Empty;
             switch (_supportedLanguage)
@@ -269,7 +273,7 @@ namespace OpenSilver.Compiler
                         xaml,
                         sourceFile,
                         fileIdentity,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.CSharp, TypeReferenceHelper.CSharp, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.CSharp, TypeReferenceHelper.CSharp, options, features),
                         !IsSecondPass);
 
                     generatedCode = CreateCSHeaderContainingHash(xaml)
@@ -284,7 +288,7 @@ namespace OpenSilver.Compiler
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.VisualBasic, TypeReferenceHelper.VisualBasic, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.VisualBasic, TypeReferenceHelper.VisualBasic, options, features),
                         !IsSecondPass);
 
                     generatedCode = CreateVBHeaderContainingHash(xaml)
@@ -299,7 +303,7 @@ namespace OpenSilver.Compiler
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.FSharp, TypeReferenceHelper.FSharp, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.FSharp, TypeReferenceHelper.FSharp, options, features),
                         !IsSecondPass);
 
                     generatedCode = CreateFSHeaderContainingHash(xaml)
@@ -318,12 +322,13 @@ namespace OpenSilver.Compiler
             string fileIdentity = GetFileIdentity(item);
             string xaml = ReadFileContent(sourceFilePath);
             XamlPreprocessorOptions options = GetXamlProcessorOptions(item);
+            XamlPreprocessorFeatures features = GetXamlFeatures(item);
 
             if (!VerifyHash || IsFileOutdated(xaml, outputFilePath))
             {
                 TimeSpan start = _watch.Elapsed;
 
-                string generatedCode = GenerateCode(xaml, sourceFilePath, fileIdentity, options);
+                string generatedCode = GenerateCode(xaml, sourceFilePath, fileIdentity, options, features);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
                 using (var sw = new StreamWriter(outputFilePath))
@@ -349,6 +354,24 @@ namespace OpenSilver.Compiler
                 return fallback;
             }
             return options;
+        }
+
+        private XamlPreprocessorFeatures ParseXamlFeatures(string value, XamlPreprocessorFeatures fallback)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return XamlPreprocessorFeatures.None;
+            }
+
+            if (!Enum.TryParse(value, true, out XamlPreprocessorFeatures features))
+            {
+                Log.LogWarning(
+                    $"Invalid XamlFeatures value '{value}'. Expected a comma-separated list of valid XamlFeatures flags: {string.Join(", ", Enum.GetNames(typeof(XamlPreprocessorFeatures)))}.");
+
+                return fallback;
+            }
+
+            return features;
         }
 
         private static bool IsFileOutdated(string xaml, string outputFile)
@@ -415,6 +438,16 @@ namespace OpenSilver.Compiler
                 return _options;
             }
             return ParseOptions(options, _options);
+        }
+
+        private XamlPreprocessorFeatures GetXamlFeatures(ITaskItem item)
+        {
+            string features = item.GetMetadata("OpenSilverXamlPreprocessorFeatures");
+            if (string.IsNullOrEmpty(features))
+            {
+                return _features;
+            }
+            return ParseXamlFeatures(features, _features);
         }
 
         private static string ReadFileContent(string filePath)

@@ -78,6 +78,30 @@
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
     <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
+    <!--
+      ================================================================
+                     OpenSilverXamlPreprocessorFeatures
+      ================================================================
+      
+      Optional XAML compiler features enabled in addition to the default Silverlight-compatible behavior.
+      
+      Multiple values can be combined using a comma-separated list.
+      
+      Available values:
+      
+        None
+          Enables no additional features. This is the default value.
+      
+        AlwaysAutoAliasContentPresenter
+          Automatically aliases ContentPresenter properties in every ControlTemplate.
+      
+          By default, ContentPresenter properties are automatically aliased only when the ContentPresenter is 
+          declared inside a ControlTemplate whose TargetType is ContentControl or derives from ContentControl.
+      
+          Enabling this feature removes that restriction and applies the same automatic aliasing behavior 
+          regardless of the ControlTemplate TargetType.
+    -->
+    <OpenSilverXamlPreprocessorFeatures Condition=" '$(OpenSilverXamlPreprocessorFeatures)' == '' ">None</OpenSilverXamlPreprocessorFeatures>
     <OpenSilverMaxDegreeOfParallelism Condition=" '$(OpenSilverMaxDegreeOfParallelism)' == '' ">-1</OpenSilverMaxDegreeOfParallelism>
     <!--
       Controls the default behavior for whether Resource and Content files are embedded into the DLL. Default: true.  
@@ -250,6 +274,7 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
+      Features="$(OpenSilverXamlPreprocessorFeatures)"
       MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)"
       Language="$(Language)"
       IsDesignTime="false">
@@ -342,6 +367,7 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
+      Features="$(OpenSilverXamlPreprocessorFeatures)"
       MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)"
       Language="$(Language)"
       IsDesignTime="true">
