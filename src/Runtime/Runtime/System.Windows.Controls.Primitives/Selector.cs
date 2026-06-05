@@ -1541,6 +1541,13 @@ namespace System.Windows.Controls.Primitives
                 new PropertyMetadata(BooleanBoxes.FalseBox));
 
         /// <summary>
+        /// Indicates whether the keyboard focus is within the Selector.
+        /// In case when focus goes to Menu/Toolbar then selection is active too.
+        /// </summary>
+        public static readonly DependencyProperty IsSelectionActiveProperty =
+            IsSelectionActivePropertyKey.DependencyProperty;
+
+        /// <summary>
         /// Gets a value that indicates whether the specified <see cref="Selector"/>
         /// has the focus.
         /// </summary>

@@ -17,7 +17,7 @@ namespace System.Windows.Input;
 /// <summary>
 /// Represents a request to an element to move focus to another control.
 /// </summary>
-internal sealed class TraversalRequest
+public sealed class TraversalRequest
 {
     /// <summary>
     /// Constructor that requests passing FocusNavigationDirection
@@ -50,7 +50,7 @@ internal sealed class TraversalRequest
 /// <summary>
 /// Determine how to move the focus
 /// </summary>
-internal enum FocusNavigationDirection
+public enum FocusNavigationDirection
 {
     /// <summary>
     /// Move the focus to the next Control in Tab order.

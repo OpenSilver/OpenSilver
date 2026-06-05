@@ -27,6 +27,18 @@ public sealed class LineSegment : PathSegment
     public LineSegment() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="LineSegment"/> class that has
+    /// the specified end <see cref="Point"/> and Boolean that determines whether this <see cref="LineSegment"/> is stroked.
+    /// </summary>
+    /// <param name="point">The end point of this <see cref="LineSegment"/>.</param>
+    /// <param name="isStroked"><see langword="true"/> to stroke this <see cref="LineSegment"/>; otherwise, <see langword="false"/>.</param>
+    public LineSegment(Point point, bool isStroked)
+    {
+        Point = point;
+        IsStroked = isStroked;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="Point"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty PointProperty =

@@ -20,7 +20,7 @@ using System.Windows.Threading;
 
 namespace System.Windows.Input;
 
-internal sealed class InputManager : DispatcherObject
+public sealed class InputManager : DispatcherObject
 {
     // This must remain synchronyzed with the EVENTS enum defined in cshtml5.js.
     // Make sure to change both files if you update this !

@@ -493,6 +493,21 @@ namespace System.Windows
         /// </returns>
         public bool IsFocused => (bool)GetValue(IsFocusedProperty);
 
+        /// <summary>
+        /// Attempts to move focus from this element to another element.
+        /// The direction to move focus is specified by a guidance direction, 
+        /// which is interpreted within the organization of the visual parent for this element.
+        /// </summary>
+        /// <param name="request">
+        /// A traversal request, which contains a property that indicates either a mode 
+        /// to traverse in existing tab order, or a direction to move visually.
+        /// </param>
+        /// <returns><see langword="true"/> if the requested traversal was performed; otherwise, <see langword="false"/>.</returns>
+        public virtual bool MoveFocus(TraversalRequest request)
+        {
+            return false;
+        }
+
         #region ClipToBounds
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace System.Windows.Controls
     {
         private CollectionChangedHelper _collectionChanged;
 
-        internal UIElementCollection(UIElement visualParent, FrameworkElement logicalParent)
+        public UIElementCollection(UIElement visualParent, FrameworkElement logicalParent)
         {
             if (visualParent is null)
             {

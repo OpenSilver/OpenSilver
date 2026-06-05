@@ -1188,6 +1188,13 @@ namespace System.Windows
 
         #endregion
 
+        public sealed override bool MoveFocus(TraversalRequest request)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            return KeyboardNavigation.Current.Navigate(this, request);
+        }
+
         private static void OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             if (e.OriginalSource == sender)
