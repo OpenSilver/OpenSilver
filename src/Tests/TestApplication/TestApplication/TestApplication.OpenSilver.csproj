@@ -31,6 +31,7 @@
     <Compile Include="HintBehavior.cs" />
     <Compile Include="LinqSamples.cs" />
     <Compile Include="NotifyPropertyChanged.cs" />
+    <Compile Include="Tests\AccessTextTest.xaml.cs" />
     <Compile Include="Tests\AccordionTest.xaml.cs" />
     <Compile Include="Tests\Geometry\BooleanToAnyConverter.cs" />
     <Compile Include="Tests\Geometry\Bounds\GeometryBoundsViewer.xaml.cs" />
@@ -359,6 +360,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="Tests\AsyncAwaitTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Tests\AccessTextTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>

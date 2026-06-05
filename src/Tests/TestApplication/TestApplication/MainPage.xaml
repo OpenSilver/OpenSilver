@@ -18,7 +18,7 @@
         </ScrollViewer>
 
         <Border Grid.Column="1" BorderThickness="2" BorderBrush="Black">
-            <ScrollViewer x:Name="ScrollViewer1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="ScrollViewer1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <sdk:Frame x:Name="ContentContainer" JournalOwnership="Automatic">
                     <sdk:Frame.UriMapper>
                         <sdk:UriMapper>
