@@ -13,6 +13,7 @@
 
 using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
+using System.Windows.Input;
 
 namespace System.Windows.Controls;
 
@@ -26,6 +27,7 @@ public class GroupBox : HeaderedContentControl
         FocusableProperty.OverrideMetadata(typeof(GroupBox), new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
         IsTabStopProperty.OverrideMetadata(typeof(GroupBox), new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
         DefaultStyleKeyProperty.OverrideMetadata(typeof(GroupBox), new PropertyMetadata(typeof(GroupBox)));
+        EventManager.RegisterClassHandler<GroupBox>(AccessKeyManager.AccessKeyPressedEvent, new AccessKeyPressedEventHandler(OnAccessKeyPressed));
     }
 
     /// <summary>
@@ -40,4 +42,20 @@ public class GroupBox : HeaderedContentControl
     /// A <see cref="GroupBoxAutomationPeer"/> for the <see cref="GroupBox"/>.
     /// </returns>
     protected override AutomationPeer OnCreateAutomationPeer() => new GroupBoxAutomationPeer(this);
+
+    /// <summary>
+    /// Responds when the <see cref="AccessText.AccessKey"/> for the <see cref="GroupBox"/> is pressed.
+    /// </summary>
+    /// <param name="e">
+    /// The event information.
+    /// </param>
+    protected override void OnAccessKey(AccessKeyEventArgs e) => MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+
+    private static void OnAccessKeyPressed(object sender, AccessKeyPressedEventArgs e)
+    {
+        if (!e.Handled && e.Scope is null && e.Target is null)
+        {
+            e.Target = (GroupBox)sender;
+        }
+    }
 }
