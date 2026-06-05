@@ -32,6 +32,8 @@ namespace System.Windows.Controls.Primitives
 
         static ButtonBase()
         {
+            EventManager.RegisterClassHandler<ButtonBase>(AccessKeyManager.AccessKeyPressedEvent, new AccessKeyPressedEventHandler(OnAccessKeyPressed));
+            EventManager.RegisterClassHandler<ButtonBase>(LoadedEvent, new RoutedEventHandler(OnLoaded));
             KeyboardNavigation.AcceptsReturnProperty.OverrideMetadata(typeof(ButtonBase), new FrameworkPropertyMetadata(BooleanBoxes.TrueBox));
             IsEnabledProperty.OverrideMetadata(typeof(ButtonBase), new PropertyMetadata(OnIsEnabledChanged));
         }
@@ -39,11 +41,7 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonBase"/> class.
         /// </summary>
-        public ButtonBase()
-        {
-            // Attach the necessary events to their virtual counterparts
-            Loaded += delegate { UpdateVisualState(false); };
-        }
+        public ButtonBase() { }
 
         /// <summary>
         /// Identifies the <see cref="Click"/> routed event.
@@ -239,6 +237,25 @@ namespace System.Windows.Controls.Primitives
         private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((ButtonBase)d).OnCommandChanged((ICommand)e.NewValue);
+        }
+
+        /// <summary>
+        /// Responds when the <see cref="AccessText.AccessKey"/> for this control is called.
+        /// </summary>
+        /// <param name="e">
+        /// The event data for the <b>AccessKeyManager.AccessKeyPressed</b> event.
+        /// </param>
+        protected override void OnAccessKey(AccessKeyEventArgs e)
+        {
+            if (e.IsMultiple)
+            {
+                base.OnAccessKey(e);
+            }
+            else
+            {
+                // Don't call the base b/c we don't want to take focus
+                OnClick();
+            }
         }
 
         /// <summary>
@@ -685,6 +702,16 @@ namespace System.Windows.Controls.Primitives
             ReleaseMouseCapture();
             _isMouseCaptured = false;
         }
+
+        private static void OnAccessKeyPressed(object sender, AccessKeyPressedEventArgs e)
+        {
+            if (!e.Handled && e.Scope is null && e.Target is null)
+            {
+                e.Target = (UIElement)sender;
+            }
+        }
+
+        private static void OnLoaded(object sender, RoutedEventArgs e) => ((ButtonBase)sender).UpdateVisualState(false);
 
         private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

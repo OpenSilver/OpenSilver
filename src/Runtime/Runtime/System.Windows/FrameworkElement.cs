@@ -393,6 +393,7 @@ namespace System.Windows
             EventManager.RegisterClassHandler<FrameworkElement>(Validation.ErrorEvent,new EventHandler<ValidationErrorEventArgs>(OnValidationError));
             EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnPreviewGotKeyboardFocus));
             EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.GotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnGotKeyboardFocus));
+            EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.LostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnLostKeyboardFocus));
         }
 
         /// <summary>
@@ -1217,7 +1218,21 @@ namespace System.Windows
             {
                 var fe = (FrameworkElement)sender;
                 KeyboardNavigation.UpdateFocusedElement(fe);
-                KeyboardNavigation.Current.UpdateActiveElement(fe);
+
+                KeyboardNavigation keyNav = KeyboardNavigation.Current;
+                keyNav.NotifyFocusChanged(fe, e);
+                keyNav.UpdateActiveElement(fe);
+            }
+        }
+
+        private static void OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (sender == e.OriginalSource)
+            {
+                if (e.NewFocus is null)
+                {
+                    KeyboardNavigation.Current.NotifyFocusChanged(sender, e);
+                }
             }
         }
 

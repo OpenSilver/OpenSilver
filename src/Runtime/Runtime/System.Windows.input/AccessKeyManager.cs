@@ -15,6 +15,7 @@ using OpenSilver.Internal;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
@@ -289,8 +290,8 @@ public sealed class AccessKeyManager
     {
         string text = e.Key switch
         {
-            Key.Enter => "\x000D",
-            Key.Escape => "\x001B",
+            Key.Enter => Button.DefaultAccessKey,
+            Key.Escape => Button.CancelAccessKey,
             _ => null,
         };
 

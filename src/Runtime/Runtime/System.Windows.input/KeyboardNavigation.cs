@@ -11,11 +11,13 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
+using System.Windows.Threading;
 
 namespace System.Windows.Input;
 
@@ -24,6 +26,12 @@ namespace System.Windows.Input;
 /// </summary>
 public sealed class KeyboardNavigation
 {
+    private readonly WeakReferenceList<KeyboardFocusChangedEventHandler> _weakFocusChangedHandlers = new();
+
+    private KeyboardNavigation() { }
+
+    internal static KeyboardNavigation Current { get; } = new KeyboardNavigation();
+
     /// <summary>
     /// Identifies the KeyboardNavigation.TabIndex attached property.
     /// </summary>
@@ -294,9 +302,35 @@ public sealed class KeyboardNavigation
         d.SetValueInternal(IsAccessKeyModeProperty, value);
     }
 
-    private KeyboardNavigation() { }
+    internal event KeyboardFocusChangedEventHandler FocusChanged
+    {
+        add
+        {
+            lock (_weakFocusChangedHandlers)
+            {
+                _weakFocusChangedHandlers.Add(value);
+            }
+        }
+        remove
+        {
+            lock (_weakFocusChangedHandlers)
+            {
+                _weakFocusChangedHandlers.Remove(value);
+            }
+        }
+    }
 
-    internal static KeyboardNavigation Current { get; } = new KeyboardNavigation();
+    internal void NotifyFocusChanged(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        _weakFocusChangedHandlers.Process(
+            static (handler, sender, e) =>
+            {
+                handler?.Invoke(sender, e);
+                return false;
+            },
+            sender,
+            e);
+    }
 
     internal void ProcessInput(KeyEventArgs keyEventArgs)
     {
@@ -1172,5 +1206,140 @@ public sealed class KeyboardNavigation
     private bool IsFocusScope(DependencyObject e)
     {
         return GetParent(e) == null;
+    }
+
+    private sealed class WeakReferenceList<T> : DispatcherObject
+        where T : class
+    {
+        public int Count => _list.Count;
+
+        // add a weak reference to the item
+        public void Add(T item)
+        {
+            // before growing the list, purge it of dead entries.
+            // The expense of purging amortizes to O(1) per entry, because
+            // the the list doubles its capacity when it grows.
+            if (_list.Count == _list.Capacity)
+            {
+                Purge();
+            }
+
+            _list.Add(new WeakReference<T>(item));
+        }
+
+        // remove all references to the target item
+        public void Remove(object target)
+        {
+            bool hasDeadEntries = false;
+            for (int i = 0; i < _list.Count; ++i)
+            {
+                if (_list[i].TryGetTarget(out T item))
+                {
+                    if (item == target)
+                    {
+                        _list.RemoveAt(i);
+                        --i;
+                    }
+                }
+                else
+                {
+                    hasDeadEntries = true;
+                }
+            }
+
+            if (hasDeadEntries)
+            {
+                Purge();
+            }
+        }
+
+        // invoke the given action on each item
+        public void Process<TArg0, TArg1>(Func<T, TArg0, TArg1, bool> action, TArg0 arg0, TArg1 arg1)
+        {
+            bool hasDeadEntries = false;
+            for (int i = 0; i < _list.Count; ++i)
+            {
+                if (_list[i].TryGetTarget(out T item))
+                {
+                    if (action(item, arg0, arg1))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    hasDeadEntries = true;
+                }
+            }
+
+            if (hasDeadEntries)
+            {
+                // some actions cause the loop to exit early (often after
+                // the first call.  Don't penalize them with a synchronous
+                // purge;  instead purge later when there's nothing more
+                // important to do.
+                ScheduleCleanup();
+            }
+        }
+
+        // purge the list of dead references
+        private void Purge()
+        {
+            int destIndex = 0;
+            int n = _list.Count;
+
+            // move valid entries toward the beginning, into one
+            // contiguous block
+            for (int i = 0; i < n; ++i)
+            {
+                if (_list[i].TryGetTarget(out _))
+                {
+                    _list[destIndex++] = _list[i];
+                }
+            }
+
+            // remove the remaining entries and shrink the list
+            if (destIndex < n)
+            {
+                _list.RemoveRange(destIndex, n - destIndex);
+
+                // shrink the list if it would be less than half full otherwise.
+                // This is more liberal than List<T>.TrimExcess(), because we're
+                // probably in the situation where additions to the list are common.
+                int newCapacity = destIndex << 1;
+                if (newCapacity < _list.Capacity)
+                {
+                    _list.Capacity = newCapacity;
+                }
+            }
+        }
+
+        // schedule a cleanup pass
+        private void ScheduleCleanup()
+        {
+            if (!_isCleanupRequested)
+            {
+                _isCleanupRequested = true;
+                Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new DispatcherOperationCallback(CleanupOperation), this);
+            }
+        }
+
+        private static object CleanupOperation(object arg)
+        {
+            var list = (WeakReferenceList<T>)arg;
+
+            lock (list)
+            {
+                list.Purge();
+
+                // cleanup is done
+                list._isCleanupRequested = false;
+            }
+
+            return null;
+        }
+
+        private readonly List<WeakReference<T>> _list = new(1);
+        private bool _isCleanupRequested;
     }
 }
