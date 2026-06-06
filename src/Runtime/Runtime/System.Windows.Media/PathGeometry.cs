@@ -13,6 +13,7 @@
 
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
+using OpenSilver.Internal.Media.Geometry.Core;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -185,6 +186,48 @@ public sealed partial class PathGeometry : Geometry
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Gets the <see cref="Point"/> and a tangent vector on this <see cref="PathGeometry"/> at the 
+    /// specified fraction of its length.
+    /// </summary>
+    /// <param name="progress">
+    /// The fraction of the length of this <see cref="PathGeometry"/>.
+    /// </param>
+    /// <param name="point">
+    /// When this method returns, contains the location on this <see cref="PathGeometry"/> at the 
+    /// specified fraction of its length. This parameter is passed uninitialized.
+    /// </param>
+    /// <param name="tangent">
+    /// When this method returns, contains the tangent vector. This parameter is passed uninitialized.
+    /// </param>
+    public void GetPointAtFractionLength(double progress, out Point point, out Point tangent)
+    {
+        GetPointAtLengthFraction(GetPathGeometryData(), progress, out point, out tangent);
+    }
+
+    internal static void GetPointAtLengthFraction(PathGeometryData pathData, double fraction, out Point point, out Point tangent)
+    {
+        if (pathData.IsEmpty())
+        {
+            point = new Point();
+            tangent = new Point();
+            return;
+        }
+
+        var pathGeometry = new PathGeometryWrapper(pathData.SerializedData, pathData.FillRule, pathData.Matrix);
+
+        var animationPath = new CAnimationPath();
+        animationPath.SetUp(pathGeometry);
+
+        animationPath.GetPointAtLengthFraction(
+            fraction,
+            out MilPoint2D ptD,
+            out MilPoint2D vecTangentD);
+
+        point = new Point(ptD.X, ptD.Y);
+        tangent = new Point(vecTangentD.X, vecTangentD.Y);
     }
 
     /// <summary>
