@@ -49,7 +49,14 @@ namespace TestApplication
             Tests.Add(new Test("Binding", "Binding"));
             Tests.Add(new Test("Transform", "Transform"));
             Tests.Add(new Test("LayoutTransform", "LayoutTransform"));
-            Tests.Add(new Test("Animation", "Animation"));
+
+            TestCategory animations = new TestCategory("Animations");
+            animations.Add(new Test("Animation", "Animations/Animation"));
+            animations.Add(new Test("DoubleAnimationUsingPath", "Animations/DoubleAnimationUsingPath"));
+            animations.Add(new Test("PointAnimationUsingPath", "Animations/PointAnimationUsingPath"));
+            animations.Add(new Test("MatrixAnimationUsingPath", "Animations/MatrixAnimationUsingPath"));
+            Tests.Add(animations);
+
             Tests.Add(new Test("MouseMove/MouseCapture", "MouseMove_MouseCapture"));
             Tests.Add(new Test("Cursor", "Cursor"));
             Tests.Add(new Test("RadioButton", "RadioButton"));

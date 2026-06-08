@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Media.Animation;
 
 /// <summary>
@@ -19,6 +21,26 @@ namespace System.Windows.Media.Animation;
 public abstract class AnimationTimeline : Timeline
 {
     internal static readonly TimeSpan DefaultDuration = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// Identifies the <b>IsAdditive</b> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsAdditiveProperty =
+        DependencyProperty.Register(
+            "IsAdditive",
+            typeof(bool),
+            typeof(AnimationTimeline),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
+
+    /// <summary>
+    /// Identifies the <b>IsCumulative</b> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsCumulativeProperty =
+        DependencyProperty.Register(
+            "IsCumulative",
+            typeof(bool),
+            typeof(AnimationTimeline),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
 
     /// <summary>
     /// When overridden in a derived class, gets the <see cref="Type"/> of property that can be animated.

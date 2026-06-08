@@ -28,6 +28,8 @@
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
     <Compile Include="OpenSilver\Internal\Documents\TextContainerList.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\IAnimation.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\Animator.cs" />
     <Compile Include="OpenSilver\Internal\Media\ByteStreamGeometryContext.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\BaseTypes.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\BezierD.cs" />
@@ -164,6 +166,10 @@
     <Compile Include="System.Windows.Input\AccessKeyEventArgs.cs" />
     <Compile Include="System.Windows.Input\AccessKeyManager.cs" />
     <Compile Include="System.Windows.Input\AccessKeyPressedEventArgs.cs" />
+    <Compile Include="System.Windows.Media.Animation\DoubleAnimationUsingPath.cs" />
+    <Compile Include="System.Windows.Media.Animation\MatrixAnimationUsingPath.cs" />
+    <Compile Include="System.Windows.Media.Animation\PointAnimationUsingPath.cs" />
+    <Compile Include="System.Windows.Media.Animation\PathAnimationSource.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\AnimationPath.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\AnimationSegment.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\NewtonRaphsonSolver.cs" />

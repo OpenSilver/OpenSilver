@@ -1,0 +1,92 @@
+﻿<Page x:Class="TestApplication.Tests.PointAnimationUsingPathTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:TestApplication.Tests">
+
+    <Grid Background="#111827">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Margin="20">
+            <TextBlock Text="PointAnimationUsingPath"
+                       Foreground="White"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+
+            <TextBlock Text="Animation options"
+                       Foreground="#CBD5E1"
+                       Margin="0,24,0,6" />
+
+            <CheckBox Content="IsCumulative"
+                      Foreground="White"
+                      IsChecked="{Binding IsCumulative, Mode=TwoWay}" />
+
+            <CheckBox Content="IsAdditive"
+                      Foreground="White"
+                      IsChecked="{Binding IsAdditive, Mode=TwoWay}"
+                      Margin="0,8,0,0" />
+
+            <TextBlock Text="Wave width"
+                       Foreground="#CBD5E1"
+                       Margin="0,24,0,4" />
+
+            <Slider Minimum="200"
+                    Maximum="760"
+                    Value="{Binding WaveWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Foreground="#94A3B8"
+                       Text="{Binding WaveWidth, StringFormat=Width: {0:F0}}" />
+
+            <TextBlock Text="Wave height"
+                       Foreground="#CBD5E1"
+                       Margin="0,16,0,4" />
+
+            <Slider Minimum="120"
+                    Maximum="460"
+                    Value="{Binding WaveHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Foreground="#94A3B8"
+                       Text="{Binding WaveHeight, StringFormat=Height: {0:F0}}" />
+
+            <UniformGrid Margin="0,16,0,0"
+                         Columns="2">
+                <Button Content="Start Animation"
+                        Margin="0 0 2 0"
+                        Click="OnStartAnimationClick" />
+                <Button Content="Stop Animation"
+                        Margin="2 0 0 0"
+                        Click="OnStopAnimationClick" />
+            </UniformGrid>
+        </StackPanel>
+
+        <Canvas Grid.Column="1"
+                ClipToBounds="True">
+
+            <Path x:Name="PathGlow"
+                  Stroke="#38BDF8"
+                  StrokeThickness="8"
+                  Opacity="0.18"
+                  StrokeStartLineCap="Round"
+                  StrokeEndLineCap="Round" />
+
+            <Path x:Name="VisiblePath"
+                  Stroke="#7DD3FC"
+                  StrokeThickness="2"
+                  StrokeDashArray="8 5"
+                  Opacity="0.9" />
+
+            <Path Fill="Blue">
+                <Path.Data>
+                    <EllipseGeometry x:Name="Dot"
+                                     Center="50 100"
+                                     RadiusX="15"
+                                     RadiusY="15" />
+                </Path.Data>
+            </Path>
+
+        </Canvas>
+    </Grid>
+
+</Page>

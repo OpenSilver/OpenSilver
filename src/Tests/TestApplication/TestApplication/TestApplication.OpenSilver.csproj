@@ -33,6 +33,9 @@
     <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="Tests\AccessTextTest.xaml.cs" />
     <Compile Include="Tests\AccordionTest.xaml.cs" />
+    <Compile Include="Tests\Animations\DoubleAnimationUsingPathTest.xaml.cs" />
+    <Compile Include="Tests\Animations\MatrixAnimationUsingPathTest.xaml.cs" />
+    <Compile Include="Tests\Animations\PointAnimationUsingPathTest.xaml.cs" />
     <Compile Include="Tests\Geometry\BooleanToAnyConverter.cs" />
     <Compile Include="Tests\Geometry\Bounds\GeometryBoundsViewer.xaml.cs" />
     <Compile Include="Tests\Geometry\CombinedGeometry\CombinedGeometryTest.xaml.cs" />
@@ -81,7 +84,7 @@
     <Compile Include="Tests\Alignments\TopLeftTest.xaml.cs">
       <DependentUpon>TopLeftTest.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tests\AnimationTest.xaml.cs">
+    <Compile Include="Tests\Animations\AnimationTest.xaml.cs">
       <DependentUpon>AnimationTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\AsyncAwaitTest.xaml.cs">
@@ -355,7 +358,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
-    <Content Include="Tests\AnimationTest.xaml">
+    <Content Include="Tests\Animations\AnimationTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
@@ -651,6 +654,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Page Include="Tests\Animations\DoubleAnimationUsingPathTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\Animations\MatrixAnimationUsingPathTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\Animations\PointAnimationUsingPathTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tests\Geometry\Bounds\GeometryBoundsViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
