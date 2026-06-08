@@ -153,6 +153,7 @@
     <Compile Include="System.Windows.Controls\AccessText.cs" />
     <Compile Include="System.Windows.Controls\BorderGapClipConverter.cs" />
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
+    <Compile Include="System.Windows.Controls\Decorator.cs" />
     <Compile Include="System.Windows.Controls\GroupBox.cs" />
     <Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />

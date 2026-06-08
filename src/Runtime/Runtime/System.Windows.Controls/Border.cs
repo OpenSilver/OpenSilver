@@ -15,400 +15,362 @@ using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
-using System.Collections;
 using System.ComponentModel;
 using System.Windows.Markup;
 using System.Windows.Media;
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Draws a border, background, or both, around another object.
+/// </summary>
+/// <example>
+/// You can add a Border to the XAML as follows:
+/// <code lang="XAML" xml:space="preserve">
+/// <Border Width="60"
+///         Height="30"
+///         CornerRadius="15"
+///         Padding="20"
+///         Background="Blue"
+///         HorizontalAlignment="Left">
+///     <!--Child here.-->
+/// </Border>
+/// </code>
+/// Or in C# (assuming we have a StackPanel Named MyStackPanel):
+/// <code lang="C#">
+/// Border myBorder = new Border();
+/// myBorder.Width = 60;
+/// myBorder.Height = 30;
+/// myBorder.CornerRadius = new CornerRadius(15);
+/// myBorder.Padding = new Thickness(20);
+/// myBorder.Background = new SolidColorBrush(Windows.UI.Colors.Blue);
+/// myBorder.HorizontalAlignment=HorizontalAlignment.Left;
+/// MyStackPanel.Children.Add(myBorder);
+/// </code>
+/// </example>
+[ContentProperty(nameof(Child))]
+public class Border : Decorator, IBorderElement
 {
+    private WeakEventToken _weakBackgroundEventToken;
+    private WeakEventToken _weakBorderBrushEventToken;
+    private bool _refreshBackgroundOnSizeChange;
+
+    // We only check the Background property even if BorderBrush not null
+    // and BorderThickness > 0 is a sufficient condition to enable pointer
+    // events on the borders of the control.
+    // There is no way right now to differentiate the Background and BorderBrush
+    // as they are both defined on the same DOM element.
+    internal override bool EnablePointerEventsCore => Background is not null;
+
     /// <summary>
-    /// Draws a border, background, or both, around another object.
+    /// Identifies the <see cref="Child"/> dependency property.
     /// </summary>
-    /// <example>
-    /// You can add a Border to the XAML as follows:
-    /// <code lang="XAML" xml:space="preserve">
-    /// <Border Width="60"
-    ///         Height="30"
-    ///         CornerRadius="15"
-    ///         Padding="20"
-    ///         Background="Blue"
-    ///         HorizontalAlignment="Left">
-    ///     <!--Child here.-->
-    /// </Border>
-    /// </code>
-    /// Or in C# (assuming we have a StackPanel Named MyStackPanel):
-    /// <code lang="C#">
-    /// Border myBorder = new Border();
-    /// myBorder.Width = 60;
-    /// myBorder.Height = 30;
-    /// myBorder.CornerRadius = new CornerRadius(15);
-    /// myBorder.Padding = new Thickness(20);
-    /// myBorder.Background = new SolidColorBrush(Windows.UI.Colors.Blue);
-    /// myBorder.HorizontalAlignment=HorizontalAlignment.Left;
-    /// MyStackPanel.Children.Add(myBorder);
-    /// </code>
-    /// </example>
-    [ContentProperty(nameof(Child))]
-    public class Border : FrameworkElement, IBorderElement
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static readonly DependencyProperty ChildProperty =
+        DependencyProperty.Register(
+            nameof(Child),
+            typeof(UIElement),
+            typeof(Border),
+            new PropertyMetadata(null, OnChildChanged));
+
+    /// <inheritdoc />
+    public override UIElement Child
     {
-        private UIElement _child;
-        private WeakEventToken _weakBackgroundEventToken;
-        private WeakEventToken _weakBorderBrushEventToken;
-        private bool _refreshBackgroundOnSizeChange;
+        get => base.Child;
+        set => SetValueInternal(ChildProperty, value);
+    }
 
-        /// <summary>
-        /// Gets a value that is equal to the number of visual child elements of this instance of <see cref="Border"/>.
-        /// </summary>
-        /// <returns>
-        /// The number of visual child elements.
-        /// </returns>
-        protected override int VisualChildrenCount => Child is null ? 0 : 1;
+    private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Border)d).SetChild((UIElement)e.NewValue);
+    }
 
-        /// <summary>
-        /// Gets the child <see cref="UIElement"/> element at the specified index position.
-        /// </summary>
-        /// <param name="index">
-        /// Index position of the child element.
-        /// </param>
-        /// <returns>
-        /// The child element at the specified index position.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// index is greater than the number of visual child elements.
-        /// </exception>
-        protected override UIElement GetVisualChild(int index)
-        {
-            if (Child is null || index != 0)
+    private void SetChild(UIElement child) => base.Child = child;
+
+    /// <summary>
+    /// Identifies the <see cref="Background"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BackgroundProperty =
+        DependencyProperty.Register(
+            nameof(Background),
+            typeof(Brush),
+            typeof(Border),
+            new PropertyMetadata(null, OnBackgroundChanged)
             {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBackground((Brush)newValue),
+            });
 
-            return Child;
+    /// <summary>
+    /// Gets or sets the <see cref="Brush"/> that fills the area between the bounds of a <see cref="Border"/>.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="Brush"/> that draws the background. This property has no default value.
+    /// </returns>
+    public Brush Background
+    {
+        get => (Brush)GetValue(BackgroundProperty);
+        set => SetValueInternal(BackgroundProperty, value);
+    }
+
+    private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        Border border = (Border)d;
+
+        border._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+
+        border._weakBackgroundEventToken?.Dispose();
+        border._weakBackgroundEventToken = null;
+
+        if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
+        {
+            border._weakBackgroundEventToken = WeakEvent.Subscribe<Border, Brush, EventArgs>(
+                border,
+                newBrush,
+                static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
 
-        /// <summary>
-        /// Gets an enumerator that can be used to iterate the logical child elements of a <see cref="Border"/>.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate the logical child elements of a <see cref="Border"/>.
-        /// </returns>
-        protected internal override IEnumerator LogicalChildren
+        // Update pointer events
+        border.CoerceIsHitTestable();
+    }
+
+    private void OnBackgroundChanged(object sender, EventArgs e)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
         {
-            get
+            this.SetBackground((Brush)sender);
+        }
+    }
+
+    /// <inheritdoc />
+    protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
+    {
+        base.OnRenderSizeChanged(info);
+
+        if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            this.SetBackground(Background);
+        }
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="BorderBrush"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BorderBrushProperty =
+        DependencyProperty.Register(
+            nameof(BorderBrush),
+            typeof(Brush),
+            typeof(Border),
+            new PropertyMetadata(null, OnBorderBrushChanged)
             {
-                if (Child is null)
-                {
-                    return EmptyEnumerator.Instance;
-                }
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderColor(oldValue as Brush, (Brush)newValue),
+            });
 
-                // otherwise, its logical children is its visual children
-                return new SingleChildEnumerator(Child);
-            }
-        }
+    /// <summary>
+    /// Gets or sets the <see cref="Brush"/> that draws the outer border color.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="Brush"/> that draws the outer border color. This property has no default value.
+    /// </returns>
+    public Brush BorderBrush
+    {
+        get => (Brush)GetValue(BorderBrushProperty);
+        set => SetValueInternal(BorderBrushProperty, value);
+    }
 
-        // We only check the Background property even if BorderBrush not null
-        // and BorderThickness > 0 is a sufficient condition to enable pointer
-        // events on the borders of the control.
-        // There is no way right now to differentiate the Background and BorderBrush
-        // as they are both defined on the same DOM element.
-        internal override bool EnablePointerEventsCore => Background is not null;
+    private static void OnBorderBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var border = (Border)d;
 
-        /// <summary>
-        /// Identifies the <see cref="Child"/> dependency property.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty ChildProperty =
-            DependencyProperty.Register(
-                nameof(Child),
-                typeof(UIElement),
-                typeof(Border),
-                new PropertyMetadata(null, OnChildChanged));
+        border._weakBorderBrushEventToken?.Dispose();
+        border._weakBorderBrushEventToken = null;
 
-        /// <summary>
-        /// Gets or sets the child element to draw the border around.
-        /// </summary>
-        public UIElement Child
+        if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
         {
-            get => _child;
-            set => SetValueInternal(ChildProperty, value);
+            border._weakBorderBrushEventToken = WeakEvent.Subscribe<Border, Brush, EventArgs>(
+                border,
+                newBrush,
+                static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
         }
+    }
 
-        private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private void OnBorderBrushChanged(object sender, EventArgs e)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
         {
-            Border border = (Border)d;
-            UIElement oldChild = (UIElement)e.OldValue;
-            UIElement newChild = (UIElement)e.NewValue;
-
-            border._child = newChild;
-
-            border.RemoveVisualChild(oldChild);
-            border.RemoveLogicalChild(oldChild);
-            border.AddLogicalChild(newChild);
-            border.AddVisualChild(newChild);
-
-            border.InvalidateMeasure();
+            var brush = (Brush)sender;
+            this.SetBorderColor(brush, brush);
         }
+    }
 
-        internal sealed override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
+    /// <summary>
+    /// Gets or sets the relative <see cref="Thickness"/> of a <see cref="Border"/>.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="Thickness"/> that describes the width of the boundaries of the <see cref="Border"/>.
+    /// This property has no default value.
+    /// </returns>
+    public Thickness BorderThickness
+    {
+        get => (Thickness)GetValue(BorderThicknessProperty);
+        set => SetValueInternal(BorderThicknessProperty, value);
+    }
 
-        /// <summary>
-        /// Identifies the <see cref="Background"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register(
-                nameof(Background),
-                typeof(Brush),
-                typeof(Border),
-                new PropertyMetadata(null, OnBackgroundChanged)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBackground((Brush)newValue),
-                });
-
-        /// <summary>
-        /// Gets or sets the <see cref="Brush"/> that fills the background of the border.
-        /// </summary>
-        /// <returns>
-        /// The brush that fills the background.
-        /// </returns>
-        public Brush Background
-        {
-            get => (Brush)GetValue(BackgroundProperty);
-            set => SetValueInternal(BackgroundProperty, value);
-        }
-
-        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Border border = (Border)d;
-
-            border._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
-
-            if (border._weakBackgroundEventToken != null)
+    /// <summary>
+    /// Identifies the <see cref="BorderThickness"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BorderThicknessProperty =
+        DependencyProperty.Register(
+            nameof(BorderThickness),
+            typeof(Thickness),
+            typeof(Border),
+            new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
             {
-                border._weakBackgroundEventToken.Dispose();
-                border._weakBackgroundEventToken = null;
-            }
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderWidth((Thickness)newValue),
+            },
+            IsThicknessValid);
 
-            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
+    /// <summary>
+    /// Gets or sets a value that represents the degree to which the corners of a <see cref="Border"/>
+    /// are rounded.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="Windows.CornerRadius"/> that describes the degree to which corners are rounded.
+    /// This property has no default value.
+    /// </returns>
+    public CornerRadius CornerRadius
+    {
+        get => (CornerRadius)GetValue(CornerRadiusProperty);
+        set => SetValueInternal(CornerRadiusProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="CornerRadius"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty CornerRadiusProperty =
+        DependencyProperty.Register(
+            nameof(CornerRadius),
+            typeof(CornerRadius),
+            typeof(Border),
+            new PropertyMetadata(new CornerRadius())
             {
-                border._weakBackgroundEventToken = WeakEvent.Subscribe<Border, Brush, EventArgs>(
-                    border,
-                    newBrush,
-                    static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
-                    static (handler, source) => source.Changed -= new EventHandler(handler),
-                    static (handler, source) => source.Changed += new EventHandler(handler));
-            }
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderRadius((CornerRadius)newValue),
+            },
+            IsCornerRadiusValid);
 
-            // Update pointer events
-            border.CoerceIsHitTestable();
-        }
+    /// <summary>
+    /// Gets or sets a <see cref="Thickness"/> value that describes the amount of space between a 
+    /// <see cref="Border"/> and its child element.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="Thickness"/> that describes the amount of space between a <see cref="Border"/>
+    /// and its single child element. This property has no default value.
+    /// </returns>
+    public Thickness Padding
+    {
+        get => (Thickness)GetValue(PaddingProperty);
+        set => SetValueInternal(PaddingProperty, value);
+    }
 
-        private void OnBackgroundChanged(object sender, EventArgs e)
+    /// <summary>
+    /// Identifies the <see cref="Padding"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty PaddingProperty =
+        DependencyProperty.Register(
+            nameof(Padding),
+            typeof(Thickness),
+            typeof(Border),
+            new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure),
+            IsThicknessValid);
+
+    /// <summary>
+    /// Measures the child elements of a <see cref="Border"/> before they are arranged during the 
+    /// <see cref="ArrangeOverride(Size)"/> pass.
+    /// </summary>
+    /// <param name="availableSize">
+    /// An upper <see cref="Size"/> limit that cannot be exceeded.
+    /// </param>
+    /// <returns>
+    /// The <see cref="Size"/> that represents the upper size limit of the element.
+    /// </returns>
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        // Compute the chrome size added by the various elements
+        Size border = HelperCollapseThickness(BorderThickness);
+        Size padding = HelperCollapseThickness(Padding);
+
+        // Combine into total decorating size
+        Size combined = new(border.Width + padding.Width, border.Height + padding.Height);
+
+        if (Child is UIElement child)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                this.SetBackground((Brush)sender);
-            }
+            // Remove size of border only from child's reference size.
+            Size childConstraint = new(
+                Math.Max(0.0, availableSize.Width - combined.Width),
+                Math.Max(0.0, availableSize.Height - combined.Height));
+
+            child.Measure(childConstraint);
+
+            return new Size(child.DesiredSize.Width + combined.Width, child.DesiredSize.Height + combined.Height);
         }
 
-        /// <inheritdoc />
-        protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
+        return combined;
+    }
+
+    /// <summary>
+    /// Arranges the contents of a <see cref="Border"/> element.
+    /// </summary>
+    /// <param name="finalSize">
+    /// The <see cref="Size"/> this element uses to arrange its child element.
+    /// </param>
+    /// <returns>
+    /// The <see cref="Size"/> that represents the arranged size of this <see cref="Border"/> element 
+    /// and its child element.
+    /// </returns>
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        //  arrange child
+        if (Child is UIElement child)
         {
-            base.OnRenderSizeChanged(info);
+            Thickness borders = BorderThickness;
+            Rect innerRect = new(0, 0,
+                Math.Max(0.0, finalSize.Width - borders.Left - borders.Right),
+                Math.Max(0.0, finalSize.Height - borders.Top - borders.Bottom));
+            Rect childRect = HelperDeflateRect(innerRect, Padding);
 
-            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                this.SetBackground(Background);
-            }
+            child.Arrange(childRect);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="BorderBrush"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BorderBrushProperty =
-            DependencyProperty.Register(
-                nameof(BorderBrush),
-                typeof(Brush),
-                typeof(Border),
-                new PropertyMetadata(null, OnBorderBrushChanged)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderColor(oldValue as Brush, (Brush)newValue),
-                });
+        return finalSize;
+    }
 
-        /// <summary>
-        /// Gets or sets the <see cref="Brush"/> that is used to create the border.
-        /// </summary>
-        /// <returns>
-        /// The brush that fills the border.
-        /// </returns>
-        public Brush BorderBrush
-        {
-            get => (Brush)GetValue(BorderBrushProperty);
-            set => SetValueInternal(BorderBrushProperty, value);
-        }
+    internal static Size HelperCollapseThickness(Thickness th) => new Size(th.Left + th.Right, th.Top + th.Bottom);
 
-        private static void OnBorderBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var border = (Border)d;
+    /// Helper to deflate rectangle by thickness
+    internal static Rect HelperDeflateRect(Rect rt, Thickness thick) =>
+        new Rect(rt.Left + thick.Left,
+                 rt.Top + thick.Top,
+                 Math.Max(0.0, rt.Width - thick.Left - thick.Right),
+                 Math.Max(0.0, rt.Height - thick.Top - thick.Bottom));
 
-            if (border._weakBorderBrushEventToken != null)
-            {
-                border._weakBorderBrushEventToken.Dispose();
-                border._weakBorderBrushEventToken = null;
-            }
+    private static bool IsThicknessValid(object value)
+    {
+        Thickness t = (Thickness)value;
+        return Thickness.IsValid(t, false, false, false, false);
+    }
 
-            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
-            {
-                border._weakBorderBrushEventToken = WeakEvent.Subscribe<Border, Brush, EventArgs>(
-                    border,
-                    newBrush,
-                    static (instance, sender, args) => instance.OnBorderBrushChanged(sender, args),
-                    static (handler, source) => source.Changed -= new EventHandler(handler),
-                    static (handler, source) => source.Changed += new EventHandler(handler));
-            }
-        }
+    private static bool IsCornerRadiusValid(object value)
+    {
+        CornerRadius cr = (CornerRadius)value;
+        return CornerRadius.IsValid(cr, false, false, false, false);
+    }
 
-        private void OnBorderBrushChanged(object sender, EventArgs e)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                var brush = (Brush)sender;
-                this.SetBorderColor(brush, brush);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the thickness of the border.
-        /// </summary>
-        public Thickness BorderThickness
-        {
-            get { return (Thickness)GetValue(BorderThicknessProperty); }
-            set { SetValueInternal(BorderThicknessProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="BorderThickness"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register(
-                nameof(BorderThickness),
-                typeof(Thickness),
-                typeof(Border),
-                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderWidth((Thickness)newValue),
-                },
-                IsThicknessValid);
-
-        /// <summary>
-        /// Gets or sets the radius for the corners of the border.
-        /// </summary>
-        public CornerRadius CornerRadius
-        {
-            get { return (CornerRadius)GetValue(CornerRadiusProperty); }
-            set { SetValueInternal(CornerRadiusProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="CornerRadius"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CornerRadiusProperty =
-            DependencyProperty.Register(
-                nameof(CornerRadius),
-                typeof(CornerRadius),
-                typeof(Border),
-                new PropertyMetadata(new CornerRadius())
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderRadius((CornerRadius)newValue),
-                },
-                IsCornerRadiusValid);
-
-        /// <summary>
-        /// Gets or sets the distance between the border and its child object.
-        /// </summary>
-        public Thickness Padding
-        {
-            get { return (Thickness)GetValue(PaddingProperty); }
-            set { SetValueInternal(PaddingProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Padding"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PaddingProperty =
-            DependencyProperty.Register(
-                nameof(Padding),
-                typeof(Thickness),
-                typeof(Border),
-                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure),
-                IsThicknessValid);
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            // Compute the chrome size added by the various elements
-            Size border = HelperCollapseThickness(BorderThickness);
-            Size padding = HelperCollapseThickness(Padding);
-
-            // Combine into total decorating size
-            Size combined = new(border.Width + padding.Width, border.Height + padding.Height);
-
-            if (Child is UIElement child)
-            {
-                // Remove size of border only from child's reference size.
-                Size childConstraint = new(
-                    Math.Max(0.0, availableSize.Width - combined.Width),
-                    Math.Max(0.0, availableSize.Height - combined.Height));
-
-                child.Measure(childConstraint);
-                
-                return new Size(child.DesiredSize.Width + combined.Width, child.DesiredSize.Height + combined.Height);
-            }
-
-            return combined;
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            //  arrange child
-            if (Child is UIElement child)
-            {
-                Thickness borders = BorderThickness;
-                Rect innerRect = new(0, 0,
-                    Math.Max(0.0, finalSize.Width - borders.Left - borders.Right),
-                    Math.Max(0.0, finalSize.Height - borders.Top - borders.Bottom));
-                Rect childRect = HelperDeflateRect(innerRect, Padding);
-
-                child.Arrange(childRect);
-            }
-
-            return finalSize;
-        }
-
-        internal static Size HelperCollapseThickness(Thickness th) => new Size(th.Left + th.Right, th.Top + th.Bottom);
-
-        /// Helper to deflate rectangle by thickness
-        internal static Rect HelperDeflateRect(Rect rt, Thickness thick) =>
-            new Rect(rt.Left + thick.Left,
-                     rt.Top + thick.Top,
-                     Math.Max(0.0, rt.Width - thick.Left - thick.Right),
-                     Math.Max(0.0, rt.Height - thick.Top - thick.Bottom));
-
-        private static bool IsThicknessValid(object value)
-        {
-            Thickness t = (Thickness)value;
-            return Thickness.IsValid(t, false, false, false, false);
-        }
-
-        private static bool IsCornerRadiusValid(object value)
-        {
-            CornerRadius cr = (CornerRadius)value;
-            return CornerRadius.IsValid(cr, false, false, false, false);
-        }
-
-        /// <inheritdoc />
-        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
-        {
-            return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parent, this);
-        }
+    /// <inheritdoc />
+    protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
+    {
+        return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parent, this);
     }
 }
