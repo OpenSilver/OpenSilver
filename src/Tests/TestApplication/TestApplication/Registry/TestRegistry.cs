@@ -62,6 +62,7 @@ namespace TestApplication
             Tests.Add(new Test("RadioButton", "RadioButton"));
             Tests.Add(new Test("Visibility", "Visibility"));
             Tests.Add(new Test("WrapPanel", "WrapPanel"));
+            Tests.Add(new Test("Responsive", "Responsive"));
 
             TestCategory grids = new TestCategory("Grids");
             grids.Add(new Test("Grid", "Grids/Grid"));

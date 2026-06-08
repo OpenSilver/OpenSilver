@@ -205,6 +205,8 @@ public sealed class Setter : SetterBase, ISupportInitialize
                             Tablet = responsiveExtension.ConvertHelper(responsiveExtension.Tablet, _property),
                             Desktop = responsiveExtension.ConvertHelper(responsiveExtension.Desktop, _property),
                             Threshold = responsiveExtension.Threshold,
+                            ElementName = responsiveExtension.ElementName,
+                            RelativeSource = responsiveExtension.RelativeSource,
                         };
                         break;
                     }

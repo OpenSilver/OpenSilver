@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using System.Windows.Data;
 
 namespace System.Windows;
 
@@ -21,6 +22,8 @@ internal sealed class ResponsiveExpression : Expression
     private readonly object _tablet;
     private readonly object _desktop;
     private readonly ResponsiveThreshold? _threshold;
+    private readonly string _elementName;
+    private readonly RelativeSource _relativeSource;
 
     // Used by the change listener to fire invalidation.
     private DependencyObject _targetObject;
@@ -30,18 +33,29 @@ internal sealed class ResponsiveExpression : Expression
     private object _cachedValue;
 
     // Used to find the value for this expression when it is set on a non-FE.
-    // The mentor is the FE that is used to identify the window.
+    // The mentor is the FE that is used to identify the source element.
     private FrameworkElement _mentorCache;
-    private Window _window;
+
+    // The element whose width is measured: a reference element resolved from ElementName/RelativeSource,
+    // or the Window when none is specified or the reference element could not be resolved.
+    private FrameworkElement _sourceElement;
 
     private InternalState _state = InternalState.Default;
 
-    public ResponsiveExpression(object mobile, object tablet, object desktop, ResponsiveThreshold? threshold)
+    public ResponsiveExpression(
+        object mobile,
+        object tablet,
+        object desktop,
+        ResponsiveThreshold? threshold,
+        string elementName,
+        RelativeSource relativeSource)
     {
         _mobile = mobile;
         _tablet = tablet;
         _desktop = desktop;
         _threshold = threshold;
+        _elementName = elementName;
+        _relativeSource = relativeSource;
     }
 
     internal override bool CanSetValue(DependencyObject d, DependencyProperty dp) => false;
@@ -101,22 +115,22 @@ internal sealed class ResponsiveExpression : Expression
             }
         }
 
-        if (!ReadInternalState(InternalState.IsWindowCacheValid))
+        if (!ReadInternalState(InternalState.IsSourceElementCacheValid))
         {
-            _window = _mentorCache?.ParentWindow;
-            WriteInternalState(InternalState.IsWindowCacheValid, true);
+            _sourceElement = ResolveSourceElement();
+            WriteInternalState(InternalState.IsSourceElementCacheValid, true);
 
-            if (_window is not null)
+            if (_sourceElement is not null)
             {
-                ((FrameworkElement)_window).SizeChanged += OnWindowSizeChanged;
+                _sourceElement.SizeChanged += OnSourceElementSizeChanged;
             }
         }
 
         object value = DependencyProperty.UnsetValue;
 
-        if (_window is not null)
+        if (_sourceElement is not null)
         {
-            double width = _window.RenderSize.Width;
+            double width = _sourceElement.RenderSize.Width;
             ResponsiveThreshold threshold = _threshold ?? ResponsiveThreshold.Default;
 
             if (width >= threshold.Tablet)
@@ -139,6 +153,41 @@ internal sealed class ResponsiveExpression : Expression
         return value;
     }
 
+    // Resolves the element whose width is measured. Falls back to the Window when no reference element is
+    // specified or when it cannot be resolved to a FrameworkElement.
+    private FrameworkElement ResolveSourceElement()
+    {
+        if (_mentorCache is null)
+        {
+            return null;
+        }
+
+        object resolved = null;
+
+        if (!string.IsNullOrEmpty(_elementName))
+        {
+            resolved = BindingExpression.FindName(_mentorCache, _elementName);
+        }
+        else if (_relativeSource is RelativeSource relativeSource)
+        {
+            resolved = relativeSource.Mode switch
+            {
+                RelativeSourceMode.Self => _mentorCache,
+                RelativeSourceMode.TemplatedParent => _mentorCache.TemplatedParent,
+                RelativeSourceMode.FindAncestor =>
+                    BindingExpression.FindAncestorOftype(_mentorCache, relativeSource.AncestorType, relativeSource.AncestorLevel),
+                _ => null,
+            };
+        }
+
+        if (resolved is FrameworkElement fe)
+        {
+            return fe;
+        }
+
+        return _mentorCache.ParentWindow;
+    }
+
     private void InvalidateMentorCache()
     {
         if (ReadInternalState(InternalState.IsMentorCacheValid))
@@ -154,21 +203,21 @@ internal sealed class ResponsiveExpression : Expression
             WriteInternalState(InternalState.IsMentorCacheValid, false);
         }
 
-        InvalidateWindowCache();
+        InvalidateSourceElementCache();
     }
 
-    private void InvalidateWindowCache()
+    private void InvalidateSourceElementCache()
     {
-        if (ReadInternalState(InternalState.IsWindowCacheValid))
+        if (ReadInternalState(InternalState.IsSourceElementCacheValid))
         {
-            if (_window is not null)
+            if (_sourceElement is not null)
             {
-                ((FrameworkElement)_window).SizeChanged -= OnWindowSizeChanged;
+                _sourceElement.SizeChanged -= OnSourceElementSizeChanged;
 
-                _window = null;
+                _sourceElement = null;
             }
 
-            WriteInternalState(InternalState.IsWindowCacheValid, false);
+            WriteInternalState(InternalState.IsSourceElementCacheValid, false);
         }
 
         InvalidateCacheValue();
@@ -180,7 +229,7 @@ internal sealed class ResponsiveExpression : Expression
         WriteInternalState(InternalState.HasCachedValue, false);
     }
 
-    private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+    private void OnSourceElementSizeChanged(object sender, SizeChangedEventArgs e)
     {
         InvalidateCacheValue();
 
@@ -189,14 +238,14 @@ internal sealed class ResponsiveExpression : Expression
 
     private void OnMentorLoaded(object sender, RoutedEventArgs e)
     {
-        InvalidateWindowCache();
+        InvalidateSourceElementCache();
 
         _targetObject.ApplyExpression(_targetProperty, this);
     }
 
     private void OnMentorUnloaded(object sender, RoutedEventArgs e)
     {
-        InvalidateWindowCache();
+        InvalidateSourceElementCache();
     }
 
     private void OnMentorChanged(object sender, EventArgs e)
@@ -255,6 +304,6 @@ internal sealed class ResponsiveExpression : Expression
         Default = 0x00,
         HasCachedValue = 0x01,
         IsMentorCacheValid = 0x02,
-        IsWindowCacheValid = 0x04,
+        IsSourceElementCacheValid = 0x04,
     }
 }

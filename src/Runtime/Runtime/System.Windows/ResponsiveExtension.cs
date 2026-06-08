@@ -13,6 +13,7 @@
 
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -29,6 +30,8 @@ public sealed class ResponsiveExtension : MarkupExtension
     private object _tablet = DependencyProperty.UnsetValue;
     private object _desktop = DependencyProperty.UnsetValue;
     private ResponsiveThreshold? _threshold;
+    private string _elementName;
+    private RelativeSource _relativeSource;
     private bool _isSealed;
     private DynamicValueConverter _dynamicConverter;
 
@@ -99,6 +102,52 @@ public sealed class ResponsiveExtension : MarkupExtension
     }
 
     /// <summary>
+    /// Gets or sets the name of the element whose width is used to evaluate the responsive breakpoints.
+    /// </summary>
+    /// <returns>
+    /// The name of the element to measure. When set, the width of that element (rather than the width of the
+    /// <see cref="Window"/>) is compared against the <see cref="Threshold"/> to select between <see cref="Mobile"/>,
+    /// <see cref="Tablet"/> and <see cref="Desktop"/>. If both <see cref="ElementName"/> and <see cref="RelativeSource"/>
+    /// are set, <see cref="ElementName"/> takes precedence. If the name cannot be resolved to a <see cref="FrameworkElement"/>,
+    /// the width of the <see cref="Window"/> is used. The default is null. Note that only the width is considered.
+    /// </returns>
+    [DefaultValue(null)]
+    public string ElementName
+    {
+        get => _elementName;
+        set
+        {
+            CheckSealed();
+            _elementName = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the location of the element whose width is used to evaluate the responsive breakpoints, relative
+    /// to the element on which the extension is applied.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Data.RelativeSource"/> describing the element to measure. <see cref="RelativeSourceMode.Self"/>
+    /// uses the element the value is applied to, <see cref="RelativeSourceMode.TemplatedParent"/> uses the templated
+    /// parent, and <see cref="RelativeSourceMode.FindAncestor"/> walks up the tree using
+    /// <see cref="Data.RelativeSource.AncestorType"/> and <see cref="Data.RelativeSource.AncestorLevel"/>. When set, the
+    /// width of the resolved element (rather than the width of the <see cref="Window"/>) is compared against the
+    /// <see cref="Threshold"/>. If the source cannot be resolved to a <see cref="FrameworkElement"/>, the width of the
+    /// <see cref="Window"/> is used. If both <see cref="ElementName"/> and <see cref="RelativeSource"/> are set,
+    /// <see cref="ElementName"/> takes precedence. The default is null. Note that only the width is considered.
+    /// </returns>
+    [DefaultValue(null)]
+    public RelativeSource RelativeSource
+    {
+        get => _relativeSource;
+        set
+        {
+            CheckSealed();
+            _relativeSource = value;
+        }
+    }
+
+    /// <summary>
     /// Returns an object that should be set on the property where this extension is applied. For 
     /// <see cref="ResponsiveExtension"/>, this is <see cref="Mobile"/>, <see cref="Tablet"/> or 
     /// <see cref="Desktop"/> depending on the current <see cref="Window"/> width.
@@ -136,7 +185,9 @@ public sealed class ResponsiveExtension : MarkupExtension
             GetValue(mobile, tablet, desktop),
             GetValue(tablet, desktop, mobile),
             GetValue(desktop, tablet, mobile),
-            _threshold);
+            _threshold,
+            _elementName,
+            _relativeSource);
 
         static object GetValue(object first, object second, object third)
         {
