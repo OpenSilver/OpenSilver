@@ -81,6 +81,29 @@ public sealed partial class PathGeometry : Geometry
     }
 
     /// <summary>
+    /// Creates a <see cref="PathGeometry"/> version of the specified <see cref="Geometry"/>.
+    /// </summary>
+    /// <param name="geometry">
+    /// The geometry from which to create a <see cref="PathGeometry"/>.
+    /// </param>
+    /// <returns>
+    /// A <see cref="PathGeometry"/> created from the current values of the specified <see cref="Geometry"/>.
+    /// </returns>
+    public static PathGeometry CreateFromGeometry(Geometry geometry)
+    {
+        if (geometry is null)
+        {
+            return null;
+        }
+
+        var pathGeometry = new PathGeometry();
+        pathGeometry.AddGeometry(geometry);
+        pathGeometry.FillRule = geometry.GetFillRule();
+
+        return pathGeometry;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="Figures"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty FiguresProperty =
@@ -160,6 +183,43 @@ public sealed partial class PathGeometry : Geometry
         get => (FillRule)GetValue(FillRuleProperty);
         set => SetValueInternal(FillRuleProperty, value);
     }
+
+    /// <summary>
+    /// Converts the specified <see cref="Geometry"/> into a collection of <see cref="PathFigure"/>
+    /// objects and adds it to the path. Note: If the specified <see cref="Geometry"/> is animated,
+    /// the conversion from <see cref="Geometry"/> to <see cref="PathFigure"/> may result in some 
+    /// loss of information.
+    /// </summary>
+    /// <param name="geometry">
+    /// The geometry to add to the path.
+    /// </param>
+    public void AddGeometry(Geometry geometry)
+    {
+        ArgumentNullException.ThrowIfNull(geometry);
+
+        if (geometry.IsEmpty())
+        {
+            return;
+        }
+
+        var context = new PathStreamGeometryContext();
+        geometry.SerializeData(context, Matrix.Identity);
+
+        if (context.GetPathFigures() is PathFigureCollection newFigures)
+        {
+            PathFigureCollection figures = Figures;
+
+            foreach (PathFigure figure in newFigures.InternalItems)
+            {
+                figures.Add(figure);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Removes all <see cref="PathFigure"/> objects from this <see cref="PathGeometry"/>.
+    /// </summary>
+    public void Clear() => Figures?.Clear();
 
     /// <summary>
     /// Determines whether this <see cref="PathGeometry"/> object is empty.
