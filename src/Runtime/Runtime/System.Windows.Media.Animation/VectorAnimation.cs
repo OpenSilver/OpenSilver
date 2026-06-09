@@ -11,7 +11,10 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace System.Windows.Media.Animation;
 
@@ -19,8 +22,11 @@ namespace System.Windows.Media.Animation;
 /// Animates the value of a <see cref="Vector"/> property between two target values using linear interpolation over a specified 
 /// <see cref="Timeline.Duration"/>.
 /// </summary>
-public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vector>
+public sealed class VectorAnimation : AnimationTimeline, IAnimation<Vector>
 {
+    private AnimationType _animationType;
+    private bool _isAnimationFunctionValid;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="VectorAnimation"/> class.
     /// </summary>
@@ -108,30 +114,6 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
     }
 
     /// <summary>
-    /// Identifies the <see cref="By"/> dependency property.
-    /// </summary>
-    [OpenSilver.NotImplemented]
-    public static readonly DependencyProperty ByProperty =
-        DependencyProperty.Register(
-            nameof(By),
-            typeof(Vector?),
-            typeof(VectorAnimation),
-            new PropertyMetadata((object)null));
-
-    /// <summary>
-    /// Gets or sets the total amount by which the animation changes its starting value.
-    /// </summary>
-    /// <returns>
-    /// The total amount by which the animation changes its starting value. The default value is null.
-    /// </returns>
-    [OpenSilver.NotImplemented]
-    public Vector? By
-    {
-        get => (Vector?)GetValue(ByProperty);
-        set => SetValueInternal(ByProperty, value);
-    }
-
-    /// <summary>
     /// Identifies the <see cref="EasingFunction"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty EasingFunctionProperty =
@@ -161,7 +143,8 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
             nameof(From),
             typeof(Vector?),
             typeof(VectorAnimation),
-            new PropertyMetadata((object)null));
+            new PropertyMetadata(null, OnFromToOrByChanged),
+            ValidateFromToOrByValue);
 
     /// <summary>
     /// Gets or sets the animation's starting value.
@@ -183,7 +166,8 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
             nameof(To),
             typeof(Vector?),
             typeof(VectorAnimation),
-            new PropertyMetadata((object)null));
+            new PropertyMetadata(null, OnFromToOrByChanged),
+            ValidateFromToOrByValue);
 
     /// <summary>
     /// Gets or sets the animation's ending value.
@@ -197,12 +181,219 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <summary>
+    /// Identifies the <see cref="By"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ByProperty =
+        DependencyProperty.Register(
+            nameof(By),
+            typeof(Vector?),
+            typeof(VectorAnimation),
+            new PropertyMetadata(null, OnFromToOrByChanged),
+            ValidateFromToOrByValue);
+
+    /// <summary>
+    /// Gets or sets the total amount by which the animation changes its starting value.
+    /// </summary>
+    /// <returns>
+    /// The total amount by which the animation changes its starting value. The default value is null.
+    /// </returns>
+    public Vector? By
+    {
+        get => (Vector?)GetValue(ByProperty);
+        set => SetValueInternal(ByProperty, value);
+    }
+
+    private static void OnFromToOrByChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((VectorAnimation)d)._isAnimationFunctionValid = false;
+    }
+
+    private static bool ValidateFromToOrByValue(object o)
+    {
+        var value = (Vector?)o;
+        return !value.HasValue || AnimatedTypeHelpers.IsValidAnimationValueVector(value.Value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value that specifies whether the animation's value accumulates when it repeats.
+    /// </summary>
+    /// <returns>
+    /// true if the animation accumulates its values when its <see cref="Timeline.RepeatBehavior"/>property causes it 
+    /// to repeat its simple duration. otherwise, false. The default value is false.
+    /// </returns>
+    public bool IsCumulative
+    {
+        get => (bool)GetValue(IsCumulativeProperty);
+        set => SetValueInternal(IsCumulativeProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the target property's current value should be added to this 
+    /// animation's starting value.
+    /// </summary>
+    /// <returns>
+    /// true if the target property's current value should be added to this animation's starting value; otherwise,
+    /// false. The default value is false.
+    /// </returns>
+    public bool IsAdditive
+    {
+        get => (bool)GetValue(IsAdditiveProperty);
+        set => SetValueInternal(IsAdditiveProperty, value);
+    }
+
     /// <inheritdoc />
     public sealed override Type TargetPropertyType => typeof(Vector);
 
     internal sealed override TimelineClock CreateClock() =>
-        new AnimationClock<Vector>(this, new FromToByAnimator<Vector>(this));
+        new AnimationClock<Vector>(this, new Animator<Vector>(this));
 
-    Vector IFromByToAnimation<Vector>.InterpolateValue(Vector from, Vector to, double progress) =>
-        AnimatedTypeHelpers.InterpolateVector(from, to, progress);
+    private void ValidateAnimationFunction()
+    {
+        _animationType = AnimationType.Automatic;
+
+        if (From.HasValue)
+        {
+            if (To.HasValue)
+            {
+                _animationType = AnimationType.FromTo;
+            }
+            else if (By.HasValue)
+            {
+                _animationType = AnimationType.FromBy;
+            }
+            else
+            {
+                _animationType = AnimationType.From;
+            }
+        }
+        else if (To.HasValue)
+        {
+            _animationType = AnimationType.To;
+        }
+        else if (By.HasValue)
+        {
+            _animationType = AnimationType.By;
+        }
+
+        _isAnimationFunctionValid = true;
+    }
+
+    Vector IAnimation<Vector>.GetCurrentValue(Vector initialValue, DependencyProperty dp, TimelineClock clock)
+    {
+        Debug.Assert(clock.CurrentState != ClockState.Stopped);
+
+        if (!_isAnimationFunctionValid)
+        {
+            ValidateAnimationFunction();
+        }
+
+        double progress = clock.CurrentProgress.Value;
+
+        if (EasingFunction is IEasingFunction easingFunction)
+        {
+            progress = easingFunction.Ease(progress);
+        }
+
+        var from = new Vector();
+        var to = new Vector();
+        var accumulated = new Vector();
+        var foundation = new Vector();
+
+        // need to validate the default origin value if the animation uses
+        // it as the from, to, or foundation values
+        bool validateOrigin = false;
+
+        switch (_animationType)
+        {
+            case AnimationType.Automatic:
+
+                from = initialValue;
+                to = initialValue;
+
+                validateOrigin = true;
+
+                break;
+
+            case AnimationType.From:
+
+                from = From.Value;
+                to = initialValue;
+
+                validateOrigin = true;
+
+                break;
+
+            case AnimationType.To:
+
+                from = initialValue;
+                to = To.Value;
+
+                validateOrigin = true;
+
+                break;
+
+            case AnimationType.By:
+
+                to = By.Value;
+                foundation = initialValue;
+
+                validateOrigin = true;
+
+                break;
+
+            case AnimationType.FromTo:
+
+                from = From.Value;
+                to = To.Value;
+
+                if (IsAdditive)
+                {
+                    foundation = initialValue;
+                    validateOrigin = true;
+                }
+
+                break;
+
+            case AnimationType.FromBy:
+
+                from = From.Value;
+                to = from + By.Value;
+
+                if (IsAdditive)
+                {
+                    foundation = initialValue;
+                    validateOrigin = true;
+                }
+
+                break;
+
+            default:
+
+                Debug.Fail("Unknown animation type.");
+                break;
+        }
+
+        if (validateOrigin && !AnimatedTypeHelpers.IsValidAnimationValueVector(initialValue))
+        {
+            throw new InvalidOperationException(
+                string.Format(
+                    Strings.Animation_Invalid_DefaultValue,
+                    GetType(),
+                    "origin",
+                    initialValue.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        if (IsCumulative)
+        {
+            double currentRepeat = (double)(clock.CurrentIteration - 1);
+
+            if (currentRepeat > 0.0)
+            {
+                accumulated = (to - from) * currentRepeat;
+            }
+        }
+
+        return foundation + accumulated + AnimatedTypeHelpers.InterpolateVector(from, to, progress);
+    }
 }

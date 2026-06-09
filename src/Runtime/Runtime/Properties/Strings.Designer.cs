@@ -124,6 +124,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; cannot use default {1} value of &apos;{2}&apos;..
+        /// </summary>
+        internal static string Animation_Invalid_DefaultValue {
+            get {
+                return ResourceManager.GetString("Animation_Invalid_DefaultValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Element declared as Application Service does not implement IApplicationService interface..
         /// </summary>
         internal static string Application_ServiceMustImplementInterface {

@@ -28,6 +28,7 @@
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
     <Compile Include="OpenSilver\Internal\Documents\TextContainerList.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\AnimationType.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\IAnimation.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\Animator.cs" />
     <Compile Include="OpenSilver\Internal\Media\ByteStreamGeometryContext.cs" />
@@ -112,9 +113,7 @@
     <Compile Include="OpenSilver\Internal\Media\Animation\AnimationManager.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\ClockCollection.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\ControllableStopwatch.cs" />
-    <Compile Include="OpenSilver\Internal\Media\Animation\FromToByAnimator.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\ICloneOnAnimation.cs" />
-    <Compile Include="OpenSilver\Internal\Media\Animation\IFromByToAnimation.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\IKeyFrameAnimation.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\KeyFramesAnimator.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\ResolvedKeyFrameEntry.cs" />

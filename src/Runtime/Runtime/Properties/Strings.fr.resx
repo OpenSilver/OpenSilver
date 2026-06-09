@@ -1359,4 +1359,7 @@
   <data name="AccessKeyManager_NotAUnicodeCharacter" xml:space="preserve">
     <value>'{0}' n'est pas un caractère Unicode unique.</value>
   </data>
+  <data name="Animation_Invalid_DefaultValue" xml:space="preserve">
+    <value>'{0}' ne peut pas utiliser la valeur par défaut {1} de '{2}'.</value>
+  </data>
 </root>
