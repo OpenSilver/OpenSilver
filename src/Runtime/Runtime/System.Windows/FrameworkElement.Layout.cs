@@ -1232,6 +1232,7 @@ public partial class FrameworkElement
                     if (hasOrigin)
                     {
                         var backOrigin = new TranslateTransform(-origin.X, -origin.Y);
+                        backOrigin.Seal();
                         t.Children.Add(backOrigin);
                     }
 
@@ -1241,6 +1242,7 @@ public partial class FrameworkElement
                     if (hasOrigin)
                     {
                         var forwardOrigin = new TranslateTransform(origin.X, origin.Y);
+                        forwardOrigin.Seal();
                         t.Children.Add(forwardOrigin);
                     }
                 }
