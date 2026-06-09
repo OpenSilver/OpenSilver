@@ -42,7 +42,7 @@ public sealed class StringAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
         {
             if (_frames is null)
             {
-                SetKeyFrames(new());
+                SetKeyFrames([]);
             }
             return _frames;
         }
@@ -50,6 +50,8 @@ public sealed class StringAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     }
 
     IKeyFrameCollection<string> IKeyFrameAnimation<string>.KeyFrames => _frames;
+
+    bool IKeyFrameAnimation<string>.IsAdditive => false;
 
     /// <inheritdoc />
     public sealed override Type TargetPropertyType => typeof(string);
@@ -59,6 +61,9 @@ public sealed class StringAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     internal sealed override TimelineClock CreateClock() =>
        new AnimationClock<string>(this, new KeyFramesAnimator<string>(this));
+
+    string IKeyFrameAnimation<string>.GetCurrentValue(string initialValue, DependencyProperty dp, TimelineClock clock, KeyFramesAnimator<string> animator) =>
+        animator.GetCurrentIterationValue(initialValue, clock);
 
     private void SetKeyFrames(StringKeyFrameCollection keyFrames)
     {

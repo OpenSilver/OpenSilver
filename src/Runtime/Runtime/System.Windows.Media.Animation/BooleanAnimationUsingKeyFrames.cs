@@ -42,7 +42,7 @@ public sealed class BooleanAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
         {
             if (_frames is null)
             {
-                SetKeyFrames(new());
+                SetKeyFrames([]);
             }
             return _frames;
         }
@@ -50,6 +50,8 @@ public sealed class BooleanAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
     }
 
     IKeyFrameCollection<bool> IKeyFrameAnimation<bool>.KeyFrames => _frames;
+
+    bool IKeyFrameAnimation<bool>.IsAdditive => false;
 
     /// <inheritdoc />
     public sealed override Type TargetPropertyType => typeof(bool);
@@ -59,6 +61,9 @@ public sealed class BooleanAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
 
     internal sealed override TimelineClock CreateClock() =>
        new AnimationClock<bool>(this, new KeyFramesAnimator<bool>(this));
+
+    bool IKeyFrameAnimation<bool>.GetCurrentValue(bool initialValue, DependencyProperty dp, TimelineClock clock, KeyFramesAnimator<bool> animator) =>
+        animator.GetCurrentIterationValue(initialValue, clock);
 
     private void SetKeyFrames(BooleanKeyFrameCollection keyFrames)
     {

@@ -13,6 +13,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Media.Animation;
 
 namespace OpenSilver.Internal.Media.Animation;
@@ -20,6 +21,8 @@ namespace OpenSilver.Internal.Media.Animation;
 internal interface IKeyFrameAnimation<T>
 {
     IKeyFrameCollection<T> KeyFrames { get; }
+    bool IsAdditive { get; }
+    T GetCurrentValue(T initialValue, DependencyProperty dp, TimelineClock clock, KeyFramesAnimator<T> animator);
 }
 
 internal interface IKeyFrameCollection<T>

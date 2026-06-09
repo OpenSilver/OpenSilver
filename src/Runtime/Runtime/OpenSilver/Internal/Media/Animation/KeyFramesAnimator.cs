@@ -30,7 +30,7 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
         _animation = animation;
     }
 
-    public T GetCurrentValue(T initialValue, DependencyProperty dp, TimelineClock clock)
+    T IValueAnimator<T>.GetCurrentValue(T initialValue, DependencyProperty dp, TimelineClock clock)
     {
         Debug.Assert(clock.CurrentState != ClockState.Stopped);
 
@@ -48,6 +48,13 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
         {
             return initialValue;
         }
+
+        return _animation.GetCurrentValue(initialValue, dp, clock, this);
+    }
+
+    internal T GetCurrentIterationValue(T initialValue, TimelineClock clock)
+    {
+        Debug.Assert(_sortedResolvedKeyFrames is not null && _sortedResolvedKeyFrames.Length > 0);
 
         TimeSpan currentTime = clock.CurrentTime.Value;
         int keyFrameCount = _sortedResolvedKeyFrames.Length;
@@ -97,7 +104,18 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
                 // some special rules for determining the fromValue and an
                 // optimized method of calculating the currentSegmentProgress.
 
-                fromValue = initialValue;
+                // If we're additive we want the base value to be a zero value
+                // so that if there isn't a key frame at time 0.0, we'll use
+                // the zero value for the time 0.0 value and then add that 
+                // later to the base value.
+                if (_animation.IsAdditive)
+                {
+                    fromValue = default;
+                }
+                else
+                {
+                    fromValue = initialValue;
+                }
 
                 // Current segment time divided by the segment duration.
                 // Note: the reason this works is that we know that we're in
@@ -175,7 +193,7 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
         _areKeyTimesValid = true;
     }
 
-    private T GetResolvedKeyFrameValue(int resolvedKeyFrameIndex)
+    internal T GetResolvedKeyFrameValue(int resolvedKeyFrameIndex)
     {
         Debug.Assert(_areKeyTimesValid, "The key frames must be resolved and sorted before calling GetResolvedKeyFrameValue");
 

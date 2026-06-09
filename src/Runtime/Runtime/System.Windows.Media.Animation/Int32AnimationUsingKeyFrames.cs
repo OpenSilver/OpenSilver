@@ -11,8 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
+using System.Diagnostics;
+using System.Windows.Markup;
 
 namespace System.Windows.Media.Animation;
 
@@ -42,7 +43,7 @@ public sealed class Int32AnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
         {
             if (_frames is null)
             {
-                SetKeyFrames(new());
+                SetKeyFrames([]);
             }
             return _frames;
         }
@@ -50,6 +51,33 @@ public sealed class Int32AnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
     }
 
     IKeyFrameCollection<int> IKeyFrameAnimation<int>.KeyFrames => _frames;
+
+    /// <summary>
+    /// Gets a value that specifies whether the animation's output value is added to the base 
+    /// value of the property being animated.
+    /// </summary>
+    /// <returns>
+    /// true if the animation adds its output value to the base value of the property being 
+    /// animated instead of replacing it; otherwise, false. The default value is false.
+    /// </returns>
+    public bool IsAdditive
+    {
+        get => (bool)GetValue(IsAdditiveProperty);
+        set => SetValueInternal(IsAdditiveProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value that specifies whether the animation's value accumulates when it repeats.
+    /// </summary>
+    /// <returns>
+    /// true if the animation accumulates its values when its <see cref="Timeline.RepeatBehavior"/> 
+    /// property causes it to repeat its simple duration; otherwise, false. The default value is false.
+    /// </returns>
+    public bool IsCumulative
+    {
+        get => (bool)GetValue(IsCumulativeProperty);
+        set => SetValueInternal(IsCumulativeProperty, value);
+    }
 
     /// <inheritdoc />
     public sealed override Type TargetPropertyType => typeof(int);
@@ -59,6 +87,34 @@ public sealed class Int32AnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
 
     internal sealed override TimelineClock CreateClock() =>
        new AnimationClock<int>(this, new KeyFramesAnimator<int>(this));
+
+    int IKeyFrameAnimation<int>.GetCurrentValue(int initialValue, DependencyProperty dp, TimelineClock clock, KeyFramesAnimator<int> animator)
+    {
+        Debug.Assert(_frames is not null && _frames.Count > 0);
+
+        int currentIterationValue = animator.GetCurrentIterationValue(initialValue, clock);
+
+        // If we're cumulative, we need to multiply the final key frame
+        // value by the current repeat count and add this to the return
+        // value.
+        if (IsCumulative)
+        {
+            double currentRepeat = (double)(clock.CurrentIteration - 1);
+
+            if (currentRepeat > 0.0)
+            {
+                currentIterationValue += AnimatedTypeHelpers.ScaleInt32(animator.GetResolvedKeyFrameValue(_frames.Count - 1), currentRepeat);
+            }
+        }
+
+        // If we're additive we need to add the base value to the return value.
+        if (IsAdditive)
+        {
+            return initialValue + currentIterationValue;
+        }
+
+        return currentIterationValue;
+    }
 
     private void SetKeyFrames(Int32KeyFrameCollection keyFrames)
     {

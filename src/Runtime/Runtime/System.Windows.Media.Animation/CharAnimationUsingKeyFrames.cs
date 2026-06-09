@@ -42,7 +42,7 @@ public sealed class CharAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
         {
             if (_frames is null)
             {
-                SetKeyFrames(new());
+                SetKeyFrames([]);
             }
             return _frames;
         }
@@ -50,6 +50,8 @@ public sealed class CharAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
     }
 
     IKeyFrameCollection<char> IKeyFrameAnimation<char>.KeyFrames => _frames;
+
+    bool IKeyFrameAnimation<char>.IsAdditive => false;
 
     /// <inheritdoc />
     public sealed override Type TargetPropertyType => typeof(char);
@@ -59,6 +61,9 @@ public sealed class CharAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
 
     internal sealed override TimelineClock CreateClock() =>
        new AnimationClock<char>(this, new KeyFramesAnimator<char>(this));
+
+    char IKeyFrameAnimation<char>.GetCurrentValue(char initialValue, DependencyProperty dp, TimelineClock clock, KeyFramesAnimator<char> animator) =>
+        animator.GetCurrentIterationValue(initialValue, clock);
 
     private void SetKeyFrames(CharKeyFrameCollection keyFrames)
     {

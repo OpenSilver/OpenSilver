@@ -41,7 +41,7 @@ public sealed class MatrixAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
         {
             if (_frames is null)
             {
-                SetKeyFrames(new());
+                SetKeyFrames([]);
             }
             return _frames;
         }
@@ -49,6 +49,8 @@ public sealed class MatrixAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     }
 
     IKeyFrameCollection<Matrix> IKeyFrameAnimation<Matrix>.KeyFrames => _frames;
+
+    bool IKeyFrameAnimation<Matrix>.IsAdditive => false;
 
     /// <inheritdoc />
     public sealed override Type TargetPropertyType => typeof(Matrix);
@@ -58,6 +60,9 @@ public sealed class MatrixAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     internal sealed override TimelineClock CreateClock() =>
        new AnimationClock<Matrix>(this, new KeyFramesAnimator<Matrix>(this));
+
+    Matrix IKeyFrameAnimation<Matrix>.GetCurrentValue(Matrix initialValue, DependencyProperty dp, TimelineClock clock, KeyFramesAnimator<Matrix> animator) =>
+        animator.GetCurrentIterationValue(initialValue, clock);
 
     private void SetKeyFrames(MatrixKeyFrameCollection keyFrames)
     {

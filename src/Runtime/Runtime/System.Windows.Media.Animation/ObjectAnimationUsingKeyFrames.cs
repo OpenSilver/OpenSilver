@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
@@ -47,7 +46,7 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
         {
             if (_frames is null)
             {
-                SetKeyFrames(new());
+                SetKeyFrames([]);
             }
             return _frames;
         }
@@ -56,6 +55,8 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     IKeyFrameCollection<object> IKeyFrameAnimation<object>.KeyFrames => _frames;
 
+    bool IKeyFrameAnimation<object>.IsAdditive => false;
+
     /// <inheritdoc />
     public sealed override Type TargetPropertyType => typeof(object);
 
@@ -63,7 +64,27 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
     internal sealed override TimelineClock CreateClock() =>
-       new AnimationClock<object>(this, new ObjectKeyFramesAnimator(this));
+       new AnimationClock<object>(this, new KeyFramesAnimator<object>(this));
+
+    object IKeyFrameAnimation<object>.GetCurrentValue(object initialValue, DependencyProperty dp, TimelineClock clock, KeyFramesAnimator<object> animator)
+    {
+        object currentIterationValue = animator.GetCurrentIterationValue(initialValue, clock);
+
+        if (currentIterationValue is not null && !dp.PropertyType.IsInstanceOfType(currentIterationValue))
+        {
+            if (currentIterationValue is Color color && dp.PropertyType == typeof(Brush))
+            {
+                currentIterationValue = new SolidColorBrush(color);
+            }
+            else if (TypeConverterHelper.GetConverter(dp.PropertyType) is TypeConverter converter &&
+                     converter.CanConvertFrom(currentIterationValue.GetType()))
+            {
+                currentIterationValue = converter.ConvertFrom(null, CultureInfo.InvariantCulture, currentIterationValue);
+            }
+        }
+
+        return currentIterationValue;
+    }
 
     private void SetKeyFrames(ObjectKeyFrameCollection keyFrames)
     {
@@ -77,37 +98,6 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
         if (_frames is not null)
         {
             ProvideSelfAsInheritanceContext(_frames, null);
-        }
-    }
-
-    private sealed class ObjectKeyFramesAnimator : IValueAnimator<object>
-    {
-        private readonly KeyFramesAnimator<object> _baseAnimator;
-
-        public ObjectKeyFramesAnimator(ObjectAnimationUsingKeyFrames animation)
-        {
-            Debug.Assert(animation is not null);
-            _baseAnimator = new KeyFramesAnimator<object>(animation);
-        }
-
-        public object GetCurrentValue(object initialValue, DependencyProperty dp, TimelineClock clock)
-        {
-            object value = _baseAnimator.GetCurrentValue(initialValue, dp, clock);
-
-            if (value is not null && !dp.PropertyType.IsInstanceOfType(value))
-            {
-                if (value is Color color && dp.PropertyType == typeof(Brush))
-                {
-                    value = new SolidColorBrush(color);
-                }
-                else if (TypeConverterHelper.GetConverter(dp.PropertyType) is TypeConverter converter &&
-                         converter.CanConvertFrom(value.GetType()))
-                {
-                    value = converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
-                }
-            }
-
-            return value;
         }
     }
 }
