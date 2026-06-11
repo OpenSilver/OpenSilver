@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -14,6 +14,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Data;
@@ -56,6 +57,12 @@ namespace System.Windows.Controls
         /// Initializes a new instance of the <see cref="ItemsControl"/> class.
         /// </summary>
         public ItemsControl() { }
+
+        /// <summary>
+        /// Gets a collection of <see cref="GroupStyle"/> objects that define the appearance of each group level.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public ObservableCollection<GroupStyle> GroupStyle { get; } = new();
 
         #endregion Constructor
 

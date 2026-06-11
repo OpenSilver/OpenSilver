@@ -281,6 +281,46 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
             new PropertyMetadata(BooleanBoxes.FalseBox));
 
     /// <summary>
+    /// Identifies the <see cref="IsSuspendingPopupAnimation"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty IsSuspendingPopupAnimationProperty =
+        DependencyProperty.Register(
+            nameof(IsSuspendingPopupAnimation),
+            typeof(bool),
+            typeof(MenuItem),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the <see cref="MenuItem"/> suspends animations on its <see cref="Primitives.Popup"/>.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public bool IsSuspendingPopupAnimation
+    {
+        get => (bool)GetValue(IsSuspendingPopupAnimationProperty);
+        set => SetValueInternal(IsSuspendingPopupAnimationProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="InputGestureText"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty InputGestureTextProperty =
+        DependencyProperty.Register(
+            nameof(InputGestureText),
+            typeof(string),
+            typeof(MenuItem),
+            new PropertyMetadata(string.Empty));
+
+    /// <summary>
+    /// Gets or sets the text describing the input gesture (e.g. shortcut keys) for this <see cref="MenuItem"/>.
+    /// </summary>
+    public string InputGestureText
+    {
+        get => (string)GetValue(InputGestureTextProperty);
+        set => SetValueInternal(InputGestureTextProperty, value);
+    }
+
+    /// <summary>
     /// Gets or sets a value that indicates that the submenu in which this <see cref="MenuItem"/> 
     /// is located should not close when this item is clicked.
     /// </summary>
