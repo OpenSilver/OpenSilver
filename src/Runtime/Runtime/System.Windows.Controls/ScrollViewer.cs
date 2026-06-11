@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -917,7 +917,7 @@ namespace System.Windows.Controls
         {
             IScrollInfo isi = ScrollInfo;
 
-            UIElement child = VisualChildrenCount > 0 ? GetVisualChild(0) : null;
+            UIElement child = VisualChildrenCount > 0 ? GetVisualChild(0) as UIElement : null;
             ScrollBarVisibility vsbv = VerticalScrollBarVisibility;
             ScrollBarVisibility hsbv = HorizontalScrollBarVisibility;
             Size desiredSize = new Size();

@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -495,7 +495,7 @@ namespace System.Windows.Controls
 
         protected sealed override int VisualChildrenCount => Blocks.InternalCount;
 
-        protected sealed override UIElement GetVisualChild(int index)
+        protected sealed override Visual GetVisualChild(int index)
         {
             if (index < 0 || index >= VisualChildrenCount)
             {

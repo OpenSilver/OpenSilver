@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -194,7 +194,7 @@ public class List : Block
     protected sealed override int VisualChildrenCount => ListItems.InternalCount;
 
     /// <inheritdoc />
-    protected sealed override UIElement GetVisualChild(int index)
+    protected sealed override System.Windows.Media.Visual GetVisualChild(int index)
     {
         if (index >= VisualChildrenCount)
         {

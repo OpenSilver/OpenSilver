@@ -119,7 +119,7 @@ internal sealed class PopupRoot : FrameworkElement
 
     protected override int VisualChildrenCount => 1;
 
-    protected override UIElement GetVisualChild(int index)
+    protected override Visual GetVisualChild(int index)
     {
         if (index != 0)
         {
@@ -231,7 +231,7 @@ internal sealed class PopupRoot : FrameworkElement
 
         protected override int VisualChildrenCount => _child is null ? 0 : 1;
 
-        protected override UIElement GetVisualChild(int index)
+        protected override Visual GetVisualChild(int index)
         {
             if (_child is not UIElement child || index != 0)
             {

@@ -28,7 +28,7 @@ namespace System.Windows
     /// UIElement is a base class for most of the objects that have visual appearance
     /// and can process basic input in a user interface.
     /// </summary>
-    public abstract partial class UIElement : DependencyObject, IInputElement
+    public abstract partial class UIElement : Visual, IInputElement
     {
         static UIElement()
         {
@@ -60,12 +60,12 @@ namespace System.Windows
         /// The requested child element. This should not return null; if the provided index 
         /// is out of range, an exception is thrown.
         /// </returns>
-        protected virtual UIElement GetVisualChild(int index) => throw new ArgumentOutOfRangeException(nameof(index));
+        protected virtual Visual GetVisualChild(int index) => throw new ArgumentOutOfRangeException(nameof(index));
 
         /// <summary>
         /// Returns the child at index "index".
         /// </summary>
-        internal UIElement InternalGetVisualChild(int index) => GetVisualChild(index);
+        internal Visual InternalGetVisualChild(int index) => GetVisualChild(index);
 
         /// <summary>
         /// Gets the number of child elements for the <see cref="UIElement"/>.
@@ -703,7 +703,7 @@ namespace System.Windows
         protected virtual bool IsEnabledCore => true;
 
         /// <summary>
-        /// Identifies the <see cref="IsEnabled"/> dependency property.
+        /// Identifies the <see cref="IsEnabled"/>ï¿½dependency property.
         /// </summary>
         public static readonly DependencyProperty IsEnabledProperty =
             DependencyProperty.Register(
@@ -1747,6 +1747,32 @@ namespace System.Windows
                 new PropertyMetadata(BooleanBoxes.TrueBox));
 
         #endregion
+
+        /// <summary>
+        /// Determines whether this element is an ancestor of the specified descendant.
+        /// </summary>
+        /// <param name="descendant">
+        /// The descendant object to evaluate.
+        /// </param>
+        /// <returns>
+        /// true if this element is an ancestor of <paramref name="descendant"/>; otherwise, false.
+        /// </returns>
+        public bool IsAncestorOf(DependencyObject descendant)
+        {
+            ArgumentNullException.ThrowIfNull(descendant);
+
+            DependencyObject current = descendant;
+            while (current is not null)
+            {
+                current = VisualTreeHelper.GetParent(current);
+                if (current == this)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         internal bool IsDescendantOf(DependencyObject ancestor)
         {

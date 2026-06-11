@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -524,6 +524,28 @@ namespace System.Windows.Controls
                 var foreground = (Brush)sender;
                 this.SetForeground(foreground, foreground);
             }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Background"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty BackgroundProperty =
+            DependencyProperty.Register(
+                nameof(Background),
+                typeof(Brush),
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata((Brush)null)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBlock)d).SetBackground((Brush)newValue),
+                });
+
+        /// <summary>
+        /// Gets or sets the <see cref="Brush"/> used to fill the background of the <see cref="TextBlock"/>.
+        /// </summary>
+        public Brush Background
+        {
+            get => (Brush)GetValue(BackgroundProperty);
+            set => SetValueInternal(BackgroundProperty, value);
         }
 
         /// <summary>
@@ -1065,7 +1087,7 @@ namespace System.Windows.Controls
 
         protected override int VisualChildrenCount => Inlines.InternalCount;
 
-        protected override UIElement GetVisualChild(int index)
+        protected override Visual GetVisualChild(int index)
         {
             if (index >= VisualChildrenCount)
             {

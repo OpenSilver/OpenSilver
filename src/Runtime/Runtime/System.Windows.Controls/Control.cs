@@ -666,7 +666,7 @@ public partial class Control : FrameworkElement, IInternalControl
 
         if (count > 0)
         {
-            UIElement child = GetVisualChild(0);
+            UIElement child = GetVisualChild(0) as UIElement;
             if (child != null)
             {
                 child.Measure(availableSize);
@@ -684,7 +684,7 @@ public partial class Control : FrameworkElement, IInternalControl
 
         if (count > 0)
         {
-            UIElement child = GetVisualChild(0);
+            UIElement child = GetVisualChild(0) as UIElement;
             if (child != null)
             {
                 child.Arrange(new Rect(finalSize));

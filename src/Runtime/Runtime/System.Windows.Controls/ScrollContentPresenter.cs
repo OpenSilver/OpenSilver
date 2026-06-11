@@ -500,7 +500,7 @@ namespace System.Windows.Controls
         /// Forces content to scroll until the coordinate space of a visual object is visible.
         /// </summary>
         /// <param name="visual">
-        /// A <see cref="UIElement"/> that becomes visible.
+        /// A <see cref="Visual"/> that becomes visible.
         /// </param>
         /// <param name="rectangle">
         /// The bounding rectangle that identifies the coordinate space to make visible.
@@ -509,7 +509,7 @@ namespace System.Windows.Controls
         /// A <see cref="Rect"/> that represents the visible region.
         /// </returns>
         [OpenSilver.NotImplemented]
-        public Rect MakeVisible(UIElement visual, Rect rectangle)
+        public Rect MakeVisible(Visual visual, Rect rectangle)
         {
             throw new NotImplementedException();
         }

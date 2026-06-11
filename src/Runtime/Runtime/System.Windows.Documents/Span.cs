@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -72,7 +72,7 @@ public class Span : Inline
 
     protected sealed override int VisualChildrenCount => Inlines.InternalCount;
 
-    protected sealed override UIElement GetVisualChild(int index)
+protected sealed override System.Windows.Media.Visual GetVisualChild(int index)
     {
         if (index >= VisualChildrenCount)
         {

@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -222,7 +222,7 @@ namespace System.Windows.Controls
         protected override Size MeasureOverride(Size constraint)
         {
             Size stackDesiredSize = new();
-            List<UIElement> children = InternalChildren;
+            List<UIElement> children = InternalChildrenList;
             bool fHorizontal = Orientation == Orientation.Horizontal;
             int visibleChildrenCount = 0;
 
@@ -298,7 +298,7 @@ namespace System.Windows.Controls
 
         protected override Size ArrangeOverride(Size arrangeSize)
         {
-            List<UIElement> children = InternalChildren;
+            List<UIElement> children = InternalChildrenList;
             bool fHorizontal = Orientation == Orientation.Horizontal;
             double spacing = Spacing;
             double previousChildSize = 0.0;

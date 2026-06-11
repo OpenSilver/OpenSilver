@@ -367,7 +367,7 @@ public class AccessText : FrameworkElement
     /// Returns an integer that represents the index of a visual child element.
     /// </returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    protected override UIElement GetVisualChild(int index)
+    protected override Visual GetVisualChild(int index)
     {
         if (index != 0)
         {

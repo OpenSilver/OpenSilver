@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -175,7 +175,7 @@ internal partial class TextViewBase : IScrollInfo
     }
 
     [NotImplemented]
-    public Rect MakeVisible(UIElement visual, Rect rectangle) => default;
+    public Rect MakeVisible(System.Windows.Media.Visual visual, Rect rectangle) => default;
 
     private void ArrangeScrollData(Size arrangeSize)
     {

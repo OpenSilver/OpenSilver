@@ -14,6 +14,7 @@
 using OpenSilver.Internal.Controls;
 using System.Collections;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace System.Windows.Controls;
 
@@ -103,7 +104,7 @@ public class Decorator : FrameworkElement
     /// <exception cref="ArgumentOutOfRangeException">
     /// index is greater than the number of visual child elements.
     /// </exception>
-    protected override UIElement GetVisualChild(int index)
+    protected override Visual GetVisualChild(int index)
     {
         if (_child is null || index != 0)
         {

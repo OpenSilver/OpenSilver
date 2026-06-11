@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -226,7 +226,7 @@ public class Canvas : Panel
     {
         var childConstraint = new Size(double.PositiveInfinity, double.PositiveInfinity);
 
-        foreach (UIElement child in InternalChildren)
+        foreach (UIElement child in InternalChildrenList)
         {
             child.Measure(childConstraint);
         }
@@ -245,7 +245,7 @@ public class Canvas : Panel
     /// </returns>
     protected override Size ArrangeOverride(Size arrangeSize)
     {
-        foreach (UIElement child in InternalChildren)
+        foreach (UIElement child in InternalChildrenList)
         {
             double x = 0;
             double y = 0;

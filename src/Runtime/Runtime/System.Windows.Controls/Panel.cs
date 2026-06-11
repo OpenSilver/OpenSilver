@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -91,7 +91,7 @@ namespace System.Windows.Controls
         /// <returns>
         /// A <see cref="UIElement"/> child of the parent <see cref="Panel"/> element.
         /// </returns>
-        protected override UIElement GetVisualChild(int index)
+        protected override Visual GetVisualChild(int index)
         {
             if (_uiElementCollection is null)
             {
@@ -314,7 +314,9 @@ namespace System.Windows.Controls
         /// operations (get accessor, GetEnumerator, Count...) are generally safe to use, but
         /// write operations (Add, Remove, Clear...) will likely lead to unexpected behaviors.
         /// </remarks>
-        internal List<UIElement> InternalChildren => Children.InternalItems;
+        protected internal UIElementCollection InternalChildren => Children;
+
+        internal List<UIElement> InternalChildrenList => Children.InternalItems;
 
         private bool VerifyBoundState()
         {
@@ -658,7 +660,7 @@ namespace System.Windows.Controls
                 return;
             }
 
-            List<UIElement> children = InternalChildren;
+            List<UIElement> children = InternalChildrenList;
 
             int chunkSize = ProgressiveRenderingChunkSize;
             bool enableProgressiveRendering = chunkSize > 0 && children.Count > chunkSize;

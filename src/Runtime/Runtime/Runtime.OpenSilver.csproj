@@ -928,6 +928,7 @@
     <Compile Include="System.Windows.Controls\Control.cs" />
     <Compile Include="System.Windows.Controls\ControlTemplate.cs" />
     <Compile Include="System.Windows.Controls\Grid.cs" />
+    <Compile Include="System.Windows.Controls\GroupStyle.cs" />
     <Compile Include="System.Windows.Controls\HyperlinkButton.cs" />
     <Compile Include="System.Windows.Controls\Image.cs" />
     <Compile Include="System.Windows.Controls\INavigate.cs" />
@@ -1063,6 +1064,7 @@
     <Compile Include="System.Windows.Media\GradientSpreadMethod.cs" />
     <Compile Include="System.Windows.Media\GradientStop.cs" />
     <Compile Include="System.Windows.Media\GradientStopCollection.cs" />
+    <Compile Include="System.Windows.Media\HitTesting.cs" />
     <Compile Include="System.Windows.Media\ImageSource.cs" />
     <Compile Include="System.Windows.Media\LinearGradientBrush.cs" />
     <Compile Include="System.Windows.Media\LineGeometry.cs" />
@@ -1093,6 +1095,7 @@
     <Compile Include="System.Windows.Media\TransformCollection.cs" />
     <Compile Include="System.Windows.Media\TransformGroup.cs" />
     <Compile Include="System.Windows.Media\TranslateTransform.cs" />
+    <Compile Include="System.Windows.Media\Visual.cs" />
     <Compile Include="System.Windows.Media\VisualTreeHelper.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\BitmapCache.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CacheMode.cs" />

@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -601,7 +601,7 @@ public class Grid : Panel, IBorderElement
             if (extData is null)
             {
                 gridDesiredSize = new Size();
-                List<UIElement> children = InternalChildren;
+                List<UIElement> children = InternalChildrenList;
 
                 for (int i = 0, count = children.Count; i < count; ++i)
                 {
@@ -935,7 +935,7 @@ public class Grid : Panel, IBorderElement
 
             if (_data is null)
             {
-                List<UIElement> children = InternalChildren;
+                List<UIElement> children = InternalChildrenList;
 
                 for (int i = 0, count = children.Count; i < count; ++i)
                 {
@@ -955,7 +955,7 @@ public class Grid : Panel, IBorderElement
                 SetFinalSize(DefinitionsU, innerRect.Width - combinedColumnSpacing, true);
                 SetFinalSize(DefinitionsV, innerRect.Height - combinedRowSpacing, false);
 
-                List<UIElement> children = InternalChildren;
+                List<UIElement> children = InternalChildrenList;
 
                 for (int currentCell = 0; currentCell < PrivateCells.Length; ++currentCell)
                 {
@@ -1114,7 +1114,7 @@ public class Grid : Panel, IBorderElement
     /// </summary>
     private void ValidateCellsCore()
     {
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = InternalChildrenList;
         ExtendedData extData = ExtData;
 
         extData.CellCachesCollection = new CellCache[children.Count];
@@ -1425,7 +1425,7 @@ public class Grid : Panel, IBorderElement
             return;
         }
 
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = InternalChildrenList;
         Dictionary<SpanKey, double> spanStore = null;
         bool ignoreDesiredSizeV = forceInfinityV;
 
@@ -1585,7 +1585,7 @@ public class Grid : Panel, IBorderElement
                                     rowSpacing);
         }
 
-        UIElement child = InternalChildren[cell];
+        UIElement child = InternalChildrenList[cell];
         child.Measure(new Size(cellMeasureWidth, cellMeasureHeight));
     }
 

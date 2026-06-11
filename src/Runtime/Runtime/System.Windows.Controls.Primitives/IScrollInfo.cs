@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.Windows.Media;
+
 namespace System.Windows.Controls.Primitives
 {
     /// <summary>
@@ -86,7 +88,7 @@ namespace System.Windows.Controls.Primitives
         /// Forces content to scroll until the coordinate space of a visual object is visible.
         /// </summary>
         /// <param name="visual">
-        /// A <see cref="UIElement"/> that becomes visible.
+        /// A <see cref="Visual"/> that becomes visible.
         /// </param>
         /// <param name="rectangle">
         /// A bounding rectangle that identifies the coordinate space to make visible.
@@ -94,7 +96,7 @@ namespace System.Windows.Controls.Primitives
         /// <returns>
         /// A <see cref="Rect"/> that is visible.
         /// </returns>
-        Rect MakeVisible(UIElement visual, Rect rectangle);
+        Rect MakeVisible(Visual visual, Rect rectangle);
 
         /// <summary>
         /// Sets the amount of horizontal offset.

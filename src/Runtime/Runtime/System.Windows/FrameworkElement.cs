@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -166,7 +166,7 @@ namespace System.Windows
         /// The requested child element. This should not return null; if the provided index
         /// is out of range, an exception is thrown.
         /// </returns>
-        protected override UIElement GetVisualChild(int index)
+        protected override Visual GetVisualChild(int index)
         {
             if (TemplateChild is null || index != 0)
             {
