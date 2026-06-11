@@ -17,6 +17,7 @@
         <dependency id="Microsoft.JSInterop" version="3.1.28" />
         <dependency id="Microsoft.CSharp" version="4.7.0" />
         <dependency id="System.ComponentModel.Composition" version="6.0.0" />
+				<dependency id="System.Security.Cryptography.Xml" version="8.0.3" />
         <dependency id="System.ServiceModel.Primitives" version="8.1.0" />
         <dependency id="System.ComponentModel.Annotations" version="5.0.0" />
       </group>
