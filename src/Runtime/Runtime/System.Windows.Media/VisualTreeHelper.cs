@@ -221,6 +221,139 @@ public sealed class VisualTreeHelper
         return reference.VisualTransform;
     }
 
+    public static void HitTest(
+        Visual reference,
+        HitTestFilterCallback filterCallback,
+        HitTestResultCallback resultCallback,
+        HitTestParameters hitTestParameters)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentNullException.ThrowIfNull(resultCallback);
+        ArgumentNullException.ThrowIfNull(hitTestParameters);
+
+        if (reference is not UIElement root)
+        {
+            return;
+        }
+
+        foreach (UIElement element in EnumerateVisuals(root))
+        {
+            if (filterCallback is not null)
+            {
+                HitTestFilterBehavior filter = filterCallback(element);
+                if (filter == HitTestFilterBehavior.Stop)
+                {
+                    return;
+                }
+
+                if (filter is HitTestFilterBehavior.ContinueSkipSelf or HitTestFilterBehavior.ContinueSkipSelfAndChildren)
+                {
+                    continue;
+                }
+            }
+
+            HitTestResult result = hitTestParameters switch
+            {
+                PointHitTestParameters point =>
+                    IsPointWithinElement(root, element, point.HitPoint)
+                        ? new PointHitTestResult(element, point.HitPoint)
+                        : null,
+                GeometryHitTestParameters geometry =>
+                    IsGeometryIntersectingElement(root, element, geometry.HitGeometry)
+                        ? new GeometryHitTestResult(element, IntersectionDetail.Intersects)
+                        : null,
+                _ => null,
+            };
+
+            if (result is not null && resultCallback(result) == HitTestResultBehavior.Stop)
+            {
+                return;
+            }
+        }
+
+        // Computes the layout bounds (in the element's own coordinate space) of an element.
+        static bool TryGetElementBounds(UIElement element, out Rect bounds)
+        {
+            bounds = default;
+
+            if (element is not FrameworkElement fe)
+            {
+                return false;
+            }
+
+            double width = fe.ActualWidth;
+            double height = fe.ActualHeight;
+            if (double.IsNaN(width) || double.IsNaN(height) || width <= 0d || height <= 0d)
+            {
+                return false;
+            }
+
+            bounds = new Rect(0d, 0d, width, height);
+            return true;
+        }
+
+        // Tests whether a point (expressed in the hit-test root's coordinate space) falls
+        // within the bounds of the candidate element.
+        static bool IsPointWithinElement(UIElement root, UIElement element, Point pointInRoot)
+        {
+            if (!TryGetElementBounds(element, out Rect bounds))
+            {
+                return false;
+            }
+
+            try
+            {
+                Point local = root.TransformToVisual(element).Transform(pointInRoot);
+                return bounds.Contains(local);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Tests whether a geometry (expressed in the hit-test root's coordinate space)
+        // intersects the bounds of the candidate element.
+        static bool IsGeometryIntersectingElement(UIElement root, UIElement element, Geometry geometry)
+        {
+            if (geometry is null || !TryGetElementBounds(element, out Rect bounds))
+            {
+                return false;
+            }
+
+            try
+            {
+                Rect elementBoundsInRoot = element.TransformToVisual(root).TransformBounds(bounds);
+                return elementBoundsInRoot.IntersectsWith(geometry.Bounds);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        static IEnumerable<UIElement> EnumerateVisuals(UIElement root)
+        {
+            var stack = new Stack<UIElement>();
+            stack.Push(root);
+
+            while (stack.Count > 0)
+            {
+                UIElement current = stack.Pop();
+                yield return current;
+
+                int count = current.InternalVisualChildrenCount;
+                for (int i = count - 1; i >= 0; i--)
+                {
+                    if (current.InternalGetVisualChild(i) is UIElement child)
+                    {
+                        stack.Push(child);
+                    }
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Retrieves a set of objects that are located within a specified point of an object's
     /// coordinate space.
@@ -297,7 +430,7 @@ public sealed class VisualTreeHelper
             int childrenCount = element.InternalVisualChildrenCount;
             for (int i = childrenCount - 1; i >= 0; i--)
             {
-                UIElement child = element.InternalGetVisualChild(i);
+                UIElement child = element.InternalGetVisualChild(i) as UIElement;
                 if (child is null or Inline)
                 {
                     continue;
