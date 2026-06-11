@@ -51,9 +51,28 @@ public sealed class TemplateBindingExpression : Expression
         return false;
     }
 
+    /// <summary>
+    /// Optional converter applied to the source value (WPF compatibility).
+    /// </summary>
+    internal Data.IValueConverter Converter { get; set; }
+
+    internal object ConverterParameter { get; set; }
+
+    internal Globalization.CultureInfo ConverterCulture { get; set; }
+
     internal override object GetValue(DependencyObject d, DependencyProperty dp)
     {
         var value = _source.GetValue(_sourceProperty);
+
+        if (Converter is not null)
+        {
+            return Converter.Convert(
+                value,
+                _targetProperty.PropertyType,
+                ConverterParameter,
+                ConverterCulture ?? Globalization.CultureInfo.CurrentCulture);
+        }
+
         if (_skipTypeCheck || ValidateValue(ref value, dp))
         {
             return value;
