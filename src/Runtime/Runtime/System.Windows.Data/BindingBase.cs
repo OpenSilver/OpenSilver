@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -36,6 +36,8 @@ public abstract class BindingBase : MarkupExtension
         OneTime = 0,
         /// <summary> Data flows in both directions - source to target and vice-versa </summary>
         TwoWay = BindingExpressionBase.PrivateFlags.iSourceToTarget | BindingExpressionBase.PrivateFlags.iTargetToSource,
+        /// <summary> Data flows from target to source (only) </summary>
+        OneWayToSource = BindingExpressionBase.PrivateFlags.iTargetToSource,
         /// <summary> Data flow obtained from target property default </summary>
         PropDefault = BindingExpressionBase.PrivateFlags.iPropDefault,
 
@@ -56,7 +58,7 @@ public abstract class BindingBase : MarkupExtension
         ValidatesOnNotifyDataErrors = BindingExpressionBase.PrivateFlags.iValidatesOnNotifyDataErrors,
 
         /// <summary> Flags describing data transfer </summary>
-        PropagationMask = OneWay | TwoWay | OneTime | PropDefault,
+        PropagationMask = OneWay | TwoWay | OneWayToSource | OneTime | PropDefault,
 
         /// <summary> Flags describing update trigger </summary>
         UpdateMask = UpdateDefault | UpdateOnPropertyChanged | UpdateOnLostFocus | UpdateExplicitly,
@@ -345,6 +347,7 @@ public abstract class BindingBase : MarkupExtension
         bindingMode switch
         {
             BindingMode.TwoWay => PrivateFlags.TwoWay,
+            BindingMode.OneWayToSource => PrivateFlags.OneWayToSource,
             BindingMode.OneTime => PrivateFlags.OneTime,
             _ => PrivateFlags.OneWay,
         };

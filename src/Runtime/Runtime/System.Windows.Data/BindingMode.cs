@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -30,6 +30,10 @@ public enum BindingMode
     /// Updates either the target or the source object when either changes. When the binding is created, the target property is updated from the source.
     /// </summary>
     TwoWay = 3,
+    /// <summary>
+    /// Updates the source property when the target property changes.
+    /// </summary>
+    OneWayToSource = 5,
     /// <summary>
     /// Uses the default <see cref="Binding.Mode"/> value of the binding target. The default value varies for each dependency property.
     /// In general, user-editable control properties, such as those of text boxes and check boxes, default to two-way bindings, whereas 

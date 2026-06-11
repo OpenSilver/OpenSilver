@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -220,6 +220,7 @@ public class Binding : BindingBase
             return GetFlagsWithinMask(PrivateFlags.PropagationMask) switch
             {
                 PrivateFlags.TwoWay => BindingMode.TwoWay,
+                PrivateFlags.OneWayToSource => BindingMode.OneWayToSource,
                 PrivateFlags.OneTime => BindingMode.OneTime,
                 _ => BindingMode.OneWay,
             };
@@ -236,6 +237,7 @@ public class Binding : BindingBase
         {
             PrivateFlags.OneWay => BindingMode.OneWay,
             PrivateFlags.TwoWay => BindingMode.TwoWay,
+            PrivateFlags.OneWayToSource => BindingMode.OneWayToSource,
             PrivateFlags.OneTime => BindingMode.OneTime,
             _ => BindingMode.Default,
         };
