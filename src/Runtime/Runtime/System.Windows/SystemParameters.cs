@@ -19,6 +19,21 @@ namespace System.Windows;
 public static class SystemParameters
 {
     /// <summary>
+    /// Gets the key used to reference the default focus visual style.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static object FocusVisualStyleKey { get; } = new object();
+
+    private static ResourceKey _menuPopupAnimationKey;
+
+    /// <summary>
+    /// Gets the resource key for the system menu popup animation.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static ResourceKey MenuPopupAnimationKey =>
+        _menuPopupAnimationKey ??= new ComponentResourceKey(typeof(SystemParameters), nameof(MenuPopupAnimationKey));
+
+    /// <summary>
     /// Gets a value that indicates whether the client computer is in high-contrast mode.
     /// </summary>
     /// <returns>

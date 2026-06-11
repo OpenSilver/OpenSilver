@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -24,6 +24,17 @@ public sealed class BitmapCache : CacheMode
     /// Initializes a new instance of the <see cref="BitmapCache"/> class.
     /// </summary>
     public BitmapCache() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BitmapCache"/> class with the specified render scale.
+    /// </summary>
+    /// <param name="renderAtScale">
+    /// The scale at which the object is rendered on the cached bitmap surface.
+    /// </param>
+    public BitmapCache(double renderAtScale)
+    {
+        RenderAtScale = renderAtScale;
+    }
 
     /// <summary>
     /// Identifies the <see cref="RenderAtScale"/> dependency property.

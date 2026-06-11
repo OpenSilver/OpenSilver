@@ -203,6 +203,19 @@ namespace System.Windows
             }
         }
 
+        /// <summary>
+        /// Gets a <see cref="SolidColorBrush"/> that paints text in a three-dimensional display element.
+        /// </summary>
+        public static SolidColorBrush ControlTextBrush => new(ControlTextColor);
+
+        private static ResourceKey _controlTextBrushKey;
+
+        /// <summary>
+        /// Gets a <see cref="ResourceKey"/> for the <see cref="ControlTextBrush"/>.
+        /// </summary>
+        public static ResourceKey ControlTextBrushKey =>
+            _controlTextBrushKey ??= new ComponentResourceKey(typeof(SystemColors), nameof(ControlTextBrushKey));
+
         private static Color _desktopColor;
 
         /// <summary>

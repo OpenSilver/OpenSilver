@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -34,6 +34,19 @@ public abstract class DrawingContext : DispatcherObject, IDisposable
     /// </exception>
     [NotImplemented]
     public void DrawText(FormattedText formattedText, Point origin)
+    {
+    }
+
+    /// <summary>
+    /// Draws a rounded rectangle.
+    /// </summary>
+    /// <param name="brush">The brush used to fill the rectangle.</param>
+    /// <param name="pen">The pen used to stroke the rectangle.</param>
+    /// <param name="rectangle">The rectangle to draw.</param>
+    /// <param name="radiusX">The horizontal corner radius.</param>
+    /// <param name="radiusY">The vertical corner radius.</param>
+    [NotImplemented]
+    public void DrawRoundedRectangle(Brush brush, object pen, Rect rectangle, double radiusX, double radiusY)
     {
     }
 

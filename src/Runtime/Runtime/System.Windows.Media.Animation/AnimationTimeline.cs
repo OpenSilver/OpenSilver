@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -49,6 +49,14 @@ public abstract class AnimationTimeline : Timeline
     /// The type of property that can be animated by this animation.
     /// </returns>
     public abstract Type TargetPropertyType { get; }
+
+    /// <summary>
+    /// Makes the current animation unmodifiable. Freezing is not enforced by OpenSilver yet.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public void Freeze()
+    {
+    }
 
     protected override Duration GetNaturalDurationCore() => DefaultDuration;
 
