@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -230,6 +230,26 @@ public sealed class Dispatcher
     [EditorBrowsable(EditorBrowsableState.Never)]
     public DispatcherOperation BeginInvoke(DispatcherPriority priority, Delegate method, object arg, params object[] args) =>
         BeginInvokeImpl(priority, method, CombineParameters(arg, args), -1);
+
+    /// <summary>
+    /// Executes the specified delegate synchronously on the thread the <see cref="Dispatcher"/> is associated with.
+    /// </summary>
+    /// <param name="callback">
+    /// The delegate to invoke.
+    /// </param>
+    public void Invoke(Action callback)
+    {
+        ArgumentNullException.ThrowIfNull(callback);
+
+        if (CheckAccess())
+        {
+            callback();
+        }
+        else
+        {
+            InvokeAsync(callback);
+        }
+    }
 
     /// <summary>
     /// Determines whether the calling thread is the thread associated with this <see cref="Dispatcher"/>.

@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -55,6 +55,11 @@ namespace System.Windows
         /// Gets the Application object for the current application.
         /// </summary>
         public static Application Current { get; private set; }
+
+        /// <summary>
+        /// Gets the dispatcher associated with the current application.
+        /// </summary>
+        public Dispatcher Dispatcher => Dispatcher.CurrentDispatcher;
 
         public Application()
             : this("opensilver-root")

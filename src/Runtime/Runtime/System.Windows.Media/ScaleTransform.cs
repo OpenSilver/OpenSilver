@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Media
 {
     /// <summary>
@@ -158,5 +160,65 @@ namespace System.Windows.Media
         public override Matrix Value => Matrix.CreateScaling(ScaleX, ScaleY, CenterX, CenterY);
 
         internal override bool IsIdentity => ScaleX == 1 && ScaleY == 1;
+
+        /// <summary>
+        /// Returns a live inverse transform that updates whenever this <see cref="ScaleTransform"/> changes.
+        /// This ensures that bindings which capture the inverse (e.g. via UnscaleTransformConverter)
+        /// continue to reflect the correct inverse even after ScaleX/ScaleY are mutated at runtime.
+        /// </summary>
+        public override GeneralTransform Inverse
+        {
+            get
+            {
+                double sx = ScaleX;
+                double sy = ScaleY;
+                if (sx == 0 || sy == 0)
+                {
+                    return null;
+                }
+                return new LiveInverseScaleTransform(this);
+            }
+        }
+
+        /// <summary>
+        /// A Transform that mirrors the inverse of a source <see cref="ScaleTransform"/>.
+        /// It subscribes to the source's Changed event so that its matrix stays current.
+        /// </summary>
+        private sealed class LiveInverseScaleTransform : Transform
+        {
+            private readonly ScaleTransform _source;
+            private WeakEventToken _changedToken;
+
+            internal LiveInverseScaleTransform(ScaleTransform source)
+            {
+                _source = source;
+                _changedToken = WeakEvent.Subscribe<LiveInverseScaleTransform, ScaleTransform, EventArgs>(
+                    this,
+                    source,
+                    static (instance, sender, args) => instance.OnSourceChanged(),
+                    static (handler, src) => src.Changed -= new EventHandler(handler),
+                    static (handler, src) => src.Changed += new EventHandler(handler));
+            }
+
+            private void OnSourceChanged() => OnTransformChanged();
+
+            public override Matrix Value
+            {
+                get
+                {
+                    double sx = _source.ScaleX;
+                    double sy = _source.ScaleY;
+                    if (sx == 0 || sy == 0)
+                    {
+                        return Matrix.Identity;
+                    }
+                    return Matrix.CreateScaling(1.0 / sx, 1.0 / sy, _source.CenterX, _source.CenterY);
+                }
+            }
+
+            internal override bool IsIdentity => _source.ScaleX == 1 && _source.ScaleY == 1;
+
+            public override GeneralTransform Inverse => _source;
+        }
     }
 }
