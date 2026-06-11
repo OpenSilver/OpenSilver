@@ -2779,6 +2779,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ResponsiveExtension.{0} cannot be set while using ResponsiveExtension.{1}..
+        /// </summary>
+        internal static string ResponsiveExtensionConflict {
+            get {
+                return ResourceManager.GetString("ResponsiveExtensionConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; must be greater than &apos;{1}&apos;..
         /// </summary>
         internal static string ResponsiveThreshold_Invalid {

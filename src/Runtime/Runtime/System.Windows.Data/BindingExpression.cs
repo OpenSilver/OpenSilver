@@ -1031,7 +1031,7 @@ namespace System.Windows.Data
             _mentor?.Loaded += new RoutedEventHandler(OnMentorLoaded);
         }
 
-        private static object FindName(IInternalFrameworkElement mentor, string name)
+        internal static object FindName(IInternalFrameworkElement mentor, string name)
         {
             object o = null;
             IInternalFrameworkElement fe = mentor is IUserControl
@@ -1072,7 +1072,7 @@ namespace System.Windows.Data
             return o;
         }
 
-        private static object FindAncestorOftype(IInternalFrameworkElement mentor, Type type, int level)
+        internal static object FindAncestorOftype(IInternalFrameworkElement mentor, Type type, int level)
         {
             Debug.Assert(mentor is not null);
 

@@ -1,0 +1,139 @@
+<Page x:Class="TestApplication.Tests.ResponsiveTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      d:DesignHeight="1200" d:DesignWidth="800">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
+            <TextBlock Text="Responsive markup extension" FontSize="24" FontWeight="Bold" Margin="0,0,0,8"/>
+            <TextBlock TextWrapping="Wrap" Margin="0,0,0,16"
+                       Text="Each section drives the orientation of a StackPanel with {Responsive Mobile=Vertical, Desktop=Horizontal, Threshold=300}. The blocks are laid out horizontally once the measured width reaches 300px, vertically below it. Move the sliders (and resize the window for section 1) and watch the orientation readout flip."/>
+
+            <!-- 1. WINDOW (baseline, no new property) -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="1. Window width (baseline)" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="No source specified, so the Window width is measured. Resize the browser window across 600px."/>
+                    <TextBlock Text="{Binding Orientation, ElementName=sp1, StringFormat='Current orientation: {0}'}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <StackPanel x:Name="sp1" Background="#FFE8F0FE"
+                                Orientation="{Responsive Mobile=Vertical, Desktop=Horizontal, Threshold=600}">
+                        <Border Background="#FF90CAF9" Margin="2" Padding="12"><TextBlock Text="A"/></Border>
+                        <Border Background="#FF64B5F6" Margin="2" Padding="12"><TextBlock Text="B"/></Border>
+                        <Border Background="#FF42A5F5" Margin="2" Padding="12"><TextBlock Text="C"/></Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 2. ElementName -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="2. ElementName" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="The StackPanel orientation is driven by the width of the named 'container2' Border (ElementName=container2). The slider sets container2's width."/>
+                    <Slider x:Name="slider2" Minimum="100" Maximum="600" Value="220" Width="400" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Value, ElementName=slider2, StringFormat='container2 width: {0:F0}px'}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Orientation, ElementName=sp2, StringFormat='Current orientation: {0}'}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <Border x:Name="container2" Width="{Binding Value, ElementName=slider2}" HorizontalAlignment="Left"
+                            BorderBrush="Gray" BorderThickness="1" Background="#FFFFF3E0">
+                        <StackPanel x:Name="sp2"
+                                    Orientation="{Responsive Mobile=Vertical, Desktop=Horizontal, Threshold=300, ElementName=container2}">
+                            <Border Background="#FFFFCC80" Margin="2" Padding="12"><TextBlock Text="A"/></Border>
+                            <Border Background="#FFFFB74D" Margin="2" Padding="12"><TextBlock Text="B"/></Border>
+                            <Border Background="#FFFFA726" Margin="2" Padding="12"><TextBlock Text="C"/></Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- 3. RelativeSource FindAncestor -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="3. RelativeSource AncestorType=Border" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="The StackPanel orientation is driven by its nearest ancestor Border's width (no name needed). The slider sets that Border's width."/>
+                    <Slider x:Name="slider3" Minimum="100" Maximum="600" Value="220" Width="400" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Value, ElementName=slider3, StringFormat='ancestor width: {0:F0}px'}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Orientation, ElementName=sp3, StringFormat='Current orientation: {0}'}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <Border Width="{Binding Value, ElementName=slider3}" HorizontalAlignment="Left"
+                            BorderBrush="Gray" BorderThickness="1" Background="#FFE8F5E9">
+                        <StackPanel x:Name="sp3"
+                                    Orientation="{Responsive Mobile=Vertical, Desktop=Horizontal, Threshold=300, RelativeSource={RelativeSource AncestorType=Border}}">
+                            <Border Background="#FFA5D6A7" Margin="2" Padding="12"><TextBlock Text="A"/></Border>
+                            <Border Background="#FF81C784" Margin="2" Padding="12"><TextBlock Text="B"/></Border>
+                            <Border Background="#FF66BB6A" Margin="2" Padding="12"><TextBlock Text="C"/></Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- 4. RelativeSource Self -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="4. RelativeSource Self" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="The StackPanel measures its own width (RelativeSource Self). Its width is set by the slider (independent of its children), so there is no circular dependency."/>
+                    <Slider x:Name="slider4" Minimum="100" Maximum="600" Value="220" Width="400" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Value, ElementName=slider4, StringFormat='self width: {0:F0}px'}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Orientation, ElementName=sp4, StringFormat='Current orientation: {0}'}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <StackPanel x:Name="sp4" Width="{Binding Value, ElementName=slider4}" HorizontalAlignment="Left" Background="#FFF3E5F5"
+                                Orientation="{Responsive Mobile=Vertical, Desktop=Horizontal, Threshold=300, RelativeSource={RelativeSource Self}}">
+                        <Border Background="#FFCE93D8" Margin="2" Padding="12"><TextBlock Text="A"/></Border>
+                        <Border Background="#FFBA68C8" Margin="2" Padding="12"><TextBlock Text="B"/></Border>
+                        <Border Background="#FFAB47BC" Margin="2" Padding="12"><TextBlock Text="C"/></Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 5. RelativeSource TemplatedParent -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="5. RelativeSource TemplatedParent" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="Inside a ControlTemplate, the StackPanel measures the templated parent's width (RelativeSource TemplatedParent). The slider sets the templated control's width."/>
+                    <Slider x:Name="slider5" Minimum="100" Maximum="600" Value="220" Width="400" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Value, ElementName=slider5, StringFormat='templated parent width: {0:F0}px'}" Margin="0,0,0,4"/>
+                    <ContentControl Width="{Binding Value, ElementName=slider5}" HorizontalAlignment="Left">
+                        <ContentControl.Template>
+                            <ControlTemplate TargetType="ContentControl">
+                                <Border BorderBrush="Gray" BorderThickness="1" Background="#FFE0F7FA">
+                                    <StackPanel x:Name="sp5"
+                                                Orientation="{Responsive Mobile=Vertical, Desktop=Horizontal, Threshold=300, RelativeSource={RelativeSource TemplatedParent}}">
+                                        <TextBlock Text="{Binding Orientation, ElementName=sp5, StringFormat='Current orientation: {0}'}" FontWeight="SemiBold" Margin="2"/>
+                                        <Border Background="#FF80DEEA" Margin="2" Padding="12"><TextBlock Text="A"/></Border>
+                                        <Border Background="#FF4DD0E1" Margin="2" Padding="12"><TextBlock Text="B"/></Border>
+                                        <Border Background="#FF26C6DA" Margin="2" Padding="12"><TextBlock Text="C"/></Border>
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </ContentControl.Template>
+                    </ContentControl>
+                </StackPanel>
+            </Border>
+            
+            <!-- 6. Source -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="6. Source" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="The StackPanel orientation is driven by the width of an explicit source. The slider sets the source width."/>
+                    <Slider x:Name="slider6" Minimum="100" Maximum="600" Value="220" Width="400" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Value, ElementName=slider6, StringFormat='container6 width: {0:F0}px'}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Orientation, ElementName=sp6, StringFormat='Current orientation: {0}'}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <Border x:Name="container6" Width="{Binding Value, ElementName=slider6}" HorizontalAlignment="Left"
+                            BorderBrush="Gray" BorderThickness="1" Background="#FFFFF3E0">
+                        <StackPanel x:Name="sp6">
+                            <Border Background="#FFEF9A9A" Margin="2" Padding="12"><TextBlock Text="A"/></Border>
+                            <Border Background="#FFE57373" Margin="2" Padding="12"><TextBlock Text="B"/></Border>
+                            <Border Background="#FFEF5350" Margin="2" Padding="12"><TextBlock Text="C"/></Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

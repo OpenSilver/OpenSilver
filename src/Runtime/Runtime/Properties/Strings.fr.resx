@@ -1362,4 +1362,7 @@
   <data name="Animation_Invalid_DefaultValue" xml:space="preserve">
     <value>'{0}' ne peut pas utiliser la valeur par défaut {1} de '{2}'.</value>
   </data>
+  <data name="ResponsiveExtensionConflict" xml:space="preserve">
+    <value>Impossible de définir ResponsiveExtension.{0} pendant l'utilisation de ResponsiveExtension.{1}.</value>
+  </data>
 </root>
