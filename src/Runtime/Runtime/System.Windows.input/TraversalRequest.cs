@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -28,10 +28,7 @@ public sealed class TraversalRequest
     /// </param>
     public TraversalRequest(FocusNavigationDirection focusNavigationDirection)
     {
-        if (focusNavigationDirection != FocusNavigationDirection.Next &&
-            focusNavigationDirection != FocusNavigationDirection.Previous &&
-            focusNavigationDirection != FocusNavigationDirection.First &&
-            focusNavigationDirection != FocusNavigationDirection.Last)
+        if (!Enum.IsDefined(typeof(FocusNavigationDirection), focusNavigationDirection))
         {
             throw new InvalidEnumArgumentException(nameof(focusNavigationDirection), (int)focusNavigationDirection, typeof(FocusNavigationDirection));
         }
@@ -85,5 +82,23 @@ public enum FocusNavigationDirection
     /// </summary>
     Last,
 
-    // If you add a new value you should also add a validation check to TraversalRequest constructor
+    /// <summary>
+    /// Move the focus to another control to the left of the currently focused element.
+    /// </summary>
+    Left,
+
+    /// <summary>
+    /// Move the focus to another control to the right of the currently focused element.
+    /// </summary>
+    Right,
+
+    /// <summary>
+    /// Move the focus to another control above the currently focused element.
+    /// </summary>
+    Up,
+
+    /// <summary>
+    /// Move the focus to another control below the currently focused element.
+    /// </summary>
+    Down,
 }

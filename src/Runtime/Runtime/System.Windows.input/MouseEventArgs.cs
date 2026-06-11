@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -42,6 +42,15 @@ public class MouseEventArgs : InputEventArgs
     /// </param>
     public MouseEventArgs(MouseDevice mouse, int timestamp)
         : base(mouse, timestamp)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MouseEventArgs"/> class using the specified
+    /// mouse device, timestamp, and stylus device.
+    /// </summary>
+    public MouseEventArgs(MouseDevice mouse, int timestamp, StylusDevice stylusDevice)
+        : this(mouse, timestamp)
     {
     }
 

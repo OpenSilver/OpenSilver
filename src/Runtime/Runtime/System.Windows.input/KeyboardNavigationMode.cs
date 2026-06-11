@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -31,5 +31,17 @@ public enum KeyboardNavigationMode
     /// <summary>
     /// The container and all of its child elements as a whole receive focus only once.
     /// </summary>
-    Once = 2
+    Once = 2,
+    /// <summary>
+    /// No keyboard navigation is allowed inside this container.
+    /// </summary>
+    None = 3,
+    /// <summary>
+    /// Focus remains contained within this container.
+    /// </summary>
+    Contained = 4,
+    /// <summary>
+    /// Focus continues out of this container when the end is reached.
+    /// </summary>
+    Continue = 5
 }

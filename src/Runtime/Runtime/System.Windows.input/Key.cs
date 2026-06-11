@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -549,6 +549,50 @@ public enum Key
     /// </summary>
     Scroll = 145,
     /// <summary>
+    /// The OEM 1 key.
+    /// </summary>
+    Oem1 = 186,
+    /// <summary>
+    /// The OEM plus key.
+    /// </summary>
+    OemPlus = 187,
+    /// <summary>
+    /// The OEM comma key.
+    /// </summary>
+    OemComma = 188,
+    /// <summary>
+    /// The OEM minus key.
+    /// </summary>
+    OemMinus = 189,
+    /// <summary>
+    /// The OEM period key.
+    /// </summary>
+    OemPeriod = 190,
+    /// <summary>
+    /// The OEM 2 key.
+    /// </summary>
+    Oem2 = 191,
+    /// <summary>
+    /// The OEM 3 key.
+    /// </summary>
+    Oem3 = 192,
+    /// <summary>
+    /// The OEM open brackets key.
+    /// </summary>
+    OemOpenBrackets = 219,
+    /// <summary>
+    /// The OEM 5 key.
+    /// </summary>
+    Oem5 = 220,
+    /// <summary>
+    /// The OEM close brackets key.
+    /// </summary>
+    OemCloseBrackets = 221,
+    /// <summary>
+    /// The OEM quotes key.
+    /// </summary>
+    OemQuotes = 222,
+    /// <summary>
     /// An unknown key.
     /// </summary>
     Unknown = int.MaxValue,
@@ -567,7 +611,7 @@ internal static class VirtualKeysHelpers
 
     internal static bool IsUnknownKey(int intValue)
     {
-        return intValue > 165 || _unknownKeys.Contains(intValue);
+        return intValue > 222 || _unknownKeys.Contains(intValue);
     }
 
     internal static Key GetKeyFromKeyCode(int keyCode)

@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -153,6 +153,13 @@ public sealed class InputManager : DispatcherObject
     /// </returns>
     public MouseDevice PrimaryMouseDevice => _primaryMouseDevice;
 
+
+    /// <summary>
+    /// Gets the input device associated with the most recent input event.
+    /// </summary>
+    public InputDevice MostRecentInputDevice { get; private set; }
+
+
     internal Window ActiveWindow { get; private set; }
 
     internal void RegisterRoot(HtmlElementReference element)
@@ -238,6 +245,11 @@ public sealed class InputManager : DispatcherObject
                 ActiveWindow = uie.ParentWindow;
             }
 
+            if (eventType is EVENTS.KEYDOWN or EVENTS.KEYUP or EVENTS.KEYPRESS)
+            {
+                MostRecentInputDevice = _primaryKeyboardDevice;
+            }
+
             _primaryKeyboardDevice.ProcessInput(uie, eventType, jsEventArg);
             _primaryMouseDevice.ProcessInput(eventType);
         }
@@ -256,6 +268,8 @@ public sealed class InputManager : DispatcherObject
             {
                 ActiveWindow = uie.ParentWindow;
             }
+
+            MostRecentInputDevice = _primaryMouseDevice;
 
             _primaryMouseDevice.ProcessInput(
                 uie,

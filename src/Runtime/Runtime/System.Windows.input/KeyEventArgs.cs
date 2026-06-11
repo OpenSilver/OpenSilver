@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -80,6 +80,16 @@ public sealed class KeyEventArgs : KeyboardEventArgs
     /// One of the enumeration values that indicates the key referenced by the event.
     /// </returns>
     public Key Key { get; internal set; }
+
+    /// <summary>
+    /// Gets a value that indicates whether this event represents a key press.
+    /// </summary>
+    public bool IsDown => RoutedEvent == Keyboard.KeyDownEvent || RoutedEvent == Keyboard.PreviewKeyDownEvent;
+
+    /// <summary>
+    /// Gets a value that indicates whether this event represents a key release.
+    /// </summary>
+    public bool IsUp => RoutedEvent == Keyboard.KeyUpEvent || RoutedEvent == Keyboard.PreviewKeyUpEvent;
 
     /// <summary>
     /// Gets an integer value that represents the key that is pressed or released (depending on which 
