@@ -172,18 +172,14 @@ public sealed class Condition : ISupportInitialize
         set
         {
             CheckSealed();
-
-            if (value is MarkupExtension)
+            _value = value switch
             {
-                throw new ArgumentException(string.Format(Strings.ConditionValueOfMarkupExtensionNotSupported, value.GetType().Name));
-            }
-
-            if (value is Expression)
-            {
-                throw new ArgumentException(Strings.ConditionValueOfExpressionNotSupported);
-            }
-
-            _value = value;
+                NullExtension => null,
+                string s when s == "{x:Null}" => null,
+                MarkupExtension => throw new ArgumentException(string.Format(Strings.ConditionValueOfMarkupExtensionNotSupported, value.GetType().Name)),
+                Expression => throw new ArgumentException(Strings.ConditionValueOfExpressionNotSupported),
+                _ => value,
+            };
         }
     }
 

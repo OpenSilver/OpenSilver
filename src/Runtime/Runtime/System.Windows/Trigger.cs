@@ -78,6 +78,7 @@ public sealed class Trigger : TriggerBase, ISupportInitialize
             _value = value switch
             {
                 NullExtension => null,
+                string s when s == "{x:Null}" => null,
                 MarkupExtension => throw new ArgumentException(string.Format(Strings.ConditionValueOfMarkupExtensionNotSupported, value.GetType().Name)),
                 Expression => throw new ArgumentException(Strings.ConditionValueOfExpressionNotSupported),
                 _ => value,
