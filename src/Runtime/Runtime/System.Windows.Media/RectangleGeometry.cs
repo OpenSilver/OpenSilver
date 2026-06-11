@@ -148,6 +148,45 @@ namespace System.Windows.Media
         }
 
         /// <summary>
+        /// Gets the area of the filled region of this <see cref="RectangleGeometry"/> object.
+        /// </summary>
+        /// <param name="tolerance">
+        /// The computational tolerance of error.
+        /// </param>
+        /// <param name="type">
+        /// Specifies how the error tolerance will be interpreted.
+        /// </param>
+        /// <returns>
+        /// The area of the filled region of this <see cref="RectangleGeometry"/> object.
+        /// </returns>
+        public override double GetArea(double tolerance, ToleranceType type)
+        {
+            if (IsEmpty())
+            {
+                return 0.0;
+            }
+
+            double radiusX = RadiusX;
+            double radiusY = RadiusY;
+            Rect rect = Rect;
+
+            // Get the area of the bounding rectangle
+            double area = Math.Abs(rect.Width * rect.Height);
+
+            // correct it for the rounded corners
+            area -= Math.Abs(radiusX * radiusY) * (4.0 - Math.PI);
+
+            // Adjust to internal transformation
+            Matrix transform = Transform.ToMatrix(Transform);
+            if (!transform.IsIdentity)
+            {
+                area *= Math.Abs(transform.Determinant);
+            }
+
+            return area;
+        }
+
+        /// <summary>
         /// Determines whether this <see cref="RectangleGeometry"/> object is empty.
         /// </summary>
         /// <returns>

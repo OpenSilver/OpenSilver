@@ -220,5 +220,79 @@ internal abstract class CShapeBase
         return false;
     }
 
+    /// <summary>
+    /// Compute area for this shape.
+    /// </summary>
+    internal double GetArea(double rTolerance, bool fRelative, Matrix matrix)
+    {
+        double result;
+
+        if (IsAxisAlignedRectangle())
+        {
+            MilRectD rc = GetFigure(0).GetAsRectangle();
+
+            result = Math.Abs((rc._right - rc._left) * (rc._bottom - rc._top));
+
+            if (!matrix.IsIdentity)
+            {
+                result *= Math.Abs(matrix.Determinant);
+            }
+        }
+        else
+        {
+            double rAbsoluteTolerance = GetAbsoluteTolerance(rTolerance, fRelative, matrix);
+
+            var area = new CArea(rAbsoluteTolerance);
+
+            // Set scanner workspace
+            Rect rect = GetTightBounds(matrix);
+            bool fDegenerate = area.SetWorkspaceTransform(rect);
+            if (fDegenerate)
+            {
+                return 0;
+            }
+
+            // Organize the shape into chains
+            Populate(area, matrix);
+
+            // Scan the chains to obtain the area
+            area.Scan();
+            result = area.GetResult();
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Get the absolute tolerance from a relative one.
+    /// Port of CShapeBase::GetAbsoluteTolerance.
+    /// </summary>
+    private double GetAbsoluteTolerance(
+        double rTolerance,
+        bool fRelative,
+        Matrix matrix)
+    {
+        Rect rcLooseBounds = GetTightBounds(matrix);
+
+        double rBoundsWidth = rcLooseBounds.Width;
+        double rBoundsHeight = rcLooseBounds.Height;
+
+        if (double.IsNaN(rBoundsWidth) || double.IsNaN(rBoundsHeight))
+        {
+            return rTolerance;
+        }
+
+        double rExtent = Math.Max(rBoundsWidth, rBoundsHeight);
+
+        if (fRelative)
+        {
+            return Math.Max(rTolerance, Utils.FUZZ_DOUBLE) * rExtent;
+        }
+        else
+        {
+            return Math.Max(rTolerance, rExtent * Utils.FUZZ_DOUBLE);
+        }
+    }
+
     private static bool IsAxisAlignedPreserving(Matrix m) => (m.M12 == 0 && m.M21 == 0) || (m.M11 == 0 && m.M22 == 0);
 }

@@ -34,6 +34,8 @@ internal abstract class IFigureData
 
     internal abstract bool IsAxisAlignedRectangle();
 
+    internal abstract MilRectD GetAsRectangle();
+
     internal abstract void GetParallelogramVertices(out MilPoint2D p0, out MilPoint2D p1, out MilPoint2D p2, out MilPoint2D p3, Matrix matrix = default);
 
     internal abstract Rect GetAsWellOrderedRectangle();

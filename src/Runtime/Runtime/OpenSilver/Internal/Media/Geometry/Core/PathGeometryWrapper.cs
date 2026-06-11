@@ -166,6 +166,15 @@ internal sealed class PathFigureData : IFigureData
         _currentPoint = 0;
     }
 
+    internal override MilRectD GetAsRectangle()
+    {
+        Debug.Assert(IsAxisAlignedRectangle());
+
+        GetParallelogramVertices(out MilPoint2D p0, out _, out MilPoint2D p2, out _);
+
+        return new MilRectD(p0.X, p0.Y, p2.X, p2.Y);
+    }
+
     internal override Rect GetAsWellOrderedRectangle()
     {
         Debug.Assert(IsAxisAlignedRectangle());

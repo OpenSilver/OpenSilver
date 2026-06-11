@@ -175,6 +175,48 @@ public abstract class Geometry : DependencyObject
     public Rect Bounds => GetBoundsInternal();
 
     /// <summary>
+    /// Gets the area of the filled region of the <see cref="Geometry"/> object.
+    /// </summary>
+    /// <returns>
+    /// The area of the filled region of the geometry.
+    /// </returns>
+    public double GetArea() => GetArea(StandardFlatteningTolerance, ToleranceType.Absolute);
+
+    /// <summary>
+    /// Gets the area, within the specified tolerance, of the filled region of the <see cref="Geometry"/> 
+    /// object.
+    /// </summary>
+    /// <param name="tolerance">
+    /// The maximum bounds on the distance between points in the polygonal approximation of the geometry.
+    /// Smaller values produce more accurate results but cause slower execution. If tolerance is less than 
+    /// .000001, .000001 is used instead.
+    /// </param>
+    /// <param name="type">
+    /// One of the <see cref="ToleranceType"/> values that specifies whether the tolerance factor is an 
+    /// absolute value or relative to the area of the geometry.
+    /// </param>
+    /// <returns>
+    /// The area of the filled region of the geometry.
+    /// </returns>
+    public virtual double GetArea(double tolerance, ToleranceType type)
+    {
+        if (IsObviouslyEmpty())
+        {
+            return 0;
+        }
+
+        PathGeometryData pathData = GetPathGeometryData();
+
+        if (pathData.IsEmpty())
+        {
+            return 0;
+        }
+
+        var pathGeometry = new PathGeometryWrapper(pathData.SerializedData, pathData.FillRule, Matrix.Identity);
+        return pathGeometry.GetArea(tolerance, type == ToleranceType.Relative, pathData.Matrix);
+    }
+
+    /// <summary>
     /// Determines whether the object is empty.
     /// </summary>
     /// <returns>

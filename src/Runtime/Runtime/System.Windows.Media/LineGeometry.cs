@@ -103,6 +103,21 @@ namespace System.Windows.Media
         }
 
         /// <summary>
+        /// Gets the area of the filled region of this <see cref="LineGeometry"/> object.
+        /// </summary>
+        /// <param name="tolerance">
+        /// The computational tolerance of error.
+        /// </param>
+        /// <param name="type">
+        /// The specified type for interpreting the error tolerance.
+        /// </param>
+        /// <returns>
+        /// The area of the filled region of this <see cref="LineGeometry"/> object, which is always 
+        /// 0 because a line contains no area.
+        /// </returns>
+        public override double GetArea(double tolerance, ToleranceType type) => 0.0;
+
+        /// <summary>
         /// Determines whether this <see cref="LineGeometry"/> object is empty.
         /// </summary>
         /// <returns>

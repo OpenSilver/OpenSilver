@@ -175,6 +175,12 @@ internal class CScanner : IPopulationSink
 
         internal MilPoint2D GetExactCoordinates() => Pt;
 
+        internal double GetAreaContribution()
+        {
+            Debug.Assert(Next != null);
+            return Pt.X * Next.Pt.Y - Pt.Y * Next.Pt.X;
+        }
+
         internal MilPoint2D GetSegmentBasePoint() => GetSegmentBase().GetExactCoordinates();
 
         internal MilPoint2D GetSegmentTipPoint() => GetSegmentTip().GetExactCoordinates();

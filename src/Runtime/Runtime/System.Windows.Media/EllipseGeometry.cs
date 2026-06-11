@@ -158,6 +158,35 @@ namespace System.Windows.Media
         }
 
         /// <summary>
+        /// Gets the area of this <see cref="EllipseGeometry"/>.
+        /// </summary>
+        /// <param name="tolerance">
+        /// The maximum bounds on the distance between points in the polygonal approximation of the geometry.
+        /// Smaller values produce more accurate results but cause slower execution. If tolerance is less than 
+        /// .000001, .000001 is used instead.
+        /// </param>
+        /// <param name="type">
+        /// One of the enumeration values, <see cref="ToleranceType.Absolute"/> or <see cref="ToleranceType.Relative"/>,
+        /// that specifies whether the tolerance factor is an absolute value or relative to the area of this geometry.
+        /// </param>
+        /// <returns>
+        /// The area of the filled region of this ellipse.
+        /// </returns>
+        public override double GetArea(double tolerance, ToleranceType type)
+        {
+            double area = Math.Abs(RadiusX * RadiusY) * Math.PI;
+
+            // Adjust to internal transformation
+            Matrix transform = Transform.ToMatrix(Transform);
+            if (!transform.IsIdentity)
+            {
+                area *= Math.Abs(transform.Determinant);
+            }
+
+            return area;
+        }
+
+        /// <summary>
         /// Determines whether this <see cref="EllipseGeometry"/> object is empty.
         /// </summary>
         /// <returns>

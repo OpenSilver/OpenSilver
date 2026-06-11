@@ -32,6 +32,7 @@
     <Compile Include="OpenSilver\Internal\Media\Animation\IAnimation.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\Animator.cs" />
     <Compile Include="OpenSilver\Internal\Media\ByteStreamGeometryContext.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Geometry\Core\Area.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\BaseTypes.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\BezierD.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\BezierFlattener.cs" />
