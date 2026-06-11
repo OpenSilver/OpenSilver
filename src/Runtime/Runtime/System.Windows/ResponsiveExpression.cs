@@ -22,6 +22,7 @@ internal sealed class ResponsiveExpression : Expression
     private readonly object _tablet;
     private readonly object _desktop;
     private readonly ResponsiveThreshold? _threshold;
+    private readonly FrameworkElement _source;
     private readonly string _elementName;
     private readonly RelativeSource _relativeSource;
 
@@ -36,7 +37,7 @@ internal sealed class ResponsiveExpression : Expression
     // The mentor is the FE that is used to identify the source element.
     private FrameworkElement _mentorCache;
 
-    // The element whose width is measured: a reference element resolved from ElementName/RelativeSource,
+    // The element whose width is measured: a reference element resolved from ElementName/RelativeSource/Source,
     // or the Window when none is specified or the reference element could not be resolved.
     private FrameworkElement _sourceElement;
 
@@ -47,6 +48,7 @@ internal sealed class ResponsiveExpression : Expression
         object tablet,
         object desktop,
         ResponsiveThreshold? threshold,
+        FrameworkElement source,
         string elementName,
         RelativeSource relativeSource)
     {
@@ -54,6 +56,7 @@ internal sealed class ResponsiveExpression : Expression
         _tablet = tablet;
         _desktop = desktop;
         _threshold = threshold;
+        _source = source;
         _elementName = elementName;
         _relativeSource = relativeSource;
     }
@@ -120,10 +123,7 @@ internal sealed class ResponsiveExpression : Expression
             _sourceElement = ResolveSourceElement();
             WriteInternalState(InternalState.IsSourceElementCacheValid, true);
 
-            if (_sourceElement is not null)
-            {
-                _sourceElement.SizeChanged += OnSourceElementSizeChanged;
-            }
+            _sourceElement?.SizeChanged += OnSourceElementSizeChanged;
         }
 
         object value = DependencyProperty.UnsetValue;
@@ -153,8 +153,6 @@ internal sealed class ResponsiveExpression : Expression
         return value;
     }
 
-    // Resolves the element whose width is measured. Falls back to the Window when no reference element is
-    // specified or when it cannot be resolved to a FrameworkElement.
     private FrameworkElement ResolveSourceElement()
     {
         if (_mentorCache is null)
@@ -162,30 +160,30 @@ internal sealed class ResponsiveExpression : Expression
             return null;
         }
 
-        object resolved = null;
+        FrameworkElement sourceElement = null;
 
-        if (!string.IsNullOrEmpty(_elementName))
+        if (_source is not null)
         {
-            resolved = BindingExpression.FindName(_mentorCache, _elementName);
+            sourceElement = _source;
         }
-        else if (_relativeSource is RelativeSource relativeSource)
+        else if (_elementName is not null)
         {
-            resolved = relativeSource.Mode switch
+            sourceElement = BindingExpression.FindName(_mentorCache, _elementName) as FrameworkElement;
+        }
+        else if (_relativeSource is not null)
+        {
+            sourceElement = _relativeSource.Mode switch
             {
                 RelativeSourceMode.Self => _mentorCache,
-                RelativeSourceMode.TemplatedParent => _mentorCache.TemplatedParent,
-                RelativeSourceMode.FindAncestor =>
-                    BindingExpression.FindAncestorOftype(_mentorCache, relativeSource.AncestorType, relativeSource.AncestorLevel),
+                RelativeSourceMode.TemplatedParent => _mentorCache.TemplatedParent as FrameworkElement,
+                RelativeSourceMode.FindAncestor => BindingExpression.FindAncestorOftype(_mentorCache, _relativeSource.AncestorType, _relativeSource.AncestorLevel) as FrameworkElement,
                 _ => null,
             };
         }
 
-        if (resolved is FrameworkElement fe)
-        {
-            return fe;
-        }
+        sourceElement ??= _mentorCache.ParentWindow;
 
-        return _mentorCache.ParentWindow;
+        return sourceElement;
     }
 
     private void InvalidateMentorCache()
@@ -210,12 +208,8 @@ internal sealed class ResponsiveExpression : Expression
     {
         if (ReadInternalState(InternalState.IsSourceElementCacheValid))
         {
-            if (_sourceElement is not null)
-            {
-                _sourceElement.SizeChanged -= OnSourceElementSizeChanged;
-
-                _sourceElement = null;
-            }
+            _sourceElement?.SizeChanged -= OnSourceElementSizeChanged;
+            _sourceElement = null;
 
             WriteInternalState(InternalState.IsSourceElementCacheValid, false);
         }

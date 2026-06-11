@@ -113,6 +113,26 @@
                     </ContentControl>
                 </StackPanel>
             </Border>
+            
+            <!-- 6. Source -->
+            <Border Background="WhiteSmoke" Padding="10" Margin="0,0,0,15" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock Text="6. Source" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="The StackPanel orientation is driven by the width of an explicit source. The slider sets the source width."/>
+                    <Slider x:Name="slider6" Minimum="100" Maximum="600" Value="220" Width="400" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Value, ElementName=slider6, StringFormat='container6 width: {0:F0}px'}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Orientation, ElementName=sp6, StringFormat='Current orientation: {0}'}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <Border x:Name="container6" Width="{Binding Value, ElementName=slider6}" HorizontalAlignment="Left"
+                            BorderBrush="Gray" BorderThickness="1" Background="#FFFFF3E0">
+                        <StackPanel x:Name="sp6">
+                            <Border Background="#FFEF9A9A" Margin="2" Padding="12"><TextBlock Text="A"/></Border>
+                            <Border Background="#FFE57373" Margin="2" Padding="12"><TextBlock Text="B"/></Border>
+                            <Border Background="#FFEF5350" Margin="2" Padding="12"><TextBlock Text="C"/></Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
 
         </StackPanel>
     </ScrollViewer>

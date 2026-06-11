@@ -199,14 +199,11 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
                     if (value is ResponsiveExtension responsiveExtension)
                     {
-                        _value = new ResponsiveExtension
+                        _value = new ResponsiveExtension(responsiveExtension)
                         {
-                            Mobile = responsiveExtension.ConvertHelper(responsiveExtension.Mobile, _property),
-                            Tablet = responsiveExtension.ConvertHelper(responsiveExtension.Tablet, _property),
-                            Desktop = responsiveExtension.ConvertHelper(responsiveExtension.Desktop, _property),
-                            Threshold = responsiveExtension.Threshold,
-                            ElementName = responsiveExtension.ElementName,
-                            RelativeSource = responsiveExtension.RelativeSource,
+                            Mobile = responsiveExtension.ConvertHelper(responsiveExtension.Mobile, dp),
+                            Tablet = responsiveExtension.ConvertHelper(responsiveExtension.Tablet, dp),
+                            Desktop = responsiveExtension.ConvertHelper(responsiveExtension.Desktop, dp),
                         };
                         break;
                     }
