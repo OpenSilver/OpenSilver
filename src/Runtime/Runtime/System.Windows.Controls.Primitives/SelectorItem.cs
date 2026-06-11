@@ -40,7 +40,7 @@ namespace System.Windows.Controls.Primitives
         public static readonly DependencyProperty IsSelectedProperty =
             Selector.IsSelectedProperty.AddOwner(
                 typeof(SelectorItem),
-                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectedChanged));
+                new System.Windows.FrameworkPropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectedChanged));
 
         private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

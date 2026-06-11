@@ -92,6 +92,62 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
+        /// Identifies the Selector.IsSelected attached property.
+        /// </summary>
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.RegisterAttached(
+                "IsSelected",
+                typeof(bool),
+                typeof(Selector),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectedChanged));
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is UIElement element)
+            {
+                element.RaiseEvent(new RoutedEventArgs((bool)e.NewValue ? SelectedEvent : UnselectedEvent, element));
+            }
+        }
+
+        /// <summary>
+        /// Gets the value of the Selector.IsSelected attached property.
+        /// </summary>
+        //public static bool GetIsSelected(DependencyObject element)
+        //{
+        //    ArgumentNullException.ThrowIfNull(element);
+        //    return (bool)element.GetValue(IsSelectedProperty);
+        //}
+
+        /// <summary>
+        /// Sets the value of the Selector.IsSelected attached property.
+        /// </summary>
+        public static void SetIsSelected(DependencyObject element, bool value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            element.SetValueInternal(IsSelectedProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the Selector.Selected routed event.
+        /// </summary>
+        public static readonly RoutedEvent SelectedEvent =
+            EventManager.RegisterRoutedEvent(
+                "Selected",
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(Selector));
+
+        /// <summary>
+        /// Identifies the Selector.Unselected routed event.
+        /// </summary>
+        public static readonly RoutedEvent UnselectedEvent =
+            EventManager.RegisterRoutedEvent(
+                "Unselected",
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(Selector));
+
+        /// <summary>
         /// Gets or sets the index of the selected item.
         /// </summary>
         public int SelectedIndex
@@ -1493,12 +1549,12 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Identifies the <b>Selector.IsSelected</b> attached property.
         /// </summary>
-        public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.RegisterAttached(
-                "IsSelected",
-                typeof(bool),
-                typeof(Selector),
-                new PropertyMetadata(BooleanBoxes.FalseBox));
+        //public static readonly DependencyProperty IsSelectedProperty =
+        //    DependencyProperty.RegisterAttached(
+        //        "IsSelected",
+        //        typeof(bool),
+        //        typeof(Selector),
+        //        new PropertyMetadata(BooleanBoxes.FalseBox));
 
         /// <summary>
         /// Gets the value of the <b>Selector.IsSelected</b> attached property that indicates whether an item is selected.
@@ -1526,12 +1582,12 @@ namespace System.Windows.Controls.Primitives
         /// <param name="isSelected">
         /// Value to set.
         /// </param>
-        public static void SetIsSelected(DependencyObject element, bool isSelected)
-        {
-            ArgumentNullException.ThrowIfNull(element);
+        //public static void SetIsSelected(DependencyObject element, bool isSelected)
+        //{
+        //    ArgumentNullException.ThrowIfNull(element);
 
-            element.SetValueInternal(IsSelectedProperty, isSelected);
-        }
+        //    element.SetValueInternal(IsSelectedProperty, isSelected);
+        //}
 
         internal static readonly DependencyPropertyKey IsSelectionActivePropertyKey =
             DependencyProperty.RegisterAttachedReadOnly(
