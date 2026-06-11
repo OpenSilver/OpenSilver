@@ -31,6 +31,76 @@ internal abstract class CShapeBase
     internal abstract bool IsAxisAlignedRectangle();
 
     /// <summary>
+    /// Find if a given point is in or near the fill of this shape
+    /// </summary>
+    internal void HitTestFill(
+        MilPoint2D ptHit,
+        double rThreshold,
+        bool fRelative,
+        Matrix matrix,
+        out bool fHit,
+        out bool fIsNear)
+    {
+        double rAbsoluteTolerance = GetAbsoluteTolerance(rThreshold, fRelative, Matrix.Identity);
+
+        var tester = new CHitTest(ptHit, matrix, rAbsoluteTolerance);
+
+        HitTestFiguresFill(tester);
+
+        fHit = fIsNear = tester.WasAborted;
+
+        if (!fHit)
+        {
+            if (GetFillMode() == FillRule.Nonzero)
+            {
+                fHit = tester.GetWindingNumber() != 0;
+            }
+            else
+            {
+                Debug.Assert(GetFillMode() == FillRule.EvenOdd);
+                fHit = (tester.GetWindingNumber() & 1) != 0;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Hit test all figures fill with a hit-tester
+    /// </summary>
+    internal void HitTestFiguresFill(CHitTest tester)
+    {
+        // Traverse the figures to get the winding number at the hit point
+        for (int i = 0; i < GetFigureCount(); i++)
+        {
+            if (GetFigure(i) is not IFigureData figure)
+            {
+                continue;
+            }
+
+            if (!figure.IsEmpty() && figure.IsFillable())
+            {
+                if (tester.StartAt(figure.GetStartPoint()))
+                {
+                    // We have a hit near the figure's start point
+                    break;
+                }
+
+                tester.TraverseForward(figure);
+                if (tester.WasAborted)
+                {
+                    // A hit was detected near this figure
+                    break;
+                }
+
+                if (!figure.IsClosed() && tester.EndAt(figure.GetStartPoint()))
+                {
+                    // We have a hit near the figure's closing segment
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Populate a scanner with this shape's figure data.
     /// </summary>
     internal void Populate(IPopulationSink scanner, Matrix transform)
@@ -218,6 +288,49 @@ internal abstract class CShapeBase
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Get the relation with another shape
+    /// </summary>
+    internal IntersectionDetail GetRelation(CShapeBase data, double rTolerance, bool fRelative)
+    {
+        Rect rcThis = GetTightBounds(Matrix.Identity);
+        Rect rcOther = data.GetTightBounds(Matrix.Identity);
+
+        if (rcThis.IntersectsWith(rcOther))
+        {
+            double rAbsoluteTolerance = GetAbsoluteTolerance(rTolerance, fRelative, Matrix.Identity);
+            var relation = new CRelation(rAbsoluteTolerance);
+
+            // Set scanner workspace
+            rcThis.Union(rcOther);
+            bool fDegenerate = relation.SetWorkspaceTransform(rcThis);
+            if (fDegenerate)
+            {
+                // The bounding boxes intersect and are miniscule, so we assume the
+                // geometries intersect.
+                return IntersectionDetail.Intersects;
+            }
+            else
+            {
+                // Organize this shape into chains
+                Populate(relation, Matrix.Identity);
+
+                // Organize the other shape into chains
+                relation.SetNext();
+                data.Populate(relation, Matrix.Identity);
+
+                // Scan the chains to obtain the result of the operation.
+                relation.Scan();
+                return relation.GetResult();
+            }
+        }
+        else
+        {
+            // Bounding boxes do not overlap, the shapes are disjoint
+            return IntersectionDetail.Empty;
+        }
     }
 
     /// <summary>

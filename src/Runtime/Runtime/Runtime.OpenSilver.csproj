@@ -185,6 +185,7 @@
     <Compile Include="System.Windows.Input\KeyboardInputProviderAcquireFocusEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseDevice.cs" />
     <Compile Include="System.Windows.Media\GeometryCombineMode.cs" />
+    <Compile Include="System.Windows.Media\IntersectionDetail.cs" />
     <Compile Include="System.Windows.Media\PathGeometry.Combine.cs" />
     <Compile Include="System.Windows.Media\Pen.cs" />
     <Compile Include="System.Windows.Media\StreamGeometry.cs" />

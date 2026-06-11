@@ -175,6 +175,120 @@ public abstract class Geometry : DependencyObject
     public Rect Bounds => GetBoundsInternal();
 
     /// <summary>
+    /// Indicates whether the geometry contains the specified <see cref="Point"/>, given the specified 
+    /// margin of error.
+    /// </summary>
+    /// <param name="hitPoint">
+    /// The point to test for containment.
+    /// </param>
+    /// <param name="tolerance">
+    /// The maximum bounds on the distance between points in the polygonal approximation of the geometry.
+    /// Smaller values produce more accurate results but cause slower execution. If tolerance is less 
+    /// than .000001, .000001 is used instead.
+    /// </param>
+    /// <param name="type">
+    /// One of the <see cref="ToleranceType"/> values that specifies whether the tolerance factor is an 
+    /// absolute value or relative to the area of the geometry.
+    /// </param>
+    /// <returns>
+    /// true if the geometry contains hitPoint, given the specified margin of error; otherwise, false.
+    /// </returns>
+    public bool FillContains(Point hitPoint, double tolerance, ToleranceType type) => ContainsInternal(hitPoint, tolerance, type);
+
+    /// <summary>
+    /// Indicates whether the geometry contains the specified <see cref="Point"/>.
+    /// </summary>
+    /// <param name="hitPoint">
+    /// The point to test for containment.
+    /// </param>
+    /// <returns>
+    /// true if the geometry contains hitPoint; otherwise, false.
+    /// </returns>
+    public bool FillContains(Point hitPoint) => ContainsInternal(hitPoint, StandardFlatteningTolerance, ToleranceType.Absolute);
+
+    /// <summary>
+    /// Indicates whether the current geometry completely contains the specified <see cref="Geometry"/>.
+    /// </summary>
+    /// <param name="geometry">
+    /// The geometry to test for containment.
+    /// </param>
+    /// <returns>
+    /// true if the current geometry completely contains geometry; otherwise, false.
+    /// </returns>
+    public bool FillContains(Geometry geometry) => FillContains(geometry, StandardFlatteningTolerance, ToleranceType.Absolute);
+
+    /// <summary>
+    /// Indicates whether the current geometry contains the specified <see cref="Geometry"/>, 
+    /// given the specified margin of error.
+    /// </summary>
+    /// <param name="geometry">
+    /// The geometry to test for containment.
+    /// </param>
+    /// <param name="tolerance">
+    /// The maximum bounds on the distance between points in the polygonal approximation of 
+    /// the geometries. Smaller values produce more accurate results but cause slower execution.
+    /// If tolerance is less than .000001, .000001 is used instead.
+    /// </param>
+    /// <param name="type">
+    /// One of the <see cref="ToleranceType"/> values that specifies whether the tolerance 
+    /// factor is an absolute value or relative to the area of the geometry.
+    /// </param>
+    /// <returns>
+    /// true if the current geometry contains geometry, given the specified margin of error;
+    /// otherwise, false.
+    /// </returns>
+    public bool FillContains(Geometry geometry, double tolerance, ToleranceType type) =>
+        FillContainsWithDetail(geometry, tolerance, type) == IntersectionDetail.FullyContains;
+
+    /// <summary>
+    /// Returns a value that describes the intersection between the current geometry and the 
+    /// specified geometry.
+    /// </summary>
+    /// <param name="geometry">
+    /// The geometry to test for containment.
+    /// </param>
+    /// <returns>
+    /// One of the enumeration values.
+    /// </returns>
+    public IntersectionDetail FillContainsWithDetail(Geometry geometry) =>
+        FillContainsWithDetail(geometry, StandardFlatteningTolerance, ToleranceType.Absolute);
+
+    /// <summary>
+    /// Returns a value that describes the intersection between the current geometry and the 
+    /// specified geometry, given the specified margin of error.
+    /// </summary>
+    /// <param name="geometry">
+    /// The geometry to test for containment.
+    /// </param>
+    /// <param name="tolerance">
+    /// The maximum bounds on the distance between points in the polygonal approximation
+    /// of the geometries. Smaller values produce more accurate results but cause slower
+    /// execution. If tolerance is less than .000001, .000001 is used instead.
+    /// </param>
+    /// <param name="type">
+    /// One of the <see cref="ToleranceType"/> values that specifies whether the tolerance 
+    /// factor is an absolute value or relative to the area of the geometry.
+    /// </param>
+    /// <returns>
+    /// One of the enumeration values.
+    /// </returns>
+    public virtual IntersectionDetail FillContainsWithDetail(Geometry geometry, double tolerance, ToleranceType type)
+    {
+        if (geometry is null || IsObviouslyEmpty() || geometry.IsObviouslyEmpty())
+        {
+            return IntersectionDetail.Empty;
+        }
+
+        var data1 = GetPathGeometryData();
+        var data2 = geometry.GetPathGeometryData();
+
+        var pathGeometry1 = new PathGeometryWrapper(data1.SerializedData, data1.FillRule, data1.Matrix);
+        var pathGeometry2 = new PathGeometryWrapper(data2.SerializedData, data2.FillRule, data2.Matrix);
+
+        return pathGeometry1.GetRelation(pathGeometry2, tolerance, type == ToleranceType.Relative);
+    }
+
+    /// <summary>
     /// Gets the area of the filled region of the <see cref="Geometry"/> object.
     /// </summary>
     /// <returns>
@@ -231,6 +345,31 @@ public abstract class Geometry : DependencyObject
     /// true if the geometry object might have curved segments; otherwise, false.
     /// </returns>
     public abstract bool MayHaveCurves();
+
+    /// <summary>
+    /// Returns true if point is inside the stroke of a pen on this geometry.
+    /// </summary>
+    /// <param name="hitPoint">The point tested for containment</param>
+    /// <param name="tolerance">The computational error tolerance</param>
+    /// <param name="type">The way the error tolerance will be interpreted - relative or absolute</param>
+    internal virtual bool ContainsInternal(Point hitPoint, double tolerance, ToleranceType type)
+    {
+        if (IsObviouslyEmpty())
+        {
+            return false;
+        }
+
+        PathGeometryData pathData = GetPathGeometryData();
+
+        if (pathData.IsEmpty())
+        {
+            return false;
+        }
+
+        var pathGeometry = new PathGeometryWrapper(pathData.SerializedData, pathData.FillRule, pathData.Matrix);
+        pathGeometry.HitTestFill(hitPoint, tolerance, type == ToleranceType.Relative, Matrix.Identity, out bool fHit, out _);
+        return fHit;
+    }
 
     internal static PathGeometryData GetEmptyPathGeometryData() => _emptyPathGeometryData;
 

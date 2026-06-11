@@ -3,6 +3,7 @@
 // Port of BezierFlattener.h / bezierflattener.cpp
 
 using System;
+using System.Diagnostics;
 
 namespace OpenSilver.Internal.Media.Geometry.Core;
 
@@ -89,6 +90,36 @@ internal struct CBezierFlattener
         }
 
         return vecTangent;
+    }
+
+    internal void TrimToStartAt(double t)
+    {
+        Debug.Assert(t > 0 && t < 1);
+        double s = 1 - t;
+
+        Point0 = Point0 * s + Point1 * t;
+        Point1 = Point1 * s + Point2 * t;
+        Point2 = Point2 * s + Point3 * t;
+
+        Point0 = Point0 * s + Point1 * t;
+        Point1 = Point1 * s + Point2 * t;
+
+        Point0 = Point0 * s + Point1 * t;
+    }
+
+    internal void TrimToEndAt(double t)
+    {
+        Debug.Assert(t > 0 && t < 1);
+        double s = 1 - t;
+
+        Point3 = Point2 * s + Point3 * t;
+        Point2 = Point1 * s + Point2 * t;
+        Point1 = Point0 * s + Point1 * t;
+
+        Point3 = Point2 * s + Point3 * t;
+        Point2 = Point1 * s + Point2 * t;
+
+        Point3 = Point2 * s + Point3 * t;
     }
 
     internal void Flatten(bool fWithTangents)

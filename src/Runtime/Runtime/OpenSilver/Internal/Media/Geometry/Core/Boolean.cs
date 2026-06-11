@@ -675,7 +675,7 @@ internal sealed class CBooleanClassifier : CScanner.CClassifier
 /// <summary>
 /// The boolean operation scanner. Composes CBooleanClassifier with COutline.
 /// </summary>
-internal sealed class CBoolean : COutline
+internal class CBoolean : COutline
 {
     private readonly CBooleanClassifier _boolClassifier;
 
@@ -687,4 +687,104 @@ internal sealed class CBoolean : COutline
     }
 
     internal void SetNext() => m_oChains.SetNext();
+}
+
+/// <summary>
+/// Classifies 2 shapes as intersecting/overlapping/disjoint
+/// </summary>
+internal sealed class CRelation : CBoolean
+{
+    private bool m_fInside0;
+    private bool m_fInside1;
+
+    private bool m_fOutside0;
+    private bool m_fOutside1;
+
+    private IntersectionDetail m_eResult;
+
+    public CRelation(double rTolerance)
+        : base(null, GeometryCombineMode.Intersect, false, rTolerance)
+    {
+    }
+
+    public IntersectionDetail GetResult()
+    {
+        if (m_eResult != IntersectionDetail.Intersects)
+        {
+            if (m_fInside0)
+            {
+                // Shape[0] has some edges inside.  If it had any edges outside then the result would have
+                // been set earlier to Overlap, and we wouldn't be here.  so all the edges of Shape[0] are
+                // inside Shape[1], hence:
+                Debug.Assert(!m_fOutside0);
+
+                m_eResult = IntersectionDetail.FullyInside;
+            }
+            else if (m_fInside1)
+            {
+                // Shape[1] has some edges inside.  If it had any edges outside then the result would have
+                // been set earlier to Overlap, and we wouldn't be here.  so all the edges of Shape[1] are
+                // inside Shape[0], hence:
+                Debug.Assert(!m_fOutside1);
+                m_eResult = IntersectionDetail.FullyContains;
+            }
+            else
+            {
+                // No shape contains any edge of the other, so they are disjoint
+                m_eResult = IntersectionDetail.Empty;
+            }
+        }
+
+        return m_eResult;
+    }
+
+    internal override void ProcessTheJunction()
+    {
+        CChain pLeftmostHead = m_oJunction.GetLeftmostHead(CChain.CHAIN_SELF_REDUNDANT);
+        CChain pChain = pLeftmostHead;
+
+        while (pChain is not null)
+        {
+            // At this stage the head chains of this junction have been classified for the
+            // Intersection Boolean operation.  A chain is therefore BoolRedundant
+            // if and only if it lies outside the other shape.
+
+            Debug.Assert(pChain.GetShape() == 0 || pChain.GetShape() == 1);
+
+            if (pChain.IsBoolRedundant())
+            {
+                // This chain lies outside the other shape
+                if (pChain.GetShape() == 0)
+                {
+                    m_fOutside0 = true;
+                }
+                else
+                {
+                    m_fOutside1 = true;
+                }
+            }
+            else
+            {
+                // This chain lies inside the other shape
+                if (pChain.GetShape() == 0)
+                {
+                    m_fInside0 = true;
+                }
+                else
+                {
+                    m_fInside1 = true;
+                }
+            }
+
+            // See if we can early out
+            if ((m_fInside0 && m_fOutside0) || (m_fInside1 && m_fOutside1))
+            {
+                m_eResult = IntersectionDetail.Intersects;
+                m_fDone = true;
+                break;
+            }
+
+            pChain = pChain.GetRelevantRight(CChain.CHAIN_SELF_REDUNDANT);
+        }
+    }
 }
