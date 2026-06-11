@@ -72,6 +72,11 @@ namespace System.Windows.Shapes
             set => SetValueInternal(DataProperty, value);
         }
 
+        // The Path's geometry lives in Data. Exposing it as the DefiningGeometry ensures
+        // Shape.MeasureOverride writes the SVG "d" attribute (instead of removing it because
+        // the base class sees a null DefiningGeometry for a "path" element).
+        protected override Geometry DefiningGeometry => Data;
+
         private static void OnDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Path path = (Path)d;

@@ -14,6 +14,7 @@
 using System.Linq;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Globalization;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
@@ -42,6 +43,11 @@ namespace System.Windows.Shapes
         /// prior to when it is drawn.
         /// </returns>
         public virtual Transform GeometryTransform => StretchMatrix is Matrix m ? new MatrixTransform(m) : Transform.Identity;
+
+        /// <summary>
+        /// Gets the <see cref="Geometry"/> that defines this <see cref="Shape"/>.
+        /// </summary>
+        protected virtual Geometry DefiningGeometry => null;
 
         /// <summary>
         /// Identifies the <see cref="Fill"/> dependency property.
@@ -557,6 +563,8 @@ namespace System.Windows.Shapes
 
         protected override Size MeasureOverride(Size constraint)
         {
+            UpdateDefiningGeometry();
+
             Size newSize;
 
             Stretch mode = Stretch;
@@ -581,6 +589,8 @@ namespace System.Windows.Shapes
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            UpdateDefiningGeometry();
+
             Size newSize;
 
             Stretch mode = Stretch;
@@ -629,6 +639,19 @@ namespace System.Windows.Shapes
         /// Get the bonds of the geometry that defines this shape
         /// </summary>
         internal virtual Rect GetDefiningGeometryBounds() => GetBBox(SvgElement);
+
+        private void UpdateDefiningGeometry()
+        {
+            if (DefiningGeometry is Geometry geometry)
+            {
+                SetSvgAttribute("d", geometry.ToPathData(CultureInfo.InvariantCulture));
+                SetFillRuleAttribute(geometry.GetFillRule());
+            }
+            else if (SvgTagName == "path")
+            {
+                RemoveSvgAttribute("d");
+            }
+        }
 
         internal Size GetStretchedRenderSize(Stretch mode, double strokeThickness, Size availableSize, Rect geometryBounds)
         {
