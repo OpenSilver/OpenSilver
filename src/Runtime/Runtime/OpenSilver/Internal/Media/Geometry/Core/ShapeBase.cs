@@ -31,6 +31,35 @@ internal abstract class CShapeBase
     internal abstract bool IsAxisAlignedRectangle();
 
     /// <summary>
+    /// Build the outline of this shape
+    /// </summary>
+    internal void Outline(
+        CapacityStreamGeometryContext context,
+        double rTolerance = Utils.DEFAULT_FLATTENING_TOLERANCE,
+        bool fRelative = false,
+        Matrix matrix = default,
+        bool fRetrieveCurves = true)
+    {
+        double rAbsoluteTolerance = GetAbsoluteTolerance(rTolerance, fRelative, matrix);
+
+        var outline = new COutline(context, fRetrieveCurves, rAbsoluteTolerance);
+
+        // Set scanner workspace
+        Rect rect = GetTightBounds(matrix);
+        bool fDegenerate = outline.SetWorkspaceTransform(rect);
+        if (fDegenerate)
+        {
+            return;
+        }
+
+        // Organize the shape into chains
+        Populate(outline, matrix);
+
+        // Scan the chains to obtain the outline
+        outline.Scan();
+    }
+
+    /// <summary>
     /// Find if a given point is in or near the fill of this shape
     /// </summary>
     internal void HitTestFill(
