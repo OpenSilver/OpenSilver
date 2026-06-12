@@ -31,6 +31,23 @@ internal abstract class CShapeBase
     internal abstract bool IsAxisAlignedRectangle();
 
     /// <summary>
+    /// Produce the flattened version of this shape
+    /// </summary>
+    internal void FlattenToShape(
+        double rTolerance,
+        bool fRelative,
+        CapacityStreamGeometryContext context,
+        Matrix matrix = default)
+    {
+        double rAbsoluteTolerance = GetAbsoluteTolerance(rTolerance, fRelative, matrix);
+
+        var sink = new CShapeFlattener(context, rAbsoluteTolerance);
+
+        // Organize the shape into chains
+        Populate(sink, matrix);
+    }
+
+    /// <summary>
     /// Build the outline of this shape
     /// </summary>
     internal void Outline(

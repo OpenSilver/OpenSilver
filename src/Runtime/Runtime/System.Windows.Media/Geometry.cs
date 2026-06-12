@@ -331,6 +331,52 @@ public abstract class Geometry : DependencyObject
     }
 
     /// <summary>
+    /// Gets a <see cref="PathGeometry"/> that is a polygonal approximation of the <see cref="Geometry"/> object.
+    /// </summary>
+    /// <returns>
+    /// The polygonal approximation of the <see cref="Geometry"/>.
+    /// </returns>
+    public PathGeometry GetFlattenedPathGeometry() => GetFlattenedPathGeometry(StandardFlatteningTolerance, ToleranceType.Absolute);
+
+    /// <summary>
+    /// Gets a <see cref="PathGeometry"/>, within the specified tolerance, that is a polygonal approximation 
+    /// of the <see cref="Geometry"/> object.
+    /// </summary>
+    /// <param name="tolerance">
+    /// The maximum bounds on the distance between points in the polygonal approximation of the geometry. 
+    /// Smaller values produce more accurate results but cause slower execution. If tolerance is less than 
+    /// .000001, .000001 is used instead.
+    /// </param>
+    /// <param name="type">
+    /// One of the <see cref="ToleranceType"/> values that specifies whether the tolerance factor is an absolute
+    /// value or relative to the area of the geometry.
+    /// </param>
+    /// <returns>
+    /// The polygonal approximation of the <see cref="Geometry"/>.
+    /// </returns>
+    public virtual PathGeometry GetFlattenedPathGeometry(double tolerance, ToleranceType type)
+    {
+        if (IsObviouslyEmpty())
+        {
+            return new PathGeometry();
+        }
+
+        PathGeometryData pathData = GetPathGeometryData();
+
+        if (pathData.IsEmpty())
+        {
+            return new PathGeometry();
+        }
+
+        var context = new PathStreamGeometryContext(pathData.FillRule, null);
+
+        var pathGeometry = new PathGeometryWrapper(pathData.SerializedData, pathData.FillRule, pathData.Matrix);
+        pathGeometry.FlattenToShape(tolerance, type == ToleranceType.Relative, context, Matrix.Identity);
+
+        return context.GetPathGeometry();
+    }
+
+    /// <summary>
     /// Gets a <see cref="PathGeometry"/> that is a simplified outline of the filled region of the <see cref="Geometry"/>.
     /// </summary>
     /// <returns>

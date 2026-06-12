@@ -44,9 +44,11 @@
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\LineSegmentIntersection.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\PathGeometryWrapper.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\PopulationSink.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Geometry\Core\PopulationSinkAdapter.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\Scanner.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\ShapeBase.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\ShapeData.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Geometry\Core\ShapeFlattener.cs" />
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\Utils.cs" />
     <Compile Include="OpenSilver\Internal\Media\PathStreamGeometryContext.cs" />
     <Compile Include="OpenSilver\Internal\Media\wgx_core_types.cs" />
