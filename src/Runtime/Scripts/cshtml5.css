@@ -111,6 +111,24 @@ body {
     z-index: 2147483647;
 }
 
+.opensilver-window-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2147483646;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.opensilver-window-content {
+    position: absolute;
+    overflow: hidden;
+    transform-origin: 0% 0%;
+}
+
 .opensilver-inkpresenter {
     width: 100%;
     height: 100%;

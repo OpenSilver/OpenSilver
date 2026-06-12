@@ -194,6 +194,34 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
+        internal static HtmlElementReference CreateWindowOverlayDomElementAndAppendIt(
+            Window window, HtmlElementReference rootElement, bool isModal)
+        {
+            Debug.Assert(window is not null);
+
+            string uid = NewId();
+            string pointerEvents = isModal ? "auto" : "none";
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createWindowOverlay('{uid}', '{rootElement.Uid}', '{pointerEvents}')");
+
+            return new(uid);
+        }
+
+        internal static HtmlElementReference CreateWindowContentDomElementAndAppendIt(Window window, HtmlElementReference overlayDiv)
+        {
+            Debug.Assert(window is not null);
+
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createWindowContent('{uid}', '{overlayDiv.Uid}')");
+
+            AddToGlobalStore(uid, window);
+
+            return new(uid);
+        }
+
         internal static HtmlElementReference CreateTextBlockDomElementAndAppendIt(HtmlElementReference parent, UIElement textBlock)
         {
 #if PERFSTAT
@@ -371,7 +399,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             TextViewManager.CreateTextView(uid, parent.Uid);
-            
+
             AddToGlobalStore(uid, textBoxView);
 
             return new(uid);
@@ -386,7 +414,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             TextViewManager.CreatePasswordView(uid, parent.Uid);
-            
+
             AddToGlobalStore(uid, passwordBoxView);
 
             return new(uid);

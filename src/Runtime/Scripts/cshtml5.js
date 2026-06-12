@@ -854,6 +854,28 @@ Object.defineProperty(window, 'osjs', {
 
                 rootElement.appendChild(popupRoot);
             },
+            createWindowOverlay: function (id, rootElementId, pointerEvents) {
+                const rootElement = document.getElementById(rootElementId);
+                if (!rootElement) return;
+
+                const overlay = document.createElement('div');
+                overlay.setAttribute('id', id);
+                overlay.classList.add('opensilver-window-overlay');
+                overlay.style.pointerEvents = pointerEvents;
+
+                rootElement.appendChild(overlay);
+            },
+            createWindowContent: function (id, overlayId) {
+                const overlay = document.getElementById(overlayId);
+                if (!overlay) return;
+
+                const rootElement = overlay.parentElement;
+                const windowId = rootElement ? rootElement.windowid : id;
+                const content = createVisualElement('div', id, windowId);
+                content.classList.add('opensilver-window-content');
+
+                overlay.appendChild(content);
+            },
             createInline: function (tagName, id, parentId) {
                 const parent = document.getElementById(parentId);
                 if (!parent) return;

@@ -45,6 +45,17 @@ namespace CSHTML5.Internal
             }
         }
 
+        internal static void DetachSecondaryWindow(Window window)
+        {
+            Debug.Assert(window is not null);
+
+            if (IsElementInVisualTree(window))
+            {
+                INTERNAL_HtmlDomManager.RemoveNodeNative(window.OuterDiv);
+                UnloadSubTree(window);
+            }
+        }
+
         public static void DetachVisualChildIfNotNull(UIElement child, UIElement parent)
         {
 #if PERFSTAT

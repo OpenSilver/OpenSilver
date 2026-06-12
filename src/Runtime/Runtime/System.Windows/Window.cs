@@ -19,9 +19,12 @@ using OpenSilver.Internal.Controls.Primitives;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shell;
 using System.Windows.Threading;
 
 namespace System.Windows;
@@ -29,8 +32,19 @@ namespace System.Windows;
 /// <summary>
 /// Represents an application window.
 /// </summary>
+[TemplatePart(Name = PART_Root, Type = typeof(FrameworkElement))]
+[TemplatePart(Name = PART_Chrome, Type = typeof(FrameworkElement))]
+[TemplatePart(Name = PART_CloseButton, Type = typeof(ButtonBase))]
+[TemplatePart(Name = PART_MinimizeButton, Type = typeof(ButtonBase))]
+[TemplatePart(Name = PART_MaximizeButton, Type = typeof(ButtonBase))]
 public class Window : ContentControl, IResizeObserverListener
 {
+    private const string PART_Root = "PART_Root";
+    private const string PART_Chrome = "PART_Chrome";
+    private const string PART_CloseButton = "PART_CloseButton";
+    private const string PART_MinimizeButton = "PART_MinimizeButton";
+    private const string PART_MaximizeButton = "PART_MaximizeButton";
+
     static Window()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
@@ -39,11 +53,22 @@ public class Window : ContentControl, IResizeObserverListener
         KeyboardNavigation.DirectionalNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
         EventManager.RegisterClassHandler<Window>(Keyboard.GotKeyboardFocusEvent, new RoutedEventHandler(OnGotKeyboardFocus), true);
         EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
+        EventManager.RegisterClassHandler<Window>(Mouse.MouseDownEvent, new MouseButtonEventHandler(OnMouseDownForChrome), false);
     }
 
     private IDisposable _resizeObserver;
     private DispatcherOperation _contentRenderedCallback;
     private bool _postContentRenderedFromLoadedHandler;
+    private bool _isShowingAsSecondary;
+    private bool _isModal;
+    private bool _isClosed;
+    private HtmlElementReference _overlayDiv;
+    private TaskCompletionSource<bool?> _dialogResultTcs;
+    private FrameworkElement _rootElement;
+    private FrameworkElement _chromeElement;
+    private ButtonBase _closeButton;
+    private ButtonBase _minimizeButton;
+    private ButtonBase _maximizeButton;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
@@ -58,7 +83,94 @@ public class Window : ContentControl, IResizeObserverListener
         }
     }
 
+    /// <summary>
+    /// Called when the window is about to be shown as a secondary window.
+    /// Disables BypassLayoutPolicies so the layout system can apply inline dimensions.
+    /// </summary>
+    private void PrepareForSecondaryDisplay()
+    {
+        BypassLayoutPolicies = false;
+    }
+
     ~Window() => _resizeObserver?.Dispose();
+
+    /// <inheritdoc />
+    public override void OnApplyTemplate()
+    {
+        UnsubscribeFromTemplatePartEvents();
+
+        base.OnApplyTemplate();
+
+        _rootElement = GetTemplateChild(PART_Root) as FrameworkElement;
+        _chromeElement = GetTemplateChild(PART_Chrome) as FrameworkElement;
+        _closeButton = GetTemplateChild(PART_CloseButton) as ButtonBase;
+        _minimizeButton = GetTemplateChild(PART_MinimizeButton) as ButtonBase;
+        _maximizeButton = GetTemplateChild(PART_MaximizeButton) as ButtonBase;
+
+        SubscribeToTemplatePartEvents();
+        UpdateWindowStyleVisualState();
+        UpdateWindowStateVisualState();
+    }
+
+    private void SubscribeToTemplatePartEvents()
+    {
+        if (_closeButton is not null)
+        {
+            _closeButton.Click += CloseButton_Click;
+        }
+        if (_minimizeButton is not null)
+        {
+            _minimizeButton.Click += MinimizeButton_Click;
+        }
+        if (_maximizeButton is not null)
+        {
+            _maximizeButton.Click += MaximizeButton_Click;
+        }
+    }
+
+    private void UnsubscribeFromTemplatePartEvents()
+    {
+        if (_closeButton is not null)
+        {
+            _closeButton.Click -= CloseButton_Click;
+        }
+        if (_minimizeButton is not null)
+        {
+            _minimizeButton.Click -= MinimizeButton_Click;
+        }
+        if (_maximizeButton is not null)
+        {
+            _maximizeButton.Click -= MaximizeButton_Click;
+        }
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    private void MaximizeButton_Click(object sender, RoutedEventArgs e) =>
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+
+    private void UpdateWindowStyleVisualState()
+    {
+        if (_rootElement is null) return;
+
+        string stateName = WindowStyle == WindowStyle.None ? "NoChrome" : "Normal";
+        VisualStateManager.GoToState(this, stateName, false);
+    }
+
+    private void UpdateWindowStateVisualState()
+    {
+        if (_rootElement is null) return;
+
+        string stateName = WindowState switch
+        {
+            WindowState.Maximized => "Maximized",
+            WindowState.Minimized => "Minimized",
+            _ => "Restored"
+        };
+        VisualStateManager.GoToState(this, stateName, false);
+    }
 
     /// <summary>
     /// Occurs after a window's content has been rendered.
@@ -206,8 +318,13 @@ public class Window : ContentControl, IResizeObserverListener
         {
             if (OuterDiv.IsConnected)
             {
-                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{RootDomElement.Uid}', 'offsetWidth')");
-                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{RootDomElement.Uid}', 'offsetHeight')");
+                HtmlElementReference sizeReference = _isShowingAsSecondary ? _overlayDiv : RootDomElement;
+                if (!sizeReference.IsConnected)
+                {
+                    return new Rect(0, 0, 0, 0);
+                }
+                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{sizeReference.Uid}', 'offsetWidth')");
+                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{sizeReference.Uid}', 'offsetHeight')");
                 return new Rect(0, 0, width, height);
             }
 
@@ -244,11 +361,21 @@ public class Window : ContentControl, IResizeObserverListener
 
     private void SetLayoutSize()
     {
-        Rect bounds = Bounds;
-        InvalidateMeasure();
-        Measure(bounds.Size);
-        Arrange(bounds);
-        UpdateLayout();
+        if (_isShowingAsSecondary)
+        {
+            InvalidateMeasure();
+            Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Arrange(new Rect(new Point(), DesiredSize));
+            UpdateLayout();
+        }
+        else
+        {
+            Rect bounds = Bounds;
+            InvalidateMeasure();
+            Measure(bounds.Size);
+            Arrange(bounds);
+            UpdateLayout();
+        }
     }
 
     /// <summary>
@@ -317,6 +444,21 @@ public class Window : ContentControl, IResizeObserverListener
     /// <inheritdoc />
     protected override Size MeasureOverride(Size availableSize)
     {
+        if (_isShowingAsSecondary)
+        {
+            Size constraintSize = GetSecondaryWindowConstraintSize();
+
+            if (VisualChildrenCount > 0)
+            {
+                if (GetVisualChild(0) is UIElement child)
+                {
+                    child.Measure(constraintSize);
+                    return constraintSize;
+                }
+            }
+            return constraintSize;
+        }
+
         Size size = Bounds.Size;
 
         if (VisualChildrenCount > 0)
@@ -332,7 +474,35 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     /// <inheritdoc />
-    protected override Size ArrangeOverride(Size finalSize) => base.ArrangeOverride(Bounds.Size);
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        if (_isShowingAsSecondary)
+        {
+            return base.ArrangeOverride(finalSize);
+        }
+        return base.ArrangeOverride(Bounds.Size);
+    }
+
+    private Size GetSecondaryWindowConstraintSize()
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            Size overlaySize = Bounds.Size;
+            if (overlaySize.Width > 0 && overlaySize.Height > 0)
+            {
+                return overlaySize;
+            }
+        }
+
+        double w = Width;
+        double h = Height;
+        if (!double.IsNaN(w) && !double.IsNaN(h))
+        {
+            return new Size(w, h);
+        }
+
+        return Bounds.Size;
+    }
 
     /// <summary>
     /// Called when the parent of the window is changed.
@@ -344,7 +514,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         base.OnVisualParentChanged(oldParent);
 
-        if (VisualTreeHelper.GetParent(this) is not null)
+        if (VisualTreeHelper.GetParent(this) is not null && !_isShowingAsSecondary)
         {
             throw new InvalidOperationException(Strings.WindowMustBeRoot);
         }
@@ -355,7 +525,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Left"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty LeftProperty =
         DependencyProperty.Register(
             nameof(Left),
@@ -369,7 +538,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// The position of the window's left edge.
     /// </returns>
-    [NotImplemented]
     public double Left
     {
         get => (double)GetValue(LeftProperty);
@@ -379,7 +547,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Top"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty TopProperty =
         DependencyProperty.Register(
             nameof(Top),
@@ -393,7 +560,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// The position of the window's top.
     /// </returns>
-    [NotImplemented]
     public double Top
     {
         get => (double)GetValue(TopProperty);
@@ -403,7 +569,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Title"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(
             nameof(Title),
@@ -418,7 +583,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// A <see cref="string"/> that contains the window's title.
     /// </returns>
-    [NotImplemented]
     public string Title
     {
         get => (string)GetValue(TitleProperty);
@@ -430,7 +594,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="AllowsTransparency"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty AllowsTransparencyProperty =
         DependencyProperty.Register(
             nameof(AllowsTransparency),
@@ -444,7 +607,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window supports transparency; otherwise, false.
     /// </returns>
-    [NotImplemented]
     public bool AllowsTransparency
     {
         get => (bool)GetValue(AllowsTransparencyProperty);
@@ -454,7 +616,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Icon"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
             nameof(Icon),
@@ -468,7 +629,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// An System.Windows.Media.ImageSource object that represents the icon.
     /// </returns>
-    [NotImplemented]
     public ImageSource Icon
     {
         get => (ImageSource)GetValue(IconProperty);
@@ -485,7 +645,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="IsActive"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty IsActiveProperty = IsActivePropertyKey.DependencyProperty;
 
     /// <summary>
@@ -494,16 +653,11 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window is active; otherwise, false. The default is false.
     /// </returns>
-    [NotImplemented]
     public bool IsActive => (bool)GetValue(IsActiveProperty);
-
-    [NotImplemented]
-    public new bool IsVisible { get; private set; }
 
     /// <summary>
     /// Identifies the <see cref="ShowActivated"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty ShowActivatedProperty =
         DependencyProperty.Register(
             nameof(ShowActivated),
@@ -517,7 +671,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if a window is activated when first shown; otherwise, false. The default is true.
     /// </returns>
-    [NotImplemented]
     public bool ShowActivated
     {
         get => (bool)GetValue(ShowActivatedProperty);
@@ -527,7 +680,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="ShowInTaskbar"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty ShowInTaskbarProperty =
         DependencyProperty.Register(
             nameof(ShowInTaskbar),
@@ -542,7 +694,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// true if the window has a task bar button; otherwise, false. Does not apply when the window
     /// is hosted in a browser.
     /// </returns>
-    [NotImplemented]
     public bool ShowInTaskbar
     {
         get => (bool)GetValue(ShowInTaskbarProperty);
@@ -552,7 +703,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Topmost"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty TopmostProperty =
         DependencyProperty.Register(
             nameof(Topmost),
@@ -566,7 +716,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window is topmost; otherwise, false.
     /// </returns>
-    [NotImplemented]
     public bool Topmost
     {
         get => (bool)GetValue(TopmostProperty);
@@ -580,19 +729,17 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowStartupLocation"/> value that specifies the top/left position
     /// of a window when first shown. The default is <see cref="WindowStartupLocation.Manual"/>.
     /// </returns>
-    [NotImplemented]
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.Manual;
 
     /// <summary>
     /// Identifies the <see cref="WindowStyle"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty WindowStyleProperty =
         DependencyProperty.Register(
             nameof(WindowStyle),
             typeof(WindowStyle),
             typeof(Window),
-            new FrameworkPropertyMetadata(WindowStyle.SingleBorderWindow),
+            new FrameworkPropertyMetadata(WindowStyle.SingleBorderWindow, OnWindowStyleChanged),
             ValidateWindowStyle);
 
     /// <summary>
@@ -602,11 +749,15 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowStyle"/> that specifies a window's border style. The default is
     /// <see cref="WindowStyle.SingleBorderWindow"/>.
     /// </returns>
-    [NotImplemented]
     public WindowStyle WindowStyle
     {
         get => (WindowStyle)GetValue(WindowStyleProperty);
         set => SetValueInternal(WindowStyleProperty, value);
+    }
+
+    private static void OnWindowStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Window)d).UpdateWindowStyleVisualState();
     }
 
     private static bool ValidateWindowStyle(object value)
@@ -620,13 +771,12 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="WindowState"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty WindowStateProperty =
         DependencyProperty.Register(
             nameof(WindowState),
             typeof(WindowState),
             typeof(Window),
-            new FrameworkPropertyMetadata(WindowState.Normal),
+            new FrameworkPropertyMetadata(WindowState.Normal, OnWindowStateChanged),
             ValidateWindowState);
 
     /// <summary>
@@ -636,11 +786,15 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowState"/> that determines whether a window is restored, minimized, or maximized.
     /// The default is <see cref="WindowState.Normal"/> (restored).
     /// </returns>
-    [NotImplemented]
     public WindowState WindowState
     {
         get => (WindowState)GetValue(WindowStateProperty);
         set => SetValueInternal(WindowStateProperty, value);
+    }
+
+    private static void OnWindowStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Window)d).UpdateWindowStateVisualState();
     }
 
     private static bool ValidateWindowState(object value)
@@ -654,7 +808,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="SizeToContent"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty SizeToContentProperty =
         DependencyProperty.Register(
             nameof(SizeToContent),
@@ -670,7 +823,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// A <see cref="Windows.SizeToContent"/> value. The default is <see cref="SizeToContent.Manual"/>.
     /// </returns>
-    [NotImplemented]
     public SizeToContent SizeToContent
     {
         get => (SizeToContent)GetValue(SizeToContentProperty);
@@ -689,7 +841,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="ResizeMode"/> dependency property.
     /// </summary>
-    [NotImplemented]
     public static readonly DependencyProperty ResizeModeProperty =
         DependencyProperty.Register(
             nameof(ResizeMode),
@@ -704,7 +855,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// A <see cref="Windows.ResizeMode"/> value specifying the resize mode.
     /// </returns>
-    [NotImplemented]
     public ResizeMode ResizeMode
     {
         get => (ResizeMode)GetValue(ResizeModeProperty);
@@ -720,42 +870,399 @@ public class Window : ContentControl, IResizeObserverListener
                mode == ResizeMode.CanResizeWithGrip;
     }
 
-    [NotImplemented]
-    public bool? DialogResult { get; set; }
+    /// <summary>
+    /// Gets or sets a value that indicates whether a window was accepted or canceled.
+    /// </summary>
+    public bool? DialogResult
+    {
+        get => _dialogResultTcs?.Task.IsCompleted == true ? _dialogResultTcs.Task.Result : null;
+        set
+        {
+            if (_isModal)
+            {
+                _dialogResultTcs?.TrySetResult(value);
+                Close();
+            }
+        }
+    }
 
-    [NotImplemented]
+    /// <summary>
+    /// Gets or sets the owner of this window.
+    /// </summary>
     public Window Owner { get; set; }
 
-    [NotImplemented]
-    public void Show() { }
+    /// <summary>
+    /// Gets a value indicating whether the window is visible.
+    /// </summary>
+    public new bool IsVisible => _isShowingAsSecondary && !_isClosed;
 
-    [NotImplemented]
-    public bool? ShowDialog() => DialogResult;
+    /// <summary>
+    /// Opens a window and returns without waiting for the newly opened window to close.
+    /// </summary>
+    public void Show()
+    {
+        if (_isClosed)
+        {
+            throw new InvalidOperationException("Cannot show a window that has been closed.");
+        }
 
-    [NotImplemented]
-    public void Close() { }
+        if (_isShowingAsSecondary)
+        {
+            return;
+        }
 
-    [NotImplemented]
-    public void Hide() { }
+        _isModal = false;
+        ShowSecondaryWindow();
+    }
 
-    [NotImplemented]
-    public void DragMove() { }
+    /// <summary>
+    /// Opens a window and returns only when the newly opened window is closed.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Nullable{Boolean}"/> value that specifies whether the activity was accepted (true) or canceled (false).
+    /// </returns>
+    public bool? ShowDialog()
+    {
+        if (_isClosed)
+        {
+            throw new InvalidOperationException("Cannot show a window that has been closed.");
+        }
 
-    [NotImplemented]
-    public void DragResize(WindowResizeEdge resizeEdge) { }
+        if (_isShowingAsSecondary)
+        {
+            return null;
+        }
 
-    [NotImplemented]
-    protected virtual void OnActivated(EventArgs e) { }
+        _isModal = true;
+        _dialogResultTcs = new TaskCompletionSource<bool?>();
+        ShowSecondaryWindow();
+        return null;
+    }
 
-    [NotImplemented]
-    protected virtual void OnDeactivated(EventArgs e) { }
+    /// <summary>
+    /// Manually closes a <see cref="Window"/>.
+    /// </summary>
+    public void Close()
+    {
+        if (_isClosed)
+        {
+            return;
+        }
 
-    [NotImplemented]
+        var e = new CancelEventArgs();
+        OnClosing(e);
+
+        if (e.Cancel)
+        {
+            return;
+        }
+
+        if (InvokeOnClosing(true))
+        {
+            return;
+        }
+
+        _isClosed = true;
+
+        if (_isShowingAsSecondary)
+        {
+            CloseSecondaryWindow();
+        }
+
+        OnClosed(EventArgs.Empty);
+        Closed?.Invoke(this, EventArgs.Empty);
+
+        _dialogResultTcs?.TrySetResult(null);
+    }
+
+    /// <summary>
+    /// Makes a window invisible.
+    /// </summary>
+    public void Hide()
+    {
+        if (_isShowingAsSecondary && _overlayDiv.IsConnected)
+        {
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.getElementById('{_overlayDiv.Uid}').style.display='none'");
+        }
+    }
+
+    /// <summary>
+    /// Allows a window to be dragged by a mouse with its left button down over an exposed area
+    /// of the window's client area.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// The left mouse button is not pressed.
+    /// </exception>
+    public void DragMove()
+    {
+        if (!_isShowingAsSecondary)
+        {
+            return;
+        }
+
+        if (Mouse.LeftButton != MouseButtonState.Pressed)
+        {
+            throw new InvalidOperationException("Can only call DragMove when the left mouse button is pressed.");
+        }
+
+        BeginDrag();
+    }
+
+    /// <summary>
+    /// Starts a window drag-resize operation.
+    /// </summary>
+    /// <param name="resizeEdge">The edge to resize from.</param>
+    public void DragResize(WindowResizeEdge resizeEdge)
+    {
+        // TODO: implement resize drag
+    }
+
+    /// <summary>
+    /// Occurs when a window becomes the foreground window.
+    /// </summary>
+    public event EventHandler Activated;
+
+    /// <summary>
+    /// Occurs when a window becomes a background window.
+    /// </summary>
+    public event EventHandler Deactivated;
+
+    /// <summary>
+    /// Occurs when the window is about to close.
+    /// </summary>
+    public event EventHandler Closed;
+
+    /// <summary>
+    /// Raises the <see cref="Activated"/> event.
+    /// </summary>
+    protected virtual void OnActivated(EventArgs e) => Activated?.Invoke(this, e);
+
+    /// <summary>
+    /// Raises the <see cref="Deactivated"/> event.
+    /// </summary>
+    protected virtual void OnDeactivated(EventArgs e) => Deactivated?.Invoke(this, e);
+
+    /// <summary>
+    /// Raises the <see cref="E:Closing"/> event.
+    /// </summary>
     protected virtual void OnClosing(CancelEventArgs e) { }
 
-    [NotImplemented]
+    /// <summary>
+    /// Raises the <see cref="Closed"/> event.
+    /// </summary>
     protected virtual void OnClosed(EventArgs e) { }
 
-    [NotImplemented]
+    /// <summary>
+    /// Raises the SourceInitialized event.
+    /// </summary>
     protected virtual void OnSourceInitialized(EventArgs e) { }
+
+    #region Secondary Window DOM Management
+
+    private void ShowSecondaryWindow()
+    {
+        _isShowingAsSecondary = true;
+        PrepareForSecondaryDisplay();
+
+        Window mainWindow = Application.Current?.MainWindow;
+        if (mainWindow is null)
+        {
+            throw new InvalidOperationException("Cannot show a secondary window before the main window is created.");
+        }
+
+        _overlayDiv = INTERNAL_HtmlDomManager.CreateWindowOverlayDomElementAndAppendIt(
+            this, mainWindow.RootDomElement, _isModal);
+
+        ParentWindow = mainWindow;
+        OuterDiv = INTERNAL_HtmlDomManager.CreateWindowContentDomElementAndAppendIt(this, _overlayDiv);
+
+        IsLoadedCache = true;
+        IsConnectedToLiveTree = true;
+        UpdateIsRenderableCache();
+        UpdateIsVisibleCache();
+        PropagateResumeLayout(null, this);
+
+        RaiseLoadedEvent();
+        SetLayoutSize();
+
+        Current = this;
+        ActiveWindow = this;
+        OnActivated(EventArgs.Empty);
+    }
+
+    private void CloseSecondaryWindow()
+    {
+        _isShowingAsSecondary = false;
+
+        INTERNAL_VisualTreeManager.DetachSecondaryWindow(this);
+
+        // Remove overlay
+        if (_overlayDiv.IsConnected)
+        {
+            INTERNAL_HtmlDomManager.RemoveNodeNative(_overlayDiv);
+        }
+
+        IsLoadedCache = false;
+        IsConnectedToLiveTree = false;
+        UpdateIsRenderableCache();
+        UpdateIsVisibleCache();
+        PropagateSuspendLayout(this);
+
+        OnDeactivated(EventArgs.Empty);
+
+        // Restore active window
+        Window mainWindow = Application.Current?.MainWindow;
+        if (mainWindow is not null)
+        {
+            Current = mainWindow;
+            ActiveWindow = mainWindow;
+        }
+    }
+
+    #endregion
+
+    #region WindowChrome and Drag Support
+
+    private bool _isDragging;
+    private Point _dragStartMousePosition;
+    private double _dragStartLeft;
+    private double _dragStartTop;
+    private MouseEventHandler _dragMoveHandler;
+    private MouseButtonEventHandler _dragUpHandler;
+
+    internal void OnWindowChromeChanged(WindowChrome oldChrome, WindowChrome newChrome)
+    {
+        // The class handler (OnMouseDownForChrome) reads the chrome at event time,
+        // so no dynamic handler registration is needed here.
+    }
+
+    private static void OnMouseDownForChrome(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is Window window)
+        {
+            window.HandleChromeMouseDown(e);
+        }
+    }
+
+    private void HandleChromeMouseDown(MouseButtonEventArgs e)
+    {
+        if (!_isShowingAsSecondary) return;
+        if (e.ChangedButton != MouseButton.Left) return;
+
+        WindowChrome chrome = WindowChrome.GetWindowChrome(this);
+        if (chrome is null) return;
+
+        if (e.OriginalSource is DependencyObject source && IsHitTestVisibleInChrome(source))
+        {
+            return;
+        }
+
+        Point position = e.GetPosition(this);
+
+        if (position.Y >= 0 && position.Y <= chrome.CaptionHeight)
+        {
+            e.Handled = true;
+            BeginDrag();
+        }
+    }
+
+    private bool IsHitTestVisibleInChrome(DependencyObject source)
+    {
+        DependencyObject current = source;
+        while (current is not null && current != this)
+        {
+            if ((bool)current.GetValue(WindowChrome.IsHitTestVisibleInChromeProperty))
+            {
+                return true;
+            }
+            current = VisualTreeHelper.GetParent(current) as DependencyObject;
+        }
+        return false;
+    }
+
+    private void BeginDrag()
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            return;
+        }
+
+        if (_isDragging)
+        {
+            return;
+        }
+
+        _isDragging = true;
+        _dragStartMousePosition = Mouse.GetPosition(ParentWindow);
+        _dragStartLeft = double.IsNaN(Left) ? 0 : Left;
+        _dragStartTop = double.IsNaN(Top) ? 0 : Top;
+
+        _dragMoveHandler ??= new MouseEventHandler(Window_DragMouseMove);
+        _dragUpHandler ??= new MouseButtonEventHandler(Window_DragMouseUp);
+
+        CaptureMouse();
+        AddHandler(Mouse.MouseMoveEvent, _dragMoveHandler, true);
+        AddHandler(Mouse.MouseUpEvent, _dragUpHandler, true);
+    }
+
+    private void Window_DragMouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_isDragging) return;
+
+        Point currentPosition = e.GetPosition(ParentWindow);
+        double deltaX = currentPosition.X - _dragStartMousePosition.X;
+        double deltaY = currentPosition.Y - _dragStartMousePosition.Y;
+
+        Left = _dragStartLeft + deltaX;
+        Top = _dragStartTop + deltaY;
+
+        UpdateWindowPosition();
+    }
+
+    private void Window_DragMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            EndDrag();
+        }
+    }
+
+    private void EndDrag()
+    {
+        if (!_isDragging) return;
+
+        _isDragging = false;
+        ReleaseMouseCapture();
+        RemoveHandler(Mouse.MouseMoveEvent, _dragMoveHandler);
+        RemoveHandler(Mouse.MouseUpEvent, _dragUpHandler);
+    }
+
+    private void UpdateWindowPosition()
+    {
+        if (!OuterDiv.IsConnected) return;
+
+        double left = double.IsNaN(Left) ? 0 : Left;
+        double top = double.IsNaN(Top) ? 0 : Top;
+
+        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+            $"(function(){{ var el=document.getElementById('{OuterDiv.Uid}'); if(el){{ el.style.left='{left.ToInvariantString()}px'; el.style.top='{top.ToInvariantString()}px'; }} }})()");
+    }
+
+    #endregion
+
+    #region Main Window Enforcement
+
+    internal bool IsMainWindow => this == Application.Current?.MainWindow;
+
+    internal void EnforceMainWindowProperties()
+    {
+        if (IsMainWindow)
+        {
+            SetValueInternal(WindowStyleProperty, WindowStyle.None);
+            SetValueInternal(WindowStateProperty, WindowState.Maximized);
+        }
+    }
+
+    #endregion
 }

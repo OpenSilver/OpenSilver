@@ -1201,6 +1201,7 @@
     <Compile Include="System.Windows\IDataObject.cs" />
     <Compile Include="System.Windows\WindowState.cs" />
     <Compile Include="System.Windows\WindowResizeEdge.cs" />
+    <Compile Include="System.Windows.Shell\WindowChrome.cs" />
     <Compile Include="System.Windows\AssemblyPart.cs" />
     <Compile Include="System.Windows\AssemblyPartCollection.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />

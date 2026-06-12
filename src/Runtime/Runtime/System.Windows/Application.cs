@@ -498,6 +498,7 @@ namespace System.Windows
 
                 Window.Current = _mainWindow = value;
 
+                _mainWindow.EnforceMainWindowProperties();
                 _mainWindow.AttachToDomElement(_rootDiv);
 
                 MainWindowReady?.Invoke(this, EventArgs.Empty);
