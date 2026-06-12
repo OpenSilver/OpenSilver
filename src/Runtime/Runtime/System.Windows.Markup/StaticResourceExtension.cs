@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.Xaml;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
-using OpenSilver.Theming;
 
 namespace System.Windows.Markup;
 
@@ -43,6 +42,18 @@ public class StaticResourceExtension : MarkupExtension
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="StaticResourceExtension"/> class, with the provided 
+    /// initial key.
+    /// </summary>
+    /// <param name="resourceKey">
+    /// The key of the resource that this markup extension references.
+    /// </param>
+    public StaticResourceExtension(object resourceKey)
+    {
+        ResourceKey = resourceKey;
+    }
+
+    /// <summary>
     /// Gets or sets the key value passed by this static resource reference. They key is used to return 
     /// the object matching that key in resource dictionaries.
     /// </summary>
@@ -60,6 +71,11 @@ public class StaticResourceExtension : MarkupExtension
     /// </returns>
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
+        if (ResourceKey is SystemResourceKey systemResourceKey)
+        {
+            return systemResourceKey.Resource;
+        }
+
         if (TryFindTheResource(serviceProvider, out object resource))
         {
             return resource;

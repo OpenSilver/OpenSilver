@@ -61,6 +61,11 @@ internal static class XamlResources
     {
         Debug.Assert(key is not null);
 
+        if (key is SystemResourceKey systemResourceKey)
+        {
+            return systemResourceKey.Resource;
+        }
+
         if (Application.Current?.Theme is Theme theme && theme.GetThemeResource(key) is object resource)
         {
             return resource;
