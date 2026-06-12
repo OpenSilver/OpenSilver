@@ -162,7 +162,8 @@ public class StaticResourceExtension : MarkupExtension
 
     private object FindResourceInAppOrSystem()
     {
-        if (FrameworkElement.FindResourceFromAppOrSystem(ResourceKey) is object resource)
+        object resource = FrameworkElement.FindResourceFromAppOrSystem(ResourceKey);
+        if (resource != DependencyProperty.UnsetValue)
         {
             return resource;
         }
