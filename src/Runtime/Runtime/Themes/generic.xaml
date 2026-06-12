@@ -4491,6 +4491,9 @@
                                                MinWidth="24" />
                     <controls:ColumnDefinition Width="4" />
                     <controls:ColumnDefinition Width="*" />
+                    <controls:ColumnDefinition Width="30" />
+                    <controls:ColumnDefinition Width="Auto" />
+                    <controls:ColumnDefinition Width="20" />
                 </controls:Grid.ColumnDefinitions>
                 <controls:ContentPresenter x:Name="Icon"
                                            Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
@@ -4526,10 +4529,11 @@
                                            controls:Grid.Column="2"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
-                <!--<controls:TextBlock
-                        Text="{TemplateBinding InputGestureText}"
-                        Margin="{TemplateBinding Padding}"
-                        controls:Grid.Column="4"/>-->
+                <controls:TextBlock controls:Grid.Column="4"
+                                    Text="{TemplateBinding Property={x:Static controls:MenuItem.InputGestureTextProperty}}"
+                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                    VerticalAlignment="Center"
+                                    Opacity="0.7"/>
             </controls:Grid>
         </controls:Grid>
         <controls:ControlTemplate.Triggers>
@@ -4614,9 +4618,9 @@
                                                MinWidth="24" />
                     <controls:ColumnDefinition Width="4" />
                     <controls:ColumnDefinition Width="*" />
-                    <!--<controls:ColumnDefinition Width="37"/>
-                        <controls:ColumnDefinition Width="Auto"/>-->
-                    <controls:ColumnDefinition Width="Auto" />
+                    <controls:ColumnDefinition Width="30" />
+                    <controls:ColumnDefinition Width="Auto"/>
+                    <controls:ColumnDefinition Width="20" />
                 </controls:Grid.ColumnDefinitions>
                 <controls:ContentPresenter x:Name="Icon"
                                            Content="{TemplateBinding Property={x:Static controls:MenuItem.IconProperty}}"
@@ -4649,13 +4653,14 @@
                                            ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                            controls:Grid.Column="2" />
-                <!--<controls:TextBlock
-                        Text="{TemplateBinding InputGestureText}"
-                        Margin="{TemplateBinding Padding}"
-                        controls:Grid.Column="4"/>-->
+                <controls:TextBlock controls:Grid.Column="4"
+                                    Text="{TemplateBinding Property={x:Static controls:MenuItem.InputGestureTextProperty}}"
+                                    Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                    VerticalAlignment="Center"
+                                    Opacity="0.7"/>
                 <!-- Submenu arrow indicator -->
                 <shapes:Path x:Name="Arrow"
-                             controls:Grid.Column="3"
+                             controls:Grid.Column="5"
                              Margin="4,0,6,0"
                              VerticalAlignment="Center"
                              Fill="#FF333333"

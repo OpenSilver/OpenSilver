@@ -8,6 +8,7 @@ using OpenSilver.Internal.Commands;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -70,6 +71,8 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
 
     static MenuItem()
     {
+        HeaderProperty.OverrideMetadata(typeof(MenuItem), new FrameworkPropertyMetadata(null, CoerceHeader));
+
         DefaultStyleKeyProperty.OverrideMetadata(typeof(MenuItem), new PropertyMetadata(typeof(MenuItem)));
         EventManager.RegisterClassHandler<MenuItem>(MenuBase.IsSelectedChangedEvent, new RoutedPropertyChangedEventHandler<bool>(OnIsSelectedChanged));
     }
@@ -357,6 +360,93 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
         }
 
         SetValueInternal(RolePropertyKey, type);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="InputGestureText"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty InputGestureTextProperty =
+        DependencyProperty.Register(
+            nameof(InputGestureText),
+            typeof(string),
+            typeof(MenuItem),
+            new FrameworkPropertyMetadata(string.Empty, null, CoerceInputGestureText));
+
+    /// <summary>
+    /// Sets the text describing an input gesture that will call the command tied to the specified item.
+    /// </summary>
+    /// <returns>
+    /// The text that describes the input gesture, such as Ctrl+C for the Copy command. The default is 
+    /// an empty string ("").
+    /// </returns>
+    public string InputGestureText
+    {
+        get => (string)GetValue(InputGestureTextProperty);
+        set => SetValueInternal(InputGestureTextProperty, value);
+    }
+
+    private static object CoerceInputGestureText(DependencyObject d, object value)
+    {
+        var menuItem = (MenuItem)d;
+
+        if (string.IsNullOrEmpty((string)value) &&
+            menuItem.HasDefaultValue(InputGestureTextProperty) &&
+            menuItem.Command is RoutedCommand routedCommand)
+        {
+            if (routedCommand.InputGestures is InputGestureCollection col && col.Count >= 1)
+            {
+                // Search for the first key gesture
+                for (int i = 0; i < col.Count; i++)
+                {
+                    if (col[i] is KeyGesture keyGesture)
+                    {
+                        return keyGesture.GetDisplayStringForCulture(CultureInfo.CurrentCulture);
+                    }
+                }
+            }
+        }
+
+        return value;
+    }
+
+    // Set the header to the command text if no header has been explicitly specified
+    private static object CoerceHeader(DependencyObject d, object value)
+    {
+        var menuItem = (MenuItem)d;
+        RoutedUICommand uiCommand;
+
+        // If no header has been set, use the command's text
+        if (value is null && menuItem.HasDefaultValue(HeaderProperty))
+        {
+            uiCommand = menuItem.Command as RoutedUICommand;
+
+            if (uiCommand is not null)
+            {
+                value = uiCommand.Text;
+            }
+            return value;
+        }
+
+        // If the header had been set to a UICommand by the ItemsControl, replace it with the command's text
+        uiCommand = value as RoutedUICommand;
+
+        if (uiCommand is not null)
+        {
+            // The header is equal to the command.
+            // If this MenuItem was generated for the command, then go ahead and overwrite the header
+            // since the generator automatically set the header.
+            if (ItemsControlFromItemContainer(menuItem) is ItemsControl parent)
+            {
+                object originalItem = parent.ItemContainerGenerator.ItemFromContainer(menuItem);
+
+                if (originalItem == value)
+                {
+                    return uiCommand.Text;
+                }
+            }
+        }
+
+        return value;
     }
 
     /// <summary>
@@ -1581,11 +1671,8 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
 
     private void OnCommandChanged(ICommand newCommand)
     {
-        if (_canExecuteChangedListener is not null)
-        {
-            _canExecuteChangedListener.Detach();
-            _canExecuteChangedListener = null;
-        }
+        _canExecuteChangedListener?.Detach();
+        _canExecuteChangedListener = null;
 
         if (newCommand is not null)
         {
@@ -1593,6 +1680,9 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
         }
 
         UpdateCanExecute();
+
+        CoerceValue(HeaderProperty);
+        CoerceValue(InputGestureTextProperty);
     }
 
     private void OnCanExecuteChanged(object sender, EventArgs e) => UpdateCanExecute();
