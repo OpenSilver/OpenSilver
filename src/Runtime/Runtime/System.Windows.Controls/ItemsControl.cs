@@ -13,6 +13,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -61,7 +62,7 @@ namespace System.Windows.Controls
         /// Gets a collection of <see cref="GroupStyle"/> objects that define the appearance of each group level.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public Collections.ObjectModel.ObservableCollection<GroupStyle> GroupStyle { get; } = new();
+        public ObservableCollection<GroupStyle> GroupStyle { get; } = new();
 
         #endregion Constructor
 
