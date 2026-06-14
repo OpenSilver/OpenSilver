@@ -15,6 +15,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
@@ -32,7 +33,7 @@ public sealed class TemplateBindingExpression : Expression
     private PropertyChangeListener _listener;
     private bool _skipTypeCheck;
 
-    internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP)
+    internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP, TemplateBindingExtension extension = null)
     {
         ArgumentNullException.ThrowIfNull(templatedParent);
         ArgumentNullException.ThrowIfNull(sourceDP);
@@ -44,7 +45,13 @@ public sealed class TemplateBindingExpression : Expression
 
         _source = source;
         _sourceProperty = sourceDP;
+        Extension = extension;
     }
+
+    /// <summary>
+    /// Gets the <see cref="TemplateBindingExtension"/> that created this expression.
+    /// </summary>
+    public TemplateBindingExtension Extension { get; }
 
     internal override bool CanSetValue(DependencyObject d, DependencyProperty dp)
     {
@@ -54,6 +61,14 @@ public sealed class TemplateBindingExpression : Expression
     internal override object GetValue(DependencyObject d, DependencyProperty dp)
     {
         var value = _source.GetValue(_sourceProperty);
+
+        if (Extension?.Converter is Data.IValueConverter converter)
+        {
+            var language = (_target is FrameworkElement fe ? fe.Language : null) ?? XmlLanguage.Empty;
+            var culture = language.GetCompatibleCulture();
+            value = converter.Convert(value, _targetProperty.PropertyType, Extension.ConverterParameter, culture);
+        }
+
         if (_skipTypeCheck || ValidateValue(ref value, dp))
         {
             return value;

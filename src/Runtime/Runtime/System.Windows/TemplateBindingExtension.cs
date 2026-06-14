@@ -82,6 +82,18 @@ public class TemplateBindingExtension : MarkupExtension
     [EditorBrowsable(EditorBrowsableState.Never)]
     public Type DependencyPropertyOwnerType { get; set; }
 
+    /// <summary>
+    /// Gets or sets the converter to apply when producing the bound value (WPF compatibility).
+    /// The culture for conversion is determined at binding time from the target element's language
+    /// using <see cref="Markup.XmlLanguage.GetCompatibleCulture"/>.
+    /// </summary>
+    public Data.IValueConverter Converter { get; set; }
+
+    /// <summary>
+    /// Gets or sets the parameter passed to the <see cref="Converter"/>.
+    /// </summary>
+    public object ConverterParameter { get; set; }
+
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
         if (serviceProvider.GetService(typeof(ITemplateOwnerProvider)) is ITemplateOwnerProvider templateOwnerProvider)
@@ -129,7 +141,7 @@ public class TemplateBindingExtension : MarkupExtension
 
             if (dp is not null)
             {
-                return new TemplateBindingExpression(source, dp);
+                return new TemplateBindingExpression(source, dp, this);
             }
         }
 
@@ -151,7 +163,7 @@ public class TemplateBindingExtension : MarkupExtension
 
                 if (dp is not null)
                 {
-                    return new TemplateBindingExpression(source, dp);
+                    return new TemplateBindingExpression(source, dp, this);
                 }
             }
         }
