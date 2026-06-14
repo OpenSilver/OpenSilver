@@ -22,6 +22,12 @@ namespace System.Windows.Input;
 public static class Stylus
 {
     /// <summary>
+    /// Gets the current stylus device.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static StylusDevice CurrentStylusDevice => null;
+
+    /// <summary>
     /// Identifies the Stylus.IsFlicksEnabled attached property.
     /// </summary>
     public static readonly DependencyProperty IsFlicksEnabledProperty =

@@ -240,6 +240,54 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="MinLines"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty MinLinesProperty =
+            DependencyProperty.Register(
+                nameof(MinLines),
+                typeof(int),
+                typeof(TextBox),
+                new PropertyMetadata(1));
+
+        /// <summary>
+        /// Gets or sets the minimum number of visible text lines.
+        /// </summary>
+        /// <returns>
+        /// The minimum number of visible lines. The default is 1.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public int MinLines
+        {
+            get => (int)GetValue(MinLinesProperty);
+            set => SetValueInternal(MinLinesProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="MaxLines"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty MaxLinesProperty =
+            DependencyProperty.Register(
+                nameof(MaxLines),
+                typeof(int),
+                typeof(TextBox),
+                new PropertyMetadata(int.MaxValue));
+
+        /// <summary>
+        /// Gets or sets the maximum number of visible text lines.
+        /// </summary>
+        /// <returns>
+        /// The maximum number of visible lines. The default is <see cref="int.MaxValue"/>.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public int MaxLines
+        {
+            get => (int)GetValue(MaxLinesProperty);
+            set => SetValueInternal(MaxLinesProperty, value);
+        }
+
+        /// <summary>
         /// Identify the <see cref="CaretBrush"/> dependency property
         /// </summary>
         public static readonly DependencyProperty CaretBrushProperty =

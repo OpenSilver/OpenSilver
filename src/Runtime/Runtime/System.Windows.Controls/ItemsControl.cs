@@ -57,6 +57,12 @@ namespace System.Windows.Controls
         /// </summary>
         public ItemsControl() { }
 
+        /// <summary>
+        /// Gets a collection of <see cref="GroupStyle"/> objects that define the appearance of each group level.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public Collections.ObjectModel.ObservableCollection<GroupStyle> GroupStyle { get; } = new();
+
         #endregion Constructor
 
         #region Public Properties

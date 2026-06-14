@@ -38,6 +38,20 @@ public abstract class DrawingContext : DispatcherObject, IDisposable
     }
 
     /// <summary>
+    /// Draws a rounded rectangle with the specified brush and pen and applies the specified radius 
+    /// to the corners of the rectangle.
+    /// </summary>
+    /// <param name="brush">The brush used to fill the rounded rectangle, or null for no fill.</param>
+    /// <param name="pen">The pen used to stroke the rounded rectangle outline, or null for no stroke.</param>
+    /// <param name="rectangle">The rectangle to draw.</param>
+    /// <param name="radiusX">The horizontal radius of the ellipse used to round the corners.</param>
+    /// <param name="radiusY">The vertical radius of the ellipse used to round the corners.</param>
+    [NotImplemented]
+    public void DrawRoundedRectangle(Brush brush, object pen, Rect rectangle, double radiusX, double radiusY)
+    {
+    }
+
+    /// <summary>
     /// Closes the DrawingContext and flushes the content.
     /// Afterwards the DrawingContext can not be used anymore.
     /// This call does not require all Push calls to have been Popped.

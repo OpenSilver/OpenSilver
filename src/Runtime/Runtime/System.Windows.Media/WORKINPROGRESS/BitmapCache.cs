@@ -26,6 +26,17 @@ public sealed class BitmapCache : CacheMode
     public BitmapCache() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="BitmapCache"/> class with the specified render scale.
+    /// </summary>
+    /// <param name="renderAtScale">
+    /// The scale at which the object is rendered on the cached bitmap surface.
+    /// </param>
+    public BitmapCache(double renderAtScale)
+    {
+        RenderAtScale = renderAtScale;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="RenderAtScale"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty RenderAtScaleProperty =

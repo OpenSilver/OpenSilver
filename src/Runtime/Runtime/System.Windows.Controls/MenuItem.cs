@@ -274,6 +274,28 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     }
 
     /// <summary>
+    /// Identifies the <see cref="IsSuspendingPopupAnimation"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty IsSuspendingPopupAnimationProperty =
+        DependencyProperty.Register(
+            nameof(IsSuspendingPopupAnimation),
+            typeof(bool),
+            typeof(MenuItem),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the <see cref="MenuItem"/> suspends animations 
+    /// on its popup.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public bool IsSuspendingPopupAnimation
+    {
+        get => (bool)GetValue(IsSuspendingPopupAnimationProperty);
+        set => SetValueInternal(IsSuspendingPopupAnimationProperty, value);
+    }
+
+    /// <summary>
     /// Identifies the <see cref="StaysOpenOnClick"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty StaysOpenOnClickProperty =
