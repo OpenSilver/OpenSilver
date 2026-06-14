@@ -306,15 +306,24 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Gets the collection of child elements of the panel without creating it.
+        /// </summary>
+        /// <remarks>
+        /// This exposes the <see cref="Children"/> collection to derived panels without
+        /// triggering the lazy initialization that the public <see cref="Children"/> property does.
+        /// </remarks>
+        protected internal UIElementCollection InternalChildren => Children;
+
+        /// <summary>
         /// Get the underlying <see cref="List{T}"/> used to back the <see cref="Children"/> 
         /// collection.
         /// </summary>
         /// <remarks>
-        /// <b>IMPORTANT</b>: This property is dangerous and must be used very carefully. Read
+        /// <b>IMPORTANT</b>: This method is dangerous and must be used very carefully. Read
         /// operations (get accessor, GetEnumerator, Count...) are generally safe to use, but
         /// write operations (Add, Remove, Clear...) will likely lead to unexpected behaviors.
         /// </remarks>
-        internal List<UIElement> InternalChildren => Children.InternalItems;
+        internal List<UIElement> UnsafeGetChildren() => Children.InternalItems;
 
         private bool VerifyBoundState()
         {
@@ -658,7 +667,7 @@ namespace System.Windows.Controls
                 return;
             }
 
-            List<UIElement> children = InternalChildren;
+            List<UIElement> children = UnsafeGetChildren();
 
             int chunkSize = ProgressiveRenderingChunkSize;
             bool enableProgressiveRendering = chunkSize > 0 && children.Count > chunkSize;
