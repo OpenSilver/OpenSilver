@@ -67,6 +67,15 @@ public sealed class TemplateBindingExpression : Expression
             var language = (_target is FrameworkElement fe ? fe.Language : null) ?? XmlLanguage.Empty;
             var culture = language.GetCompatibleCulture();
             value = converter.Convert(value, _targetProperty.PropertyType, Extension.ConverterParameter, culture);
+
+            // Always validate when a converter is involved since the converter
+            // is responsible for the type conversion.
+            if (ValidateValue(ref value, dp))
+            {
+                return value;
+            }
+
+            return _targetProperty.GetDefaultValue(_target);
         }
 
         if (_skipTypeCheck || ValidateValue(ref value, dp))
