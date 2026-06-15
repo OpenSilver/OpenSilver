@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Media;
 
 /// <summary>
@@ -24,6 +26,17 @@ public sealed class BitmapCache : CacheMode
     /// Initializes a new instance of the <see cref="BitmapCache"/> class.
     /// </summary>
     public BitmapCache() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BitmapCache"/> class with the specified scale.
+    /// </summary>
+    /// <param name="renderAtScale">
+    /// A double that scales the bitmap.
+    /// </param>
+    public BitmapCache(double renderAtScale)
+    {
+        RenderAtScale = renderAtScale;
+    }
 
     /// <summary>
     /// Identifies the <see cref="RenderAtScale"/> dependency property.
@@ -47,5 +60,49 @@ public sealed class BitmapCache : CacheMode
     {
         get => (double)GetValue(RenderAtScaleProperty);
         set => SetValueInternal(RenderAtScaleProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="EnableClearType"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty EnableClearTypeProperty =
+        DependencyProperty.Register(
+            nameof(EnableClearType),
+            typeof(bool),
+            typeof(BitmapCache),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the bitmap is rendered with ClearType activated.
+    /// </summary>
+    /// <returns>
+    /// true if ClearType is active; otherwise, false. The default is false.
+    /// </returns>
+    public bool EnableClearType
+    {
+        get => (bool)GetValue(EnableClearTypeProperty);
+        set => SetValueInternal(EnableClearTypeProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="SnapsToDevicePixels"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty SnapsToDevicePixelsProperty =
+        DependencyProperty.Register(
+            nameof(SnapsToDevicePixels),
+            typeof(bool),
+            typeof(BitmapCache),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the bitmap is rendered with pixel snapping.
+    /// </summary>
+    /// <returns>
+    /// true if pixel snapping is active; otherwise, false. The default is false.
+    /// </returns>
+    public bool SnapsToDevicePixels
+    {
+        get => (bool)GetValue(SnapsToDevicePixelsProperty);
+        set => SetValueInternal(SnapsToDevicePixelsProperty, value);
     }
 }

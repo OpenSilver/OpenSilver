@@ -273,6 +273,33 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
         remove => RemoveHandler(UncheckedEvent, value);
     }
 
+    private static readonly DependencyPropertyKey IsSuspendingPopupAnimationPropertyKey =
+        DependencyProperty.RegisterReadOnly(
+            nameof(IsSuspendingPopupAnimation),
+            typeof(bool),
+            typeof(MenuItem),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
+
+    /// <summary>
+    /// Identifies the <see cref="IsSuspendingPopupAnimation"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty IsSuspendingPopupAnimationProperty = IsSuspendingPopupAnimationPropertyKey.DependencyProperty;
+
+    /// <summary>
+    /// Gets whether a menu suspends animations on its <see cref="Popup"/> control.
+    /// </summary>
+    /// <returns>
+    /// true if the menu should suspend animations on its popup; otherwise, false. The 
+    /// default is false.
+    /// </returns>
+    [OpenSilver.NotImplemented]
+    public bool IsSuspendingPopupAnimation
+    {
+        get => (bool)GetValue(IsSuspendingPopupAnimationProperty);
+        internal set => SetValueInternal(IsSuspendingPopupAnimationProperty, value);
+    }
+
     /// <summary>
     /// Identifies the <see cref="StaysOpenOnClick"/> dependency property.
     /// </summary>

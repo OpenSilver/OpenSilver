@@ -157,6 +157,7 @@
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Controls\Decorator.cs" />
     <Compile Include="System.Windows.Controls\GroupBox.cs" />
+    <Compile Include="System.Windows.Controls\GroupItem.cs" />
     <Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
@@ -179,6 +180,7 @@
     <Compile Include="System.Windows.Media\CombinedGeometry.cs" />
     <Compile Include="System.Windows.Media\DashStyle.cs" />
     <Compile Include="System.Windows.Media\DashStyles.cs" />
+    <Compile Include="System.Windows.Media\Drawing.cs" />
     <Compile Include="System.Windows.Media\DrawingContext.cs" />
     <Compile Include="System.Windows.Media\FormattedText.cs" />
     <Compile Include="System.Windows.Input\InputDevice.cs" />
@@ -187,6 +189,7 @@
     <Compile Include="System.Windows.Input\KeyboardInputProviderAcquireFocusEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseDevice.cs" />
     <Compile Include="System.Windows.Media\GeometryCombineMode.cs" />
+    <Compile Include="System.Windows.Media\GuidelineSet.cs" />
     <Compile Include="System.Windows.Media\IntersectionDetail.cs" />
     <Compile Include="System.Windows.Media\PathGeometry.Combine.cs" />
     <Compile Include="System.Windows.Media\Pen.cs" />
@@ -228,6 +231,7 @@
     <Compile Include="System.Windows.Controls\ContextMenu.cs" />
     <Compile Include="System.Windows.Controls\ContextMenuService.cs" />
     <Compile Include="System.Windows.Controls\DataTemplateSelector.cs" />
+    <Compile Include="System.Windows.Controls\GroupStyle.cs" />
     <Compile Include="System.Windows.Controls\HeaderedItemsControl.cs" />
     <Compile Include="System.Windows.Controls\InteractionHelper.cs" />
     <Compile Include="System.Windows.Controls\ItemsControlHelper.cs" />

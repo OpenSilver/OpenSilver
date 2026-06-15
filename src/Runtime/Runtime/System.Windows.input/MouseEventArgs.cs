@@ -45,6 +45,24 @@ public class MouseEventArgs : InputEventArgs
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MouseEventArgs"/> class using the specified 
+    /// <see cref="MouseDevice"/>, timestamp, and <see cref="StylusDevice"/>.
+    /// </summary>
+    /// <param name="mouse">
+    /// The mouse device associated with this event.
+    /// </param>
+    /// <param name="timestamp">
+    /// The time when the input occurred.
+    /// </param>
+    /// <param name="stylusDevice">
+    /// The logical stylus device associated with this event.
+    /// </param>
+    public MouseEventArgs(MouseDevice mouse, int timestamp, StylusDevice stylusDevice)
+        : this(mouse, timestamp)
+    {
+    }
+
     internal MouseEventArgs(MouseDevice mouse, int timestamp, bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
         : base(mouse, timestamp)
     {

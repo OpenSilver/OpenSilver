@@ -13,6 +13,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -56,6 +57,15 @@ namespace System.Windows.Controls
         /// Initializes a new instance of the <see cref="ItemsControl"/> class.
         /// </summary>
         public ItemsControl() { }
+
+        /// <summary>
+        /// Gets a collection of <see cref="GroupStyle"/> objects that define the appearance of each level of groups.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="GroupStyle"/> objects that define the appearance of each level of groups.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public ObservableCollection<GroupStyle> GroupStyle { get; } = [];
 
         #endregion Constructor
 
