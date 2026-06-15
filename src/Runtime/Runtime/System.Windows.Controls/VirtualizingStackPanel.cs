@@ -393,7 +393,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             double constraintSize = isHorizontal ? constraint.Width : constraint.Height;
             (int firstItemInViewportIndex, double firstItemInViewportLogicalOffset) = ComputeFirstItemInViewportIndex(isHorizontal, itemCount);
             GeneratorPosition start = generator.GeneratorPositionFromIndex(firstItemInViewportIndex);
-            List<UIElement> children = InternalChildren;
+            List<UIElement> children = UnsafeGetChildren();
 
             using (generator.StartAt(start, GeneratorDirection.Forward, true))
             {
@@ -663,7 +663,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
     private void CleanupContainers(ItemsControl owner, int firstItemInViewportIndex, int count)
     {
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = UnsafeGetChildren();
         IRecyclingItemContainerGenerator generator = ItemContainerGenerator as IRecyclingItemContainerGenerator;
         int last = firstItemInViewportIndex + count - 1;
         int index = 0;
@@ -740,7 +740,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     private Size MeasureNonItemsHost(Size constraint)
     {
         Size stackDesiredSize = new();
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = UnsafeGetChildren();
         Size layoutSlotSize = constraint;
         bool fHorizontal = Orientation == Orientation.Horizontal;
         int firstViewport;          // First child index in the viewport.
@@ -960,7 +960,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         bool isHorizontal = Orientation == Orientation.Horizontal;
         var rcChild = new Rect(arrangeSize);
         double previousChildSize = 0.0;
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = UnsafeGetChildren();
 
         if (IsScrolling)
         {
@@ -1007,7 +1007,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         double offset = _firstItemInViewportPixelOffset;
 
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = UnsafeGetChildren();
         for (int i = 0; i < _firstItemInViewportIndex && i < children.Count; i++)
         {
             UIElement child = children[i];
@@ -1019,7 +1019,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
     private Size ArrangeNonItemsHost(Size arrangeSize)
     {
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = UnsafeGetChildren();
         bool fHorizontal = Orientation == Orientation.Horizontal;
         Rect rcChild = new Rect(arrangeSize);
         double previousChildSize = 0.0;
@@ -1076,7 +1076,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         double physicalOffset = 0.0;
 
-        List<UIElement> children = InternalChildren;
+        List<UIElement> children = UnsafeGetChildren();
         Debug.Assert(logicalOffset == 0 || (logicalOffset > 0 && logicalOffset < children.Count));
 
         for (int i = 0; i < logicalOffset; i++)
@@ -1150,7 +1150,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         if (IsItemsHost)
         {
-            List<UIElement> children = InternalChildren;
+            List<UIElement> children = UnsafeGetChildren();
             int pos = position.Index;
             if (position.Offset > 0)
             {
@@ -1354,7 +1354,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         Rect exposed = new Rect(0, 0, 0, 0);
 
-        foreach (UIElement child in InternalChildren)
+        foreach (UIElement child in UnsafeGetChildren())
         {
             if (child == visual)
             {

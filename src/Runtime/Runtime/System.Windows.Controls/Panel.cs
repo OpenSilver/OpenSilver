@@ -282,9 +282,20 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets the collection of child elements of the panel.
+        /// Gets a <see cref="UIElementCollection"/> of child elements of this <see cref="Panel"/>.
         /// </summary>
-        public UIElementCollection Children
+        /// <returns>
+        /// A <see cref="UIElementCollection"/>. The default is an empty <see cref="UIElementCollection"/>.
+        /// </returns>
+        public UIElementCollection Children => InternalChildren;
+
+        /// <summary>
+        /// Gets a <see cref="UIElementCollection"/> of child elements.
+        /// </summary>
+        /// <returns>
+        /// An ordered collection of <see cref="UIElement"/> objects. This property has no default value.
+        /// </returns>
+        protected internal UIElementCollection InternalChildren
         {
             get
             {
@@ -310,11 +321,11 @@ namespace System.Windows.Controls
         /// collection.
         /// </summary>
         /// <remarks>
-        /// <b>IMPORTANT</b>: This property is dangerous and must be used very carefully. Read
+        /// <b>IMPORTANT</b>: This method is dangerous and must be used very carefully. Read
         /// operations (get accessor, GetEnumerator, Count...) are generally safe to use, but
         /// write operations (Add, Remove, Clear...) will likely lead to unexpected behaviors.
         /// </remarks>
-        internal List<UIElement> InternalChildren => Children.InternalItems;
+        internal List<UIElement> UnsafeGetChildren() => InternalChildren.InternalItems;
 
         private bool VerifyBoundState()
         {
@@ -658,7 +669,7 @@ namespace System.Windows.Controls
                 return;
             }
 
-            List<UIElement> children = InternalChildren;
+            List<UIElement> children = UnsafeGetChildren();
 
             int chunkSize = ProgressiveRenderingChunkSize;
             bool enableProgressiveRendering = chunkSize > 0 && children.Count > chunkSize;
