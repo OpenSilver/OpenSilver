@@ -282,9 +282,20 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets the collection of child elements of the panel.
+        /// Gets a <see cref="UIElementCollection"/> of child elements of this <see cref="Panel"/>.
         /// </summary>
-        public UIElementCollection Children
+        /// <returns>
+        /// A <see cref="UIElementCollection"/>. The default is an empty <see cref="UIElementCollection"/>.
+        /// </returns>
+        public UIElementCollection Children => InternalChildren;
+
+        /// <summary>
+        /// Gets a <see cref="UIElementCollection"/> of child elements.
+        /// </summary>
+        /// <returns>
+        /// An ordered collection of <see cref="UIElement"/> objects. This property has no default value.
+        /// </returns>
+        protected internal UIElementCollection InternalChildren
         {
             get
             {
@@ -306,15 +317,6 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets the collection of child elements of the panel without creating it.
-        /// </summary>
-        /// <remarks>
-        /// This exposes the <see cref="Children"/> collection to derived panels without
-        /// triggering the lazy initialization that the public <see cref="Children"/> property does.
-        /// </remarks>
-        protected internal UIElementCollection InternalChildren => Children;
-
-        /// <summary>
         /// Get the underlying <see cref="List{T}"/> used to back the <see cref="Children"/> 
         /// collection.
         /// </summary>
@@ -323,7 +325,7 @@ namespace System.Windows.Controls
         /// operations (get accessor, GetEnumerator, Count...) are generally safe to use, but
         /// write operations (Add, Remove, Clear...) will likely lead to unexpected behaviors.
         /// </remarks>
-        internal List<UIElement> UnsafeGetChildren() => Children.InternalItems;
+        internal List<UIElement> UnsafeGetChildren() => InternalChildren.InternalItems;
 
         private bool VerifyBoundState()
         {
