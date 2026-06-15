@@ -4253,13 +4253,10 @@
                 <controls:ContentPresenter x:Name="Presenter"
                                            controls:Grid.Column="1"
                                            VerticalAlignment="Center"
+                                           RecognizesAccessKey="True"
                                            Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
                                            ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
-                <!--<controls:TextBlock
-                        Text="{TemplateBinding InputGestureText}"
-                        Margin="{TemplateBinding Padding}"
-                        controls:Grid.Column="4"/>-->
             </controls:Grid>
         </controls:Grid>
         <controls:ControlTemplate.Triggers>
@@ -4368,13 +4365,10 @@
                 <controls:ContentPresenter x:Name="Presenter"
                                            controls:Grid.Column="1"
                                            VerticalAlignment="Center"
+                                           RecognizesAccessKey="True"
                                            Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
                                            ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}" />
-                <!--<controls:TextBlock
-                        Text="{TemplateBinding InputGestureText}"
-                        Margin="{TemplateBinding Padding}"
-                        controls:Grid.Column="4"/>-->
             </controls:Grid>
             <!-- Submenu Popup -->
             <primitives:Popup x:Name="PART_Popup"
@@ -4523,10 +4517,11 @@
                                  Fill="#FF0C12A1" />
                 </controls:Border>
                 <controls:ContentPresenter x:Name="Presenter"
+                                           controls:Grid.Column="2"
                                            Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
                                            ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
-                                           controls:Grid.Column="2"
+                                           RecognizesAccessKey="True"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                 <controls:TextBlock controls:Grid.Column="4"
@@ -4649,10 +4644,11 @@
                                  Fill="#FF0C12A1" />
                 </controls:Border>
                 <controls:ContentPresenter x:Name="Presenter"
+                                           controls:Grid.Column="2"
                                            Content="{TemplateBinding Property={x:Static controls:MenuItem.HeaderProperty}}"
                                            ContentTemplate="{TemplateBinding Property={x:Static controls:MenuItem.HeaderTemplateProperty}}"
                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
-                                           controls:Grid.Column="2" />
+                                           RecognizesAccessKey="True" />
                 <controls:TextBlock controls:Grid.Column="4"
                                     Text="{TemplateBinding Property={x:Static controls:MenuItem.InputGestureTextProperty}}"
                                     Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
