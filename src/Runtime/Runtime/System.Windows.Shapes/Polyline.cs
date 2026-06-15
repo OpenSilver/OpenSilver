@@ -31,6 +31,52 @@ public sealed class Polyline : Shape
     /// </summary>
     public Polyline() { }
 
+    /// <inheritdoc />
+    protected override Geometry DefiningGeometry
+    {
+        get
+        {
+            List<Point> pointCollection = Points.InternalItems;
+            var pathFigure = new PathFigure();
+
+            if (pointCollection.Count > 0)
+            {
+                pathFigure.StartPoint = pointCollection[0];
+
+                if (pointCollection.Count > 1)
+                {
+                    var points = new PointCollection(pointCollection.Count - 1);
+
+                    for (int i = 1; i < pointCollection.Count; i++)
+                    {
+                        points.Add(pointCollection[i]);
+                    }
+
+                    pathFigure.Segments.Add(new PolyLineSegment
+                    {
+                        Points = points,
+                        IsStroked = true,
+                    });
+                }
+            }
+
+            var polylineGeometry = new PathGeometry();
+            polylineGeometry.Figures.Add(pathFigure);
+
+            // Set FillRule
+            polylineGeometry.FillRule = FillRule;
+
+            if (polylineGeometry.Bounds == Rect.Empty)
+            {
+                return Geometry.Empty;
+            }
+            else
+            {
+                return polylineGeometry;
+            }
+        }
+    }
+
     /// <summary>
     /// Identifies the <see cref="FillRule"/> dependency property.
     /// </summary>

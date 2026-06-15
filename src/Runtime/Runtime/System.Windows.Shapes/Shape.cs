@@ -34,14 +34,55 @@ namespace System.Windows.Shapes
         protected Shape() { }
 
         /// <summary>
-        /// Gets a value that represents a <see cref="Transform"/> that is applied
-        /// to the geometry of a <see cref="Shape"/> prior to when it is drawn.
+        /// Gets a value that represents a <see cref="Transform"/> that is applied to the geometry of a 
+        /// <see cref="Shape"/> prior to when it is drawn.
         /// </summary>
         /// <returns>
-        /// A <see cref="Transform"/> that is applied to the geometry of a <see cref="Shape"/>
-        /// prior to when it is drawn.
+        /// A <see cref="Transform"/> that is applied to the geometry of a <see cref="Shape"/> prior to 
+        /// when it is drawn.
         /// </returns>
         public virtual Transform GeometryTransform => StretchMatrix is Matrix m ? new MatrixTransform(m) : Transform.Identity;
+
+        /// <summary>
+        /// Gets a value that represents the final rendered <see cref="Geometry"/> of a <see cref="Shape"/>.
+        /// </summary>
+        /// <returns>
+        /// The final rendered <see cref="Geometry"/> of a <see cref="Shape"/>.
+        /// </returns>
+        public virtual Geometry RenderedGeometry
+        {
+            get
+            {
+                if (DefiningGeometry is not Geometry renderedGeometry)
+                {
+                    return Geometry.Empty;
+                }
+
+                if (Stretch != Stretch.None)
+                {
+                    Transform renderedTransform = renderedGeometry.Transform;
+                    Matrix stretchMatrix = StretchMatrix ?? Matrix.Identity;
+                    if (renderedTransform is null || renderedTransform.IsIdentity)
+                    {
+                        renderedGeometry.Transform = new MatrixTransform(stretchMatrix);
+                    }
+                    else
+                    {
+                        renderedGeometry.Transform = new MatrixTransform(renderedTransform.Value * stretchMatrix);
+                    }
+                }
+
+                return renderedGeometry;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value that represents the <see cref="Geometry"/> of the <see cref="Shape"/>.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Geometry"/> of the <see cref="Shape"/>.
+        /// </returns>
+        protected abstract Geometry DefiningGeometry { get; }
 
         /// <summary>
         /// Identifies the <see cref="Fill"/> dependency property.

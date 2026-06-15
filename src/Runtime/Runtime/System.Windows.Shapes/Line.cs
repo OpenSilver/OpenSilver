@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using System.Windows.Media;
 
 namespace System.Windows.Shapes
 {
@@ -24,6 +25,9 @@ namespace System.Windows.Shapes
         /// Initializes a new instance of the <see cref="Line"/> class.
         /// </summary>
         public Line() { }
+
+        /// <inheritdoc />
+        protected override Geometry DefiningGeometry => new LineGeometry(new Point(X1, Y1), new Point(X2, Y2));
 
         /// <summary>
         /// Identifies the <see cref="X1"/> dependency property.

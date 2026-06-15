@@ -28,13 +28,22 @@ namespace System.Windows.Shapes
                 new FrameworkPropertyMetadata(Stretch.Fill, FrameworkPropertyMetadataOptions.AffectsMeasure));
         }
 
+        private Rect _rect = Rect.Empty;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Ellipse"/> class.
         /// </summary>
         public Ellipse() { }
 
+        /// <inheritdoc />
+        public override Geometry RenderedGeometry => DefiningGeometry;
+
+        /// <inheritdoc />
+        protected override Geometry DefiningGeometry => _rect.IsEmpty ? Geometry.Empty : new EllipseGeometry(_rect);
+
         internal sealed override string SvgTagName => "ellipse";
 
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size availableSize)
         {
             if (Stretch == Stretch.UniformToFill)
@@ -65,42 +74,46 @@ namespace System.Windows.Shapes
             return GetNaturalSize();
         }
 
+        /// <inheritdoc />
         protected override Size ArrangeOverride(Size finalSize)
         {
             double penThickness = GetStrokeThickness();
-            
-            double rx = Math.Max(0, finalSize.Width - penThickness) / 2;
-            double ry = Math.Max(0, finalSize.Height - penThickness) / 2;
+            double margin = penThickness / 2;
+
+            _rect = new Rect(
+                margin, // X
+                margin, // Y
+                Math.Max(0, finalSize.Width - penThickness),    // Width
+                Math.Max(0, finalSize.Height - penThickness));  // Height
 
             switch (Stretch)
             {
                 case Stretch.None:
                     // A 0 Rect.Width and Rect.Height rectangle
-                    //rect.Width = rect.Height = 0;
-                    rx = ry = 0;
+                    _rect.Width = _rect.Height = 0;
                     break;
                 
                 case Stretch.Uniform:
                     // The maximal square that fits in the final box
-                    if (rx > ry)
+                    if (_rect.Width > _rect.Height)
                     {
-                        rx = ry;
+                        _rect.Width = _rect.Height;
                     }
                     else
                     {
-                        ry = rx;
+                        _rect.Height = _rect.Width;
                     }
                     break;
 
                 case Stretch.UniformToFill:
                     // The minimal square that fills the final box
-                    if (rx < ry)
+                    if (_rect.Width < _rect.Height)
                     {
-                        rx = ry;
+                        _rect.Width = _rect.Height;
                     }
                     else
                     {
-                        ry = rx;
+                        _rect.Height = _rect.Width;
                     }
                     break;
 
@@ -111,7 +124,7 @@ namespace System.Windows.Shapes
                     break;
             }
 
-            ArrangeNative(rx, ry, penThickness);
+            ArrangeNative(_rect.Width / 2, _rect.Height / 2, penThickness);
 
             return finalSize;
         }

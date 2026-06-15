@@ -31,6 +31,47 @@ public sealed class Polygon : Shape
     /// </summary>
     public Polygon() { }
 
+    /// <inheritdoc />
+    protected override Geometry DefiningGeometry
+    {
+        get
+        {
+            List<Point> pointCollection = Points.InternalItems;
+            var pathFigure = new PathFigure();
+
+            if (pointCollection.Count > 0)
+            {
+                pathFigure.StartPoint = pointCollection[0];
+
+                if (pointCollection.Count > 1)
+                {
+                    var points = new PointCollection(pointCollection.Count - 1);
+
+                    for (int i = 1; i < pointCollection.Count; i++)
+                    {
+                        points.Add(pointCollection[i]);
+                    }
+
+                    pathFigure.Segments.Add(new PolyLineSegment
+                    {
+                        Points = points,
+                        IsStroked = true,
+                    });
+                }
+
+                pathFigure.IsClosed = true;
+            }
+
+            var polygonGeometry = new PathGeometry();
+            polygonGeometry.Figures.Add(pathFigure);
+
+            // Set FillRule
+            polygonGeometry.FillRule = FillRule;
+
+            return polygonGeometry;
+        }
+    }
+
     /// <summary>
     /// Identifies the <see cref="FillRule"/> dependency property.
     /// </summary>

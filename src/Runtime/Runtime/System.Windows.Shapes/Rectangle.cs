@@ -28,10 +28,18 @@ namespace System.Windows.Shapes
                 new FrameworkPropertyMetadata(Stretch.Fill, FrameworkPropertyMetadataOptions.AffectsMeasure));
         }
 
+        private Rect _rect = Rect.Empty;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Rectangle"/> class.
         /// </summary>
         public Rectangle() { }
+
+        /// <inheritdoc />
+        public override Geometry RenderedGeometry => DefiningGeometry;
+
+        /// <inheritdoc />
+        protected override Geometry DefiningGeometry => new RectangleGeometry(_rect, RadiusX, RadiusY);
 
         /// <summary>
         /// Identifies the <see cref="RadiusX"/> dependency property.
@@ -98,6 +106,7 @@ namespace System.Windows.Shapes
 
         internal sealed override string SvgTagName => "rect";
 
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size availableSize)
         {
             if (Stretch == Stretch.UniformToFill)
@@ -128,10 +137,17 @@ namespace System.Windows.Shapes
             return GetNaturalSize();
         }
 
+        /// <inheritdoc />
         protected override Size ArrangeOverride(Size finalSize)
         {
             double penThickness = GetStrokeThickness();
             double margin = penThickness / 2;
+
+            _rect = new Rect(
+                margin, // X
+                margin, // Y
+                Math.Max(0, finalSize.Width - penThickness),    // Width
+                Math.Max(0, finalSize.Height - penThickness));  // Height
 
             double x = margin;
             double y = margin;
@@ -157,6 +173,7 @@ namespace System.Windows.Shapes
                 case Stretch.None:
                     // A 0 Rect.Width and Rect.Height rectangle
                     rect.Width = rect.Height = 0;
+                    _rect.Width = _rect.Height = 0;
                     break;
 
                 case Stretch.Uniform:
@@ -169,6 +186,15 @@ namespace System.Windows.Shapes
                     {
                         rect.Height = rect.Width;
                     }
+
+                    if (_rect.Width > _rect.Height)
+                    {
+                        _rect.Width = _rect.Height;
+                    }
+                    else
+                    {
+                        _rect.Height = _rect.Width;
+                    }
                     break;
 
                 case Stretch.UniformToFill:
@@ -180,6 +206,15 @@ namespace System.Windows.Shapes
                     else
                     {
                         rect.Height = rect.Width;
+                    }
+
+                    if (_rect.Width < _rect.Height)
+                    {
+                        _rect.Width = _rect.Height;
+                    }
+                    else
+                    {
+                        _rect.Height = _rect.Width;
                     }
                     break;
 

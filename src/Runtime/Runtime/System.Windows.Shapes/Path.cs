@@ -32,6 +32,9 @@ namespace System.Windows.Shapes
         /// </summary>
         public Path() { }
 
+        /// <inheritdoc />
+        protected override Geometry DefiningGeometry => Data ?? Geometry.Empty;
+
         /// <summary>
         /// Identifies the <see cref="Data"/> dependency property.
         /// </summary>
