@@ -703,7 +703,7 @@ namespace System.Windows
         protected virtual bool IsEnabledCore => true;
 
         /// <summary>
-        /// Identifies the <see cref="IsEnabled"/> dependency property.
+        /// Identifies the <see cref="IsEnabled"/>Â dependency property.
         /// </summary>
         public static readonly DependencyProperty IsEnabledProperty =
             DependencyProperty.Register(
@@ -1748,7 +1748,37 @@ namespace System.Windows
 
         #endregion
 
-        internal bool IsDescendantOf(DependencyObject ancestor)
+        /// <summary>
+        /// Determines whether the visual object is an ancestor of the descendant visual object.
+        /// </summary>
+        /// <param name="descendant">
+        /// A value of type <see cref="DependencyObject"/>.
+        /// </param>
+        /// <returns>
+        /// true if the visual object is an ancestor of descendant; otherwise, false.
+        /// </returns>
+        public bool IsAncestorOf(DependencyObject descendant)
+        {
+            ArgumentNullException.ThrowIfNull(descendant);
+
+            if (descendant is not UIElement uie)
+            {
+                throw new ArgumentException(string.Format(Strings.UIElement_NotAnUIElement, nameof(descendant)));
+            }
+
+            return uie.IsDescendantOf(this);
+        }
+
+        /// <summary>
+        /// Determines whether the visual object is a descendant of the ancestor visual object.
+        /// </summary>
+        /// <param name="ancestor">
+        /// A value of type <see cref="DependencyObject"/>.
+        /// </param>
+        /// <returns>
+        /// true if the visual object is a descendant of ancestor; otherwise, false.
+        /// </returns>
+        public bool IsDescendantOf(DependencyObject ancestor)
         {
             ArgumentNullException.ThrowIfNull(ancestor);
 
@@ -1767,6 +1797,27 @@ namespace System.Windows
             }
 
             return current == ancestor;
+        }
+
+        /// <summary>
+        /// Returns the common ancestor of two visual objects.
+        /// </summary>
+        /// <param name="otherVisual">
+        /// A visual object of type <see cref="DependencyObject"/>.
+        /// </param>
+        /// <returns>
+        /// The common ancestor of the visual object and otherVisual if one exists; otherwise, null.
+        /// </returns>
+        public DependencyObject FindCommonVisualAncestor(DependencyObject otherVisual)
+        {
+            ArgumentNullException.ThrowIfNull(otherVisual);
+
+            if (otherVisual is UIElement other)
+            {
+                return FindCommonVisualAncestor(other);
+            }
+
+            return null;
         }
 
         #region ForceInherit property support
