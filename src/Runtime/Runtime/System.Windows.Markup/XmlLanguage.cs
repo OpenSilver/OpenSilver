@@ -224,7 +224,7 @@ public sealed class XmlLanguage
     /// </returns>
     public static bool operator !=(XmlLanguage xmlLanguage1, XmlLanguage xmlLanguage2) => !(xmlLanguage1 == xmlLanguage2);
 
-    private CultureInfo GetCompatibleCulture()
+    internal CultureInfo GetCompatibleCulture()
     {
         if (_compatibleCulture is null)
         {

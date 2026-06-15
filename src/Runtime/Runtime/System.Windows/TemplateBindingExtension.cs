@@ -11,10 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml;
 using System.ComponentModel;
 using System.Windows.Controls;
-using OpenSilver.Internal.Xaml;
+using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace System.Windows;
 
@@ -26,6 +28,9 @@ namespace System.Windows;
 public class TemplateBindingExtension : MarkupExtension
 {
     private DependencyProperty _property;
+    private IValueConverter _converter;
+    private object _converterParameter;
+    private bool _sealed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateBindingExtension"/> class.
@@ -82,6 +87,50 @@ public class TemplateBindingExtension : MarkupExtension
     [EditorBrowsable(EditorBrowsableState.Never)]
     public Type DependencyPropertyOwnerType { get; set; }
 
+    /// <summary>
+    /// Gets or sets the converter that interprets between source and target of a binding.
+    /// </summary>
+    /// <returns>
+    /// The converter implementation. This value defaults to null and is typically provided 
+    /// as an optional parameter of the binding.
+    /// </returns>
+    public IValueConverter Converter
+    {
+        get => _converter;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            if (_sealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(TemplateBindingExtension)));
+            }
+
+            _converter = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the parameter to pass to the converter.
+    /// </summary>
+    /// <returns>
+    /// The parameter being bound as referenced by the converter implementation. The default 
+    /// value is null.
+    /// </returns>
+    public object ConverterParameter
+    {
+        get => _converterParameter;
+        set
+        {
+            if (_sealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(TemplateBindingExtension)));
+            }
+
+            _converterParameter = value;
+        }
+    }
+
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
         if (serviceProvider.GetService(typeof(ITemplateOwnerProvider)) is ITemplateOwnerProvider templateOwnerProvider)
@@ -129,7 +178,7 @@ public class TemplateBindingExtension : MarkupExtension
 
             if (dp is not null)
             {
-                return new TemplateBindingExpression(source, dp);
+                return CreateBindingExpression(source, dp);
             }
         }
 
@@ -151,11 +200,23 @@ public class TemplateBindingExtension : MarkupExtension
 
                 if (dp is not null)
                 {
-                    return new TemplateBindingExpression(source, dp);
+                    return CreateBindingExpression(source, dp);
                 }
             }
         }
 
         return DependencyProperty.UnsetValue;
+    }
+
+    private TemplateBindingExpression CreateBindingExpression(IInternalControl templatedParent, DependencyProperty dp)
+    {
+        _sealed = true;
+
+        if (templatedParent is not DependencyObject source)
+        {
+            throw new ArgumentException(string.Format(Strings.General_Expected_Type, nameof(DependencyObject)), nameof(templatedParent));
+        }
+
+        return new TemplateBindingExpression(source, dp, this);
     }
 }
