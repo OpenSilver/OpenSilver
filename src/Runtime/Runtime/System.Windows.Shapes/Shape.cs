@@ -92,7 +92,7 @@ namespace System.Windows.Shapes
                 nameof(Fill),
                 typeof(Brush),
                 typeof(Shape),
-                new PropertyMetadata(null, OnFillChanged)
+                new FrameworkPropertyMetadata(null, OnFillChanged)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) => SetFill((Shape)d, (Brush)newValue),
                 });
@@ -194,7 +194,7 @@ namespace System.Windows.Shapes
                 nameof(Stroke),
                 typeof(Brush),
                 typeof(Shape),
-                new PropertyMetadata(null, OnStrokeChanged)
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnStrokeChanged)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) => SetStroke((Shape)d, (Brush)newValue),
                 });
@@ -270,7 +270,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeDashArray),
                 typeof(DoubleCollection),
                 typeof(Shape),
-                new PropertyMetadata(
+                new FrameworkPropertyMetadata(
                     new PFCDefaultValueFactory<double>(
                         static () => new DoubleCollection(),
                         static (d, dp) => new DoubleCollection()),
@@ -319,7 +319,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeDashCap),
                 typeof(PenLineCap),
                 typeof(Shape),
-                new PropertyMetadata(PenLineCap.Flat)
+                new FrameworkPropertyMetadata(PenLineCap.Flat)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
@@ -359,7 +359,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeDashOffset),
                 typeof(double),
                 typeof(Shape),
-                new PropertyMetadata(0.0)
+                new FrameworkPropertyMetadata(0.0)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
@@ -391,7 +391,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeLineCap),
                 typeof(PenLineCap),
                 typeof(Shape),
-                new PropertyMetadata(PenLineCap.Flat)
+                new FrameworkPropertyMetadata(PenLineCap.Flat)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
@@ -432,7 +432,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeStartLineCap),
                 typeof(PenLineCap),
                 typeof(Shape),
-                new PropertyMetadata(PenLineCap.Flat),
+                new FrameworkPropertyMetadata(PenLineCap.Flat),
                 ValidateEnums.IsPenLineCapValid);
 
         /// <summary>
@@ -459,7 +459,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeEndLineCap),
                 typeof(PenLineCap),
                 typeof(Shape),
-                new PropertyMetadata(PenLineCap.Flat),
+                new FrameworkPropertyMetadata(PenLineCap.Flat),
                 ValidateEnums.IsPenLineCapValid);
 
         /// <summary>
@@ -485,7 +485,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeLineJoin),
                 typeof(PenLineJoin),
                 typeof(Shape),
-                new PropertyMetadata(PenLineJoin.Miter)
+                new FrameworkPropertyMetadata(PenLineJoin.Miter)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
@@ -525,7 +525,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeMiterLimit),
                 typeof(double),
                 typeof(Shape),
-                new PropertyMetadata(10.0)
+                new FrameworkPropertyMetadata(10.0)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
@@ -558,7 +558,7 @@ namespace System.Windows.Shapes
                 nameof(StrokeThickness),
                 typeof(double),
                 typeof(Shape),
-                new PropertyMetadata(1.0)
+                new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {

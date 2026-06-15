@@ -80,7 +80,7 @@ public sealed class Polygon : Shape
             nameof(FillRule),
             typeof(FillRule),
             typeof(Polygon),
-            new PropertyMetadata(FillRule.EvenOdd)
+            new FrameworkPropertyMetadata(FillRule.EvenOdd)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Polygon)d).SetFillRuleAttribute((FillRule)newValue),
             },

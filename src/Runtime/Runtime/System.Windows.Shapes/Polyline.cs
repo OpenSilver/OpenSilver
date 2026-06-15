@@ -85,7 +85,7 @@ public sealed class Polyline : Shape
             nameof(FillRule),
             typeof(FillRule),
             typeof(Polyline),
-            new PropertyMetadata(FillRule.EvenOdd)
+            new FrameworkPropertyMetadata(FillRule.EvenOdd)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Polyline)d).SetFillRuleAttribute((FillRule)newValue),
             },

@@ -49,7 +49,7 @@ namespace System.Windows.Shapes
                 nameof(RadiusX),
                 typeof(double),
                 typeof(Rectangle),
-                new PropertyMetadata(0.0)
+                new FrameworkPropertyMetadata(0.0)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
@@ -80,7 +80,7 @@ namespace System.Windows.Shapes
                 nameof(RadiusY),
                 typeof(double),
                 typeof(Rectangle),
-                new PropertyMetadata(0.0)
+                new FrameworkPropertyMetadata(0.0)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
