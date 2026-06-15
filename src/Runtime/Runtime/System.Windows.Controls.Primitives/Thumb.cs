@@ -20,7 +20,7 @@ namespace System.Windows.Controls.Primitives
     [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
     [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
     [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
-    public sealed class Thumb : Control
+    public class Thumb : Control
     {
         static Thumb()
         {
@@ -35,21 +35,63 @@ namespace System.Windows.Controls.Primitives
         public Thumb() { }
 
         /// <summary>
-        /// Occurs when a <see cref="Thumb"/> control receives logical focus and 
+        /// Identifies the <see cref="DragStarted"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent DragStartedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(DragStarted),
+                RoutingStrategy.Bubble,
+                typeof(DragStartedEventHandler),
+                typeof(Thumb));
+
+        /// <summary>
+        /// Occurs when a <see cref="Thumb"/> control receives logical focus and
         /// mouse capture.
         /// </summary>
-        public event DragStartedEventHandler DragStarted;
+        public event DragStartedEventHandler DragStarted
+        {
+            add => AddHandler(DragStartedEvent, value);
+            remove => RemoveHandler(DragStartedEvent, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="DragDelta"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent DragDeltaEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(DragDelta),
+                RoutingStrategy.Bubble,
+                typeof(DragDeltaEventHandler),
+                typeof(Thumb));
 
         /// <summary>
         /// Occurs one or more times as the mouse pointer is moved when a <see cref="Thumb"/>
         /// control has logical focus and mouse capture.
-        /// </summary> 
-        public event DragDeltaEventHandler DragDelta;
+        /// </summary>
+        public event DragDeltaEventHandler DragDelta
+        {
+            add => AddHandler(DragDeltaEvent, value);
+            remove => RemoveHandler(DragDeltaEvent, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="DragCompleted"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent DragCompletedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(DragCompleted),
+                RoutingStrategy.Bubble,
+                typeof(DragCompletedEventHandler),
+                typeof(Thumb));
 
         /// <summary> 
         /// Occurs when the <see cref="Thumb"/> control loses mouse capture.
         /// </summary>
-        public event DragCompletedEventHandler DragCompleted;
+        public event DragCompletedEventHandler DragCompleted
+        {
+            add => AddHandler(DragCompletedEvent, value);
+            remove => RemoveHandler(DragCompletedEvent, value);
+        }
 
         private static readonly DependencyPropertyKey IsDraggingPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -156,7 +198,7 @@ namespace System.Windows.Controls.Primitives
                 bool success = false;
                 try
                 {
-                    DragStarted?.Invoke(this, new DragStartedEventArgs(_origin.X, _origin.Y));
+                    RaiseEvent(new DragStartedEventArgs(_origin.X, _origin.Y));
                     success = true;
                 }
                 finally
@@ -241,7 +283,7 @@ namespace System.Windows.Controls.Primitives
                 if (position != _previousPosition)
                 {
                     // Raise the DragDelta event 
-                    DragDelta?.Invoke(this, new DragDeltaEventArgs(position.X - _previousPosition.X, position.Y - _previousPosition.Y));
+                    RaiseEvent(new DragDeltaEventArgs(position.X - _previousPosition.X, position.Y - _previousPosition.Y));
 
                     _previousPosition = position;
                 }
@@ -333,7 +375,7 @@ namespace System.Windows.Controls.Primitives
         /// </param>
         private void RaiseDragCompleted(bool canceled)
         {
-            DragCompleted?.Invoke(this, new DragCompletedEventArgs(
+            RaiseEvent(new DragCompletedEventArgs(
                 _previousPosition.X - _origin.X,
                 _previousPosition.Y - _origin.Y,
                 canceled));

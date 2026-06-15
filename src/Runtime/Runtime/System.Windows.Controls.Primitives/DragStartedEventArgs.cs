@@ -11,34 +11,49 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls.Primitives
+namespace System.Windows.Controls.Primitives;
+
+/// <summary>
+/// Provides information about the <see cref="Thumb.DragStarted"/> event that occurs when a user drags a 
+/// <see cref="Thumb"/> control with the mouse.
+/// </summary>
+public class DragStartedEventArgs : RoutedEventArgs
 {
     /// <summary>
-    /// Provides data for the DragStarted event that occurs when a user drags a Thumb control with the mouse.
+    /// Initializes a new instance of the <see cref="DragStartedEventArgs"/> class.
     /// </summary>
-    public class DragStartedEventArgs : RoutedEventArgs
+    /// <param name="horizontalOffset">
+    /// The horizontal offset of the mouse click with respect to the screen coordinates of the <see cref="Thumb"/>.
+    /// </param>
+    /// <param name="verticalOffset">
+    /// The vertical offset of the mouse click with respect to the screen coordinates of the <see cref="Thumb"/>.
+    /// </param>
+    public DragStartedEventArgs(double horizontalOffset, double verticalOffset)
     {
-        /// <summary>
-        /// Initializes a new instance of the DragStartedEventArgs class.
-        /// </summary>
-        /// <param name="horizontalOffset">The horizontal distance between the current mouse position and the thumb coordinates.</param>
-        /// <param name="verticalOffset">The vertical distance between the current mouse position and the thumb coordinates.</param>
-        public DragStartedEventArgs(double horizontalOffset, double verticalOffset)
-        {
-            this.HorizontalOffset = horizontalOffset;
-            this.VerticalOffset = verticalOffset;
-        }
-
-        /// <summary>
-        /// Gets the horizontal distance between the current mouse position and the thumb
-        /// coordinates.
-        /// </summary>
-        public double HorizontalOffset { get; private set; }
-
-        /// <summary>
-        /// Gets the vertical distance between the current mouse position and the thumb
-        /// coordinates.
-        /// </summary>
-        public double VerticalOffset { get; private set; }
+        HorizontalOffset = horizontalOffset;
+        VerticalOffset = verticalOffset;
+        RoutedEvent = Thumb.DragStartedEvent;
     }
+
+    /// <summary>
+    /// Gets the horizontal offset of the mouse click relative to the screen coordinates of the <see cref="Thumb"/>.
+    /// </summary>
+    /// <returns>
+    /// The horizontal offset of the mouse click with respect to the upper-left corner of the bounding box of the 
+    /// <see cref="Thumb"/>. There is no default value.
+    /// </returns>
+    public double HorizontalOffset { get; }
+
+    /// <summary>
+    /// Gets the vertical offset of the mouse click relative to the screen coordinates of the <see cref="Thumb"/>.
+    /// </summary>
+    /// <returns>
+    /// The horizontal offset of the mouse click with respect to the upper-left corner of the bounding box of the 
+    /// <see cref="Thumb"/>. There is no default value.
+    /// </returns>
+    public double VerticalOffset { get; }
+
+    /// <inheritdoc />
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
+        ((DragStartedEventHandler)genericHandler)(genericTarget, this);
 }
