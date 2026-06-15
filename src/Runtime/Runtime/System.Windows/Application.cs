@@ -37,7 +37,7 @@ namespace System.Windows
     /// <summary>
     /// Encapsulates the app and its available services.
     /// </summary>
-    public partial class Application : IResourceDictionaryOwner
+    public partial class Application : DispatcherObject, IResourceDictionaryOwner
     {
         private static readonly Dictionary<string, string> _resourcesCache = new(StringComparer.OrdinalIgnoreCase);
 
