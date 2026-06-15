@@ -2419,6 +2419,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error in newly produced path figures..
+        /// </summary>
+        internal static string PathGeometry_InternalReadBackError {
+            get {
+                return ResourceManager.GetString("PathGeometry_InternalReadBackError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot change collection during a CollectionChanged event..
         /// </summary>
         internal static string PresentationFrameworkCollectionReentrancyNotAllowed {

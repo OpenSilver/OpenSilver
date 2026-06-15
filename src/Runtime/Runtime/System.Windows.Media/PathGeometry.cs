@@ -319,22 +319,7 @@ public sealed partial class PathGeometry : Geometry
 
         foreach (var figure in figures)
         {
-            var segments = figure.Segments.InternalItems;
-
-            if (segments.Count == 0)
-            {
-                continue;
-            }
-
-            Point current = figure.StartPoint;
-            Point startPoint = current * matrix;
-
-            context.BeginFigure(startPoint, figure.IsFilled, figure.IsClosed);
-
-            foreach (var segment in segments)
-            {
-                segment.SerializeData(context, matrix, ref current);
-            }
+            figure.SerializeData(context, matrix);
         }
     }
 
