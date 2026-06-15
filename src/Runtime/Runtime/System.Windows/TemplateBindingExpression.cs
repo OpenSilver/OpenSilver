@@ -14,9 +14,10 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Markup;
-using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows;
@@ -33,49 +34,38 @@ public sealed class TemplateBindingExpression : Expression
     private PropertyChangeListener _listener;
     private bool _skipTypeCheck;
 
-    internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP, TemplateBindingExtension extension = null)
+    internal TemplateBindingExpression(DependencyObject templatedParent, DependencyProperty sourceDP, TemplateBindingExtension extension)
     {
-        ArgumentNullException.ThrowIfNull(templatedParent);
-        ArgumentNullException.ThrowIfNull(sourceDP);
+        Debug.Assert(extension is not null);
+        Debug.Assert(templatedParent is not null);
+        Debug.Assert(sourceDP is not null);
 
-        if (templatedParent is not DependencyObject source)
-        {
-            throw new ArgumentException(string.Format(Strings.General_Expected_Type, nameof(DependencyObject)), nameof(templatedParent));
-        }
-
-        _source = source;
+        _source = templatedParent;
         _sourceProperty = sourceDP;
-        Extension = extension;
+        TemplateBindingExtension = extension;
     }
 
     /// <summary>
-    /// Gets the <see cref="TemplateBindingExtension"/> that created this expression.
+    /// Gets the <see cref="Windows.TemplateBindingExtension"/> object of this expression instance.
     /// </summary>
-    public TemplateBindingExtension Extension { get; }
+    /// <returns>
+    /// The template binding extension of this expression instance.
+    /// </returns>
+    public TemplateBindingExtension TemplateBindingExtension { get; }
 
-    internal override bool CanSetValue(DependencyObject d, DependencyProperty dp)
-    {
-        return false;
-    }
+    internal override bool CanSetValue(DependencyObject d, DependencyProperty dp) => false;
 
     internal override object GetValue(DependencyObject d, DependencyProperty dp)
     {
         var value = _source.GetValue(_sourceProperty);
 
-        if (Extension?.Converter is Data.IValueConverter converter)
+        if (TemplateBindingExtension.Converter is IValueConverter converter)
         {
-            var language = (_target is FrameworkElement fe ? fe.Language : null) ?? XmlLanguage.Empty;
-            var culture = language.GetCompatibleCulture();
-            value = converter.Convert(value, _targetProperty.PropertyType, Extension.ConverterParameter, culture);
-
-            // Always validate when a converter is involved since the converter
-            // is responsible for the type conversion.
-            if (ValidateValue(ref value, dp))
-            {
-                return value;
-            }
-
-            return _targetProperty.GetDefaultValue(_target);
+            value = converter.Convert(
+                value,
+                _targetProperty.PropertyType,
+                TemplateBindingExtension.ConverterParameter,
+                GetCulture());
         }
 
         if (_skipTypeCheck || ValidateValue(ref value, dp))
@@ -95,8 +85,8 @@ public sealed class TemplateBindingExpression : Expression
         _target = d;
         _targetProperty = dp;
 
-        _skipTypeCheck = _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
-        _listener = PropertyChangeListener.CreateListener((DependencyObject)_source, _sourceProperty, OnPropertyChanged);
+        _skipTypeCheck = TemplateBindingExtension.Converter is null && _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
+        _listener = PropertyChangeListener.CreateListener(_source, _sourceProperty, OnPropertyChanged);
     }
 
     internal override void OnDetach(DependencyObject d, DependencyProperty dp)
@@ -136,5 +126,15 @@ public sealed class TemplateBindingExpression : Expression
         }
 
         return false;
+    }
+
+    private CultureInfo GetCulture()
+    {
+        if (_target.GetValue(FrameworkElement.LanguageProperty) is XmlLanguage xmlLanguage)
+        {
+            return xmlLanguage.GetCompatibleCulture();
+        }
+
+        return null;
     }
 }
