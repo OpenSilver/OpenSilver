@@ -11,33 +11,52 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls.Primitives
+
+namespace System.Windows.Controls.Primitives;
+
+/// <summary>
+/// Provides information about the <see cref="Thumb.DragDelta"/> event that occurs one or more times when 
+/// a user drags a <see cref="Thumb"/> control with the mouse.
+/// </summary>
+public class DragDeltaEventArgs : RoutedEventArgs
 {
     /// <summary>
-    /// Provides data for the DragDelta event that occurs one or more times when
-    /// a user drags a Thumb control with the mouse.
+    /// Initializes a new instance of the <see cref="DragDeltaEventArgs"/> class.
     /// </summary>
-    public class DragDeltaEventArgs : RoutedEventArgs
+    /// <param name="horizontalChange">
+    /// The horizontal change in the <see cref="Thumb"/> position since the last <see cref="Thumb.DragDelta"/> 
+    /// event.
+    /// </param>
+    /// <param name="verticalChange">
+    /// The vertical change in the <see cref="Thumb"/> position since the last <see cref="Thumb.DragDelta"/> 
+    /// event.
+    /// </param>
+    public DragDeltaEventArgs(double horizontalChange, double verticalChange)
     {
-        /// <summary>
-        /// Initializes a new instance of the DragDeltaEventArgs class.
-        /// </summary>
-        /// <param name="horizontalChange">The horizontal change in the Thumb position since the last DragDelta event.</param>
-        /// <param name="verticalChange">The vertical change in the Thumb position since the last DragDelta event.</param>
-        public DragDeltaEventArgs(double horizontalChange, double verticalChange)
-        {
-            this.HorizontalChange = horizontalChange;
-            this.VerticalChange = verticalChange;
-        }
-
-        /// <summary>
-        /// Gets the horizontal change in the Thumb position since the last DragDelta event.
-        /// </summary>
-        public double HorizontalChange { get; private set; }
-
-        /// <summary>
-        /// Gets the vertical change in the Thumb position since the last DragDelta event.
-        /// </summary>
-        public double VerticalChange { get; private set; }
+        HorizontalChange = horizontalChange;
+        VerticalChange = verticalChange;
+        RoutedEvent = Thumb.DragDeltaEvent;
     }
+
+    /// <summary>
+    /// Gets the horizontal distance that the mouse has moved since the previous <see cref="Thumb.DragDelta"/>
+    /// event when the user drags the <see cref="Thumb"/> control with the mouse.
+    /// </summary>
+    /// <returns>
+    /// A horizontal change in position of the mouse during a drag operation. There is no default value.
+    /// </returns>
+    public double HorizontalChange { get; }
+
+    /// <summary>
+    /// Gets the vertical distance that the mouse has moved since the previous <see cref="Thumb.DragDelta"/>
+    /// event when the user drags the <see cref="Thumb"/> with the mouse.
+    /// </summary>
+    /// <returns>
+    /// A vertical change in position of the mouse during a drag operation. There is no default value.
+    /// </returns>
+    public double VerticalChange { get; }
+
+    /// <inheritdoc />
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
+        ((DragDeltaEventHandler)genericHandler)(genericTarget, this);
 }

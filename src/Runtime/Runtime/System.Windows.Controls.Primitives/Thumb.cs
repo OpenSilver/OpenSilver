@@ -198,7 +198,7 @@ namespace System.Windows.Controls.Primitives
                 bool success = false;
                 try
                 {
-                    RaiseEvent(new DragStartedEventArgs(_origin.X, _origin.Y) { RoutedEvent = DragStartedEvent });
+                    RaiseEvent(new DragStartedEventArgs(_origin.X, _origin.Y));
                     success = true;
                 }
                 finally
@@ -283,7 +283,7 @@ namespace System.Windows.Controls.Primitives
                 if (position != _previousPosition)
                 {
                     // Raise the DragDelta event 
-                    RaiseEvent(new DragDeltaEventArgs(position.X - _previousPosition.X, position.Y - _previousPosition.Y) { RoutedEvent = DragDeltaEvent });
+                    RaiseEvent(new DragDeltaEventArgs(position.X - _previousPosition.X, position.Y - _previousPosition.Y));
 
                     _previousPosition = position;
                 }
@@ -378,10 +378,7 @@ namespace System.Windows.Controls.Primitives
             RaiseEvent(new DragCompletedEventArgs(
                 _previousPosition.X - _origin.X,
                 _previousPosition.Y - _origin.Y,
-                canceled)
-            {
-                RoutedEvent = DragCompletedEvent,
-            });
+                canceled));
         }
 
         private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
