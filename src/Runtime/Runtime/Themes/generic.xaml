@@ -150,100 +150,11 @@
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="Window">
-                    <controls:Grid x:Name="PART_Root">
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="WindowStyleStates">
-                                <VisualState x:Name="Normal" />
-                                <VisualState x:Name="NoChrome">
-                                    <animation:Storyboard>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="PART_Chrome"
-                                                                                 animation:Storyboard.TargetProperty="Visibility">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0"
-                                                                              Value="Collapsed" />
-                                        </animation:ObjectAnimationUsingKeyFrames>
-                                    </animation:Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                            <VisualStateGroup x:Name="WindowStateStates">
-                                <VisualState x:Name="Restored" />
-                                <VisualState x:Name="Maximized" />
-                                <VisualState x:Name="Minimized">
-                                    <animation:Storyboard>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="PART_Root"
-                                                                                 animation:Storyboard.TargetProperty="Visibility">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0"
-                                                                              Value="Collapsed" />
-                                        </animation:ObjectAnimationUsingKeyFrames>
-                                    </animation:Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
-                                         BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
-                                         BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}">
-                            <controls:Grid>
-                                <controls:Grid.RowDefinitions>
-                                    <controls:RowDefinition Height="Auto" />
-                                    <controls:RowDefinition Height="*" />
-                                </controls:Grid.RowDefinitions>
-
-                                <!-- Title Bar / Chrome -->
-                                <controls:Border x:Name="PART_Chrome"
-                                                 Background="#FF0078D7"
-                                                 Height="30">
-                                    <controls:Grid>
-                                        <controls:Grid.ColumnDefinitions>
-                                            <controls:ColumnDefinition Width="*" />
-                                            <controls:ColumnDefinition Width="Auto" />
-                                            <controls:ColumnDefinition Width="Auto" />
-                                            <controls:ColumnDefinition Width="Auto" />
-                                        </controls:Grid.ColumnDefinitions>
-                                        <controls:TextBlock Text="{TemplateBinding Property={x:Static Window.TitleProperty}}"
-                                                            VerticalAlignment="Center"
-                                                            Margin="10,0,0,0"
-                                                            Foreground="White"
-                                                            FontSize="12" />
-                                        <controls:Button x:Name="PART_MinimizeButton"
-                                                         controls:Grid.Column="1"
-                                                         shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                                         Content="&#xE921;"
-                                                         FontFamily="Segoe MDL2 Assets"
-                                                         FontSize="10"
-                                                         Width="46"
-                                                         Height="30"
-                                                         BorderThickness="0"
-                                                         Background="Transparent"
-                                                         Foreground="White" />
-                                        <controls:Button x:Name="PART_MaximizeButton"
-                                                         controls:Grid.Column="2"
-                                                         shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                                         Content="&#xE922;"
-                                                         FontFamily="Segoe MDL2 Assets"
-                                                         FontSize="10"
-                                                         Width="46"
-                                                         Height="30"
-                                                         BorderThickness="0"
-                                                         Background="Transparent"
-                                                         Foreground="White" />
-                                        <controls:Button x:Name="PART_CloseButton"
-                                                         controls:Grid.Column="3"
-                                                         shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                                         Content="&#xE8BB;"
-                                                         FontFamily="Segoe MDL2 Assets"
-                                                         FontSize="10"
-                                                         Width="46"
-                                                         Height="30"
-                                                         BorderThickness="0"
-                                                         Background="Transparent"
-                                                         Foreground="White" />
-                                    </controls:Grid>
-                                </controls:Border>
-
-                                <!-- Content Area -->
-                                <controls:ContentPresenter controls:Grid.Row="1" />
-                            </controls:Grid>
-                        </controls:Border>
-                    </controls:Grid>
+                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}">
+                        <controls:ContentPresenter />
+                    </controls:Border>
                 </controls:ControlTemplate>
             </Setter.Value>
         </Setter>

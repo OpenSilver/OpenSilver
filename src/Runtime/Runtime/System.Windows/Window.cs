@@ -21,7 +21,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
@@ -32,19 +31,8 @@ namespace System.Windows;
 /// <summary>
 /// Represents an application window.
 /// </summary>
-[TemplatePart(Name = PART_Root, Type = typeof(FrameworkElement))]
-[TemplatePart(Name = PART_Chrome, Type = typeof(FrameworkElement))]
-[TemplatePart(Name = PART_CloseButton, Type = typeof(ButtonBase))]
-[TemplatePart(Name = PART_MinimizeButton, Type = typeof(ButtonBase))]
-[TemplatePart(Name = PART_MaximizeButton, Type = typeof(ButtonBase))]
 public class Window : ContentControl, IResizeObserverListener
 {
-    private const string PART_Root = "PART_Root";
-    private const string PART_Chrome = "PART_Chrome";
-    private const string PART_CloseButton = "PART_CloseButton";
-    private const string PART_MinimizeButton = "PART_MinimizeButton";
-    private const string PART_MaximizeButton = "PART_MaximizeButton";
-
     static Window()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(typeof(Window)));
@@ -53,7 +41,6 @@ public class Window : ContentControl, IResizeObserverListener
         KeyboardNavigation.DirectionalNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
         EventManager.RegisterClassHandler<Window>(Keyboard.GotKeyboardFocusEvent, new RoutedEventHandler(OnGotKeyboardFocus), true);
         EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
-        EventManager.RegisterClassHandler<Window>(Mouse.MouseDownEvent, new MouseButtonEventHandler(OnMouseDownForChrome), false);
     }
 
     private IDisposable _resizeObserver;
@@ -64,11 +51,7 @@ public class Window : ContentControl, IResizeObserverListener
     private bool _isClosed;
     private HtmlElementReference _overlayDiv;
     private TaskCompletionSource<bool?> _dialogResultTcs;
-    private FrameworkElement _rootElement;
-    private FrameworkElement _chromeElement;
-    private ButtonBase _closeButton;
-    private ButtonBase _minimizeButton;
-    private ButtonBase _maximizeButton;
+    private OpenSilver.Internal.Controls.WindowHost _windowHost;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
@@ -93,84 +76,6 @@ public class Window : ContentControl, IResizeObserverListener
     }
 
     ~Window() => _resizeObserver?.Dispose();
-
-    /// <inheritdoc />
-    public override void OnApplyTemplate()
-    {
-        UnsubscribeFromTemplatePartEvents();
-
-        base.OnApplyTemplate();
-
-        _rootElement = GetTemplateChild(PART_Root) as FrameworkElement;
-        _chromeElement = GetTemplateChild(PART_Chrome) as FrameworkElement;
-        _closeButton = GetTemplateChild(PART_CloseButton) as ButtonBase;
-        _minimizeButton = GetTemplateChild(PART_MinimizeButton) as ButtonBase;
-        _maximizeButton = GetTemplateChild(PART_MaximizeButton) as ButtonBase;
-
-        SubscribeToTemplatePartEvents();
-        UpdateWindowStyleVisualState();
-        UpdateWindowStateVisualState();
-    }
-
-    private void SubscribeToTemplatePartEvents()
-    {
-        if (_closeButton is not null)
-        {
-            _closeButton.Click += CloseButton_Click;
-        }
-        if (_minimizeButton is not null)
-        {
-            _minimizeButton.Click += MinimizeButton_Click;
-        }
-        if (_maximizeButton is not null)
-        {
-            _maximizeButton.Click += MaximizeButton_Click;
-        }
-    }
-
-    private void UnsubscribeFromTemplatePartEvents()
-    {
-        if (_closeButton is not null)
-        {
-            _closeButton.Click -= CloseButton_Click;
-        }
-        if (_minimizeButton is not null)
-        {
-            _minimizeButton.Click -= MinimizeButton_Click;
-        }
-        if (_maximizeButton is not null)
-        {
-            _maximizeButton.Click -= MaximizeButton_Click;
-        }
-    }
-
-    private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
-
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
-
-    private void MaximizeButton_Click(object sender, RoutedEventArgs e) =>
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-
-    private void UpdateWindowStyleVisualState()
-    {
-        if (_rootElement is null) return;
-
-        string stateName = WindowStyle == WindowStyle.None ? "NoChrome" : "Normal";
-        VisualStateManager.GoToState(this, stateName, false);
-    }
-
-    private void UpdateWindowStateVisualState()
-    {
-        if (_rootElement is null) return;
-
-        string stateName = WindowState switch
-        {
-            WindowState.Maximized => "Maximized",
-            WindowState.Minimized => "Minimized",
-            _ => "Restored"
-        };
-        VisualStateManager.GoToState(this, stateName, false);
-    }
 
     /// <summary>
     /// Occurs after a window's content has been rendered.
@@ -514,7 +419,8 @@ public class Window : ContentControl, IResizeObserverListener
     {
         base.OnVisualParentChanged(oldParent);
 
-        if (VisualTreeHelper.GetParent(this) is not null && !_isShowingAsSecondary)
+        var parent = VisualTreeHelper.GetParent(this);
+        if (parent is not null && !_isShowingAsSecondary && parent is not OpenSilver.Internal.Controls.WindowHost)
         {
             throw new InvalidOperationException(Strings.WindowMustBeRoot);
         }
@@ -757,7 +663,13 @@ public class Window : ContentControl, IResizeObserverListener
 
     private static void OnWindowStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        ((Window)d).UpdateWindowStyleVisualState();
+        var window = (Window)d;
+        if (window._windowHost is not null)
+        {
+            WindowChrome chrome = WindowChrome.GetWindowChrome(window);
+            window._windowHost.UpdateTitleBarVisibility(
+                chrome is not null && (WindowStyle)e.NewValue != WindowStyle.None);
+        }
     }
 
     private static bool ValidateWindowStyle(object value)
@@ -794,7 +706,6 @@ public class Window : ContentControl, IResizeObserverListener
 
     private static void OnWindowStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        ((Window)d).UpdateWindowStateVisualState();
     }
 
     private static bool ValidateWindowState(object value)
@@ -1074,17 +985,16 @@ public class Window : ContentControl, IResizeObserverListener
         _overlayDiv = INTERNAL_HtmlDomManager.CreateWindowOverlayDomElementAndAppendIt(
             this, mainWindow.RootDomElement, _isModal);
 
-        ParentWindow = mainWindow;
-        OuterDiv = INTERNAL_HtmlDomManager.CreateWindowContentDomElementAndAppendIt(this, _overlayDiv);
+        _windowHost = new OpenSilver.Internal.Controls.WindowHost(this);
 
-        IsLoadedCache = true;
-        IsConnectedToLiveTree = true;
-        UpdateIsRenderableCache();
-        UpdateIsVisibleCache();
-        PropagateResumeLayout(null, this);
+        WindowChrome chrome = WindowChrome.GetWindowChrome(this);
+        if (chrome is not null)
+        {
+            _windowHost.UpdateTitleBarHeight(chrome.CaptionHeight);
+        }
+        _windowHost.UpdateTitleBarVisibility(WindowStyle != WindowStyle.None && chrome is not null);
 
-        RaiseLoadedEvent();
-        SetLayoutSize();
+        _windowHost.Show(_overlayDiv, mainWindow);
 
         Current = this;
         ActiveWindow = this;
@@ -1095,19 +1005,14 @@ public class Window : ContentControl, IResizeObserverListener
     {
         _isShowingAsSecondary = false;
 
-        INTERNAL_VisualTreeManager.DetachSecondaryWindow(this);
+        _windowHost?.Close();
+        _windowHost = null;
 
         // Remove overlay
         if (_overlayDiv.IsConnected)
         {
             INTERNAL_HtmlDomManager.RemoveNodeNative(_overlayDiv);
         }
-
-        IsLoadedCache = false;
-        IsConnectedToLiveTree = false;
-        UpdateIsRenderableCache();
-        UpdateIsVisibleCache();
-        PropagateSuspendLayout(this);
 
         OnDeactivated(EventArgs.Empty);
 
@@ -1133,52 +1038,14 @@ public class Window : ContentControl, IResizeObserverListener
 
     internal void OnWindowChromeChanged(WindowChrome oldChrome, WindowChrome newChrome)
     {
-        // The class handler (OnMouseDownForChrome) reads the chrome at event time,
-        // so no dynamic handler registration is needed here.
-    }
-
-    private static void OnMouseDownForChrome(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is Window window)
+        if (_windowHost is not null)
         {
-            window.HandleChromeMouseDown(e);
-        }
-    }
-
-    private void HandleChromeMouseDown(MouseButtonEventArgs e)
-    {
-        if (!_isShowingAsSecondary) return;
-        if (e.ChangedButton != MouseButton.Left) return;
-
-        WindowChrome chrome = WindowChrome.GetWindowChrome(this);
-        if (chrome is null) return;
-
-        if (e.OriginalSource is DependencyObject source && IsHitTestVisibleInChrome(source))
-        {
-            return;
-        }
-
-        Point position = e.GetPosition(this);
-
-        if (position.Y >= 0 && position.Y <= chrome.CaptionHeight)
-        {
-            e.Handled = true;
-            BeginDrag();
-        }
-    }
-
-    private bool IsHitTestVisibleInChrome(DependencyObject source)
-    {
-        DependencyObject current = source;
-        while (current is not null && current != this)
-        {
-            if ((bool)current.GetValue(WindowChrome.IsHitTestVisibleInChromeProperty))
+            _windowHost.UpdateTitleBarVisibility(newChrome is not null && WindowStyle != WindowStyle.None);
+            if (newChrome is not null)
             {
-                return true;
+                _windowHost.UpdateTitleBarHeight(newChrome.CaptionHeight);
             }
-            current = VisualTreeHelper.GetParent(current) as DependencyObject;
         }
-        return false;
     }
 
     private void BeginDrag()
@@ -1240,13 +1107,13 @@ public class Window : ContentControl, IResizeObserverListener
 
     private void UpdateWindowPosition()
     {
-        if (!OuterDiv.IsConnected) return;
+        if (_windowHost is null || !_windowHost.OuterDiv.IsConnected) return;
 
         double left = double.IsNaN(Left) ? 0 : Left;
         double top = double.IsNaN(Top) ? 0 : Top;
 
         OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"(function(){{ var el=document.getElementById('{OuterDiv.Uid}'); if(el){{ el.style.left='{left.ToInvariantString()}px'; el.style.top='{top.ToInvariantString()}px'; }} }})()");
+            $"(function(){{ var el=document.getElementById('{_windowHost.OuterDiv.Uid}'); if(el){{ el.style.left='{left.ToInvariantString()}px'; el.style.top='{top.ToInvariantString()}px'; }} }})()");
     }
 
     #endregion

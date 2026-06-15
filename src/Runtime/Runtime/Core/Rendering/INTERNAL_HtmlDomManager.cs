@@ -194,6 +194,20 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
+        internal static HtmlElementReference CreatePopupRootDomElementAndAppendIt(HtmlElementReference parentDiv, UIElement element)
+        {
+            Debug.Assert(element is not null);
+
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createPopupRoot('{uid}','{parentDiv.Uid}','auto')");
+
+            AddToGlobalStore(uid, element);
+
+            return new(uid);
+        }
+
         internal static HtmlElementReference CreateWindowOverlayDomElementAndAppendIt(
             Window window, HtmlElementReference rootElement, bool isModal)
         {
@@ -208,14 +222,15 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
-        internal static HtmlElementReference CreateWindowContentDomElementAndAppendIt(Window window, HtmlElementReference overlayDiv)
+
+        internal static HtmlElementReference CreateWindowContentDomElementAndAppendIt(Window window, HtmlElementReference chromeDomDiv)
         {
             Debug.Assert(window is not null);
 
             string uid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"osjs.createWindowContent('{uid}', '{overlayDiv.Uid}')");
+                $"osjs.createWindowContent('{uid}', '{chromeDomDiv.Uid}')");
 
             AddToGlobalStore(uid, window);
 

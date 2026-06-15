@@ -124,9 +124,10 @@ body {
 }
 
 .opensilver-window-content {
-    position: absolute;
+    position: relative;
     overflow: hidden;
     transform-origin: 0% 0%;
+    pointer-events: auto;
 }
 
 .opensilver-inkpresenter {
