@@ -22,8 +22,11 @@ namespace System.Windows.Input;
 public static class Stylus
 {
     /// <summary>
-    /// Gets the current stylus device.
+    /// Gets the stylus that represents the stylus currently in use.
     /// </summary>
+    /// <returns>
+    /// The <see cref="StylusDevice"/> that represents the stylus currently in use.
+    /// </returns>
     [OpenSilver.NotImplemented]
     public static StylusDevice CurrentStylusDevice => null;
 

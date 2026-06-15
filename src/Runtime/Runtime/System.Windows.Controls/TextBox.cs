@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
@@ -23,7 +22,6 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.Xml.Linq;
 
 namespace System.Windows.Controls
 {
@@ -242,13 +240,14 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="MinLines"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty MinLinesProperty =
             DependencyProperty.Register(
                 nameof(MinLines),
                 typeof(int),
                 typeof(TextBox),
-                new PropertyMetadata(1));
+                new PropertyMetadata(1),
+                ValidateMinMaxLines);
 
         /// <summary>
         /// Gets or sets the minimum number of visible text lines.
@@ -256,7 +255,7 @@ namespace System.Windows.Controls
         /// <returns>
         /// The minimum number of visible lines. The default is 1.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public int MinLines
         {
             get => (int)GetValue(MinLinesProperty);
@@ -266,13 +265,14 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="MaxLines"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty MaxLinesProperty =
             DependencyProperty.Register(
                 nameof(MaxLines),
                 typeof(int),
                 typeof(TextBox),
-                new PropertyMetadata(int.MaxValue));
+                new PropertyMetadata(int.MaxValue),
+                ValidateMinMaxLines);
 
         /// <summary>
         /// Gets or sets the maximum number of visible text lines.
@@ -280,12 +280,14 @@ namespace System.Windows.Controls
         /// <returns>
         /// The maximum number of visible lines. The default is <see cref="int.MaxValue"/>.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public int MaxLines
         {
             get => (int)GetValue(MaxLinesProperty);
             set => SetValueInternal(MaxLinesProperty, value);
         }
+
+        private static bool ValidateMinMaxLines(object value) => (int)value > 0;
 
         /// <summary>
         /// Identify the <see cref="CaretBrush"/> dependency property
