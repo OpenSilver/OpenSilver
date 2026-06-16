@@ -51,7 +51,7 @@ public class Window : ContentControl, IResizeObserverListener
     private bool _isClosed;
     private HtmlElementReference _overlayDiv;
     private TaskCompletionSource<bool?> _dialogResultTcs;
-    private OpenSilver.Internal.Controls.WindowHost _windowHost;
+    private OpenSilver.Controls.WindowHost _windowHost;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
@@ -420,7 +420,7 @@ public class Window : ContentControl, IResizeObserverListener
         base.OnVisualParentChanged(oldParent);
 
         var parent = VisualTreeHelper.GetParent(this);
-        if (parent is not null && !_isShowingAsSecondary && parent is not OpenSilver.Internal.Controls.WindowHost)
+        if (parent is not null && !_isShowingAsSecondary)
         {
             throw new InvalidOperationException(Strings.WindowMustBeRoot);
         }
@@ -985,7 +985,7 @@ public class Window : ContentControl, IResizeObserverListener
         _overlayDiv = INTERNAL_HtmlDomManager.CreateWindowOverlayDomElementAndAppendIt(
             this, mainWindow.RootDomElement, _isModal);
 
-        _windowHost = new OpenSilver.Internal.Controls.WindowHost(this);
+        _windowHost = new OpenSilver.Controls.WindowHost(this);
 
         WindowChrome chrome = WindowChrome.GetWindowChrome(this);
         if (chrome is not null)

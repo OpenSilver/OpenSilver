@@ -19,6 +19,7 @@
                     xmlns:shapes="clr-namespace:System.Windows.Shapes"
                     xmlns:effects="clr-namespace:System.Windows.Media.Effects"
                     xmlns:shell="clr-namespace:System.Windows.Shell"
+                    xmlns:oscontrols="clr-namespace:OpenSilver.Controls"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <controls:ControlTemplate x:Key="ValidationToolTipTemplate">
@@ -159,6 +160,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
 
     <!--  ItemsControl  -->
     <Style TargetType="controls:ItemsControl">
@@ -4772,6 +4774,70 @@
                                      BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
                                      Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                      Height="1" />
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  oscontrols:WindowHost  -->
+    <Style TargetType="oscontrols:WindowHost">
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="oscontrols:WindowHost">
+                    <controls:Grid>
+                        <controls:Grid.RowDefinitions>
+                            <controls:RowDefinition Height="30" />
+                            <controls:RowDefinition Height="*" />
+                        </controls:Grid.RowDefinitions>
+                        <!-- Title Bar -->
+                        <controls:Border x:Name="PART_TitleBar"
+                                     controls:Grid.Row="0"
+                                     Background="#FF0078D7">
+                            <controls:Grid>
+                                <controls:Grid.ColumnDefinitions>
+                                    <controls:ColumnDefinition Width="*" />
+                                    <controls:ColumnDefinition Width="Auto" />
+                                    <controls:ColumnDefinition Width="Auto" />
+                                    <controls:ColumnDefinition Width="Auto" />
+                                </controls:Grid.ColumnDefinitions>
+                                <controls:TextBlock controls:Grid.Column="0"
+                                                Text="{TemplateBinding Property={x:Static oscontrols:WindowHost.TitleProperty}}"
+                                                VerticalAlignment="Center"
+                                                Margin="10,0,0,0"
+                                                Foreground="White"
+                                                FontSize="12" />
+                                <controls:Button x:Name="PART_MinimizeButton"
+                                             controls:Grid.Column="1"
+                                             Content="&#x2013;"
+                                             FontSize="13"
+                                             Width="46"
+                                             BorderThickness="0"
+                                             Background="Transparent"
+                                             Foreground="White"
+                                             VerticalAlignment="Stretch" />
+                                <controls:Button x:Name="PART_MaximizeButton"
+                                             controls:Grid.Column="2"
+                                             Content="&#x25A1;"
+                                             FontSize="13"
+                                             Width="46"
+                                             BorderThickness="0"
+                                             Background="Transparent"
+                                             Foreground="White"
+                                             VerticalAlignment="Stretch" />
+                                <controls:Button x:Name="PART_CloseButton"
+                                             controls:Grid.Column="3"
+                                             Content="&#x2715;"
+                                             FontSize="13"
+                                             Width="46"
+                                             BorderThickness="0"
+                                             Background="Red"
+                                             Foreground="White"
+                                             VerticalAlignment="Stretch" />
+                            </controls:Grid>
+                        </controls:Border>
+                        <!-- Window Content -->
+                        <controls:ContentPresenter controls:Grid.Row="1" />
+                    </controls:Grid>
                 </controls:ControlTemplate>
             </Setter.Value>
         </Setter>
