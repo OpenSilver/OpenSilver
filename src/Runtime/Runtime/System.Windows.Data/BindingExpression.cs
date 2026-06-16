@@ -818,6 +818,13 @@ namespace System.Windows.Data
                 value = ConvertValue(ParentBinding.FallbackValue, TargetProperty);
             }
 
+            // OneWayToSource bindings should initialize to the Fallback/Default
+            // value without error
+            if (value == DependencyProperty.UnsetValue && IsOneWayToSource)
+            {
+                value = DefaultValue;
+            }
+
             if (value == DependencyProperty.UnsetValue)
             {
                 if (Status == BindingStatus.Active)

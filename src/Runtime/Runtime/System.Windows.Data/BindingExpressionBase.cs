@@ -78,6 +78,15 @@ public abstract class BindingExpressionBase : Expression
         ParentBindingExpressionBase = parent;
 
         _flags = (PrivateFlags)binding.Flags;
+
+        if (parent is not null)
+        {
+            Type type = parent.GetType();
+            if (type == typeof(MultiBindingExpression))
+            {
+                ChangeFlag(PrivateFlags.iInMultiBindingExpression, true);
+            }
+        }
     }
 
     /// <summary> Create an untargeted BindingExpression </summary>
@@ -147,6 +156,9 @@ public abstract class BindingExpressionBase : Expression
     internal bool IsReflective =>
         TestFlag(PrivateFlags.iTargetToSource) && (!IsInMultiBindingExpression || ParentBindingExpressionBase.IsReflective);
 
+    /// <summary> True if this binding expression is OneWayToSource </summary>
+    internal bool IsOneWayToSource => (_flags & PrivateFlags.iPropagationMask) == PrivateFlags.iTargetToSource;
+
     /// <summary> True if this binding expression updates on PropertyChanged </summary>
     internal bool IsUpdateOnPropertyChanged => TestFlag(PrivateFlags.iUpdateOnPropertyChanged);
 
@@ -189,11 +201,7 @@ public abstract class BindingExpressionBase : Expression
     }
 
     /// <summary> True if this binding expression belongs to a MultiBinding </summary>
-    internal bool IsInMultiBindingExpression
-    {
-        get => TestFlag(PrivateFlags.iInMultiBindingExpression);
-        set => ChangeFlag(PrivateFlags.iInMultiBindingExpression, value);
-    }
+    internal bool IsInMultiBindingExpression => TestFlag(PrivateFlags.iInMultiBindingExpression);
 
     /// <summary> True if this binding expression belongs to a PriorityBinding or MultiBinding </summary>
     internal bool IsInBindingExpressionCollection => TestFlag(PrivateFlags.iInMultiBindingExpression);

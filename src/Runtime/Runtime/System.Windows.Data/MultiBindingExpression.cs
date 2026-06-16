@@ -453,7 +453,6 @@ public sealed class MultiBindingExpression : BindingExpressionBase
         MultiBinding.CheckTrigger(binding);
 
         BindingExpressionBase bindExpr = binding.CreateBindingExpression(Target, TargetProperty, this);
-        bindExpr.IsInMultiBindingExpression = true;
 
         bindExpr.MarkAttached();
         bindExpr.OnAttach(Target, TargetProperty);
