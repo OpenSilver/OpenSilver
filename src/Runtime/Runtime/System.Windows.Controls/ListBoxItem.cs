@@ -106,12 +106,10 @@ namespace System.Windows.Controls
         protected override void OnMouseEnter(MouseEventArgs e)
         {
             base.OnMouseEnter(e);
-            if (this.ParentSelector != null)
-            {
+
 #pragma warning disable CS0618 // Type or member is obsolete
-                this.ParentSelector.NotifyItemMouseEnter(this);
+            this.ParentSelector?.NotifyItemMouseEnter(this);
 #pragma warning restore CS0618 // Type or member is obsolete
-            }
 
             this.UpdateVisualStates();
         }
@@ -172,7 +170,7 @@ namespace System.Windows.Controls
             // Change to the correct state in the Selection group
             if (IsSelected)
             {
-                if (ParentSelector != null && Selector.GetIsSelectionActive(ParentSelector))
+                if (ParentSelector is Selector selector && Selector.GetIsSelectionActive(selector))
                 {
                     VisualStateManager.GoToState(this, VisualStates.StateSelected, useTransitions);
                 }

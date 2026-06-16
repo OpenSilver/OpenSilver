@@ -58,7 +58,16 @@ namespace System.Windows.Controls.Primitives
         // This is our internal representation of the selection and generally should be modified
         // only by SelectionChanger.  Internal classes may read this for efficiency's sake
         // to avoid putting SelectedItems "in use" but we can't really expose this externally.
-        private readonly InternalSelectedItemsStorage _selectedItems = new InternalSelectedItemsStorage(1, MatchExplicitEqualityComparer);
+        private readonly InternalSelectedItemsStorage _selectedItems = new(1, MatchExplicitEqualityComparer);
+
+        // the container that is being cleared.   It doesn't require much action.
+        private DependencyObject _clearingContainer;
+
+        static Selector()
+        {
+            EventManager.RegisterClassHandler<Selector>(SelectedEvent, new RoutedEventHandler(OnSelected));
+            EventManager.RegisterClassHandler<Selector>(UnselectedEvent, new RoutedEventHandler(OnUnselected));
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Selector"/> class.
@@ -90,6 +99,74 @@ namespace System.Windows.Controls.Primitives
             add => AddHandler(SelectionChangedEvent, value);
             remove => RemoveHandler(SelectionChangedEvent, value);
         }
+
+        /// <summary>
+        /// Identifies the <b>Selector.Selected</b> routed event.
+        /// </summary>
+        public static readonly RoutedEvent SelectedEvent =
+            EventManager.RegisterRoutedEvent(
+                "Selected",
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(Selector));
+
+        /// <summary>
+        /// Adds a handler for the <b>Selector.Selected</b> attached event.
+        /// </summary>
+        /// <param name="element">
+        /// Element that listens to this event.
+        /// </param>
+        /// <param name="handler">
+        /// Event handler to add.
+        /// </param>
+        public static void AddSelectedHandler(DependencyObject element, RoutedEventHandler handler) =>
+            AddHandler(element, SelectedEvent, handler);
+
+        /// <summary>
+        /// Removes a handler for the <b>Selector.Selected</b> attached event.
+        /// </summary>
+        /// <param name="element">
+        /// Element that listens to this event.
+        /// </param>
+        /// <param name="handler">
+        /// Event handler to remove.
+        /// </param>
+        public static void RemoveSelectedHandler(DependencyObject element, RoutedEventHandler handler) =>
+            RemoveHandler(element, SelectedEvent, handler);
+
+        /// <summary>
+        /// Identifies the <b>Selector.Unselected</b> routed event.
+        /// </summary>
+        public static readonly RoutedEvent UnselectedEvent =
+            EventManager.RegisterRoutedEvent(
+                "Unselected",
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(Selector));
+
+        /// <summary>
+        /// Adds a handler for the <b>Selector.Unselected</b> attached event.
+        /// </summary>
+        /// <param name="element">
+        /// Element that listens to this event.
+        /// </param>
+        /// <param name="handler">
+        /// Event handler to add.
+        /// </param>
+        public static void AddUnselectedHandler(DependencyObject element, RoutedEventHandler handler) =>
+            AddHandler(element, UnselectedEvent, handler);
+
+        /// <summary>
+        /// Removes a handler for the <b>Selector.Unselected</b> attached event.
+        /// </summary>
+        /// <param name="element">
+        /// Element that listens to this event.
+        /// </param>
+        /// <param name="handler">
+        /// Event handler to remove.
+        /// </param>
+        public static void RemoveUnselectedHandler(DependencyObject element, RoutedEventHandler handler) =>
+            RemoveHandler(element, UnselectedEvent, handler);
 
         /// <summary>
         /// Gets or sets the index of the selected item.
@@ -568,15 +645,6 @@ namespace System.Windows.Controls.Primitives
         {
             base.PrepareContainerForItemOverride(element, item);
 
-            if (element is SelectorItem container)
-            {
-                container.ParentSelector = this;
-                if (container.IsSelected)
-                {
-                    NotifyIsSelectedChanged(container, true);
-                }
-            }
-
             OnNewContainer();
         }
 
@@ -596,14 +664,21 @@ namespace System.Windows.Controls.Primitives
 
             if (element is SelectorItem container)
             {
-                container.ParentSelector = null;
                 container.ClearContentControl(item);
             }
 
             //This check ensures that selection is cleared only for generated containers.
             if (!((IGeneratorHost)this).IsItemItsOwnContainer(item))
             {
-                element.ClearValue(IsSelectedProperty);
+                try
+                {
+                    _clearingContainer = element;
+                    element.ClearValue(IsSelectedProperty);
+                }
+                finally
+                {
+                    _clearingContainer = null;
+                }
             }
         }
 
@@ -1015,24 +1090,33 @@ namespace System.Windows.Controls.Primitives
             return item != null;
         }
 
+        private static void OnSelected(object sender, RoutedEventArgs e)
+        {
+            ((Selector)sender).NotifyIsSelectedChanged(e.OriginalSource as FrameworkElement, true, e);
+        }
+
+        private static void OnUnselected(object sender, RoutedEventArgs e)
+        {
+            ((Selector)sender).NotifyIsSelectedChanged(e.OriginalSource as FrameworkElement, false, e);
+        }
+
         /// <summary>
         /// Called by handlers of Selected/Unselected or CheckedChanged events to indicate that the selection state
         /// on the item has changed and selector needs to update accordingly.
         /// </summary>
-        /// <param name="container"></param>
-        /// <param name="selected"></param>
-        /// <returns></returns>
-        internal void NotifyIsSelectedChanged(FrameworkElement container, bool selected)
+        private void NotifyIsSelectedChanged(FrameworkElement container, bool selected, RoutedEventArgs e)
         {
             // The selectionchanged event will fire at the end of the selection change.
             // We are here because this change was requested within the SelectionChange.
             // If there isn't a selection change going on now, we should do a SelectionChange.
-            if (SelectionChange.IsActive)
+            if (SelectionChange.IsActive || container == _clearingContainer)
             {
+                // We cause this property to change, so mark it as handled
+                e.Handled = true;
                 return;
             }
 
-            if (container != null)
+            if (container is not null)
             {
                 object item = GetItemOrContainerFromContainer(container);
                 if (item != DependencyProperty.UnsetValue)
