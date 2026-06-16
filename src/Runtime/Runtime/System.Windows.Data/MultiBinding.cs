@@ -126,6 +126,7 @@ public class MultiBinding : BindingBase
             return GetFlagsWithinMask(PrivateFlags.PropagationMask) switch
             {
                 PrivateFlags.TwoWay => BindingMode.TwoWay,
+                PrivateFlags.OneWayToSource => BindingMode.OneWayToSource,
                 PrivateFlags.OneTime => BindingMode.OneTime,
                 _ => BindingMode.OneWay,
             };
@@ -142,6 +143,7 @@ public class MultiBinding : BindingBase
         {
             PrivateFlags.OneWay => BindingMode.OneWay,
             PrivateFlags.TwoWay => BindingMode.TwoWay,
+            PrivateFlags.OneWayToSource => BindingMode.OneWayToSource,
             PrivateFlags.OneTime => BindingMode.OneTime,
             _ => BindingMode.Default,
         };
