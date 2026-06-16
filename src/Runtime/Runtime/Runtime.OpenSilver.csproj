@@ -152,6 +152,7 @@
     <Compile Include="System.ComponentModel\PropertyFilterAttribute.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
     <Compile Include="System.Windows.Automation.Peers\GroupBoxAutomationPeer.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\MultiSelector.cs" />
     <Compile Include="System.Windows.Controls\AccessText.cs" />
     <Compile Include="System.Windows.Controls\BorderGapClipConverter.cs" />
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />

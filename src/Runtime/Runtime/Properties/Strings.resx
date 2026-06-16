@@ -1370,4 +1370,7 @@
   <data name="PathGeometry_InternalReadBackError" xml:space="preserve">
     <value>Internal error in newly produced path figures.</value>
   </data>
+  <data name="MultiSelectorSelectAll" xml:space="preserve">
+    <value>Can only call SelectAll when CanSelectMultipleItems is true.</value>
+  </data>
 </root>

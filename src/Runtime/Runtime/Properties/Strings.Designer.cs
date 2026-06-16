@@ -2113,6 +2113,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can only call SelectAll when CanSelectMultipleItems is true..
+        /// </summary>
+        internal static string MultiSelectorSelectAll {
+            get {
+                return ResourceManager.GetString("MultiSelectorSelectAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This type of CollectionView does not support changes to its SourceCollection from a thread different from the Dispatcher thread..
         /// </summary>
         internal static string MultiThreadedCollectionChangeNotSupported {

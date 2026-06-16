@@ -1368,4 +1368,7 @@
   <data name="PathGeometry_InternalReadBackError" xml:space="preserve">
     <value>Erreur interne dans les figures de tracé récemment créées.</value>
   </data>
+  <data name="MultiSelectorSelectAll" xml:space="preserve">
+    <value>SelectAll ne peut être appelé que lorsque CanSelectMultipleItems a la valeur true.</value>
+  </data>
 </root>

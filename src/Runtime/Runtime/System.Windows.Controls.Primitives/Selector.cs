@@ -810,7 +810,7 @@ namespace System.Windows.Controls.Primitives
 
         internal SelectionChanger SelectionChange { get; }
 
-        internal ObservableCollection<object> SelectedItemsImpl { get; }
+        internal SelectedItemCollection SelectedItemsImpl { get; }
 
         internal InternalSelectedItemsStorage SelectedItemsInternal
         {
@@ -895,7 +895,7 @@ namespace System.Windows.Controls.Primitives
         private void UpdateSelectedItems(InternalSelectedItemsStorage toAdd, InternalSelectedItemsStorage toRemove)
         {
             Debug.Assert(SelectionChange.IsActive, "SelectionChange.IsActive should be true");
-            IList userSelectedItems = SelectedItemsImpl;
+            var userSelectedItems = SelectedItemsImpl;
 
             _changeInfo = null;
 
@@ -923,7 +923,7 @@ namespace System.Windows.Controls.Primitives
             // If this is ever called from another location, ensure that SC.IsActive is true.
             Debug.Assert(SelectionChange.IsActive, "SelectionChange.IsActive should be true");
 
-            SelectedItemCollection userSelectedItems = (SelectedItemCollection)SelectedItemsImpl;
+            SelectedItemCollection userSelectedItems = SelectedItemsImpl;
             if (userSelectedItems != null)
             {
                 InternalSelectedItemsStorage toAdd = new InternalSelectedItemsStorage(0, MatchExplicitEqualityComparer);
