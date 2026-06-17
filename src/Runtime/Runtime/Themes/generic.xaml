@@ -4792,7 +4792,7 @@
                         <!-- Title Bar -->
                         <controls:Border x:Name="PART_TitleBar"
                                      controls:Grid.Row="0"
-                                     Background="#FF0078D7">
+                                     Background="#FF39465c">
                             <controls:Grid>
                                 <controls:Grid.ColumnDefinitions>
                                     <controls:ColumnDefinition Width="*" />
@@ -4809,7 +4809,7 @@
                                 <controls:Button x:Name="PART_MinimizeButton"
                                              controls:Grid.Column="1"
                                              Content="&#x2013;"
-                                             FontSize="13"
+                                             FontSize="15"
                                              Width="46"
                                              BorderThickness="0"
                                              Background="Transparent"
@@ -4818,7 +4818,7 @@
                                 <controls:Button x:Name="PART_MaximizeButton"
                                              controls:Grid.Column="2"
                                              Content="&#x25A1;"
-                                             FontSize="13"
+                                             FontSize="15"
                                              Width="46"
                                              BorderThickness="0"
                                              Background="Transparent"
@@ -4827,10 +4827,10 @@
                                 <controls:Button x:Name="PART_CloseButton"
                                              controls:Grid.Column="3"
                                              Content="&#x2715;"
-                                             FontSize="13"
+                                             FontSize="15"
                                              Width="46"
                                              BorderThickness="0"
-                                             Background="Red"
+                                             Background="Transparent"
                                              Foreground="White"
                                              VerticalAlignment="Stretch" />
                             </controls:Grid>
@@ -4838,6 +4838,43 @@
                         <!-- Window Content -->
                         <controls:ContentPresenter controls:Grid.Row="1" />
                     </controls:Grid>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  oscontrols:TaskbarItem  -->
+    <Style TargetType="oscontrols:TaskbarItem">
+        <Setter Property="Width" Value="160" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="oscontrols:TaskbarItem">
+                    <controls:Border Background="#FF39465c"
+                                     BorderThickness="0">
+                        <controls:Grid>
+                            <controls:Grid.ColumnDefinitions>
+                                <controls:ColumnDefinition Width="*" />
+                                <controls:ColumnDefinition Width="Auto" />
+                            </controls:Grid.ColumnDefinitions>
+                            <controls:TextBlock controls:Grid.Column="0"
+                                               Text="{TemplateBinding Property={x:Static oscontrols:TaskbarItem.TitleProperty}}"
+                                               VerticalAlignment="Center"
+                                               Margin="8,0,4,0"
+                                               Foreground="White"
+                                               FontSize="12" />
+                            <controls:Button x:Name="PART_RestoreButton"
+                                             controls:Grid.Column="1"
+                                             Content="&#x25A1;"
+                                             FontSize="13"
+                                             Width="30"
+                                             BorderThickness="0"
+                                             Background="Transparent"
+                                             Foreground="White"
+                                             VerticalAlignment="Stretch" />
+                        </controls:Grid>
+                    </controls:Border>
                 </controls:ControlTemplate>
             </Setter.Value>
         </Setter>

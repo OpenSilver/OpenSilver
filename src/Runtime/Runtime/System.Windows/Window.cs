@@ -148,7 +148,7 @@ public class Window : ContentControl, IResizeObserverListener
         // Create the DIV that will correspond to the root of the window visual tree:
         OuterDiv = INTERNAL_HtmlDomManager.CreateWindowDomElementAndAppendIt(this);
 
-        _resizeObserver = ResizeObserver.Observe(RootDomElement, this);
+        _resizeObserver = ResizeObserver.Observe(OuterDiv, this);
 
         InputManager.Current.RegisterRoot(RootDomElement);
 
@@ -223,7 +223,7 @@ public class Window : ContentControl, IResizeObserverListener
         {
             if (OuterDiv.IsConnected)
             {
-                HtmlElementReference sizeReference = _isShowingAsSecondary ? _overlayDiv : RootDomElement;
+                HtmlElementReference sizeReference = _isShowingAsSecondary ? _overlayDiv : OuterDiv;
                 if (!sizeReference.IsConnected)
                 {
                     return new Rect(0, 0, 0, 0);
@@ -706,6 +706,20 @@ public class Window : ContentControl, IResizeObserverListener
 
     private static void OnWindowStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
+        var window = (Window)d;
+        if (!window._isShowingAsSecondary) return;
+
+        var oldState = (WindowState)e.OldValue;
+        var newState = (WindowState)e.NewValue;
+
+        if (newState == WindowState.Minimized)
+        {
+            window.MinimizeSecondaryWindow();
+        }
+        else if (oldState == WindowState.Minimized)
+        {
+            window.RestoreFromMinimized();
+        }
     }
 
     private static bool ValidateWindowState(object value)
@@ -1005,6 +1019,9 @@ public class Window : ContentControl, IResizeObserverListener
     {
         _isShowingAsSecondary = false;
 
+        // If minimized, remove from taskbar first
+        OpenSilver.Controls.WindowTaskbar.RestoreWindow(this);
+
         _windowHost?.Close();
         _windowHost = null;
 
@@ -1022,6 +1039,30 @@ public class Window : ContentControl, IResizeObserverListener
         {
             Current = mainWindow;
             ActiveWindow = mainWindow;
+        }
+    }
+
+    private void MinimizeSecondaryWindow()
+    {
+        // Hide the overlay (and the WindowHost within it)
+        if (_overlayDiv.IsConnected)
+        {
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.getElementById('{_overlayDiv.Uid}').style.display = 'none'");
+        }
+
+        OpenSilver.Controls.WindowTaskbar.MinimizeWindow(this);
+    }
+
+    private void RestoreFromMinimized()
+    {
+        OpenSilver.Controls.WindowTaskbar.RestoreWindow(this);
+
+        // Show the overlay again
+        if (_overlayDiv.IsConnected)
+        {
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.getElementById('{_overlayDiv.Uid}').style.display = 'flex'");
         }
     }
 
