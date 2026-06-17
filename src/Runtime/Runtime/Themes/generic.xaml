@@ -4786,7 +4786,7 @@
                 <controls:ControlTemplate TargetType="oscontrols:WindowHost">
                     <controls:Grid>
                         <controls:Grid.RowDefinitions>
-                            <controls:RowDefinition Height="30" />
+                            <controls:RowDefinition Height="Auto" />
                             <controls:RowDefinition Height="*" />
                         </controls:Grid.RowDefinitions>
                         <!-- Title Bar -->
