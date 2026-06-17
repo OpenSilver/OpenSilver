@@ -44,5 +44,11 @@ internal sealed class SynchronyzedStore<T>
         }
     }
 
-    public T Get(int index) => _items.TryGetValue(index, out T value) ? value : default;
+    public T Get(int index)
+    {
+        lock (_lock)
+        {
+            return _items.TryGetValue(index, out T value) ? value : default;
+        }
+    }
 }
