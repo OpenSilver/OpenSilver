@@ -11,38 +11,24 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace OpenSilver.Internal;
 
 internal sealed class SynchronyzedStore<T>
 {
-    private readonly object _lock = new();
-    private readonly Dictionary<int, T> _items;
-    private int _slot;
-
-    public SynchronyzedStore(int initialCapacity)
-    {
-        _items = new Dictionary<int, T>(initialCapacity);
-    }
+    private readonly ConcurrentDictionary<int, T> _items = [];
+    private int _slot = -1;
 
     public int Add(T item)
     {
-        lock (_lock)
-        {
-            int slot = _slot++;
-            _items.Add(slot, item);
-            return slot;
-        }
+        int slot = Interlocked.Increment(ref _slot);
+        _items.TryAdd(slot, item);
+        return slot;
     }
 
-    public void Clean(int index)
-    {
-        lock (_lock)
-        {
-            _items.Remove(index);
-        }
-    }
+    public void Clean(int index) => _items.TryRemove(index, out _);
 
-    public T Get(int index) => _items.TryGetValue(index, out T value) ? value : default;
+    public T Get(int index) => _items.TryGetValue(index, out T item) ? item : default;
 }

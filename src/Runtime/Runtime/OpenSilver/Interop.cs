@@ -33,7 +33,7 @@ namespace OpenSilver;
 public static partial class Interop
 {
     private static readonly ReferenceIDGenerator _refIdGenerator = new();
-    private static readonly SynchronyzedStore<string> _javascriptCallsStore = new(0);
+    private static readonly SynchronyzedStore<string> _javascriptCallsStore = new();
     private static readonly CharArrayBuilder _buffer = new();
 
     private static int _dumpAllJavascriptObjectsEveryMs;
