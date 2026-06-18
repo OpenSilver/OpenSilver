@@ -462,7 +462,10 @@ public partial class Control : FrameworkElement, IInternalControl
     /// <summary>
     /// Identifies the <see cref="TabNavigation"/> dependency property.
     /// </summary>
-    public static readonly DependencyProperty TabNavigationProperty = KeyboardNavigation.TabNavigationProperty.AddOwner(typeof(Control));
+    public static readonly DependencyProperty TabNavigationProperty =
+        KeyboardNavigation.TabNavigationProperty.AddOwner(
+            typeof(Control),
+            new FrameworkPropertyMetadata(KeyboardNavigationMode.Local));
 
     //-----------------------
     // TEMPLATE

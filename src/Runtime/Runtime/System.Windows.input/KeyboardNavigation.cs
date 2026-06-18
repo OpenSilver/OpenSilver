@@ -138,7 +138,8 @@ public sealed class KeyboardNavigation
             "TabNavigation",
             typeof(KeyboardNavigationMode),
             typeof(KeyboardNavigation),
-            new FrameworkPropertyMetadata(KeyboardNavigationMode.Local));
+            new FrameworkPropertyMetadata(KeyboardNavigationMode.Continue),
+            IsValidKeyNavigationMode);
 
     /// <summary>
     /// Gets the value of the KeyboardNavigation.TabNavigation attached property for the specified element.
@@ -188,7 +189,8 @@ public sealed class KeyboardNavigation
             "DirectionalNavigation",
             typeof(KeyboardNavigationMode),
             typeof(KeyboardNavigation),
-            new FrameworkPropertyMetadata(KeyboardNavigationMode.Local));
+            new FrameworkPropertyMetadata(KeyboardNavigationMode.Continue),
+            IsValidKeyNavigationMode);
 
     /// <summary>
     /// Gets the value of the KeyboardNavigation.DirectionalNavigation attached property for the specified element.
@@ -229,6 +231,17 @@ public sealed class KeyboardNavigation
         ArgumentNullException.ThrowIfNull(element);
 
         element.SetValueInternal(DirectionalNavigationProperty, mode);
+    }
+
+    private static bool IsValidKeyNavigationMode(object o)
+    {
+        var value = (KeyboardNavigationMode)o;
+        return value == KeyboardNavigationMode.Continue ||
+               value == KeyboardNavigationMode.Once ||
+               value == KeyboardNavigationMode.Cycle ||
+               value == KeyboardNavigationMode.None ||
+               value == KeyboardNavigationMode.Contained ||
+               value == KeyboardNavigationMode.Local;
     }
 
     /// <summary>
@@ -820,7 +833,7 @@ public sealed class KeyboardNavigation
         return false;
     }
 
-    private bool IsGroup(DependencyObject e) => GetKeyNavigationMode(e) != KeyboardNavigationMode.Local;
+    private bool IsGroup(DependencyObject e) => GetKeyNavigationMode(e) != KeyboardNavigationMode.Continue;
 
     private KeyboardNavigationMode GetKeyNavigationMode(DependencyObject e)
     {
@@ -919,6 +932,10 @@ public sealed class KeyboardNavigation
 
     private DependencyObject GetNextTabInGroup(DependencyObject e, DependencyObject container, KeyboardNavigationMode tabbingType)
     {
+        // None groups: Tab navigation is not supported
+        if (tabbingType == KeyboardNavigationMode.None)
+            return null;
+
         // e == null or e == container -> return the first TabStopOrGroup
         if (e == null || e == container)
         {
@@ -965,7 +982,7 @@ public sealed class KeyboardNavigation
         }
         else
         {
-            if (tabbingType == KeyboardNavigationMode.Once)
+            if (tabbingType == KeyboardNavigationMode.Once || tabbingType == KeyboardNavigationMode.None)
             {
                 if (container != e)
                 {
@@ -996,13 +1013,17 @@ public sealed class KeyboardNavigation
             DependencyObject firstTabElementInside = GetNextTab(null, nextTabElement, true);
             if (firstTabElementInside != null)
                 return firstTabElementInside;
+
+            // If we want to continue searching inside the Once groups, we should change the navigation mode
+            if (currentTabbingType == KeyboardNavigationMode.Once)
+                currentTabbingType = KeyboardNavigationMode.Contained;
         }
 
         // If there is no next element in the group (nextTabElement == null)
 
         // Search up in the tree if allowed
         // consider: Use original tabbingType instead of currentTabbingType
-        if (!goDownOnly && GetParent(container) != null)
+        if (!goDownOnly && currentTabbingType != KeyboardNavigationMode.Contained && GetParent(container) != null)
         {
             return GetNextTab(container, GetGroupParent(container), false);
         }
@@ -1091,6 +1112,10 @@ public sealed class KeyboardNavigation
 
     private DependencyObject GetPrevTabInGroup(DependencyObject e, DependencyObject container, KeyboardNavigationMode tabbingType)
     {
+        // None groups: Tab navigation is not supported
+        if (tabbingType == KeyboardNavigationMode.None)
+            return null;
+
         // Search the last index inside the group
         if (e == null)
         {
@@ -1150,7 +1175,7 @@ public sealed class KeyboardNavigation
         }
         else
         {
-            if (tabbingType == KeyboardNavigationMode.Once)
+            if (tabbingType == KeyboardNavigationMode.Once || tabbingType == KeyboardNavigationMode.None)
             {
                 if (goDownOnly || container == e)
                     return null;
@@ -1189,6 +1214,9 @@ public sealed class KeyboardNavigation
             if (lastTabElementInside != null)
                 return lastTabElementInside;
         }
+
+        if (tabbingType == KeyboardNavigationMode.Contained)
+            return null;
 
         if (e != container && IsTabStop(container))
             return container;
