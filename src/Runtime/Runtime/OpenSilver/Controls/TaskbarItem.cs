@@ -93,7 +93,7 @@ public class TaskbarItem : Control
     {
         if (_window is not null)
         {
-            _window.WindowState = WindowState.Normal;
+            _window.RestoreFromTaskbar();
         }
     }
 }

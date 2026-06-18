@@ -351,14 +351,21 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (_isShowingAsSecondary)
         {
-            Size constraintSize = GetSecondaryWindowConstraintSize();
+            Size constraintSize = GetSecondaryWindowConstraintSize(availableSize);
 
             if (VisualChildrenCount > 0)
             {
                 if (GetVisualChild(0) is UIElement child)
                 {
                     child.Measure(constraintSize);
-                    return constraintSize;
+
+                    // If constrained (explicit size or maximized), use that size.
+                    // If unconstrained (no explicit size), use the child's desired size.
+                    double resultWidth = double.IsPositiveInfinity(constraintSize.Width)
+                        ? child.DesiredSize.Width : constraintSize.Width;
+                    double resultHeight = double.IsPositiveInfinity(constraintSize.Height)
+                        ? child.DesiredSize.Height : constraintSize.Height;
+                    return new Size(resultWidth, resultHeight);
                 }
             }
             return constraintSize;
@@ -388,15 +395,12 @@ public class Window : ContentControl, IResizeObserverListener
         return base.ArrangeOverride(Bounds.Size);
     }
 
-    private Size GetSecondaryWindowConstraintSize()
+    private Size GetSecondaryWindowConstraintSize(Size availableSize)
     {
         if (WindowState == WindowState.Maximized)
         {
-            Size overlaySize = Bounds.Size;
-            if (overlaySize.Width > 0 && overlaySize.Height > 0)
-            {
-                return overlaySize;
-            }
+            // Use whatever space the parent allocated (fills the WindowHost)
+            return availableSize;
         }
 
         double w = Width;
@@ -406,7 +410,8 @@ public class Window : ContentControl, IResizeObserverListener
             return new Size(w, h);
         }
 
-        return Bounds.Size;
+        // No explicit size: let the content determine the window size
+        return new Size(double.PositiveInfinity, double.PositiveInfinity);
     }
 
     /// <summary>
@@ -714,11 +719,32 @@ public class Window : ContentControl, IResizeObserverListener
 
         if (newState == WindowState.Minimized)
         {
+            // Remember what state we were in before minimizing
+            window._stateBeforeMinimize = oldState;
             window.MinimizeSecondaryWindow();
         }
         else if (oldState == WindowState.Minimized)
         {
             window.RestoreFromMinimized();
+
+            // After restoring from minimized, apply the target state
+            if (newState == WindowState.Maximized)
+            {
+                window.MaximizeSecondaryWindow(WindowState.Minimized);
+            }
+            else if (newState == WindowState.Normal && window._stateBeforeMinimize == WindowState.Maximized)
+            {
+                // Was maximized before minimize, now going to Normal → restore size
+                window.RestoreFromMaximized();
+            }
+        }
+        else if (newState == WindowState.Maximized)
+        {
+            window.MaximizeSecondaryWindow(oldState);
+        }
+        else if (newState == WindowState.Normal && oldState == WindowState.Maximized)
+        {
+            window.RestoreFromMaximized();
         }
     }
 
@@ -1042,6 +1068,13 @@ public class Window : ContentControl, IResizeObserverListener
         }
     }
 
+    internal void RestoreFromTaskbar()
+    {
+        WindowState = _stateBeforeMinimize == WindowState.Maximized
+            ? WindowState.Maximized
+            : WindowState.Normal;
+    }
+
     private void MinimizeSecondaryWindow()
     {
         // Hide the overlay (and the WindowHost within it)
@@ -1066,6 +1099,60 @@ public class Window : ContentControl, IResizeObserverListener
         }
     }
 
+    private void MaximizeSecondaryWindow(WindowState previousState)
+    {
+        if (_windowHost is null || !_windowHost.OuterDiv.IsConnected) return;
+
+        if (previousState == WindowState.Normal)
+        {
+            // Save current position and size for later restoration
+            _restoreLeft = double.IsNaN(Left) ? 0 : Left;
+            _restoreTop = double.IsNaN(Top) ? 0 : Top;
+            _restoreWidth = Width;
+            _restoreHeight = Height;
+        }
+
+        // Clear explicit Width/Height so MeasureCore doesn't clamp to those values.
+        // The layout will use the available space from the parent instead.
+        Width = double.NaN;
+        Height = double.NaN;
+
+        // Fill the overlay: position at origin with full size
+        string hostId = _windowHost.OuterDiv.Uid;
+        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+            $"(function(){{ var el=document.getElementById('{hostId}');" +
+            $"el.style.left='0px'; el.style.top='0px';" +
+            $"el.style.width='100%'; el.style.height='100%'; }})()");
+
+        // Invalidate both the Window and WindowHost so the constraint is re-evaluated
+        InvalidateMeasure();
+        _windowHost.InvalidateMeasure();
+        _windowHost.SetLayoutSize();
+    }
+
+    private void RestoreFromMaximized()
+    {
+        if (_windowHost is null || !_windowHost.OuterDiv.IsConnected) return;
+
+        // Restore position and size properties
+        Left = _restoreLeft;
+        Top = _restoreTop;
+        Width = _restoreWidth;
+        Height = _restoreHeight;
+
+        // Remove the 100% override so the layout system can size to content
+        string hostId = _windowHost.OuterDiv.Uid;
+        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+            $"(function(){{ var el=document.getElementById('{hostId}');" +
+            $"el.style.width=''; el.style.height='';" +
+            $"el.style.left='{_restoreLeft.ToInvariantString()}px'; el.style.top='{_restoreTop.ToInvariantString()}px'; }})()");
+
+        // Re-layout: Width/Height are restored so the layout uses those, or infinity if NaN
+        InvalidateMeasure();
+        _windowHost.InvalidateMeasure();
+        _windowHost.SetLayoutSize();
+    }
+
     #endregion
 
     #region WindowChrome and Drag Support
@@ -1076,6 +1163,12 @@ public class Window : ContentControl, IResizeObserverListener
     private double _dragStartTop;
     private MouseEventHandler _dragMoveHandler;
     private MouseButtonEventHandler _dragUpHandler;
+
+    private double _restoreLeft;
+    private double _restoreTop;
+    private double _restoreWidth;
+    private double _restoreHeight;
+    private WindowState _stateBeforeMinimize;
 
     internal void OnWindowChromeChanged(WindowChrome oldChrome, WindowChrome newChrome)
     {
