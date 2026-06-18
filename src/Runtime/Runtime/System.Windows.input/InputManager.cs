@@ -153,6 +153,14 @@ public sealed class InputManager : DispatcherObject
     /// </returns>
     public MouseDevice PrimaryMouseDevice => _primaryMouseDevice;
 
+    /// <summary>
+    /// Gets a value that represents the input device associated with the most recent input event.
+    /// </summary>
+    /// <returns>
+    /// The input device.
+    /// </returns>
+    public InputDevice MostRecentInputDevice { get; private set; }
+
     internal Window ActiveWindow { get; private set; }
 
     internal void RegisterRoot(HtmlElementReference element)
@@ -238,6 +246,8 @@ public sealed class InputManager : DispatcherObject
                 ActiveWindow = uie.ParentWindow;
             }
 
+            UpdateMostRecentDevice(eventType);
+
             _primaryKeyboardDevice.ProcessInput(uie, eventType, jsEventArg);
             _primaryMouseDevice.ProcessInput(eventType);
         }
@@ -251,16 +261,34 @@ public sealed class InputManager : DispatcherObject
         using (DisableProcessing())
         {
             UIElement uie = INTERNAL_HtmlDomManager.GetElementById(id);
+            EVENTS eventType = (EVENTS)eventId;
 
             if (uie is not null)
             {
                 ActiveWindow = uie.ParentWindow;
             }
 
+            UpdateMostRecentDevice(eventType);
+
             _primaryMouseDevice.ProcessInput(
                 uie,
-                (EVENTS)eventId,
+                eventType,
                 new PointerCallbackParameters(isTouchEvent, pageX, pageY, (ModifierKeys)keyModifiers, jsEventArg));
+        }
+    }
+
+    private void UpdateMostRecentDevice(EVENTS eventType)
+    {
+        if (eventType is EVENTS.KEYDOWN or EVENTS.KEYUP)
+        {
+            MostRecentInputDevice = _primaryKeyboardDevice;
+        }
+        else if (eventType is EVENTS.WHEEL or
+                 EVENTS.POINTER_LEFT_DOWN or EVENTS.POINTER_LEFT_UP or
+                 EVENTS.POINTER_RIGHT_DOWN or EVENTS.POINTER_RIGHT_UP or
+                 EVENTS.POINTER_MIDDLE_DOWN or EVENTS.POINTER_MIDDLE_UP)
+        {
+            MostRecentInputDevice = _primaryMouseDevice;
         }
     }
 
