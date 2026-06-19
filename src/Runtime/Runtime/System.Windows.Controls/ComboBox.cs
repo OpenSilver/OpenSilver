@@ -65,7 +65,10 @@ namespace System.Windows.Controls
         /// <summary>
         /// Initializes a new instance of the ComboBox class.
         /// </summary>
-        public ComboBox() { }
+        public ComboBox()
+        {
+            CanSelectMultiple = false;
+        }
 
         /// <inheritdoc />
         protected internal override bool HandlesScrolling => true;

@@ -45,7 +45,7 @@ namespace System.Windows.Controls.Primitives
         }
 
         // Condense boolean bits.  Constructor takes the default value, and will resize to access up to 32 bits.
-        private CacheBits _cacheValid;
+        private CacheBits _cacheValid = CacheBits.CanSelectMultiple;
 
         private ItemInfo PendingSelectionByValue;
         private ChangeInfo _changeInfo;

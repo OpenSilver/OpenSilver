@@ -45,7 +45,10 @@ namespace System.Windows.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBox"/> class.
         /// </summary>
-        public ListBox() { }
+        public ListBox()
+        {
+            ValidateSelectionMode((SelectionMode)SelectionModeProperty.GetDefaultValue(DependencyObjectType));
+        }
 
         /// <inheritdoc />
         protected internal override bool HandlesScrolling => true;
