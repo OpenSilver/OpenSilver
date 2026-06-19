@@ -980,6 +980,8 @@ public class Window : ContentControl, IResizeObserverListener
         OnClosed(EventArgs.Empty);
         Closed?.Invoke(this, EventArgs.Empty);
 
+        Application.Current?.Windows.Remove(this);
+
         _dialogResultTcs?.TrySetResult(null);
     }
 
