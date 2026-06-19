@@ -849,7 +849,7 @@ public class Window : ContentControl, IResizeObserverListener
             nameof(ResizeMode),
             typeof(ResizeMode),
             typeof(Window),
-            new FrameworkPropertyMetadata(ResizeMode.CanResize),
+            new FrameworkPropertyMetadata(ResizeMode.CanResize, OnResizeModeChanged),
             ValidateResizeMode);
 
     /// <summary>
@@ -862,6 +862,12 @@ public class Window : ContentControl, IResizeObserverListener
     {
         get => (ResizeMode)GetValue(ResizeModeProperty);
         set => SetValueInternal(ResizeModeProperty, value);
+    }
+
+    private static void OnResizeModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var window = (Window)d;
+        window._windowHost?.UpdateResizeMode((ResizeMode)e.NewValue);
     }
 
     private static bool ValidateResizeMode(object value)
@@ -1046,7 +1052,12 @@ public class Window : ContentControl, IResizeObserverListener
     /// <param name="resizeEdge">The edge to resize from.</param>
     public void DragResize(WindowResizeEdge resizeEdge)
     {
-        // TODO: implement resize drag
+        if (_windowHost is null) return;
+        if (WindowState == WindowState.Maximized) return;
+        if (ResizeMode < ResizeMode.CanResize) return;
+        if (Mouse.LeftButton != MouseButtonState.Pressed) return;
+
+        BeginResize(resizeEdge);
     }
 
     /// <summary>
@@ -1293,6 +1304,7 @@ public class Window : ContentControl, IResizeObserverListener
             if (newChrome is not null)
             {
                 _windowHost.UpdateTitleBarHeight(newChrome.CaptionHeight);
+                _windowHost.UpdateResizeBorderThickness(newChrome.ResizeBorderThickness);
             }
         }
     }
@@ -1353,6 +1365,149 @@ public class Window : ContentControl, IResizeObserverListener
         RemoveHandler(Mouse.MouseMoveEvent, _dragMoveHandler);
         RemoveHandler(Mouse.MouseUpEvent, _dragUpHandler);
     }
+
+    #endregion
+
+    #region DragResize Support
+
+    private bool _isResizing;
+    private WindowResizeEdge _resizeEdge;
+    private Point _resizeStartMousePosition;
+    private double _resizeStartLeft;
+    private double _resizeStartTop;
+    private double _resizeStartWidth;
+    private double _resizeStartHeight;
+    private MouseEventHandler _resizeMoveHandler;
+    private MouseButtonEventHandler _resizeUpHandler;
+
+    private void BeginResize(WindowResizeEdge edge)
+    {
+        if (_isResizing) return;
+
+        _isResizing = true;
+        _resizeEdge = edge;
+        _resizeStartMousePosition = Mouse.GetPosition(ParentWindow);
+        _resizeStartLeft = double.IsNaN(Left) ? 0 : Left;
+        _resizeStartTop = double.IsNaN(Top) ? 0 : Top;
+        _resizeStartWidth = ActualWidth;
+        _resizeStartHeight = ActualHeight;
+
+        _resizeMoveHandler ??= new MouseEventHandler(Window_ResizeMouseMove);
+        _resizeUpHandler ??= new MouseButtonEventHandler(Window_ResizeMouseUp);
+
+        CaptureMouse();
+        AddHandler(Mouse.MouseMoveEvent, _resizeMoveHandler, true);
+        AddHandler(Mouse.MouseUpEvent, _resizeUpHandler, true);
+    }
+
+    private void Window_ResizeMouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_isResizing) return;
+
+        Point currentPosition = e.GetPosition(ParentWindow);
+        double deltaX = currentPosition.X - _resizeStartMousePosition.X;
+        double deltaY = currentPosition.Y - _resizeStartMousePosition.Y;
+
+        double newLeft = _resizeStartLeft;
+        double newTop = _resizeStartTop;
+        double newWidth = _resizeStartWidth;
+        double newHeight = _resizeStartHeight;
+
+        bool resizeLeft = _resizeEdge == WindowResizeEdge.Left ||
+                          _resizeEdge == WindowResizeEdge.TopLeft ||
+                          _resizeEdge == WindowResizeEdge.BottomLeft;
+
+        bool resizeRight = _resizeEdge == WindowResizeEdge.Right ||
+                           _resizeEdge == WindowResizeEdge.TopRight ||
+                           _resizeEdge == WindowResizeEdge.BottomRight;
+
+        bool resizeTop = _resizeEdge == WindowResizeEdge.Top ||
+                         _resizeEdge == WindowResizeEdge.TopLeft ||
+                         _resizeEdge == WindowResizeEdge.TopRight;
+
+        bool resizeBottom = _resizeEdge == WindowResizeEdge.Bottom ||
+                            _resizeEdge == WindowResizeEdge.BottomLeft ||
+                            _resizeEdge == WindowResizeEdge.BottomRight;
+
+        if (resizeRight)
+        {
+            newWidth = _resizeStartWidth + deltaX;
+        }
+        else if (resizeLeft)
+        {
+            newWidth = _resizeStartWidth - deltaX;
+            newLeft = _resizeStartLeft + deltaX;
+        }
+
+        if (resizeBottom)
+        {
+            newHeight = _resizeStartHeight + deltaY;
+        }
+        else if (resizeTop)
+        {
+            newHeight = _resizeStartHeight - deltaY;
+            newTop = _resizeStartTop + deltaY;
+        }
+
+        // Clamp to Min/Max constraints
+        double minW = MinWidth > 0 ? MinWidth : 0;
+        double minH = MinHeight > 0 ? MinHeight : 0;
+        double maxW = double.IsPositiveInfinity(MaxWidth) ? double.MaxValue : MaxWidth;
+        double maxH = double.IsPositiveInfinity(MaxHeight) ? double.MaxValue : MaxHeight;
+
+        if (newWidth < minW)
+        {
+            if (resizeLeft) newLeft -= (minW - newWidth);
+            newWidth = minW;
+        }
+        else if (newWidth > maxW)
+        {
+            if (resizeLeft) newLeft -= (maxW - newWidth);
+            newWidth = maxW;
+        }
+
+        if (newHeight < minH)
+        {
+            if (resizeTop) newTop -= (minH - newHeight);
+            newHeight = minH;
+        }
+        else if (newHeight > maxH)
+        {
+            if (resizeTop) newTop -= (maxH - newHeight);
+            newHeight = maxH;
+        }
+
+        Width = newWidth;
+        Height = newHeight;
+        Left = newLeft;
+        Top = newTop;
+
+        UpdateWindowPosition();
+        _windowHost?.InvalidateMeasure();
+        _windowHost?.SetLayoutSize();
+    }
+
+    private void Window_ResizeMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            EndResize();
+        }
+    }
+
+    private void EndResize()
+    {
+        if (!_isResizing) return;
+
+        _isResizing = false;
+        ReleaseMouseCapture();
+        RemoveHandler(Mouse.MouseMoveEvent, _resizeMoveHandler);
+        RemoveHandler(Mouse.MouseUpEvent, _resizeUpHandler);
+    }
+
+    #endregion
+
+    #region Window Position
 
     private void UpdateWindowPosition()
     {

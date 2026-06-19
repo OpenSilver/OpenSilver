@@ -53,7 +53,7 @@ public class WindowChrome : DependencyObject
             nameof(ResizeBorderThickness),
             typeof(Thickness),
             typeof(WindowChrome),
-            new FrameworkPropertyMetadata(new Thickness()));
+            new FrameworkPropertyMetadata(new Thickness(), OnResizeBorderThicknessChanged));
 
     /// <summary>
     /// Gets or sets a value that indicates the width of the border that is used to resize a window.
@@ -165,6 +165,14 @@ public class WindowChrome : DependencyObject
     {
         if (d is Window window)
         {
+            if (e.OldValue is WindowChrome oldChrome)
+            {
+                oldChrome.Owner = null;
+            }
+            if (e.NewValue is WindowChrome newChrome)
+            {
+                newChrome.Owner = window;
+            }
             window.OnWindowChromeChanged((WindowChrome)e.OldValue, (WindowChrome)e.NewValue);
         }
     }
@@ -214,4 +222,14 @@ public class WindowChrome : DependencyObject
     #endregion
 
     private static bool IsNonNegative(object value) => (double)value >= 0d;
+
+    internal Window Owner { get; set; }
+
+    private static void OnResizeBorderThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is WindowChrome chrome && chrome.Owner is not null)
+        {
+            chrome.Owner.OnWindowChromeChanged(chrome, chrome);
+        }
+    }
 }
