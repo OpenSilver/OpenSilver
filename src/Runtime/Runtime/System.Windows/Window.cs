@@ -46,12 +46,17 @@ public class Window : ContentControl, IResizeObserverListener
     private IDisposable _resizeObserver;
     private DispatcherOperation _contentRenderedCallback;
     private bool _postContentRenderedFromLoadedHandler;
-    private bool _isShowingAsSecondary;
+    internal bool _isShowingAsSecondary;
     private bool _isModal;
-    private bool _isClosed;
+    internal bool _isClosed;
     private HtmlElementReference _overlayDiv;
     private TaskCompletionSource<bool?> _dialogResultTcs;
     private OpenSilver.Controls.WindowHost _windowHost;
+
+    /// <summary>
+    /// True if this window was shown via Show()/ShowDialog() and has overlay infrastructure.
+    /// </summary>
+    internal bool HasOverlayInfrastructure => _windowHost is not null;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
@@ -124,7 +129,45 @@ public class Window : ContentControl, IResizeObserverListener
     protected virtual void OnContentRendered(EventArgs e) => ContentRendered?.Invoke(this, e);
 
     /// <summary>
-    /// Set the DOM element that will host the window. This can be set only to new windows. The MainWindow looks for a DIV that has the ID "cshtml5-root" or "opensilver-root".
+    /// Detaches this window from its root DOM element, cleaning up the visual tree and DOM references.
+    /// </summary>
+    internal void DetachFromDomElement()
+    {
+        if (!RootDomElement.IsConnected)
+        {
+            return;
+        }
+
+        _resizeObserver?.Dispose();
+        _resizeObserver = null;
+
+        if (OuterDiv.IsConnected)
+        {
+            INTERNAL_HtmlDomManager.RemoveNodeNative(OuterDiv);
+            INTERNAL_VisualTreeManager.DetachSecondaryWindow(this);
+        }
+
+        IsLoadedCache = false;
+        IsConnectedToLiveTree = false;
+        UpdateIsRenderableCache();
+        UpdateIsVisibleCache();
+
+        OuterDiv = default;
+        RootDomElement = default;
+    }
+
+    /// <summary>
+    /// Fully removes the initial main window from the DOM tree.
+    /// Safe because windowid now points to the rootDiv, not this window's OuterDiv.
+    /// </summary>
+    internal void RemoveMainWindowFromDom()
+    {
+        DetachFromDomElement();
+    }
+
+    /// <summary>
+    /// Set the DOM element that will host the window. The MainWindow looks for a DIV that
+    /// has the ID "cshtml5-root" or "opensilver-root".
     /// </summary>
     /// <param name="rootDomElement">The DOM element that will host the window</param>
     public void AttachToDomElement(HtmlElementReference rootDomElement)
@@ -210,7 +253,16 @@ public class Window : ContentControl, IResizeObserverListener
 
     private void OnWindowSizeChanged(Size size)
     {
-        InvalidateMeasure();
+        if (_windowHost is not null && WindowState == WindowState.Maximized)
+        {
+            _windowHost.InvalidateMeasure();
+            _windowHost.SetLayoutSize();
+        }
+        else
+        {
+            InvalidateMeasure();
+        }
+
         SizeChanged?.Invoke(this, new WindowSizeChangedEventArgs(size));
     }
 
@@ -223,7 +275,7 @@ public class Window : ContentControl, IResizeObserverListener
         {
             if (OuterDiv.IsConnected)
             {
-                HtmlElementReference sizeReference = _isShowingAsSecondary ? _overlayDiv : OuterDiv;
+                HtmlElementReference sizeReference = _overlayDiv.IsConnected ? _overlayDiv : OuterDiv;
                 if (!sizeReference.IsConnected)
                 {
                     return new Rect(0, 0, 0, 0);
@@ -266,7 +318,7 @@ public class Window : ContentControl, IResizeObserverListener
 
     private void SetLayoutSize()
     {
-        if (_isShowingAsSecondary)
+        if (_windowHost is not null)
         {
             InvalidateMeasure();
             Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -349,7 +401,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <inheritdoc />
     protected override Size MeasureOverride(Size availableSize)
     {
-        if (_isShowingAsSecondary)
+        if (_windowHost is not null)
         {
             Size constraintSize = GetSecondaryWindowConstraintSize(availableSize);
 
@@ -388,7 +440,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <inheritdoc />
     protected override Size ArrangeOverride(Size finalSize)
     {
-        if (_isShowingAsSecondary)
+        if (_windowHost is not null)
         {
             return base.ArrangeOverride(finalSize);
         }
@@ -425,7 +477,7 @@ public class Window : ContentControl, IResizeObserverListener
         base.OnVisualParentChanged(oldParent);
 
         var parent = VisualTreeHelper.GetParent(this);
-        if (parent is not null && !_isShowingAsSecondary)
+        if (parent is not null && _windowHost is null)
         {
             throw new InvalidOperationException(Strings.WindowMustBeRoot);
         }
@@ -712,7 +764,7 @@ public class Window : ContentControl, IResizeObserverListener
     private static void OnWindowStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var window = (Window)d;
-        if (!window._isShowingAsSecondary) return;
+        if (window._windowHost is null) return;
 
         var oldState = (WindowState)e.OldValue;
         var newState = (WindowState)e.NewValue;
@@ -845,7 +897,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Gets a value indicating whether the window is visible.
     /// </summary>
-    public new bool IsVisible => _isShowingAsSecondary && !_isClosed;
+    public new bool IsVisible => (_overlayDiv.IsConnected || IsMainWindow) && !_isClosed;
 
     /// <summary>
     /// Opens a window and returns without waiting for the newly opened window to close.
@@ -857,7 +909,7 @@ public class Window : ContentControl, IResizeObserverListener
             throw new InvalidOperationException("Cannot show a window that has been closed.");
         }
 
-        if (_isShowingAsSecondary)
+        if (_overlayDiv.IsConnected)
         {
             return;
         }
@@ -879,7 +931,7 @@ public class Window : ContentControl, IResizeObserverListener
             throw new InvalidOperationException("Cannot show a window that has been closed.");
         }
 
-        if (_isShowingAsSecondary)
+        if (_overlayDiv.IsConnected)
         {
             return null;
         }
@@ -915,7 +967,12 @@ public class Window : ContentControl, IResizeObserverListener
 
         _isClosed = true;
 
-        if (_isShowingAsSecondary)
+        if (IsMainWindow)
+        {
+            PromoteNextMainWindow();
+        }
+
+        if (_overlayDiv.IsConnected)
         {
             CloseSecondaryWindow();
         }
@@ -926,12 +983,33 @@ public class Window : ContentControl, IResizeObserverListener
         _dialogResultTcs?.TrySetResult(null);
     }
 
+    private void PromoteNextMainWindow()
+    {
+        Application app = Application.Current;
+        if (app is null) return;
+
+        // Find the most recently shown window that has an overlay and isn't closed
+        Window candidate = null;
+        foreach (Window w in app.Windows)
+        {
+            if (w != this && !w._isClosed && w._overlayDiv.IsConnected)
+            {
+                candidate = w;
+            }
+        }
+
+        if (candidate is not null)
+        {
+            app.MainWindow = candidate;
+        }
+    }
+
     /// <summary>
     /// Makes a window invisible.
     /// </summary>
     public void Hide()
     {
-        if (_isShowingAsSecondary && _overlayDiv.IsConnected)
+        if (_overlayDiv.IsConnected)
         {
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.getElementById('{_overlayDiv.Uid}').style.display='none'");
@@ -947,7 +1025,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// </exception>
     public void DragMove()
     {
-        if (!_isShowingAsSecondary)
+        if (_windowHost is null)
         {
             return;
         }
@@ -1016,14 +1094,17 @@ public class Window : ContentControl, IResizeObserverListener
         _isShowingAsSecondary = true;
         PrepareForSecondaryDisplay();
 
-        Window mainWindow = Application.Current?.MainWindow;
-        if (mainWindow is null)
+        Application app = Application.Current;
+        if (app?.MainWindow is null)
         {
             throw new InvalidOperationException("Cannot show a secondary window before the main window is created.");
         }
 
+        // Always append the overlay to the app's rootDiv (not the main window's RootDomElement,
+        // which may be an overlay itself after promotion).
+        HtmlElementReference rootDiv = app.GetRootDiv();
         _overlayDiv = INTERNAL_HtmlDomManager.CreateWindowOverlayDomElementAndAppendIt(
-            this, mainWindow.RootDomElement, _isModal);
+            this, rootDiv, _isModal);
 
         _windowHost = new OpenSilver.Controls.WindowHost(this);
 
@@ -1034,14 +1115,31 @@ public class Window : ContentControl, IResizeObserverListener
         }
         _windowHost.UpdateTitleBarVisibility(WindowStyle != WindowStyle.None && chrome is not null);
 
-        _windowHost.Show(_overlayDiv, mainWindow);
+        _windowHost.Show(_overlayDiv, app.MainWindow);
+
+        // Make this window self-sufficient: own ParentWindow, TextMeasurementService, and popup anchor.
+        RootDomElement = _overlayDiv;
+        ParentWindow = this;
+        PropagateParentWindow(this, this);
+        TextMeasurementService = new TextMeasurementService(this);
 
         Current = this;
         ActiveWindow = this;
         OnActivated(EventArgs.Empty);
     }
 
-    private void CloseSecondaryWindow()
+    private static void PropagateParentWindow(UIElement element, Window window)
+    {
+        if (element.VisualChildrenInformation is null) return;
+
+        foreach (UIElement child in element.VisualChildrenInformation)
+        {
+            child.ParentWindow = window;
+            PropagateParentWindow(child, window);
+        }
+    }
+
+    internal void CloseSecondaryWindow()
     {
         _isShowingAsSecondary = false;
 
@@ -1105,17 +1203,24 @@ public class Window : ContentControl, IResizeObserverListener
 
         if (previousState == WindowState.Normal)
         {
-            // Save current position and size for later restoration
+            // Save current position, size, and constraints for later restoration
             _restoreLeft = double.IsNaN(Left) ? 0 : Left;
             _restoreTop = double.IsNaN(Top) ? 0 : Top;
             _restoreWidth = Width;
             _restoreHeight = Height;
+            _restoreMinWidth = MinWidth;
+            _restoreMinHeight = MinHeight;
+            _restoreMaxWidth = MaxWidth;
+            _restoreMaxHeight = MaxHeight;
         }
 
-        // Clear explicit Width/Height so MeasureCore doesn't clamp to those values.
-        // The layout will use the available space from the parent instead.
+        // Clear all size constraints so the window fills the available space.
         Width = double.NaN;
         Height = double.NaN;
+        MinWidth = 0;
+        MinHeight = 0;
+        MaxWidth = double.PositiveInfinity;
+        MaxHeight = double.PositiveInfinity;
 
         // Fill the overlay: position at origin with full size
         string hostId = _windowHost.OuterDiv.Uid;
@@ -1134,11 +1239,15 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (_windowHost is null || !_windowHost.OuterDiv.IsConnected) return;
 
-        // Restore position and size properties
+        // Restore position, size, and constraints
         Left = _restoreLeft;
         Top = _restoreTop;
         Width = _restoreWidth;
         Height = _restoreHeight;
+        MinWidth = _restoreMinWidth;
+        MinHeight = _restoreMinHeight;
+        MaxWidth = _restoreMaxWidth;
+        MaxHeight = _restoreMaxHeight;
 
         // Remove the 100% override so the layout system can size to content
         string hostId = _windowHost.OuterDiv.Uid;
@@ -1168,6 +1277,10 @@ public class Window : ContentControl, IResizeObserverListener
     private double _restoreTop;
     private double _restoreWidth;
     private double _restoreHeight;
+    private double _restoreMinWidth;
+    private double _restoreMinHeight;
+    private double _restoreMaxWidth;
+    private double _restoreMaxHeight;
     private WindowState _stateBeforeMinimize;
 
     internal void OnWindowChromeChanged(WindowChrome oldChrome, WindowChrome newChrome)
@@ -1260,6 +1373,18 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (IsMainWindow)
         {
+            if (_windowHost is null)
+            {
+                // Only set BypassLayoutPolicies for the initial main window (directly in rootDiv).
+                // Promoted windows keep their existing layout management via WindowHost.
+                BypassLayoutPolicies = true;
+            }
+            else if (_overlayDiv.IsConnected)
+            {
+                // Observe the overlay for viewport resize changes so layout stays in sync.
+                _resizeObserver?.Dispose();
+                _resizeObserver = ResizeObserver.Observe(_overlayDiv, this);
+            }
             SetValueInternal(WindowStyleProperty, WindowStyle.None);
             SetValueInternal(WindowStateProperty, WindowState.Maximized);
         }

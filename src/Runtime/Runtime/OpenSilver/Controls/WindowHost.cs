@@ -253,10 +253,10 @@ public class WindowHost : ContentControl
     {
         if (_window is not null && _window.WindowState == WindowState.Maximized)
         {
-            // When maximized, fill the available viewport
-            if (ParentWindow is not null)
+            Window viewport = Application.Current?.MainWindow;
+            if (viewport is not null)
             {
-                Rect bounds = ParentWindow.Bounds;
+                Rect bounds = viewport.Bounds;
                 if (bounds.Width > 0 && bounds.Height > 0)
                 {
                     return bounds.Size;

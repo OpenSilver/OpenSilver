@@ -163,8 +163,16 @@ public sealed class InputManager : DispatcherObject
 
     internal Window ActiveWindow { get; private set; }
 
+    private string _registeredRootId;
+
     internal void RegisterRoot(HtmlElementReference element)
     {
+        if (element.Uid == _registeredRootId)
+        {
+            return;
+        }
+
+        _registeredRootId = element.Uid;
         OpenSilver.Interop.ExecuteJavaScriptVoid($"osjs.inputManager.registerRoot('{element.Uid}')");
     }
 

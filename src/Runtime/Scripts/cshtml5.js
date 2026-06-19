@@ -832,14 +832,15 @@ Object.defineProperty(window, 'osjs', {
                 const rootElement = document.getElementById(rootElementId);
                 if (!rootElement) return;
 
-                // Set the window on the root element, used by popups
+                // Set windowid on the root element to its own ID.
+                // This is used for coordinate translation (page coords → app-relative coords).
                 Object.defineProperty(rootElement, 'windowid', {
-                    value: id,
+                    value: rootElementId,
                     writable: false,
                     configurable: true,
                 });
 
-                const w = createVisualElement('div', id, id);
+                const w = createVisualElement('div', id, rootElementId);
                 w.classList.add(CSS_CLASS.WINDOW);
 
                 rootElement.appendChild(w);
@@ -862,6 +863,7 @@ Object.defineProperty(window, 'osjs', {
                 overlay.setAttribute('id', id);
                 overlay.classList.add('opensilver-window-overlay');
                 overlay.style.pointerEvents = pointerEvents;
+                setWindowId(overlay, rootElement.windowid);
 
                 rootElement.appendChild(overlay);
             },

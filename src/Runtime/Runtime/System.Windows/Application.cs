@@ -482,24 +482,44 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Gets the application main window.
+        /// Gets or sets the main application window.
         /// </summary>
         public Window MainWindow
         {
             get => _mainWindow;
-            private set
+            set
             {
-                if (_mainWindow is not null)
+                ArgumentNullException.ThrowIfNull(value);
+
+                if (value == _mainWindow)
                 {
-                    throw new InvalidOperationException(Strings.MainWindowCanOnlyBeSetOnce);
+                    return;
                 }
 
-                ArgumentNullException.ThrowIfNull(value);
+                Window oldMainWindow = _mainWindow;
+
+                if (oldMainWindow is not null && !oldMainWindow.HasOverlayInfrastructure)
+                {
+                    // Remove the initial main window from DOM entirely.
+                    // Promoted windows (which have a WindowHost/overlay) are cleaned up via CloseSecondaryWindow().
+                    oldMainWindow.RemoveMainWindowFromDom();
+                }
 
                 Window.Current = _mainWindow = value;
 
-                _mainWindow.EnforceMainWindowProperties();
-                _mainWindow.AttachToDomElement(_rootDiv);
+                if (_mainWindow.HasOverlayInfrastructure)
+                {
+                    // The promoted window stays in its overlay (no DOM changes).
+                    // Just enforce main window properties (hides chrome, fills overlay).
+                    _mainWindow._isShowingAsSecondary = false;
+                    _mainWindow.EnforceMainWindowProperties();
+                }
+                else
+                {
+                    // Fresh window, not yet shown — attach to root (initial startup path).
+                    _mainWindow.EnforceMainWindowProperties();
+                    _mainWindow.AttachToDomElement(_rootDiv);
+                }
 
                 MainWindowReady?.Invoke(this, EventArgs.Empty);
             }
