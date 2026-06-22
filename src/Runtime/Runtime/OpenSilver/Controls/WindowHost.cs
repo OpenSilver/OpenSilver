@@ -174,7 +174,8 @@ public class WindowHost : ContentControl
         {
             _maximizeButtonPart.Visibility = mode == ResizeMode.NoResize
                 ? Visibility.Collapsed : Visibility.Visible;
-            _maximizeButtonPart.IsEnabled = canResize;
+            _maximizeButtonPart.IsHitTestVisible = canResize;
+            _maximizeButtonPart.Opacity = canResize ? 1.0 : 0.4;
         }
 
         var resizeVisibility = canResize ? Visibility.Visible : Visibility.Collapsed;
