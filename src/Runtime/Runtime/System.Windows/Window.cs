@@ -99,7 +99,6 @@ public class Window : ContentControl, IResizeObserverListener
 
     internal HtmlElementReference RootDomElement { get; private set; }
 
-    internal TextMeasurementService TextMeasurementService { get; private set; }
 
     /// <inheritdoc />
     protected override void OnContentChanged(object oldContent, object newContent)
@@ -200,8 +199,6 @@ public class Window : ContentControl, IResizeObserverListener
         IsConnectedToLiveTree = true;
         UpdateIsRenderableCache();
         UpdateIsVisibleCache();
-
-        TextMeasurementService = new TextMeasurementService(this);
 
         // Raise the "Loaded" event:
         RaiseLoadedEvent();
@@ -1123,10 +1120,6 @@ public class Window : ContentControl, IResizeObserverListener
         PrepareForSecondaryDisplay();
 
         Application app = Application.Current;
-        if (app?.MainWindow is null)
-        {
-            throw new InvalidOperationException("Cannot show a secondary window before the main window is created.");
-        }
 
         // Always append the overlay to the app's rootDiv (not the main window's RootDomElement,
         // which may be an overlay itself after promotion).
@@ -1143,28 +1136,13 @@ public class Window : ContentControl, IResizeObserverListener
         }
         _windowHost.UpdateTitleBarVisibility(WindowStyle != WindowStyle.None && chrome is not null);
 
-        _windowHost.Show(_overlayDiv, app.MainWindow);
-
-        // Make this window self-sufficient: own ParentWindow, TextMeasurementService, and popup anchor.
         RootDomElement = _overlayDiv;
-        ParentWindow = this;
-        PropagateParentWindow(this, this);
-        TextMeasurementService = new TextMeasurementService(this);
+
+        _windowHost.Show(_overlayDiv);
 
         Current = this;
         ActiveWindow = this;
         OnActivated(EventArgs.Empty);
-    }
-
-    private static void PropagateParentWindow(UIElement element, Window window)
-    {
-        if (element.VisualChildrenInformation is null) return;
-
-        foreach (UIElement child in element.VisualChildrenInformation)
-        {
-            child.ParentWindow = window;
-            PropagateParentWindow(child, window);
-        }
     }
 
     internal void CloseSecondaryWindow()
@@ -1337,7 +1315,7 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         _isDragging = true;
-        _dragStartMousePosition = Mouse.GetPosition(ParentWindow);
+        _dragStartMousePosition = Mouse.GetPosition(null);
         _dragStartLeft = double.IsNaN(Left) ? 0 : Left;
         _dragStartTop = double.IsNaN(Top) ? 0 : Top;
 
@@ -1353,7 +1331,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (!_isDragging) return;
 
-        Point currentPosition = e.GetPosition(ParentWindow);
+        Point currentPosition = e.GetPosition(null);
         double deltaX = currentPosition.X - _dragStartMousePosition.X;
         double deltaY = currentPosition.Y - _dragStartMousePosition.Y;
 
@@ -1401,7 +1379,7 @@ public class Window : ContentControl, IResizeObserverListener
 
         _isResizing = true;
         _resizeEdge = edge;
-        _resizeStartMousePosition = Mouse.GetPosition(ParentWindow);
+        _resizeStartMousePosition = Mouse.GetPosition(null);
         _resizeStartLeft = double.IsNaN(Left) ? 0 : Left;
         _resizeStartTop = double.IsNaN(Top) ? 0 : Top;
         _resizeStartWidth = ActualWidth;
@@ -1419,7 +1397,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (!_isResizing) return;
 
-        Point currentPosition = e.GetPosition(ParentWindow);
+        Point currentPosition = e.GetPosition(null);
         double deltaX = currentPosition.X - _resizeStartMousePosition.X;
         double deltaY = currentPosition.Y - _resizeStartMousePosition.Y;
 

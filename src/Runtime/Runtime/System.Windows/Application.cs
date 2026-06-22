@@ -70,6 +70,8 @@ namespace System.Windows
             // Keep a reference to the app:
             Current = this;
 
+            TextMeasurementService = new OpenSilver.Internal.TextMeasurementService(rootDivId);
+
             // Initialize Deployment
             _ = Deployment.Current;
             // Ensure InputManager is created
@@ -528,6 +530,8 @@ namespace System.Windows
         internal event EventHandler MainWindowReady;
 
         internal HtmlElementReference GetRootDiv() => _rootDiv;
+
+        internal OpenSilver.Internal.TextMeasurementService TextMeasurementService { get; private set; }
 
         /// <summary>
         /// Returns a string that contains the content of the file that is located at the

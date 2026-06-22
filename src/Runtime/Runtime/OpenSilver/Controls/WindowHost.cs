@@ -103,11 +103,11 @@ public class WindowHost : ContentControl
 
     internal Window HostedWindow => _window;
 
-    internal void Show(HtmlElementReference overlayDiv, Window parentWindow)
+    internal void Show(HtmlElementReference overlayDiv)
     {
         IsOpen = true;
 
-        ParentWindow = parentWindow;
+        ParentWindow = _window;
         OuterDiv = INTERNAL_HtmlDomManager.CreateWindowHostRootDomElementAndAppendIt(overlayDiv, this);
         IsLoadedCache = true;
         IsConnectedToLiveTree = true;

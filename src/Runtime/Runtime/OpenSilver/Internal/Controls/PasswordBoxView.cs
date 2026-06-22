@@ -57,7 +57,7 @@ internal sealed class PasswordBoxView : TextViewBase
         (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(TextWrapping.NoWrap);
         int pwdLength = Host.Password.Length;
 
-        return ParentWindow.TextMeasurementService.MeasureView(
+        return Application.Current.TextMeasurementService.MeasureView(
             OuterDiv.Uid,
             whiteSpace,
             overflowWrap,
