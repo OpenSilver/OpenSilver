@@ -251,20 +251,6 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
 
-        internal static HtmlElementReference CreateWindowContentDomElementAndAppendIt(Window window, HtmlElementReference chromeDomDiv)
-        {
-            Debug.Assert(window is not null);
-
-            string uid = NewId();
-
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"osjs.createWindowContent('{uid}', '{chromeDomDiv.Uid}')");
-
-            AddToGlobalStore(uid, window);
-
-            return new(uid);
-        }
-
         internal static HtmlElementReference CreateTextBlockDomElementAndAppendIt(HtmlElementReference parent, UIElement textBlock)
         {
 #if PERFSTAT

@@ -557,6 +557,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="AllowsTransparency"/> dependency property.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty AllowsTransparencyProperty =
         DependencyProperty.Register(
             nameof(AllowsTransparency),
@@ -570,6 +571,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window supports transparency; otherwise, false.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public bool AllowsTransparency
     {
         get => (bool)GetValue(AllowsTransparencyProperty);
@@ -579,6 +581,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Icon"/> dependency property.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
             nameof(Icon),
@@ -592,6 +595,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// An System.Windows.Media.ImageSource object that represents the icon.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public ImageSource Icon
     {
         get => (ImageSource)GetValue(IconProperty);
@@ -616,11 +620,13 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window is active; otherwise, false. The default is false.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public bool IsActive => (bool)GetValue(IsActiveProperty);
 
     /// <summary>
     /// Identifies the <see cref="ShowActivated"/> dependency property.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty ShowActivatedProperty =
         DependencyProperty.Register(
             nameof(ShowActivated),
@@ -634,6 +640,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if a window is activated when first shown; otherwise, false. The default is true.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public bool ShowActivated
     {
         get => (bool)GetValue(ShowActivatedProperty);
@@ -643,6 +650,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="ShowInTaskbar"/> dependency property.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty ShowInTaskbarProperty =
         DependencyProperty.Register(
             nameof(ShowInTaskbar),
@@ -657,6 +665,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// true if the window has a task bar button; otherwise, false. Does not apply when the window
     /// is hosted in a browser.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public bool ShowInTaskbar
     {
         get => (bool)GetValue(ShowInTaskbarProperty);
@@ -666,6 +675,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="Topmost"/> dependency property.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty TopmostProperty =
         DependencyProperty.Register(
             nameof(Topmost),
@@ -679,6 +689,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window is topmost; otherwise, false.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public bool Topmost
     {
         get => (bool)GetValue(TopmostProperty);
@@ -692,6 +703,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowStartupLocation"/> value that specifies the top/left position
     /// of a window when first shown. The default is <see cref="WindowStartupLocation.Manual"/>.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.Manual;
 
     /// <summary>
@@ -811,6 +823,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="SizeToContent"/> dependency property.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty SizeToContentProperty =
         DependencyProperty.Register(
             nameof(SizeToContent),
@@ -826,6 +839,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// A <see cref="Windows.SizeToContent"/> value. The default is <see cref="SizeToContent.Manual"/>.
     /// </returns>
+    [OpenSilver.NotImplemented]
     public SizeToContent SizeToContent
     {
         get => (SizeToContent)GetValue(SizeToContentProperty);
@@ -898,6 +912,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Gets or sets the owner of this window.
     /// </summary>
+    [OpenSilver.NotImplemented]
     public Window Owner { get; set; }
 
     /// <summary>
