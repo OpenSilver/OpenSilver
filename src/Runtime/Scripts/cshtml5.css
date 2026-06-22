@@ -111,6 +111,20 @@ body {
     z-index: 2147483647;
 }
 
+.opensilver-window-host-root {
+    pointer-events: none;
+    position: relative;
+}
+
+.opensilver-taskbar-item-root {
+    pointer-events: auto;
+    position: relative;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    margin: 2px;
+}
+
 .opensilver-window-overlay {
     position: absolute;
     top: 0;

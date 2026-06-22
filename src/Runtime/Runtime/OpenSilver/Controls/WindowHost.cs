@@ -108,7 +108,7 @@ public class WindowHost : ContentControl
         IsOpen = true;
 
         ParentWindow = parentWindow;
-        OuterDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(overlayDiv, this);
+        OuterDiv = INTERNAL_HtmlDomManager.CreateWindowHostRootDomElementAndAppendIt(overlayDiv, this);
         IsLoadedCache = true;
         IsConnectedToLiveTree = true;
         UpdateIsRenderableCache();

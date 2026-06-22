@@ -208,6 +208,34 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
+        internal static HtmlElementReference CreateWindowHostRootDomElementAndAppendIt(HtmlElementReference parentDiv, UIElement element)
+        {
+            Debug.Assert(element is not null);
+
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createWindowHostRoot('{uid}','{parentDiv.Uid}')");
+
+            AddToGlobalStore(uid, element);
+
+            return new(uid);
+        }
+
+        internal static HtmlElementReference CreateTaskbarItemRootDomElementAndAppendIt(HtmlElementReference parentDiv, UIElement element)
+        {
+            Debug.Assert(element is not null);
+
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createTaskbarItemRoot('{uid}','{parentDiv.Uid}')");
+
+            AddToGlobalStore(uid, element);
+
+            return new(uid);
+        }
+
         internal static HtmlElementReference CreateWindowOverlayDomElementAndAppendIt(
             Window window, HtmlElementReference rootElement, bool isModal)
         {

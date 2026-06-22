@@ -855,6 +855,25 @@ Object.defineProperty(window, 'osjs', {
 
                 rootElement.appendChild(popupRoot);
             },
+            createWindowHostRoot: function (id, rootElementId) {
+                const rootElement = document.getElementById(rootElementId);
+                if (!rootElement) return;
+
+                const element = createVisualElement('div', id, rootElement.windowid);
+                element.classList.add('opensilver-window-host-root');
+                element.style.pointerEvents = 'none';
+
+                rootElement.appendChild(element);
+            },
+            createTaskbarItemRoot: function (id, rootElementId) {
+                const rootElement = document.getElementById(rootElementId);
+                if (!rootElement) return;
+
+                const element = createVisualElement('div', id, rootElement.windowid);
+                element.classList.add('opensilver-taskbar-item-root');
+
+                rootElement.appendChild(element);
+            },
             createWindowOverlay: function (id, rootElementId, pointerEvents) {
                 const rootElement = document.getElementById(rootElementId);
                 if (!rootElement) return;

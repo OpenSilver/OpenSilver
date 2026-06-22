@@ -73,18 +73,7 @@ internal static class WindowTaskbar
 
         // Attach the TaskbarItem's DOM element inside the flex container
         HtmlElementReference taskbarDiv = new HtmlElementReference(_taskbarId);
-        item.OuterDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(taskbarDiv, item);
-
-        // Override the popup root's absolute positioning so it flows within the flex container
-        string itemDivId = item.OuterDiv.Uid;
-        Interop.ExecuteJavaScriptVoidAsync(
-            $"(function() {{ var el = document.getElementById('{itemDivId}'); " +
-            $"el.classList.remove('opensilver-popup'); " +
-            $"el.style.position = 'relative'; " +
-            $"el.style.width = 'auto'; " +
-            $"el.style.height = 'auto'; " +
-            $"el.style.overflow = 'visible'; " +
-            $"el.style.margin = '2px'; }})()");
+        item.OuterDiv = INTERNAL_HtmlDomManager.CreateTaskbarItemRootDomElementAndAppendIt(taskbarDiv, item);
 
         item.IsLoadedCache = true;
         item.IsConnectedToLiveTree = true;
@@ -104,6 +93,7 @@ internal static class WindowTaskbar
         // and template children are position:absolute so they don't give the parent flow height.
         string w = item.DesiredSize.Width.ToInvariantString();
         string h = item.DesiredSize.Height.ToInvariantString();
+        string itemDivId = item.OuterDiv.Uid;
         Interop.ExecuteJavaScriptVoidAsync(
             $"(function() {{ var el = document.getElementById('{itemDivId}'); " +
             $"el.style.width = '{w}px'; el.style.height = '{h}px'; }})()");
