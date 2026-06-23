@@ -862,6 +862,7 @@ Object.defineProperty(window, 'osjs', {
                 const element = createVisualElement('div', id, rootElement.windowid);
                 element.classList.add('opensilver-window-host-root');
                 element.style.pointerEvents = 'none';
+                element.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
                 rootElement.appendChild(element);
             },
