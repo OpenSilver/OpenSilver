@@ -1365,6 +1365,9 @@
   <data name="ResponsiveExtensionConflict" xml:space="preserve">
     <value>Impossible de définir ResponsiveExtension.{0} pendant l'utilisation de ResponsiveExtension.{1}.</value>
   </data>
+  <data name="MultipleApplicationInstancesNotAllowed" xml:space="preserve">
+    <value>Une seule instance d'Application peut être créée.</value>
+  </data>
   <data name="PathGeometry_InternalReadBackError" xml:space="preserve">
     <value>Erreur interne dans les figures de tracé récemment créées.</value>
   </data>

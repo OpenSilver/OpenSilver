@@ -1367,6 +1367,9 @@
   <data name="ResponsiveExtensionConflict" xml:space="preserve">
     <value>ResponsiveExtension.{0} cannot be set while using ResponsiveExtension.{1}.</value>
   </data>
+  <data name="MultipleApplicationInstancesNotAllowed" xml:space="preserve">
+    <value>Only one instance of Application can be created.</value>
+  </data>
   <data name="PathGeometry_InternalReadBackError" xml:space="preserve">
     <value>Internal error in newly produced path figures.</value>
   </data>

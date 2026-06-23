@@ -2113,6 +2113,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Only one instance of Application can be created..
+        /// </summary>
+        internal static string MultipleApplicationInstancesNotAllowed {
+            get {
+                return ResourceManager.GetString("MultipleApplicationInstancesNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can only call SelectAll when CanSelectMultipleItems is true..
         /// </summary>
         internal static string MultiSelectorSelectAll {

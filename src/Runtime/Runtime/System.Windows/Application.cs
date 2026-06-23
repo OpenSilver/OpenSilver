@@ -63,6 +63,8 @@ namespace System.Windows
 
         public Application(string rootDivId)
         {
+            if (Current != null) throw new InvalidOperationException(Strings.MultipleApplicationInstancesNotAllowed);
+
             ArgumentException.ThrowIfNullOrEmpty(rootDivId);
 
             _rootDiv = new(rootDivId);
