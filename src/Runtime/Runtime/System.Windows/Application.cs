@@ -76,8 +76,8 @@ namespace System.Windows
 
             // Initialize Deployment
             _ = Deployment.Current;
-            // Ensure InputManager is created
-            _ = InputManager.Current;
+            // Ensure InputManager is created and register the root element for input events
+            InputManager.Current.RegisterRoot(_rootDiv);
 
             AppParams = GetAppParams();
 

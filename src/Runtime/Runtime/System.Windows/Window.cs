@@ -169,7 +169,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// has the ID "cshtml5-root" or "opensilver-root".
     /// </summary>
     /// <param name="rootDomElement">The DOM element that will host the window</param>
-    public void AttachToDomElement(HtmlElementReference rootDomElement)
+    internal void AttachToDomElement(HtmlElementReference rootDomElement)
     {
         if (OuterDiv.IsConnected || RootDomElement.IsConnected)
         {
@@ -191,8 +191,6 @@ public class Window : ContentControl, IResizeObserverListener
         OuterDiv = INTERNAL_HtmlDomManager.CreateWindowDomElementAndAppendIt(this);
 
         _resizeObserver = ResizeObserver.Observe(OuterDiv, this);
-
-        InputManager.Current.RegisterRoot(RootDomElement);
 
         // Set the window as "loaded":
         IsLoadedCache = true;
