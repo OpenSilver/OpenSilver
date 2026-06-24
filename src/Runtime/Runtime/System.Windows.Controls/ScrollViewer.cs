@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Diagnostics;
-using System.Windows.Input;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -62,6 +63,7 @@ namespace System.Windows.Controls
         static ScrollViewer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollViewer), new PropertyMetadata(typeof(ScrollViewer)));
+            EventManager.RegisterClassHandler<ScrollViewer>(RequestBringIntoViewEvent, new RequestBringIntoViewEventHandler(OnRequestBringIntoView));
             EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnTouchStartThunk), true);
             EventManager.RegisterClassHandler<ScrollViewer>(PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler(OnTouchEndThunk), true);
             EventManager.RegisterClassHandler<ScrollViewer>(Mouse.MouseMoveEvent, new MouseEventHandler(OnTouchMoveThunk), true);
@@ -301,7 +303,7 @@ namespace System.Windows.Controls
 
             // Queue up the scroll command, which tells the content to scroll.
             // Will lead to an update of all offsets (both live and deferred).
-            EnqueueCommand(Commands.SetHorizontalOffset, validatedOffset);
+            EnqueueCommand(Commands.SetHorizontalOffset, validatedOffset, null);
         }
 
         /// <summary>
@@ -317,7 +319,7 @@ namespace System.Windows.Controls
 
             // Queue up the scroll command, which tells the content to scroll.
             // Will lead to an update of all offsets (both live and deferred).
-            EnqueueCommand(Commands.SetVerticalOffset, validatedOffset);
+            EnqueueCommand(Commands.SetVerticalOffset, validatedOffset, null);
         }
 
         /// <summary>
@@ -829,6 +831,25 @@ namespace System.Windows.Controls
             e.Handled = true;
         }
 
+        internal void MakeVisible(UIElement child, Rect rect) => EnqueueCommand(Commands.MakeVisible, 0, new MakeVisibleParams(child, rect));
+
+        private static void OnRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {
+            var sv = (ScrollViewer)sender;
+
+            if (e.TargetObject is UIElement child)
+            {
+                //the event starts from the elemetn itself, so if it is an SV.BringINtoView we would
+                //get an SV trying to bring into view itself  - this does not work obviously
+                //so don't handle if the request is about ourselves, the event will bubble
+                if (child != sv && child.IsDescendantOf(sv))
+                {
+                    e.Handled = true;
+                    sv.MakeVisible(child, e.TargetRect);
+                }
+            }
+        }
+
         private static void OnTouchStartThunk(object sender, MouseButtonEventArgs e) => ((ScrollViewer)sender).OnTouchStart(e);
 
         private void OnTouchStart(MouseButtonEventArgs e) => _panHelper.HandleMouseLeftButtonDown(e);
@@ -1066,60 +1087,60 @@ namespace System.Windows.Controls
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content upward by one line.
         /// </summary>
-        public void LineUp() => EnqueueCommand(Commands.LineUp, 0);
+        public void LineUp() => EnqueueCommand(Commands.LineUp, 0, null);
 
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content downward by one line.
         /// </summary>
-        public void LineDown() => EnqueueCommand(Commands.LineDown, 0);
+        public void LineDown() => EnqueueCommand(Commands.LineDown, 0, null);
 
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content to the left by a predetermined amount.
         /// </summary>
-        public void LineLeft() => EnqueueCommand(Commands.LineLeft, 0);
+        public void LineLeft() => EnqueueCommand(Commands.LineLeft, 0, null);
 
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content to the right by a predetermined amount.
         /// </summary>
-        public void LineRight() => EnqueueCommand(Commands.LineRight, 0);
+        public void LineRight() => EnqueueCommand(Commands.LineRight, 0, null);
 
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content upward by one page.
         /// </summary>
-        public void PageUp() => EnqueueCommand(Commands.PageUp, 0);
+        public void PageUp() => EnqueueCommand(Commands.PageUp, 0, null);
 
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content downward by one page.
         /// </summary>
-        public void PageDown() => EnqueueCommand(Commands.PageDown, 0);
+        public void PageDown() => EnqueueCommand(Commands.PageDown, 0, null);
 
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content to the left by one page.
         /// </summary>
-        public void PageLeft() => EnqueueCommand(Commands.PageLeft, 0);
+        public void PageLeft() => EnqueueCommand(Commands.PageLeft, 0, null);
 
         /// <summary>
         /// Scrolls the <see cref="ScrollViewer"/> content to the right by one page.
         /// </summary>
-        public void PageRight() => EnqueueCommand(Commands.PageRight, 0);
+        public void PageRight() => EnqueueCommand(Commands.PageRight, 0, null);
 
         /// <summary>
         /// Scrolls horizontally to the beginning of the <see cref="ScrollViewer"/> content.
         /// </summary>
-        public void ScrollToLeftEnd() => EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity);
+        public void ScrollToLeftEnd() => EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity, null);
 
         /// <summary>
         /// Scrolls horizontally to the end of the <see cref="ScrollViewer"/> content.
         /// </summary>
-        public void ScrollToRightEnd() => EnqueueCommand(Commands.SetHorizontalOffset, double.PositiveInfinity);
+        public void ScrollToRightEnd() => EnqueueCommand(Commands.SetHorizontalOffset, double.PositiveInfinity, null);
 
         /// <summary>
         /// Scrolls to the beginning of the <see cref="ScrollViewer"/> content.
         /// </summary>
         public void ScrollToHome()
         {
-            EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity);
-            EnqueueCommand(Commands.SetVerticalOffset, double.NegativeInfinity);
+            EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity, null);
+            EnqueueCommand(Commands.SetVerticalOffset, double.NegativeInfinity, null);
         }
 
         /// <summary>
@@ -1127,19 +1148,19 @@ namespace System.Windows.Controls
         /// </summary>
         public void ScrollToEnd()
         {
-            EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity);
-            EnqueueCommand(Commands.SetVerticalOffset, double.PositiveInfinity);
+            EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity, null);
+            EnqueueCommand(Commands.SetVerticalOffset, double.PositiveInfinity, null);
         }
 
         /// <summary>
         /// Scrolls vertically to the beginning of the <see cref="ScrollViewer"/> content.
         /// </summary>
-        public void ScrollToTop() => EnqueueCommand(Commands.SetVerticalOffset, double.NegativeInfinity);
+        public void ScrollToTop() => EnqueueCommand(Commands.SetVerticalOffset, double.NegativeInfinity, null);
 
         /// <summary>
         /// Scrolls vertically to the end of the <see cref="ScrollViewer"/> content.
         /// </summary>
-        public void ScrollToBottom() => EnqueueCommand(Commands.SetVerticalOffset, double.PositiveInfinity);
+        public void ScrollToBottom() => EnqueueCommand(Commands.SetVerticalOffset, double.PositiveInfinity, null);
 
         //returns true if there was a command sent to ISI
         private bool ExecuteNextCommand()
@@ -1163,14 +1184,59 @@ namespace System.Windows.Controls
                 case Commands.SetHorizontalOffset: isi.SetHorizontalOffset(cmd.Param); break;
                 case Commands.SetVerticalOffset: isi.SetVerticalOffset(cmd.Param); break;
 
+                case Commands.MakeVisible:
+                    {
+                        if (cmd.MakeVisibleParam.Child is UIElement child
+                            && isi is UIElement visi
+                            && (visi == child || visi.IsAncestorOf(child))
+                            //  bug 1616807. ISI could be removed from visual tree,
+                            //  but ScrollViewer.ScrollInfo may not reflect this yet.
+                            && IsAncestorOf(visi))
+                        {
+                            Rect targetRect = cmd.MakeVisibleParam.TargetRect;
+                            if (targetRect.IsEmpty)
+                            {
+                                targetRect = new Rect(child.RenderSize);
+                            }
+
+                            // (ScrollContentPresenter.MakeVisible can cause an exception when encountering an empty rectangle)
+                            // Workaround:
+                            // The method throws InvalidOperationException in some scenarios where it should return Rect.Empty.
+                            // Do not workaround for derived classes.
+                            Rect rcNew;
+                            if (isi.GetType() == typeof(ScrollContentPresenter))
+                            {
+                                rcNew = ((ScrollContentPresenter)isi).MakeVisible(child, targetRect, false);
+                            }
+                            else
+                            {
+                                rcNew = isi.MakeVisible(child, targetRect);
+                            }
+
+                            if (!rcNew.IsEmpty)
+                            {
+                                // clip the new rect to isi's bounds, in case isi didn't.
+                                // The ancestor's scroll should only depend on the visible
+                                // portion of the new rect.
+                                rcNew.Intersect(new Rect(visi.RenderSize));
+
+                                Matrix t = visi.InternalTransformToAncestor(this);
+                                rcNew.Transform(t);
+                            }
+
+                            BringIntoView(rcNew);
+                        }
+                    }
+                    break;
+
                 case Commands.Invalid: return false;
             }
             return true;
         }
 
-        private void EnqueueCommand(Commands code, double param)
+        private void EnqueueCommand(Commands code, double param, MakeVisibleParams mvp)
         {
-            _queue.Enqueue(new Command(code, param));
+            _queue.Enqueue(new Command(code, param, mvp));
             EnsureQueueProcessing();
         }
 
@@ -1347,18 +1413,33 @@ namespace System.Windows.Controls
             PageRight,
             SetHorizontalOffset,
             SetVerticalOffset,
+            MakeVisible,
         }
 
         private struct Command
         {
-            internal Command(Commands code, double param)
+            internal Command(Commands code, double param, MakeVisibleParams mvp)
             {
                 Code = code;
                 Param = param;
+                MakeVisibleParam = mvp;
             }
 
             internal Commands Code;
             internal double Param;
+            internal MakeVisibleParams MakeVisibleParam;
+        }
+
+        private sealed class MakeVisibleParams
+        {
+            internal MakeVisibleParams(UIElement child, Rect targetRect)
+            {
+                Child = child;
+                TargetRect = targetRect;
+            }
+
+            internal readonly UIElement Child;
+            internal readonly Rect TargetRect;
         }
 
         // implements ring buffer of commands
@@ -1398,11 +1479,13 @@ namespace System.Windows.Controls
                 if (_lastWritePosition != _lastReadPosition) //buffer has something
                 {
                     if ((command.Code == Commands.SetHorizontalOffset && _array[_lastWritePosition].Code == Commands.SetHorizontalOffset) ||
-                        (command.Code == Commands.SetVerticalOffset && _array[_lastWritePosition].Code == Commands.SetVerticalOffset))
+                        (command.Code == Commands.SetVerticalOffset && _array[_lastWritePosition].Code == Commands.SetVerticalOffset) ||
+                        (command.Code == Commands.MakeVisible && _array[_lastWritePosition].Code == Commands.MakeVisible))
                     {
                         //if the last command was "set offset" or "make visible", simply replace it and
                         //don't insert new command
                         _array[_lastWritePosition].Param = command.Param;
+                        _array[_lastWritePosition].MakeVisibleParam = command.MakeVisibleParam;
                         return true;
                     }
                 }
@@ -1414,7 +1497,7 @@ namespace System.Windows.Controls
             {
                 if (_lastWritePosition == _lastReadPosition) //buffer is empty
                 {
-                    return new Command(Commands.Invalid, 0);
+                    return new Command(Commands.Invalid, 0, null);
                 }
                 _lastReadPosition = (_lastReadPosition + 1) % _capacity;
 

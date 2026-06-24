@@ -13,7 +13,6 @@
 
 using System.Collections;
 using System.Diagnostics;
-using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
 namespace System.Windows;
@@ -23,6 +22,24 @@ namespace System.Windows;
 /// </summary>
 public static class LogicalTreeHelper
 {
+    /// <summary>
+    /// Attempts to bring the requested UI element into view and raises the 
+    /// <see cref="FrameworkElement.RequestBringIntoView"/> event on the target in order 
+    /// to report the results.
+    /// </summary>
+    /// <param name="current">
+    /// The UI element to bring into view.
+    /// </param>
+    public static void BringIntoView(DependencyObject current)
+    {
+        ArgumentNullException.ThrowIfNull(current);
+
+        if (current is FrameworkElement fe)
+        {
+            fe.BringIntoView();
+        }
+    }
+
     /// <summary>
     /// Attempts to find and return an object that has the specified name. The search
     /// starts from the specified object and continues into subnodes of the logical tree.

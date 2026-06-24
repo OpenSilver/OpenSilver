@@ -103,7 +103,13 @@ public abstract class VirtualizingPanel : Panel
     {
     }
 
-    internal void BringIndexIntoViewInternal(int index) => BringIndexIntoView(index);
+    /// <summary>
+    /// Generates the item at the specified index location and makes it visible.
+    /// </summary>
+    /// <param name="index">
+    /// The index position of the item that is generated and made visible.
+    /// </param>
+    public void BringIndexIntoViewPublic(int index) => BringIndexIntoView(index);
 
     internal override void GenerateChildren()
     {

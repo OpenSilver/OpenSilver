@@ -16,7 +16,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using CSHTML5.Internal;
+using System.Windows.Media;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -26,156 +26,75 @@ internal partial class TextViewBase : IScrollInfo
 
     internal bool IsScrollClient => _scrollData is not null;
 
-    public bool CanVerticallyScroll
+    bool IScrollInfo.CanVerticallyScroll
     {
-        get { return IsScrollClient ? _scrollData.CanVerticallyScroll : false; }
-        set { if (IsScrollClient) _scrollData.CanVerticallyScroll = value; }
+        get => _scrollData?.CanVerticallyScroll ?? false;
+        set => _scrollData?.CanVerticallyScroll = value;
     }
 
-    public bool CanHorizontallyScroll
+    bool IScrollInfo.CanHorizontallyScroll
     {
-        get { return IsScrollClient ? _scrollData.CanHorizontallyScroll : false; }
-        set { if (IsScrollClient) _scrollData.CanHorizontallyScroll = value; }
+        get => _scrollData?.CanHorizontallyScroll ?? false;
+        set => _scrollData?.CanHorizontallyScroll = value;
     }
 
-    public double ExtentWidth => IsScrollClient ? _scrollData.ExtentWidth : 0.0;
+    double IScrollInfo.ExtentWidth => _scrollData?.ExtentWidth ?? 0.0;
 
-    public double ExtentHeight => IsScrollClient ? _scrollData.ExtentHeight : 0.0;
+    double IScrollInfo.ExtentHeight => _scrollData?.ExtentHeight ?? 0.0;
 
-    public double ViewportWidth => IsScrollClient ? _scrollData.ViewportWidth : 0.0;
+    double IScrollInfo.ViewportWidth => _scrollData?.ViewportWidth ?? 0.0;
 
-    public double ViewportHeight => IsScrollClient ? _scrollData.ViewportHeight : 0.0;
+    double IScrollInfo.ViewportHeight => _scrollData?.ViewportHeight ?? 0.0;
 
-    public double HorizontalOffset => IsScrollClient ? _scrollData.HorizontalOffset : 0.0;
+    double IScrollInfo.HorizontalOffset => _scrollData?.HorizontalOffset ?? 0.0;
 
-    public double VerticalOffset => IsScrollClient ? _scrollData.VerticalOffset : 0.0;
+    double IScrollInfo.VerticalOffset => _scrollData?.VerticalOffset ?? 0.0;
 
-    public ScrollViewer ScrollOwner
+    ScrollViewer IScrollInfo.ScrollOwner
     {
-        get => IsScrollClient ? _scrollData.ScrollOwner : null;
+        get => _scrollData?.ScrollOwner;
         set => (_scrollData ??= new ScrollData()).ScrollOwner = value;
     }
 
-    public void LineDown()
+    void IScrollInfo.LineUp() => _scrollData?.LineUp(this);
+
+    void IScrollInfo.LineDown() => _scrollData?.LineDown(this);
+
+    void IScrollInfo.LineLeft() => _scrollData?.LineLeft(this);
+
+    void IScrollInfo.LineRight() => _scrollData?.LineRight(this);
+
+    void IScrollInfo.MouseWheelUp() => _scrollData?.MouseWheelUp(this);
+
+    void IScrollInfo.MouseWheelDown() => _scrollData?.MouseWheelDown(this);
+
+    void IScrollInfo.MouseWheelLeft() => _scrollData?.MouseWheelLeft(this);
+
+    void IScrollInfo.MouseWheelRight() => _scrollData?.MouseWheelRight(this);
+
+    void IScrollInfo.PageUp() => _scrollData?.PageUp(this);
+
+    void IScrollInfo.PageDown() => _scrollData?.PageDown(this);
+
+    void IScrollInfo.PageLeft() => _scrollData?.PageLeft(this);
+
+    void IScrollInfo.PageRight() => _scrollData?.PageRight(this);
+
+    void IScrollInfo.SetVerticalOffset(double offset) => _scrollData?.SetVerticalOffset(this, offset);
+
+    void IScrollInfo.SetHorizontalOffset(double offset) => _scrollData?.SetHorizontalOffset(this, offset);
+
+    Rect IScrollInfo.MakeVisible(UIElement visual, Rect rectangle)
     {
-        if (IsScrollClient)
+        if (_scrollData is null)
         {
-            SetVerticalOffset(_scrollData.VerticalOffset + ScrollViewer.LineDelta);
+            return Rect.Empty;
+        }
+        else
+        {
+            return _scrollData.MakeVisible(this, visual, rectangle);
         }
     }
-
-    public void LineLeft()
-    {
-        if (IsScrollClient)
-        {
-            SetHorizontalOffset(_scrollData.HorizontalOffset - ScrollViewer.LineDelta);
-        }
-    }
-
-    public void LineRight()
-    {
-        if (IsScrollClient)
-        {
-            SetHorizontalOffset(_scrollData.HorizontalOffset + ScrollViewer.LineDelta);
-        }
-    }
-
-    public void LineUp()
-    {
-        if (IsScrollClient)
-        {
-            SetVerticalOffset(_scrollData.VerticalOffset - ScrollViewer.LineDelta);
-        }
-    }
-
-    public void MouseWheelDown()
-    {
-        if (IsScrollClient)
-        {
-            SetVerticalOffset(_scrollData.VerticalOffset + ScrollViewer.WheelDelta);
-        }
-    }
-
-    public void MouseWheelLeft()
-    {
-        if (IsScrollClient)
-        {
-            SetHorizontalOffset(_scrollData.HorizontalOffset - ScrollViewer.WheelDelta);
-        }
-    }
-
-    public void MouseWheelRight()
-    {
-        if (IsScrollClient)
-        {
-            SetHorizontalOffset(_scrollData.HorizontalOffset + ScrollViewer.WheelDelta);
-        }
-    }
-
-    public void MouseWheelUp()
-    {
-        if (IsScrollClient)
-        {
-            SetVerticalOffset(_scrollData.VerticalOffset - ScrollViewer.WheelDelta);
-        }
-    }
-
-    public void PageDown()
-    {
-        if (IsScrollClient)
-        {
-            SetVerticalOffset(_scrollData.VerticalOffset + _scrollData.ViewportHeight);
-        }
-    }
-
-    public void PageLeft()
-    {
-        if (IsScrollClient)
-        {
-            SetHorizontalOffset(_scrollData.HorizontalOffset - _scrollData.ViewportWidth);
-        }
-    }
-
-    public void PageRight()
-    {
-        if (IsScrollClient)
-        {
-            SetHorizontalOffset(_scrollData.HorizontalOffset + _scrollData.ViewportWidth);
-        }
-    }
-
-    public void PageUp()
-    {
-        if (IsScrollClient)
-        {
-            SetVerticalOffset(_scrollData.VerticalOffset - _scrollData.ViewportHeight);
-        }
-    }
-
-    public void SetHorizontalOffset(double offset)
-    {
-        if (!IsScrollClient) return;
-        if (!_scrollData.CanHorizontallyScroll) return;
-
-        if (OuterDiv.IsConnected)
-        {
-            OuterDiv.SetProperty("scrollLeft", offset);
-        }
-    }
-
-    public void SetVerticalOffset(double offset)
-    {
-        if (!IsScrollClient) return;
-        if (!_scrollData.CanVerticallyScroll) return;
-
-        if (OuterDiv.IsConnected)
-        {
-            OuterDiv.SetProperty("scrollTop", offset);
-        }
-    }
-
-    [NotImplemented]
-    public Rect MakeVisible(UIElement visual, Rect rectangle) => default;
 
     private void ArrangeScrollData(Size arrangeSize)
     {
@@ -237,5 +156,128 @@ internal partial class TextViewBase : IScrollInfo
         internal double ViewportHeight => Viewport.Height;
         internal double ExtentWidth => Extent.Width;
         internal double ExtentHeight => Extent.Height;
+
+        internal void SetVerticalOffset(UIElement owner, double offset)
+        {
+            if (!CanVerticallyScroll) return;
+
+            if (owner.OuterDiv.IsConnected)
+            {
+                owner.OuterDiv.SetProperty("scrollTop", offset);
+            }
+        }
+
+        internal void SetHorizontalOffset(UIElement owner, double offset)
+        {
+            if (!CanHorizontallyScroll) return;
+
+            if (owner.OuterDiv.IsConnected)
+            {
+                owner.OuterDiv.SetProperty("scrollLeft", offset);
+            }
+        }
+
+        internal void LineUp(UIElement owner) => SetVerticalOffset(owner, Offset.Y - ScrollViewer.LineDelta);
+
+        internal void LineDown(UIElement owner) => SetVerticalOffset(owner, Offset.Y + ScrollViewer.LineDelta);
+
+        internal void LineLeft(UIElement owner) => SetHorizontalOffset(owner, Offset.X - ScrollViewer.LineDelta);
+
+        internal void LineRight(UIElement owner) => SetHorizontalOffset(owner, Offset.X + ScrollViewer.LineDelta);
+
+        internal void MouseWheelUp(UIElement owner) => SetVerticalOffset(owner, Offset.Y - ScrollViewer.WheelDelta);
+
+        internal void MouseWheelDown(UIElement owner) => SetVerticalOffset(owner, Offset.Y + ScrollViewer.WheelDelta);
+
+        internal void MouseWheelLeft(UIElement owner) => SetHorizontalOffset(owner, Offset.X - ScrollViewer.WheelDelta);
+
+        internal void MouseWheelRight(UIElement owner) => SetHorizontalOffset(owner, Offset.X + ScrollViewer.WheelDelta);
+
+        internal void PageUp(UIElement owner) => SetVerticalOffset(owner, Offset.Y - Viewport.Height);
+
+        internal void PageDown(UIElement owner) => SetVerticalOffset(owner, Offset.Y + Viewport.Height);
+
+        internal void PageLeft(UIElement owner) => SetHorizontalOffset(owner, Offset.X - Viewport.Width);
+
+        internal void PageRight(UIElement owner) => SetHorizontalOffset(owner, Offset.X + Viewport.Width);
+
+        internal Rect MakeVisible(UIElement owner, UIElement visual, Rect rectangle)
+        {
+            // We can only work on visuals that are us or children.
+            // An empty rect has no size or position.  We can't meaningfully use it.
+            if (rectangle.IsEmpty || visual is null || (visual != owner && !owner.IsAncestorOf(visual)))
+            {
+                return Rect.Empty;
+            }
+
+            // Compute the child's rect relative to (0,0) in our coordinate space.
+            Matrix childTransform = visual.InternalTransformToAncestor(owner);
+            rectangle.Transform(childTransform);
+
+            // Initialize the viewport.
+            var viewport = new Rect(HorizontalOffset, VerticalOffset, ViewportWidth, ViewportHeight);
+            rectangle.X += viewport.X;
+            rectangle.Y += viewport.Y;
+
+            // Compute the offsets required to scroll the child into view.
+            double minX = ComputeScrollOffset(viewport.Left, viewport.Right, rectangle.Left, rectangle.Right);
+            double minY = ComputeScrollOffset(viewport.Top, viewport.Bottom, rectangle.Top, rectangle.Bottom);
+
+            // We have computed the scrolling offsets; scroll to them.
+            SetHorizontalOffset(owner, minX);
+            SetVerticalOffset(owner, minY);
+
+            // Compute the visible rectangle of the child relative to the viewport.
+            if (CanHorizontallyScroll)
+            {
+                viewport.X = minX;
+            }
+            else
+            {
+                rectangle.X = viewport.X;
+            }
+
+            if (CanVerticallyScroll)
+            {
+                viewport.Y = minY;
+            }
+            else
+            {
+                rectangle.Y = viewport.Y;
+            }
+
+            rectangle.Intersect(viewport);
+
+            if (!rectangle.IsEmpty)
+            {
+                rectangle.X -= viewport.X;
+                rectangle.Y -= viewport.Y;
+            }
+
+            return rectangle;
+        }
+
+        private static double ComputeScrollOffset(double topView, double bottomView, double topChild, double bottomChild)
+        {
+            // # CHILD POSITION             REMEDY
+            // 1 Above viewport             Align top edge of child & viewport
+            // 2 Below viewport             Align top edge of child & viewport
+            // 3 Entirely within viewport   No scroll
+            // 4 Spanning viewport          Align top edge of child & viewport
+            //
+            // Note: "Above viewport" = childTop above viewportTop, childBottom above viewportBottom
+            //       "Below viewport" = childTop below viewportTop, childBottom below viewportBottom
+            // These child thus may overlap with the viewport, but will scroll the same direction
+
+            bool topInView = DoubleUtil.GreaterThanOrClose(topChild, topView) && DoubleUtil.LessThan(topChild, bottomView);
+            bool bottomInView = DoubleUtil.LessThanOrClose(bottomChild, bottomView) && DoubleUtil.GreaterThan(bottomChild, topView);
+
+            if (topInView && bottomInView)
+            {
+                return topView;
+            }
+
+            return topChild;
+        }
     }
 }

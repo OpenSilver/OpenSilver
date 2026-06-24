@@ -1189,6 +1189,49 @@ namespace System.Windows
 
         #endregion
 
+        #region BringIntoView
+
+        /// <summary>
+        /// Identifies the <see cref="RequestBringIntoView"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent RequestBringIntoViewEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(RequestBringIntoView),
+                RoutingStrategy.Bubble,
+                typeof(RequestBringIntoViewEventHandler),
+                typeof(FrameworkElement));
+
+        /// <summary>
+        /// Occurs when <see cref="BringIntoView(Rect)"/> is called on this element.
+        /// </summary>
+        public event RequestBringIntoViewEventHandler RequestBringIntoView
+        {
+            add => AddHandler(RequestBringIntoViewEvent, value, false);
+            remove => RemoveHandler(RequestBringIntoViewEvent, value);
+        }
+
+        /// <summary>
+        /// Attempts to bring this element into view, within any scrollable regions it is contained within.
+        /// </summary>
+        public void BringIntoView() => BringIntoView(Rect.Empty);
+
+        /// <summary>
+        /// Attempts to bring the provided region size of this element into view, within any scrollable regions it 
+        /// is contained within.
+        /// </summary>
+        /// <param name="targetRectangle">
+        /// Specified size of the element that should also be brought into view.
+        /// </param>
+        public void BringIntoView(Rect targetRectangle)
+        {
+            RaiseEvent(new RequestBringIntoViewEventArgs(this, targetRectangle)
+            {
+                RoutedEvent = RequestBringIntoViewEvent
+            });
+        }
+
+        #endregion BringIntoView
+
         /// <summary>
         /// Moves the keyboard focus away from this element and to another element in a provided traversal direction.
         /// </summary>
@@ -1251,6 +1294,17 @@ namespace System.Windows
                     KeyboardNavigation.Current.NotifyFocusChanged(sender, e);
                 }
             }
+        }
+
+        /// <inheritdoc />
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            if (IsKeyboardFocused)
+            {
+                BringIntoView();
+            }
+
+            base.OnGotFocus(e);
         }
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()

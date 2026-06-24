@@ -18,7 +18,8 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Xml.Linq;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace System.Windows.Controls;
 
@@ -33,6 +34,10 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     private bool _isVirtualizing;
     private int _firstItemInViewportIndex;
     private double _firstItemInViewportPixelOffset;
+
+    // The container that a BringIndexIntoView operation realized and is trying to scroll into view.
+    // It is kept alive (not recycled) by the virtualization cleanup until the scroll has settled.
+    private FrameworkElement _bringIntoViewContainer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VirtualizingStackPanel"/> class.
@@ -672,11 +677,13 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         while (pos.Index >= 0)
         {
             int item = generator.IndexFromGeneratorPosition(pos);
+            UIElement child = children[pos.Index];
 
             if ((item < firstItemInViewportIndex || item > last) &&
                 !((IGeneratorHost)owner).IsItemItsOwnContainer(owner.Items[item]) &&
-                !FocusManager.HasFocus(children[pos.Index], false) &&
-                NotifyCleanupItem(children[pos.Index], owner))
+                !child.IsKeyboardFocusWithin &&
+                child != _bringIntoViewContainer &&
+                NotifyCleanupItem(child, owner))
             {
                 RemoveInternalChildRange(pos.Index, 1);
 
@@ -1186,13 +1193,59 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </param>
     protected override void BringIndexIntoView(int index)
     {
-        if (Orientation == Orientation.Horizontal)
+        ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
+        if (itemsControl is null)
         {
-            SetHorizontalOffset(index);
+            return;
         }
-        else
+
+        BringContainerIntoView(itemsControl, index);
+    }
+
+    // Realizes the container for the item at itemIndex (generating it if necessary) and brings it
+    // into view by delegating to the container's BringIntoView, which routes through
+    // IScrollInfo.MakeVisible for minimal scrolling.
+    private void BringContainerIntoView(ItemsControl itemsControl, int itemIndex)
+    {
+        if (itemIndex < 0 || itemIndex >= itemsControl.Items.Count)
         {
-            SetVerticalOffset(index);
+            throw new ArgumentOutOfRangeException(nameof(itemIndex));
+        }
+
+        EnsureGenerator();
+
+        UIElement child;
+        IItemContainerGenerator generator = ItemContainerGenerator;
+        List<UIElement> children = UnsafeGetChildren();
+        GeneratorPosition position = generator.GeneratorPositionFromIndex(itemIndex);
+        int childIndex = position.Offset == 0 ? position.Index : position.Index + 1;
+
+        using (generator.StartAt(position, GeneratorDirection.Forward, true))
+        {
+            child = (UIElement)generator.GenerateNext(out bool isNewlyRealized);
+            if (child is not null && (isNewlyRealized || childIndex >= children.Count || children[childIndex] != child))
+            {
+                if (childIndex < children.Count)
+                {
+                    InsertInternalChild(childIndex, child);
+                }
+                else
+                {
+                    AddInternalChild(child);
+                }
+
+                generator.PrepareItemContainer(child);
+            }
+        }
+
+        if (child is FrameworkElement childFE)
+        {
+            _bringIntoViewContainer = childFE;
+
+            // Carefully remove the _bringIntoViewContainer after the storm of layouts to bring it into view has subsided
+            Dispatcher.InvokeAsync(() => _bringIntoViewContainer = null, DispatcherPriority.Loaded);
+
+            childFE.BringIntoView();
         }
     }
 
@@ -1352,41 +1405,180 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </returns>
     public Rect MakeVisible(UIElement visual, Rect rectangle)
     {
-        Rect exposed = new Rect(0, 0, 0, 0);
+        // The goal is to change offsets to bring the child into view, and return a rectangle in our space to make visible.
+        // The rectangle we return is in the physical dimension the input target rect transformed into our space.
+        // In the logical (stacking) dimension, it is our immediate child's rect.
+        // Note: This code presently assumes we/children are layout clean.
 
-        foreach (UIElement child in UnsafeGetChildren())
+        var newOffset = new Vector();
+        var newRect = new Rect();
+        Rect originalRect = rectangle;
+        bool isHorizontal = Orientation == Orientation.Horizontal;
+
+        // We can only work on visuals that are us or children.
+        // An empty rect has no size or position. We can't meaningfully use it.
+        if (rectangle.IsEmpty || visual is null || visual == this || !IsAncestorOf(visual))
         {
-            if (child == visual)
-            {
-                if (Orientation == Orientation.Vertical)
-                {
-                    if (rectangle.X != HorizontalOffset)
-                        SetHorizontalOffset(rectangle.X);
-
-                    exposed.Width = Math.Min(child.RenderSize.Width, ViewportWidth);
-                    exposed.Height = child.RenderSize.Height;
-                    exposed.X = HorizontalOffset;
-                }
-                else
-                {
-                    if (rectangle.Y != VerticalOffset)
-                        SetVerticalOffset(rectangle.Y);
-
-                    exposed.Height = Math.Min(child.RenderSize.Height, ViewportHeight);
-                    exposed.Width = child.RenderSize.Width;
-                    exposed.Y = VerticalOffset;
-                }
-
-                return exposed;
-            }
-
-            if (Orientation == Orientation.Vertical)
-                exposed.Y += child.RenderSize.Height;
-            else
-                exposed.X += child.RenderSize.Width;
+            return Rect.Empty;
         }
 
-        throw new ArgumentException("Visual is not a child of this Panel");
+        // Compute the child's rect relative to (0,0) in our coordinate space.
+        Matrix childTransform = visual.InternalTransformToAncestor(this);
+        rectangle.Transform(childTransform);
+
+        // We can't do any work unless we're scrolling.
+        if (!IsScrolling)
+        {
+            return rectangle;
+        }
+
+        // Make ourselves visible in the non-stacking direction (physical/pixel based).
+        MakeVisiblePhysicalHelper(rectangle, ref newOffset, ref newRect, !isHorizontal);
+
+        // Bring the child containing the visual into view. OpenSilver only supports logical
+        // (item based) scrolling in the stacking direction, so always use the logical helper here.
+        int childIndex = FindChildLogicalIndex(visual);
+        MakeVisibleLogicalHelper(childIndex, rectangle, ref newOffset, ref newRect);
+
+        // We have computed the scrolling offsets; validate and scroll to them.
+        newOffset.X = ScrollContentPresenter.CoerceOffset(newOffset.X, _scrollData._extent.Width, _scrollData._viewport.Width);
+        newOffset.Y = ScrollContentPresenter.CoerceOffset(newOffset.Y, _scrollData._extent.Height, _scrollData._viewport.Height);
+
+        if (!LayoutDoubleUtil.AreClose(newOffset.X, _scrollData._offset.X) ||
+            !LayoutDoubleUtil.AreClose(newOffset.Y, _scrollData._offset.Y))
+        {
+            _scrollData._offset = newOffset;
+            InvalidateMeasure();
+            OnScrollChange();
+
+            // When layout gets updated it may happen that the visual is obscured by a ScrollBar.
+            // Call MakeVisible again to make sure the element is visible in this case.
+            ScrollOwner?.MakeVisible(visual, originalRect);
+        }
+
+        return newRect;
+    }
+
+    // Finds the logical (item) index of the child container that is, or is an ancestor of, the given visual.
+    // Returns -1 if no such child exists.
+    private int FindChildLogicalIndex(UIElement visual)
+    {
+        List<UIElement> children = UnsafeGetChildren();
+        for (int i = 0; i < children.Count; i++)
+        {
+            UIElement child = children[i];
+            if (child == visual || child.IsAncestorOf(visual))
+            {
+                // When hosting items, the visual child index maps to an item index through the generator.
+                // Otherwise (standalone scrolling panel) the logical offset is the visual child index itself.
+                if (IsItemsHost && ItemContainerGenerator is IItemContainerGenerator generator)
+                {
+                    return generator.IndexFromGeneratorPosition(new GeneratorPosition(i, 0));
+                }
+
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // Adjusts the offset in the non-stacking (physical/pixel) direction to bring the target rect into view.
+    // This is very similar to the work that ScrollContentPresenter does for MakeVisible.
+    private void MakeVisiblePhysicalHelper(Rect r, ref Vector newOffset, ref Rect newRect, bool isHorizontal)
+    {
+        double viewportOffset;
+        double viewportSize;
+        double targetRectOffset;
+        double targetRectSize;
+
+        if (isHorizontal)
+        {
+            viewportOffset = _scrollData._computedOffset.X;
+            viewportSize = ViewportWidth;
+            targetRectOffset = r.X;
+            targetRectSize = r.Width;
+        }
+        else
+        {
+            viewportOffset = _scrollData._computedOffset.Y;
+            viewportSize = ViewportHeight;
+            targetRectOffset = r.Y;
+            targetRectSize = r.Height;
+        }
+
+        targetRectOffset += viewportOffset;
+        double minPhysicalOffset = ScrollContentPresenter.ComputeScrollOffsetWithMinimalScroll(
+            viewportOffset, viewportOffset + viewportSize, targetRectOffset, targetRectOffset + targetRectSize);
+
+        // Compute the visible rectangle of the child relative to the viewport.
+        double start = targetRectOffset - minPhysicalOffset;
+        double end = start + targetRectSize;
+
+        double visibleStart = Math.Max(start, 0);
+        double visibleEnd = Math.Max(Math.Min(end, viewportSize), visibleStart);
+
+        if (isHorizontal)
+        {
+            newOffset.X = minPhysicalOffset;
+            newRect.X = visibleStart;
+            newRect.Width = visibleEnd - visibleStart;
+        }
+        else
+        {
+            newOffset.Y = minPhysicalOffset;
+            newRect.Y = visibleStart;
+            newRect.Height = visibleEnd - visibleStart;
+        }
+    }
+
+    // Adjusts the offset in the stacking (logical/item) direction to bring the child at childIndex into view.
+    private void MakeVisibleLogicalHelper(int childIndex, Rect r, ref Vector newOffset, ref Rect newRect)
+    {
+        bool fHorizontal = Orientation == Orientation.Horizontal;
+        int firstChildInView;
+        int viewportSize;
+        double childOffsetWithinViewport = fHorizontal ? r.X : r.Y;
+
+        if (fHorizontal)
+        {
+            firstChildInView = (int)_scrollData._computedOffset.X;
+            viewportSize = (int)_scrollData._viewport.Width;
+        }
+        else
+        {
+            firstChildInView = (int)_scrollData._computedOffset.Y;
+            viewportSize = (int)_scrollData._viewport.Height;
+        }
+
+        int newFirstChild = firstChildInView;
+
+        // If the target child is before the current viewport, move the viewport to put the child at the top.
+        if (childIndex < firstChildInView)
+        {
+            childOffsetWithinViewport = 0;
+            newFirstChild = childIndex;
+        }
+        // If the target child is after the current viewport, move the viewport to put the child at the bottom.
+        else if (childIndex > firstChildInView + Math.Max(viewportSize - 1, 0))
+        {
+            newFirstChild = childIndex - viewportSize + 1;
+            double pixelSize = fHorizontal ? ActualWidth : ActualHeight;
+            childOffsetWithinViewport = pixelSize * (1.0 - (1.0 / viewportSize));
+        }
+
+        if (fHorizontal)
+        {
+            newOffset.X = newFirstChild;
+            newRect.X = childOffsetWithinViewport;
+            newRect.Width = r.Width;
+        }
+        else
+        {
+            newOffset.Y = newFirstChild;
+            newRect.Y = childOffsetWithinViewport;
+            newRect.Height = r.Height;
+        }
     }
 
     private bool IsScrolling => ScrollOwner is not null;

@@ -591,7 +591,6 @@ namespace System.Windows.Controls
 
             BringIntoView();
         }
-#endif // SL_TOOLKIT
 
         /// <summary>
         /// Scroll the TreeViewItem into view.
@@ -621,6 +620,7 @@ namespace System.Windows.Controls
                 }
             }
         }
+#endif // SL_TOOLKIT
 
         /// <summary>
         /// Update the visual state of the control.

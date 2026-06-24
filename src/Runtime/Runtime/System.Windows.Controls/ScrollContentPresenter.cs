@@ -508,10 +508,141 @@ namespace System.Windows.Controls
         /// <returns>
         /// A <see cref="Rect"/> that represents the visible region.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public Rect MakeVisible(UIElement visual, Rect rectangle)
+        public Rect MakeVisible(UIElement visual, Rect rectangle) => MakeVisible(visual, rectangle, true);
+
+        /// <summary>
+        /// ScrollContentPresenter implementation of <seealso cref="IScrollInfo.MakeVisible" />.
+        /// </summary>
+        /// <param name="visual">The Visual that should become visible</param>
+        /// <param name="rectangle">A rectangle representing in the visual's coordinate space to make visible.</param>
+        /// <param name="throwOnError">If true the method throws an exception when an error is encountered, otherwise the method returns Rect.Empty when an error is encountered</param>
+        /// <returns>
+        /// A rectangle in the IScrollInfo's coordinate space that has been made visible.
+        /// Other ancestors to in turn make this new rectangle visible.
+        /// The rectangle should generally be a transformed version of the input rectangle.  In some cases, like
+        /// when the input rectangle cannot entirely fit in the viewport, the return value might be smaller.
+        /// </returns>
+        internal Rect MakeVisible(UIElement visual, Rect rectangle, bool throwOnError)
         {
-            throw new NotImplementedException();
+            // (ScrollContentPresenter.MakeVisible can cause an exception when encountering an empty rectangle)
+            // This method exists to keep ScrollContentPresenter.MakeVisible v1 behavior
+            // while allowing callers of IScrollInfo.MakeVisible in the platform work around a bug
+            // in the v1 behavior.
+            // If this bug is fixed look for callers of IScrollInfo.MakeVisible with workarounds.
+            // They should be updated remove the workarounds.
+
+            //
+            // Note: This code presently assumes we/children are layout clean.  See work item 22269 for more detail.
+            //
+
+            // We can only work on visuals that are us or children.
+            // An empty rect has no size or position.  We can't meaningfully use it.
+            if (rectangle.IsEmpty || visual is null || visual == this || !IsAncestorOf(visual))
+            {
+                return Rect.Empty;
+            }
+
+            // Compute the child's rect relative to (0,0) in our coordinate space.
+            Matrix childTransform = visual.InternalTransformToAncestor(this);
+
+            rectangle.Transform(childTransform);
+
+            if (!IsScrollClient || (!throwOnError && rectangle.IsEmpty))
+            {
+                return rectangle;
+            }
+
+            // Initialize the viewport
+            var viewport = new Rect(HorizontalOffset, VerticalOffset, ViewportWidth, ViewportHeight);
+            rectangle.X += viewport.X;
+            rectangle.Y += viewport.Y;
+
+            // Compute the offsets required to minimally scroll the child maximally into view.
+            double minX = ComputeScrollOffsetWithMinimalScroll(viewport.Left, viewport.Right, rectangle.Left, rectangle.Right);
+            double minY = ComputeScrollOffsetWithMinimalScroll(viewport.Top, viewport.Bottom, rectangle.Top, rectangle.Bottom);
+
+            // We have computed the scrolling offsets; scroll to them.
+            SetHorizontalOffset(minX);
+            SetVerticalOffset(minY);
+
+            // Compute the visible rectangle of the child relative to the viewport.
+            viewport.X = minX;
+            viewport.Y = minY;
+            rectangle.Intersect(viewport);
+
+            if (throwOnError)
+            {
+                // (ScrollContentPresenter.MakeVisible can cause an exception when encountering an empty rectangle)
+                // Old behavior for app compat
+                rectangle.X -= viewport.X;
+                rectangle.Y -= viewport.Y;
+            }
+            else
+            {
+                // (ScrollContentPresenter.MakeVisible can cause an exception when encountering an empty rectangle)
+                // New correct behavior
+                if (!rectangle.IsEmpty)
+                {
+                    rectangle.X -= viewport.X;
+                    rectangle.Y -= viewport.Y;
+                }
+            }
+
+            // Return the rectangle
+            return rectangle;
+        }
+
+        internal static double ComputeScrollOffsetWithMinimalScroll(
+            double topView,
+            double bottomView,
+            double topChild,
+            double bottomChild)
+        {
+            bool alignTop = false;
+            bool alignBottom = false;
+            return ComputeScrollOffsetWithMinimalScroll(topView, bottomView, topChild, bottomChild, ref alignTop, ref alignBottom);
+        }
+
+        internal static double ComputeScrollOffsetWithMinimalScroll(
+            double topView,
+            double bottomView,
+            double topChild,
+            double bottomChild,
+            ref bool alignTop,
+            ref bool alignBottom)
+        {
+            // # CHILD POSITION       CHILD SIZE      SCROLL      REMEDY
+            // 1 Above viewport       <= viewport     Down        Align top edge of child & viewport
+            // 2 Above viewport       > viewport      Down        Align bottom edge of child & viewport
+            // 3 Below viewport       <= viewport     Up          Align bottom edge of child & viewport
+            // 4 Below viewport       > viewport      Up          Align top edge of child & viewport
+            // 5 Entirely within viewport             NA          No scroll.
+            // 6 Spanning viewport                    NA          No scroll.
+            //
+            // Note: "Above viewport" = childTop above viewportTop, childBottom above viewportBottom
+            //       "Below viewport" = childTop below viewportTop, childBottom below viewportBottom
+            // These child thus may overlap with the viewport, but will scroll the same direction/
+
+            bool fAbove = DoubleUtil.LessThan(topChild, topView) && DoubleUtil.LessThan(bottomChild, bottomView);
+            bool fBelow = DoubleUtil.GreaterThan(bottomChild, bottomView) && DoubleUtil.GreaterThan(topChild, topView);
+            bool fLarger = (bottomChild - topChild) > (bottomView - topView);
+
+            // Handle Cases:  1 & 4 above
+            if ((fAbove && !fLarger) || (fBelow && fLarger) || alignTop)
+            {
+                alignTop = true;
+                return topChild;
+            }
+
+            // Handle Cases: 2 & 3 above
+            else if (fAbove || fBelow || alignBottom)
+            {
+                alignBottom = true;
+                return bottomChild - (bottomView - topView);
+            }
+
+            // Handle cases: 5 & 6 above.
+            return topView;
         }
 
         internal static double ValidateInputOffset(double offset, string parameterName)

@@ -200,6 +200,7 @@
     <Compile Include="System.Windows.Media\ToleranceType.cs" />
     <Compile Include="System.Windows\ComponentResourceKey.cs" />
     <Compile Include="System.Windows\CoreCompatibilityPreferences.cs" />
+    <Compile Include="System.Windows\RequestBringIntoViewEventArgs.cs" />
     <Compile Include="System.Windows\ResourceKey.cs" />
     <Compile Include="System.Windows\SystemResourceKey.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
