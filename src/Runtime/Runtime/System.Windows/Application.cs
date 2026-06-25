@@ -487,7 +487,7 @@ namespace System.Windows
         public Window MainWindow
         {
             get => _mainWindow;
-            private set
+            set
             {
                 if (_mainWindow is not null)
                 {

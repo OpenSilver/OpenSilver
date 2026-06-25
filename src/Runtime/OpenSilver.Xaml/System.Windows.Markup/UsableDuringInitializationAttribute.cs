@@ -20,20 +20,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup;
+
+/// <summary>
+/// Indicates whether this type is built top-down during XAML object graph creation.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+public sealed class UsableDuringInitializationAttribute : Attribute
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    internal sealed class UsableDuringInitializationAttribute : Attribute
-	{
-		public UsableDuringInitializationAttribute(bool usable)
-		{
-			Usable = usable;
-		}
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UsableDuringInitializationAttribute"/> class.
+    /// </summary>
+    /// <param name="usable">Defines whether the associated class is usable during initialization.</param>
+    public UsableDuringInitializationAttribute(bool usable)
+    {
+        Usable = usable;
+    }
 
-		public bool Usable { get; private set; }
-	}
+    /// <summary>
+    /// Gets a value that indicates whether the associated class is usable during initialization.
+    /// </summary>
+    public bool Usable { get; }
 }

@@ -20,20 +20,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //\
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup;
+
+/// <summary>
+/// Identifies the property to associate with the xml:lang attribute.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public sealed class XmlLangPropertyAttribute : Attribute
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal sealed class XmlLangPropertyAttribute : Attribute
-	{
-		public XmlLangPropertyAttribute(string name)
-		{
-			Name = name;
-		}
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlLangPropertyAttribute"/> class.
+    /// </summary>
+    /// <param name="name">The property name to associate with the xml:lang attribute.</param>
+    public XmlLangPropertyAttribute(string name)
+    {
+        Name = name;
+    }
 
-		public string Name { get; private set; }
-	}
+    /// <summary>
+    /// Gets the name of the property that is specified in this attribute.
+    /// </summary>
+    public string Name { get; private set; }
 }

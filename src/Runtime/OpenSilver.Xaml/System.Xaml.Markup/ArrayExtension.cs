@@ -20,85 +20,126 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Markup;
 
 namespace System.Xaml.Markup
 {
-	[MarkupExtensionReturnType(typeof(Array))]
-	[ContentProperty("Items")]
+    /// <summary>
+    /// Implements x:Array support for .NET XAML Services.
+    /// </summary>
+    [MarkupExtensionReturnType(typeof(Array))]
+    [ContentProperty(nameof(Items))]
     //[System.Runtime.CompilerServices.TypeForwardedFrom (Consts.AssemblyPresentationFramework_3_5)]
-    internal class ArrayExtension : MarkupExtension
-	{
-		public ArrayExtension()
-		{
-			items = new List<object>();
-		}
+    public class ArrayExtension : MarkupExtension
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArrayExtension"/> class. This creates an empty array.
+        /// </summary>
+        public ArrayExtension()
+        {
+            items = [];
+        }
 
-		public ArrayExtension(Array elements)
-		{
-			ArgumentNullException.ThrowIfNull(elements);
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArrayExtension"/> class based on the provided raw array.
+        /// </summary>
+        /// <param name="elements">The array content that populates the created array.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="elements"/> is <see langword="null"/>.</exception>
+        /// <remarks>This method supports markup extension behavior and is not typically
+        /// called by user code, unless that user code implements XAML processing behavior.</remarks>
+        public ArrayExtension(Array elements)
+        {
+            ArgumentNullException.ThrowIfNull(elements);
 
             Type = elements.GetType().GetElementType();
-			items = new List<object>(elements.OfType<object>());
-		}
+            items = [.. elements.OfType<object>()];
+        }
 
-		public ArrayExtension(Type arrayType)
-		{
-			ArgumentNullException.ThrowIfNull(arrayType);
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArrayExtension"/> class and initializes the type of the array.
+        /// </summary>
+        /// <param name="arrayType">The object type of the new array.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="arrayType"/> is <see langword="null"/>.</exception>
+        /// <remarks>This method supports markup extension behavior and is not typically
+        /// called by user code, unless that user code implements XAML processing behavior.</remarks>
+        public ArrayExtension(Type arrayType)
+        {
+            ArgumentNullException.ThrowIfNull(arrayType);
 
             Type = arrayType;
-			items = new List<object>();
-		}
+            items = [];
+        }
 
-		[ConstructorArgument("arrayType")]
-		public Type Type { get; set; }
+        /// <summary>
+        /// Gets or sets the type of array to be created when calling <see cref="ProvideValue(IServiceProvider)"/>.
+        /// </summary>
+        [ConstructorArgument("arrayType")]
+        public Type Type { get; set; }
 
-		List<object> items;
-		//[DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
-		public IList Items
-		{
-			get { return items; }
-		}
+        private readonly List<object> items;
 
-		public void AddChild(Object value)
-		{
-			// null is allowed.
-			Items.Add(value);
-		}
+        /// <summary>
+        /// Gets the contents of the array. Settable in XAML through XAML collection syntax.
+        /// </summary>
+        //[DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+        public IList Items => items;
 
-		public void AddText(string text)
-		{
-			// null is allowed.
-			Items.Add(text);
-		}
+        /// <summary>
+        /// Appends the supplied object to the end of the array.
+        /// </summary>
+        /// <param name="value">The object to add to the end of the array.</param>
+        public void AddChild(object value)
+        {
+            // null is allowed.
+            Items.Add(value);
+        }
 
-		public override object ProvideValue(IServiceProvider serviceProvider)
-		{
-			if (Type == null)
-				throw new InvalidOperationException("Type property must be set before calling ProvideValue method");
+        /// <summary>
+        /// Adds a text node as a new array item.
+        /// </summary>
+        /// <param name="text">The text to add to the end of the array.</param>
+        public void AddText(string text)
+        {
+            // null is allowed.
+            Items.Add(text);
+        }
 
-			bool invalid = false;
-			foreach (var item in Items)
-			{
-				if (item == null)
-				{
-					if (Type.GetTypeInfo().IsValueType)
-						invalid = true;
-				}
-				else if (!Type.GetTypeInfo().IsAssignableFrom(item.GetType().GetTypeInfo()))
-					invalid = true;
-				if (invalid)
-					throw new InvalidOperationException(String.Format("Item in the array must be an instance of '{0}'", Type));
-			}
-			Array a = Array.CreateInstance(Type, Items.Count);
-			Items.CopyTo(a, 0);
-			return a;
-		}
-	}
+        /// <summary>
+        /// Returns an array that is sized to the number of objects supplied in the <see cref="Items"/> values.
+        /// </summary>
+        /// <param name="serviceProvider">An object that can provide services for the markup extension.</param>
+        /// <returns>The created array, or null.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Processed an array that did not provide a valid <see cref="Type"/>.
+        /// -or-
+        /// There is a type mismatch between the declared <see cref="Type"/> of the array 
+        /// and one or more of its <see cref="Items"/> values.
+        /// </exception>
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            if (Type == null)
+                throw new InvalidOperationException("Type property must be set before calling ProvideValue method");
+
+            bool invalid = false;
+            foreach (var item in Items)
+            {
+                if (item == null)
+                {
+                    if (Type.GetTypeInfo().IsValueType)
+                        invalid = true;
+                }
+                else if (!Type.GetTypeInfo().IsAssignableFrom(item.GetType().GetTypeInfo()))
+                    invalid = true;
+                if (invalid)
+                    throw new InvalidOperationException(string.Format("Item in the array must be an instance of '{0}'", Type));
+            }
+            Array a = Array.CreateInstance(Type, Items.Count);
+            Items.CopyTo(a, 0);
+            return a;
+        }
+    }
 }
