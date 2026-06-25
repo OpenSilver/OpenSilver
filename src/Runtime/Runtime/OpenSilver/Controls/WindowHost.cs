@@ -66,6 +66,15 @@ public class WindowHost : ContentControl
     static WindowHost()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(WindowHost), new PropertyMetadata(typeof(WindowHost)));
+        EventManager.RegisterClassHandler<WindowHost>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
+    }
+
+    private static void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is WindowHost host)
+        {
+            host._window?.Activate();
+        }
     }
 
     internal WindowHost(Window window)

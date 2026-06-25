@@ -336,7 +336,33 @@ public class Window : ContentControl, IResizeObserverListener
     /// </summary>
     public void Activate()
     {
-        // Not needed in HTML.
+        BringToFront();
+
+        if (ActiveWindow != this)
+        {
+            Window previous = ActiveWindow;
+            ActiveWindow = this;
+            Current = this;
+            previous?.OnDeactivated(EventArgs.Empty);
+            OnActivated(EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    /// Moves this window's overlay to the front of the z-order.
+    /// </summary>
+    internal void BringToFront()
+    {
+        if (!_overlayDiv.IsConnected) return;
+
+        Application app = Application.Current;
+        if (app is null) return;
+
+        string rootId = app.GetRootDiv().Uid;
+        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+            $"(function(){{ var overlay=document.getElementById('{_overlayDiv.Uid}');" +
+            $"var root=document.getElementById('{rootId}');" +
+            $"if(overlay && root) root.appendChild(overlay); }})()");
     }
 
     #region Closing event
