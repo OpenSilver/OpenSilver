@@ -33,6 +33,8 @@ namespace System.Windows
     /// object tree, and object lifetime feature areas.
     /// </summary>
     [RuntimeNameProperty(nameof(Name))]
+    [XmlLangProperty(nameof(Language))]
+    [UsableDuringInitialization(true)]
     public abstract partial class FrameworkElement : UIElement, ISupportInitialize, IResourceDictionaryOwner
     {
         #region Inheritance Context

@@ -29,6 +29,7 @@ namespace System.Windows
     /// Alternatively you can access resources by traversing the dictionary at run
     /// time.
     /// </summary>
+    [UsableDuringInitialization(true)]
     public partial class ResourceDictionary : DependencyObject,
         IDictionary<object, object>,
         IDictionary,
