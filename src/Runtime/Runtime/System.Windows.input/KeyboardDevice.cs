@@ -327,12 +327,10 @@ public abstract class KeyboardDevice : InputDevice
 
         ToolTipService.OnKeyDown(key);
 
-        var previewKeyDown = new KeyEventArgs(this, timestamp, key)
+        var previewKeyDown = new KeyEventArgs(this, timestamp, key, keyCode, modifiers, true)
         {
             RoutedEvent = Keyboard.PreviewKeyDownEvent,
             Source = source,
-            PlatformKeyCode = keyCode,
-            KeyModifiers = modifiers,
             UIEventArg = jsEventArg,
         };
 
@@ -344,12 +342,10 @@ public abstract class KeyboardDevice : InputDevice
             return;
         }
 
-        var keyDown = new KeyEventArgs(this, timestamp, key)
+        var keyDown = new KeyEventArgs(this, timestamp, key, keyCode, modifiers, true)
         {
             RoutedEvent = Keyboard.KeyDownEvent,
             Source = source,
-            PlatformKeyCode = keyCode,
-            KeyModifiers = modifiers,
             UIEventArg = jsEventArg,
         };
 
@@ -386,12 +382,10 @@ public abstract class KeyboardDevice : InputDevice
         ModifierKeys modifiers = Keyboard.Modifiers;
         int timestamp = Environment.TickCount;
 
-        var previewKeyUp = new KeyEventArgs(this, timestamp, key)
+        var previewKeyUp = new KeyEventArgs(this, timestamp, key, keyCode, modifiers, false)
         {
             RoutedEvent = Keyboard.PreviewKeyUpEvent,
             Source = source,
-            PlatformKeyCode = keyCode,
-            KeyModifiers = modifiers,
             UIEventArg = jsEventArg,
         };
 
@@ -402,12 +396,10 @@ public abstract class KeyboardDevice : InputDevice
             return;
         }
 
-        var keyUp = new KeyEventArgs(this, timestamp, key)
+        var keyUp = new KeyEventArgs(this, timestamp, key, keyCode, modifiers, false)
         {
             RoutedEvent = Keyboard.KeyUpEvent,
             Source = source,
-            PlatformKeyCode = keyCode,
-            KeyModifiers = modifiers,
             UIEventArg = jsEventArg,
         };
 

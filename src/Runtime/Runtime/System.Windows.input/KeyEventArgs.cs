@@ -20,6 +20,8 @@ namespace System.Windows.Input;
 /// </summary>
 public sealed class KeyEventArgs : KeyboardEventArgs
 {
+    private readonly bool _isDown;
+
     [EditorBrowsable(EditorBrowsableState.Never)]
     public KeyEventArgs()
         : base(Keyboard.PrimaryDevice, Environment.TickCount)
@@ -42,6 +44,15 @@ public sealed class KeyEventArgs : KeyboardEventArgs
         : base(keyboard, timestamp)
     {
         Key = key;
+    }
+
+    internal KeyEventArgs(KeyboardDevice keyboard, int timestamp, Key key, int keyCode, ModifierKeys modifiers, bool isDown)
+        : base(keyboard, timestamp)
+    {
+        Key = key;
+        PlatformKeyCode = keyCode;
+        KeyModifiers = modifiers;
+        _isDown = isDown;
     }
 
     /// <inheritdoc />
@@ -79,7 +90,7 @@ public sealed class KeyEventArgs : KeyboardEventArgs
     /// <returns>
     /// One of the enumeration values that indicates the key referenced by the event.
     /// </returns>
-    public Key Key { get; internal set; }
+    public Key Key { get; }
 
     /// <summary>
     /// Gets an integer value that represents the key that is pressed or released (depending on which 
@@ -88,11 +99,27 @@ public sealed class KeyEventArgs : KeyboardEventArgs
     /// <returns>
     /// The key code value.
     /// </returns>
-    public int PlatformKeyCode { get; internal set; }
+    public int PlatformKeyCode { get; }
 
     /// <summary>
     /// Gets a value that indicates which key modifiers were active at the time that
     /// the pointer event was initiated.
     /// </summary>
-    public ModifierKeys KeyModifiers { get; internal set; }
+    public ModifierKeys KeyModifiers { get; }
+
+    /// <summary>
+    /// Gets a value that indicates whether the key referenced by the event is in the down state.
+    /// </summary>
+    /// <returns>
+    /// true if the key is down; otherwise, false.
+    /// </returns>
+    public bool IsDown => _isDown;
+
+    /// <summary>
+    /// Gets a value that indicates whether the key referenced by the event is in the up state.
+    /// </summary>
+    /// <returns>
+    /// true if the key is up; otherwise, false. There is no default value.
+    /// </returns>
+    public bool IsUp => !_isDown;
 }
