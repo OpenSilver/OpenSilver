@@ -41,7 +41,9 @@ namespace System.Windows.Controls
         private Size _noWrapSize = Size.Empty;
         private Size? _textSize;
         private bool _textContentChanging;
-        private WeakEventToken _weakEventToken;
+        private bool _refreshBackgroundOnSizeChange;
+        private WeakEventToken _weakForegroundChangedEventToken;
+        private WeakEventToken _weakBackgroundChangedEventToken;
 
         static TextBlock()
         {
@@ -59,6 +61,58 @@ namespace System.Windows.Controls
         public TextBlock()
         {
             SetValueInternal(InlinesProperty, new InlineCollection(this));
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Background"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty BackgroundProperty =
+            TextElement.BackgroundProperty.AddOwner(
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(null, OnBackgroundChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBlock)d).SetBackground((Brush)newValue),
+                });
+
+        /// <summary>
+        /// Gets or sets the <see cref="Brush"/> used to fill the background of content area.
+        /// </summary>
+        /// <returns>
+        /// The brush used to fill the background of the content area, or null to not use a background brush.
+        /// The default is null.
+        /// </returns>
+        public Brush Background
+        {
+            get => (Brush)GetValue(BackgroundProperty);
+            set => SetValueInternal(BackgroundProperty, value);
+        }
+
+        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var textBlock = (TextBlock)d;
+
+            textBlock._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+
+            textBlock._weakBackgroundChangedEventToken?.Dispose();
+            textBlock._weakBackgroundChangedEventToken = null;
+
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
+            {
+                textBlock._weakBackgroundChangedEventToken = WeakEvent.Subscribe<TextBlock, Brush, EventArgs>(
+                    textBlock,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
+            }
+        }
+
+        private void OnBackgroundChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                this.SetBackground((Brush)sender);
+            }
         }
 
         /// <summary>
@@ -500,15 +554,12 @@ namespace System.Windows.Controls
         {
             var tb = (TextBlock)d;
 
-            if (tb._weakEventToken != null)
-            {
-                tb._weakEventToken.Dispose();
-                tb._weakEventToken = null;
-            }
+            tb._weakForegroundChangedEventToken?.Dispose();
+            tb._weakForegroundChangedEventToken = null;
 
             if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
-                tb._weakEventToken = WeakEvent.Subscribe<TextBlock, Brush, EventArgs>(
+                tb._weakForegroundChangedEventToken = WeakEvent.Subscribe<TextBlock, Brush, EventArgs>(
                     tb,
                     newBrush,
                     static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
@@ -988,6 +1039,17 @@ namespace System.Windows.Controls
         /// </returns>
         [OpenSilver.NotImplemented]
         public FontSource FontSource { get; set; }
+
+        /// <inheritdoc />
+        protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
+        {
+            base.OnRenderSizeChanged(info);
+
+            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                this.SetBackground(Background);
+            }
+        }
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new TextBlockAutomationPeer(this);

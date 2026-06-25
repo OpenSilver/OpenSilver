@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Documents;
 using System.Text;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Xaml.Markup;
-using OpenSilver.Internal.Documents;
-using OpenSilver.Internal;
 
 namespace System.Windows.Documents;
 
@@ -28,6 +29,7 @@ namespace System.Windows.Documents;
 public abstract class TextElement : UIElement
 {
     private ITextContainer _textContainer;
+    private WeakEventToken _weakEventToken;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TextElement"/> class.
@@ -37,6 +39,58 @@ public abstract class TextElement : UIElement
     internal ITextContainer TextContainer => _textContainer ??= TextContainersHelper.Create(this);
 
     internal virtual bool IsModel { get; set; }
+
+    /// <summary>
+    /// Identifies the <see cref="Background"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BackgroundProperty =
+        DependencyProperty.Register(
+            nameof(Background),
+            typeof(Brush),
+            typeof(TextElement),
+            new FrameworkPropertyMetadata(null, OnBackgroundChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextElement)d).SetBackground((Brush)newValue),
+            });
+
+    /// <summary>
+    /// Gets or sets the brush used to fill the background of the content area.
+    /// </summary>
+    /// <returns>
+    /// The brush used to fill the background of the content area, or null to not 
+    /// use a background brush. The default is null.
+    /// </returns>
+    public Brush Background
+    {
+        get => (Brush)GetValue(BackgroundProperty);
+        set => SetValueInternal(BackgroundProperty, value);
+    }
+
+    private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var textElement = (TextElement)d;
+
+        textElement._weakEventToken?.Dispose();
+        textElement._weakEventToken = null;
+
+        if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
+        {
+            textElement._weakEventToken = WeakEvent.Subscribe<TextElement, Brush, EventArgs>(
+                textElement,
+                newBrush,
+                static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
+                static (handler, source) => source.Changed -= new EventHandler(handler),
+                static (handler, source) => source.Changed += new EventHandler(handler));
+        }
+    }
+
+    private void OnBackgroundChanged(object sender, EventArgs e)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            this.SetBackground((Brush)sender);
+        }
+    }
 
     /// <summary>
     /// Identifies the <see cref="CharacterSpacing"/> dependency property.

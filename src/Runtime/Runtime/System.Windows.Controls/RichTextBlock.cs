@@ -42,6 +42,8 @@ namespace System.Windows.Controls
         }
 
         private BlockCollection _blocks;
+        private bool _refreshBackgroundOnSizeChange;
+        private WeakEventToken _weakEventToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextBlock"/> class.
@@ -68,6 +70,58 @@ namespace System.Windows.Controls
         private static void OnBlocksChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((RichTextBlock)d)._blocks = (BlockCollection)e.NewValue;
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Background"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty BackgroundProperty =
+            TextElement.BackgroundProperty.AddOwner(
+                typeof(RichTextBlock),
+                new FrameworkPropertyMetadata(null, OnBackgroundChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetBackground((Brush)newValue),
+                });
+
+        /// <summary>
+        /// Gets or sets the <see cref="Brush"/> used to fill the background of content area.
+        /// </summary>
+        /// <returns>
+        /// The brush used to fill the background of the content area, or null to not use a background brush.
+        /// The default is null.
+        /// </returns>
+        public Brush Background
+        {
+            get => (Brush)GetValue(BackgroundProperty);
+            set => SetValueInternal(BackgroundProperty, value);
+        }
+
+        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var richTextBlock = (RichTextBlock)d;
+
+            richTextBlock._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+
+            richTextBlock._weakEventToken?.Dispose();
+            richTextBlock._weakEventToken = null;
+
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
+            {
+                richTextBlock._weakEventToken = WeakEvent.Subscribe<RichTextBlock, Brush, EventArgs>(
+                    richTextBlock,
+                    newBrush,
+                    static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
+                    static (handler, source) => source.Changed -= new EventHandler(handler),
+                    static (handler, source) => source.Changed += new EventHandler(handler));
+            }
+        }
+
+        private void OnBackgroundChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                this.SetBackground((Brush)sender);
+            }
         }
 
         /// <summary>
@@ -448,6 +502,17 @@ namespace System.Windows.Controls
                         }
                     }
                 }
+            }
+        }
+
+        /// <inheritdoc />
+        protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
+        {
+            base.OnRenderSizeChanged(info);
+
+            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                this.SetBackground(Background);
             }
         }
 
