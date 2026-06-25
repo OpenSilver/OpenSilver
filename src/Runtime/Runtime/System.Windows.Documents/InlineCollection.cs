@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections;
-using System.Xml.Linq;
 
 namespace System.Windows.Documents;
 
@@ -26,6 +25,28 @@ public class InlineCollection : TextElementCollection<Inline>, IList
     {
     }
 
+    /// <summary>
+    /// Gets the first <see cref="Inline"/> element within this instance of <see cref="InlineCollection"/>.
+    /// </summary>
+    /// <returns>
+    /// The first <see cref="Inline"/> element within this instance of <see cref="InlineCollection"/>.
+    /// </returns>
+    public Inline FirstInline => InternalCount > 0 ? InternalItems[0] : null;
+
+    /// <summary>
+    /// Gets the last <see cref="Inline"/> element within this instance of <see cref="InlineCollection"/>.
+    /// </summary>
+    /// <returns>
+    /// The last <see cref="Inline"/> element within this instance of <see cref="InlineCollection"/>.
+    /// </returns>
+    public Inline LastInline => InternalCount > 0 ? InternalItems[InternalCount - 1] : null;
+
+    /// <summary>
+    /// Adds an implicit <see cref="Run"/> element with the given text, supplied as a <see cref="string"/>.
+    /// </summary>
+    /// <param name="text">
+    /// Text set as the <see cref="Run.Text"/> property for the implicit <see cref="Run"/>.
+    /// </param>
     public void Add(string text)
     {
         ArgumentNullException.ThrowIfNull(text);

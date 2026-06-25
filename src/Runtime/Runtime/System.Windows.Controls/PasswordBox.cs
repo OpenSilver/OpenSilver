@@ -289,6 +289,11 @@ namespace System.Windows.Controls
 
         #endregion
 
+        /// <summary>
+        /// Clears the value of the <see cref="Password"/> property.
+        /// </summary>
+        public void Clear() => Password = string.Empty;
+
         protected override void OnMouseEnter(MouseEventArgs e)
         {
             base.OnMouseEnter(e);

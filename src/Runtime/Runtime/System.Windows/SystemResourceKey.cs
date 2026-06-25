@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Reflection;
 
 namespace System.Windows;
@@ -20,6 +21,7 @@ namespace System.Windows;
 /// </summary>
 internal enum SystemResourceKeyID
 {
+    // ---- Colors and Brushes section ----
     InternalSystemColorsStart = 0,
 
     ActiveBorderBrush,
@@ -74,6 +76,22 @@ internal enum SystemResourceKeyID
     ControlDarkDarkColor,
 
     InternalSystemColorsEnd,
+
+    // ---- SystemParameters section ---
+    InternalSystemParametersStart,
+
+    MenuFade,
+    MenuAnimation,
+    MenuPopupAnimation,
+
+    // ---- SystemThemeStyle section ---
+    InternalSystemThemeStylesStart,
+
+    FocusVisualStyle,
+
+    InternalSystemParametersEnd,
+
+    InternalSystemThemeStylesEnd,
 }
 
 internal sealed class SystemResourceKey : ResourceKey
@@ -145,6 +163,9 @@ internal sealed class SystemResourceKey : ResourceKey
                 SystemResourceKeyID.DesktopColor => SystemColors.DesktopColor,
                 SystemResourceKeyID.GrayTextColor => SystemColors.GrayTextColor,
                 SystemResourceKeyID.ControlDarkDarkColor => SystemColors.ControlDarkDarkColor,
+                SystemResourceKeyID.MenuFade => BooleanBoxes.Box(SystemParameters.MenuFade),
+                SystemResourceKeyID.MenuAnimation => BooleanBoxes.Box(SystemParameters.MenuAnimation),
+                SystemResourceKeyID.MenuPopupAnimation => SystemParameters.MenuPopupAnimation,
                 _ => null,
             };
         }

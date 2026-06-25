@@ -203,6 +203,7 @@
     <Compile Include="System.Windows\RequestBringIntoViewEventArgs.cs" />
     <Compile Include="System.Windows\ResourceKey.cs" />
     <Compile Include="System.Windows\SystemResourceKey.cs" />
+    <Compile Include="System.Windows\SystemThemeKey.cs" />
     <Compile Include="System.Windows\TemplateContent.cs" />
     <Compile Include="System.Windows\TemplateKey.cs" />
     <Compile Include="System.Windows\TextMarkerStyle.cs" />

@@ -33,14 +33,26 @@ public sealed class ImageBrush : TileBrush
     public ImageBrush() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="ImageBrush"/> class that paints an 
+    /// area with the specified image.
+    /// </summary>
+    /// <param name="image">
+    /// The image to display.
+    /// </param>
+    public ImageBrush(ImageSource image)
+    {
+        ImageSource = image;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="ImageSource"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty ImageSourceProperty =
-    DependencyProperty.Register(
-        nameof(ImageSource),
-        typeof(ImageSource),
-        typeof(ImageBrush),
-        new PropertyMetadata(null, OnImageSourceChanged));
+        DependencyProperty.Register(
+            nameof(ImageSource),
+            typeof(ImageSource),
+            typeof(ImageBrush),
+            new PropertyMetadata(null, OnImageSourceChanged));
 
     /// <summary>
     /// Gets or sets the image displayed by this <see cref="ImageBrush"/>.

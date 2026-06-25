@@ -22,4 +22,20 @@ public sealed class BlockCollection : TextElementCollection<Block>
         : base(owner)
     {
     }
+
+    /// <summary>
+    /// Gets the first <see cref="Block"/> element within this instance of <see cref="BlockCollection"/>.
+    /// </summary>
+    /// <returns>
+    /// The first <see cref="Block"/> element in the <see cref="BlockCollection"/>.
+    /// </returns>
+    public Block FirstBlock => InternalCount > 0 ? InternalItems[0] : null;
+
+    /// <summary>
+    /// Gets the last <see cref="Block"/> element within this instance of <see cref="BlockCollection"/>.
+    /// </summary>
+    /// <returns>
+    /// The last <see cref="Block"/> element in the <see cref="BlockCollection"/>.
+    /// </returns>
+    public Block LastBlock => InternalCount > 0 ? InternalItems[InternalCount - 1] : null;
 }
