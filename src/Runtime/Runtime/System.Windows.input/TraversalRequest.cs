@@ -31,7 +31,11 @@ public sealed class TraversalRequest
         if (focusNavigationDirection != FocusNavigationDirection.Next &&
             focusNavigationDirection != FocusNavigationDirection.Previous &&
             focusNavigationDirection != FocusNavigationDirection.First &&
-            focusNavigationDirection != FocusNavigationDirection.Last)
+            focusNavigationDirection != FocusNavigationDirection.Last &&
+            focusNavigationDirection != FocusNavigationDirection.Left &&
+            focusNavigationDirection != FocusNavigationDirection.Right &&
+            focusNavigationDirection != FocusNavigationDirection.Up &&
+            focusNavigationDirection != FocusNavigationDirection.Down)
         {
             throw new InvalidEnumArgumentException(nameof(focusNavigationDirection), (int)focusNavigationDirection, typeof(FocusNavigationDirection));
         }
@@ -67,23 +71,47 @@ public enum FocusNavigationDirection
 {
     /// <summary>
     /// Move focus to the next focusable element in tab order.
+    /// Not supported for <see cref="UIElement.PredictFocus(FocusNavigationDirection)"/>.
     /// </summary>
     Next,
 
     /// <summary>
     /// Move focus to the previous focusable element in tab order.
+    /// Not supported for <see cref="UIElement.PredictFocus(FocusNavigationDirection)"/>.
     /// </summary>
     Previous,
 
     /// <summary>
     /// Move focus to the first focusable element in tab order.
+    /// Not supported for <see cref="UIElement.PredictFocus(FocusNavigationDirection)"/>.
     /// </summary>
     First,
 
     /// <summary>
     /// Move focus to the last focusable element in tab order.
+    /// Not supported for <see cref="UIElement.PredictFocus(FocusNavigationDirection)"/>.
     /// </summary>
     Last,
+
+    /// <summary>
+    /// Move focus to another focusable element to the left of the currently focused element.
+    /// </summary>
+    Left,
+
+    /// <summary>
+    /// Move focus to another focusable element to the right of the currently focused element.
+    /// </summary>
+    Right,
+
+    /// <summary>
+    /// Move focus to another focusable element upwards from the currently focused element.
+    /// </summary>
+    Up,
+
+    /// <summary>
+    /// Move focus to another focusable element downwards from the currently focused element.
+    /// </summary>
+    Down,
 
     // If you add a new value you should also add a validation check to TraversalRequest constructor
 }

@@ -1249,6 +1249,27 @@ namespace System.Windows
             return KeyboardNavigation.Current.Navigate(this, request);
         }
 
+        /// <summary>
+        /// Determines the next element that would receive focus relative to this element for a provided focus movement 
+        /// direction, but does not actually move the focus.
+        /// </summary>
+        /// <param name="direction">
+        /// The direction for which a prospective focus change should be determined.
+        /// </param>
+        /// <returns>
+        /// The next element that focus would move to if focus were actually traversed. May return null if focus cannot 
+        /// be moved relative to this element for the provided direction.
+        /// </returns>
+        /// <exception cref="InvalidEnumArgumentException">
+        /// Specified one of the following directions in the <see cref="TraversalRequest"/>:
+        /// <see cref="FocusNavigationDirection.Next"/>, <see cref="FocusNavigationDirection.Previous"/>,
+        /// <see cref="FocusNavigationDirection.First"/>, <see cref="FocusNavigationDirection.Last"/>.
+        /// These directions are not legal for <see cref="PredictFocus(FocusNavigationDirection)"/> (but they are legal 
+        /// for <see cref="MoveFocus(TraversalRequest)"/>).
+        /// </exception>
+        public sealed override DependencyObject PredictFocus(FocusNavigationDirection direction) =>
+            KeyboardNavigation.Current.PredictFocusedElement(this, direction);
+
         private static void OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             if (e.OriginalSource == sender)

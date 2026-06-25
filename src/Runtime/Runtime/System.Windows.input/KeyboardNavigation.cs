@@ -14,7 +14,9 @@
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -26,11 +28,20 @@ namespace System.Windows.Input;
 /// </summary>
 public sealed class KeyboardNavigation
 {
+    [ThreadStatic]
+    private static KeyboardNavigation _current;
+    private static readonly object _fakeNull = new();
+    private const double BASELINE_DEFAULT = double.MinValue;
+
     private readonly WeakReferenceList<KeyboardFocusChangedEventHandler> _weakFocusChangedHandlers = new();
+    private readonly Dictionary<DependencyObject, HashSet<object>> _containerHashtable = new(10);
+    private double _verticalBaseline = BASELINE_DEFAULT;
+    private double _horizontalBaseline = BASELINE_DEFAULT;
+    private DependencyProperty _navigationProperty;
 
     private KeyboardNavigation() { }
 
-    internal static KeyboardNavigation Current { get; } = new KeyboardNavigation();
+    internal static KeyboardNavigation Current => _current ??= new KeyboardNavigation();
 
     /// <summary>
     /// Identifies the KeyboardNavigation.TabIndex attached property.
@@ -181,9 +192,58 @@ public sealed class KeyboardNavigation
     }
 
     /// <summary>
+    /// Identifies the KeyboardNavigation.ControlTabNavigation attached property
+    /// </summary>
+    public static readonly DependencyProperty ControlTabNavigationProperty =
+        DependencyProperty.RegisterAttached(
+            "ControlTabNavigation",
+            typeof(KeyboardNavigationMode),
+            typeof(KeyboardNavigation),
+            new FrameworkPropertyMetadata(KeyboardNavigationMode.Continue),
+            IsValidKeyNavigationMode);
+
+    /// <summary>
+    /// Gets the value of the KeyboardNavigation.ControlTabNavigation attached property for the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// Element from which to get the attached property.
+    /// </param>
+    /// <returns>
+    /// The value of the KeyboardNavigation.ControlTabNavigation property.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="element"/> is null.
+    /// </exception>
+    [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+    public static KeyboardNavigationMode GetControlTabNavigation(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        return (KeyboardNavigationMode)element.GetValue(ControlTabNavigationProperty);
+    }
+
+    /// <summary>
+    /// Sets the value of the KeyboardNavigation.ControlTabNavigation attached property for the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// Element on which to set the attached property.
+    /// </param>
+    /// <param name="mode">
+    /// The property value to set.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="element"/> is null.
+    /// </exception>
+    public static void SetControlTabNavigation(DependencyObject element, KeyboardNavigationMode mode)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        element.SetValueInternal(ControlTabNavigationProperty, mode);
+    }
+
+    /// <summary>
     /// Identifies the KeyboardNavigation.DirectionalNavigation attached property.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty DirectionalNavigationProperty =
         DependencyProperty.RegisterAttached(
             "DirectionalNavigation",
@@ -204,7 +264,6 @@ public sealed class KeyboardNavigation
     /// <exception cref="ArgumentNullException">
     /// <paramref name="element"/> is null.
     /// </exception>
-    [OpenSilver.NotImplemented]
     [AttachedPropertyBrowsableForType(typeof(DependencyObject))]
     public static KeyboardNavigationMode GetDirectionalNavigation(DependencyObject element)
     {
@@ -225,7 +284,6 @@ public sealed class KeyboardNavigation
     /// <exception cref="ArgumentNullException">
     /// <paramref name="element"/> is null.
     /// </exception>
-    [OpenSilver.NotImplemented]
     public static void SetDirectionalNavigation(DependencyObject element, KeyboardNavigationMode mode)
     {
         ArgumentNullException.ThrowIfNull(element);
@@ -383,6 +441,44 @@ public sealed class KeyboardNavigation
         }
     }
 
+    internal static FocusNavigationDirection KeyToTraversalDirection(Key key)
+    {
+        return key switch
+        {
+            Key.Left => FocusNavigationDirection.Left,
+            Key.Right => FocusNavigationDirection.Right,
+            Key.Up => FocusNavigationDirection.Up,
+            Key.Down => FocusNavigationDirection.Down,
+            _ => throw new NotSupportedException(),
+        };
+    }
+
+    internal DependencyObject PredictFocusedElement(DependencyObject sourceElement, FocusNavigationDirection direction)
+    {
+        return PredictFocusedElement(sourceElement, direction, /*treeViewNavigation*/ false);
+    }
+
+    internal DependencyObject PredictFocusedElement(DependencyObject sourceElement, FocusNavigationDirection direction, bool treeViewNavigation)
+    {
+        return PredictFocusedElement(sourceElement, direction, treeViewNavigation, considerDescendants: true);
+    }
+
+    internal DependencyObject PredictFocusedElement(DependencyObject sourceElement,
+        FocusNavigationDirection direction,
+        bool treeViewNavigation,
+        bool considerDescendants)
+    {
+        if (sourceElement == null)
+        {
+            return null;
+        }
+
+        _navigationProperty = DirectionalNavigationProperty;
+        _verticalBaseline = BASELINE_DEFAULT;
+        _horizontalBaseline = BASELINE_DEFAULT;
+        return GetNextInDirection(sourceElement, direction, treeViewNavigation, considerDescendants);
+    }
+
     private static readonly DependencyProperty TabOnceActiveElementProperty =
         DependencyProperty.RegisterAttached(
             "TabOnceActiveElement",
@@ -409,14 +505,45 @@ public sealed class KeyboardNavigation
         d.SetValueInternal(TabOnceActiveElementProperty, new WeakReference<DependencyObject>(value));
     }
 
+    private static readonly DependencyProperty ControlTabOnceActiveElementProperty =
+        DependencyProperty.RegisterAttached(
+            "ControlTabOnceActiveElement",
+            typeof(WeakReference<DependencyObject>),
+            typeof(KeyboardNavigation),
+            null);
+
+    private static DependencyObject GetControlTabOnceActiveElement(DependencyObject d)
+    {
+        var weakRef = (WeakReference<DependencyObject>)d.GetValue(ControlTabOnceActiveElementProperty);
+        if (weakRef != null && weakRef.TryGetTarget(out DependencyObject activeElement))
+        {
+            // Verify if the element is still in the same visual tree
+            if (VisualTreeHelper.GetVisualRoot(activeElement) == VisualTreeHelper.GetVisualRoot(d))
+                return activeElement;
+            else
+                d.SetValueInternal(ControlTabOnceActiveElementProperty, null);
+        }
+        return null;
+    }
+
+    private static void SetControlTabOnceActiveElement(DependencyObject d, DependencyObject value)
+    {
+        d.SetValueInternal(ControlTabOnceActiveElementProperty, new WeakReference<DependencyObject>(value));
+    }
+
     private DependencyObject GetActiveElement(DependencyObject d)
     {
-        return GetTabOnceActiveElement(d);
+        return _navigationProperty == ControlTabNavigationProperty ?
+            GetControlTabOnceActiveElement(d) :
+            GetTabOnceActiveElement(d);
     }
 
     private void SetActiveElement(DependencyObject d, DependencyObject value)
     {
-        SetTabOnceActiveElement(d, value);
+        if (_navigationProperty == TabNavigationProperty)
+            SetTabOnceActiveElement(d, value);
+        else
+            SetControlTabOnceActiveElement(d, value);
     }
 
     internal static void UpdateFocusedElement(UIElement focusTarget)
@@ -431,12 +558,32 @@ public sealed class KeyboardNavigation
     internal void UpdateActiveElement(DependencyObject activeElement)
     {
         // Update TabNavigation = Once groups
-        DependencyObject container = GetGroupParent(activeElement);
-        UpdateActiveElement(container, activeElement);
+        UpdateActiveElement(activeElement, TabNavigationProperty);
+
+        // Update ControlTabNavigation = Once groups
+        UpdateActiveElement(activeElement, ControlTabNavigationProperty);
     }
 
-    private void UpdateActiveElement(DependencyObject container, DependencyObject activeElement)
+    private void UpdateActiveElement(DependencyObject activeElement, DependencyProperty dp)
     {
+        _navigationProperty = dp;
+        DependencyObject container = GetGroupParent(activeElement);
+        UpdateActiveElement(container, activeElement, dp);
+    }
+
+    internal void UpdateActiveElement(DependencyObject container, DependencyObject activeElement)
+    {
+        // Update TabNavigation = Once groups
+        UpdateActiveElement(container, activeElement, TabNavigationProperty);
+
+        // Update ControlTabNavigation = Once groups
+        UpdateActiveElement(container, activeElement, ControlTabNavigationProperty);
+    }
+
+    private void UpdateActiveElement(DependencyObject container, DependencyObject activeElement, DependencyProperty dp)
+    {
+        _navigationProperty = dp;
+
         if (activeElement == container)
             return;
 
@@ -467,19 +614,31 @@ public sealed class KeyboardNavigation
         switch (request.FocusNavigationDirection)
         {
             case FocusNavigationDirection.Next:
+                _navigationProperty = (modifierKeys & ModifierKeys.Control) == ModifierKeys.Control ? ControlTabNavigationProperty : TabNavigationProperty;
                 nextTab = GetNextTab(currentElement, GetGroupParent(currentElement, true /*includeCurrent*/), false);
                 break;
 
             case FocusNavigationDirection.Previous:
+                _navigationProperty = (modifierKeys & ModifierKeys.Control) == ModifierKeys.Control ? ControlTabNavigationProperty : TabNavigationProperty;
                 nextTab = GetPrevTab(currentElement, null, false);
                 break;
 
             case FocusNavigationDirection.First:
+                _navigationProperty = (modifierKeys & ModifierKeys.Control) == ModifierKeys.Control ? ControlTabNavigationProperty : TabNavigationProperty;
                 nextTab = GetNextTab(null, currentElement, true);
                 break;
 
             case FocusNavigationDirection.Last:
+                _navigationProperty = (modifierKeys & ModifierKeys.Control) == ModifierKeys.Control ? ControlTabNavigationProperty : TabNavigationProperty;
                 nextTab = GetPrevTab(null, currentElement, true);
+                break;
+
+            case FocusNavigationDirection.Left:
+            case FocusNavigationDirection.Right:
+            case FocusNavigationDirection.Up:
+            case FocusNavigationDirection.Down:
+                _navigationProperty = DirectionalNavigationProperty;
+                nextTab = GetNextInDirection(currentElement, request.FocusNavigationDirection);
                 break;
         }
 
@@ -492,15 +651,540 @@ public sealed class KeyboardNavigation
         return nextTab is UIElement iie && iie.Focus();
     }
 
+    private DependencyObject GetNextInDirection(DependencyObject sourceElement, FocusNavigationDirection direction)
+    {
+        return GetNextInDirection(sourceElement, direction, /*treeViewNavigation*/ false);
+    }
+
+    private DependencyObject GetNextInDirection(DependencyObject sourceElement, FocusNavigationDirection direction, bool treeViewNavigation)
+    {
+        return GetNextInDirection(sourceElement, direction, treeViewNavigation, considerDescendants: true);
+    }
+
+    private DependencyObject GetNextInDirection(DependencyObject sourceElement,
+        FocusNavigationDirection direction,
+        bool treeViewNavigation,
+        bool considerDescendants)
+    {
+        _containerHashtable.Clear();
+        DependencyObject targetElement = MoveNext(sourceElement, null, direction, BASELINE_DEFAULT, BASELINE_DEFAULT, treeViewNavigation, considerDescendants);
+
+        if (targetElement != null)
+        {
+            UIElement sourceUIElement = sourceElement as UIElement;
+            if (sourceUIElement != null)
+                sourceUIElement.RemoveHandler(Keyboard.PreviewLostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(LostFocus));
+
+            UIElement targetUIElement = targetElement as UIElement;
+
+            if (targetUIElement != null)
+            {
+                // When layout is changed we need to reset the base line
+                // Set up a layout invalidation listener.
+                targetUIElement.LayoutUpdated += new EventHandler(OnLayoutUpdated);
+
+                // When Focus is changed we need to reset the base line
+                if (targetElement == targetUIElement)
+                    targetUIElement.AddHandler(Keyboard.PreviewLostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(LostFocus), true);
+            }
+        }
+
+        _containerHashtable.Clear();
+        return targetElement;
+    }
+
+    // LayoutUpdated handler.
+    private void OnLayoutUpdated(object sender, EventArgs e)
+    {
+        UIElement uiElement = sender as UIElement;
+        // Disconnect the layout listener.
+        uiElement?.LayoutUpdated -= new EventHandler(OnLayoutUpdated);
+
+        _verticalBaseline = BASELINE_DEFAULT;
+        _horizontalBaseline = BASELINE_DEFAULT;
+    }
+
+    private void LostFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        _verticalBaseline = BASELINE_DEFAULT;
+        _horizontalBaseline = BASELINE_DEFAULT;
+
+        if (sender is UIElement uie)
+            uie.RemoveHandler(Keyboard.PreviewLostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(LostFocus));
+    }
+
+    private bool IsEndlessLoop(DependencyObject element, DependencyObject container)
+    {
+        object elementObject = element ?? _fakeNull;
+
+        // If entry exists then we have endless loop
+        if (_containerHashtable.TryGetValue(container, out HashSet<object> elementTable))
+        {
+            if (elementTable.Contains(elementObject))
+                return true;
+        }
+        else
+        {
+            // Adding the entry to the collection
+            elementTable = [];
+            _containerHashtable[container] = elementTable;
+        }
+
+        elementTable.Add(elementObject);
+        return false;
+    }
+
+    private void ResetBaseLines(double value, bool horizontalDirection)
+    {
+        if (horizontalDirection)
+        {
+            _verticalBaseline = BASELINE_DEFAULT;
+            if (_horizontalBaseline == BASELINE_DEFAULT)
+                _horizontalBaseline = value;
+        }
+        else // vertical direction
+        {
+            _horizontalBaseline = BASELINE_DEFAULT;
+            if (_verticalBaseline == BASELINE_DEFAULT)
+                _verticalBaseline = value;
+        }
+    }
+
+    private DependencyObject FindNextInDirection(DependencyObject sourceElement,
+        Rect sourceRect,
+        DependencyObject container,
+        FocusNavigationDirection direction,
+        double startRange,
+        double endRange,
+        bool treeViewNavigation,
+        bool considerDescendants)   // when false, descendants of sourceElement are not candidates
+    {
+        DependencyObject result = null;
+        Rect resultRect = Rect.Empty;
+        double resultScore = 0d;
+        bool searchInsideContainer = sourceElement == null;
+        DependencyObject currElement = container;
+        while ((currElement = GetNextInTree(currElement, container)) != null)
+        {
+            if (currElement != sourceElement &&
+                IsGroupElementEligible(currElement, treeViewNavigation))
+            {
+                Rect currentRect = GetRepresentativeRectangle(currElement);
+
+                // Consider the current element as a result candidate only if its layout is valid.
+                if (currentRect != Rect.Empty)
+                {
+                    bool isInDirection = IsInDirection(sourceRect, currentRect, direction);
+                    bool isInRange = IsInRange(sourceElement, currElement, sourceRect, currentRect, direction, startRange, endRange);
+                    if (searchInsideContainer || isInDirection || isInRange)
+                    {
+                        double score = isInRange ? GetPerpDistance(sourceRect, currentRect, direction) : GetDistance(sourceRect, currentRect, direction);
+
+                        if (double.IsNaN(score))
+                        {
+                            continue;
+                        }
+
+                        // Keep the first element in the result
+                        if (result == null && (considerDescendants || !IsAncestorOfEx(sourceElement, currElement)))
+                        {
+                            result = currElement;
+                            resultRect = currentRect;
+                            resultScore = score;
+                        }
+                        else if ((DoubleUtil.LessThan(score, resultScore) ||
+                            (DoubleUtil.AreClose(score, resultScore) && GetDistance(sourceRect, resultRect, direction) > GetDistance(sourceRect, currentRect, direction))) &&
+                            (considerDescendants || !IsAncestorOfEx(sourceElement, currElement)))
+                        {
+                            result = currElement;
+                            resultRect = currentRect;
+                            resultScore = score;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private DependencyObject MoveNext(DependencyObject sourceElement,
+        DependencyObject container,
+        FocusNavigationDirection direction,
+        double startRange,
+        double endRange,
+        bool treeViewNavigation,
+        bool considerDescendants)
+    {
+        Debug.Assert(!(sourceElement == null && container == null), "Both sourceElement and container cannot be null");
+
+        if (container == null)
+        {
+            container = GetGroupParent(sourceElement);
+            Debug.Assert(container != null, "container cannot be null");
+        }
+
+        // If we get to the tree root, return null
+        if (container == sourceElement)
+            return null;
+
+        if (IsEndlessLoop(sourceElement, container))
+            return null;
+
+        KeyboardNavigationMode mode = GetKeyNavigationMode(container);
+        bool searchInsideContainer = (sourceElement == null);
+
+        // Don't navigate inside None containers
+        if (mode == KeyboardNavigationMode.None && searchInsideContainer)
+            return null;
+
+        Rect sourceRect = searchInsideContainer ? GetRectangle(container) : GetRepresentativeRectangle(sourceElement);
+        bool horizontalDirection = direction == FocusNavigationDirection.Right || direction == FocusNavigationDirection.Left;
+
+        // Reset the baseline when we change the direction
+        ResetBaseLines(horizontalDirection ? sourceRect.Top : sourceRect.Left, horizontalDirection);
+
+        // If range is not set - use source rect
+        if (startRange == BASELINE_DEFAULT || endRange == BASELINE_DEFAULT)
+        {
+            startRange = horizontalDirection ? sourceRect.Top : sourceRect.Left;
+            endRange = horizontalDirection ? sourceRect.Bottom : sourceRect.Right;
+        }
+
+        // Navigate outside the container
+        if (mode == KeyboardNavigationMode.Once && !searchInsideContainer)
+            return MoveNext(container, null, direction, startRange, endRange, treeViewNavigation, considerDescendants: true);
+
+        DependencyObject result = FindNextInDirection(sourceElement, sourceRect, container, direction, startRange, endRange, treeViewNavigation, considerDescendants);
+
+        // If there is no next element in current container
+        if (result == null)
+        {
+            switch (mode)
+            {
+                case KeyboardNavigationMode.Cycle:
+                    return MoveNext(null, container, direction, startRange, endRange, treeViewNavigation, considerDescendants: true);
+
+                case KeyboardNavigationMode.Contained:
+                    return null;
+
+                default: // Continue, Once, None, Local - search outside the container
+                    return MoveNext(container, null, direction, startRange, endRange, treeViewNavigation, considerDescendants: true);
+            }
+        }
+
+        if (IsElementEligible(result, treeViewNavigation))
+            return result;
+
+        // Using ActiveElement if set
+        DependencyObject activeElement = GetActiveElementChain(result, treeViewNavigation);
+        if (activeElement != null)
+            return activeElement;
+
+        // Try to find focus inside the element
+        // result is not TabStop, which means it is a group
+        DependencyObject insideElement = MoveNext(null, result, direction, startRange, endRange, treeViewNavigation, considerDescendants: true);
+        if (insideElement != null)
+            return insideElement;
+
+        return MoveNext(result, null, direction, startRange, endRange, treeViewNavigation, considerDescendants: true);
+    }
+
+    /// <summary>
+    ///     Returns the element rectange relative to the root.
+    ///     Also calls UpdateLayout if the layout of element is
+    ///     not valid.
+    /// </summary>
+    internal static Rect GetRectangle(DependencyObject element)
+    {
+        if (element is UIElement uiElement)
+        {
+            if (!uiElement.IsArrangeValid)
+            {
+                // Call UpdateLayout if qualifies.
+                uiElement.UpdateLayout();
+            }
+
+            if (VisualTreeHelper.GetVisualRoot(uiElement) is UIElement rootVisual)
+            {
+                Matrix transform = uiElement.InternalTransformToAncestor(rootVisual);
+                return Rect.Transform(new Rect(uiElement.RenderSize), transform);
+            }
+        }
+
+        return Rect.Empty;
+    }
+
+    // return the rectangle representing the given element.  Usually this is
+    // just GetRectangle(element).  But a TreeViewItem surrounds its children,
+    // which produces wrong results.  Instead use a rectangle that excludes
+    // the children in the vertical direction, and extends as much as the
+    // TreeViewItem in the horizontal direction.
+    private Rect GetRepresentativeRectangle(DependencyObject element)
+    {
+        Rect rect = GetRectangle(element);
+        TreeViewItem tvi = element as TreeViewItem;
+        if (tvi != null)
+        {
+            Panel itemsHost = tvi.ItemsHost;
+            if (itemsHost != null && itemsHost.IsVisible)
+            {
+                Rect itemsHostRect = GetRectangle(itemsHost);
+                if (itemsHostRect != Rect.Empty)
+                {
+                    bool? placeBeforeChildren = null;
+
+                    // if there's a header, put the representative Rect on
+                    // the same side of the children as the header.
+                    FrameworkElement header = tvi.TryGetHeaderElement();
+                    if (header != null && header != tvi && header.IsVisible)
+                    {
+                        Rect headerRect = GetRectangle(header);
+                        if (!headerRect.IsEmpty)
+                        {
+                            if (DoubleUtil.LessThan(headerRect.Top, itemsHostRect.Top))
+                            {
+                                // header starts before children - put rect before
+                                // (this is the most common case, used by the default layout)
+                                placeBeforeChildren = true;
+                            }
+                            else if (DoubleUtil.GreaterThan(headerRect.Bottom, itemsHostRect.Bottom))
+                            {
+                                // header ends after children - put rect after
+                                placeBeforeChildren = false;
+                            }
+                        }
+                    }
+
+                    double before = itemsHostRect.Top - rect.Top;
+                    double after = rect.Bottom - itemsHostRect.Bottom;
+
+                    // If there is no header, or if the header doesn't extend
+                    // past the children, put the representative Rect on
+                    // whichever side of the children has more room.
+                    // This handles the case where the TVI's template has
+                    // content that's not explicitly marked as "header".
+                    if (placeBeforeChildren == null)
+                    {
+                        placeBeforeChildren = DoubleUtil.GreaterThanOrClose(before, after);
+                    }
+
+                    // adjust the rect according to the placement computed above.
+                    // Ensure that its height is non-negative, but no taller than the TVI.
+                    if (placeBeforeChildren == true)
+                    {
+                        rect.Height = Math.Min(Math.Max(before, 0.0d), rect.Height);
+                    }
+                    else
+                    {
+                        double height = Math.Min(Math.Max(after, 0.0d), rect.Height);
+                        rect.Y = rect.Bottom - height;
+                        rect.Height = height;
+                    }
+                }
+            }
+        }
+
+        return rect;
+    }
+
+    // distance between two points
+    private double GetDistance(Point p1, Point p2)
+    {
+        double deltaX = p1.X - p2.X;
+        double deltaY = p1.Y - p2.Y;
+        return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+
+    private double GetPerpDistance(Rect sourceRect, Rect targetRect, FocusNavigationDirection direction)
+    {
+        return direction switch
+        {
+            FocusNavigationDirection.Right => targetRect.Left - sourceRect.Left,
+            FocusNavigationDirection.Left => sourceRect.Right - targetRect.Right,
+            FocusNavigationDirection.Up => sourceRect.Bottom - targetRect.Bottom,
+            FocusNavigationDirection.Down => targetRect.Top - sourceRect.Top,
+            _ => throw new InvalidEnumArgumentException(nameof(direction), (int)direction, typeof(FocusNavigationDirection)),
+        };
+    }
+
+    // Example when moving down:
+    // distance between sourceRect.TopLeft (or Y=vertical baseline)
+    // and targetRect.TopLeft
+    private double GetDistance(Rect sourceRect, Rect targetRect, FocusNavigationDirection direction)
+    {
+        Point startPoint;
+        Point endPoint;
+        switch (direction)
+        {
+            case FocusNavigationDirection.Right:
+                startPoint = sourceRect.TopLeft;
+                if (_horizontalBaseline != BASELINE_DEFAULT)
+                    startPoint.Y = _horizontalBaseline;
+                endPoint = targetRect.TopLeft;
+                break;
+
+            case FocusNavigationDirection.Left:
+                startPoint = sourceRect.TopRight;
+                if (_horizontalBaseline != BASELINE_DEFAULT)
+                    startPoint.Y = _horizontalBaseline;
+                endPoint = targetRect.TopRight;
+                break;
+
+            case FocusNavigationDirection.Up:
+                startPoint = sourceRect.BottomLeft;
+                if (_verticalBaseline != BASELINE_DEFAULT)
+                    startPoint.X = _verticalBaseline;
+                endPoint = targetRect.BottomLeft;
+                break;
+
+            case FocusNavigationDirection.Down:
+                startPoint = sourceRect.TopLeft;
+                if (_verticalBaseline != BASELINE_DEFAULT)
+                    startPoint.X = _verticalBaseline;
+                endPoint = targetRect.TopLeft;
+                break;
+
+            default:
+                throw new InvalidEnumArgumentException(nameof(direction), (int)direction, typeof(FocusNavigationDirection));
+        }
+        return GetDistance(startPoint, endPoint);
+    }
+
+    // Example when moving down:
+    // true if the top of the toRect is below the bottom of fromRect
+    private bool IsInDirection(Rect fromRect, Rect toRect, FocusNavigationDirection direction)
+    {
+        return direction switch
+        {
+            FocusNavigationDirection.Right => DoubleUtil.LessThanOrClose(fromRect.Right, toRect.Left),
+            FocusNavigationDirection.Left => DoubleUtil.GreaterThanOrClose(fromRect.Left, toRect.Right),
+            FocusNavigationDirection.Up => DoubleUtil.GreaterThanOrClose(fromRect.Top, toRect.Bottom),
+            FocusNavigationDirection.Down => DoubleUtil.LessThanOrClose(fromRect.Bottom, toRect.Top),
+            _ => throw new InvalidEnumArgumentException(nameof(direction), (int)direction, typeof(FocusNavigationDirection)),
+        };
+    }
+
+    // this is like the previous method, except it works when targetElement is
+    // a ContentElement (e.g. Hyperlink).  "Works" means it gives results consistent
+    // with the tree navigation methods GetParent, Get*Child, Get*Sibling.
+    // [It might be correct to have only one method - this one - but we need
+    // to keep the existing calls to the previous method around for compat.]
+    internal bool IsAncestorOfEx(DependencyObject sourceElement, DependencyObject targetElement)
+    {
+        Debug.Assert(sourceElement != null, "sourceElement must not be null");
+
+        while (targetElement != null && targetElement != sourceElement)
+        {
+            targetElement = GetParent(targetElement);
+        }
+
+        return targetElement == sourceElement;
+    }
+
+    // Example: When moving down:
+    // Range is the sourceRect width extended to the vertical baseline
+    // targetRect.Top > sourceRect.Top (target is below the source)
+    // targetRect.Right > sourceRect.Left || targetRect.Left < sourceRect.Right
+    private bool IsInRange(DependencyObject sourceElement,
+        DependencyObject targetElement,
+        Rect sourceRect,
+        Rect targetRect,
+        FocusNavigationDirection direction,
+        double startRange,
+        double endRange)
+    {
+        switch (direction)
+        {
+            case FocusNavigationDirection.Right:
+            case FocusNavigationDirection.Left:
+                if (_horizontalBaseline != BASELINE_DEFAULT)
+                {
+                    startRange = Math.Min(startRange, _horizontalBaseline);
+                    endRange = Math.Max(endRange, _horizontalBaseline);
+                }
+
+                if (DoubleUtil.GreaterThan(targetRect.Bottom, startRange) && DoubleUtil.LessThan(targetRect.Top, endRange))
+                {
+                    // If there is no sourceElement - checking the range is enough
+                    if (sourceElement == null)
+                        return true;
+
+                    if (direction == FocusNavigationDirection.Right)
+                        return DoubleUtil.GreaterThan(targetRect.Left, sourceRect.Left) || (DoubleUtil.AreClose(targetRect.Left, sourceRect.Left) && IsAncestorOfEx(sourceElement, targetElement));
+                    else
+                        return DoubleUtil.LessThan(targetRect.Right, sourceRect.Right) || (DoubleUtil.AreClose(targetRect.Right, sourceRect.Right) && IsAncestorOfEx(sourceElement, targetElement));
+                }
+                break;
+
+            case FocusNavigationDirection.Up:
+            case FocusNavigationDirection.Down:
+                if (_verticalBaseline != BASELINE_DEFAULT)
+                {
+                    startRange = Math.Min(startRange, _verticalBaseline);
+                    endRange = Math.Max(endRange, _verticalBaseline);
+                }
+
+                if (DoubleUtil.GreaterThan(targetRect.Right, startRange) && DoubleUtil.LessThan(targetRect.Left, endRange))
+                {
+                    // If there is no sourceElement - checking the range is enough
+                    if (sourceElement == null)
+                        return true;
+
+                    if (direction == FocusNavigationDirection.Down)
+                        return DoubleUtil.GreaterThan(targetRect.Top, sourceRect.Top) || (DoubleUtil.AreClose(targetRect.Top, sourceRect.Top) && IsAncestorOfEx(sourceElement, targetElement));
+                    else
+                        return DoubleUtil.LessThan(targetRect.Bottom, sourceRect.Bottom) || (DoubleUtil.AreClose(targetRect.Bottom, sourceRect.Bottom) && IsAncestorOfEx(sourceElement, targetElement));
+                }
+                break;
+
+            default:
+                throw new InvalidEnumArgumentException(nameof(direction), (int)direction, typeof(FocusNavigationDirection));
+        }
+
+        return false;
+    }
+
+    private DependencyObject GetActiveElementChain(DependencyObject element, bool treeViewNavigation)
+    {
+        DependencyObject validActiveElement = null;
+        DependencyObject activeElement = element;
+        while ((activeElement = GetActiveElement(activeElement)) != null)
+        {
+            if (IsElementEligible(activeElement, treeViewNavigation))
+                validActiveElement = activeElement;
+        }
+
+        return validActiveElement;
+    }
+
     internal bool Navigate(DependencyObject sourceElement, Key key, ModifierKeys modifiers, bool fromProcessInput = false)
     {
         bool success = false;
 
-        if (key == Key.Tab)
+        switch (key)
         {
-            success = Navigate(sourceElement,
-                new TraversalRequest(((modifiers & ModifierKeys.Shift) == ModifierKeys.Shift) ?
-                FocusNavigationDirection.Previous : FocusNavigationDirection.Next), modifiers, fromProcessInput);
+            case Key.Tab:
+                success = Navigate(sourceElement,
+                    new TraversalRequest(((modifiers & ModifierKeys.Shift) == ModifierKeys.Shift) ?
+                    FocusNavigationDirection.Previous : FocusNavigationDirection.Next), modifiers, fromProcessInput);
+                break;
+
+            case Key.Right:
+                success = Navigate(sourceElement, new TraversalRequest(FocusNavigationDirection.Right), modifiers);
+                break;
+
+            case Key.Left:
+                success = Navigate(sourceElement, new TraversalRequest(FocusNavigationDirection.Left), modifiers);
+                break;
+
+            case Key.Up:
+                success = Navigate(sourceElement, new TraversalRequest(FocusNavigationDirection.Up), modifiers);
+                break;
+
+            case Key.Down:
+                success = Navigate(sourceElement, new TraversalRequest(FocusNavigationDirection.Down), modifiers);
+                break;
         }
 
         return success;
@@ -573,14 +1257,14 @@ public sealed class KeyboardNavigation
     // 2. ToolBar or Menu (which have IsFocusScope=true) both have FocusedElement but included only in Control+Tab navigation
     private DependencyObject FocusedElement(DependencyObject e)
     {
-        UIElement iie = e as UIElement;
+        IInputElement iie = e as IInputElement;
         // Focus delegation is enabled only if keyboard focus is outside the container
-        if (iie != null)
+        if (iie != null && !iie.IsKeyboardFocusWithin)
         {
             DependencyObject focusedElement = FocusManager.GetFocusedElement(e) as DependencyObject;
             if (focusedElement != null)
             {
-                if (!IsFocusScope(e))
+                if (_navigationProperty == ControlTabNavigationProperty || !IsFocusScope(e))
                 {
                     // Verify if focusedElement is a visual descendant of e
                     UIElement visualFocusedElement = focusedElement as UIElement;
@@ -835,9 +1519,43 @@ public sealed class KeyboardNavigation
 
     private bool IsGroup(DependencyObject e) => GetKeyNavigationMode(e) != KeyboardNavigationMode.Continue;
 
+    private bool IsFocusableInternal(DependencyObject element)
+    {
+        if (element is UIElement uie)
+        {
+            return uie.Focusable && uie.IsEnabled && uie.IsVisible;
+        }
+
+        return false;
+    }
+
+    private bool IsElementEligible(DependencyObject element, bool treeViewNavigation)
+    {
+        if (treeViewNavigation)
+        {
+            return (element is TreeViewItem) && IsFocusableInternal(element);
+        }
+        else
+        {
+            return IsTabStop(element);
+        }
+    }
+
+    private bool IsGroupElementEligible(DependencyObject element, bool treeViewNavigation)
+    {
+        if (treeViewNavigation)
+        {
+            return (element is TreeViewItem) && IsFocusableInternal(element);
+        }
+        else
+        {
+            return IsTabStopOrGroup(element);
+        }
+    }
+
     private KeyboardNavigationMode GetKeyNavigationMode(DependencyObject e)
     {
-        return (KeyboardNavigationMode)e.GetValue(TabNavigationProperty);
+        return (KeyboardNavigationMode)e.GetValue(_navigationProperty);
     }
 
     private bool IsTabStopOrGroup(DependencyObject e)
@@ -896,8 +1614,8 @@ public sealed class KeyboardNavigation
         // min (index>currentTabIndex)
         DependencyObject nextTabElement = null;
         DependencyObject firstTabElement = null;
-        int minIndexFirstTab = Int32.MinValue;
-        int minIndex = Int32.MinValue;
+        int minIndexFirstTab = int.MinValue;
+        int minIndex = int.MinValue;
         int elementTabPriority = GetTabIndexHelper(e);
 
         DependencyObject currElement = container;

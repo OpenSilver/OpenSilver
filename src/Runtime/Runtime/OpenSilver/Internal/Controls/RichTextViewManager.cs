@@ -29,7 +29,7 @@ internal static class RichTextViewManager
         Debug.Assert(e is not null);
 
         string sArgs = Interop.GetVariableStringForJS(e.UIEventArg);
-        return Interop.ExecuteJavaScriptBoolean($"osjs.richTextViewManager.onKeyDownNative('{richTextBoxView.OuterDiv}', {sArgs})");
+        return Interop.ExecuteJavaScriptBoolean($"osjs.richTextViewManager.onKeyDownNative('{richTextBoxView.OuterDiv.Uid}', {sArgs})");
     }
 
     internal static void OnSelectionChangedNative(string id, int start, int length)

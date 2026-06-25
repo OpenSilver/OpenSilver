@@ -11,14 +11,15 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
+using System.Windows.Input;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -644,6 +645,14 @@ namespace System.Windows.Controls.Primitives
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
+
+            // In some cases, the current TabOnceActiveElement will be pointing to an orphaned container.
+            // This causes problems with restoring focus, so to work around this we'll reset it whenever
+            // the selected item is prepared.
+            if (item == SelectedItem)
+            {
+                KeyboardNavigation.Current.UpdateActiveElement(this, element);
+            }
 
             OnNewContainer();
         }

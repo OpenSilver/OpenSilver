@@ -1752,26 +1752,7 @@ Object.defineProperty(window, 'osjs', {
                 };
 
                 function navigateInDirection(view, e) {
-                    if (!e.shiftKey && !e.ctrlKey && getSelectionLength(view) > 0) {
-                        return true;
-                    }
-
-                    switch (e.key) {
-                        case 'ArrowUp':
-                            return getCaretPosition(view) > 0;
-                        case 'ArrowDown':
-                            return getCaretPosition(view) < view.value.length;
-                        case 'ArrowLeft':
-                            return window.getComputedStyle(view).direction === 'ltr' ?
-                                (getCaretPosition(view) > 0) :
-                                (getCaretPosition(view) < view.value.length);
-                        case 'ArrowRight':
-                            return window.getComputedStyle(view).direction === 'ltr' ?
-                                (getCaretPosition(view) < view.value.length) :
-                                (getCaretPosition(view) > 0);
-                        default:
-                            return false;
-                    }
+                    return true;
                 };
 
                 function navigateByPage(view, e) {
@@ -2281,24 +2262,7 @@ Object.defineProperty(window, 'osjs', {
                 }
 
                 function navigateInDirection(ql, e) {
-                    if (!e.shiftKey && !e.ctrlKey && getSelectionLength(ql) > 0) return true;
-
-                    switch (e.key) {
-                        case 'ArrowUp':
-                            return getCaretPosition(ql) > 0;
-                        case 'ArrowDown':
-                            return getCaretPosition(ql) < getLength(ql);
-                        case 'ArrowLeft':
-                            return window.getComputedStyle(ql.container).direction === 'ltr' ?
-                                (getCaretPosition(ql) > 0) :
-                                (getCaretPosition(ql) < getLength(ql));
-                        case 'ArrowRight':
-                            return window.getComputedStyle(ql.container).direction === 'ltr' ?
-                                (getCaretPosition(ql) < getLength(ql)) :
-                                (getCaretPosition(ql) > 0);
-                        default:
-                            return false;
-                    }
+                    return true;
                 }
 
                 function navigateByPage(ql, e) {

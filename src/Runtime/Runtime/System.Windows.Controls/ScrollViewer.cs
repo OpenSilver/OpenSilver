@@ -508,49 +508,6 @@ namespace System.Windows.Controls
             }
         }
 
-        /// <summary> 
-        /// Scrolls the view in the specified direction.
-        /// </summary> 
-        /// <param name="key">Key corresponding to the direction.</param>
-        /// <remarks>Similar to WPF's corresponding ScrollViewer method.</remarks>
-        internal void ScrollInDirection(Key key)
-        {
-            if (ScrollInfo is not null)
-            {
-                bool fInvertForRTL = FlowDirection == FlowDirection.RightToLeft;
-
-                switch (key)
-                {
-                    case Key.Up:
-                        LineUp();
-                        break;
-                    case Key.Down:
-                        LineDown();
-                        break;
-                    case Key.Left:
-                        if (fInvertForRTL)
-                        {
-                            LineRight();
-                        }
-                        else
-                        {
-                            LineLeft();
-                        }
-                        break;
-                    case Key.Right:
-                        if (fInvertForRTL)
-                        {
-                            LineLeft();
-                        }
-                        else
-                        {
-                            LineRight();
-                        }
-                        break;
-                }
-            }
-        }
-
         private static readonly DependencyPropertyKey ScrollableHeightPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(ScrollableHeight),
@@ -872,53 +829,192 @@ namespace System.Windows.Controls
         /// </param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            base.OnKeyDown(e);
-
-            if (ScrollInfo is not null && !e.Handled && !TemplatedParentHandlesScrolling)
+            if (e.Handled || ScrollInfo is not null || TemplatedParentHandlesScrolling)
             {
-                // Parent is not going to handle scrolling; do so here 
-                bool control = ModifierKeys.Control == (Keyboard.Modifiers & ModifierKeys.Control);
-                bool handled = true;
+                return;
+            }
 
+            // If the ScrollViewer has focus or other that arrow key is pressed
+            // then it only scrolls
+            if (e.OriginalSource == this)
+            {
+                ScrollInDirection(e);
+            }
+            else
+            {
+                // Focus is on the element within the ScrollViewer
+                // If arrow key is pressed
+                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down)
+                {
+                    var viewPort = ElementScrollContentPresenter;
+
+                    // If style changes and ConentSite cannot be found - just scroll and exit
+                    if (viewPort is null)
+                    {
+                        ScrollInDirection(e);
+                        return;
+                    }
+
+                    FocusNavigationDirection direction = KeyboardNavigation.KeyToTraversalDirection(e.Key);
+                    DependencyObject predictedFocus = null;
+                    DependencyObject focusedElement = Keyboard.FocusedElement as DependencyObject;
+                    bool isFocusWithinViewport = IsInViewport(viewPort, focusedElement);
+
+                    if (isFocusWithinViewport)
+                    {
+                        // Navigate from current focused element
+                        if (focusedElement is UIElement currentFocusUIElement)
+                        {
+                            predictedFocus = currentFocusUIElement.PredictFocus(direction);
+                        }
+                    }
+                    else
+                    {
+                        // Navigate from current viewport
+                        predictedFocus = viewPort.PredictFocus(direction);
+                    }
+
+                    if (predictedFocus == null)
+                    {
+                        // predictedFocus is null - just scroll
+                        ScrollInDirection(e);
+                    }
+                    else
+                    {
+                        if (IsInViewport(viewPort, predictedFocus))
+                        {
+                            // Case 1: predictedFocus is entirely in current view port
+                            // Action: Set focus to predictedFocus, handle the event and exit
+
+                            ((IInputElement)predictedFocus).Focus();
+                            e.Handled = true;
+                        }
+                        else
+                        {
+                            // Case 2: else - predictedFocus is not entirely in the viewport
+                            // Scroll in the direction
+                            // If predictedFocus is in the new viewport - set focus
+                            // handle the event and exit
+
+                            ScrollInDirection(e);
+                            UpdateLayout();
+                            if (IsInViewport(viewPort, predictedFocus))
+                            {
+                                ((IInputElement)predictedFocus).Focus();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // If other than arrow Key is down
+                    ScrollInDirection(e);
+                }
+            }
+        }
+
+        // Returns true only if element is partly visible in the current viewport
+        private bool IsInViewport(ScrollContentPresenter scp, DependencyObject element)
+        {
+            var baseRoot = VisualTreeHelper.GetVisualRoot(scp);
+            var elementRoot = VisualTreeHelper.GetVisualRoot(element);
+
+            // If scp and element are not under the same root, find the
+            // parent of root of element and try with it instead and so on.
+            while (baseRoot != elementRoot)
+            {
+                if (elementRoot is null)
+                {
+                    return false;
+                }
+
+                if (elementRoot is not FrameworkElement fe)
+                {
+                    return false;
+                }
+
+                element = fe.Parent;
+
+                if (element is null)
+                {
+                    return false;
+                }
+
+                elementRoot = VisualTreeHelper.GetVisualRoot(element);
+            }
+
+            Rect viewPortRect = KeyboardNavigation.GetRectangle(scp);
+            Rect elementRect = KeyboardNavigation.GetRectangle(element);
+            return viewPortRect.IntersectsWith(elementRect);
+        }
+
+        internal void ScrollInDirection(KeyEventArgs e)
+        {
+            bool fControlDown = (e.KeyboardDevice.Modifiers & ModifierKeys.Control) != 0;
+            bool fAltDown = (e.KeyboardDevice.Modifiers & ModifierKeys.Alt) != 0;
+
+            // We don't handle Alt + Key
+            if (!fAltDown)
+            {
+                bool fInvertForRTL = FlowDirection == FlowDirection.RightToLeft;
                 switch (e.Key)
                 {
+                    case Key.Left:
+                        if (fInvertForRTL) LineRight(); else LineLeft();
+                        e.Handled = true;
+                        break;
+                    case Key.Right:
+                        if (fInvertForRTL) LineLeft(); else LineRight();
+                        e.Handled = true;
+                        break;
+                    case Key.Up:
+                        LineUp();
+                        e.Handled = true;
+                        break;
+                    case Key.Down:
+                        LineDown();
+                        e.Handled = true;
+                        break;
+                    case Key.PageUp:
+                        PageUp();
+                        e.Handled = true;
+                        break;
+                    case Key.PageDown:
+                        PageDown();
+                        e.Handled = true;
+                        break;
+                    case Key.Home:
+                        if (fControlDown) ScrollToTop(); else ScrollToLeftEnd();
+                        e.Handled = true;
+                        break;
+                    case Key.End:
+                        if (fControlDown) ScrollToBottom(); else ScrollToRightEnd();
+                        e.Handled = true;
+                        break;
+                }
+            }
+        }
+
+        internal void ScrollInDirection(Key key)
+        {
+            if (ScrollInfo is not null)
+            {
+                bool fInvertForRTL = FlowDirection == FlowDirection.RightToLeft;
+                switch (key)
+                {
+                    case Key.Left:
+                        if (fInvertForRTL) LineRight(); else LineLeft();
+                        break;
+                    case Key.Right:
+                        if (fInvertForRTL) LineLeft(); else LineRight();
+                        break;
                     case Key.Up:
                         LineUp();
                         break;
                     case Key.Down:
                         LineDown();
                         break;
-                    case Key.Left:
-                        LineLeft();
-                        break;
-                    case Key.Right:
-                        LineRight();
-                        break;
-                    case Key.PageUp:
-                        PageUp();
-                        break;
-                    case Key.PageDown:
-                        PageDown();
-                        break;
-                    case Key.Home:
-                        if (!control)
-                            ScrollToLeftEnd();
-                        else
-                            ScrollToTop();
-                        break;
-                    case Key.End:
-                        if (!control)
-                            ScrollToRightEnd();
-                        else
-                            ScrollToBottom();
-                        break;
-                    default:
-                        handled = false;
-                        break;
                 }
-
-                if (handled)
-                    e.Handled = true;
             }
         }
 

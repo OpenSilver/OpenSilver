@@ -366,6 +366,19 @@ namespace System.Windows
         public virtual bool MoveFocus(TraversalRequest request) => false;
 
         /// <summary>
+        /// When overridden in a derived class, returns the element that would receive focus for a specified focus 
+        /// traversal direction, without actually moving focus to that element.
+        /// </summary>
+        /// <param name="direction">
+        /// The direction of the requested focus traversal.
+        /// </param>
+        /// <returns>
+        /// The element that would have received focus if <see cref="MoveFocus(TraversalRequest)"/> were actually 
+        /// invoked.
+        /// </returns>
+        public virtual DependencyObject PredictFocus(FocusNavigationDirection direction) => null;
+
+        /// <summary>
         /// Occurs when the value of the <see cref="Focusable"/> property changes.
         /// </summary>
         public event DependencyPropertyChangedEventHandler FocusableChanged;

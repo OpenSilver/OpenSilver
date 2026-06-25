@@ -114,6 +114,10 @@ namespace System.Windows.Controls
             }
         }
 
+        // returns the HeaderElement, or an approximation.   If no acceptable
+        // candidate is found, return the TreeViewItem itself.
+        internal FrameworkElement TryGetHeaderElement() => HeaderElement ?? this;
+
         /// <summary>
         /// The ExpansionStates visual state group.
         /// </summary>

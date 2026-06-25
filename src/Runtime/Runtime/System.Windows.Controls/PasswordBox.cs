@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal.Controls;
 using System.Windows.Automation.Peers;
@@ -333,6 +332,18 @@ namespace System.Windows.Controls
         {
             base.OnMouseLeftButtonUp(e);
             e.Handled = true;
+        }
+
+        /// <inheritdoc />
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down)
+            {
+                e.Handled = true;
+                e.Cancellable = false;
+            }
         }
 
         /// <summary>

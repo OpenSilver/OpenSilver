@@ -29,6 +29,7 @@ internal sealed class PopupRoot : FrameworkElement
     static PopupRoot()
     {
         KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(PopupRoot), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
+        KeyboardNavigation.ControlTabNavigationProperty.OverrideMetadata(typeof(PopupRoot), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
         EventManager.RegisterClassHandler<PopupRoot>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
     }
 
