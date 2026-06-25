@@ -101,7 +101,7 @@ namespace System.Windows.Navigation
         /// </summary>
         /// <param name="dependencyObject">The object to retrieve the attached <see cref="NavigationService"/> for</param>
         /// <returns>The <see cref="NavigationService"/> attached to the <paramref name="dependencyObject"/></returns>
-        internal static NavigationService GetNavigationService(DependencyObject dependencyObject)
+        public static NavigationService GetNavigationService(DependencyObject dependencyObject)
         {
             Guard.ArgumentNotNull(dependencyObject, "dependencyObject");
 
