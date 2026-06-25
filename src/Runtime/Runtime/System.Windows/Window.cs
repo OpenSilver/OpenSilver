@@ -1164,9 +1164,33 @@ public class Window : ContentControl, IResizeObserverListener
 
         _windowHost.Show(_overlayDiv);
 
+        CenterWindow();
+
         Current = this;
         ActiveWindow = this;
         OnActivated(EventArgs.Empty);
+    }
+
+    private void CenterWindow()
+    {
+        if (_windowHost is null) return;
+
+        Rect bounds = Bounds;
+        double hostWidth = _windowHost.DesiredSize.Width;
+        double hostHeight = _windowHost.DesiredSize.Height;
+
+        if (bounds.Width > 0 && bounds.Height > 0 && hostWidth > 0 && hostHeight > 0)
+        {
+            Left = Math.Max(0, (bounds.Width - hostWidth) / 2);
+            Top = Math.Max(0, (bounds.Height - hostHeight) / 2);
+        }
+        else
+        {
+            Left = 0;
+            Top = 0;
+        }
+
+        UpdateWindowPosition();
     }
 
     internal void CloseSecondaryWindow()
@@ -1532,6 +1556,8 @@ public class Window : ContentControl, IResizeObserverListener
 
         double left = double.IsNaN(Left) ? 0 : Left;
         double top = double.IsNaN(Top) ? 0 : Top;
+
+        _windowHost.VisualOffset = new Vector(left, top);
 
         OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
             $"(function(){{ var el=document.getElementById('{_windowHost.OuterDiv.Uid}'); if(el){{ el.style.left='{left.ToInvariantString()}px'; el.style.top='{top.ToInvariantString()}px'; }} }})()");

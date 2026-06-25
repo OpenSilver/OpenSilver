@@ -113,7 +113,7 @@ body {
 
 .opensilver-window-host-root {
     pointer-events: none;
-    position: relative;
+    position: absolute;
 }
 
 .opensilver-taskbar-item-root {
