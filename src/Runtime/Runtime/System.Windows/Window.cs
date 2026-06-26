@@ -17,6 +17,7 @@ using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Controls.Primitives;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -54,6 +55,8 @@ public class Window : ContentControl, IResizeObserverListener
     private HtmlElementReference _overlayDiv;
     private TaskCompletionSource<bool?> _dialogResultTcs;
     private OpenSilver.Controls.WindowHost _windowHost;
+    private Window _owner;
+    private readonly List<Window> _ownedWindows = new();
 
     /// <summary>
     /// True if this window was shown via Show()/ShowDialog() and has overlay infrastructure.
@@ -330,6 +333,15 @@ public class Window : ContentControl, IResizeObserverListener
             $"(function(){{ var overlay=document.getElementById('{_overlayDiv.Uid}');" +
             $"var root=document.getElementById('{rootId}');" +
             $"if(overlay && root) root.appendChild(overlay); }})()");
+
+        // Owned windows always stay in front of their owner
+        foreach (var owned in _ownedWindows)
+        {
+            if (!owned._isClosed && owned._overlayDiv.IsConnected)
+            {
+                owned.BringToFront();
+            }
+        }
     }
 
     #region Closing event
@@ -638,7 +650,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="ShowInTaskbar"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty ShowInTaskbarProperty =
         DependencyProperty.Register(
             nameof(ShowInTaskbar),
@@ -650,10 +661,8 @@ public class Window : ContentControl, IResizeObserverListener
     /// Gets or sets a value that indicates whether the window has a task bar button.
     /// </summary>
     /// <returns>
-    /// true if the window has a task bar button; otherwise, false. Does not apply when the window
-    /// is hosted in a browser.
+    /// true if the window has a task bar button; otherwise, false.
     /// </returns>
-    [OpenSilver.NotImplemented]
     public bool ShowInTaskbar
     {
         get => (bool)GetValue(ShowInTaskbarProperty);
@@ -900,8 +909,51 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Gets or sets the owner of this window.
     /// </summary>
-    [OpenSilver.NotImplemented]
-    public Window Owner { get; set; }
+    public Window Owner
+    {
+        get => _owner;
+        set
+        {
+            if (_owner == value) return;
+
+            if (!_isClosed && _overlayDiv.IsConnected)
+            {
+                throw new InvalidOperationException("Owner cannot be set after the window has been shown.");
+            }
+
+            if (value == this)
+            {
+                throw new ArgumentException("A window cannot own itself.");
+            }
+
+            if (value is not null && IsOwnerOf(value))
+            {
+                throw new ArgumentException("Setting this owner would create a cyclic ownership.");
+            }
+
+            _owner?.RemoveOwnedWindow(this);
+            _owner = value;
+            _owner?.AddOwnedWindow(this);
+        }
+    }
+
+    private bool IsOwnerOf(Window window)
+    {
+        for (Window w = window; w is not null; w = w._owner)
+        {
+            if (w == this) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Gets the collection of windows that are owned by this window.
+    /// </summary>
+    public IReadOnlyList<Window> OwnedWindows => _ownedWindows;
+
+    private void AddOwnedWindow(Window window) => _ownedWindows.Add(window);
+
+    private void RemoveOwnedWindow(Window window) => _ownedWindows.Remove(window);
 
     /// <summary>
     /// Gets a value indicating whether the window is visible.
@@ -945,6 +997,8 @@ public class Window : ContentControl, IResizeObserverListener
             return null;
         }
 
+        Owner ??= ActiveWindow;
+
         _isModal = true;
         _dialogResultTcs = new TaskCompletionSource<bool?>();
         ShowSecondaryWindow();
@@ -975,6 +1029,15 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         _isClosed = true;
+
+        // Close owned windows first
+        foreach (var owned in _ownedWindows.ToArray())
+        {
+            owned.Close();
+        }
+
+        // Detach from owner
+        Owner = null;
 
         if (IsMainWindow)
         {
@@ -1217,17 +1280,34 @@ public class Window : ContentControl, IResizeObserverListener
                 $"document.getElementById('{_overlayDiv.Uid}').style.display = 'none'");
         }
 
+        // Minimize owned windows
+        foreach (var owned in _ownedWindows)
+        {
+            if (!owned._isClosed && owned.WindowState != WindowState.Minimized)
+            {
+                owned.WindowState = WindowState.Minimized;
+            }
+        }
+
         OpenSilver.Controls.WindowTaskbar.UpdateVisibility();
     }
 
     private void RestoreFromMinimized()
     {
-
         // Show the overlay again
         if (_overlayDiv.IsConnected)
         {
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.getElementById('{_overlayDiv.Uid}').style.display = 'flex'");
+        }
+
+        // Restore owned windows
+        foreach (var owned in _ownedWindows)
+        {
+            if (!owned._isClosed && owned.WindowState == WindowState.Minimized)
+            {
+                owned.RestoreFromTaskbar();
+            }
         }
     }
 

@@ -64,6 +64,7 @@ internal static class WindowTaskbar
     internal static void AddWindow(Window window)
     {
         if (_items.ContainsKey(window)) return;
+        if (!window.ShowInTaskbar) return;
 
         EnsureInitialized();
 
