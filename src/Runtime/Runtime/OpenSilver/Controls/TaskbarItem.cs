@@ -19,15 +19,11 @@ using System.Windows.Input;
 namespace OpenSilver.Controls;
 
 /// <summary>
-/// Represents a minimized window item in the taskbar. Can be restyled via theme resource dictionaries.
+/// Represents a window item in the taskbar. Can be restyled via theme resource dictionaries.
 /// </summary>
-[TemplatePart(Name = PART_RestoreButton, Type = typeof(System.Windows.Controls.Primitives.ButtonBase))]
 public class TaskbarItem : Control
 {
-    private const string PART_RestoreButton = "PART_RestoreButton";
-
     private Window _window;
-    private System.Windows.Controls.Primitives.ButtonBase _restoreButtonPart;
 
     static TaskbarItem()
     {
@@ -59,41 +55,41 @@ public class TaskbarItem : Control
             typeof(TaskbarItem),
             new PropertyMetadata(string.Empty));
 
-    public override void OnApplyTemplate()
+    /// <summary>
+    /// Gets or sets whether this is the currently active window.
+    /// </summary>
+    internal bool IsActiveWindow
     {
-        if (_restoreButtonPart is not null)
-        {
-            _restoreButtonPart.Click -= RestoreButton_Click;
-        }
-
-        base.OnApplyTemplate();
-
-        _restoreButtonPart = GetTemplateChild(PART_RestoreButton) as System.Windows.Controls.Primitives.ButtonBase;
-
-        if (_restoreButtonPart is not null)
-        {
-            _restoreButtonPart.Click += RestoreButton_Click;
-        }
+        get => (bool)GetValue(IsActiveWindowProperty);
+        set => SetValueInternal(IsActiveWindowProperty, value);
     }
+
+    internal static readonly DependencyProperty IsActiveWindowProperty =
+        DependencyProperty.Register(
+            nameof(IsActiveWindow),
+            typeof(bool),
+            typeof(TaskbarItem),
+            new PropertyMetadata(false));
+
+    internal Window Window => _window;
 
     /// <inheritdoc/>
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
         base.OnMouseLeftButtonDown(e);
-        Restore();
+        ActivateWindow();
         e.Handled = true;
     }
 
-    private void RestoreButton_Click(object sender, RoutedEventArgs e)
+    private void ActivateWindow()
     {
-        Restore();
-    }
+        if (_window is null) return;
 
-    private void Restore()
-    {
-        if (_window is not null)
+        if (_window.WindowState == WindowState.Minimized)
         {
             _window.RestoreFromTaskbar();
         }
+
+        _window.Activate();
     }
 }

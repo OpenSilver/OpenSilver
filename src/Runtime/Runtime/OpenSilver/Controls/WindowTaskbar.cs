@@ -20,58 +20,57 @@ using OpenSilver.Internal;
 namespace OpenSilver.Controls;
 
 /// <summary>
-/// Manages a taskbar area at the bottom of the main window where minimized windows are displayed.
-/// Uses a CSS flex-wrap container in the second row of the RootDomElement's CSS grid.
-/// Each minimized window is represented by a stylable <see cref="TaskbarItem"/> control.
+/// Manages a taskbar area at the bottom of the screen where window miniatures are displayed.
+/// The taskbar is shown when there are 2+ windows, or when any window is minimized.
 /// </summary>
 internal static class WindowTaskbar
 {
     private static bool _isInitialized;
     private static string _taskbarId;
     private static string _rootId;
-    private static readonly Dictionary<Window, TaskbarItem> _minimizedItems = new();
+    private static readonly Dictionary<Window, TaskbarItem> _items = new();
+    private static bool _isVisible;
 
-    private static void EnsureInitialized(Window mainWindow)
+    private static void EnsureInitialized()
     {
         if (_isInitialized) return;
 
-        _rootId = mainWindow.RootDomElement.Uid;
-        _taskbarId = $"os_taskbar_{_rootId}";
+        Application app = Application.Current;
+        if (app is null) return;
 
-        string windowDivId = mainWindow.OuterDiv.Uid;
+        _rootId = app.GetRootDiv().Uid;
+        _taskbarId = $"os_taskbar_{_rootId}";
 
         Interop.ExecuteJavaScriptVoidAsync(
             $"(function() {{" +
             $"  var root = document.getElementById('{_rootId}');" +
-            $"  root.style.gridTemplateRows = '1fr auto';" +
-            $"  var win = document.getElementById('{windowDivId}');" +
-            $"  if (win) {{ win.style.height = 'auto'; win.style.minHeight = '0'; }}" +
             $"  var tb = document.createElement('div');" +
             $"  tb.id = '{_taskbarId}';" +
-            $"  tb.style.display = 'flex';" +
+            $"  tb.style.display = 'none';" +
             $"  tb.style.flexWrap = 'wrap';" +
             $"  tb.style.alignItems = 'center';" +
             $"  tb.style.background = '#1e1e1e';" +
+            $"  tb.style.zIndex = '2147483647';" +
+            $"  tb.style.position = 'absolute';" +
+            $"  tb.style.bottom = '0';" +
+            $"  tb.style.left = '0';" +
+            $"  tb.style.right = '0';" +
             $"  root.appendChild(tb);" +
             $"}})()");
 
         _isInitialized = true;
     }
 
-    internal static void MinimizeWindow(Window window)
+    internal static void AddWindow(Window window)
     {
-        if (_minimizedItems.ContainsKey(window)) return;
+        if (_items.ContainsKey(window)) return;
 
-        Window mainWindow = Application.Current?.MainWindow;
-        if (mainWindow is null) return;
-
-        EnsureInitialized(mainWindow);
+        EnsureInitialized();
 
         var item = new TaskbarItem(window);
         item.BypassLayoutPolicies = true;
-        item.ParentWindow = mainWindow;
+        item.ParentWindow = window;
 
-        // Attach the TaskbarItem's DOM element inside the flex container
         HtmlElementReference taskbarDiv = new HtmlElementReference(_taskbarId);
         item.OuterDiv = INTERNAL_HtmlDomManager.CreateTaskbarItemRootDomElementAndAppendIt(taskbarDiv, item);
 
@@ -81,7 +80,6 @@ internal static class WindowTaskbar
         item.UpdateIsVisibleCache();
         UIElement.PropagateResumeLayout(null, item);
 
-        // Trigger theme style resolution (normally done during visual tree attachment)
         item.INTERNAL_OnAttachedToVisualTree();
 
         item.InvalidateMeasure();
@@ -89,8 +87,6 @@ internal static class WindowTaskbar
         item.Arrange(new Rect(new Point(), item.DesiredSize));
         item.UpdateLayout();
 
-        // Explicitly set the OuterDiv size since BypassLayoutPolicies skips ArrangeNative,
-        // and template children are position:absolute so they don't give the parent flow height.
         string w = item.DesiredSize.Width.ToInvariantString();
         string h = item.DesiredSize.Height.ToInvariantString();
         string itemDivId = item.OuterDiv.Uid;
@@ -98,13 +94,13 @@ internal static class WindowTaskbar
             $"(function() {{ var el = document.getElementById('{itemDivId}'); " +
             $"el.style.width = '{w}px'; el.style.height = '{h}px'; }})()");
 
-
-        _minimizedItems[window] = item;
+        _items[window] = item;
+        UpdateVisibility();
     }
 
-    internal static void RestoreWindow(Window window)
+    internal static void RemoveWindow(Window window)
     {
-        if (!_minimizedItems.TryGetValue(window, out var item)) return;
+        if (!_items.TryGetValue(window, out var item)) return;
 
         if (item.OuterDiv.IsConnected)
         {
@@ -117,12 +113,44 @@ internal static class WindowTaskbar
         item.UpdateIsVisibleCache();
         UIElement.PropagateSuspendLayout(item);
 
-        _minimizedItems.Remove(window);
+        _items.Remove(window);
+        UpdateVisibility();
+    }
 
-        if (_minimizedItems.Count == 0 && _rootId != null)
+    internal static void UpdateVisibility()
+    {
+        bool shouldBeVisible = _items.Count >= 2 || HasMinimizedWindow();
+
+        if (shouldBeVisible == _isVisible) return;
+        _isVisible = shouldBeVisible;
+
+        if (_taskbarId is null) return;
+
+        string display = shouldBeVisible ? "flex" : "none";
+        Interop.ExecuteJavaScriptVoidAsync(
+            $"document.getElementById('{_taskbarId}').style.display='{display}'");
+    }
+
+    private static bool HasMinimizedWindow()
+    {
+        if (Application.Current is not Application app) return false;
+
+        foreach (Window w in app.Windows)
         {
-            Interop.ExecuteJavaScriptVoidAsync(
-                $"document.getElementById('{_rootId}').style.gridTemplateRows = '1fr'");
+            if (!w._isClosed && w.WindowState == WindowState.Minimized)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    internal static void OnWindowActivated(Window window)
+    {
+        // Update visual state of taskbar items to reflect active window
+        foreach (var kvp in _items)
+        {
+            kvp.Value.IsActiveWindow = kvp.Key == window;
         }
     }
 }

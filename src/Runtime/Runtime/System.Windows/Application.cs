@@ -502,27 +502,12 @@ namespace System.Windows
 
                 Window oldMainWindow = _mainWindow;
 
-                if (oldMainWindow is not null && !oldMainWindow.HasOverlayInfrastructure)
-                {
-                    // Remove the initial main window from DOM entirely.
-                    // Promoted windows (which have a WindowHost/overlay) are cleaned up via CloseSecondaryWindow().
-                    oldMainWindow.RemoveMainWindowFromDom();
-                }
-
                 Window.Current = _mainWindow = value;
 
-                if (_mainWindow.HasOverlayInfrastructure)
+                if (!_mainWindow.HasOverlayInfrastructure)
                 {
-                    // The promoted window stays in its overlay (no DOM changes).
-                    // Just enforce main window properties (hides chrome, fills overlay).
-                    _mainWindow._isShowingAsSecondary = false;
-                    _mainWindow.EnforceMainWindowProperties();
-                }
-                else
-                {
-                    // Fresh window, not yet shown — attach to root (initial startup path).
-                    _mainWindow.EnforceMainWindowProperties();
-                    _mainWindow.AttachToDomElement(_rootDiv);
+                    // Window hasn't been shown yet — show it now.
+                    _mainWindow.Show();
                 }
 
                 MainWindowReady?.Invoke(this, EventArgs.Empty);

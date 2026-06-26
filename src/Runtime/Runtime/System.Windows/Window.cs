@@ -49,6 +49,8 @@ public class Window : ContentControl, IResizeObserverListener
     internal bool _isShowingAsSecondary;
     private bool _isModal;
     internal bool _isClosed;
+    private bool _isFullScreen;
+    private bool _hasExplicitWindowProps;
     private HtmlElementReference _overlayDiv;
     private TaskCompletionSource<bool?> _dialogResultTcs;
     private OpenSilver.Controls.WindowHost _windowHost;
@@ -126,43 +128,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// An <see cref="EventArgs"/> that contains the event data.
     /// </param>
     protected virtual void OnContentRendered(EventArgs e) => ContentRendered?.Invoke(this, e);
-
-    /// <summary>
-    /// Detaches this window from its root DOM element, cleaning up the visual tree and DOM references.
-    /// </summary>
-    internal void DetachFromDomElement()
-    {
-        if (!RootDomElement.IsConnected)
-        {
-            return;
-        }
-
-        _resizeObserver?.Dispose();
-        _resizeObserver = null;
-
-        if (OuterDiv.IsConnected)
-        {
-            INTERNAL_HtmlDomManager.RemoveNodeNative(OuterDiv);
-            INTERNAL_VisualTreeManager.DetachSecondaryWindow(this);
-        }
-
-        IsLoadedCache = false;
-        IsConnectedToLiveTree = false;
-        UpdateIsRenderableCache();
-        UpdateIsVisibleCache();
-
-        OuterDiv = default;
-        RootDomElement = default;
-    }
-
-    /// <summary>
-    /// Fully removes the initial main window from the DOM tree.
-    /// Safe because windowid now points to the rootDiv, not this window's OuterDiv.
-    /// </summary>
-    internal void RemoveMainWindowFromDom()
-    {
-        DetachFromDomElement();
-    }
 
     /// <summary>
     /// Set the DOM element that will host the window. The MainWindow looks for a DIV that
@@ -346,6 +311,8 @@ public class Window : ContentControl, IResizeObserverListener
             previous?.OnDeactivated(EventArgs.Empty);
             OnActivated(EventArgs.Empty);
         }
+
+        OpenSilver.Controls.WindowTaskbar.OnWindowActivated(this);
     }
 
     /// <summary>
@@ -1164,7 +1131,22 @@ public class Window : ContentControl, IResizeObserverListener
 
         _windowHost.Show(_overlayDiv);
 
-        CenterWindow();
+        // Determine display mode before centering (centering sets Left/Top which would
+        // make HasExplicitWindowProps return true).
+        UpdateFullScreenMode();
+
+        if (!_isFullScreen)
+        {
+            CenterWindow();
+        }
+
+        // If another window exists and is in full-screen mode, it should exit full-screen.
+        if (app?.MainWindow is Window mainWindow && mainWindow != this)
+        {
+            mainWindow.UpdateFullScreenMode();
+        }
+
+        OpenSilver.Controls.WindowTaskbar.AddWindow(this);
 
         Current = this;
         ActiveWindow = this;
@@ -1197,8 +1179,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         _isShowingAsSecondary = false;
 
-        // If minimized, remove from taskbar first
-        OpenSilver.Controls.WindowTaskbar.RestoreWindow(this);
+        OpenSilver.Controls.WindowTaskbar.RemoveWindow(this);
 
         _windowHost?.Close();
         _windowHost = null;
@@ -1236,12 +1217,11 @@ public class Window : ContentControl, IResizeObserverListener
                 $"document.getElementById('{_overlayDiv.Uid}').style.display = 'none'");
         }
 
-        OpenSilver.Controls.WindowTaskbar.MinimizeWindow(this);
+        OpenSilver.Controls.WindowTaskbar.UpdateVisibility();
     }
 
     private void RestoreFromMinimized()
     {
-        OpenSilver.Controls.WindowTaskbar.RestoreWindow(this);
 
         // Show the overlay again
         if (_overlayDiv.IsConnected)
@@ -1569,25 +1549,79 @@ public class Window : ContentControl, IResizeObserverListener
 
     internal bool IsMainWindow => this == Application.Current?.MainWindow;
 
-    internal void EnforceMainWindowProperties()
+    /// <summary>
+    /// Enters or exits full-screen mode based on whether this is the sole window
+    /// and no explicit window properties have been set.
+    /// </summary>
+    internal void UpdateFullScreenMode()
     {
-        if (IsMainWindow)
+        bool shouldBeFullScreen = IsMainWindow
+            && !HasExplicitWindowProps()
+            && Application.Current?.Windows.Count <= 1;
+
+        if (shouldBeFullScreen && !_isFullScreen)
         {
-            if (_windowHost is null)
-            {
-                // Only set BypassLayoutPolicies for the initial main window (directly in rootDiv).
-                // Promoted windows keep their existing layout management via WindowHost.
-                BypassLayoutPolicies = true;
-            }
-            else if (_overlayDiv.IsConnected)
-            {
-                // Observe the overlay for viewport resize changes so layout stays in sync.
-                _resizeObserver?.Dispose();
-                _resizeObserver = ResizeObserver.Observe(_overlayDiv, this);
-            }
-            SetValueInternal(WindowStyleProperty, WindowStyle.None);
-            SetValueInternal(WindowStateProperty, WindowState.Maximized);
+            EnterFullScreen();
         }
+        else if (!shouldBeFullScreen && _isFullScreen)
+        {
+            ExitFullScreen();
+        }
+    }
+
+    private void EnterFullScreen()
+    {
+        _isFullScreen = true;
+
+        if (_windowHost is not null)
+        {
+            _windowHost.UpdateTitleBarVisibility(false);
+        }
+
+        SetValueInternal(WindowStateProperty, WindowState.Maximized);
+
+        if (_overlayDiv.IsConnected)
+        {
+            _resizeObserver?.Dispose();
+            _resizeObserver = ResizeObserver.Observe(_overlayDiv, this);
+        }
+    }
+
+    private void ExitFullScreen()
+    {
+        _isFullScreen = false;
+
+        _resizeObserver?.Dispose();
+        _resizeObserver = null;
+
+        if (_windowHost is not null)
+        {
+            WindowChrome chrome = WindowChrome.GetWindowChrome(this);
+            _windowHost.UpdateTitleBarVisibility(chrome is not null && WindowStyle != WindowStyle.None);
+        }
+
+        // Stay maximized but with chrome visible
+    }
+
+    private bool HasExplicitWindowProps()
+    {
+        if (_hasExplicitWindowProps) return true;
+
+        _hasExplicitWindowProps =
+            ReadLocalValue(WidthProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(HeightProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(LeftProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(TopProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(MinWidthProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(MinHeightProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(MaxWidthProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(MaxHeightProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(WindowStyleProperty) != DependencyProperty.UnsetValue ||
+            ReadLocalValue(ResizeModeProperty) != DependencyProperty.UnsetValue ||
+            WindowStartupLocation != WindowStartupLocation.Manual ||
+            ReadLocalValue(WindowChrome.WindowChromeProperty) != DependencyProperty.UnsetValue;
+
+        return _hasExplicitWindowProps;
     }
 
     #endregion
