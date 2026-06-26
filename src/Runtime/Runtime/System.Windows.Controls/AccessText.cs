@@ -91,6 +91,45 @@ public class AccessText : FrameworkElement
     }
 
     /// <summary>
+    /// Identifies the <see cref="Background"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BackgroundProperty =
+        TextElement.BackgroundProperty.AddOwner(
+            typeof(AccessText),
+            new FrameworkPropertyMetadata(null, OnPropertyChanged));
+
+    /// <summary>
+    /// Gets or sets the <see cref="Brush"/> that fills the content area.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="Brush"/> that fills the content area. The default is null.
+    /// </returns>
+    public Brush Background
+    {
+        get => (Brush)GetValue(BackgroundProperty);
+        set => SetValueInternal(BackgroundProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="CharacterSpacing"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty CharacterSpacingProperty = TextElement.CharacterSpacingProperty.AddOwner(typeof(AccessText));
+
+    /// <summary>
+    /// Gets or sets the distance between characters of text in the control measured
+    /// in 1000ths of the font size.
+    /// </summary>
+    /// <returns>
+    /// The distance between characters of text in the control measured in 1000ths of
+    /// the font size. The default is 0.
+    /// </returns>
+    public int CharacterSpacing
+    {
+        get => (int)GetValue(CharacterSpacingProperty);
+        set => SetValueInternal(CharacterSpacingProperty, value);
+    }
+
+    /// <summary>
     /// Identifies the <see cref="FontFamily"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty FontFamilyProperty = TextElement.FontFamilyProperty.AddOwner(typeof(AccessText));
