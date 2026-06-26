@@ -11,14 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System.Linq;
-using System.Diagnostics;
-using System.Text.Json;
-using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
-using OpenSilver;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Text.Json;
+using System.Windows.Media;
 
 namespace System.Windows.Shapes
 {
@@ -598,6 +599,8 @@ namespace System.Windows.Shapes
 
         protected override Size MeasureOverride(Size constraint)
         {
+            UpdateDefiningGeometry();
+
             Size newSize;
 
             Stretch mode = Stretch;
@@ -622,6 +625,8 @@ namespace System.Windows.Shapes
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            UpdateDefiningGeometry();
+
             Size newSize;
 
             Stretch mode = Stretch;
@@ -670,6 +675,15 @@ namespace System.Windows.Shapes
         /// Get the bonds of the geometry that defines this shape
         /// </summary>
         internal virtual Rect GetDefiningGeometryBounds() => GetBBox(SvgElement);
+
+        private void UpdateDefiningGeometry()
+        {
+            if (UseDefaultRendering && DefiningGeometry is Geometry geometry)
+            {
+                SetSvgAttribute("d", geometry.ToPathData(CultureInfo.InvariantCulture));
+                SetFillRuleAttribute(geometry.GetFillRule());
+            }
+        }
 
         internal Size GetStretchedRenderSize(Stretch mode, double strokeThickness, Size availableSize, Rect geometryBounds)
         {
@@ -863,6 +877,8 @@ namespace System.Windows.Shapes
             SvgElement.SetCssStyleProperty(CssPropertyNames.PointerEvents, hitTestable ? "auto" : "none");
 
         internal virtual string SvgTagName => "path";
+
+        internal virtual bool UseDefaultRendering => true;
 
         internal sealed override bool EnablePointerEventsCore => true;
 

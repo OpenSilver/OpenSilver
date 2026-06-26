@@ -151,6 +151,8 @@ namespace System.Windows.Shapes
 
         internal sealed override string SvgTagName => "line";
 
+        internal sealed override bool UseDefaultRendering => false;
+
         internal sealed override Size GetNaturalSize()
         {
             Rect bounds = GetDefiningGeometryBounds();
