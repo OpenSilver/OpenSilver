@@ -13,6 +13,7 @@
 
 using System.Linq;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.Json;
 using System.Windows.Media;
 using CSHTML5.Internal;
@@ -598,6 +599,8 @@ namespace System.Windows.Shapes
 
         protected override Size MeasureOverride(Size constraint)
         {
+            UpdateDefiningGeometry();
+
             Size newSize;
 
             Stretch mode = Stretch;
@@ -622,6 +625,8 @@ namespace System.Windows.Shapes
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            UpdateDefiningGeometry();
+
             Size newSize;
 
             Stretch mode = Stretch;
@@ -670,6 +675,19 @@ namespace System.Windows.Shapes
         /// Get the bonds of the geometry that defines this shape
         /// </summary>
         internal virtual Rect GetDefiningGeometryBounds() => GetBBox(SvgElement);
+
+        // Writes a path-based shape's DefiningGeometry into the SVG "d" attribute so that custom
+        // Shape subclasses (which override DefiningGeometry but are rendered as a <path>) are drawn
+        // and measured from their geometry. Built-in non-path shapes (rect/ellipse/line) are skipped;
+        // Path is path-tagged and its own Data update writes the same value.
+        private void UpdateDefiningGeometry()
+        {
+            if (SvgTagName == "path" && DefiningGeometry is Geometry geometry)
+            {
+                SetSvgAttribute("d", geometry.ToPathData(CultureInfo.InvariantCulture));
+                SetFillRuleAttribute(geometry.GetFillRule());
+            }
+        }
 
         internal Size GetStretchedRenderSize(Stretch mode, double strokeThickness, Size availableSize, Rect geometryBounds)
         {
