@@ -311,7 +311,7 @@ public abstract class KeyboardDevice : InputDevice
         }
 
         uint nativeKeyCode = OpenSilver.Interop.ExecuteJavaScriptUInt32(
-            $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.keyCode", false);
+            $"osjs.keyFromKeyboardEvent({OpenSilver.Interop.GetVariableStringForJS(jsEventArg)})", false);
 
         if (nativeKeyCode > int.MaxValue)
         {
@@ -320,7 +320,7 @@ public abstract class KeyboardDevice : InputDevice
 
         UIElement source = GetEventSource(uie);
 
-        int keyCode = VirtualKeysHelpers.FixKeyCodeForSilverlight((int)nativeKeyCode);
+        int keyCode = (int)nativeKeyCode;
         Key key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode);
         ModifierKeys modifiers = Keyboard.Modifiers;
         int timestamp = Environment.TickCount;
@@ -368,7 +368,7 @@ public abstract class KeyboardDevice : InputDevice
         }
 
         uint nativeKeyCode = OpenSilver.Interop.ExecuteJavaScriptUInt32(
-            $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.keyCode", false);
+            $"osjs.keyFromKeyboardEvent({OpenSilver.Interop.GetVariableStringForJS(jsEventArg)})", false);
 
         if (nativeKeyCode > int.MaxValue)
         {
@@ -377,7 +377,7 @@ public abstract class KeyboardDevice : InputDevice
 
         UIElement source = GetEventSource(uie);
 
-        int keyCode = VirtualKeysHelpers.FixKeyCodeForSilverlight((int)nativeKeyCode);
+        int keyCode = (int)nativeKeyCode;
         Key key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode);
         ModifierKeys modifiers = Keyboard.Modifiers;
         int timestamp = Environment.TickCount;
@@ -416,7 +416,7 @@ public abstract class KeyboardDevice : InputDevice
         }
 
         uint nativeKeyCode = OpenSilver.Interop.ExecuteJavaScriptUInt32(
-            $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.keyCode", false);
+            $"osjs.keyFromKeyboardEvent({OpenSilver.Interop.GetVariableStringForJS(jsEventArg)})", false);
 
         if (nativeKeyCode > ushort.MaxValue)
         {

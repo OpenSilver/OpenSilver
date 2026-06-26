@@ -16,6 +16,14 @@ using System.ComponentModel;
 
 namespace System.Windows.Input;
 
+//
+// IMPORTANT:
+// This enum must remain synchronized with the KEY enum defined in cshtml5.js.                                                     
+// Make sure to change both files if you update this !
+// Note that not all values are defined in cshtml5.js. However each value that is defined
+// has the same integer value, and they must remain synchronized.
+//
+
 /// <summary>
 /// Specifies the values for each virtual key.
 /// </summary>
@@ -539,7 +547,7 @@ public enum Key
     /// <summary>
     /// The Num Lock key.
     /// </summary>
-    NumLock = 114,
+    NumLock = 138,
     /// <summary>
     /// The Num Lock key.
     /// </summary>
@@ -547,7 +555,87 @@ public enum Key
     /// <summary>
     /// The Scroll Lock (ScrLk) key.
     /// </summary>
-    Scroll = 145,
+    Scroll = 139,
+    /// <summary>
+    /// The OEM 1 key.
+    /// </summary>
+    Oem1 = 140,
+    /// <summary>
+    /// The OEM Semicolon key.
+    /// </summary>
+    OemSemicolon = Oem1,
+    /// <summary>
+    /// The OEM Addition key.
+    /// </summary>
+    OemPlus = 141,
+    /// <summary>
+    /// The OEM Comma key.
+    /// </summary>
+    OemComma = 142,
+    /// <summary>
+    /// The OEM Minus key.
+    /// </summary>
+    OemMinus = 143,
+    /// <summary>
+    /// The OEM Period key.
+    /// </summary>
+    OemPeriod = 144,
+    /// <summary>
+    /// The OEM 2 key.
+    /// </summary>
+    Oem2 = 145,
+    /// <summary>
+    /// The OEM Question key
+    /// </summary>
+    OemQuestion = Oem2,
+    /// <summary>
+    /// The OEM 3 key.
+    /// </summary>
+    Oem3 = 146,
+    /// <summary>
+    /// The OEM Tilde key.
+    /// </summary>
+    OemTilde = Oem3,
+    /// <summary>
+    /// The OEM 4 key.
+    /// </summary>
+    Oem4 = 149,
+    /// <summary>
+    /// The OEM Open Brackets key.
+    /// </summary>
+    OemOpenBrackets = Oem4,
+    /// <summary>
+    /// The OEM 5 key.
+    /// </summary>
+    Oem5 = 150,
+    /// <summary>
+    /// The OEM Pipe key.
+    /// </summary>
+    OemPipe = Oem5,
+    /// <summary>
+    /// The OEM 6 key.
+    /// </summary>
+    Oem6 = 151,
+    /// <summary>
+    /// The OEM Close Brackets key.
+    /// </summary>
+    OemCloseBrackets = Oem6,
+    /// <summary>
+    /// The OEM 7 key.
+    /// </summary>
+    Oem7 = 152,
+    /// <summary>
+    /// The OEM Quotes key.
+    /// </summary>
+    OemQuotes = Oem7,
+    /// <summary>
+    /// The OEM 102 key.
+    /// </summary>
+    Oem102 = 154,
+    /// <summary>
+    /// The OEM Backslash key.
+    /// </summary>
+    OemBackslash = Oem102,
     /// <summary>
     /// An unknown key.
     /// </summary>
@@ -557,48 +645,13 @@ public enum Key
 internal static class VirtualKeysHelpers
 {
     private static readonly HashSet<int> _unknownKeys =
-        new()
-        {
+        [
             7, 10, 11, 14, 15, 22, 26, 58, 59, 60, 61, 62,
-            63, 64, 94, 136, 137, 138, 139, 140, 141, 142,
-            143, 146, 147, 148, 149, 150, 151, 152, 153,
-            154, 155, 156, 157, 158, 159
-        };
+            63, 64, 94, 136, 137, 147, 148, 153, 155, 156,
+            157, 158, 159,
+        ];
 
-    internal static bool IsUnknownKey(int intValue)
-    {
-        return intValue > 165 || _unknownKeys.Contains(intValue);
-    }
+    internal static Key GetKeyFromKeyCode(int keyCode) => IsUnknownKey(keyCode) ? Key.Unknown : (Key)keyCode;
 
-    internal static Key GetKeyFromKeyCode(int keyCode)
-    {
-        if (keyCode == 59) // The keyCode for the period in Firefox is 59 while it is 190 for IE, Chrome and Edge.
-        {
-            keyCode = 190;
-        }
-        return IsUnknownKey(keyCode) ? Key.Unknown : (Key)keyCode;
-    }
-
-    internal static int FixKeyCodeForSilverlight(int keycode)
-    {
-        // Silverlight does not distinguish between left and right ctrl/alt/shift keys, so we need to "redirect" those keys to the generic ones.
-
-        int fixedKeyCode = keycode;
-        //left Shift key or right Shift key.
-        if (fixedKeyCode == 160 || fixedKeyCode == 161)
-        {
-            fixedKeyCode = 16;
-        }
-        //left Ctrl key or right Ctrl key
-        else if (fixedKeyCode == 162 || fixedKeyCode == 163)
-        {
-            fixedKeyCode = 17;
-        }
-        //left Alt key of right Alt key
-        else if (fixedKeyCode == 164 || fixedKeyCode == 165)
-        {
-            fixedKeyCode = 18;
-        }
-        return fixedKeyCode;
-    }
+    private static bool IsUnknownKey(int intValue) => intValue > 165 || _unknownKeys.Contains(intValue);
 }

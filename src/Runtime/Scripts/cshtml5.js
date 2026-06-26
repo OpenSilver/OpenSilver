@@ -55,6 +55,95 @@ Object.defineProperty(window, 'osjs', {
             POINTER_CAPTURED: 'opensilver-pointer-captured'
         });
 
+        // This enum must remain in sync with the enum in Key.cs
+        const KEY = Object.freeze({
+            Back: 8,
+            Tab: 9,
+            Return: 13,
+            Shift: 16,
+            Ctrl: 17,
+            Alt: 18,
+            Pause: 19,
+            CapsLock: 20,
+            Escape: 27,
+            Space: 32,
+            PageUp: 33,
+            PageDown: 34,
+            End: 35,
+            Home: 36,
+            Left: 37,
+            Up: 38,
+            Right: 39,
+            Down: 40,
+            Insert: 45,
+            Delete: 46,
+            D0: 48,
+            D1: 49,
+            D2: 50,
+            D3: 51,
+            D4: 52,
+            D5: 53,
+            D6: 54,
+            D7: 55,
+            D8: 56,
+            D9: 57,
+            LWin: 91,
+            RWin: 92,
+            NumPad0: 96,
+            NumPad1: 97,
+            NumPad2: 98,
+            NumPad3: 99,
+            NumPad4: 100,
+            NumPad5: 101,
+            NumPad6: 102,
+            NumPad7: 103,
+            NumPad8: 104,
+            NumPad9: 105,
+            Multiply: 106,
+            Add: 107,
+            Subtract: 109,
+            Decimal: 110,
+            Divide: 111,
+            F1: 112,
+            F2: 113,
+            F3: 114,
+            F4: 115,
+            F5: 116,
+            F6: 117,
+            F7: 118,
+            F8: 119,
+            F9: 120,
+            F10: 121,
+            F11: 122,
+            F12: 123,
+            F13: 124,
+            F14: 125,
+            F15: 126,
+            F16: 127,
+            F17: 128,
+            F18: 129,
+            F19: 130,
+            F20: 131,
+            F21: 132,
+            F22: 133,
+            F23: 134,
+            F24: 135,
+            NumLock: 138,
+            Scroll: 139,
+            OemSemicolon: 140,
+            OemPlus: 141,
+            OemComma: 142,
+            OemMinus: 143,
+            OemPeriod: 144,
+            OemQuestion: 145,
+            OemTilde: 146,
+            OemOpenBrackets: 149,
+            OemPipe: 150,
+            OemCloseBrackets: 151,
+            OemQuotes: 152,
+            OemBackslash: 154,
+        });
+
         const _jsObjRef = new Map();
         const _callbacks = new CALLBACKS();
         const _performanceCounters = [];
@@ -1221,6 +1310,117 @@ Object.defineProperty(window, 'osjs', {
                     return computedColor;
                 }
                 return '';
+            },
+            keyFromKeyboardEvent: function (event) {
+                // 1 - Try to use the physical key location when it is safe (i.e. layout independent)
+                // 2 - Attempt to map from the produced key
+                // 3 - Return keyCode
+
+                switch (event.code) {
+                    case 'Digit0': return KEY.D0;
+                    case 'Digit1': return KEY.D1;
+                    case 'Digit2': return KEY.D2;
+                    case 'Digit3': return KEY.D3;
+                    case 'Digit4': return KEY.D4;
+                    case 'Digit5': return KEY.D5;
+                    case 'Digit6': return KEY.D6;
+                    case 'Digit7': return KEY.D7;
+                    case 'Digit8': return KEY.D8;
+                    case 'Digit9': return KEY.D9;
+                    case 'Numpad0': return KEY.NumPad0;
+                    case 'Numpad1': return KEY.NumPad1;
+                    case 'Numpad2': return KEY.NumPad2;
+                    case 'Numpad3': return KEY.NumPad3;
+                    case 'Numpad4': return KEY.NumPad4;
+                    case 'Numpad5': return KEY.NumPad5;
+                    case 'Numpad6': return KEY.NumPad6;
+                    case 'Numpad7': return KEY.NumPad7;
+                    case 'Numpad8': return KEY.NumPad8;
+                    case 'Numpad9': return KEY.NumPad9;
+                    case 'NumpadEnter': return KEY.Return;
+                    case 'NumpadDecimal': return KEY.Decimal;
+                    case 'NumpadMultiply': return KEY.Multiply;
+                    case 'NumpadAdd': return KEY.Add;
+                    case 'NumpadSubtract': return KEY.Subtract;
+                    case 'NumpadDivide': return KEY.Divide;
+                    case 'NumLock': return KEY.NumLock;
+                    case 'F1': return KEY.F1;
+                    case 'F2': return KEY.F2;
+                    case 'F3': return KEY.F3;
+                    case 'F4': return KEY.F4;
+                    case 'F5': return KEY.F5;
+                    case 'F6': return KEY.F6;
+                    case 'F7': return KEY.F7;
+                    case 'F8': return KEY.F8;
+                    case 'F9': return KEY.F9;
+                    case 'F10': return KEY.F10;
+                    case 'F11': return KEY.F11;
+                    case 'F12': return KEY.F12;
+                    case 'F13': return KEY.F13;
+                    case 'F14': return KEY.F14;
+                    case 'F15': return KEY.F15;
+                    case 'F16': return KEY.F16;
+                    case 'F17': return KEY.F17;
+                    case 'F18': return KEY.F18;
+                    case 'F19': return KEY.F19;
+                    case 'F20': return KEY.F20;
+                    case 'F21': return KEY.F21;
+                    case 'F22': return KEY.F22;
+                    case 'F23': return KEY.F23;
+                    case 'F24': return KEY.F24;
+                }
+
+                if (event.key.length === 1) {
+                    if (event.key >= 'A' && event.key <= 'Z') {
+                        return event.key.charCodeAt(0);
+                    }
+
+                    if (event.key >= 'a' && event.key <= 'z') {
+                        return event.key.charCodeAt(0) - 32;
+                    }
+                }
+
+                switch (event.key) {
+                    case 'Backspace': return KEY.Back;
+                    case 'Tab': return KEY.Tab;
+                    case 'Enter': return KEY.Return;
+                    case 'Shift': return KEY.Shift;
+                    case 'Control': return KEY.Ctrl;
+                    case 'Alt': return KEY.Alt;
+                    case 'AltGraph': return KEY.Alt;
+                    case 'Pause': return KEY.Pause;
+                    case 'CapsLock': return KEY.CapsLock;
+                    case 'Escape': return KEY.Escape;
+                    case ' ': return KEY.Space;
+                    case 'PageUp': return KEY.PageUp;
+                    case 'PageDown': return KEY.PageDown;
+                    case 'End': return KEY.End;
+                    case 'Home': return KEY.Home;
+                    case 'ArrowLeft': return KEY.Left;
+                    case 'ArrowUp': return KEY.Up;
+                    case 'ArrowRight': return KEY.Right;
+                    case 'ArrowDown': return KEY.Down;
+                    case 'Insert': return KEY.Insert;
+                    case 'Delete': return KEY.Delete;
+                    case 'Meta': return event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ? KEY.RWin : KEY.LWin;
+                    case 'ScrollLock': return KEY.Scroll;
+                    case ';': return KEY.OemSemicolon;
+                    case '+': return KEY.OemPlus;
+                    case ',': return KEY.OemComma;
+                    case '-': return KEY.OemMinus;
+                    case '.': return KEY.OemPeriod;
+                    case '?': return KEY.OemQuestion;
+                    case '~': return KEY.OemTilde;
+                    case '[': return KEY.OemOpenBrackets;
+                    case '{': return KEY.OemOpenBrackets;
+                    case '|': return KEY.OemPipe;
+                    case ']': return KEY.OemCloseBrackets;
+                    case '}': return KEY.OemCloseBrackets;
+                    case '\'': return KEY.OemQuotes;
+                    case '\\': return KEY.OemBackslash;
+                }
+
+                return event.keyCode;
             },
             htmlPresenter: Object.freeze({
                 createView: function (id, contentId, parentId, useShadowDom) {
