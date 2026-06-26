@@ -115,6 +115,8 @@ namespace System.Windows.Shapes
 
         internal sealed override string SvgTagName => "path";
 
+        internal sealed override bool UseDefaultRendering => false;
+
         protected override Size MeasureOverride(Size constraint)
         {
             InvalidateData();

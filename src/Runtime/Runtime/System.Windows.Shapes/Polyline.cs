@@ -211,6 +211,8 @@ public sealed class Polyline : Shape
 
     internal sealed override string SvgTagName => "polyline";
 
+    internal sealed override bool UseDefaultRendering => false;
+
     /// <summary>
     /// Get the natural size of the geometry that defines this shape
     /// </summary>

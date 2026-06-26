@@ -207,6 +207,8 @@ public sealed class Polygon : Shape
 
     internal sealed override string SvgTagName => "polygon";
 
+    internal sealed override bool UseDefaultRendering => false;
+
     /// <summary>
     /// Get the natural size of the geometry that defines this shape
     /// </summary>

@@ -11,15 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System.Linq;
-using System.Diagnostics;
-using System.Globalization;
-using System.Text.Json;
-using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
-using OpenSilver;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Text.Json;
+using System.Windows.Media;
 
 namespace System.Windows.Shapes
 {
@@ -676,13 +676,9 @@ namespace System.Windows.Shapes
         /// </summary>
         internal virtual Rect GetDefiningGeometryBounds() => GetBBox(SvgElement);
 
-        // Writes a path-based shape's DefiningGeometry into the SVG "d" attribute so that custom
-        // Shape subclasses (which override DefiningGeometry but are rendered as a <path>) are drawn
-        // and measured from their geometry. Built-in non-path shapes (rect/ellipse/line) are skipped;
-        // Path is path-tagged and its own Data update writes the same value.
         private void UpdateDefiningGeometry()
         {
-            if (SvgTagName == "path" && DefiningGeometry is Geometry geometry)
+            if (UseDefaultRendering && DefiningGeometry is Geometry geometry)
             {
                 SetSvgAttribute("d", geometry.ToPathData(CultureInfo.InvariantCulture));
                 SetFillRuleAttribute(geometry.GetFillRule());
@@ -881,6 +877,8 @@ namespace System.Windows.Shapes
             SvgElement.SetCssStyleProperty(CssPropertyNames.PointerEvents, hitTestable ? "auto" : "none");
 
         internal virtual string SvgTagName => "path";
+
+        internal virtual bool UseDefaultRendering => true;
 
         internal sealed override bool EnablePointerEventsCore => true;
 

@@ -106,6 +106,8 @@ namespace System.Windows.Shapes
 
         internal sealed override string SvgTagName => "rect";
 
+        internal sealed override bool UseDefaultRendering => false;
+
         /// <inheritdoc />
         protected override Size MeasureOverride(Size availableSize)
         {
