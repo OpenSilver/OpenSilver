@@ -146,6 +146,16 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Raises <see cref="FrameworkElement.Initialized"/> after XAML initialization.
+        /// </summary>
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+
+            ScheduleDeferredSelectionChanged();
+        }
+
+        /// <summary>
         /// Gets or sets the currently selected <see cref="TabItem" />.
         /// </summary>
         /// <value>
@@ -336,10 +346,14 @@ namespace System.Windows.Controls
 
             var args = new SelectionChangedEventArgs(oldItem, newItem);
 
-            OnSelectionChanged(args);
-
-            // Fire SelectionChanged Event
-            SelectionChanged?.Invoke(this, args);
+            if (IsInitialized)
+            {
+                RaiseSelectionChanged(args);
+            }
+            else
+            {
+                _deferredSelectionChangedArgs = args;
+            }
         }
 
         /// <summary>
@@ -1036,5 +1050,29 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         private bool _updateIndex = true;
+
+        private SelectionChangedEventArgs _deferredSelectionChangedArgs;
+
+        private void RaiseSelectionChanged(SelectionChangedEventArgs args)
+        {
+            OnSelectionChanged(args);
+            SelectionChanged?.Invoke(this, args);
+        }
+
+        private void ScheduleDeferredSelectionChanged()
+        {
+            if (_deferredSelectionChangedArgs == null)
+                return;
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                if (_deferredSelectionChangedArgs == null)
+                    return;
+
+                SelectionChangedEventArgs args = _deferredSelectionChangedArgs;
+                _deferredSelectionChangedArgs = null;
+                RaiseSelectionChanged(args);
+            });
+        }
     }
 }
