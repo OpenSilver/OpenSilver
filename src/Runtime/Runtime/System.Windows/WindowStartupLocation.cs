@@ -28,5 +28,10 @@ public enum WindowStartupLocation
     /// The application window is positioned according to the <see cref="WindowSettings.Top"/>
     /// and <see cref="WindowSettings.Left"/> settings.
     /// </summary>
-    Manual = 1
+    Manual = 1,
+
+    /// <summary>
+    /// The application window is centered relative to its owner window.
+    /// </summary>
+    CenterOwner = 2,
 }

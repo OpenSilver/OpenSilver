@@ -700,7 +700,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowStartupLocation"/> value that specifies the top/left position
     /// of a window when first shown. The default is <see cref="WindowStartupLocation.Manual"/>.
     /// </returns>
-    [OpenSilver.NotImplemented]
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.Manual;
 
     /// <summary>
@@ -1194,13 +1193,13 @@ public class Window : ContentControl, IResizeObserverListener
 
         _windowHost.Show(_overlayDiv);
 
-        // Determine display mode before centering (centering sets Left/Top which would
+        // Determine display mode before positioning (centering sets Left/Top which would
         // make HasExplicitWindowProps return true).
         UpdateFullScreenMode();
 
         if (!_isFullScreen)
         {
-            CenterWindow();
+            ApplyStartupLocation();
         }
 
         // If another window exists and is in full-screen mode, it should exit full-screen.
@@ -1216,7 +1215,45 @@ public class Window : ContentControl, IResizeObserverListener
         OnActivated(EventArgs.Empty);
     }
 
-    private void CenterWindow()
+    private void ApplyStartupLocation()
+    {
+        switch (WindowStartupLocation)
+        {
+            case WindowStartupLocation.CenterScreen:
+                CenterInViewport();
+                break;
+            case WindowStartupLocation.CenterOwner:
+                CenterOverOwner();
+                break;
+            case WindowStartupLocation.Manual:
+            default:
+                UpdateWindowPosition();
+                break;
+        }
+    }
+
+    private void CenterOverOwner()
+    {
+        if (_windowHost is null || _owner is null || _owner._windowHost is null)
+        {
+            CenterInViewport();
+            return;
+        }
+
+        double ownerLeft = double.IsNaN(_owner.Left) ? 0 : _owner.Left;
+        double ownerTop = double.IsNaN(_owner.Top) ? 0 : _owner.Top;
+        double ownerWidth = _owner._windowHost.DesiredSize.Width;
+        double ownerHeight = _owner._windowHost.DesiredSize.Height;
+        double hostWidth = _windowHost.DesiredSize.Width;
+        double hostHeight = _windowHost.DesiredSize.Height;
+
+        Left = Math.Max(0, ownerLeft + (ownerWidth - hostWidth) / 2);
+        Top = Math.Max(0, ownerTop + (ownerHeight - hostHeight) / 2);
+
+        UpdateWindowPosition();
+    }
+
+    private void CenterInViewport()
     {
         if (_windowHost is null) return;
 
