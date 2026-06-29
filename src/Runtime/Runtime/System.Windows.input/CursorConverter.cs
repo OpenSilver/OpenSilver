@@ -11,8 +11,10 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 
 namespace System.Windows.Input;
 
@@ -75,14 +77,29 @@ public class CursorConverter : TypeConverter
         {
             string text = s.Trim();
 
-            if (Enum.TryParse(text, true, out CursorType cursorType) &&
-                (int)cursorType >= (int)CursorType.None && (int)cursorType <= (int)CursorType.Eraser)
+            if (text == string.Empty)
             {
-                return Cursors.EnsureCursor(cursorType);
+                return null;
+            }
+
+            if (text.LastIndexOf('.') == -1)
+            {
+                if (Enum.TryParse(text, true, out CursorType cursorType) &&
+                    (int)cursorType >= (int)CursorType.None && (int)cursorType <= (int)CursorType.Eraser)
+                {
+                    return Cursors.EnsureCursor(cursorType);
+                }
+                else
+                {
+                    throw new FormatException($"'{value}' is not a valid token.");
+                }
             }
             else
             {
-                throw new FormatException($"'{value}' is not a valid token.");
+                if (text.EndsWith(".cur", StringComparison.OrdinalIgnoreCase) && AppResourcesManager.GetResourceStream(text) is Stream stream)
+                {
+                    return new Cursor(stream);
+                }
             }
         }
 

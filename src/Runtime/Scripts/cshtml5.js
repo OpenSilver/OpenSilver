@@ -2855,6 +2855,23 @@ Object.defineProperty(window, 'osjs', {
                     },
                 }
             })()),
+            cursors: Object.freeze({
+                create: function (payload) {
+                    const binary = atob(payload);
+                    const length = binary.length;
+                    const bytes = new Uint8Array(length);
+
+                    for (let i = 0; i < length; i++) {
+                        bytes[i] = binary.charCodeAt(i);
+                    }
+
+                    const blob = new Blob([bytes], { type: 'image/x-icon' });
+                    return URL.createObjectURL(blob);
+                },
+                release: function (url) {
+                    URL.revokeObjectURL(url);
+                },
+            }),
         };
     })()),
     writable: false,

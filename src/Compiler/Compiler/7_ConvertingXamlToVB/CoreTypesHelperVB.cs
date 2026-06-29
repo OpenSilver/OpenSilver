@@ -46,7 +46,26 @@ internal sealed class CoreTypesConverterVB : CoreTypesConverter
 
     public override string ConvertToCursor(XObject context, string source)
     {
-        return $"Global.System.Windows.Input.Cursors.{source}";
+        string text = source.Trim();
+
+        if (text == string.Empty)
+        {
+            return "Nothing";
+        }
+
+        if (text.LastIndexOf('.') == -1)
+        {
+            return $"Global.System.Windows.Input.Cursors.{text}";
+        }
+        else
+        {
+            if (text.EndsWith(".cur", StringComparison.OrdinalIgnoreCase))
+            {
+                return ConvertFromInvariantString(text, "System.Windows.Input.Cursor");
+            }
+        }
+
+        throw GetConvertException(source, "System.Windows.Input.Cursor", context);
     }
 
     public override string ConvertToModifierKeys(XObject context, string source)
