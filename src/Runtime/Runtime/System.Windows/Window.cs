@@ -271,7 +271,9 @@ public class Window : ContentControl, IResizeObserverListener
             Window previous = ActiveWindow;
             ActiveWindow = this;
             Current = this;
+            previous?.SetValue(IsActivePropertyKey, false);
             previous?.OnDeactivated(EventArgs.Empty);
+            SetValue(IsActivePropertyKey, true);
             OnActivated(EventArgs.Empty);
         }
 
@@ -580,7 +582,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if the window is active; otherwise, false. The default is false.
     /// </returns>
-    [OpenSilver.NotImplemented]
     public bool IsActive => (bool)GetValue(IsActiveProperty);
 
     /// <summary>
@@ -600,7 +601,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// true if a window is activated when first shown; otherwise, false. The default is true.
     /// </returns>
-    [OpenSilver.NotImplemented]
     public bool ShowActivated
     {
         get => (bool)GetValue(ShowActivatedProperty);
@@ -1169,9 +1169,7 @@ public class Window : ContentControl, IResizeObserverListener
 
         OpenSilver.Controls.WindowTaskbar.AddWindow(this);
 
-        Current = this;
-        ActiveWindow = this;
-        OnActivated(EventArgs.Empty);
+        if(ShowActivated) Activate();
     }
 
     private void ApplyStartupLocation()
