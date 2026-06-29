@@ -27,6 +27,7 @@
     <Compile Include="OpenSilver\HtmlElementReference.cs" />
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
+    <Compile Include="OpenSilver\Internal\Documents\TextContainerInlineUIContainer.cs" />
     <Compile Include="OpenSilver\Internal\Documents\TextContainerList.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\AnimationType.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\IAnimation.cs" />

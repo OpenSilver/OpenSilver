@@ -60,6 +60,7 @@ public class InlineCollection : TextElementCollection<Inline>, IList
         {
             string text => new Run(text ?? string.Empty),
             Inline i => i,
+            UIElement element => new InlineUIContainer { Child = element },
             _ => null,
         };
 
