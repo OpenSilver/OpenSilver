@@ -47,7 +47,6 @@ public class Window : ContentControl, IResizeObserverListener
     private IDisposable _resizeObserver;
     private DispatcherOperation _contentRenderedCallback;
     private bool _postContentRenderedFromLoadedHandler;
-    internal bool _isShowingAsSecondary;
     private bool _isModal;
     internal bool _isClosed;
     private bool _isFullScreen;
@@ -132,45 +131,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// </param>
     protected virtual void OnContentRendered(EventArgs e) => ContentRendered?.Invoke(this, e);
 
-    /// <summary>
-    /// Set the DOM element that will host the window. The MainWindow looks for a DIV that
-    /// has the ID "cshtml5-root" or "opensilver-root".
-    /// </summary>
-    /// <param name="rootDomElement">The DOM element that will host the window</param>
-    internal void AttachToDomElement(HtmlElementReference rootDomElement)
-    {
-        if (OuterDiv.IsConnected || RootDomElement.IsConnected)
-        {
-            throw new InvalidOperationException("The method 'Window.AttachToDomElement' can be called only once.");
-        }
-
-        ArgumentNullException.ThrowIfNull(rootDomElement);
-
-        //Note: The "rootDomElement" will contain one DIV for the root of the window visual tree, and other DIVs to host the popups.
-        RootDomElement = rootDomElement;
-
-        ParentWindow = this;
-
-        // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
-        RootDomElement.SetCssStyleProperty(CssPropertyNames.Display, "grid");
-        RootDomElement.SetCssStyleProperty(CssPropertyNames.Overflow, "clip");
-
-        // Create the DIV that will correspond to the root of the window visual tree:
-        OuterDiv = INTERNAL_HtmlDomManager.CreateWindowDomElementAndAppendIt(this);
-
-        _resizeObserver = ResizeObserver.Observe(OuterDiv, this);
-
-        // Set the window as "loaded":
-        IsLoadedCache = true;
-        IsConnectedToLiveTree = true;
-        UpdateIsRenderableCache();
-        UpdateIsVisibleCache();
-
-        // Raise the "Loaded" event:
-        RaiseLoadedEvent();
-
-        SetLayoutSize();
-    }
 
     private static void OnGotKeyboardFocus(object sender, RoutedEventArgs e)
     {
@@ -1169,7 +1129,6 @@ public class Window : ContentControl, IResizeObserverListener
 
     private void ShowSecondaryWindow()
     {
-        _isShowingAsSecondary = true;
         PrepareForSecondaryDisplay();
 
         Application app = Application.Current;
@@ -1277,8 +1236,6 @@ public class Window : ContentControl, IResizeObserverListener
 
     internal void CloseSecondaryWindow()
     {
-        _isShowingAsSecondary = false;
-
         OpenSilver.Controls.WindowTaskbar.RemoveWindow(this);
 
         _windowHost?.Close();

@@ -49,7 +49,6 @@ Object.defineProperty(window, 'osjs', {
             LIST: 'opensilver-list',
             LISTITEM: 'opensilver-listitem',
             HYPERLINK: 'opensilver-hyperlink',
-            WINDOW: 'opensilver-window',
             POPUP: 'opensilver-popup',
             INKPRESENTER: 'opensilver-inkpresenter',
             POINTER_CAPTURED: 'opensilver-pointer-captured'
@@ -378,6 +377,13 @@ Object.defineProperty(window, 'osjs', {
                 registerRoot: function (rootId) {
                     const root = document.getElementById(rootId);
                     if (!root) return;
+
+                    // Set windowid on the root element for coordinate translation.
+                    Object.defineProperty(root, 'windowid', {
+                        value: rootId,
+                        writable: false,
+                        configurable: true,
+                    });
 
                     // Make sure the root div is keyboard focusable, so that we can tab into the app.
                     root.tabIndex = Math.max(root.tabIndex, 0);
@@ -827,23 +833,6 @@ Object.defineProperty(window, 'osjs', {
 
                 element.appendChild(canvas);
                 parent.appendChild(element);
-            },
-            createWindow: function (id, rootElementId) {
-                const rootElement = document.getElementById(rootElementId);
-                if (!rootElement) return;
-
-                // Set windowid on the root element to its own ID.
-                // This is used for coordinate translation (page coords → app-relative coords).
-                Object.defineProperty(rootElement, 'windowid', {
-                    value: rootElementId,
-                    writable: false,
-                    configurable: true,
-                });
-
-                const w = createVisualElement('div', id, rootElementId);
-                w.classList.add(CSS_CLASS.WINDOW);
-
-                rootElement.appendChild(w);
             },
             createPopupRoot: function (id, rootElementId, pointerEvents) {
                 const rootElement = document.getElementById(rootElementId);

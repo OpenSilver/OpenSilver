@@ -165,20 +165,6 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
-        internal static HtmlElementReference CreateWindowDomElementAndAppendIt(Window window)
-        {
-            Debug.Assert(window is not null);
-
-            string uid = NewId();
-
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"osjs.createWindow('{uid}', '{window.RootDomElement.Uid}')");
-
-            AddToGlobalStore(uid, window);
-
-            return new(uid);
-        }
-
         internal static HtmlElementReference CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
         {
             Debug.Assert(popupRoot != null);
