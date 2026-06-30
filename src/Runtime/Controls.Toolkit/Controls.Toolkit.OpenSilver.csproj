@@ -33,7 +33,6 @@
       <Link>Common\VisualStates.cs</Link>
     </Compile>
     <Compile Include="Common\VisualTreeExtensions.cs" />
-    <Compile Include="DockPanel\DockPanel.cs" />
     <Compile Include="Common\CollectionHelper.cs" />
     <Compile Include="DragDrop\CardPanel.cs" />
     <Compile Include="DragDrop\DataObject.cs" />

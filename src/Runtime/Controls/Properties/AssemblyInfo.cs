@@ -21,3 +21,4 @@ using System.Windows.Markup;
 [assembly: TypeForwardedTo(typeof(TreeViewItem))]
 [assembly: TypeForwardedTo(typeof(HeaderedItemsControl))]
 [assembly: TypeForwardedTo(typeof(HierarchicalDataTemplate))]
+[assembly: TypeForwardedTo(typeof(Dock))]

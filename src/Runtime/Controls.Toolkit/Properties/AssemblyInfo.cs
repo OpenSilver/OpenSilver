@@ -18,3 +18,4 @@ using System.Windows.Markup;
 
 [assembly: TypeForwardedTo(typeof(LengthConverter))]
 [assembly: TypeForwardedTo(typeof(HeaderedContentControl))]
+[assembly: TypeForwardedTo(typeof(DockPanel))]

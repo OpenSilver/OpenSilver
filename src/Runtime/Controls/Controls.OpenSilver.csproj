@@ -39,7 +39,6 @@
     <Compile Include="Calendar\DateTimeHelper.cs" />
     <Compile Include="Calendar\DateTimeTypeConverter.cs" />
     <Compile Include="Calendar\SelectedDatesCollection.cs" />
-    <Compile Include="Common\Dock.cs" />
     <Compile Include="..\Runtime\System.Windows.Controls\InteractionHelper.cs">
       <Link>Common\InteractionHelper.cs</Link>
     </Compile>

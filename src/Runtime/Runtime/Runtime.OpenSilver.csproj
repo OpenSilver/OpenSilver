@@ -160,6 +160,8 @@
     <Compile Include="System.Windows.Controls\BorderGapClipConverter.cs" />
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Controls\Decorator.cs" />
+    <Compile Include="System.Windows.Controls\Dock.cs" />
+    <Compile Include="System.Windows.Controls\DockPanel.cs" />
     <Compile Include="System.Windows.Controls\GroupBox.cs" />
     <Compile Include="System.Windows.Controls\GroupItem.cs" />
     <Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
