@@ -944,7 +944,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <returns>
     /// A <see cref="Nullable{Boolean}"/> value that specifies whether the activity was accepted (true) or canceled (false).
     /// </returns>
-    public bool? ShowDialog()
+    public Task<bool?> ShowDialog()
     {
         if (_isClosed)
         {
@@ -953,7 +953,7 @@ public class Window : ContentControl, IResizeObserverListener
 
         if (_overlayDiv.IsConnected)
         {
-            return null;
+            return Task.FromResult<bool?>(null);
         }
 
         Owner ??= ActiveWindow;
@@ -961,7 +961,7 @@ public class Window : ContentControl, IResizeObserverListener
         _isModal = true;
         _dialogResultTcs = new TaskCompletionSource<bool?>();
         ShowSecondaryWindow();
-        return null;
+        return _dialogResultTcs.Task;
     }
 
     /// <summary>
