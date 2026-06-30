@@ -1679,7 +1679,17 @@ public sealed class KeyboardNavigation
             return container;
         }
 
-        return GetNextTab(container, container, true);
+        // Focus can be called during directional navigation, so we need to restore _navigationProperty
+        // when we are done.
+
+        DependencyProperty navigationProperty = _navigationProperty;
+        _navigationProperty = TabNavigationProperty;
+
+        DependencyObject nextTab = GetNextTab(container, container, true);
+
+        _navigationProperty = navigationProperty;
+
+        return nextTab;
     }
 
     private DependencyObject GetNextTab(DependencyObject e, DependencyObject container, bool goDownOnly)
