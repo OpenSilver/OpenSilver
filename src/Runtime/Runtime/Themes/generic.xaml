@@ -4959,26 +4959,37 @@
 
     <!--  oscontrols:TaskbarItem  -->
     <Style TargetType="oscontrols:TaskbarItem">
-        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="MinWidth" Value="100" />
         <Setter Property="MaxWidth" Value="200" />
         <Setter Property="MinHeight" Value="30" />
         <Setter Property="Background" Value="#FF5c5c5c" />
         <Setter Property="Foreground" Value="White" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="8,0,8,2" />
+        
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="oscontrols:TaskbarItem">
-                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                    <controls:Border x:Name="RootBorder"
+                                     Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                      BorderThickness="0"
                                      MinHeight="{TemplateBinding MinHeight}"
                                      MinWidth="{TemplateBinding MinWidth}"
-                                     Padding="8,0">
+                                     MaxWidth="{TemplateBinding MaxWidth}"
+                                     CornerRadius="{TemplateBinding CornerRadius}"
+                                     Padding="{TemplateBinding Padding}">
                         <controls:TextBlock Text="{TemplateBinding Property={x:Static oscontrols:TaskbarItem.TitleProperty}}"
                                            VerticalAlignment="Center"
                                            Foreground="{TemplateBinding Property={x:Static controls:Control.ForegroundProperty}}"
                                            FontSize="12"
                                            TextTrimming="CharacterEllipsis" />
                     </controls:Border>
+                    <controls:ControlTemplate.Triggers>
+                        <Trigger Property="IsActiveWindow" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background" Value="#FF3c3c3c" />
+                        </Trigger>
+                    </controls:ControlTemplate.Triggers>
                 </controls:ControlTemplate>
             </Setter.Value>
         </Setter>

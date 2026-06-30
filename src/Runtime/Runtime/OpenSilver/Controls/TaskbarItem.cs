@@ -58,18 +58,19 @@ public class TaskbarItem : Control
     /// <summary>
     /// Gets or sets whether this is the currently active window.
     /// </summary>
-    internal bool IsActiveWindow
+    public bool IsActiveWindow
     {
         get => (bool)GetValue(IsActiveWindowProperty);
-        set => SetValueInternal(IsActiveWindowProperty, value);
+        internal set => SetValueInternal(IsActiveWindowProperty, value);
     }
 
-    internal static readonly DependencyProperty IsActiveWindowProperty =
+    public static readonly DependencyProperty IsActiveWindowProperty =
         DependencyProperty.Register(
             nameof(IsActiveWindow),
             typeof(bool),
             typeof(TaskbarItem),
             new PropertyMetadata(false));
+
 
     internal Window Window => _window;
 
