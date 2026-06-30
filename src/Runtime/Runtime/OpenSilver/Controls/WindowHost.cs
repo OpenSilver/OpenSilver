@@ -169,6 +169,16 @@ public class WindowHost : ContentControl
         }
     }
 
+    internal void SetResizeBordersVisible(bool visible)
+    {
+        var visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        if (_resizeLeftPart is not null) _resizeLeftPart.Visibility = visibility;
+        if (_resizeRightPart is not null) _resizeRightPart.Visibility = visibility;
+        if (_resizeBottomPart is not null) _resizeBottomPart.Visibility = visibility;
+        if (_resizeBottomLeftPart is not null) _resizeBottomLeftPart.Visibility = visibility;
+        if (_resizeBottomRightPart is not null) _resizeBottomRightPart.Visibility = visibility;
+    }
+
     internal void UpdateResizeMode(ResizeMode mode)
     {
         bool canResize = mode >= ResizeMode.CanResize;

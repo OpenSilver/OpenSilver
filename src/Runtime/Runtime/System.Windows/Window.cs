@@ -264,10 +264,10 @@ public class Window : ContentControl, IResizeObserverListener
     /// </summary>
     public void Activate()
     {
-        BringToFront();
-
         if (ActiveWindow != this)
         {
+            BringToFront();
+
             Window previous = ActiveWindow;
             ActiveWindow = this;
             Current = this;
@@ -275,9 +275,9 @@ public class Window : ContentControl, IResizeObserverListener
             previous?.OnDeactivated(EventArgs.Empty);
             SetValue(IsActivePropertyKey, true);
             OnActivated(EventArgs.Empty);
-        }
 
-        OpenSilver.Controls.WindowTaskbar.OnWindowActivated(this);
+            OpenSilver.Controls.WindowTaskbar.OnWindowActivated(this);
+        }
     }
 
     /// <summary>
@@ -1335,6 +1335,18 @@ public class Window : ContentControl, IResizeObserverListener
             $"el.style.left='0px'; el.style.top='0px';" +
             $"el.style.width='100%'; el.style.height='100%'; }})()");
 
+        _windowHost.VisualOffset = new Vector(0, 0);
+
+        // Observe overlay resize so maximized windows follow viewport changes
+        if (_overlayDiv.IsConnected)
+        {
+            _resizeObserver?.Dispose();
+            _resizeObserver = ResizeObserver.Observe(_overlayDiv, this);
+        }
+
+        // Hide resize borders when maximized
+        _windowHost.SetResizeBordersVisible(false);
+
         // Invalidate both the Window and WindowHost so the constraint is re-evaluated
         InvalidateMeasure();
         _windowHost.InvalidateMeasure();
@@ -1344,6 +1356,16 @@ public class Window : ContentControl, IResizeObserverListener
     private void RestoreFromMaximized()
     {
         if (_windowHost is null || !_windowHost.OuterDiv.IsConnected) return;
+
+        // Stop observing overlay resize (no longer maximized)
+        if (!_isFullScreen)
+        {
+            _resizeObserver?.Dispose();
+            _resizeObserver = null;
+        }
+
+        // Restore resize borders
+        _windowHost.SetResizeBordersVisible(ResizeMode >= ResizeMode.CanResize);
 
         // Restore position, size, and constraints
         Left = _restoreLeft;
@@ -1361,6 +1383,8 @@ public class Window : ContentControl, IResizeObserverListener
             $"(function(){{ var el=document.getElementById('{hostId}');" +
             $"el.style.width=''; el.style.height='';" +
             $"el.style.left='{_restoreLeft.ToInvariantString()}px'; el.style.top='{_restoreTop.ToInvariantString()}px'; }})()");
+
+        _windowHost.VisualOffset = new Vector(_restoreLeft, _restoreTop);
 
         // Re-layout: Width/Height are restored so the layout uses those, or infinity if NaN
         InvalidateMeasure();
@@ -1663,16 +1687,13 @@ public class Window : ContentControl, IResizeObserverListener
     {
         _isFullScreen = false;
 
-        _resizeObserver?.Dispose();
-        _resizeObserver = null;
+        // Keep the resize observer — window stays maximized, just with chrome visible.
 
         if (_windowHost is not null)
         {
             WindowChrome chrome = WindowChrome.GetWindowChrome(this);
             _windowHost.UpdateTitleBarVisibility(chrome is not null && WindowStyle != WindowStyle.None);
         }
-
-        // Stay maximized but with chrome visible
     }
 
     private bool HasExplicitWindowProps()
