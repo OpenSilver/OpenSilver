@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Controls;
@@ -41,6 +42,7 @@ public class WindowHost : ContentControl
     private const string PART_TitleBar = "PART_TitleBar";
     private const string PART_MinimizeButton = "PART_MinimizeButton";
     private const string PART_MaximizeButton = "PART_MaximizeButton";
+    private const string PART_RestoreButton = "PART_RestoreButton";
     private const string PART_CloseButton = "PART_CloseButton";
     private const string PART_ResizeLeft = "PART_ResizeLeft";
     private const string PART_ResizeRight = "PART_ResizeRight";
@@ -53,6 +55,7 @@ public class WindowHost : ContentControl
     private FrameworkElement _titleBarPart;
     private ButtonBase _minimizeButtonPart;
     private ButtonBase _maximizeButtonPart;
+    private ButtonBase _restoreButtonPart;
     private ButtonBase _closeButtonPart;
     private FrameworkElement _resizeLeftPart;
     private FrameworkElement _resizeRightPart;
@@ -107,6 +110,26 @@ public class WindowHost : ContentControl
             typeof(string),
             typeof(WindowHost),
             new PropertyMetadata(string.Empty));
+
+    /// <summary>
+    /// Gets or sets the background brush for the window chrome (title bar).
+    /// </summary>
+    public Brush ChromeBackground
+    {
+        get => (Brush)GetValue(ChromeBackgroundProperty);
+        set => SetValueInternal(ChromeBackgroundProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ChromeBackground"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ChromeBackgroundProperty =
+        DependencyProperty.Register(
+            nameof(ChromeBackground),
+            typeof(Brush),
+            typeof(WindowHost),
+            new PropertyMetadata(null));
+
 
     internal bool IsOpen { get; private set; }
 
@@ -197,6 +220,16 @@ public class WindowHost : ContentControl
             _maximizeButtonPart.Opacity = canResize ? 1.0 : 0.4;
         }
 
+        if (_restoreButtonPart is not null)
+        {
+            if (mode == ResizeMode.NoResize)
+            {
+                _restoreButtonPart.Visibility = Visibility.Collapsed;
+            }
+            _restoreButtonPart.IsHitTestVisible = canResize;
+            _restoreButtonPart.Opacity = canResize ? 1.0 : 0.4;
+        }
+
         var resizeVisibility = canResize ? Visibility.Visible : Visibility.Collapsed;
         if (_resizeLeftPart is not null) _resizeLeftPart.Visibility = resizeVisibility;
         if (_resizeRightPart is not null) _resizeRightPart.Visibility = resizeVisibility;
@@ -208,6 +241,18 @@ public class WindowHost : ContentControl
         {
             _resizeGripPart.Visibility = mode == ResizeMode.CanResizeWithGrip
                 ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
+    internal void UpdateMaximizeRestoreButton(bool isMaximized)
+    {
+        if (_maximizeButtonPart is not null)
+        {
+            _maximizeButtonPart.Visibility = isMaximized ? Visibility.Collapsed : Visibility.Visible;
+        }
+        if (_restoreButtonPart is not null)
+        {
+            _restoreButtonPart.Visibility = isMaximized ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
@@ -238,6 +283,7 @@ public class WindowHost : ContentControl
         _titleBarPart = GetTemplateChild(PART_TitleBar) as FrameworkElement;
         _minimizeButtonPart = GetTemplateChild(PART_MinimizeButton) as ButtonBase;
         _maximizeButtonPart = GetTemplateChild(PART_MaximizeButton) as ButtonBase;
+        _restoreButtonPart = GetTemplateChild(PART_RestoreButton) as ButtonBase;
         _closeButtonPart = GetTemplateChild(PART_CloseButton) as ButtonBase;
         _resizeLeftPart = GetTemplateChild(PART_ResizeLeft) as FrameworkElement;
         _resizeRightPart = GetTemplateChild(PART_ResizeRight) as FrameworkElement;
@@ -282,6 +328,11 @@ public class WindowHost : ContentControl
             _maximizeButtonPart.Click += MaximizeButton_Click;
         }
 
+        if (_restoreButtonPart is not null)
+        {
+            _restoreButtonPart.Click += MaximizeButton_Click;
+        }
+
         if (_closeButtonPart is not null)
         {
             _closeButtonPart.Click += CloseButton_Click;
@@ -310,6 +361,11 @@ public class WindowHost : ContentControl
         if (_maximizeButtonPart is not null)
         {
             _maximizeButtonPart.Click -= MaximizeButton_Click;
+        }
+
+        if (_restoreButtonPart is not null)
+        {
+            _restoreButtonPart.Click -= MaximizeButton_Click;
         }
 
         if (_closeButtonPart is not null)

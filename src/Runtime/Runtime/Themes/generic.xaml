@@ -143,9 +143,9 @@
             </Setter.Value>
         </Setter>
         <Setter Property="Background"
-                Value="#FFF0F0F0" />
+                Value="#FFFFFFFF" />
         <Setter Property="BorderBrush"
-                Value="#FF0078D7" />
+                Value="#FF5c5c5c" />
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Template">
@@ -4780,61 +4780,113 @@
     </Style>
 
     <!--  oscontrols:WindowHost  -->
+    <Style x:Key="WindowChromeButtonStyle" TargetType="controls:Button">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="controls:Button">
+                    <controls:Border x:Name="BackgroundBorder"
+                                     Background="Transparent"
+                                     CornerRadius="0">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <animation:Storyboard>
+                                        <animation:ColorAnimation Duration="0"
+                                                                  animation:Storyboard.TargetName="BackgroundBorder"
+                                                                  animation:Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                  To="#33FFFFFF" />
+                                    </animation:Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <animation:Storyboard>
+                                        <animation:ColorAnimation Duration="0"
+                                                                  animation:Storyboard.TargetName="BackgroundBorder"
+                                                                  animation:Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                  To="#55FFFFFF" />
+                                    </animation:Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <controls:ContentPresenter HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}" />
+                    </controls:Border>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="oscontrols:WindowHost">
+        <Setter Property="ChromeBackground" Value="#FF5c5c5c" />
+        <Setter Property="BorderBrush" Value="#FF3c3c3c" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="oscontrols:WindowHost">
-                    <controls:Grid>
-                        <controls:Grid.RowDefinitions>
-                            <controls:RowDefinition Height="Auto" />
-                            <controls:RowDefinition Height="*" />
-                        </controls:Grid.RowDefinitions>
-                        <!-- Title Bar -->
-                        <controls:Border x:Name="PART_TitleBar"
-                                     controls:Grid.Row="0"
-                                     Background="#FF39465c">
-                            <controls:Grid>
-                                <controls:Grid.ColumnDefinitions>
-                                    <controls:ColumnDefinition Width="*" />
-                                    <controls:ColumnDefinition Width="Auto" />
-                                    <controls:ColumnDefinition Width="Auto" />
-                                    <controls:ColumnDefinition Width="Auto" />
-                                </controls:Grid.ColumnDefinitions>
-                                <controls:TextBlock controls:Grid.Column="0"
-                                                Text="{TemplateBinding Property={x:Static oscontrols:WindowHost.TitleProperty}}"
-                                                VerticalAlignment="Center"
-                                                Margin="10,0,0,0"
-                                                Foreground="White"
-                                                FontSize="12" />
-                                <controls:Button x:Name="PART_MinimizeButton"
-                                             controls:Grid.Column="1"
-                                             Content="&#x2013;"
-                                             FontSize="15"
-                                             Width="46"
-                                             BorderThickness="0"
-                                             Background="Transparent"
-                                             Foreground="White"
-                                             VerticalAlignment="Stretch" />
-                                <controls:Button x:Name="PART_MaximizeButton"
-                                             controls:Grid.Column="2"
-                                             Content="&#x25A1;"
-                                             FontSize="15"
-                                             Width="46"
-                                             BorderThickness="0"
-                                             Background="Transparent"
-                                             Foreground="White"
-                                             VerticalAlignment="Stretch" />
-                                <controls:Button x:Name="PART_CloseButton"
-                                             controls:Grid.Column="3"
-                                             Content="&#x2715;"
-                                             FontSize="15"
-                                             Width="46"
-                                             BorderThickness="0"
-                                             Background="Transparent"
-                                             Foreground="White"
-                                             VerticalAlignment="Stretch" />
-                            </controls:Grid>
-                        </controls:Border>
+                    <controls:Border BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}">
+                        <controls:Grid>
+                            <controls:Grid.RowDefinitions>
+                                <controls:RowDefinition Height="Auto" />
+                                <controls:RowDefinition Height="*" />
+                            </controls:Grid.RowDefinitions>
+                            <controls:Grid.Effect>
+                                <effects:DropShadowEffect BlurRadius="5" Color="Black" Opacity="0.3" ShadowDepth="4"/>
+                            </controls:Grid.Effect>
+
+                            <!-- Title Bar -->
+                            <controls:Border x:Name="PART_TitleBar"
+                                         controls:Grid.Row="0"
+                                         Background="{TemplateBinding Property={x:Static oscontrols:WindowHost.ChromeBackgroundProperty}}">
+                                <controls:Grid>
+                                    <controls:Grid.ColumnDefinitions>
+                                        <controls:ColumnDefinition Width="*" />
+                                        <controls:ColumnDefinition Width="Auto" />
+                                        <controls:ColumnDefinition Width="Auto" />
+                                        <controls:ColumnDefinition Width="Auto" />
+                                    </controls:Grid.ColumnDefinitions>
+                                    <controls:TextBlock controls:Grid.Column="0"
+                                                    Text="{TemplateBinding Property={x:Static oscontrols:WindowHost.TitleProperty}}"
+                                                    VerticalAlignment="Center"
+                                                    Margin="10,0,0,0"
+                                                    Foreground="White"
+                                                    FontSize="12" />
+                                    <controls:Button x:Name="PART_MinimizeButton"
+                                                 controls:Grid.Column="1"
+                                                 Content="&#x2500;"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
+                                    <controls:Button x:Name="PART_MaximizeButton"
+                                                 controls:Grid.Column="2"
+                                                 Content="&#x2610;"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
+                                    <controls:Button x:Name="PART_RestoreButton"
+                                                 controls:Grid.Column="2"
+                                                 Content="&#x29C9;"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Visibility="Collapsed" />
+                                    <controls:Button x:Name="PART_CloseButton"
+                                                 controls:Grid.Column="3"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}">
+                                        <controls:Button.Content>
+                                            <shapes:Path Data="M 0,0 L 8,8 M 0,8 L 8,0"
+                                                         Stroke="White"
+                                                         StrokeThickness="1"
+                                                         Width="10"
+                                                         Height="10"
+                                                         Stretch="Uniform" />
+                                        </controls:Button.Content>
+                                    </controls:Button>
+                                </controls:Grid>
+                            </controls:Border>
                         <!-- Window Content -->
                         <controls:ContentPresenter controls:Grid.Row="1" />
                         <!-- Resize edges (full height/width strips) -->
@@ -4898,7 +4950,8 @@
                                              VerticalAlignment="Bottom"
                                              Margin="0,0,2,0" />
                         </controls:Border>
-                    </controls:Grid>
+                        </controls:Grid>
+                    </controls:Border>
                 </controls:ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -4909,18 +4962,20 @@
         <Setter Property="MinWidth" Value="120" />
         <Setter Property="MaxWidth" Value="200" />
         <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Background" Value="#FF5c5c5c" />
+        <Setter Property="Foreground" Value="White" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="oscontrols:TaskbarItem">
-                    <controls:Border Background="#FF39465c"
+                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                      BorderThickness="0"
                                      MinHeight="{TemplateBinding MinHeight}"
                                      MinWidth="{TemplateBinding MinWidth}"
                                      Padding="8,0">
                         <controls:TextBlock Text="{TemplateBinding Property={x:Static oscontrols:TaskbarItem.TitleProperty}}"
                                            VerticalAlignment="Center"
-                                           Foreground="White"
+                                           Foreground="{TemplateBinding Property={x:Static controls:Control.ForegroundProperty}}"
                                            FontSize="12"
                                            TextTrimming="CharacterEllipsis" />
                     </controls:Border>

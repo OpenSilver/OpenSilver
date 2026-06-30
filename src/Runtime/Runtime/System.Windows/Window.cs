@@ -1307,6 +1307,8 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (_windowHost is null || !_windowHost.OuterDiv.IsConnected) return;
 
+        _windowHost.UpdateMaximizeRestoreButton(true);
+
         if (previousState == WindowState.Normal)
         {
             // Save current position, size, and constraints for later restoration
@@ -1356,6 +1358,8 @@ public class Window : ContentControl, IResizeObserverListener
     private void RestoreFromMaximized()
     {
         if (_windowHost is null || !_windowHost.OuterDiv.IsConnected) return;
+
+        _windowHost.UpdateMaximizeRestoreButton(false);
 
         // Stop observing overlay resize (no longer maximized)
         if (!_isFullScreen)
