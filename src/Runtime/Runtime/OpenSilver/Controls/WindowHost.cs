@@ -459,7 +459,14 @@ public class WindowHost : ContentControl
             }
         }
 
-        // When normal, let the content determine the size
+        if (_window is not null)
+        {
+            double w = _window.Width;
+            return new Size(
+                double.IsNaN(w) ? double.PositiveInfinity : w,
+                double.PositiveInfinity);
+        }
+
         return new Size(double.PositiveInfinity, double.PositiveInfinity);
     }
 }

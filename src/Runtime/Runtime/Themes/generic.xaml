@@ -148,6 +148,8 @@
                 Value="#FF5c5c5c" />
         <Setter Property="BorderThickness"
                 Value="1" />
+        <Setter Property="MinWidth"
+                Value="100" />
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="Window">
@@ -4859,7 +4861,8 @@
                                                     VerticalAlignment="Center"
                                                     Margin="10,0,0,0"
                                                     Foreground="White"
-                                                    FontSize="12" />
+                                                    FontSize="12"
+                                                    TextTrimming="CharacterEllipsis" />
                                     <controls:Button x:Name="PART_MinimizeButton"
                                                  controls:Grid.Column="1"
                                                  Content="&#x2500;"
