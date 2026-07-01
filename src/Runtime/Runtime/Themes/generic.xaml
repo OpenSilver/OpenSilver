@@ -4991,6 +4991,7 @@
                     <controls:ControlTemplate.Triggers>
                         <Trigger Property="IsActiveWindow" Value="True">
                             <Setter TargetName="RootBorder" Property="Background" Value="#FF3c3c3c" />
+                            <Setter Property="Cursor" Value="Arrow" />
                         </Trigger>
                     </controls:ControlTemplate.Triggers>
                 </controls:ControlTemplate>
