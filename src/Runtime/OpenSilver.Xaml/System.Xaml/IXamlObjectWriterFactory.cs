@@ -23,7 +23,7 @@
 
 namespace System.Xaml
 {
-    internal interface IXamlObjectWriterFactory
+    public interface IXamlObjectWriterFactory
 	{
 		XamlObjectWriterSettings GetParentSettings();
 		XamlObjectWriter GetXamlObjectWriter(XamlObjectWriterSettings settings);

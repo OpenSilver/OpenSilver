@@ -27,7 +27,7 @@ using System.Text;
 
 namespace System.Xaml
 {
-    internal class XamlException : Exception
+    public class XamlException : Exception
 	{
 		public XamlException()
 			: this("XAML error")

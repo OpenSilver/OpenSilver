@@ -26,13 +26,13 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Windows.Markup;
 using System.Xaml.ComponentModel;
-using System.Xaml.Markup;
 using System.Xaml.Schema;
 
 namespace System.Xaml
 {
-    internal class XamlMember : IEquatable<XamlMember>
+    public class XamlMember : IEquatable<XamlMember>
 	{
 		FlagValue flags;
 		static class MemberFlags

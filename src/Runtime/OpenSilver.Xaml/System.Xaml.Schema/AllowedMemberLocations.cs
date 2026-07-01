@@ -21,10 +21,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace System.Xaml
+namespace System.Xaml.Schema
 {
 	[Flags]
-	internal enum AllowedMemberLocations
+	public enum AllowedMemberLocations
 	{
 		None = 0,
 		Attribute = 1,

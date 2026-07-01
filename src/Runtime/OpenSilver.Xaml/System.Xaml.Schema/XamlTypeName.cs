@@ -28,7 +28,7 @@ using System.Windows.Markup;
 
 namespace System.Xaml.Schema
 {
-    internal class XamlTypeName
+    public class XamlTypeName
 	{
 		public static XamlTypeName Parse(string typeName, IXamlNamespaceResolver namespaceResolver)
 		{

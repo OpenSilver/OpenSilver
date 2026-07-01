@@ -31,7 +31,7 @@ using System.Xaml.Markup;
 
 namespace System.Xaml
 {
-    internal class XamlObjectWriterSettings : XamlWriterSettings
+    public class XamlObjectWriterSettings : XamlWriterSettings
 	{
 		public XamlObjectWriterSettings()
 		{

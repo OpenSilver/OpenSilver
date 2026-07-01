@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-    internal class XamlObjectEventArgs : EventArgs
+    public class XamlObjectEventArgs : EventArgs
 	{
 		public XamlObjectEventArgs(object instance)
 		{

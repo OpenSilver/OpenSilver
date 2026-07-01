@@ -22,41 +22,34 @@
 //
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xaml;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    internal sealed class XamlDeferLoadAttribute : Attribute
+    public class XamlSetTypeConverterEventArgs : XamlSetValueEventArgs
 	{
-		public XamlDeferLoadAttribute(string loaderType, string contentType)
+		public XamlSetTypeConverterEventArgs(XamlMember member, TypeConverter typeConverter, object value, ITypeDescriptorContext serviceProvider, CultureInfo cultureInfo)
+			: base(member, value)
 		{
-			LoaderTypeName = loaderType;
-			ContentTypeName = contentType;
+			CultureInfo = cultureInfo;
+			ServiceProvider = serviceProvider;
+			TypeConverter = typeConverter;
 		}
 
-		public XamlDeferLoadAttribute(Type loaderType, Type contentType)
+		public CultureInfo CultureInfo { get; private set; }
+
+		public ITypeDescriptorContext ServiceProvider { get; private set; }
+
+		public TypeConverter TypeConverter { get; private set; }
+
+		public override void CallBase()
 		{
-			LoaderType = loaderType;
-			ContentType = contentType;
+			throw new NotImplementedException();
 		}
-
-		public Type ContentType { get; private set; }
-		public string ContentTypeName { get; private set; }
-		public Type LoaderType { get; private set; }
-		public string LoaderTypeName { get; private set; }
-
-		internal Type GetLoaderType()
-		{
-			return LoaderType ?? Type.GetType(LoaderTypeName);
-		}
-
-		internal Type GetContentType()
-		{
-			return ContentType ?? Type.GetType(ContentTypeName);
-		}
-
 	}
 }

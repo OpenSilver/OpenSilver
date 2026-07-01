@@ -22,15 +22,18 @@
 //
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
 using System.Text;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-    internal interface IValueSerializerContext : IServiceProvider, ITypeDescriptorContext
+	[AttributeUsageAttribute(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    public sealed class XamlSetMarkupExtensionAttribute : Attribute
 	{
-		ValueSerializer GetValueSerializerFor(PropertyInfo descriptor);
-		ValueSerializer GetValueSerializerFor(Type type);
+		public XamlSetMarkupExtensionAttribute(string xamlSetMarkupExtensionHandler)
+		{
+			XamlSetMarkupExtensionHandler = xamlSetMarkupExtensionHandler;
+		}
+
+		public string XamlSetMarkupExtensionHandler { get; private set; }
 	}
 }

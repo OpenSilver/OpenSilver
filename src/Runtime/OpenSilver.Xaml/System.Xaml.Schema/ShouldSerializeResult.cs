@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace System.Xaml
+namespace System.Xaml.Schema
 {
-    internal enum ShouldSerializeResult
+    public enum ShouldSerializeResult
 	{
 		Default,
 		True,

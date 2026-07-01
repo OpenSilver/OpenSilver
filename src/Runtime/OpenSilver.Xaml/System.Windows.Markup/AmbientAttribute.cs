@@ -20,52 +20,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
-using System.Xml;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[ContentProperty("Text")]
-    internal sealed class XData
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, Inherited = true)]
+	public sealed class AmbientAttribute : Attribute
 	{
-		string text;
-		XmlReader reader;
-
-		public string Text
-		{
-			get { return text; }
-			set
-			{
-				if (value == null)
-				{
-					text = null;
-					reader = null;
-				}
-				else
-					text = value;
-			}
-		}
-
-		public object XmlReader
-		{
-			get
-			{
-				if (reader == null)
-					reader = System.Xml.XmlReader.Create(new StringReader(text));
-				return reader;
-			}
-			set
-			{
-				// silly? yes, it's also a hack in .NET - who cares?
-				reader = value as XmlReader;
-				text = null;
-			}
-		}
 	}
 }

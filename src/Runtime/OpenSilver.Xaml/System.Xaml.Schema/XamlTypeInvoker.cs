@@ -29,11 +29,11 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xaml.Markup;
+using System.Windows.Markup;
 
 namespace System.Xaml.Schema
 {
-    internal class XamlTypeInvoker
+    public class XamlTypeInvoker
 	{
 		static readonly XamlTypeInvoker unknown = new XamlTypeInvoker();
 		public static XamlTypeInvoker UnknownInvoker => unknown;

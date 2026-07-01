@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-	internal class AmbientPropertyValue
+	public class AmbientPropertyValue
 	{
 		public AmbientPropertyValue(XamlMember property, object value)
 		{

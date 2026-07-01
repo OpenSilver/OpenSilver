@@ -22,18 +22,37 @@
 //
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
+using System.Xaml;
+using System.Xaml.Schema;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[AttributeUsage(AttributeTargets.Class)]
-    internal sealed class RuntimeNamePropertyAttribute : Attribute
+    public class PropertyDefinition : MemberDefinition
 	{
-		public RuntimeNamePropertyAttribute(string name)
+		public PropertyDefinition()
 		{
-			Name = name;
+			attributes = new List<Attribute>();
 		}
 
-		public string Name { get; private set; }
+		List<Attribute> attributes;
+		public IList<Attribute> Attributes
+		{
+			get { return attributes; }
+		}
+
+		[DefaultValue("public")]
+		public string Modifier { get; set; }
+
+		string name;
+		public override string Name
+		{
+			get { return name; }
+			set { name = value; }
+		}
+
+		[TypeConverter(typeof(XamlTypeTypeConverter))]
+		public XamlType Type { get; set; }
 	}
 }

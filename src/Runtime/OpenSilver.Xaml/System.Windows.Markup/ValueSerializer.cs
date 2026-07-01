@@ -27,12 +27,13 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Windows.Markup;
+using System.Xaml;
+using System.Xaml.Markup;
 using System.Xaml.Schema;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-    internal abstract class ValueSerializer
+    public abstract class ValueSerializer
 	{
 		public static ValueSerializer GetSerializerFor(PropertyInfo descriptor)
 		{

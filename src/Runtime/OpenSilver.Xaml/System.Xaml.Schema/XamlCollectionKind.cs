@@ -23,7 +23,7 @@
 
 namespace System.Xaml.Schema
 {
-    internal enum XamlCollectionKind
+    public enum XamlCollectionKind
 	{
 		None,
 		Collection,

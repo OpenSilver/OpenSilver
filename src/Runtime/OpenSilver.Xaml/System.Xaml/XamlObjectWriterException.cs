@@ -28,7 +28,7 @@ using System.Runtime.Serialization;
 namespace System.Xaml
 {
 	[Serializable]
-    internal class XamlObjectWriterException : XamlException
+    public class XamlObjectWriterException : XamlException
 	{
 		public XamlObjectWriterException()
 			: this("XAML object writer error")

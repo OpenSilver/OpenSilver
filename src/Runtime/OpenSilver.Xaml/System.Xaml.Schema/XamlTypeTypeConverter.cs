@@ -25,11 +25,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text;
-using System.Xaml.Markup;
+using System.Windows.Markup;
 
 namespace System.Xaml.Schema
 {
-    internal class XamlTypeTypeConverter : TypeConverter
+    public class XamlTypeTypeConverter : TypeConverter
 	{
 		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
 		{

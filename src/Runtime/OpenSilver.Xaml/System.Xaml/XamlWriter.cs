@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-    internal abstract class XamlWriter : IDisposable
+    public abstract class XamlWriter : IDisposable
 	{
 		protected bool IsDisposed { get; private set; }
 		public abstract XamlSchemaContext SchemaContext { get; }

@@ -22,18 +22,50 @@
 //
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Markup;
+using System.Xml;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    internal sealed class ConstructorArgumentAttribute : Attribute
+	[ContentProperty("Text")]
+    public sealed class XData
 	{
-		public ConstructorArgumentAttribute(string argumentName)
+		string text;
+		XmlReader reader;
+
+		public string Text
 		{
-			ArgumentName = argumentName;
+			get { return text; }
+			set
+			{
+				if (value == null)
+				{
+					text = null;
+					reader = null;
+				}
+				else
+					text = value;
+			}
 		}
 
-		public string ArgumentName { get; private set; }
+		public object XmlReader
+		{
+			get
+			{
+				if (reader == null)
+					reader = System.Xml.XmlReader.Create(new StringReader(text));
+				return reader;
+			}
+			set
+			{
+				// silly? yes, it's also a hack in .NET - who cares?
+				reader = value as XmlReader;
+				text = null;
+			}
+		}
 	}
 }

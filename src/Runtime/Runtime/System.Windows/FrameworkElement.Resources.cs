@@ -13,8 +13,8 @@
 
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
-using System.Xaml.Markup;
 using OpenSilver.Internal;
 
 namespace System.Windows;

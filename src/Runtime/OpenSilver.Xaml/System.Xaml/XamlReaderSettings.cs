@@ -28,7 +28,7 @@ using System.Text;
 
 namespace System.Xaml
 {
-    internal class XamlReaderSettings
+    public class XamlReaderSettings
 	{
 		public XamlReaderSettings()
 		{

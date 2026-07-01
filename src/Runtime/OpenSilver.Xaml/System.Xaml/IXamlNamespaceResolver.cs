@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace System.Xaml
 {
-    internal interface IXamlNamespaceResolver
+    public interface IXamlNamespaceResolver
 	{
 		string GetNamespace(string prefix);
 		IEnumerable<NamespaceDeclaration> GetNamespacePrefixes();

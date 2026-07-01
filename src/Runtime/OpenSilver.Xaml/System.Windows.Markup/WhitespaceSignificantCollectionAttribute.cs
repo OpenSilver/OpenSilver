@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    internal sealed class WhitespaceSignificantCollectionAttribute : Attribute
+    public sealed class WhitespaceSignificantCollectionAttribute : Attribute
 	{
 	}
 }
