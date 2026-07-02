@@ -13,6 +13,7 @@
 
 using CSHTML5.Internal;
 using OpenSilver;
+using OpenSilver.Controls;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Controls.Primitives;
@@ -44,6 +45,7 @@ public class Window : ContentControl, IResizeObserverListener
         EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
     }
 
+    private readonly List<Window> _ownedWindows = [];
     private IDisposable _resizeObserver;
     private DispatcherOperation _contentRenderedCallback;
     private bool _postContentRenderedFromLoadedHandler;
@@ -53,9 +55,8 @@ public class Window : ContentControl, IResizeObserverListener
     private bool _hasExplicitWindowProps;
     private HtmlElementReference _overlayDiv;
     private TaskCompletionSource<bool?> _dialogResultTcs;
-    private OpenSilver.Controls.WindowHost _windowHost;
+    private WindowHost _windowHost;
     private Window _owner;
-    private readonly List<Window> _ownedWindows = new();
 
     /// <summary>
     /// True if this window was shown via Show()/ShowDialog() and has overlay infrastructure.
@@ -103,7 +104,6 @@ public class Window : ContentControl, IResizeObserverListener
 
     internal HtmlElementReference RootDomElement { get; private set; }
 
-
     /// <inheritdoc />
     protected override void OnContentChanged(object oldContent, object newContent)
     {
@@ -130,7 +130,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// An <see cref="EventArgs"/> that contains the event data.
     /// </param>
     protected virtual void OnContentRendered(EventArgs e) => ContentRendered?.Invoke(this, e);
-
 
     private static void OnGotKeyboardFocus(object sender, RoutedEventArgs e)
     {
@@ -239,25 +238,6 @@ public class Window : ContentControl, IResizeObserverListener
         }
     }
 
-    private void SetLayoutSize()
-    {
-        if (_windowHost is not null)
-        {
-            InvalidateMeasure();
-            Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            Arrange(new Rect(new Point(), DesiredSize));
-            UpdateLayout();
-        }
-        else
-        {
-            Rect bounds = Bounds;
-            InvalidateMeasure();
-            Measure(bounds.Size);
-            Arrange(bounds);
-            UpdateLayout();
-        }
-    }
-
     /// <summary>
     /// Attempts to activate the application window by bringing it to the foreground
     /// and setting the input focus to it.
@@ -271,12 +251,12 @@ public class Window : ContentControl, IResizeObserverListener
             Window previous = ActiveWindow;
             ActiveWindow = this;
             Current = this;
-            previous?.SetValue(IsActivePropertyKey, false);
+            previous?.SetValueInternal(IsActivePropertyKey, false);
             previous?.OnDeactivated(EventArgs.Empty);
-            SetValue(IsActivePropertyKey, true);
+            SetValueInternal(IsActivePropertyKey, true);
             OnActivated(EventArgs.Empty);
 
-            OpenSilver.Controls.WindowTaskbar.OnWindowActivated(this);
+            WindowTaskbar.OnWindowActivated(this);
         }
     }
 
@@ -306,8 +286,6 @@ public class Window : ContentControl, IResizeObserverListener
         }
     }
 
-    #region Closing event
-
     /// <summary>
     /// Occurs when the window is about to close.
     /// </summary>
@@ -330,7 +308,18 @@ public class Window : ContentControl, IResizeObserverListener
         return false;
     }
 
-    #endregion
+    /// <summary>
+    /// Occurs when the window is about to close.
+    /// </summary>
+    public event EventHandler Closed;
+
+    /// <summary>
+    /// Raises the <see cref="Closed"/> event.
+    /// </summary>
+    /// <param name="e">
+    /// An <see cref="EventArgs"/> that contains the event data.
+    /// </param>
+    protected virtual void OnClosed(EventArgs e) => Closed?.Invoke(this, e);
 
     /// <summary>
     /// Gets the window that contains the specified <see cref="DependencyObject"/>.
@@ -660,7 +649,26 @@ public class Window : ContentControl, IResizeObserverListener
     /// A <see cref="Windows.WindowStartupLocation"/> value that specifies the top/left position
     /// of a window when first shown. The default is <see cref="WindowStartupLocation.Manual"/>.
     /// </returns>
-    public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.Manual;
+    public WindowStartupLocation WindowStartupLocation
+    {
+        get;
+        set
+        {
+            if (!IsValidWindowStartupLocation(value))
+            {
+                throw new InvalidEnumArgumentException(nameof(value), (int)value, typeof(WindowStartupLocation));
+            }
+
+            field = value;
+        }
+    }
+
+    private static bool IsValidWindowStartupLocation(WindowStartupLocation value)
+    {
+        return value == WindowStartupLocation.CenterScreen ||
+               value == WindowStartupLocation.Manual ||
+               value == WindowStartupLocation.CenterOwner;
+    }
 
     /// <summary>
     /// Identifies the <see cref="WindowStyle"/> dependency property.
@@ -873,7 +881,10 @@ public class Window : ContentControl, IResizeObserverListener
         get => _owner;
         set
         {
-            if (_owner == value) return;
+            if (_owner == value)
+            {
+                return;
+            }
 
             if (!_isClosed && _overlayDiv.IsConnected)
             {
@@ -882,12 +893,12 @@ public class Window : ContentControl, IResizeObserverListener
 
             if (value == this)
             {
-                throw new ArgumentException("A window cannot own itself.");
+                throw new ArgumentException(Strings.CannotSetOwnerToItself);
             }
 
             if (value is not null && IsOwnerOf(value))
             {
-                throw new ArgumentException("Setting this owner would create a cyclic ownership.");
+                throw new ArgumentException(string.Format(Strings.CircularOwnerChild, value, this));
             }
 
             _owner?.RemoveOwnedWindow(this);
@@ -926,7 +937,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (_isClosed)
         {
-            throw new InvalidOperationException("Cannot show a window that has been closed.");
+            throw new InvalidOperationException(Strings.ReshowNotAllowed);
         }
 
         if (_overlayDiv.IsConnected)
@@ -948,7 +959,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (_isClosed)
         {
-            throw new InvalidOperationException("Cannot show a window that has been closed.");
+            throw new InvalidOperationException(Strings.ReshowNotAllowed);
         }
 
         if (_overlayDiv.IsConnected)
@@ -967,36 +978,32 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Manually closes a <see cref="Window"/>.
     /// </summary>
-    public void Close()
+    public void Close() => InternalClose(false);
+
+    internal void InternalClose(bool ignoreCancel)
     {
         if (_isClosed)
         {
             return;
         }
 
-        var e = new CancelEventArgs();
-        OnClosing(e);
-
-        if (e.Cancel)
-        {
-            return;
-        }
-
-        if (InvokeOnClosing(true))
+        if (InvokeOnClosing(!ignoreCancel))
         {
             return;
         }
 
         _isClosed = true;
 
+        // Detach from owner
+        Owner = null;
+
+        Application.Current?.Windows.Remove(this);
+
         // Close owned windows first
         foreach (var owned in _ownedWindows.ToArray())
         {
-            owned.Close();
+            owned.InternalClose(true);
         }
-
-        // Detach from owner
-        Owner = null;
 
         if (IsMainWindow)
         {
@@ -1009,23 +1016,22 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         OnClosed(EventArgs.Empty);
-        Closed?.Invoke(this, EventArgs.Empty);
-
-        Application.Current?.Windows.Remove(this);
 
         _dialogResultTcs?.TrySetResult(null);
     }
 
     private void PromoteNextMainWindow()
     {
-        Application app = Application.Current;
-        if (app is null) return;
+        if (Application.Current is not Application app)
+        {
+            return;
+        }
 
         // Find the most recently shown window that has an overlay and isn't closed
         Window candidate = null;
         foreach (Window w in app.Windows)
         {
-            if (w != this && !w._isClosed && w._overlayDiv.IsConnected)
+            if (!w._isClosed && w._overlayDiv.IsConnected)
             {
                 candidate = w;
             }
@@ -1044,8 +1050,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (_overlayDiv.IsConnected)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.getElementById('{_overlayDiv.Uid}').style.display='none'");
+            _overlayDiv.SetCssStyleProperty(CssPropertyNames.Display, "none");
         }
     }
 
@@ -1065,7 +1070,7 @@ public class Window : ContentControl, IResizeObserverListener
 
         if (Mouse.LeftButton != MouseButtonState.Pressed)
         {
-            throw new InvalidOperationException("Can only call DragMove when the left mouse button is pressed.");
+            throw new InvalidOperationException(Strings.DragMoveFail);
         }
 
         BeginDrag();
@@ -1091,34 +1096,25 @@ public class Window : ContentControl, IResizeObserverListener
     public event EventHandler Activated;
 
     /// <summary>
+    /// Raises the <see cref="Activated"/> event.
+    /// </summary>
+    /// <param name="e">
+    /// An <see cref="EventArgs"/> that contains the event data.
+    /// </param>
+    protected virtual void OnActivated(EventArgs e) => Activated?.Invoke(this, e);
+
+    /// <summary>
     /// Occurs when a window becomes a background window.
     /// </summary>
     public event EventHandler Deactivated;
 
     /// <summary>
-    /// Occurs when the window is about to close.
-    /// </summary>
-    public event EventHandler Closed;
-
-    /// <summary>
-    /// Raises the <see cref="Activated"/> event.
-    /// </summary>
-    protected virtual void OnActivated(EventArgs e) => Activated?.Invoke(this, e);
-
-    /// <summary>
     /// Raises the <see cref="Deactivated"/> event.
     /// </summary>
+    /// <param name="e">
+    /// An <see cref="EventArgs"/> that contains the event data.
+    /// </param>
     protected virtual void OnDeactivated(EventArgs e) => Deactivated?.Invoke(this, e);
-
-    /// <summary>
-    /// Raises the <see cref="E:Closing"/> event.
-    /// </summary>
-    protected virtual void OnClosing(CancelEventArgs e) { }
-
-    /// <summary>
-    /// Raises the <see cref="Closed"/> event.
-    /// </summary>
-    protected virtual void OnClosed(EventArgs e) { }
 
     /// <summary>
     /// Raises the SourceInitialized event.
@@ -1139,7 +1135,7 @@ public class Window : ContentControl, IResizeObserverListener
         _overlayDiv = INTERNAL_HtmlDomManager.CreateWindowOverlayDomElementAndAppendIt(
             this, rootDiv, _isModal);
 
-        _windowHost = new OpenSilver.Controls.WindowHost(this);
+        _windowHost = new WindowHost(this);
 
         WindowChrome chrome = WindowChrome.GetWindowChrome(this);
         if (chrome is not null)
@@ -1167,9 +1163,9 @@ public class Window : ContentControl, IResizeObserverListener
             mainWindow.UpdateFullScreenMode();
         }
 
-        OpenSilver.Controls.WindowTaskbar.AddWindow(this);
+        WindowTaskbar.AddWindow(this);
 
-        if(ShowActivated) Activate();
+        if (ShowActivated) Activate();
     }
 
     private void ApplyStartupLocation()
@@ -1232,9 +1228,9 @@ public class Window : ContentControl, IResizeObserverListener
         UpdateWindowPosition();
     }
 
-    internal void CloseSecondaryWindow()
+    private void CloseSecondaryWindow()
     {
-        OpenSilver.Controls.WindowTaskbar.RemoveWindow(this);
+        WindowTaskbar.RemoveWindow(this);
 
         _windowHost?.Close();
         _windowHost = null;
@@ -1266,11 +1262,7 @@ public class Window : ContentControl, IResizeObserverListener
     private void MinimizeSecondaryWindow()
     {
         // Hide the overlay (and the WindowHost within it)
-        if (_overlayDiv.IsConnected)
-        {
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.getElementById('{_overlayDiv.Uid}').style.display = 'none'");
-        }
+        Hide();
 
         // Minimize owned windows
         foreach (var owned in _ownedWindows)
@@ -1281,7 +1273,7 @@ public class Window : ContentControl, IResizeObserverListener
             }
         }
 
-        OpenSilver.Controls.WindowTaskbar.UpdateVisibility();
+        WindowTaskbar.UpdateVisibility();
     }
 
     private void RestoreFromMinimized()
@@ -1289,8 +1281,7 @@ public class Window : ContentControl, IResizeObserverListener
         // Show the overlay again
         if (_overlayDiv.IsConnected)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.getElementById('{_overlayDiv.Uid}').style.display = 'flex'");
+            _overlayDiv.SetCssStyleProperty(CssPropertyNames.Display, "flex");
         }
 
         // Restore owned windows
@@ -1331,11 +1322,10 @@ public class Window : ContentControl, IResizeObserverListener
         MaxHeight = double.PositiveInfinity;
 
         // Fill the overlay: position at origin with full size
-        string hostId = _windowHost.OuterDiv.Uid;
-        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"(function(){{ var el=document.getElementById('{hostId}');" +
-            $"el.style.left='0px'; el.style.top='0px';" +
-            $"el.style.width='100%'; el.style.height='100%'; }})()");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Left, "0px");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Top, "0px");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, "100%");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, "100%");
 
         _windowHost.VisualOffset = new Vector(0, 0);
 
@@ -1382,11 +1372,10 @@ public class Window : ContentControl, IResizeObserverListener
         MaxHeight = _restoreMaxHeight;
 
         // Remove the 100% override so the layout system can size to content
-        string hostId = _windowHost.OuterDiv.Uid;
-        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"(function(){{ var el=document.getElementById('{hostId}');" +
-            $"el.style.width=''; el.style.height='';" +
-            $"el.style.left='{_restoreLeft.ToInvariantString()}px'; el.style.top='{_restoreTop.ToInvariantString()}px'; }})()");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, string.Empty);
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, string.Empty);
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Left, $"{_restoreLeft.ToInvariantString()}px");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Top, $"{_restoreTop.ToInvariantString()}px");
 
         _windowHost.VisualOffset = new Vector(_restoreLeft, _restoreTop);
 
@@ -1639,8 +1628,8 @@ public class Window : ContentControl, IResizeObserverListener
 
         _windowHost.VisualOffset = new Vector(left, top);
 
-        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"(function(){{ var el=document.getElementById('{_windowHost.OuterDiv.Uid}'); if(el){{ el.style.left='{left.ToInvariantString()}px'; el.style.top='{top.ToInvariantString()}px'; }} }})()");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Left, $"{left.ToInvariantString()}px");
+        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Top, $"{top.ToInvariantString()}px");
     }
 
     #endregion
@@ -1673,10 +1662,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         _isFullScreen = true;
 
-        if (_windowHost is not null)
-        {
-            _windowHost.UpdateTitleBarVisibility(false);
-        }
+        _windowHost?.UpdateTitleBarVisibility(false);
 
         SetValueInternal(WindowStateProperty, WindowState.Maximized);
 

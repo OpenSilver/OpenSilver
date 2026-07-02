@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Shell;
 
 /// <summary>
@@ -18,12 +20,12 @@ namespace System.Windows.Shell;
 /// </summary>
 public class WindowChrome : DependencyObject
 {
+    private Window _owner;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="WindowChrome"/> class.
     /// </summary>
-    public WindowChrome()
-    {
-    }
+    public WindowChrome() { }
 
     /// <summary>
     /// Identifies the <see cref="CaptionHeight"/> dependency property.
@@ -34,7 +36,7 @@ public class WindowChrome : DependencyObject
             typeof(double),
             typeof(WindowChrome),
             new FrameworkPropertyMetadata(0d),
-            IsNonNegative);
+            value => (double)value >= 0d);
 
     /// <summary>
     /// Gets or sets the height of the caption area at the top of a window.
@@ -58,10 +60,19 @@ public class WindowChrome : DependencyObject
     /// <summary>
     /// Gets or sets a value that indicates the width of the border that is used to resize a window.
     /// </summary>
+    /// <returns>
+    /// The width of the border that is used to resize a window.
+    /// </returns>
     public Thickness ResizeBorderThickness
     {
         get => (Thickness)GetValue(ResizeBorderThicknessProperty);
         set => SetValueInternal(ResizeBorderThicknessProperty, value);
+    }
+
+    private static void OnResizeBorderThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var chrome = (WindowChrome)d;
+        chrome._owner?.OnWindowChromeChanged(chrome, chrome);
     }
 
     /// <summary>
@@ -113,7 +124,7 @@ public class WindowChrome : DependencyObject
             nameof(UseAeroCaptionButtons),
             typeof(bool),
             typeof(WindowChrome),
-            new FrameworkPropertyMetadata(true));
+            new FrameworkPropertyMetadata(BooleanBoxes.TrueBox));
 
     /// <summary>
     /// Gets or sets a value that indicates whether hit-testing is enabled on the Windows Aero caption buttons.
@@ -126,8 +137,6 @@ public class WindowChrome : DependencyObject
         get => (bool)GetValue(UseAeroCaptionButtonsProperty);
         set => SetValueInternal(UseAeroCaptionButtonsProperty, value);
     }
-
-    #region WindowChrome Attached Property
 
     /// <summary>
     /// Identifies the WindowChrome attached property.
@@ -165,21 +174,15 @@ public class WindowChrome : DependencyObject
     {
         if (d is Window window)
         {
-            if (e.OldValue is WindowChrome oldChrome)
-            {
-                oldChrome.Owner = null;
-            }
-            if (e.NewValue is WindowChrome newChrome)
-            {
-                newChrome.Owner = window;
-            }
-            window.OnWindowChromeChanged((WindowChrome)e.OldValue, (WindowChrome)e.NewValue);
+            var oldChrome = (WindowChrome)e.OldValue;
+            var newChrome = (WindowChrome)e.NewValue;
+
+            oldChrome?._owner = null;
+            newChrome?._owner = window;
+
+            window.OnWindowChromeChanged(oldChrome, newChrome);
         }
     }
-
-    #endregion
-
-    #region IsHitTestVisibleInChrome Attached Property
 
     /// <summary>
     /// Identifies the IsHitTestVisibleInChrome attached property.
@@ -189,47 +192,43 @@ public class WindowChrome : DependencyObject
             "IsHitTestVisibleInChrome",
             typeof(bool),
             typeof(WindowChrome),
-            new FrameworkPropertyMetadata(false));
+            new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
 
     /// <summary>
     /// Gets the value of the <see cref="IsHitTestVisibleInChromeProperty"/> attached property from a <see cref="UIElement"/>.
     /// </summary>
-    /// <param name="element">The element from which to read the property value.</param>
-    /// <returns>The value of the <see cref="IsHitTestVisibleInChromeProperty"/> attached property.</returns>
-    public static bool GetIsHitTestVisibleInChrome(IInputElement element)
+    /// <param name="inputElement">
+    /// The element from which to read the property value.
+    /// </param>
+    /// <returns>
+    /// The value of the <see cref="IsHitTestVisibleInChromeProperty"/> attached property.
+    /// </returns>
+    public static bool GetIsHitTestVisibleInChrome(IInputElement inputElement)
     {
-        if (element is not DependencyObject d)
+        if (inputElement is not DependencyObject d)
         {
-            throw new ArgumentException("element must be a DependencyObject.", nameof(element));
+            throw new ArgumentException("element must be a DependencyObject.", nameof(inputElement));
         }
+
         return (bool)d.GetValue(IsHitTestVisibleInChromeProperty);
     }
 
     /// <summary>
     /// Sets the value of the <see cref="IsHitTestVisibleInChromeProperty"/> attached property on a <see cref="UIElement"/>.
     /// </summary>
-    /// <param name="element">The element on which to set the attached property.</param>
-    /// <param name="hitTestVisible">The value to set.</param>
-    public static void SetIsHitTestVisibleInChrome(IInputElement element, bool hitTestVisible)
+    /// <param name="inputElement">
+    /// The element on which to set the attached property.
+    /// </param>
+    /// <param name="hitTestVisible">
+    /// The value to set.
+    /// </param>
+    public static void SetIsHitTestVisibleInChrome(IInputElement inputElement, bool hitTestVisible)
     {
-        if (element is not DependencyObject d)
+        if (inputElement is not DependencyObject d)
         {
-            throw new ArgumentException("element must be a DependencyObject.", nameof(element));
+            throw new ArgumentException("element must be a DependencyObject.", nameof(inputElement));
         }
+
         d.SetValueInternal(IsHitTestVisibleInChromeProperty, hitTestVisible);
-    }
-
-    #endregion
-
-    private static bool IsNonNegative(object value) => (double)value >= 0d;
-
-    internal Window Owner { get; set; }
-
-    private static void OnResizeBorderThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is WindowChrome chrome && chrome.Owner is not null)
-        {
-            chrome.Owner.OnWindowChromeChanged(chrome, chrome);
-        }
     }
 }

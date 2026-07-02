@@ -24,6 +24,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -40,6 +41,7 @@ namespace System.Windows
     public partial class Application : DispatcherObject, IResourceDictionaryOwner
     {
         private static readonly Dictionary<string, string> _resourcesCache = new(StringComparer.OrdinalIgnoreCase);
+        private static Application _current;
 
         private readonly HtmlElementReference _rootDiv;
         private readonly ApplicationLifetimeObjectsCollection _lifetimeObjects = [];
@@ -54,25 +56,40 @@ namespace System.Windows
         /// <summary>
         /// Gets the Application object for the current application.
         /// </summary>
-        public static Application Current { get; private set; }
+        public static Application Current => _current;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// More than one instance of the <see cref="Application"/> class is created per <see cref="AppDomain"/>.
+        /// </exception>
         public Application()
             : this("opensilver-root")
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="rootDivId"/> is null or the empty string.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// More than one instance of the <see cref="Application"/> class is created per <see cref="AppDomain"/>.
+        /// </exception>
         public Application(string rootDivId)
         {
-            if (Current != null) throw new InvalidOperationException(Strings.MultipleApplicationInstancesNotAllowed);
-
             ArgumentException.ThrowIfNullOrEmpty(rootDivId);
+
+            if (Interlocked.CompareExchange(ref _current, this, null) is not null)
+            {
+                throw new InvalidOperationException(Strings.MultiSingleton);
+            }
 
             _rootDiv = new(rootDivId);
 
-            // Keep a reference to the app:
-            Current = this;
-
-            TextMeasurementService = new OpenSilver.Internal.TextMeasurementService(rootDivId);
+            TextMeasurementService = new TextMeasurementService(rootDivId);
 
             // Initialize Deployment
             _ = Deployment.Current;
@@ -488,6 +505,9 @@ namespace System.Windows
         /// <summary>
         /// Gets or sets the main application window.
         /// </summary>
+        /// <exception cref="ArgumentNullException">
+        /// MainWindow is set with a value of null.
+        /// </exception>
         public Window MainWindow
         {
             get => _mainWindow;
@@ -518,7 +538,7 @@ namespace System.Windows
 
         internal HtmlElementReference GetRootDiv() => _rootDiv;
 
-        internal OpenSilver.Internal.TextMeasurementService TextMeasurementService { get; private set; }
+        internal TextMeasurementService TextMeasurementService { get; }
 
         /// <summary>
         /// Returns a string that contains the content of the file that is located at the

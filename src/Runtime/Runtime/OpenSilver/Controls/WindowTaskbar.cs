@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using CSHTML5.Internal;
@@ -26,37 +25,43 @@ namespace OpenSilver.Controls;
 internal static class WindowTaskbar
 {
     private static bool _isInitialized;
-    private static string _taskbarId;
-    private static string _rootId;
+    private static HtmlElementReference _taskbarElement;
     private static readonly Dictionary<Window, TaskbarItem> _items = new();
     private static bool _isVisible;
 
     private static void EnsureInitialized()
     {
-        if (_isInitialized) return;
+        if (_isInitialized)
+        {
+            return;
+        }
 
-        Application app = Application.Current;
-        if (app is null) return;
+        if (Application.Current is not Application app)
+        {
+            return;
+        }
 
-        _rootId = app.GetRootDiv().Uid;
-        _taskbarId = $"os_taskbar_{_rootId}";
+        var _rootId = app.GetRootDiv().Uid;
+        _taskbarElement = new HtmlElementReference($"os_taskbar_{_rootId}");
 
         Interop.ExecuteJavaScriptVoidAsync(
-            $"(function() {{" +
-            $"  var root = document.getElementById('{_rootId}');" +
-            $"  var tb = document.createElement('div');" +
-            $"  tb.id = '{_taskbarId}';" +
-            $"  tb.style.display = 'none';" +
-            $"  tb.style.flexWrap = 'wrap';" +
-            $"  tb.style.alignItems = 'center';" +
-            $"  tb.style.background = '#1e1e1e';" +
-            $"  tb.style.zIndex = '2147483647';" +
-            $"  tb.style.position = 'absolute';" +
-            $"  tb.style.bottom = '0';" +
-            $"  tb.style.left = '0';" +
-            $"  tb.style.right = '0';" +
-            $"  root.appendChild(tb);" +
-            $"}})()");
+            $$"""
+            (function () {
+              const root = document.getElementById('{{_rootId}}');
+              const tb = document.createElement('div');
+              tb.id = '{{_taskbarElement.Uid}}';
+              tb.style.display = 'none';
+              tb.style.flexWrap = 'wrap';
+              tb.style.alignItems = 'center';
+              tb.style.background = '#1e1e1e';
+              tb.style.zIndex = '2147483647';
+              tb.style.position = 'absolute';
+              tb.style.bottom = '0';
+              tb.style.left = '0';
+              tb.style.right = '0';
+              root.appendChild(tb);
+            })();
+            """);
 
         _isInitialized = true;
     }
@@ -72,8 +77,7 @@ internal static class WindowTaskbar
         item.BypassLayoutPolicies = true;
         item.ParentWindow = window;
 
-        HtmlElementReference taskbarDiv = new HtmlElementReference(_taskbarId);
-        item.OuterDiv = INTERNAL_HtmlDomManager.CreateTaskbarItemRootDomElementAndAppendIt(taskbarDiv, item);
+        item.OuterDiv = INTERNAL_HtmlDomManager.CreateTaskbarItemRootDomElementAndAppendIt(_taskbarElement, item);
 
         item.IsLoadedCache = true;
         item.IsConnectedToLiveTree = true;
@@ -88,12 +92,8 @@ internal static class WindowTaskbar
         item.Arrange(new Rect(new Point(), item.DesiredSize));
         item.UpdateLayout();
 
-        string w = item.DesiredSize.Width.ToInvariantString();
-        string h = item.DesiredSize.Height.ToInvariantString();
-        string itemDivId = item.OuterDiv.Uid;
-        Interop.ExecuteJavaScriptVoidAsync(
-            $"(function() {{ var el = document.getElementById('{itemDivId}'); " +
-            $"el.style.width = '{w}px'; el.style.height = '{h}px'; }})()");
+        item.OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, $"{item.DesiredSize.Width.ToInvariantString()}px");
+        item.OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, $"{item.DesiredSize.Height.ToInvariantString()}px");
 
         _items[window] = item;
         UpdateVisibility();
@@ -120,21 +120,27 @@ internal static class WindowTaskbar
 
     internal static void UpdateVisibility()
     {
-        bool shouldBeVisible = _items.Count >= 2 || HasMinimizedWindow();
+        bool showTaskBar = _items.Count >= 2 || HasMinimizedWindow();
 
-        if (shouldBeVisible == _isVisible) return;
-        _isVisible = shouldBeVisible;
+        if (showTaskBar == _isVisible)
+        {
+            return;
+        }
 
-        if (_taskbarId is null) return;
+        _isVisible = showTaskBar;
 
-        string display = shouldBeVisible ? "flex" : "none";
-        Interop.ExecuteJavaScriptVoidAsync(
-            $"document.getElementById('{_taskbarId}').style.display='{display}'");
+        if (_taskbarElement.IsConnected)
+        {
+            _taskbarElement.SetCssStyleProperty(CssPropertyNames.Display, showTaskBar ? "flex" : "none");
+        }
     }
 
     private static bool HasMinimizedWindow()
     {
-        if (Application.Current is not Application app) return false;
+        if (Application.Current is not Application app)
+        {
+            return false;
+        }
 
         foreach (Window w in app.Windows)
         {

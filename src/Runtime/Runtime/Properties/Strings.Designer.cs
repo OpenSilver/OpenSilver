@@ -457,6 +457,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot set Owner property to itself..
+        /// </summary>
+        internal static string CannotSetOwnerToItself {
+            get {
+                return ResourceManager.GetString("CannotSetOwnerToItself", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; view does not support sorting..
         /// </summary>
         internal static string CannotSortView {
@@ -534,6 +543,15 @@ namespace OpenSilver.Internal {
         internal static string ChildWindow_InvalidOperation {
             get {
                 return ResourceManager.GetString("ChildWindow_InvalidOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; Window is already a child of Window &apos;{1}&apos;..
+        /// </summary>
+        internal static string CircularOwnerChild {
+            get {
+                return ResourceManager.GetString("CircularOwnerChild", resourceCulture);
             }
         }
         
@@ -894,6 +912,15 @@ namespace OpenSilver.Internal {
         internal static string DisplayMemberPathAndItemTemplateDefined {
             get {
                 return ResourceManager.GetString("DisplayMemberPathAndItemTemplateDefined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can only call DragMove when primary mouse button is down..
+        /// </summary>
+        internal static string DragMoveFail {
+            get {
+                return ResourceManager.GetString("DragMoveFail", resourceCulture);
             }
         }
         
@@ -2113,20 +2140,20 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Only one instance of Application can be created..
-        /// </summary>
-        internal static string MultipleApplicationInstancesNotAllowed {
-            get {
-                return ResourceManager.GetString("MultipleApplicationInstancesNotAllowed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Can only call SelectAll when CanSelectMultipleItems is true..
         /// </summary>
         internal static string MultiSelectorSelectAll {
             get {
                 return ResourceManager.GetString("MultiSelectorSelectAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot create more than one System.Windows.Application instance in the same AppDomain..
+        /// </summary>
+        internal static string MultiSingleton {
+            get {
+                return ResourceManager.GetString("MultiSingleton", resourceCulture);
             }
         }
         
@@ -2784,6 +2811,15 @@ namespace OpenSilver.Internal {
         internal static string ReplaceText {
             get {
                 return ResourceManager.GetString("ReplaceText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot call Show or ShowDialog after a Window has closed..
+        /// </summary>
+        internal static string ReshowNotAllowed {
+            get {
+                return ResourceManager.GetString("ReshowNotAllowed", resourceCulture);
             }
         }
         

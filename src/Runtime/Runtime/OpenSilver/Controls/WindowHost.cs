@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +18,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shell;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Controls;
@@ -51,7 +51,7 @@ public class WindowHost : ContentControl
     private const string PART_ResizeBottomRight = "PART_ResizeBottomRight";
     private const string PART_ResizeGrip = "PART_ResizeGrip";
 
-    private Window _window;
+    private readonly Window _window;
     private FrameworkElement _titleBarPart;
     private ButtonBase _minimizeButtonPart;
     private ButtonBase _maximizeButtonPart;
@@ -72,13 +72,7 @@ public class WindowHost : ContentControl
         EventManager.RegisterClassHandler<WindowHost>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
     }
 
-    private static void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is WindowHost host)
-        {
-            host._window?.Activate();
-        }
-    }
+    private static void OnPreviewMouseDown(object sender, MouseButtonEventArgs e) => ((WindowHost)sender)._window.Activate();
 
     internal WindowHost(Window window)
     {
@@ -89,7 +83,7 @@ public class WindowHost : ContentControl
         _window = window;
         Content = window;
 
-        SetBinding(TitleProperty, new Binding(nameof(Window.Title)) { Source = window });
+        SetBinding(TitleProperty, new Binding(Window.TitleProperty) { Source = window });
     }
 
     /// <summary>
@@ -104,12 +98,7 @@ public class WindowHost : ContentControl
     /// <summary>
     /// Identifies the <see cref="Title"/> dependency property.
     /// </summary>
-    public static readonly DependencyProperty TitleProperty =
-        DependencyProperty.Register(
-            nameof(Title),
-            typeof(string),
-            typeof(WindowHost),
-            new PropertyMetadata(string.Empty));
+    public static readonly DependencyProperty TitleProperty = Window.TitleProperty.AddOwner(typeof(WindowHost));
 
     /// <summary>
     /// Gets or sets the background brush for the window chrome (title bar).
@@ -132,8 +121,6 @@ public class WindowHost : ContentControl
 
 
     internal bool IsOpen { get; private set; }
-
-    internal Window HostedWindow => _window;
 
     internal void Show(HtmlElementReference overlayDiv)
     {
@@ -167,7 +154,7 @@ public class WindowHost : ContentControl
 
     private void UnloadSubTree()
     {
-        INTERNAL_VisualTreeManager.DetachSecondaryWindow(this);
+        INTERNAL_VisualTreeManager.DetachWindowHost(this);
         IsLoadedCache = false;
         IsConnectedToLiveTree = false;
         UpdateIsRenderableCache();
@@ -177,9 +164,9 @@ public class WindowHost : ContentControl
 
     internal void UpdateResizeBorderThickness(Thickness thickness)
     {
-        if (_resizeLeftPart is not null) _resizeLeftPart.Width = thickness.Left;
-        if (_resizeRightPart is not null) _resizeRightPart.Width = thickness.Right;
-        if (_resizeBottomPart is not null) _resizeBottomPart.Height = thickness.Bottom;
+        _resizeLeftPart?.Width = thickness.Left;
+        _resizeRightPart?.Width = thickness.Right;
+        _resizeBottomPart?.Height = thickness.Bottom;
         if (_resizeBottomLeftPart is not null)
         {
             _resizeBottomLeftPart.Width = thickness.Left;
@@ -195,27 +182,23 @@ public class WindowHost : ContentControl
     internal void SetResizeBordersVisible(bool visible)
     {
         var visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-        if (_resizeLeftPart is not null) _resizeLeftPart.Visibility = visibility;
-        if (_resizeRightPart is not null) _resizeRightPart.Visibility = visibility;
-        if (_resizeBottomPart is not null) _resizeBottomPart.Visibility = visibility;
-        if (_resizeBottomLeftPart is not null) _resizeBottomLeftPart.Visibility = visibility;
-        if (_resizeBottomRightPart is not null) _resizeBottomRightPart.Visibility = visibility;
+
+        _resizeLeftPart?.Visibility = visibility;
+        _resizeRightPart?.Visibility = visibility;
+        _resizeBottomPart?.Visibility = visibility;
+        _resizeBottomLeftPart?.Visibility = visibility;
+        _resizeBottomRightPart?.Visibility = visibility;
     }
 
     internal void UpdateResizeMode(ResizeMode mode)
     {
         bool canResize = mode >= ResizeMode.CanResize;
 
-        if (_minimizeButtonPart is not null)
-        {
-            _minimizeButtonPart.Visibility = mode == ResizeMode.NoResize
-                ? Visibility.Collapsed : Visibility.Visible;
-        }
+        _minimizeButtonPart?.Visibility = mode == ResizeMode.NoResize ? Visibility.Collapsed : Visibility.Visible;
 
         if (_maximizeButtonPart is not null)
         {
-            _maximizeButtonPart.Visibility = mode == ResizeMode.NoResize
-                ? Visibility.Collapsed : Visibility.Visible;
+            _maximizeButtonPart.Visibility = mode == ResizeMode.NoResize ? Visibility.Collapsed : Visibility.Visible;
             _maximizeButtonPart.IsHitTestVisible = canResize;
             _maximizeButtonPart.Opacity = canResize ? 1.0 : 0.4;
         }
@@ -226,52 +209,32 @@ public class WindowHost : ContentControl
             {
                 _restoreButtonPart.Visibility = Visibility.Collapsed;
             }
+
             _restoreButtonPart.IsHitTestVisible = canResize;
             _restoreButtonPart.Opacity = canResize ? 1.0 : 0.4;
         }
 
-        var resizeVisibility = canResize ? Visibility.Visible : Visibility.Collapsed;
-        if (_resizeLeftPart is not null) _resizeLeftPart.Visibility = resizeVisibility;
-        if (_resizeRightPart is not null) _resizeRightPart.Visibility = resizeVisibility;
-        if (_resizeBottomPart is not null) _resizeBottomPart.Visibility = resizeVisibility;
-        if (_resizeBottomLeftPart is not null) _resizeBottomLeftPart.Visibility = resizeVisibility;
-        if (_resizeBottomRightPart is not null) _resizeBottomRightPart.Visibility = resizeVisibility;
+        SetResizeBordersVisible(canResize);
 
-        if (_resizeGripPart is not null)
-        {
-            _resizeGripPart.Visibility = mode == ResizeMode.CanResizeWithGrip
-                ? Visibility.Visible : Visibility.Collapsed;
-        }
+        _resizeGripPart?.Visibility = mode == ResizeMode.CanResizeWithGrip ? Visibility.Visible : Visibility.Collapsed;
     }
 
     internal void UpdateMaximizeRestoreButton(bool isMaximized)
     {
-        if (_maximizeButtonPart is not null)
-        {
-            _maximizeButtonPart.Visibility = isMaximized ? Visibility.Collapsed : Visibility.Visible;
-        }
-        if (_restoreButtonPart is not null)
-        {
-            _restoreButtonPart.Visibility = isMaximized ? Visibility.Visible : Visibility.Collapsed;
-        }
+        _maximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : Visibility.Visible;
+        _restoreButtonPart?.Visibility = isMaximized ? Visibility.Visible : Visibility.Collapsed;
     }
 
     internal void UpdateTitleBarVisibility(bool visible)
     {
         _pendingTitleBarVisible = visible;
-        if (_titleBarPart is not null)
-        {
-            _titleBarPart.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-        }
+        _titleBarPart?.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
     }
 
     internal void UpdateTitleBarHeight(double captionHeight)
     {
         _pendingTitleBarHeight = captionHeight;
-        if (_titleBarPart is not null)
-        {
-            _titleBarPart.Height = captionHeight;
-        }
+        _titleBarPart?.Height = captionHeight;
     }
 
     public override void OnApplyTemplate()
@@ -300,121 +263,65 @@ public class WindowHost : ContentControl
             _titleBarPart.Height = _pendingTitleBarHeight;
         }
 
-        if (_window is not null)
+        UpdateResizeMode(_window.ResizeMode);
+        var chrome = WindowChrome.GetWindowChrome(_window);
+        if (chrome is not null)
         {
-            UpdateResizeMode(_window.ResizeMode);
-            var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(_window);
-            if (chrome is not null)
-            {
-                UpdateResizeBorderThickness(chrome.ResizeBorderThickness);
-            }
+            UpdateResizeBorderThickness(chrome.ResizeBorderThickness);
         }
     }
 
     private void SubscribeToTemplateParts()
     {
-        if (_titleBarPart is not null)
-        {
-            _titleBarPart.MouseLeftButtonDown += TitleBar_MouseLeftButtonDown;
-        }
-
-        if (_minimizeButtonPart is not null)
-        {
-            _minimizeButtonPart.Click += MinimizeButton_Click;
-        }
-
-        if (_maximizeButtonPart is not null)
-        {
-            _maximizeButtonPart.Click += MaximizeButton_Click;
-        }
-
-        if (_restoreButtonPart is not null)
-        {
-            _restoreButtonPart.Click += MaximizeButton_Click;
-        }
-
-        if (_closeButtonPart is not null)
-        {
-            _closeButtonPart.Click += CloseButton_Click;
-        }
-
-        if (_resizeLeftPart is not null) _resizeLeftPart.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
-        if (_resizeRightPart is not null) _resizeRightPart.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
-        if (_resizeBottomPart is not null) _resizeBottomPart.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
-        if (_resizeBottomLeftPart is not null) _resizeBottomLeftPart.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
-        if (_resizeBottomRightPart is not null) _resizeBottomRightPart.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
-        if (_resizeGripPart is not null) _resizeGripPart.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _titleBarPart?.MouseLeftButtonDown += TitleBar_MouseLeftButtonDown;
+        _minimizeButtonPart?.Click += MinimizeButton_Click;
+        _maximizeButtonPart?.Click += MaximizeButton_Click;
+        _restoreButtonPart?.Click += MaximizeButton_Click;
+        _closeButtonPart?.Click += CloseButton_Click;
+        _resizeLeftPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _resizeRightPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _resizeBottomPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _resizeBottomLeftPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _resizeBottomRightPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _resizeGripPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
     }
 
     private void UnsubscribeFromTemplateParts()
     {
-        if (_titleBarPart is not null)
-        {
-            _titleBarPart.MouseLeftButtonDown -= TitleBar_MouseLeftButtonDown;
-        }
-
-        if (_minimizeButtonPart is not null)
-        {
-            _minimizeButtonPart.Click -= MinimizeButton_Click;
-        }
-
-        if (_maximizeButtonPart is not null)
-        {
-            _maximizeButtonPart.Click -= MaximizeButton_Click;
-        }
-
-        if (_restoreButtonPart is not null)
-        {
-            _restoreButtonPart.Click -= MaximizeButton_Click;
-        }
-
-        if (_closeButtonPart is not null)
-        {
-            _closeButtonPart.Click -= CloseButton_Click;
-        }
-
-        if (_resizeLeftPart is not null) _resizeLeftPart.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
-        if (_resizeRightPart is not null) _resizeRightPart.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
-        if (_resizeBottomPart is not null) _resizeBottomPart.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
-        if (_resizeBottomLeftPart is not null) _resizeBottomLeftPart.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
-        if (_resizeBottomRightPart is not null) _resizeBottomRightPart.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
-        if (_resizeGripPart is not null) _resizeGripPart.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _titleBarPart?.MouseLeftButtonDown -= TitleBar_MouseLeftButtonDown;
+        _minimizeButtonPart?.Click -= MinimizeButton_Click;
+        _maximizeButtonPart?.Click -= MaximizeButton_Click;
+        _restoreButtonPart?.Click -= MaximizeButton_Click;
+        _closeButtonPart?.Click -= CloseButton_Click;
+        _resizeLeftPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _resizeRightPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _resizeBottomPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _resizeBottomLeftPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _resizeBottomRightPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _resizeGripPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_window is not null && _window.IsVisible)
+        if (_window.IsVisible)
         {
             _window.DragMove();
         }
     }
 
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_window is not null)
-        {
-            _window.WindowState = WindowState.Minimized;
-        }
-    }
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e) => _window.WindowState = WindowState.Minimized;
 
-    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_window is not null)
-        {
-            _window.WindowState = _window.WindowState == WindowState.Maximized
-                ? WindowState.Normal
-                : WindowState.Maximized;
-        }
-    }
+    private void MaximizeButton_Click(object sender, RoutedEventArgs e) =>
+        _window.WindowState = _window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
-    {
-        _window?.Close();
-    }
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => _window.Close();
 
     private void ResizeEdge_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_window is null || _window.WindowState == WindowState.Maximized) return;
+        if (_window.WindowState == WindowState.Maximized)
+        {
+            return;
+        }
 
         WindowResizeEdge edge = GetEdgeFromSender(sender);
         if (edge != (WindowResizeEdge)(-1))
@@ -446,7 +353,7 @@ public class WindowHost : ContentControl
 
     private Size GetAvailableSize()
     {
-        if (_window is not null && _window.WindowState == WindowState.Maximized)
+        if (_window.WindowState == WindowState.Maximized)
         {
             Window viewport = Application.Current?.MainWindow;
             if (viewport is not null)
@@ -459,14 +366,9 @@ public class WindowHost : ContentControl
             }
         }
 
-        if (_window is not null)
-        {
-            double w = _window.Width;
-            return new Size(
-                double.IsNaN(w) ? double.PositiveInfinity : w,
-                double.PositiveInfinity);
-        }
-
-        return new Size(double.PositiveInfinity, double.PositiveInfinity);
+        double w = _window.Width;
+        return new Size(
+            double.IsNaN(w) ? double.PositiveInfinity : w,
+            double.PositiveInfinity);
     }
 }

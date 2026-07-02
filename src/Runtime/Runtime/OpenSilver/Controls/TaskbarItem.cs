@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,11 +20,11 @@ using System.Windows.Input;
 namespace OpenSilver.Controls;
 
 /// <summary>
-/// Represents a window item in the taskbar. Can be restyled via theme resource dictionaries.
+/// Represents a window item in the taskbar.
 /// </summary>
 public class TaskbarItem : Control
 {
-    private Window _window;
+    private readonly Window _window;
 
     static TaskbarItem()
     {
@@ -33,7 +34,7 @@ public class TaskbarItem : Control
     internal TaskbarItem(Window window)
     {
         _window = window;
-        SetBinding(TitleProperty, new Binding(nameof(Window.Title)) { Source = window });
+        SetBinding(TitleProperty, new Binding(Window.TitleProperty) { Source = window });
     }
 
     /// <summary>
@@ -48,12 +49,7 @@ public class TaskbarItem : Control
     /// <summary>
     /// Identifies the <see cref="Title"/> dependency property.
     /// </summary>
-    public static readonly DependencyProperty TitleProperty =
-        DependencyProperty.Register(
-            nameof(Title),
-            typeof(string),
-            typeof(TaskbarItem),
-            new PropertyMetadata(string.Empty));
+    public static readonly DependencyProperty TitleProperty = Window.TitleProperty.AddOwner(typeof(TaskbarItem));
 
     /// <summary>
     /// Gets or sets whether this is the currently active window.
@@ -64,15 +60,15 @@ public class TaskbarItem : Control
         internal set => SetValueInternal(IsActiveWindowProperty, value);
     }
 
+    /// <summary>
+    /// Identifies the <see cref="IsActiveWindow"/> dependency property.
+    /// </summary>
     public static readonly DependencyProperty IsActiveWindowProperty =
         DependencyProperty.Register(
             nameof(IsActiveWindow),
             typeof(bool),
             typeof(TaskbarItem),
-            new PropertyMetadata(false));
-
-
-    internal Window Window => _window;
+            new PropertyMetadata(BooleanBoxes.FalseBox));
 
     /// <inheritdoc/>
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
