@@ -76,7 +76,7 @@ window._openSilverRuntime = (function () {
 
         const styleheets = ['libs/cshtml5.css', 'libs/quill.core.css'];
         const scripts = ['libs/quill.min.js', 'libs/html-to-image.js', 'libs/filesaver.min.js'];
-        const timestamp = '?date=' + new Date().toISOString();
+        const timestamp = new URL(document.currentScript.src).search;
 
         styleheets.forEach((name) => {
             dependencies.push(new Promise((resolve, reject) => {
