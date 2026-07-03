@@ -1386,4 +1386,7 @@
   <data name="ReshowNotAllowed" xml:space="preserve">
     <value>Impossible d'appeler Show ou ShowDialog après la fermeture d'un objet Window.</value>
   </data>
+  <data name="BindingExpressionIsDetached" xml:space="preserve">
+    <value>Impossible d'effectuer cette opération quand la liaison est détachée.</value>
+  </data>
 </root>

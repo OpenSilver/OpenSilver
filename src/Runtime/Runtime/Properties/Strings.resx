@@ -1388,4 +1388,7 @@
   <data name="ReshowNotAllowed" xml:space="preserve">
     <value>Cannot call Show or ShowDialog after a Window has closed.</value>
   </data>
+  <data name="BindingExpressionIsDetached" xml:space="preserve">
+    <value>Cannot perform this operation when binding is detached.</value>
+  </data>
 </root>

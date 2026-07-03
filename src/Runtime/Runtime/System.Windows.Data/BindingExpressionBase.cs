@@ -218,6 +218,12 @@ public abstract class BindingExpressionBase : Expression
     internal bool UsesLanguage => ParentBindingBase.ConverterCultureInternal is null;
 
     /// <summary>
+    /// Sends the current binding target value to the binding source in <see cref="BindingMode.TwoWay"/>
+    /// or <see cref="BindingMode.OneWayToSource"/> bindings.
+    /// </summary>
+    public virtual void UpdateSource() { }
+
+    /// <summary>
     /// Compute the culture, either from the parent Binding, or from the target element.
     /// </summary>
     internal CultureInfo GetCulture()

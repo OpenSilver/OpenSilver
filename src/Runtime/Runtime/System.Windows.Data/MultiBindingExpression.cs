@@ -86,11 +86,11 @@ public sealed class MultiBindingExpression : BindingExpressionBase
     /// <exception cref="InvalidOperationException">
     /// The <see cref="MultiBindingExpression"/> is detached from the binding target.
     /// </exception>
-    public void UpdateSource()
+    public override void UpdateSource()
     {
         if (!IsAttached)
         {
-            throw new InvalidOperationException("The Binding has been detached from its target.");
+            throw new InvalidOperationException(Strings.BindingExpressionIsDetached);
         }
 
         NeedsUpdate = true;

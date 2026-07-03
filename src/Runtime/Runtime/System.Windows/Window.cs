@@ -576,7 +576,6 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Identifies the <see cref="ShowActivated"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty ShowActivatedProperty =
         DependencyProperty.Register(
             nameof(ShowActivated),
@@ -1119,6 +1118,7 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Raises the SourceInitialized event.
     /// </summary>
+    [NotImplemented]
     protected virtual void OnSourceInitialized(EventArgs e) { }
 
     #region Secondary Window DOM Management

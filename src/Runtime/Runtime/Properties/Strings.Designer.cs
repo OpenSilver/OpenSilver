@@ -196,6 +196,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot perform this operation when binding is detached..
+        /// </summary>
+        internal static string BindingExpressionIsDetached {
+            get {
+                return ResourceManager.GetString("BindingExpressionIsDetached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Underlying list of this CollectionView does not support filtering..
         /// </summary>
         internal static string BindingListCannotCustomFilter {

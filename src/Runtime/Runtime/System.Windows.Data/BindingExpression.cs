@@ -121,11 +121,11 @@ namespace System.Windows.Data
         /// <exception cref="InvalidOperationException">
         /// The <see cref="BindingExpression"/> is detached from the binding target.
         /// </exception>
-        public void UpdateSource()
+        public override void UpdateSource()
         {
             if (!IsAttached)
             {
-                throw new InvalidOperationException("The Binding has been detached from its target.");
+                throw new InvalidOperationException(Strings.BindingExpressionIsDetached);
             }
 
             NeedsUpdate = true;
