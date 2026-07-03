@@ -93,6 +93,7 @@ namespace TestApplication
 
             TestCategory tileBrushes = new TestCategory("TileBrush");
             tileBrushes.Add(new Test("ImageBrush", "TileBrush/ImageBrush"));
+            tileBrushes.Add(new Test("VisualBrush", "TileBrush/VisualBrush"));
             Tests.Add(tileBrushes);
 
             TestCategory gradientBrushes = new TestCategory("GradientBrushes");

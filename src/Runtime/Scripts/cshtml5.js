@@ -3112,6 +3112,50 @@ Object.defineProperty(window, 'osjs', {
                     URL.revokeObjectURL(url);
                 },
             }),
+            visualBrush: Object.freeze((function () {
+                return {
+                    createRenderArea: function (id, parentId) {
+                        const parent = document.getElementById(parentId);
+                        if (parent) {
+                            const renderArea = document.createElement('div');
+                            renderArea.id = id;
+                            renderArea.style.position = 'absolute';
+                            renderArea.style.opacity = '0';
+                            renderArea.style.left = '-100000px';
+                            renderArea.style.top = '-100000px';
+                            parent.appendChild(renderArea);
+                            return true;
+                        }
+                        return false;
+                    },
+                    create: async function (id, pixelRatio, callback) {
+                        const element = document.getElementById(id);
+                        if (!element) {
+                            callback('');
+                            return;
+                        }
+
+                        let blob = null;
+                        try {
+                            const bounds = element.getBoundingClientRect();
+                            blob = await htmlToImage.toBlob(element, {
+                                width: bounds.width,
+                                height: bounds.height,
+                                pixelRatio: pixelRatio,
+                            });
+                        } catch (error) { }
+
+                        if (blob) {
+                            callback(URL.createObjectURL(blob));
+                        } else {
+                            callback('');
+                        }
+                    },
+                    release: function (url) {
+                        URL.revokeObjectURL(url);
+                    },
+                }
+            })()),
         };
     })()),
     writable: false,
