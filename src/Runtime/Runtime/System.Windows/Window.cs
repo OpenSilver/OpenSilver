@@ -289,13 +289,13 @@ public class Window : ContentControl, IResizeObserverListener
     /// <summary>
     /// Occurs when the window is about to close.
     /// </summary>
-    public event EventHandler<ClosingEventArgs> Closing;
+    public event CancelEventHandler Closing;
 
     /// <summary>
     /// Raises the Closing event
     /// </summary>
     /// <param name="e">The arguments for the event.</param>
-    protected void OnClosing(ClosingEventArgs e) => Closing?.Invoke(this, e);
+    protected virtual void OnClosing(CancelEventArgs e) => Closing?.Invoke(this, e);
 
     internal bool InvokeOnClosing(bool cancellable)
     {
