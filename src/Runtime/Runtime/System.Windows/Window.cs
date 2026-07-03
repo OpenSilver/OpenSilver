@@ -1274,6 +1274,41 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         WindowTaskbar.UpdateVisibility();
+
+        // Activate the next available window
+        if (ActiveWindow == this)
+        {
+            ActivateNextWindow();
+        }
+    }
+
+    private void ActivateNextWindow()
+    {
+        if (Application.Current is not Application app) return;
+
+        // The DOM order of overlays reflects z-order (appendChild moves to top).
+        // Find the topmost non-minimized, non-closed window by checking DOM order.
+        string rootId = app.GetRootDiv().Uid;
+        string currentOverlayId = _overlayDiv.Uid;
+
+        string nextId = OpenSilver.Interop.ExecuteJavaScriptString(
+            $"(function(){{ var root=document.getElementById('{rootId}');" +
+            $"var children=root.querySelectorAll('.opensilver-window-overlay');" +
+            $"for(var i=children.length-1;i>=0;i--){{" +
+            $"  var c=children[i]; if(c.id!=='{currentOverlayId}' && c.style.display!=='none') return c.id;" +
+            $"}} return ''; }})()");
+
+        if (!string.IsNullOrEmpty(nextId))
+        {
+            foreach (Window w in app.Windows)
+            {
+                if (!w._isClosed && w._overlayDiv.Uid == nextId)
+                {
+                    w.Activate();
+                    return;
+                }
+            }
+        }
     }
 
     private void RestoreFromMinimized()
