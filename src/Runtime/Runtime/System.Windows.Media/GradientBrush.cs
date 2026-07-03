@@ -123,7 +123,8 @@ namespace System.Windows.Media
                 nameof(MappingMode),
                 typeof(BrushMappingMode),
                 typeof(GradientBrush),
-                new PropertyMetadata(BrushMappingMode.RelativeToBoundingBox));
+                new PropertyMetadata(BrushMappingMode.RelativeToBoundingBox),
+                ValidateEnums.IsBrushMappingModeValid);
 
         /// <summary>
         /// Gets or sets a <see cref="BrushMappingMode"/> enumeration value that specifies
@@ -148,7 +149,8 @@ namespace System.Windows.Media
                 nameof(SpreadMethod),
                 typeof(GradientSpreadMethod),
                 typeof(GradientBrush),
-                new PropertyMetadata(GradientSpreadMethod.Pad));
+                new PropertyMetadata(GradientSpreadMethod.Pad),
+                ValidateEnums.IsGradientSpreadMethodValid);
 
         /// <summary>
         /// Gets or sets the type of spread method that specifies how to draw a gradient
@@ -173,7 +175,8 @@ namespace System.Windows.Media
                 nameof(ColorInterpolationMode),
                 typeof(ColorInterpolationMode),
                 typeof(GradientBrush),
-                new PropertyMetadata(ColorInterpolationMode.SRgbLinearInterpolation));
+                new PropertyMetadata(ColorInterpolationMode.SRgbLinearInterpolation),
+                ValidateEnums.IsColorInterpolationModeValid);
 
         /// <summary>
         /// Gets or sets a <see cref="ColorInterpolationMode"/> enumeration value

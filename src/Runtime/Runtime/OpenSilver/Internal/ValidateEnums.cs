@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace OpenSilver.Internal;
@@ -48,5 +49,70 @@ internal static class ValidateEnums
                value == GeometryCombineMode.Intersect ||
                value == GeometryCombineMode.Xor ||
                value == GeometryCombineMode.Exclude;
+    }
+
+    public static bool IsBrushMappingModeValid(object o)
+    {
+        var value = (BrushMappingMode)o;
+        return value == BrushMappingMode.Absolute ||
+               value == BrushMappingMode.RelativeToBoundingBox;
+    }
+
+    public static bool IsGradientSpreadMethodValid(object o)
+    {
+        var value = (GradientSpreadMethod)o;
+        return value == GradientSpreadMethod.Pad ||
+               value == GradientSpreadMethod.Reflect ||
+               value == GradientSpreadMethod.Repeat;
+    }
+
+    public static bool IsColorInterpolationModeValid(object o)
+    {
+        var value = (ColorInterpolationMode)o;
+        return value == ColorInterpolationMode.ScRgbLinearInterpolation ||
+               value == ColorInterpolationMode.SRgbLinearInterpolation;
+    }
+
+    public static bool IsTileModeValid(object o)
+    {
+        var value = (TileMode)o;
+        return value == TileMode.None ||
+               value == TileMode.Tile ||
+               value == TileMode.FlipX ||
+               value == TileMode.FlipY ||
+               value == TileMode.FlipXY;
+    }
+
+    public static bool IsAlignmentXValid(object o)
+    {
+        var value = (AlignmentX)o;
+        return value == AlignmentX.Left ||
+               value == AlignmentX.Center ||
+               value == AlignmentX.Right;
+    }
+
+    public static bool IsAlignmentYValid(object o)
+    {
+        var value = (AlignmentY)o;
+        return value == AlignmentY.Top ||
+               value == AlignmentY.Center ||
+               value == AlignmentY.Bottom;
+    }
+
+    public static bool IsStretchValid(object o)
+    {
+        var value = (Stretch)o;
+        return value == Stretch.None ||
+               value == Stretch.Fill ||
+               value == Stretch.Uniform ||
+               value == Stretch.UniformToFill;
+    }
+
+    public static bool IsStretchDirectionValid(object o)
+    {
+        var value = (StretchDirection)o;
+        return value == StretchDirection.UpOnly ||
+               value == StretchDirection.DownOnly ||
+               value == StretchDirection.Both;
     }
 }

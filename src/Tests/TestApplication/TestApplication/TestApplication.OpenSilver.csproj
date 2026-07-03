@@ -297,6 +297,7 @@
     <Compile Include="Tests\TextPropertiesTest.xaml.cs">
       <DependentUpon>TextPropertiesTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\TileBrush\ImageBrushTest.xaml.cs" />
     <Compile Include="Tests\TimePickerTest.xaml.cs" />
     <Compile Include="Tests\ToolTipTest.xaml.cs">
       <DependentUpon>ToolTipTest.xaml</DependentUpon>
@@ -645,6 +646,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Resource Include="Tests\TileBrush\Images\arrow_left.png" />
+    <Resource Include="Tests\TileBrush\Images\Background.jpg" />
+    <Resource Include="Tests\TileBrush\Images\back_1.jpg" />
+    <Resource Include="Tests\TileBrush\Images\icon_open.png" />
+    <Resource Include="Tests\TileBrush\Images\Logo1.png" />
+    <Resource Include="Tests\TileBrush\Images\flower.jpg" />
     <Content Include="Tests\ToolTipTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -680,6 +687,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\GroupBoxTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\TileBrush\ImageBrushTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\generic.xaml">
