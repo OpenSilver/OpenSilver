@@ -287,7 +287,7 @@ internal sealed class TextBoxView : TextViewBase
     {
         (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(Host.TextWrapping);
 
-        return ParentWindow.TextMeasurementService.MeasureView(
+        return Application.Current.TextMeasurementService.MeasureView(
             OuterDiv.Uid,
             whiteSpace,
             overflowWrap,

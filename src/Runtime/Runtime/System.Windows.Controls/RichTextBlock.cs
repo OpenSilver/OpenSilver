@@ -449,7 +449,7 @@ namespace System.Windows.Controls
             {
                 if (Blocks.InternalCount > 0 && Application.Current is Application app)
                 {
-                    return app.MainWindow.TextMeasurementService.MeasureBaseline(GetFonts(this));
+                    return app.TextMeasurementService.MeasureBaseline(GetFonts(this));
                 }
 
                 return 0.0;
@@ -546,7 +546,7 @@ namespace System.Windows.Controls
             (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(textWrapping);
             double maxWidth = textWrapping == TextWrapping.NoWrap ? double.PositiveInfinity : Math.Max(0, availableSize.Width - paddingWidth);
 
-            Size textSize = ParentWindow.TextMeasurementService.MeasureView(
+            Size textSize = Application.Current.TextMeasurementService.MeasureView(
                 OuterDiv.Uid,
                 whiteSpace,
                 overflowWrap,

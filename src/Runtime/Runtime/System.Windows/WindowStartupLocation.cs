@@ -19,14 +19,20 @@ namespace System.Windows;
 public enum WindowStartupLocation
 {
     /// <summary>
-    /// The application window is centered in the screen, and the <see cref="WindowSettings.Top"/>
-    /// and <see cref="WindowSettings.Left"/> settings are ignored.
-    /// </summary>
-    CenterScreen = 0,
-
-    /// <summary>
     /// The application window is positioned according to the <see cref="WindowSettings.Top"/>
     /// and <see cref="WindowSettings.Left"/> settings.
     /// </summary>
-    Manual = 1
+    Manual = 0,
+
+    /// <summary>
+    /// The application window is centered in the screen, and the <see cref="WindowSettings.Top"/>
+    /// and <see cref="WindowSettings.Left"/> settings are ignored.
+    /// </summary>
+    CenterScreen = 1,
+
+    /// <summary>
+    /// The startup location of a <see cref="Window"/> is the center of the <see cref="Window"/>
+    /// that owns it, as specified by the <see cref="Window.Owner"/> property.
+    /// </summary>
+    CenterOwner = 2,
 }

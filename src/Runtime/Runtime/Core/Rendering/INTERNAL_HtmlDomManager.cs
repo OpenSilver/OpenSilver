@@ -165,20 +165,6 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
-        internal static HtmlElementReference CreateWindowDomElementAndAppendIt(Window window)
-        {
-            Debug.Assert(window is not null);
-
-            string uid = NewId();
-
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"osjs.createWindow('{uid}', '{window.RootDomElement.Uid}')");
-
-            AddToGlobalStore(uid, window);
-
-            return new(uid);
-        }
-
         internal static HtmlElementReference CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
         {
             Debug.Assert(popupRoot != null);
@@ -190,6 +176,48 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 $"osjs.createPopupRoot('{uid}','{popupRoot.ParentWindow.RootDomElement.Uid}','{sPointerEvents}')");
 
             AddToGlobalStore(uid, popupRoot);
+
+            return new(uid);
+        }
+
+        internal static HtmlElementReference CreateWindowHostRootDomElementAndAppendIt(HtmlElementReference parentDiv, UIElement element)
+        {
+            Debug.Assert(element is not null);
+
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createWindowHostRoot('{uid}','{parentDiv.Uid}')");
+
+            AddToGlobalStore(uid, element);
+
+            return new(uid);
+        }
+
+        internal static HtmlElementReference CreateTaskbarItemRootDomElementAndAppendIt(HtmlElementReference parentDiv, UIElement element)
+        {
+            Debug.Assert(element is not null);
+
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createTaskbarItemRoot('{uid}','{parentDiv.Uid}')");
+
+            AddToGlobalStore(uid, element);
+
+            return new(uid);
+        }
+
+        internal static HtmlElementReference CreateWindowOverlayDomElementAndAppendIt(
+            Window window, HtmlElementReference rootElement, bool isModal)
+        {
+            Debug.Assert(window is not null);
+
+            string uid = NewId();
+            string pointerEvents = isModal ? "auto" : "none";
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.createWindowOverlay('{uid}', '{rootElement.Uid}', '{pointerEvents}')");
 
             return new(uid);
         }
@@ -371,7 +399,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             TextViewManager.CreateTextView(uid, parent.Uid);
-            
+
             AddToGlobalStore(uid, textBoxView);
 
             return new(uid);
@@ -386,7 +414,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string uid = NewId();
 
             TextViewManager.CreatePasswordView(uid, parent.Uid);
-            
+
             AddToGlobalStore(uid, passwordBoxView);
 
             return new(uid);

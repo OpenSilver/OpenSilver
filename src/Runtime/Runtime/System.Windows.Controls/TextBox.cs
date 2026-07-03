@@ -634,7 +634,7 @@ namespace System.Windows.Controls
                     _textViewHost?.View is TextBoxView view &&
                     Application.Current is Application app)
                 {
-                    return app.MainWindow.TextMeasurementService.MeasureBaseline(
+                    return app.TextMeasurementService.MeasureBaseline(
                         [new FontProperties
                          {
                              FontStyle = (FontStyle)view.GetValue(FontStyleProperty),

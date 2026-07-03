@@ -36,6 +36,7 @@ internal static class CssPropertyNames
     public const string FontStyle = "font-style";
     public const string FontWeight = "font-weight";
     public const string Height = "height";
+    public const string Left = "left";
     public const string LineHeight = "line-height";
     public const string ListStyleType = "list-style-type";
     public const string LetterSpacing = "letter-spacing";
@@ -54,6 +55,7 @@ internal static class CssPropertyNames
     public const string TextDecoration = "text-decoration";
     public const string TextOverflow = "text-overflow";
     public const string TextShadow = "text-shadow";
+    public const string Top = "top";
     public const string Transform = "transform";
     public const string TransformOrigin = "transform-origin";
     public const string TouchAction = "touch-action";

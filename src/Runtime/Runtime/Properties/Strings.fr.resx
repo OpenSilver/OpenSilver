@@ -1365,10 +1365,25 @@
   <data name="ResponsiveExtensionConflict" xml:space="preserve">
     <value>Impossible de définir ResponsiveExtension.{0} pendant l'utilisation de ResponsiveExtension.{1}.</value>
   </data>
+  <data name="MultiSingleton" xml:space="preserve">
+    <value>Impossible de créer plusieurs instances System.Windows.Application dans le même AppDomain.</value>
+  </data>
   <data name="PathGeometry_InternalReadBackError" xml:space="preserve">
     <value>Erreur interne dans les figures de tracé récemment créées.</value>
   </data>
   <data name="MultiSelectorSelectAll" xml:space="preserve">
     <value>SelectAll ne peut être appelé que lorsque CanSelectMultipleItems a la valeur true.</value>
+  </data>
+  <data name="DragMoveFail" xml:space="preserve">
+    <value>La méthode DragMove ne peut être appelée que lorsque le bouton principal de la souris est enfoncé.</value>
+  </data>
+  <data name="CannotSetOwnerToItself" xml:space="preserve">
+    <value>Impossible de définir la propriété Owner avec elle-même.</value>
+  </data>
+  <data name="CircularOwnerChild" xml:space="preserve">
+    <value>Window '{0}' est déjà un enfant de Window '{1}'.</value>
+  </data>
+  <data name="ReshowNotAllowed" xml:space="preserve">
+    <value>Impossible d'appeler Show ou ShowDialog après la fermeture d'un objet Window.</value>
   </data>
 </root>

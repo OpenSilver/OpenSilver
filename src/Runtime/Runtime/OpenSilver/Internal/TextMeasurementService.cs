@@ -25,22 +25,15 @@ namespace OpenSilver.Internal;
 
 internal sealed class TextMeasurementService
 {
-    private readonly Window _window;
+    private readonly string _hostId;
 
-    public TextMeasurementService(Window owner)
+    public TextMeasurementService(string hostElementId)
     {
-        Debug.Assert(owner is not null);
+        Debug.Assert(!string.IsNullOrEmpty(hostElementId));
 
-        _window = owner;
+        _hostId = hostElementId;
 
-        AttachMeasurementService(owner);
-    }
-
-    private void AttachMeasurementService(Window owner)
-    {
-        Debug.Assert(owner.OuterDiv.IsConnected);
-
-        Interop.ExecuteJavaScriptVoid($"osjs.attachMeasurementService('{owner.OuterDiv.Uid}')");
+        Interop.ExecuteJavaScriptVoid($"osjs.attachMeasurementService('{hostElementId}')");
     }
 
     public Size MeasureView(string id,
@@ -53,7 +46,7 @@ internal sealed class TextMeasurementService
             ? string.Empty : $"{maxWidth.ToInvariantString()}px";
 
         string strTextSize = Interop.ExecuteJavaScriptString(
-            $"osjs.measureTextView('{_window.OuterDiv.Uid}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
+            $"osjs.measureTextView('{_hostId}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
 
         int index = strTextSize.IndexOf('|');
         if (index > -1)
@@ -74,7 +67,7 @@ internal sealed class TextMeasurementService
         string innerHTML = BuildInnerHtml(textblock);
 
         string size = Interop.ExecuteJavaScriptString(
-            $"osjs.measureTextBlock('{_window.OuterDiv.Uid}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
+            $"osjs.measureTextBlock('{_hostId}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
             false);
 
         int index = size.IndexOf('|');
@@ -131,6 +124,6 @@ internal sealed class TextMeasurementService
         }
 
         return Interop.ExecuteJavaScriptDouble(
-            $"osjs.measureBaseline('{_window.OuterDiv.Uid}',{StringBuilderCache.GetStringAndRelease(builder)})", false);
+            $"osjs.measureBaseline('{_hostId}',{StringBuilderCache.GetStringAndRelease(builder)})", false);
     }
 }

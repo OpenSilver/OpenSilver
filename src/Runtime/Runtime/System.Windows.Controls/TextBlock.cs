@@ -993,7 +993,7 @@ namespace System.Windows.Controls
             {
                 if (!string.IsNullOrEmpty(Text) && Application.Current is Application app)
                 {
-                    return app.MainWindow.TextMeasurementService.MeasureBaseline(GetFonts(this, this));
+                    return app.TextMeasurementService.MeasureBaseline(GetFonts(this, this));
                 }
 
                 return 0.0;
@@ -1086,7 +1086,7 @@ namespace System.Windows.Controls
             {
                 (whiteSpace, overflowWrap) = UIElementHelpers.ToCssTextWrapping(TextWrapping.NoWrap);
 
-                _noWrapSize = ParentWindow.TextMeasurementService.MeasureView(
+                _noWrapSize = Application.Current.TextMeasurementService.MeasureView(
                     OuterDiv.Uid,
                     whiteSpace,
                     overflowWrap,
@@ -1111,7 +1111,7 @@ namespace System.Windows.Controls
 
             (whiteSpace, overflowWrap) = UIElementHelpers.ToCssTextWrapping(textWrapping);
 
-            Size textSize = ParentWindow.TextMeasurementService.MeasureView(
+            Size textSize = Application.Current.TextMeasurementService.MeasureView(
                 OuterDiv.Uid,
                 whiteSpace,
                 overflowWrap,
@@ -1174,7 +1174,7 @@ namespace System.Windows.Controls
         {
             if (Application.Current is Application app)
             {
-                return _textSize ??= app.MainWindow.TextMeasurementService.MeasureTextBlock(this);
+                return _textSize ??= app.TextMeasurementService.MeasureTextBlock(this);
             }
 
             return new Size(0, 0);

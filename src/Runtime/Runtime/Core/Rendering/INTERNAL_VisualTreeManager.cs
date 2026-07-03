@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
+using OpenSilver.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +20,6 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using OpenSilver;
 
 namespace CSHTML5.Internal
 {
@@ -42,6 +43,17 @@ namespace CSHTML5.Internal
             else
             {
                 UnloadVisual(popupRoot);
+            }
+        }
+
+        internal static void DetachWindowHost(WindowHost windowHost)
+        {
+            Debug.Assert(windowHost is not null);
+
+            if (IsElementInVisualTree(windowHost))
+            {
+                INTERNAL_HtmlDomManager.RemoveNodeNative(windowHost.OuterDiv);
+                UnloadSubTree(windowHost);
             }
         }
 

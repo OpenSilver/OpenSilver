@@ -253,7 +253,8 @@ public partial class UIElement
         // This method helps reconnecting the popup root to its window.
         //
         // (1) Get the regular visual parent
-        // (2) Get the containing window (if different from the element itself)
+        // (2) Get the containing window (if different from the element itself AND not already
+        //     embedded in the visual tree — to avoid cycles when a Window is a child of its own WindowHost)
 
         if (uie.InternalVisualParent is UIElement parent)
         {
@@ -261,7 +262,7 @@ public partial class UIElement
         }
 
         Window window = Window.GetWindow(uie);
-        if (window != uie)
+        if (window != uie && window?.InternalVisualParent is null)
         {
             return window;
         }
