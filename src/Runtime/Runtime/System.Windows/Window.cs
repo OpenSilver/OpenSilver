@@ -186,6 +186,9 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         SizeChanged?.Invoke(this, new WindowSizeChangedEventArgs(size));
+
+        // When viewport changes, ensure all windows stay within boundaries
+        EnsureAllWindowsWithinBoundaries();
     }
 
     /// <summary>
@@ -1327,6 +1330,8 @@ public class Window : ContentControl, IResizeObserverListener
                 owned.RestoreFromTaskbar();
             }
         }
+
+        EnsureWithinBoundaries();
     }
 
     private void MaximizeSecondaryWindow(WindowState previousState)
@@ -1418,6 +1423,8 @@ public class Window : ContentControl, IResizeObserverListener
         InvalidateMeasure();
         _windowHost.InvalidateMeasure();
         _windowHost.SetLayoutSize();
+
+        EnsureWithinBoundaries();
     }
 
     #endregion
@@ -1509,6 +1516,8 @@ public class Window : ContentControl, IResizeObserverListener
         ReleaseMouseCapture();
         RemoveHandler(Mouse.MouseMoveEvent, _dragMoveHandler);
         RemoveHandler(Mouse.MouseUpEvent, _dragUpHandler);
+
+        EnsureWithinBoundaries();
     }
 
     #endregion
@@ -1648,6 +1657,8 @@ public class Window : ContentControl, IResizeObserverListener
         ReleaseMouseCapture();
         RemoveHandler(Mouse.MouseMoveEvent, _resizeMoveHandler);
         RemoveHandler(Mouse.MouseUpEvent, _resizeUpHandler);
+
+        EnsureWithinBoundaries();
     }
 
     #endregion
@@ -1665,6 +1676,82 @@ public class Window : ContentControl, IResizeObserverListener
 
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Left, $"{left.ToInvariantString()}px");
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Top, $"{top.ToInvariantString()}px");
+    }
+
+    /// <summary>
+    /// Ensures the window stays within the visible boundaries of the viewport.
+    /// Clamps position so the chrome's draggable area remains accessible.
+    /// Limits the window's maximum height to the viewport height.
+    /// Does not resize the window content — only repositions and caps height.
+    /// </summary>
+    internal void EnsureWithinBoundaries()
+    {
+        if (_windowHost is null || WindowState == WindowState.Maximized) return;
+
+        Rect viewport = Bounds;
+        if (viewport.Width <= 0 || viewport.Height <= 0) return;
+
+        double left = double.IsNaN(Left) ? 0 : Left;
+        double top = double.IsNaN(Top) ? 0 : Top;
+        double hostWidth = _windowHost.DesiredSize.Width;
+
+        double titleBarHeight = _windowHost.GetTitleBarHeight();
+
+        // Compute the minimum draggable margin: we need some area on each side
+        // where the user can click and drag (not covered by buttons).
+        double minDraggableMargin = _windowHost.GetMinDraggableMargin();
+
+        // Clamp top: title bar must remain visible (can't go above viewport)
+        if (top < 0)
+        {
+            top = 0;
+        }
+        if (top > viewport.Height - titleBarHeight)
+        {
+            top = Math.Max(0, viewport.Height - titleBarHeight);
+        }
+
+        // Clamp left: enough draggable area must remain visible
+        if (left + hostWidth < minDraggableMargin)
+        {
+            left = minDraggableMargin - hostWidth;
+        }
+        if (left > viewport.Width - minDraggableMargin)
+        {
+            left = viewport.Width - minDraggableMargin;
+        }
+
+        // Limit maximum height to viewport (accounting for chrome and position)
+        if (ResizeMode >= ResizeMode.CanResize)
+        {
+            double maxHeight = viewport.Height - titleBarHeight;
+            if (!double.IsNaN(Height) && Height > maxHeight && maxHeight > 0)
+            {
+                Height = maxHeight;
+            }
+        }
+
+        bool changed = false;
+        if (Left != left) { Left = left; changed = true; }
+        if (Top != top) { Top = top; changed = true; }
+
+        if (changed)
+        {
+            UpdateWindowPosition();
+        }
+    }
+
+    internal static void EnsureAllWindowsWithinBoundaries()
+    {
+        if (Application.Current is not Application app) return;
+
+        foreach (Window w in app.Windows)
+        {
+            if (!w._isClosed && w._windowHost is not null)
+            {
+                w.EnsureWithinBoundaries();
+            }
+        }
     }
 
     #endregion

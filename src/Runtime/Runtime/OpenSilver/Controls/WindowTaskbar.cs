@@ -130,6 +130,8 @@ internal static class WindowTaskbar
         {
             _taskbarElement.SetCssStyleProperty(CssPropertyNames.Display, showTaskBar ? "flex" : "none");
         }
+
+        Window.EnsureAllWindowsWithinBoundaries();
     }
 
     private static bool HasMinimizedWindow()
