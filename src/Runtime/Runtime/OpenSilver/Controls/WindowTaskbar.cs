@@ -54,11 +54,8 @@ internal static class WindowTaskbar
               tb.style.flexWrap = 'wrap';
               tb.style.alignItems = 'center';
               tb.style.background = '#1e1e1e';
-              tb.style.zIndex = '2147483647';
-              tb.style.position = 'absolute';
-              tb.style.bottom = '0';
-              tb.style.left = '0';
-              tb.style.right = '0';
+              tb.style.gridRow = '2';
+              tb.style.width = '100%';
               root.appendChild(tb);
             })();
             """);
