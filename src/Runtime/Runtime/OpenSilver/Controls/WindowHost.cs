@@ -237,6 +237,33 @@ public class WindowHost : ContentControl
         _titleBarPart?.Height = captionHeight;
     }
 
+    internal double GetTitleBarHeight()
+    {
+        if (_titleBarPart is not null && _titleBarPart.Visibility == Visibility.Visible)
+        {
+            return _titleBarPart.ActualHeight > 0 ? _titleBarPart.ActualHeight : _pendingTitleBarHeight;
+        }
+        return _pendingTitleBarHeight;
+    }
+
+    internal double GetMinDraggableMargin()
+    {
+        // We need at least some pixels of draggable title bar area visible.
+        // Measure the buttons' total width + a small grab area.
+        double buttonsWidth = 0;
+        if (_minimizeButtonPart is not null && _minimizeButtonPart.Visibility == Visibility.Visible)
+            buttonsWidth += _minimizeButtonPart.ActualWidth;
+        if (_maximizeButtonPart is not null && _maximizeButtonPart.Visibility == Visibility.Visible)
+            buttonsWidth += _maximizeButtonPart.ActualWidth;
+        if (_restoreButtonPart is not null && _restoreButtonPart.Visibility == Visibility.Visible)
+            buttonsWidth += _restoreButtonPart.ActualWidth;
+        if (_closeButtonPart is not null && _closeButtonPart.Visibility == Visibility.Visible)
+            buttonsWidth += _closeButtonPart.ActualWidth;
+
+        // Add a minimum grab area (at least 40px of draggable space beyond buttons)
+        return buttonsWidth + 40;
+    }
+
     public override void OnApplyTemplate()
     {
         UnsubscribeFromTemplateParts();
