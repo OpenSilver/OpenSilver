@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Windows.Data;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
@@ -36,6 +37,9 @@ namespace System.Windows.Controls
             _modelParent = parent;
             _collectionChanged = new(this);
         }
+
+        internal CollectionView CollectionView =>
+            IsUsingItemsSource ? CollectionViewSource.GetDefaultCollectionView(_itemsSource, (DependencyObject)_modelParent) : null;
 
         internal override bool IsFixedSizeImpl => IsUsingItemsSource;
 

@@ -112,16 +112,48 @@ public class ItemsPresenter : FrameworkElement
 
     private void AttachToOwner()
     {
-        ItemsControl owner = TemplatedParent as ItemsControl;
+        DependencyObject templatedParent = TemplatedParent;
+        ItemsControl owner = templatedParent as ItemsControl;
+        ItemContainerGenerator generator;
 
-        // top-level presenter - get information from ItemsControl
-        ItemContainerGenerator generator = owner?.ItemContainerGenerator;
+        if (owner is not null)
+        {
+            // top-level presenter - get information from ItemsControl
+            generator = owner.ItemContainerGenerator;
+        }
+        else
+        {
+            // subgroup presenter - get information from GroupItem
+            GroupItem parentGI = templatedParent as GroupItem;
+
+            if (FromGroupItem(parentGI) is ItemsPresenter parentIP)
+            {
+                owner = parentIP.Owner;
+            }
+
+            generator = parentGI?.Generator;
+        }
 
         Owner = owner;
         UseGenerator(generator);
 
-        // create the panel, based on ItemsControl.ItemsPanel
-        ItemsPanelTemplate template = Owner?.ItemsPanel;
+        // create the panel, based either on ItemsControl.ItemsPanel or GroupStyle.Panel
+        ItemsPanelTemplate template = null;
+        GroupStyle groupStyle = Generator?.GroupStyle;
+
+        if (groupStyle is not null)
+        {
+            // If GroupStyle.Panel is set then we dont honor ItemsControl.IsVirtualizing
+            template = groupStyle.Panel;
+
+            // create default Panels
+            template ??= GroupStyle.DefaultStackPanel;
+        }
+        else
+        {
+            // Its a leaf-level ItemsPresenter, therefore pick ItemsControl.ItemsPanel
+            template = Owner?.ItemsPanel;
+        }
 
         Template = template;
     }
@@ -161,6 +193,21 @@ public class ItemsPresenter : FrameworkElement
         }
 
         return panel.TemplatedParent as ItemsPresenter;
+    }
+
+    internal static ItemsPresenter FromGroupItem(GroupItem groupItem)
+    {
+        if (groupItem is null)
+        {
+            return null;
+        }
+
+        if (VisualTreeHelper.GetParent(groupItem) is not UIElement parent)
+        {
+            return null;
+        }
+
+        return VisualTreeHelper.GetParent(parent) as ItemsPresenter;
     }
 
     /// <summary>

@@ -338,7 +338,7 @@ namespace System.Windows.Controls
             // needs to release resources (an event handler) when it is "out of the tree."
             // Currently, there is no good notification for when this happens.
 
-            bool isItemsHost = ItemsControl.GetItemsOwner(this) != null;
+            bool isItemsHost = ItemsControl.GetItemsOwnerInternal(this) != null;
 
             if (isItemsHost)
             {
@@ -785,10 +785,10 @@ namespace System.Windows.Controls
         {
             // GetItemsOwner will check IsItemsHost first, so we don't have
             // to check that IsItemsHost == true before calling it.
-            ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
+            DependencyObject parent = ItemsControl.GetItemsOwnerInternal(this);
             Panel oldItemsHost = null;
 
-            if (itemsControl != null)
+            if (parent is ItemsControl itemsControl)
             {
                 // ItemsHost should be the "root" element which has
                 // IsItemsHost = true on it.  In the case of grouping,
@@ -800,6 +800,18 @@ namespace System.Windows.Controls
                 {
                     oldItemsHost = itemsControl.ItemsHost;
                     itemsControl.ItemsHost = this;
+                }
+            }
+            else
+            {
+                if (parent is GroupItem groupItem)
+                {
+                    IItemContainerGenerator generator = groupItem.Generator;
+                    if (generator != null && generator == generator.GetItemContainerGeneratorForPanel(this))
+                    {
+                        oldItemsHost = groupItem.ItemsHost;
+                        groupItem.ItemsHost = this;
+                    }
                 }
             }
 

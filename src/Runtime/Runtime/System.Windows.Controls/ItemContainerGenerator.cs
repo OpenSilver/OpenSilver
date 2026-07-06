@@ -17,10 +17,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;   // IItemContainerGenerator
+using System.Windows.Data;
 using System.Windows.Media;
-using System.Xml.Linq;
 
 namespace System.Windows.Controls
 {
@@ -42,7 +43,7 @@ namespace System.Windows.Controls
         /// <summary> Constructor </summary>
         /// <parameter name="host"> the control that owns the items </parameter>
         internal ItemContainerGenerator(IGeneratorHost host)
-            : this(host, host as DependencyObject)
+            : this(null, host, host as DependencyObject, 0)
         {
             // The top-level generator always listens to changes from ItemsCollection.
             // It needs to get these events before anyone else, so that other listeners
@@ -54,11 +55,17 @@ namespace System.Windows.Controls
             }
         }
 
-        private ItemContainerGenerator(IGeneratorHost host, DependencyObject peer)
+        private ItemContainerGenerator(ItemContainerGenerator parent, GroupItem groupItem)
+            : this(parent, parent.Host, groupItem, parent.Level + 1)
         {
+        }
+
+        private ItemContainerGenerator(ItemContainerGenerator parent, IGeneratorHost host, DependencyObject peer, int level)
+        {
+            _parent = parent;
             _host = host;
             _peer = peer;
-            _items = host.View;
+            _level = level;
             OnRefresh();
         }
 
@@ -280,8 +287,11 @@ namespace System.Windows.Controls
                 DependencyObject container = rblock.ContainerAt(offset);
 
                 UnlinkContainerFromItem(container, rblock.ItemAt(offset));
+                // DataGrid generates non-GroupItem for NewItemPlaceHolder
+                // Dont recycle in this case.
+                bool isNewItemPlaceHolderWhenGrouping = _generatesGroupItems && !(container is GroupItem);
 
-                if (isRecycling)
+                if (isRecycling && !isNewItemPlaceHolderWhenGrouping)
                 {
                     Debug.Assert(!_recyclableContainers.Contains(container), "trying to add a container to the collection twice");
 
@@ -417,6 +427,8 @@ namespace System.Windows.Controls
             }
             finally
             {
+                PrepareGrouping();
+
                 // re-initialize the data structure
                 _itemMap = new ItemBlock();
                 _itemMap.Prev = _itemMap.Next = _itemMap;
@@ -444,6 +456,7 @@ namespace System.Windows.Controls
         {
             _recyclableContainers = new Queue<DependencyObject>();
             _containerType = null;
+            _generatesGroupItems = false;
         }
 
         void IRecyclingItemContainerGenerator.Recycle(GeneratorPosition position, int count)
@@ -709,13 +722,28 @@ namespace System.Windows.Controls
                 {
                     for (; offset < endOffset; ++offset)
                     {
+                        CollectionViewGroup group;
                         bool found = match(matchState, rib.ItemAt(offset), rib.ContainerAt(offset));
 
                         if (found)
                         {
                             item = rib.ItemAt(offset);
                             container = rib.ContainerAt(offset);
-                        
+                        }
+                        else if (!returnLocalIndex && IsGrouping && ((group = rib.ItemAt(offset) as CollectionViewGroup) != null))
+                        {
+                            // found a group;  see if the group contains the item
+                            GroupItem groupItem = (GroupItem)rib.ContainerAt(offset);
+                            int indexInGroup;
+                            found = groupItem.Generator.DoLinearSearch(match, matchState, out item, out container, out indexInGroup, false);
+                            if (found)
+                            {
+                                itemIndex = indexInGroup;
+                            }
+                        }
+
+                        if (found)
+                        {
                             // found the item;  update state and return
                             _startIndexForUIFromItem = index + offset;
                             itemIndex += GetRealizedItemBlockCount(rib, offset, returnLocalIndex) + GetCount(block, returnLocalIndex);
@@ -795,12 +823,47 @@ namespace System.Windows.Controls
                 block = block.Next;
             }
 
+            if (!returnLocalIndex && IsGrouping)
+            {
+                int n = count;
+                count = 0;
+
+                for (int i = 0; i < n; ++i)
+                {
+                    CollectionViewGroup group = Items[i] as CollectionViewGroup;
+                    count += (group == null) ? 1 : group.ItemCount;
+                }
+            }
+
             return count;
         }
 
         private int GetRealizedItemBlockCount(RealizedItemBlock rib, int end, bool returnLocalIndex)
         {
-            return end;
+            if (!IsGrouping || returnLocalIndex)
+            {
+                // when the UI is not grouping, each item counts as 1, even
+                // groups (bug 1761421)
+                return end;
+            }
+
+            int count = 0;
+
+            for (int offset = 0; offset < end; ++offset)
+            {
+                CollectionViewGroup group;
+                if ((group = rib.ItemAt(offset) as CollectionViewGroup) != null)
+                {
+                    // found a group, count the group
+                    count += group.ItemCount;
+                }
+                else
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         /// <summary>
@@ -816,8 +879,28 @@ namespace System.Windows.Controls
             }
 
 #if DEBUG
-            object target = (0 <= index && index < Host.View.Count) ? Host.View[index] : null;
+            object target = (Parent == null) && (0 <= index && index < Host.View.Count) ? Host.View[index] : null;
 #endif
+
+            int subIndex = 0;
+
+            // if we're grouping, determine the appropriate child
+            if (IsGrouping)
+            {
+                int n;
+                subIndex = index;
+                for (index = 0, n = ItemsInternal.Count; index < n; ++index)
+                {
+                    CollectionViewGroup group = ItemsInternal[index] as CollectionViewGroup;
+                    int size = (group == null) ? 1 : group.ItemCount;
+
+                    if (subIndex < size)
+                        break;
+                    else
+                        subIndex -= size;
+                }
+            }
+
             // search the table for the item
 
             for (ItemBlock block = _itemMap.Next; block != _itemMap; block = block.Next)
@@ -825,8 +908,14 @@ namespace System.Windows.Controls
                 if (index < block.ItemCount)
                 {
                     DependencyObject container = block.ContainerAt(index);
+                    GroupItem groupItem = container as GroupItem;
+
+                    if (groupItem != null)
+                    {
+                        container = groupItem.Generator.ContainerFromIndex(subIndex);
+                    }
 #if DEBUG
-                    object item = (container != null) ?
+                    object item = (Parent == null) && (container != null) ?
                                 container.ReadLocalValue(ItemForItemContainerProperty) : null;
                     Debug.Assert(item == null || ItemsControl.EqualsEx(item, target),
                         "Generator's data structure is corrupt - ContainerFromIndex found wrong item");
@@ -898,6 +987,22 @@ namespace System.Windows.Controls
 
             // update my AlternationCount and adjust my containers
             SetAlternationCount();
+
+            // propagate to subgroups, if necessary
+            if (IsGrouping && GroupStyle != null)
+            {
+                ItemBlock block = _itemMap.Next;
+                while (block != _itemMap)
+                {
+                    for (int offset = 0; offset < block.ContainerCount; ++offset)
+                    {
+                        GroupItem gi = ((RealizedItemBlock)block).ContainerAt(offset) as GroupItem;
+                        gi?.Generator.ChangeAlternationCount();
+                    }
+
+                    block = block.Next;
+                }
+            }
         }
 
         // update AlternationIndex on each container to reflect the new AlternationCount
@@ -947,10 +1052,56 @@ namespace System.Windows.Controls
         //
         //------------------------------------------------------
 
+        internal ItemContainerGenerator Parent
+        {
+            get { return _parent; }
+        }
+
+        internal int Level
+        {
+            get { return _level; }
+        }
+
+        // The group style that governs the generation of UI for the items.
+        internal GroupStyle GroupStyle
+        {
+            get { return _groupStyle; }
+            set
+            {
+                if (_groupStyle != value)
+                {
+                    ((INotifyPropertyChanged)_groupStyle)?.PropertyChanged -= new PropertyChangedEventHandler(OnGroupStylePropertyChanged);
+
+                    _groupStyle = value;
+
+                    ((INotifyPropertyChanged)_groupStyle)?.PropertyChanged += new PropertyChangedEventHandler(OnGroupStylePropertyChanged);
+                }
+            }
+        }
+
         // The collection of items, as IList
         internal IList ItemsInternal
         {
             get { return _items; }
+            set
+            {
+                if (_items != value)
+                {
+                    if (_items != Host.View && _items is INotifyCollectionChanged incc)
+                    {
+                        incc.CollectionChanged -= new NotifyCollectionChangedEventHandler(OnCollectionChanged);
+                    }
+
+                    _items = value;
+                    _itemsReadOnly = null;
+
+                    incc = _items as INotifyCollectionChanged;
+                    if (_items != Host.View && incc != null)
+                    {
+                        incc.CollectionChanged += new NotifyCollectionChangedEventHandler(OnCollectionChanged);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1070,16 +1221,29 @@ namespace System.Windows.Controls
                         // if possible, otherwise generate a new container.
 
                         isNewlyRealized = true;
-                        
-                        if (_factory._recyclableContainers.Count > 0 && !_factory.Host.IsItemItsOwnContainer(item))
+                        CollectionViewGroup group = item as CollectionViewGroup;
+
+                        // DataGrid needs to generate DataGridRows for special items like NewItemPlaceHolder and when adding a new row.
+                        // Generate a new container for such cases.
+                        bool isNewItemPlaceHolderWhenGrouping = (_factory._generatesGroupItems && group == null);
+
+                        if (_factory._recyclableContainers.Count > 0 && !_factory.Host.IsItemItsOwnContainer(item) && !isNewItemPlaceHolderWhenGrouping)
                         {
                             container = _factory._recyclableContainers.Dequeue();
                             isNewlyRealized = false;
                         }
                         else
                         {
-                            // generate container for an item
-                            container = _factory.Host.GetContainerForItem(item, container);
+                            if (group == null || !_factory.IsGrouping)
+                            {
+                                // generate container for an item
+                                container = _factory.Host.GetContainerForItem(item, container);
+                            }
+                            else
+                            {
+                                // generate container for a group
+                                container = _factory.ContainerForGroup(group);
+                            }
                         }
 
                         // add the (item, container) to the current block
@@ -1275,6 +1439,11 @@ namespace System.Windows.Controls
         DependencyObject Peer
         {
             get { return _peer; }
+        }
+
+        bool IsGrouping
+        {
+            get { return (ItemsInternal != Host.View); }
         }
 
         //------------------------------------------------------
@@ -1568,11 +1737,205 @@ namespace System.Windows.Controls
             }
         }
 
+        // create a group item for the given group
+        DependencyObject ContainerForGroup(CollectionViewGroup group)
+        {
+            _generatesGroupItems = true;
+            if (!ShouldHide(group))
+            {
+                // normal group - link a new GroupItem
+                GroupItem groupItem = new GroupItem();
+
+                LinkContainerToItem(groupItem, group);
+
+                // create the generator
+                groupItem.Generator = new ItemContainerGenerator(this, groupItem);
+
+                return groupItem;
+            }
+            else
+            {
+                // hidden empty group - link a new EmptyGroupItem
+                AddEmptyGroupItem(group);
+
+                // but don't return it to layout
+                return null;
+            }
+        }
+
+        // prepare the grouping information.  Called from RemoveAll.
+        void PrepareGrouping()
+        {
+            GroupStyle groupStyle;
+            IList items;
+
+            if (Level == 0)
+            {
+                groupStyle = Host.GetGroupStyle(null, 0);
+
+                if (groupStyle == null)
+                {
+                    items = Host.View;
+                }
+                else
+                {
+                    CollectionView cv = Host.View.CollectionView;
+                    items = cv?.Groups;
+                    if (items == null)
+                    {
+                        items = Host.View;
+
+                        // When there are no groups, we should ignore GroupStyle
+                        // and use the host's ItemsPanel .
+                        // But this breaks Nero because
+                        // their ItemsPanel can only be used at the leaf level of
+                        // a real grouping scenario.  It null-refs if used with
+                        // an empty collection, which happens during the first layout.
+                        // So for compat we let the bogus GroupStyle.Panel leak through
+                        // when the Items collection is empty.
+                        if (items.Count > 0)
+                        {
+                            groupStyle = null;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                GroupItem groupItem = (GroupItem)Peer;
+                CollectionViewGroup group = groupItem.ReadLocalValue(ItemForItemContainerProperty) as CollectionViewGroup;
+
+                if (group != null)
+                {
+                    if (group.IsBottomLevel)
+                    {
+                        groupStyle = null;
+                    }
+                    else
+                    {
+                        groupStyle = Host.GetGroupStyle(group, Level);
+                    }
+
+                    items = group.Items;
+                }
+                else
+                {
+                    // GroupItem has been recycled.
+                    groupStyle = null;
+                    items = Host.View;
+                }
+            }
+
+            GroupStyle = groupStyle;
+            ItemsInternal = items;
+
+            if ((Level == 0) && (Host != null))
+            {
+                // Notify the host of a change in IsGrouping
+                Host.SetIsGrouping(IsGrouping);
+            }
+        }
+
         void SetAlternationCount()
         {
-            int alternationCount = Host.AlternationCount;
+            int alternationCount;
+
+            if (IsGrouping && GroupStyle != null)
+            {
+                if (GroupStyle.IsAlternationCountSet)
+                {
+                    alternationCount = GroupStyle.AlternationCount;
+                }
+                else if (_parent != null)
+                {
+                    alternationCount = _parent._alternationCount;
+                }
+                else
+                {
+                    alternationCount = Host.AlternationCount;
+                }
+            }
+            else
+            {
+                alternationCount = Host.AlternationCount;
+            }
 
             ChangeAlternationCount(alternationCount);
+        }
+
+        // should the given group be hidden?
+        bool ShouldHide(CollectionViewGroup group)
+        {
+            return GroupStyle.HidesIfEmpty &&      // user asked to hide
+                    group.ItemCount == 0;           // group is empty
+        }
+
+        // create an empty-group placeholder item
+        void AddEmptyGroupItem(CollectionViewGroup group)
+        {
+            EmptyGroupItem emptyGroupItem = new EmptyGroupItem();
+
+            LinkContainerToItem(emptyGroupItem, group);
+
+            emptyGroupItem.SetGenerator(new ItemContainerGenerator(this, emptyGroupItem));
+
+            // add it to the list of placeholder items (this keeps it from being GC'd)
+            if (_emptyGroupItems == null)
+                _emptyGroupItems = new List<EmptyGroupItem>();
+
+            _emptyGroupItems.Add(emptyGroupItem);
+        }
+
+        // notification that a subgroup has become non-empty
+        void OnSubgroupBecameNonEmpty(EmptyGroupItem groupItem, CollectionViewGroup group)
+        {
+            // Discard placeholder container.
+            UnlinkContainerFromItem(groupItem, group);
+            _emptyGroupItems?.Remove(groupItem);
+
+            // inform layout as if the group just got added
+            if (ItemsChanged != null)
+            {
+                GeneratorPosition position = PositionFromIndex(ItemsInternal.IndexOf(group));
+                ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Add, position, 1, 0));
+            }
+        }
+
+        // notification that a subgroup has become empty
+        void OnSubgroupBecameEmpty(CollectionViewGroup group)
+        {
+            if (ShouldHide(group))
+            {
+                GeneratorPosition position = PositionFromIndex(ItemsInternal.IndexOf(group));
+
+                // if the group is realized, un-realize it and notify layout
+                if (position.Offset == 0 && position.Index >= 0)
+                {
+                    // un-realize
+                    ((IItemContainerGenerator)this).Remove(position, 1);
+
+                    // inform layout as if the group just got removed
+                    if (ItemsChanged != null)
+                    {
+                        ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Remove, position, 1, 1));
+                    }
+
+                    // create the placeholder
+                    AddEmptyGroupItem(group);
+                }
+            }
+        }
+
+        // convert an index (into Items) into a GeneratorPosition
+        GeneratorPosition PositionFromIndex(int itemIndex)
+        {
+            GeneratorPosition position;
+            ItemBlock itemBlock;
+            int offsetFromBlockStart;
+
+            GetBlockAndPosition(itemIndex, out position, out itemBlock, out offsetFromBlockStart);
+
+            return position;
         }
 
         void GetBlockAndPosition(object item, int itemIndex, bool deletedFromItems, out GeneratorPosition position, out ItemBlock block, out int offsetFromBlockStart, out int correctIndex)
@@ -1806,6 +2169,18 @@ namespace System.Windows.Controls
             }
         }
 
+        void OnGroupStylePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Panel")
+            {
+                OnPanelChanged();
+            }
+            else
+            {
+                OnRefresh();
+            }
+        }
+
         void ValidateAndCorrectIndex(object item, ref int index)
         {
             if (index >= 0)
@@ -1828,6 +2203,9 @@ namespace System.Windows.Controls
         // Called  when items collection changes.
         void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
+            if (sender != ItemsInternal && args.Action != NotifyCollectionChangedAction.Reset)
+                return;     // ignore events (except Reset) from ItemsCollection when we're listening to group's items.
+
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -1992,6 +2370,20 @@ namespace System.Windows.Controls
             if (container != null)
             {
                 UnlinkContainerFromItem(container, item);
+            }
+
+            // detect empty groups, so they can be hidden if necessary
+            if (Level > 0 && ItemsInternal.Count == 0)
+            {
+                GroupItem groupItem = (GroupItem)Peer;
+                CollectionViewGroup group = groupItem.ReadLocalValue(ItemForItemContainerProperty) as CollectionViewGroup;
+
+                // the group could be null if the parent generator has already
+                // unhooked its container
+                if (group != null)
+                {
+                    Parent.OnSubgroupBecameEmpty(group);
+                }
             }
         }
 
@@ -2195,13 +2587,18 @@ namespace System.Windows.Controls
         private GeneratorStatus _status;
         private int _startIndexForUIFromItem;
         private DependencyObject _peer;
+        private int _level;
         private IList _items;
         private ReadOnlyCollection<object> _itemsReadOnly;
+        private GroupStyle _groupStyle;
+        private ItemContainerGenerator _parent;
+        private List<EmptyGroupItem> _emptyGroupItems;
         private int _alternationCount;
 
         private Type _containerType;     // type of containers on the recycle queue
         private Queue<DependencyObject> _recyclableContainers = new Queue<DependencyObject>();
 
+        private bool _generatesGroupItems; // Flag to indicate that this generates GroupItems
         private bool _isGeneratingBatches;
 
         private event MapChangedHandler MapChanged;
@@ -2471,6 +2868,31 @@ namespace System.Windows.Controls
             public int Offset { get; set; } // offset with the block
             public int Count { get; set; } // cumulative item count of blocks before the cached one
             public int ItemIndex { get; set; } // index of current item
+        }
+
+        // The EmptyGroupItem class is used for the HidesIfEmpty grouping feature.
+        // It takes the place of a regular GroupItem for an empty group, but is never
+        // returned to layout/panel as a real container.
+        private sealed class EmptyGroupItem : GroupItem
+        {
+            public void SetGenerator(ItemContainerGenerator generator)
+            {
+                Generator = generator;
+                generator.ItemsChanged += new ItemsChangedEventHandler(OnItemsChanged);
+            }
+
+            private void OnItemsChanged(object sender, ItemsChangedEventArgs e)
+            {
+                CollectionViewGroup group = (CollectionViewGroup)GetValue(ItemContainerGenerator.ItemForItemContainerProperty);
+
+                // if the group becomes non-empty, un-hide the UI
+                if (group.ItemCount > 0)
+                {
+                    ItemContainerGenerator generator = Generator;
+                    generator.ItemsChanged -= new ItemsChangedEventHandler(OnItemsChanged);
+                    generator.Parent.OnSubgroupBecameNonEmpty(this, group);
+                }
+            }
         }
 
         private sealed class ListOfObject : IList<object>

@@ -212,6 +212,15 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        ///    Indicates whether Content is a data item
+        /// </summary>
+        internal bool ContentIsItem
+        {
+            get => ReadControlFlag(ControlFlags.ContentIsItem);
+            set => WriteControlFlag(ControlFlags.ContentIsItem, value);
+        }
+
+        /// <summary>
         /// Gets an enumerator to the content control's logical child elements.
         /// </summary>
         /// <returns>
@@ -258,7 +267,12 @@ namespace System.Windows.Controls
                 // don't treat Content as a logical child
                 ContentIsNotLogical = true;
 
-                Content = item;
+                // copy styles from the ItemsControl
+                if (ContentIsItem || HasDefaultValue(ContentProperty))
+                {
+                    Content = item;
+                    ContentIsItem = true;
+                }
 
                 if (itemTemplate is not null)
                 {
@@ -280,7 +294,10 @@ namespace System.Windows.Controls
         {
             if (this != item)
             {
-                ClearValue(ContentProperty);
+                if (ContentIsItem)
+                {
+                    ClearValue(ContentProperty);
+                }
             }
         }
 

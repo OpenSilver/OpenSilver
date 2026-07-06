@@ -13,6 +13,8 @@
 
 using System.Collections;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -25,7 +27,7 @@ internal interface IGeneratorHost
     /// <summary>
     /// The view of the data
     /// </summary>
-    IList View { get; }
+    ItemCollection View { get; }
 
     /// <summary>
     /// The AlternationCount
@@ -56,4 +58,14 @@ internal interface IGeneratorHost
     /// Determine if the given element was generated for this host as an ItemUI.
     /// </summary>
     bool IsHostForItemContainer(DependencyObject container);
+
+    /// <summary>
+    /// Return the GroupStyle (if any) to use for the given group at the given level.
+    /// </summary>
+    GroupStyle GetGroupStyle(CollectionViewGroup group, int level);
+
+    /// <summary>
+    /// Communicates to the host that the generator is using grouping.
+    /// </summary>
+    void SetIsGrouping(bool isGrouping);
 }

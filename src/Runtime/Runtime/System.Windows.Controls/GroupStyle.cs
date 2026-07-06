@@ -14,19 +14,20 @@
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml.Context;
 using System.ComponentModel;
+using System.Windows.Data;
 
 namespace System.Windows.Controls;
 
 /// <summary>
 /// Defines how you want the group to look at each level.
 /// </summary>
-[OpenSilver.NotImplemented]
 public class GroupStyle : INotifyPropertyChanged
 {
     /// <summary>
     /// Identifies the default <see cref="ItemsPanelTemplate"/> that creates the panel used to layout the items.
     /// </summary>
     public static readonly ItemsPanelTemplate DefaultGroupPanel;
+    internal static readonly ItemsPanelTemplate DefaultStackPanel;
 
     private ItemsPanelTemplate _panel;
     private Style _containerStyle;
@@ -34,6 +35,7 @@ public class GroupStyle : INotifyPropertyChanged
     private DataTemplate _headerTemplate;
     private DataTemplateSelector _headerTemplateSelector;
     private bool _hidesIfEmpty;
+    private bool _isAlternationCountSet;
     private int _alternationCount;
 
     static GroupStyle()
@@ -53,6 +55,7 @@ public class GroupStyle : INotifyPropertyChanged
         template.Seal();
 
         DefaultGroupPanel = template;
+        DefaultStackPanel = template;
 
         Default = new GroupStyle();
     }
@@ -180,9 +183,12 @@ public class GroupStyle : INotifyPropertyChanged
         set
         {
             _alternationCount = value;
+            _isAlternationCountSet = true;
             OnPropertyChanged(nameof(AlternationCount));
         }
     }
+
+    internal bool IsAlternationCountSet => _isAlternationCountSet;
 
     event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
     {
@@ -205,3 +211,17 @@ public class GroupStyle : INotifyPropertyChanged
 
     private void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 }
+
+/// <summary>
+/// Delegate used to select the group style as a function of the parent group and its level.
+/// </summary>
+/// <param name="group">
+/// Group whose style is to be selected.
+/// </param>
+/// <param name="level">
+/// Level of the group.
+/// </param>
+/// <returns>
+/// The appropriate group style.
+/// </returns>
+public delegate GroupStyle GroupStyleSelector(CollectionViewGroup group, int level);

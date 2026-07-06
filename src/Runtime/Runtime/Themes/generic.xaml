@@ -135,6 +135,22 @@
         </Setter>
     </Style>
 
+    <!--  GroupItem  -->
+    <Style TargetType="controls:GroupItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="controls:GroupItem">
+                    <controls:StackPanel>
+                        <controls:ContentPresenter x:Name="PART_Header" />
+                        <controls:ItemsPresenter x:Name="ItemsPresenter"
+                                                 Margin="5,0,0,0" />
+                    </controls:StackPanel>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  Window  -->
     <Style TargetType="Window">
         <Setter Property="shell:WindowChrome.WindowChrome">
             <Setter.Value>

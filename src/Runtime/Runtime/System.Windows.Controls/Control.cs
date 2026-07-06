@@ -726,7 +726,8 @@ public partial class Control : FrameworkElement, IInternalControl
         Invalid = 0x004, // Used in Control
         IsFocusWithin = 0x008, // Used in Control
         ContentIsNotLogical = 0x010, // Used in ContentControl
-        CommandDisabled = 0x020, // Used in ButtonBase, MenuItem
-        IsSpaceKeyDown = 0x040, // Used in ButtonBase
+        ContentIsItem = 0x020, // Used in ContentControl
+        CommandDisabled = 0x040, // Used in ButtonBase, MenuItem
+        IsSpaceKeyDown = 0x080, // Used in ButtonBase
     }
 }

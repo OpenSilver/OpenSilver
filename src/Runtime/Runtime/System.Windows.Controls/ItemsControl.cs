@@ -58,15 +58,6 @@ namespace System.Windows.Controls
         /// </summary>
         public ItemsControl() { }
 
-        /// <summary>
-        /// Gets a collection of <see cref="GroupStyle"/> objects that define the appearance of each level of groups.
-        /// </summary>
-        /// <returns>
-        /// A collection of <see cref="GroupStyle"/> objects that define the appearance of each level of groups.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public ObservableCollection<GroupStyle> GroupStyle { get; } = [];
-
         #endregion Constructor
 
         #region Public Properties
@@ -118,6 +109,8 @@ namespace System.Windows.Controls
             _itemContainerGenerator.ChangeAlternationCount();
 
             _items.CollectionChanged += new NotifyCollectionChangedEventHandler(OnItemCollectionChanged2);
+
+            ((INotifyCollectionChanged)GroupStyle).CollectionChanged += new NotifyCollectionChangedEventHandler(OnGroupStyleChanged);
         }
 
         #endregion Public Properties
@@ -546,7 +539,6 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="IsGrouping"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsGroupingProperty = IsGroupingPropertyKey.DependencyProperty;
 
         /// <summary>
@@ -557,8 +549,63 @@ namespace System.Windows.Controls
         /// </returns>
         [Bindable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [OpenSilver.NotImplemented]
         public bool IsGrouping => (bool)GetValue(IsGroupingProperty);
+
+        /// <summary>
+        /// Gets a collection of <see cref="GroupStyle"/> objects that define the appearance of each level of groups.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="GroupStyle"/> objects that define the appearance of each level of groups.
+        /// </returns>
+        public ObservableCollection<GroupStyle> GroupStyle { get; } = [];
+
+        private void OnGroupStyleChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            _itemContainerGenerator?.Refresh();
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="GroupStyleSelector"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty GroupStyleSelectorProperty =
+            DependencyProperty.Register(
+                nameof(GroupStyleSelector),
+                typeof(GroupStyleSelector),
+                typeof(ItemsControl),
+                new PropertyMetadata(null, OnGroupStyleSelectorChanged));
+
+        /// <summary>
+        /// Gets or sets a method that enables you to provide custom selection logic for a <see cref="Controls.GroupStyle"/>
+        /// to apply to each group in a collection.
+        /// </summary>
+        /// <returns>
+        /// A method that enables you to provide custom selection logic for a <see cref="Controls.GroupStyle"/> to apply 
+        /// to each group in a collection.
+        /// </returns>
+        public GroupStyleSelector GroupStyleSelector
+        {
+            get { return (GroupStyleSelector)GetValue(GroupStyleSelectorProperty); }
+            set { SetValueInternal(GroupStyleSelectorProperty, value); }
+        }
+
+        private static void OnGroupStyleSelectorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ItemsControl)d).OnGroupStyleSelectorChanged((GroupStyleSelector)e.OldValue, (GroupStyleSelector)e.NewValue);
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="GroupStyleSelector"/> property changes.
+        /// </summary>
+        /// <param name="oldGroupStyleSelector">
+        /// Old value of the <see cref="GroupStyleSelector"/> property.
+        /// </param>
+        /// <param name="newGroupStyleSelector">
+        /// New value of the <see cref="GroupStyleSelector"/> property.
+        /// </param>
+        protected virtual void OnGroupStyleSelectorChanged(GroupStyleSelector oldGroupStyleSelector, GroupStyleSelector newGroupStyleSelector)
+        {
+            _itemContainerGenerator?.Refresh();
+        }
 
         /// <summary>
         /// Identifies the <see cref="AlternationCount"/> dependency property.
@@ -634,7 +681,7 @@ namespace System.Windows.Controls
         // an app, only by internal code
         internal static void SetAlternationIndex(DependencyObject d, int value)
         {
-            d.SetValue(AlternationIndexPropertyKey, value);
+            d.SetValueInternal(AlternationIndexPropertyKey, value);
         }
 
         // internal clearer for AlternationIndex.  This property is not settable by
@@ -651,7 +698,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// The view of the data
         /// </summary>
-        IList IGeneratorHost.View
+        ItemCollection IGeneratorHost.View
         {
             get { return Items; }
         }
@@ -666,7 +713,17 @@ namespace System.Windows.Controls
 
         void IGeneratorHost.ClearContainerForItem(DependencyObject container, object item)
         {
-            ClearContainerForItemOverride(container, item);
+            if (container is not GroupItem groupItem)
+            {
+                ClearContainerForItemOverride(container, item);
+            }
+            else
+            {
+                // GroupItems are special - their information comes from a different place
+                // Recursively clear the sub-generators, so that ClearContainerForItemOverride
+                // is called on the bottom-level containers.
+                groupItem.ClearItemContainer(item, this);
+            }
         }
 
         DependencyObject IGeneratorHost.GetContainerForItem(object item, DependencyObject recycledContainer)
@@ -750,6 +807,13 @@ namespace System.Windows.Controls
 
         void IGeneratorHost.PrepareItemContainer(DependencyObject container, object item)
         {
+            // GroupItems are special - their information comes from a different place
+            if (container is GroupItem groupItem)
+            {
+                groupItem.PrepareItemContainer(item, this);
+                return;
+            }
+
             if (ShouldApplyItemContainerStyle(container, item))
             {
                 // apply the ItemContainer style (if any)
@@ -758,6 +822,45 @@ namespace System.Windows.Controls
 
             // forward ItemTemplate, et al.
             PrepareContainerForItemOverride(container, item);
+        }
+
+        /// <summary>
+        /// Return the GroupStyle (if any) to use for the given group at the given level.
+        /// </summary>
+        GroupStyle IGeneratorHost.GetGroupStyle(CollectionViewGroup group, int level)
+        {
+            GroupStyle result = null;
+
+            // a. Use global selector
+            if (GroupStyleSelector is GroupStyleSelector groupStyleSelector)
+            {
+                result = groupStyleSelector(group, level);
+            }
+
+            // b. lookup in GroupStyle list
+            if (result == null)
+            {
+                // use last entry for all higher levels
+                if (level >= GroupStyle.Count)
+                {
+                    level = GroupStyle.Count - 1;
+                }
+
+                if (level >= 0)
+                {
+                    result = GroupStyle[level];
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Communicates to the host that the generator is using grouping.
+        /// </summary>
+        void IGeneratorHost.SetIsGrouping(bool isGrouping)
+        {
+            SetValueInternal(IsGroupingPropertyKey, isGrouping);
         }
 
         #endregion IGeneratorHost
@@ -1164,7 +1267,7 @@ namespace System.Windows.Controls
 
         private void OnItemCollectionChanged2(object sender, NotifyCollectionChangedEventArgs e)
         {
-            SetValue(HasItemsPropertyKey, _items.Count > 0);
+            SetValueInternal(HasItemsPropertyKey, _items.Count > 0);
 
             // If the focused item is removed, drop our reference to it.
             if (_focusedInfo is not null && _focusedInfo.Index < 0)
@@ -1283,6 +1386,30 @@ namespace System.Windows.Controls
                 {
                     // otherwise use element's templated parent
                     container = panel.TemplatedParent as ItemsControl;
+                }
+            }
+
+            return container;
+        }
+
+        internal static DependencyObject GetItemsOwnerInternal(DependencyObject element)
+        {
+            DependencyObject container = null;
+
+            if (element is Panel panel && panel.IsItemsHost)
+            {
+                // see if element was generated for an ItemsPresenter
+                ItemsPresenter ip = ItemsPresenter.FromPanel(panel);
+
+                if (ip != null)
+                {
+                    // if so use the element whose style begat the ItemsPresenter
+                    container = ip.TemplatedParent;
+                }
+                else
+                {
+                    // otherwise use element's templated parent
+                    container = panel.TemplatedParent;
                 }
             }
 
