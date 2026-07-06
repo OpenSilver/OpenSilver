@@ -186,9 +186,6 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         SizeChanged?.Invoke(this, new WindowSizeChangedEventArgs(size));
-
-        // When viewport changes, ensure all windows stay within boundaries
-        EnsureAllWindowsWithinBoundaries();
     }
 
     /// <summary>

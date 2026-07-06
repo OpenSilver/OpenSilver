@@ -161,5 +161,6 @@ public class Host : IResizeObserverListener
     {
         Content.SetSize(size);
         Content.FireResized();
+        Window.EnsureAllWindowsWithinBoundaries();
     }
 }
