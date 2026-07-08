@@ -1179,6 +1179,8 @@ public class Window : ContentControl, IResizeObserverListener
                 UpdateWindowPosition();
                 break;
         }
+
+        EnsureWithinBoundaries();
     }
 
     private void CenterOverOwner()

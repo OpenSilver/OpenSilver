@@ -4985,25 +4985,34 @@
                                          Cursor="SizeNWSE"
                                          Visibility="Collapsed" />
 
-                            <!-- Layer 5: Chrome buttons (for WindowChrome mode, collapsed by default) -->
+                            <!-- Layer 5: Drag area (for WindowChrome mode, collapsed by default) -->
+                            <controls:Border x:Name="PART_DragArea"
+                                         controls:Grid.Row="1"
+                                         VerticalAlignment="Top"
+                                         Height="30"
+                                         Background="Transparent"
+                                         Visibility="Collapsed" />
+
+                            <!-- Layer 6: Chrome buttons (for WindowChrome mode, collapsed by default) -->
                             <controls:StackPanel x:Name="PART_ChromeButtons"
-                                             controls:Grid.Row="0"
-                                             Orientation="Horizontal"
-                                             HorizontalAlignment="Right"
-                                             VerticalAlignment="Top"
-                                             Visibility="Collapsed">
+                                                 controls:Grid.Row="0"
+                                                 controls:Grid.RowSpan="2"
+                                                 Orientation="Horizontal"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Top"
+                                                 Visibility="Collapsed">
                                 <controls:Button x:Name="PART_ChromeMinimizeButton"
-                                             Content="&#x2500;"
-                                             Style="{markup:StaticResource WindowChromeButtonStyle}" />
+                                                 Content="&#x2500;"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
                                 <controls:Button x:Name="PART_ChromeMaximizeButton"
-                                             Content="&#x2610;"
-                                             Style="{markup:StaticResource WindowChromeButtonStyle}" />
+                                                 Content="&#x2610;"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
                                 <controls:Button x:Name="PART_ChromeRestoreButton"
-                                             Content="&#x29C9;"
-                                             Style="{markup:StaticResource WindowChromeButtonStyle}"
-                                             Visibility="Collapsed" />
+                                                 Content="&#x29C9;"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Visibility="Collapsed" />
                                 <controls:Button x:Name="PART_ChromeCloseButton"
-                                             Style="{markup:StaticResource WindowChromeButtonStyle}">
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}">
                                     <controls:Button.Content>
                                         <shapes:Path Data="M 0,0 L 8,8 M 0,8 L 8,0"
                                                      Stroke="White"
@@ -5013,15 +5022,7 @@
                                                      Stretch="Uniform" />
                                     </controls:Button.Content>
                                 </controls:Button>
-                            </controls:StackPanel>
-
-                            <!-- Layer 6: Drag area (for WindowChrome mode, collapsed by default) -->
-                            <controls:Border x:Name="PART_DragArea"
-                                         controls:Grid.Row="1"
-                                         VerticalAlignment="Top"
-                                         Height="30"
-                                         Background="Transparent"
-                                         Visibility="Collapsed" />
+                            </controls:StackPanel>  
 
                             <!-- Resize Grip (visible indicator for CanResizeWithGrip) -->
                             <controls:Border x:Name="PART_ResizeGrip"
