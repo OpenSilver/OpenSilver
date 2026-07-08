@@ -695,13 +695,7 @@ public class Window : ContentControl, IResizeObserverListener
 
     private static void OnWindowStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var window = (Window)d;
-        if (window._windowHost is not null)
-        {
-            WindowChrome chrome = WindowChrome.GetWindowChrome(window);
-            window._windowHost.UpdateTitleBarVisibility(
-                chrome is not null && (WindowStyle)e.NewValue != WindowStyle.None);
-        }
+        ((Window)d)._windowHost?.ApplyWindowStyle();
     }
 
     private static bool ValidateWindowStyle(object value)
@@ -1142,7 +1136,7 @@ public class Window : ContentControl, IResizeObserverListener
         {
             _windowHost.UpdateTitleBarHeight(chrome.CaptionHeight);
         }
-        _windowHost.UpdateTitleBarVisibility(WindowStyle != WindowStyle.None && chrome is not null);
+        _windowHost.ApplyWindowStyle();
 
         RootDomElement = _overlayDiv;
 
@@ -1162,6 +1156,8 @@ public class Window : ContentControl, IResizeObserverListener
         {
             mainWindow.UpdateFullScreenMode();
         }
+
+        _windowHost.UpdateMaximizeRestoreButton(WindowState == WindowState.Maximized);
 
         WindowTaskbar.AddWindow(this);
 
@@ -1374,7 +1370,7 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         // Hide resize borders when maximized
-        _windowHost.SetResizeBordersVisible(false);
+        _windowHost.SetResizeBordersVisible(false, false);
 
         // Invalidate both the Window and WindowHost so the constraint is re-evaluated
         InvalidateMeasure();
@@ -1396,7 +1392,7 @@ public class Window : ContentControl, IResizeObserverListener
         }
 
         // Restore resize borders
-        _windowHost.SetResizeBordersVisible(ResizeMode >= ResizeMode.CanResize);
+        _windowHost.SetResizeBordersVisible(ResizeMode >= ResizeMode.CanResize, ResizeMode == ResizeMode.CanResizeWithGrip);
 
         // Restore position, size, and constraints
         Left = _restoreLeft;
@@ -1445,11 +1441,25 @@ public class Window : ContentControl, IResizeObserverListener
     private double _restoreMaxHeight;
     private WindowState _stateBeforeMinimize;
 
+
+
+    internal bool HasWindowChromeOverride()
+    {
+        return ReadLocalValue(WindowChrome.WindowChromeProperty) != DependencyProperty.UnsetValue;
+    }
+
     internal void OnWindowChromeChanged(WindowChrome oldChrome, WindowChrome newChrome)
     {
         if (_windowHost is not null)
         {
-            _windowHost.UpdateTitleBarVisibility(newChrome is not null && WindowStyle != WindowStyle.None);
+            bool isChromeOverride = HasWindowChromeOverride();
+            _windowHost.ApplyWindowChromeMode();
+
+            if (!isChromeOverride)
+            {
+                _windowHost.ApplyWindowStyle();
+            }
+
             if (newChrome is not null)
             {
                 _windowHost.UpdateTitleBarHeight(newChrome.CaptionHeight);
@@ -1781,7 +1791,7 @@ public class Window : ContentControl, IResizeObserverListener
     {
         _isFullScreen = true;
 
-        _windowHost?.UpdateTitleBarVisibility(false);
+        _windowHost?.HideTitleBar();
 
         SetValueInternal(WindowStateProperty, WindowState.Maximized);
 
@@ -1798,11 +1808,7 @@ public class Window : ContentControl, IResizeObserverListener
 
         // Keep the resize observer — window stays maximized, just with chrome visible.
 
-        if (_windowHost is not null)
-        {
-            WindowChrome chrome = WindowChrome.GetWindowChrome(this);
-            _windowHost.UpdateTitleBarVisibility(chrome is not null && WindowStyle != WindowStyle.None);
-        }
+        _windowHost?.ApplyWindowChromeMode();
     }
 
     private bool HasExplicitWindowProps()
@@ -1825,6 +1831,7 @@ public class Window : ContentControl, IResizeObserverListener
 
         return _hasExplicitWindowProps;
     }
+
 
     #endregion
 }
