@@ -152,12 +152,6 @@
 
     <!--  Window  -->
     <Style TargetType="Window">
-        <Setter Property="shell:WindowChrome.WindowChrome">
-            <Setter.Value>
-                <shell:WindowChrome CaptionHeight="30"
-                                    ResizeBorderThickness="8,8,8,8" />
-            </Setter.Value>
-        </Setter>
         <Setter Property="Background"
                 Value="#FFFFFFFF" />
         <Setter Property="BorderBrush"
