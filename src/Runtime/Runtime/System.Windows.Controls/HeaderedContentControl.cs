@@ -166,5 +166,48 @@ public class HeaderedContentControl : ContentControl
     {
     }
 
+    /// <summary>
+    /// Identifies the <see cref="HeaderStringFormat"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty HeaderStringFormatProperty =
+        DependencyProperty.Register(
+            nameof(HeaderStringFormat),
+            typeof(string),
+            typeof(HeaderedContentControl),
+            new PropertyMetadata(null, OnHeaderStringFormatChanged));
+
+    /// <summary>
+    /// Gets or sets a composite string that specifies how to format the <see cref="Header"/> property if it is displayed
+    /// as a string.
+    /// </summary>
+    /// <returns>
+    /// A composite string that specifies how to format the <see cref="Header"/> property if it is displayed as a string.
+    /// The default is null.
+    /// </returns>
+    public string HeaderStringFormat
+    {
+        get => (string)GetValue(HeaderStringFormatProperty);
+        set => SetValueInternal(HeaderStringFormatProperty, value);
+    }
+
+    private static void OnHeaderStringFormatChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var ctrl = (HeaderedContentControl)d;
+        ctrl.OnHeaderStringFormatChanged((string)e.OldValue, (string)e.NewValue);
+    }
+
+    /// <summary>
+    /// Called when the <see cref="HeaderStringFormat"/> property changes.
+    /// </summary>
+    /// <param name="oldHeaderStringFormat">
+    /// The old value of the <see cref="HeaderStringFormat"/> property.
+    /// </param>
+    /// <param name="newHeaderStringFormat">
+    /// The new value of the <see cref="HeaderStringFormat"/> property.
+    /// </param>
+    protected virtual void OnHeaderStringFormatChanged(string oldHeaderStringFormat, string newHeaderStringFormat)
+    {
+    }
+
     internal override string GetPlainText() => ContentObjectToString(Header);
 }

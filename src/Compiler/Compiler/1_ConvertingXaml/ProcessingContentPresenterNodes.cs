@@ -69,13 +69,15 @@ internal static class ProcessingContentPresenterNodes
                     bool isContentPropertyDefined = HasAttribute(element, "Content", settings);
                     bool isContentTemplatePropertyDefined = HasAttribute(element, "ContentTemplate", settings);
                     bool isContentTemplateSelectorPropertyDefined = HasAttribute(element, "ContentTemplateSelector", settings);
+                    bool isContentStringFormatPropertyDefined = HasAttribute(element, "ContentStringFormat", settings);
 
                     if (!isContentSourceSet && isContentControl)
                     {
                         SetDefaultTemplateBindings(element,
                             isContentPropertyDefined,
                             isContentTemplatePropertyDefined,
-                            isContentTemplateSelectorPropertyDefined);
+                            isContentTemplateSelectorPropertyDefined,
+                            isContentStringFormatPropertyDefined);
                     }
                     else
                     {
@@ -89,7 +91,8 @@ internal static class ProcessingContentPresenterNodes
                             contentSource,
                             isContentPropertyDefined,
                             isContentTemplatePropertyDefined,
-                            isContentTemplateSelectorPropertyDefined);
+                            isContentTemplateSelectorPropertyDefined,
+                            isContentStringFormatPropertyDefined);
                     }
                 }
             }
@@ -104,9 +107,10 @@ internal static class ProcessingContentPresenterNodes
     private static void SetDefaultTemplateBindings(XElement element,
         bool isContentPropertyDefined,
         bool isContentTemplatePropertyDefined,
-        bool isContentTemplateSelectorPropertyDefined)
+        bool isContentTemplateSelectorPropertyDefined,
+        bool isContentStringFormatPropertyDefined)
     {
-        if (!isContentPropertyDefined || (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined))
+        if (!isContentPropertyDefined || (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined && !isContentStringFormatPropertyDefined))
         {
             string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
 
@@ -132,10 +136,11 @@ internal static class ProcessingContentPresenterNodes
                 SetTemplateBinding(element, "Content", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
             }
 
-            if (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined)
+            if (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined && !isContentStringFormatPropertyDefined)
             {
                 SetTemplateBinding(element, "ContentTemplate", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
                 SetTemplateBinding(element, "ContentTemplateSelector", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
+                SetTemplateBinding(element, "ContentStringFormat", systemWindowsPrefix, systemWindowsControlsPrefix, xPrefix);
             }
         }
 
@@ -174,14 +179,15 @@ internal static class ProcessingContentPresenterNodes
         string contentSource,
         bool isContentPropertyDefined,
         bool isContentTemplatePropertyDefined,
-        bool isContentTemplateSelectorPropertyDefined)
+        bool isContentTemplateSelectorPropertyDefined,
+        bool isContentStringFormatPropertyDefined)
     {
         if (string.IsNullOrEmpty(contentSource))
         {
             return;
         }
 
-        if (!isContentPropertyDefined || (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined))
+        if (!isContentPropertyDefined || (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined && !isContentStringFormatPropertyDefined))
         {
             string systemWindowsPrefix = string.Empty, systemWindowsControlsPrefix = string.Empty;
 
@@ -214,7 +220,7 @@ internal static class ProcessingContentPresenterNodes
                     targetType.Type.Name);
             }
 
-            if (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined)
+            if (!isContentTemplatePropertyDefined && !isContentTemplateSelectorPropertyDefined && !isContentStringFormatPropertyDefined)
             {
                 SetTemplateBinding(element,
                     "ContentTemplate",
@@ -227,6 +233,14 @@ internal static class ProcessingContentPresenterNodes
                 SetTemplateBinding(element,
                     "ContentTemplateSelector",
                     $"{contentSource}TemplateSelector",
+                    systemWindowsPrefix,
+                    systemWindowsControlsPrefix,
+                    targetTypePrefix,
+                    targetType.Type.Name);
+
+                SetTemplateBinding(element,
+                    "ContentStringFormat",
+                    $"{contentSource}StringFormat",
                     systemWindowsPrefix,
                     systemWindowsControlsPrefix,
                     targetTypePrefix,

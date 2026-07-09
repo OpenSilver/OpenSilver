@@ -89,10 +89,10 @@ public class GroupItem : ContentControl
             ContentTemplateSelector = groupStyle.HeaderTemplateSelector;
         }
 
-        //if (HasDefaultValue(ContentStringFormatProperty))
-        //{
-        //    ContentStringFormat = groupStyle.HeaderStringFormat;
-        //}
+        if (HasDefaultValue(ContentStringFormatProperty))
+        {
+            ContentStringFormat = groupStyle.HeaderStringFormat;
+        }
     }
 
     internal void ClearItemContainer(object item, ItemsControl parentItemsControl)

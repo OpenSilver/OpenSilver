@@ -34,6 +34,7 @@ public class GroupStyle : INotifyPropertyChanged
     private StyleSelector _containerStyleSelector;
     private DataTemplate _headerTemplate;
     private DataTemplateSelector _headerTemplateSelector;
+    private string _headerStringFormat;
     private bool _hidesIfEmpty;
     private bool _isAlternationCountSet;
     private int _alternationCount;
@@ -152,6 +153,22 @@ public class GroupStyle : INotifyPropertyChanged
         {
             _headerTemplateSelector = value;
             OnPropertyChanged(nameof(HeaderTemplateSelector));
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a composite string that specifies how to format the header if it is displayed as a string.
+    /// </summary>
+    /// <returns>
+    /// A composite string that specifies how to format the header if it is displayed as a string.
+    /// </returns>
+    public string HeaderStringFormat
+    {
+        get => _headerStringFormat;
+        set
+        {
+            _headerStringFormat = value;
+            OnPropertyChanged(nameof(HeaderStringFormat));
         }
     }
 

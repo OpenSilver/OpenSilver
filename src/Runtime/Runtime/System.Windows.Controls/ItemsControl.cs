@@ -35,8 +35,6 @@ namespace System.Windows.Controls
     {
         #region Data
 
-        private static readonly UncommonField<DisplayMemberPathTemplate> DisplayMemberPathTemplateField = new();
-
         // Note: this maps an item (for example a string) to the element
         // that is added to the visual tree (such a datatemplate) or to 
         // the native DOM element in case of native combo box for example.
@@ -323,16 +321,60 @@ namespace System.Windows.Controls
             }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="ItemStringFormat"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ItemStringFormatProperty =
+            DependencyProperty.Register(
+                nameof(ItemStringFormat),
+                typeof(string),
+                typeof(ItemsControl),
+                new PropertyMetadata(null, OnItemStringFormatChanged));
+
+        /// <summary>
+        /// Gets or sets a composite string that specifies how to format the items in the <see cref="ItemsControl"/> 
+        /// if they are displayed as strings.
+        /// </summary>
+        /// <returns>
+        /// A composite string that specifies how to format the items in the <see cref="ItemsControl"/> if they are 
+        /// displayed as strings.
+        /// </returns>
+        public string ItemStringFormat
+        {
+            get { return (string)GetValue(ItemStringFormatProperty); }
+            set { SetValueInternal(ItemStringFormatProperty, value); }
+        }
+
+        private static void OnItemStringFormatChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var ctrl = (ItemsControl)d;
+            ctrl.OnItemStringFormatChanged((string)e.OldValue, (string)e.NewValue);
+            ctrl.UpdateDisplayMemberTemplateSelector();
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ItemStringFormat"/> property changes.
+        /// </summary>
+        /// <param name="oldItemStringFormat">
+        /// The old value of the <see cref="ItemStringFormat"/> property.
+        /// </param>
+        /// <param name="newItemStringFormat">
+        /// The new value of the <see cref="ItemStringFormat"/> property.
+        /// </param>
+        protected virtual void OnItemStringFormatChanged(string oldItemStringFormat, string newItemStringFormat)
+        {
+        }
+
         private void CheckTemplateSource()
         {
             if (!string.IsNullOrEmpty(DisplayMemberPath))
             {
-                if (ItemTemplateSelector is not null)
+                if (ItemTemplateSelector is not DisplayMemberTemplateSelector)
                 {
                     throw new InvalidOperationException(Strings.ItemTemplateSelectorBreaksDisplayMemberPath);
                 }
 
-                if (ItemTemplate is not null)
+                if (Helper.IsTemplateDefined(ItemTemplateProperty, this))
                 {
                     throw new InvalidOperationException(Strings.DisplayMemberPathAndItemTemplateDefined);
                 }
@@ -365,7 +407,47 @@ namespace System.Windows.Controls
         {
             ItemsControl itemsControl = (ItemsControl)d;
             itemsControl.OnDisplayMemberPathChanged((string)e.OldValue, (string)e.NewValue);
-            itemsControl.UpdateDisplayMemberTemplate();
+            itemsControl.UpdateDisplayMemberTemplateSelector();
+        }
+
+        // DisplayMemberPath and ItemStringFormat use the ItemTemplateSelector property
+        // to achieve the desired result.  When either of these properties change,
+        // update the ItemTemplateSelector property here.
+        private void UpdateDisplayMemberTemplateSelector()
+        {
+            string displayMemberPath = DisplayMemberPath;
+            string itemStringFormat = ItemStringFormat;
+
+            if (!string.IsNullOrEmpty(displayMemberPath) || !string.IsNullOrEmpty(itemStringFormat))
+            {
+                // One or both of DisplayMemberPath and ItemStringFormat are desired.
+                // Set ItemTemplateSelector to an appropriate object, provided that
+                // this doesn't conflict with the user's own setting.
+                DataTemplateSelector itemTemplateSelector = ItemTemplateSelector;
+                if (itemTemplateSelector is not null && itemTemplateSelector is not DisplayMemberTemplateSelector)
+                {
+                    // if ITS was actually set to something besides a DisplayMember selector,
+                    // it's an error to overwrite it with a DisplayMember selector
+                    // unless ITS came from a style and DMP is local
+                    if (ReadLocalValue(ItemTemplateSelectorProperty) != DependencyProperty.UnsetValue ||
+                        ReadLocalValue(DisplayMemberPathProperty) == DependencyProperty.UnsetValue)
+                    {
+                        throw new InvalidOperationException(Strings.DisplayMemberPathAndItemTemplateSelectorDefined);
+                    }
+                }
+
+                // now set the ItemTemplateSelector to use the new DisplayMemberPath and ItemStringFormat
+                ItemTemplateSelector = new DisplayMemberTemplateSelector(DisplayMemberPath, ItemStringFormat);
+            }
+            else
+            {
+                // Neither property is desired.  Clear the ItemTemplateSelector if
+                // we had set it earlier.
+                if (ItemTemplateSelector is DisplayMemberTemplateSelector)
+                {
+                    ClearValue(ItemTemplateSelectorProperty);
+                }
+            }
         }
 
         /// <summary>
@@ -379,24 +461,6 @@ namespace System.Windows.Controls
         /// </param>
         protected virtual void OnDisplayMemberPathChanged(string oldDisplayMemberPath, string newDisplayMemberPath)
         {
-        }
-
-        private void UpdateDisplayMemberTemplate()
-        {
-            string displayMemberPath = DisplayMemberPath;
-
-            if (!string.IsNullOrEmpty(displayMemberPath))
-            {
-                CheckTemplateSource();
-
-                DisplayMemberPathTemplateField.SetValue(this, new DisplayMemberPathTemplate(displayMemberPath));
-            }
-            else
-            {
-                DisplayMemberPathTemplateField.ClearValue(this);
-            }
-
-            _itemContainerGenerator?.Refresh();
         }
 
         /// <summary>
@@ -1339,22 +1403,14 @@ namespace System.Windows.Controls
         /// </param>
         protected virtual void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
-            DataTemplate itemTemplate = ItemTemplate;
-            DataTemplateSelector itemTemplateSelector = ItemTemplateSelector;
-
-            if (itemTemplate is null && itemTemplateSelector is null)
-            {
-                itemTemplate = DisplayMemberPathTemplateField.GetValue(this);
-            }
-
             switch (element)
             {
                 case ContentControl cc:
-                    cc.PrepareContentControl(item, itemTemplate, itemTemplateSelector);
+                    cc.PrepareContentControl(item, ItemTemplate, ItemTemplateSelector, ItemStringFormat);
                     break;
 
                 case ContentPresenter cp:
-                    cp.PrepareContentPresenter(item, itemTemplate, itemTemplateSelector);
+                    cp.PrepareContentPresenter(item, ItemTemplate, ItemTemplateSelector, ItemStringFormat);
                     break;
             }
         }
@@ -1484,30 +1540,58 @@ namespace System.Windows.Controls
             }
         }
 
-        internal static DataTemplate GetDisplayMemberPathTemplate(ItemsControl itemsControl) => DisplayMemberPathTemplateField.GetValue(itemsControl);
-
-        private sealed class DisplayMemberPathTemplate : DataTemplate
+        internal static DataTemplate GetDisplayMemberPathTemplate(ItemsControl itemsControl)
         {
-            private readonly Binding _binding;
-
-            public DisplayMemberPathTemplate(string displayMemberPath)
+            if (itemsControl.ItemTemplateSelector is DisplayMemberTemplateSelector itemTemplateSelector)
             {
-                _binding = new Binding(displayMemberPath);
+                return itemTemplateSelector.ClrNodeContentTemplate;
+            }
+            return null;
+        }
+
+        private sealed class DisplayMemberTemplateSelector : DataTemplateSelector
+        {
+            private readonly string _displayMemberPath;
+            private readonly string _stringFormat;
+            private DataTemplate _clrNodeContentTemplate;
+
+            public DisplayMemberTemplateSelector(string displayMemberPath, string stringFormat)
+            {
+                Debug.Assert(!(string.IsNullOrEmpty(displayMemberPath) && string.IsNullOrEmpty(stringFormat)));
+                _displayMemberPath = displayMemberPath;
+                _stringFormat = stringFormat;
             }
 
-            internal override bool BuildVisualTree(IFrameworkElement container)
+            public override DataTemplate SelectTemplate(object item, DependencyObject container) => ClrNodeContentTemplate;
+
+            internal DataTemplate ClrNodeContentTemplate
             {
-                Debug.Assert(container is ContentControl || container is ContentPresenter);
+                get
+                {
+                    if (_clrNodeContentTemplate is null)
+                    {
+                        _clrNodeContentTemplate = new DataTemplate
+                        {
+                            Template = new CompiledTemplateContent(
+                                new XamlContext(),
+                                (owner, context) =>
+                                {
+                                    var text = new TextBlock();
+                                    text.SetTemplatedParent(context.TemplateOwnerReference);
+                                    var binding = new Binding(_displayMemberPath)
+                                    {
+                                        StringFormat = _stringFormat,
+                                    };
+                                    text.SetBinding(TextBlock.TextProperty, binding);
+                                    return text;
+                                }),
+                        };
 
-                var feContainer = (FrameworkElement)container;
+                        _clrNodeContentTemplate.Seal();
+                    }
 
-                var textBlock = new TextBlock();
-                textBlock.SetTemplatedParent(new(feContainer));
-                textBlock.SetBinding(TextBlock.TextProperty, _binding);
-
-                feContainer.TemplateChild = textBlock;
-
-                return true;
+                    return _clrNodeContentTemplate;
+                }
             }
         }
     }

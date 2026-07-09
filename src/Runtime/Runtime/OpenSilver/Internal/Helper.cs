@@ -21,6 +21,21 @@ internal static class Helper
 {
     public const string ObsoleteMemberMessage = "Deprecated. It will be removed in a future release.";
 
+    /// <summary>
+    /// Check whether xxxTemplate property is set on the given element.
+    /// Only explicit local values or resource references count;  data-bound or templated values don't count.
+    /// </summary>
+    internal static bool IsTemplateDefined(DependencyProperty templateProperty, DependencyObject d)
+    {
+        // Check whether xxxTemplate property is set on the given element.
+        object template = d.ReadLocalValue(templateProperty);
+        // the checks for UnsetValue and null are for perf:
+        // they're redundant to the type checks, but they're cheaper
+        return (template != DependencyProperty.UnsetValue &&
+                template is not null &&
+                (template is FrameworkTemplate || template is ResourceReferenceExpression));
+    }
+
     internal static EventHandler<XamlSetMarkupExtensionEventArgs> LookupSetMarkupExtensionHandler(Type type)
     {
         if (typeof(Setter) == type)

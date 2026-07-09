@@ -1389,4 +1389,7 @@
   <data name="BindingExpressionIsDetached" xml:space="preserve">
     <value>Impossible d'effectuer cette opération quand la liaison est détachée.</value>
   </data>
+  <data name="DisplayMemberPathAndItemTemplateSelectorDefined" xml:space="preserve">
+    <value>Impossible de définir à la fois DisplayMemberPath et ItemTemplateSelector. Quand l'un n'est pas vide, il doit être supprimé avant que l'autre ne puisse être défini.</value>
+  </data>
 </root>

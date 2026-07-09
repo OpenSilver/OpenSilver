@@ -1391,4 +1391,7 @@
   <data name="BindingExpressionIsDetached" xml:space="preserve">
     <value>Cannot perform this operation when binding is detached.</value>
   </data>
+  <data name="DisplayMemberPathAndItemTemplateSelectorDefined" xml:space="preserve">
+    <value>Cannot set both DisplayMemberPath and ItemTemplateSelector. When one is nonempty, it must be cleared before the other can be set.</value>
+  </data>
 </root>

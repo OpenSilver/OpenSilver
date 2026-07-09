@@ -27,8 +27,12 @@ namespace System.Windows.Controls
     [ContentProperty(nameof(Content))]
     public class ContentPresenter : FrameworkElement
     {
+        private static readonly UncommonField<DataTemplate> StringFormattingTemplateField = new();
+        private static readonly UncommonField<DataTemplate> AccessTextFormattingTemplateField = new();
+
         private DataTemplate _templateCache;
         private bool _templateIsCurrent;
+        private bool _contentIsItem;
 
         static ContentPresenter()
         {
@@ -250,6 +254,52 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="ContentStringFormat"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentStringFormatProperty =
+            DependencyProperty.Register(
+                nameof(ContentStringFormat),
+                typeof(string),
+                typeof(ContentPresenter),
+                new PropertyMetadata(null, OnContentStringFormatChanged));
+
+        /// <summary>
+        /// Gets or sets a composite string that specifies how to format the <see cref="Content"/>
+        /// property if it is displayed as a string.
+        /// </summary>
+        /// <returns>
+        /// A composite string that specifies how to format the <see cref="Content"/> property if 
+        /// it is displayed as a string. The default is null.
+        /// </returns>
+        public string ContentStringFormat
+        {
+            get => (string)GetValue(ContentStringFormatProperty);
+            set => SetValueInternal(ContentStringFormatProperty, value);
+        }
+
+        private static void OnContentStringFormatChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ContentPresenter ctrl = (ContentPresenter)d;
+            ctrl.OnContentStringFormatChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ContentStringFormat"/> property changes.
+        /// </summary>
+        /// <param name="oldContentStringFormat">
+        /// The old value of the <see cref="ContentStringFormat"/> property.
+        /// </param>
+        /// <param name="newContentStringFormat">
+        /// The new value of the <see cref="ContentStringFormat"/> property.
+        /// </param>
+        protected virtual void OnContentStringFormatChanged(string oldContentStringFormat, string newContentStringFormat)
+        {
+            // force on-demand regeneration of the formatting templates for XML and String content
+            StringFormattingTemplateField.ClearValue(this);
+            AccessTextFormattingTemplateField.ClearValue(this);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="ContentSource"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentSourceProperty =
@@ -341,7 +391,96 @@ namespace System.Windows.Controls
 
         internal static DataTemplate UIElementContentTemplate { get; }
 
-        private bool IsUsingDefaultStringTemplate => Template == StringContentTemplate || Template == AccessTextContentTemplate;
+        private DataTemplate FormattingAccessTextContentTemplate
+        {
+            get
+            {
+                DataTemplate template = AccessTextFormattingTemplateField.GetValue(this);
+                if (template is null)
+                {
+                    template = new DataTemplate
+                    {
+                        Template = new CompiledTemplateContent(
+                            new XamlContext(),
+                            static (owner, context) =>
+                            {
+                                var contentPresenter = (ContentPresenter)owner;
+                                var text = new AccessText();
+                                text.SetTemplatedParent(context.TemplateOwnerReference);
+                                var binding = new Binding
+                                {
+                                    StringFormat = contentPresenter.ContentStringFormat,
+                                };
+                                text.SetBinding(AccessText.TextProperty, binding);
+                                return text;
+                            }),
+                    };
+
+                    template.Seal();
+
+                    AccessTextFormattingTemplateField.SetValue(this, template);
+                }
+                return template;
+            }
+        }
+
+        private DataTemplate FormattingStringContentTemplate
+        {
+            get
+            {
+                DataTemplate template = StringFormattingTemplateField.GetValue(this);
+                if (template is null)
+                {
+                    template = new DataTemplate
+                    {
+                        Template = new CompiledTemplateContent(
+                            new XamlContext(),
+                            static (owner, context) =>
+                            {
+                                var contentPresenter = (ContentPresenter)owner;
+                                var text = new TextBlock();
+                                text.SetTemplatedParent(context.TemplateOwnerReference);
+                                var binding = new Binding
+                                {
+                                    StringFormat = contentPresenter.ContentStringFormat,
+                                };
+                                text.SetBinding(TextBlock.TextProperty, binding);
+                                return text;
+                            }),
+                    };
+
+                    template.Seal();
+
+                    StringFormattingTemplateField.SetValue(this, template);
+                }
+                return template;
+            }
+        }
+
+        private bool IsUsingDefaultStringTemplate
+        {
+            get
+            {
+                if (Template == StringContentTemplate || Template == AccessTextContentTemplate)
+                {
+                    return true;
+                }
+
+                DataTemplate template = StringFormattingTemplateField.GetValue(this);
+                if (template is not null && template == Template)
+                {
+                    return true;
+                }
+
+                template = AccessTextFormattingTemplateField.GetValue(this);
+                if (template is not null && template == Template)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
 
         internal override void OnPreApplyTemplate()
         {
@@ -472,11 +611,11 @@ namespace System.Windows.Controls
         {
             if (RecognizesAccessKey && s.IndexOf(AccessText.AccessKeyMarker) > -1)
             {
-                return AccessTextContentTemplate;
+                return string.IsNullOrEmpty(ContentStringFormat) ? AccessTextContentTemplate : FormattingAccessTextContentTemplate;
             }
             else
             {
-                return StringContentTemplate;
+                return string.IsNullOrEmpty(ContentStringFormat) ? StringContentTemplate : FormattingStringContentTemplate;
             }
         }
 
@@ -719,11 +858,16 @@ namespace System.Windows.Controls
             return resource;
         }
 
-        internal void PrepareContentPresenter(object item, DataTemplate itemTemplate, DataTemplateSelector itemTemplateSelector)
+        internal void PrepareContentPresenter(object item, DataTemplate itemTemplate, DataTemplateSelector itemTemplateSelector, string stringFormat)
         {
             if (item != this)
             {
-                Content = item;
+                // copy templates from parent ItemsControl
+                if (_contentIsItem || HasDefaultValue(ContentProperty))
+                {
+                    Content = item;
+                    _contentIsItem = true;
+                }
 
                 if (itemTemplate is not null)
                 {
@@ -734,6 +878,11 @@ namespace System.Windows.Controls
                 {
                     ContentTemplateSelector = itemTemplateSelector;
                 }
+
+                if (stringFormat is not null)
+                {
+                    ContentStringFormat = stringFormat;
+                }
             }
         }
 
@@ -741,7 +890,10 @@ namespace System.Windows.Controls
         {
             if (this != item)
             {
-                ClearValue(ContentProperty);
+                if (_contentIsItem)
+                {
+                    ClearValue(ContentProperty);
+                }
             }
         }
 
@@ -831,7 +983,18 @@ namespace System.Windows.Controls
 
                 var textBlock = new TextBlock();
                 textBlock.SetTemplatedParent(new(container));
-                textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
+
+                if (container.ContentStringFormat is string stringFormat)
+                {
+                    textBlock.SetBinding(TextBlock.TextProperty, new Binding
+                    {
+                        StringFormat = stringFormat,
+                    });
+                }
+                else
+                {
+                    textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
+                }
 
                 return textBlock;
             }

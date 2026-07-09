@@ -925,6 +925,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot set both DisplayMemberPath and ItemTemplateSelector. When one is nonempty, it must be cleared before the other can be set..
+        /// </summary>
+        internal static string DisplayMemberPathAndItemTemplateSelectorDefined {
+            get {
+                return ResourceManager.GetString("DisplayMemberPathAndItemTemplateSelectorDefined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can only call DragMove when primary mouse button is down..
         /// </summary>
         internal static string DragMoveFail {

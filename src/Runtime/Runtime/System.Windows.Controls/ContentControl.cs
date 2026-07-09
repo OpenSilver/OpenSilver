@@ -172,6 +172,49 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="ContentStringFormat"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentStringFormatProperty =
+            DependencyProperty.Register(
+                nameof(ContentStringFormat),
+                typeof(string),
+                typeof(ContentControl),
+                new PropertyMetadata(null, OnContentStringFormatChanged));
+
+        /// <summary>
+        /// Gets or sets a composite string that specifies how to format the <see cref="Content"/> 
+        /// roperty if it is displayed as a string.
+        /// </summary>
+        /// <returns>
+        /// A composite string that specifies how to format the <see cref="Content"/> property if it 
+        /// is displayed as a string.
+        /// </returns>
+        public string ContentStringFormat
+        {
+            get => (string)GetValue(ContentStringFormatProperty);
+            set => SetValueInternal(ContentStringFormatProperty, value);
+        }
+
+        private static void OnContentStringFormatChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ContentControl ctrl = (ContentControl)d;
+            ctrl.OnContentStringFormatChanged((string)e.OldValue, (string)e.NewValue);
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="ContentStringFormat"/> property changes.
+        /// </summary>
+        /// <param name="oldContentStringFormat">
+        /// The old value of <see cref="ContentStringFormat"/>.
+        /// </param>
+        /// <param name="newContentStringFormat">
+        /// The new value of <see cref="ContentStringFormat"/>.
+        /// </param>
+        protected virtual void OnContentStringFormatChanged(string oldContentStringFormat, string newContentStringFormat)
+        {
+        }
+
+        /// <summary>
         /// Called when the <see cref="Content"/> property changes.
         /// </summary>
         /// <param name="oldContent">
@@ -260,7 +303,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Prepare to display the item.
         /// </summary>
-        internal void PrepareContentControl(object item, DataTemplate itemTemplate, DataTemplateSelector itemTemplateSelector)
+        internal void PrepareContentControl(object item, DataTemplate itemTemplate, DataTemplateSelector itemTemplateSelector, string itemStringFormat)
         {
             if (item != this)
             {
@@ -282,6 +325,11 @@ namespace System.Windows.Controls
                 if (itemTemplateSelector is not null)
                 {
                     ContentTemplateSelector = itemTemplateSelector;
+                }
+
+                if (itemStringFormat is not null)
+                {
+                    SetValue(ContentStringFormatProperty, itemStringFormat);
                 }
             }
             else
