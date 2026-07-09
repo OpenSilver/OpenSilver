@@ -11,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
 using OpenSilver.Internal;
+using System.Collections.Generic;
 
 namespace System.Windows;
 
@@ -52,6 +52,7 @@ internal sealed class EventRoute
         // to achieve performance gain based 
         // on standard app behavior
         _routeItemList = new List<RouteItem>(16);
+        _sourceItemList = new List<SourceItem>(16);
     }
 
     /// <summary>
@@ -86,12 +87,33 @@ internal sealed class EventRoute
     ///     Invokes all the handlers that have been 
     ///     added to the route
     /// </summary>
+    /// <remarks>
+    ///     NOTE: If the <see cref="RoutingStrategy"/> 
+    ///     of the associated <see cref="RoutedEvent"/> 
+    ///     is <see cref="RoutingStrategy.Bubble"/>
+    ///     the last handlers added are the 
+    ///     last ones invoked <para/>
+    ///     However if the <see cref="RoutingStrategy"/> 
+    ///     of the associated <see cref="RoutedEvent"/> 
+    ///     is <see cref="RoutingStrategy.Tunnel"/>, 
+    ///     the last handlers added are the 
+    ///     first ones invoked 
+    /// </remarks>
+    /// <param name="source">
+    ///     <see cref="RoutedEventArgs.Source"/> 
+    ///     that raised the RoutedEvent
+    /// </param>
     /// <param name="args">
     ///     <see cref="RoutedEventArgs"/> that carry
     ///     all the details specific to this RoutedEvent
     /// </param>
-    internal void InvokeHandlers(RoutedEventArgs args)
+    internal void InvokeHandlers(object source, RoutedEventArgs args) => InvokeHandlersImpl(source, args, false);
+
+    internal void ReInvokeHandlers(object source, RoutedEventArgs args) => InvokeHandlersImpl(source, args, true);
+
+    internal void InvokeHandlersImpl(object source, RoutedEventArgs args, bool reRaised)
     {
+        ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(args);
 
         if (args.Source is null)
@@ -106,16 +128,56 @@ internal sealed class EventRoute
 
         if (args.RoutedEvent.RoutingStrategy == RoutingStrategy.Direct || args.RoutedEvent.RoutingStrategy == RoutingStrategy.Bubble)
         {
-            foreach (RouteItem routeItem in _routeItemList)
+            int endSourceChangeIndex = 0;
+
+            // If the RoutingStrategy of the associated is 
+            // Bubble the handlers for the last target 
+            // added are the last ones invoked
+            // Invoke class listeners
+            for (int i = 0; i < _routeItemList.Count; i++)
             {
-                routeItem.InvokeHandler(args);
+                // Query for new source only if we are 
+                // past the range of the previous source change
+                if (i >= endSourceChangeIndex)
+                {
+                    // Get the source at this point in the bubble route and also 
+                    // the index at which this source change seizes to apply
+                    object newSource = GetBubbleSource(i, out endSourceChangeIndex);
+
+                    // Set appropriate source
+                    // The first call to setsource seems redundant 
+                    // but is necessary because the source could have 
+                    // been modified during BuildRoute call and hence 
+                    // may need to be reset to the original source.
+                    // Note: we skip this logic if reRaised is set, which is done when we're trying
+                    //       to convert MouseDown/Up into a MouseLeft/RightButtonDown/Up
+                    if (!reRaised)
+                    {
+                        if (newSource is null)
+                        {
+                            args.Source = source;
+                        }
+                        else
+                        {
+                            args.Source = newSource;
+                        }
+                    }
+                }
+
+                // Invoke listeners
+
+                _routeItemList[i].InvokeHandler(args);
             }
         }
         else
         {
+            int startSourceChangeIndex = _routeItemList.Count;
             int endTargetIndex = _routeItemList.Count - 1;
             int startTargetIndex;
 
+            // If the RoutingStrategy of the associated is 
+            // Tunnel the handlers for the last target 
+            // added are the first ones invoked
             while (endTargetIndex >= 0)
             {
                 // For tunnel events we need to invoke handlers for the last target first. 
@@ -132,12 +194,124 @@ internal sealed class EventRoute
 
                 for (int i = startTargetIndex + 1; i <= endTargetIndex; i++)
                 {
+                    // Query for new source only if we are 
+                    // past the range of the previous source change
+                    if (i < startSourceChangeIndex)
+                    {
+                        // Get the source at this point in the tunnel route and also 
+                        // the index at which this source change seizes to apply
+                        object newSource = GetTunnelSource(i, out startSourceChangeIndex);
+
+                        // Set appropriate source
+                        // The first call to setsource seems redundant 
+                        // but is necessary because the source could have 
+                        // been modified during BuildRoute call and hence 
+                        // may need to be reset to the original source.
+                        if (newSource is null)
+                        {
+                            args.Source = source;
+                        }
+                        else
+                        {
+                            args.Source = newSource;
+                        }
+                    }
+
+                    // Invoke listeners
                     _routeItemList[i].InvokeHandler(args);
                 }
 
                 endTargetIndex = startTargetIndex;
             }
         }
+    }
+
+    internal RoutedEvent RoutedEvent { get; set; }
+
+    // Add the given source to the source item list
+    // indicating what the source will be this point 
+    // onwards in the route
+    internal void AddSource(object source)
+    {
+        int startIndex = _routeItemList.Count;
+        _sourceItemList.Add(new SourceItem(startIndex, source));
+    }
+
+    // Determine what the RoutedEventArgs.Source should be, at this
+    // point in the bubble. Also the endIndex output parameter tells 
+    // you the exact index of the handlersList at which this source 
+    // change ceases to apply
+    private object GetBubbleSource(int index, out int endIndex)
+    {
+        // If the Source never changes during the route execution,
+        // then we're done (just return null).
+        if (_sourceItemList.Count == 0)
+        {
+            endIndex = _routeItemList.Count;
+            return null;
+        }
+
+        // Similarly, if we're not to the point of the route of the first Source
+        // change, simply return null.
+        if (index < _sourceItemList[0].StartIndex)
+        {
+            endIndex = _sourceItemList[0].StartIndex;
+            return null;
+        }
+
+        // See if we should be using one of the intermediate
+        // sources
+        for (int i = 0; i < _sourceItemList.Count - 1; i++)
+        {
+            if (index >= _sourceItemList[i].StartIndex && index < _sourceItemList[i + 1].StartIndex)
+            {
+                endIndex = _sourceItemList[i + 1].StartIndex;
+                return _sourceItemList[i].Source;
+            }
+        }
+
+        // If we get here, we're on the last one,
+        // so return that.            
+        endIndex = _routeItemList.Count;
+        return _sourceItemList[_sourceItemList.Count - 1].Source;
+    }
+
+    // Determine what the RoutedEventArgs.Source should be, at this
+    // point in the tunnel. Also the startIndex output parameter tells 
+    // you the exact index of the handlersList at which this source 
+    // change starts to apply
+    private object GetTunnelSource(int index, out int startIndex)
+    {
+        // If the Source never changes during the route execution,
+        // then we're done (just return null).
+        if (_sourceItemList.Count == 0)
+        {
+            startIndex = 0;
+            return null;
+        }
+
+        // Similarly, if we're past the point of the route of the first Source
+        // change, simply return null.
+        if (index < _sourceItemList[0].StartIndex)
+        {
+            startIndex = 0;
+            return null;
+        }
+
+        // See if we should be using one of the intermediate
+        // sources
+        for (int i = 0; i < _sourceItemList.Count - 1; i++)
+        {
+            if (index >= _sourceItemList[i].StartIndex && index < _sourceItemList[i + 1].StartIndex)
+            {
+                startIndex = _sourceItemList[i].StartIndex;
+                return _sourceItemList[i].Source;
+            }
+        }
+
+        // If we get here, we're on the last one, so return that.            
+        startIndex = _sourceItemList[_sourceItemList.Count - 1].StartIndex;
+        return _sourceItemList[_sourceItemList.Count - 1].Source;
     }
 
     /// <summary>
@@ -148,11 +322,13 @@ internal sealed class EventRoute
         RoutedEvent = null;
 
         _routeItemList.Clear();
+        _sourceItemList.Clear();
     }
-
-    internal RoutedEvent RoutedEvent { get; set; }
 
     // Stores the routed event handlers to be 
     // invoked for the associated RoutedEvent
     private readonly List<RouteItem> _routeItemList;
+
+    // Stores Source Items for separated trees
+    private readonly List<SourceItem> _sourceItemList;
 }

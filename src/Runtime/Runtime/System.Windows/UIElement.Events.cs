@@ -11,13 +11,13 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
+using OpenSilver.Internal;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media;
-using OpenSilver;
-using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -462,6 +462,25 @@ namespace System.Windows
             }
         }
 
+        /// <summary>
+        ///     Allows adjustment to the event source
+        /// </summary>
+        /// <remarks>
+        ///     Subclasses must override this method
+        ///     to be able to adjust the source during
+        ///     route invocation <para/>
+        ///
+        ///     NOTE: Expected to return null when no
+        ///     change is made to source
+        /// </remarks>
+        /// <param name="args">
+        ///     Routed Event Args
+        /// </param>
+        /// <returns>
+        ///     Returns new source
+        /// </returns>
+        internal virtual object AdjustEventSource(RoutedEventArgs args) => null;
+
         private static RoutedEvent CrackMouseButtonEvent(MouseButtonEventArgs e)
         {
             RoutedEvent newEvent = null;
@@ -549,7 +568,7 @@ namespace System.Windows
             // Build the route and invoke the handlers
             BuildRouteHelper(uie, route, args);
 
-            route.InvokeHandlers(args);
+            route.ReInvokeHandlers(uie, args);
 
             // Restore Source
             args.OverrideSource(preservedSource);
@@ -570,7 +589,7 @@ namespace System.Windows
 
             BuildRouteHelper(sender, route, args);
 
-            route.InvokeHandlers(args);
+            route.InvokeHandlers(sender, args);
 
             // Reset Source to OriginalSource
             args.Source = args.OriginalSource;
@@ -602,13 +621,19 @@ namespace System.Windows
             {
                 int cElements = 0;
 
-                while (e != null)
+                while (e is not null)
                 {
                     // Protect against infinite loops by limiting the number of elements
                     // that we will process.
                     if (cElements++ > MAX_ELEMENTS_IN_ROUTE)
                     {
                         throw new InvalidOperationException(Strings.TreeLoop);
+                    }
+
+                    // Add changed source information to the route
+                    if (e.AdjustEventSource(args) is object newSource)
+                    {
+                        route.AddSource(newSource);
                     }
 
                     // Add this element to route
@@ -622,6 +647,11 @@ namespace System.Windows
                     }
 
                     e = parent as UIElement;
+
+                    if (e == args.Source)
+                    {
+                        route.AddSource(e);
+                    }
                 }
             }
         }

@@ -608,6 +608,50 @@ namespace System.Windows
         internal virtual string GetPlainText() => string.Empty;
 
         /// <summary>
+        ///     Allows adjustment to the event source
+        /// </summary>
+        /// <remarks>
+        ///     Subclasses must override this method
+        ///     to be able to adjust the source during
+        ///     route invocation <para/>
+        ///
+        ///     NOTE: Expected to return null when no
+        ///     change is made to source
+        /// </remarks>
+        /// <param name="args">
+        ///     Routed Event Args
+        /// </param>
+        /// <returns>
+        ///     Returns new source
+        /// </returns>
+        internal override object AdjustEventSource(RoutedEventArgs args)
+        {
+            object source = null;
+
+            // As part of routing events through logical trees, we have
+            // to be careful about events that come to us from "foreign"
+            // trees.  For example, the event could come from an element
+            // in our "implementation" visual tree, or from an element
+            // in a different logical tree all together.
+            //
+            // Note that we consider ourselves to be part of a logical tree
+            // if we have either a logical parent, or any logical children.
+            //
+            // BUGBUG: this misses "trees" that have only one logical node.  No parents, no children.
+
+            if (Parent is not null || HasLogicalChildren)
+            {
+                if (args.Source is not DependencyObject logicalSource || !IsLogicalDescendent(logicalSource))
+                {
+                    args.Source = this;
+                    source = this;
+                }
+            }
+
+            return source;
+        }
+
+        /// <summary>
         /// Add Style event handlers to the EventRoute
         /// </summary>
         internal sealed override void AddToEventRouteCore(EventRoute route, RoutedEventArgs args) => AddStyleHandlersToEventRoute(this, route, args);
@@ -641,6 +685,22 @@ namespace System.Windows
                     route.Add(source, handler.Handler, handler.InvokeHandledEventsToo);
                 }
             }
+        }
+
+        // Returns if the given child instance is a logical descendent
+        private bool IsLogicalDescendent(DependencyObject child)
+        {
+            while (child is not null)
+            {
+                if (child == this)
+                {
+                    return true;
+                }
+
+                child = LogicalTreeHelper.GetParent(child);
+            }
+
+            return false;
         }
 
         #region Cursor
