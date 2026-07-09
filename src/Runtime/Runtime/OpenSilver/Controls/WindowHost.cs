@@ -199,10 +199,11 @@ public class WindowHost : ContentControl
 
     internal void UpdateMaximizeRestoreButton(bool isMaximized)
     {
-        _maximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : Visibility.Visible;
-        _restoreButtonPart?.Visibility = isMaximized ? Visibility.Visible : Visibility.Collapsed;
-        _chromeMaximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : Visibility.Visible;
-        _chromeRestoreButtonPart?.Visibility = isMaximized ? Visibility.Visible : Visibility.Collapsed;
+        Visibility maxVisibility = _window.ResizeMode == ResizeMode.NoResize ? Visibility.Collapsed : Visibility.Visible;
+        _maximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : maxVisibility;
+        _restoreButtonPart?.Visibility = isMaximized ? maxVisibility : Visibility.Collapsed;
+        _chromeMaximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : maxVisibility;
+        _chromeRestoreButtonPart?.Visibility = isMaximized ? maxVisibility : Visibility.Collapsed;
     }
 
 
@@ -279,6 +280,7 @@ public class WindowHost : ContentControl
                 break;
             case ResizeMode.CanMinimize:
                 canMaximize = false;
+                areResizeBordersVisible = false;
                 maximizeButtonOpacity = 0.4;
                 break;
             case ResizeMode.CanResize:
