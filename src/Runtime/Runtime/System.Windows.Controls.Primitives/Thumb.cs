@@ -245,8 +245,8 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnLostMouseCapture(e);
 
-            RaiseDragCompleted(false);
             IsDragging = false;
+            RaiseDragCompleted(false);
         }
 
         /// <inheritdoc />
