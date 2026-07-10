@@ -37,6 +37,12 @@ namespace System.Windows.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBoxItem), new PropertyMetadata(typeof(ListBoxItem)));
             IsEnabledProperty.OverrideMetadata(typeof(ListBoxItem), new PropertyMetadata(OnVisualStatePropertyChanged));
+            Selector.IsSelectionActivePropertyKey.OverrideMetadata(typeof(ListBoxItem), new FrameworkPropertyMetadata(OnIsSelectionActiveChanged));
+        }
+
+        private static void OnIsSelectionActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ListBoxItem)d).UpdateVisualStates();
         }
 
         /// <summary>
@@ -170,7 +176,7 @@ namespace System.Windows.Controls
             // Change to the correct state in the Selection group
             if (IsSelected)
             {
-                if (ParentSelector is Selector selector && Selector.GetIsSelectionActive(selector))
+                if (Selector.GetIsSelectionActive(this))
                 {
                     VisualStateManager.GoToState(this, VisualStates.StateSelected, useTransitions);
                 }

@@ -58,7 +58,7 @@ namespace System.Windows.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(typeof(ComboBox)));
             IsEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(OnVisualStatePropertyChanged));
-            IsSelectionActivePropertyKey.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
+            IsSelectionActivePropertyKey.OverrideMetadata(typeof(ComboBox), new FrameworkPropertyMetadata(OnIsSelectionActiveChanged));
             IsTextSearchEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
 
@@ -145,8 +145,7 @@ namespace System.Windows.Controls
             {
                 _popupChild.KeyDown -= new KeyEventHandler(OnPopupKeyDown);
                 _popupChild.TextInput -= new TextCompositionEventHandler(OnPopupTextInput);
-                _popupChild.GotFocus -= new RoutedEventHandler(OnPopupGotFocus);
-                _popupChild.LostFocus -= new RoutedEventHandler(OnPopupLostFocus);
+                _popupChild.IsKeyboardFocusWithinChanged -= new DependencyPropertyChangedEventHandler(OnPopupIsKeyboardFocusWithinChanged);
                 _popupChild = null;
             }
 
@@ -174,8 +173,7 @@ namespace System.Windows.Controls
                 {
                     _popupChild.KeyDown += new KeyEventHandler(OnPopupKeyDown);
                     _popupChild.TextInput += new TextCompositionEventHandler(OnPopupTextInput);
-                    _popupChild.GotFocus += new RoutedEventHandler(OnPopupGotFocus);
-                    _popupChild.LostFocus += new RoutedEventHandler(OnPopupLostFocus);
+                    _popupChild.IsKeyboardFocusWithinChanged += new DependencyPropertyChangedEventHandler(OnPopupIsKeyboardFocusWithinChanged);
                 }
             }
 
@@ -401,30 +399,6 @@ namespace System.Windows.Controls
             UpdateVisualStates();
         }
 
-        /// <summary>
-        /// Provides handling for the <see cref="UIElement.GotFocus"/> event.
-        /// </summary>
-        /// <param name="e">
-        /// The event data.
-        /// </param>
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-            SetValueInternal(IsSelectionActivePropertyKey, true);
-        }
-
-        /// <summary>
-        /// Provides handling for the <see cref="UIElement.LostFocus"/> event.
-        /// </summary>
-        /// <param name="e">
-        /// The event data.
-        /// </param>
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            base.OnLostFocus(e);
-            SetValueInternal(IsSelectionActivePropertyKey, FocusManager.HasFocus(this, true));
-        }
-
         /// <inheritdoc />
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
@@ -511,9 +485,8 @@ namespace System.Windows.Controls
 
         private void OnPopupTextInput(object sender, TextCompositionEventArgs e) => OnTextInput(e);
 
-        private void OnPopupGotFocus(object sender, RoutedEventArgs e) => SetValueInternal(IsSelectionActivePropertyKey, true);
-
-        private void OnPopupLostFocus(object sender, RoutedEventArgs e) => SetValueInternal(IsSelectionActivePropertyKey, false);
+        private void OnPopupIsKeyboardFocusWithinChanged(object sender, DependencyPropertyChangedEventArgs e) =>
+            SetValueInternal(IsSelectionActivePropertyKey, (bool)e.NewValue);
 
         private void OnDropDownToggleClick(object sender, RoutedEventArgs e)
         {

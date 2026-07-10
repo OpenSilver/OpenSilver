@@ -38,7 +38,6 @@ namespace System.Windows.Controls
         static ListBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBox), new PropertyMetadata(typeof(ListBox)));
-            IsSelectionActivePropertyKey.OverrideMetadata(typeof(ListBox), new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
             IsTextSearchEnabledProperty.OverrideMetadata(typeof(ListBox), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
 
@@ -122,23 +121,6 @@ namespace System.Windows.Controls
         /// Identifies the IsSelectionActive dependency property.
         /// </summary>
         new public static readonly DependencyProperty IsSelectionActiveProperty = Selector.IsSelectionActiveProperty;
-
-        private static void OnIsSelectionActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var listbox = (ListBox)d;
-            foreach (ItemInfo item in listbox.SelectedItemsInternal)
-            {
-                if (item.Index < 0)
-                {
-                    continue;
-                }
-
-                if (listbox.ItemContainerGenerator.ContainerFromIndex(item.Index) is ListBoxItem listboxItem)
-                {
-                    listboxItem.UpdateVisualStates();
-                }
-            }
-        }
 
         /// <summary>
         /// Causes the object to scroll into view.
@@ -298,20 +280,6 @@ namespace System.Windows.Controls
                     e.Handled = true;
                 }
             }
-        }
-
-        /// <inheritdoc />
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            base.OnLostFocus(e);
-            SetValueInternal(IsSelectionActivePropertyKey, false);
-        }
-
-        /// <inheritdoc />
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-            SetValueInternal(IsSelectionActivePropertyKey, true);
         }
 
         /// <summary>

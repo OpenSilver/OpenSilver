@@ -80,6 +80,10 @@ namespace System.Windows.Controls.Primitives
             SelectedItemsImpl = new SelectedItemCollection(this);
             SelectedItemsImpl.CollectionChanged += new NotifyCollectionChangedEventHandler(OnSelectedItemsCollectionChanged);
             SelectionChange = new SelectionChanger(this);
+
+            // to prevent this inherited property from bleeding into nested selectors, set this locally to
+            // false at construction time
+            SetValueInternal(IsSelectionActivePropertyKey, false);
         }
 
         /// <summary>
@@ -816,6 +820,26 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         /// <param name="e">The arguments for the event.</param>
         protected virtual void OnSelectionChanged(SelectionChangedEventArgs e) => RaiseEvent(e);
+
+        /// <summary>
+        /// Called when the <see cref="UIElement.IsKeyboardFocusWithin"/> property has changed.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+        protected override void OnIsKeyboardFocusWithinChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnIsKeyboardFocusWithinChanged(e);
+
+            if ((bool)e.NewValue)
+            {
+                SetValueInternal(IsSelectionActivePropertyKey, true);
+            }
+            else
+            {
+                SetValueInternal(IsSelectionActivePropertyKey, false);
+            }
+        }
 
         internal SelectionChanger SelectionChange { get; }
 
@@ -1631,7 +1655,7 @@ namespace System.Windows.Controls.Primitives
                 "IsSelectionActive",
                 typeof(bool),
                 typeof(Selector),
-                new PropertyMetadata(BooleanBoxes.FalseBox));
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, FrameworkPropertyMetadataOptions.Inherits));
 
         /// <summary>
         /// Indicates whether the keyboard focus is within the Selector.
