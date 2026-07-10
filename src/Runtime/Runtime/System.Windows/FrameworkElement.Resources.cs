@@ -347,6 +347,7 @@ public partial class FrameworkElement
     private void OnResourcesChanged(ResourcesChangeInfo info)
     {
         bool containsTypeOfKey = info.Contains(DependencyObjectType.SystemType, true /*isImplicitStyleKey*/);
+        bool isSystemResourcesChange = info.IsThemeChange;
 
         // If a resource dictionary changed above this node then we need to
         // synchronize the ShouldLookupImplicitStyles flag with respect to
@@ -372,6 +373,13 @@ public partial class FrameworkElement
         {
             HasStyleInvalidated = false;
             UpdateStyleProperty();
+        }
+
+        // If there has been a Theme change then
+        // invalidate the ThemeStyleProperty
+        if (isSystemResourcesChange)
+        {
+            UpdateThemeStyleProperty();
         }
 
         ResourcesChanged?.Invoke(this, new ResourcesChangedEventArgs(info));

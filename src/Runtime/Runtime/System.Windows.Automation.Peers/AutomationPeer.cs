@@ -529,7 +529,7 @@ namespace System.Windows.Automation.Peers
         /// <returns>
         /// The proxy.
         /// </returns>
-        protected IRawElementProviderSimple ProviderFromPeer(AutomationPeer peer)
+        protected internal IRawElementProviderSimple ProviderFromPeer(AutomationPeer peer)
             => peer is null ? null : new IRawElementProviderSimple(peer);        
     }
 }

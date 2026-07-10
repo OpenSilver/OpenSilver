@@ -859,6 +859,11 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
+        internal ItemInfo InternalSelectedInfo
+        {
+            get { return (_selectedItems.Count == 0) ? null : _selectedItems[0]; }
+        } 
+
         /// <summary>
         /// Index of the first item in SelectedItems or (-1) if SelectedItems is empty.
         /// </summary>

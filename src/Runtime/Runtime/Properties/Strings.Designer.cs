@@ -160,6 +160,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} (&apos;{1}&apos;) must be less than &apos;{2}&apos;..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Generic_MustBeLess {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Generic_MustBeLess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} (&apos;{1}&apos;) must be less than or equal to &apos;{2}&apos;..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Generic_MustBeLessOrEqual {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Generic_MustBeLessOrEqual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} (&apos;{1}&apos;) must be a non-negative value..
         /// </summary>
         internal static string ArgumentOutOfRange_Generic_MustBeNonNegative {
@@ -1483,6 +1501,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AnchorItem &apos;{0}&apos; does not have a realized container and hence is invalid..
+        /// </summary>
+        internal static string ListBoxInvalidAnchorItem {
+            get {
+                return ResourceManager.GetString("ListBoxInvalidAnchorItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can only call SelectAll when SelectionMode is Multiple or Extended..
         /// </summary>
         internal static string ListBoxSelectAllSelectionMode {
@@ -1506,6 +1533,51 @@ namespace OpenSilver.Internal {
         internal static string ListenerDidNotHandleEventDetail {
             get {
                 return ResourceManager.GetString("ListenerDidNotHandleEventDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GridViewColumnCollection is read-only now..
+        /// </summary>
+        internal static string ListView_GridViewColumnCollectionIsReadOnly {
+            get {
+                return ResourceManager.GetString("ListView_GridViewColumnCollectionIsReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot add object data other than GridViewColumn type..
+        /// </summary>
+        internal static string ListView_IllegalChildrenType {
+            get {
+                return ResourceManager.GetString("ListView_IllegalChildrenType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; does not have a parameterless constructor. GridViewHeaderRowPresenter needs the constructor to create a floating header during column reorder operation..
+        /// </summary>
+        internal static string ListView_MissingParameterlessConstructor {
+            get {
+                return ResourceManager.GetString("ListView_MissingParameterlessConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sharing GridViewColumn among multiple GridViewColumnCollections or adding the same GridViewColumn into one GridViewColumnCollection more than once is not allowed..
+        /// </summary>
+        internal static string ListView_NotAllowShareColumnToTwoColumnCollection {
+            get {
+                return ResourceManager.GetString("ListView_NotAllowShareColumnToTwoColumnCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View can&apos;t be shared by more than one ListView..
+        /// </summary>
+        internal static string ListView_ViewCannotBeShared {
+            get {
+                return ResourceManager.GetString("ListView_ViewCannotBeShared", resourceCulture);
             }
         }
         
@@ -3576,6 +3648,42 @@ namespace OpenSilver.Internal {
         internal static string TooManyRoutedEvents {
             get {
                 return ResourceManager.GetString("TooManyRoutedEvents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Columns.Count:{1}.
+        /// </summary>
+        internal static string ToStringFormatString_GridView {
+            get {
+                return ResourceManager.GetString("ToStringFormatString_GridView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Header:{1}.
+        /// </summary>
+        internal static string ToStringFormatString_GridViewColumn {
+            get {
+                return ResourceManager.GetString("ToStringFormatString_GridViewColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Content:{1} Columns.Count:{2}.
+        /// </summary>
+        internal static string ToStringFormatString_GridViewRowPresenter {
+            get {
+                return ResourceManager.GetString("ToStringFormatString_GridViewRowPresenter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Columns.Count:{1}.
+        /// </summary>
+        internal static string ToStringFormatString_GridViewRowPresenterBase {
+            get {
+                return ResourceManager.GetString("ToStringFormatString_GridViewRowPresenterBase", resourceCulture);
             }
         }
         

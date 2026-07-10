@@ -154,7 +154,15 @@
     <Compile Include="OpenSilver\Internal\ComponentModel\PropertyKey.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterAttribute.cs" />
     <Compile Include="System.ComponentModel\PropertyFilterOptions.cs" />
+    <Compile Include="System.Windows.Automation.Peers\GridViewAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\GridViewCellAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\GridViewColumnHeaderAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\GridViewHeaderRowPresenterAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\GridViewItemAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\GroupBoxAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\IViewAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\ListViewAutomationPeer.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\GridViewRowPresenterBase.cs" />
     <Compile Include="System.Windows.Controls.Primitives\MultiSelector.cs" />
     <Compile Include="System.Windows.Controls\AccessText.cs" />
     <Compile Include="System.Windows.Controls\BorderGapClipConverter.cs" />
@@ -165,6 +173,16 @@
     <Compile Include="System.Windows.Controls\GroupBox.cs" />
     <Compile Include="System.Windows.Controls\GroupItem.cs" />
     <Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
+    <Compile Include="System.Windows.Controls\GridView.cs" />
+    <Compile Include="System.Windows.Controls\GridViewColumn.cs" />
+    <Compile Include="System.Windows.Controls\GridViewColumnCollection.cs" />
+    <Compile Include="System.Windows.Controls\GridViewColumnCollectionChangedEventArgs.cs" />
+    <Compile Include="System.Windows.Controls\GridViewColumnHeader.cs" />
+    <Compile Include="System.Windows.Controls\GridViewHeaderRowPresenter.cs" />
+    <Compile Include="System.Windows.Controls\GridViewRowPresenter.cs" />
+    <Compile Include="System.Windows.Controls\ListView.cs" />
+    <Compile Include="System.Windows.Controls\ListViewItem.cs" />
+    <Compile Include="System.Windows.Controls\ViewBase.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Data\BindingStatus.cs" />
@@ -1223,6 +1241,18 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
       <CustomToolNamespace>OpenSilver.Internal</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\split.cur">
+      <GenerateSource>false</GenerateSource>
+      <Type>Non-Resx</Type>
+      <ManifestResourceName>SplitCursor</ManifestResourceName>
+      <WithCulture>false</WithCulture>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\splitopen.cur">
+      <GenerateSource>false</GenerateSource>
+      <Type>Non-Resx</Type>
+      <ManifestResourceName>SplitOpenCursor</ManifestResourceName>
+      <WithCulture>false</WithCulture>
     </EmbeddedResource>
   </ItemGroup>
 

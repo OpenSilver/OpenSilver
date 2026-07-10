@@ -132,7 +132,7 @@ namespace System.Windows.Controls.Primitives
         /// </returns>
         public new bool IsMouseOver => base.IsMouseOver;
 
-        private static readonly DependencyPropertyKey IsPressedPropertyKey =
+        internal static readonly DependencyPropertyKey IsPressedPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(IsPressed),
                 typeof(bool),

@@ -91,6 +91,10 @@ internal enum SystemResourceKeyID
 
     InternalSystemParametersEnd,
 
+    GridViewScrollViewerStyle,
+    GridViewStyle,
+    GridViewItemContainerStyle,
+
     InternalSystemThemeStylesEnd,
 }
 

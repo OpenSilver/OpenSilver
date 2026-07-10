@@ -1,0 +1,165 @@
+<Page x:Class="TestApplication.Tests.ListViewTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      d:DesignHeight="900"
+      d:DesignWidth="1000">
+
+    <Page.Resources>
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,20,0,8"/>
+        </Style>
+        <Style x:Key="DescriptionStyle" TargetType="TextBlock">
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="Foreground" Value="#FF666666"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Orientation="Vertical" Margin="10">
+
+            <TextBlock Text="ListView" FontSize="24" FontWeight="Bold"/>
+            <TextBlock Style="{StaticResource DescriptionStyle}"
+                       Text="This page showcases the ListView control: default (list) mode, buttons to mutate Items/ItemsSource and selection (inherited from ListBox), the GridView view with columns (DisplayMemberBinding, CellTemplate, custom header styles, column-header click-to-sort), alternating row colors via ItemContainerStyle/AlternationCount, and switching the View at run time."/>
+
+            <!-- ================================================================ -->
+            <!-- 1. Default ListView (no View set) - behaves like a ListBox       -->
+            <!-- ================================================================ -->
+            <TextBlock Text="1. Default ListView (no View) - Items/ItemsSource/Selection" Style="{StaticResource SectionHeaderStyle}"/>
+            <TextBlock Style="{StaticResource DescriptionStyle}"
+                       Text="Without setting the View property, ListView behaves exactly like a ListBox."/>
+
+            <ListView x:Name="SimpleListView" Width="300" Height="140" SelectionMode="Extended"
+                      SelectionChanged="SimpleListView_SelectionChanged"/>
+
+            <WrapPanel Orientation="Horizontal">
+                <Button Content="Items.Add" Click="ButtonSimple_ItemsAdd_Click" Margin="0,4,4,4"/>
+                <Button Content="Items.Clear" Click="ButtonSimple_ItemsClear_Click" Margin="0,4,4,4"/>
+                <Button Content="Items.Remove First" Click="ButtonSimple_ItemsRemoveFirst_Click" Margin="0,4,4,4"/>
+                <Button Content="Set new ItemsSource" Click="ButtonSimple_SetNewItemsSource_Click" Margin="0,4,4,4"/>
+                <Button Content="Set ItemsSource to null" Click="ButtonSimple_SetItemsSourceToNull_Click" Margin="0,4,4,4"/>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+                <Button Content="Select second item" Click="ButtonSimple_SelectSecondItem_Click" Margin="0,4,4,4"/>
+                <Button Content="Select second index" Click="ButtonSimple_SelectSecondIndex_Click" Margin="0,4,4,4"/>
+                <Button Content="SelectedItem=null" Click="ButtonSimple_SelectItemNull_Click" Margin="0,4,4,4"/>
+                <Button Content="SelectedIndex=-1" Click="ButtonSimple_SelectedIndexMinusOne_Click" Margin="0,4,4,4"/>
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="SelectedIndex:"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=SimpleListView, Path=SelectedIndex}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="SelectedItem:"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=SimpleListView, Path=SelectedItem}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="SelectedItems.Count:"/>
+                <TextBlock x:Name="SimpleSelectedItemsCountText" Margin="5,0,0,0" Text="0"/>
+            </StackPanel>
+
+            <!-- ================================================================ -->
+            <!-- 2. ListView with a GridView view                                 -->
+            <!-- ================================================================ -->
+            <TextBlock Text="2. ListView with a GridView view" Style="{StaticResource SectionHeaderStyle}"/>
+            <TextBlock Style="{StaticResource DescriptionStyle}"
+                       Text="GridView.Columns define one column per property, using DisplayMemberBinding for plain text columns, CellTemplate for the Active/Department columns, and a custom ColumnHeaderContainerStyle. Click a column header to sort by that column. Drag a header to reorder columns (GridView.AllowsColumnReorder)."/>
+
+            <ListView x:Name="EmployeesListView"
+                      HorizontalAlignment="Center"
+                      AlternationCount="2"
+                      SelectionMode="Extended">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Style.Triggers>
+                            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                <Setter Property="Background" Value="#FFF2F6FC"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView AllowsColumnReorder="True">
+                        <GridView.ColumnHeaderContainerStyle>
+                            <Style TargetType="GridViewColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Background" Value="#FFDDE7F5"/>
+                                <EventSetter Event="Click" Handler="GridViewColumnHeader_Click"/>
+                            </Style>
+                        </GridView.ColumnHeaderContainerStyle>
+                        <GridViewColumn Header="First Name" Width="140" DisplayMemberBinding="{Binding FirstName}"/>
+                        <GridViewColumn Header="Last Name" Width="140" DisplayMemberBinding="{Binding LastName}"/>
+                        <GridViewColumn Header="Age" Width="60" DisplayMemberBinding="{Binding Age}"/>
+                        <GridViewColumn Header="Department" Width="140">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="#FFE8F0E4" CornerRadius="3" Padding="4,1" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding Department}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Active" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Sorted by:"/>
+                <TextBlock x:Name="SortedByText" Margin="5,0,0,0" Text="(none, click a column header)"/>
+            </StackPanel>
+
+            <WrapPanel Orientation="Horizontal">
+                <Button Content="Items.Add" Click="ButtonEmployees_ItemsAdd_Click" Margin="0,4,4,4"/>
+                <Button Content="Items.Remove First" Click="ButtonEmployees_ItemsRemoveFirst_Click" Margin="0,4,4,4"/>
+                <Button Content="Set new ItemsSource" Click="ButtonEmployees_SetNewItemsSource_Click" Margin="0,4,4,4"/>
+                <Button Content="ItemsSource.Add" Click="ButtonEmployees_ItemsSourceAdd_Click" Margin="0,4,4,4"/>
+                <Button Content="ItemsSource.Remove first" Click="ButtonEmployees_ItemsSourceRemove_Click" Margin="0,4,4,4"/>
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="SelectedItem:"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=EmployeesListView, Path=SelectedItem}"/>
+            </StackPanel>
+
+            <!-- ================================================================ -->
+            <!-- 3. Switching the View at run time                                -->
+            <!-- ================================================================ -->
+            <TextBlock Text="3. Switching View at run time" Style="{StaticResource SectionHeaderStyle}"/>
+            <TextBlock Style="{StaticResource DescriptionStyle}"
+                       Text="The same ListView can switch between a GridView layout and a plain list (View = null). Note that a GridView instance can only be assigned to a single ListView at a time, so a new GridView is created each time the GridView option is selected."/>
+
+            <ListView x:Name="SwitchableListView" Width="500" Height="160"/>
+
+            <WrapPanel Orientation="Horizontal">
+                <Button Content="Use GridView" Click="ButtonSwitchable_UseGridView_Click" Margin="0,4,4,4"/>
+                <Button Content="Use plain list (View = null)" Click="ButtonSwitchable_UsePlainList_Click" Margin="0,4,4,4"/>
+            </WrapPanel>
+
+            <!-- ================================================================ -->
+            <!-- 4. ListViewItem containers created directly in XAML              -->
+            <!-- ================================================================ -->
+            <TextBlock Text="4. ListViewItem elements declared directly in XAML" Style="{StaticResource SectionHeaderStyle}"/>
+            <TextBlock Style="{StaticResource DescriptionStyle}"
+                       Text="ListViewItem objects (like ListBoxItem for ListBox) can be added directly as items; IsItemItsOwnContainerOverride recognizes them and reuses them instead of wrapping them in another container."/>
+
+            <ListView Width="300" Height="110" SelectionMode="Single">
+                <ListViewItem Content="First ListViewItem" IsSelected="True"/>
+                <ListViewItem Content="Second ListViewItem"/>
+                <ListViewItem Content="Third ListViewItem" IsEnabled="False"/>
+            </ListView>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

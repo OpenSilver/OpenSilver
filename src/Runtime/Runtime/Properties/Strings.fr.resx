@@ -1392,4 +1392,40 @@
   <data name="DisplayMemberPathAndItemTemplateSelectorDefined" xml:space="preserve">
     <value>Impossible de définir à la fois DisplayMemberPath et ItemTemplateSelector. Quand l'un n'est pas vide, il doit être supprimé avant que l'autre ne puisse être défini.</value>
   </data>
+  <data name="ListView_ViewCannotBeShared" xml:space="preserve">
+    <value>L'affichage ne peut pas être partagé par plusieurs ListView.</value>
+  </data>
+  <data name="ListView_IllegalChildrenType" xml:space="preserve">
+    <value>Impossible d'ajouter des données d'objet autres que de type GridViewColumn.</value>
+  </data>
+  <data name="ToStringFormatString_GridView" xml:space="preserve">
+    <value>{0} Columns.Count:{1}</value>
+  </data>
+  <data name="ToStringFormatString_GridViewColumn" xml:space="preserve">
+    <value>{0} Header:{1}</value>
+  </data>
+  <data name="ToStringFormatString_GridViewRowPresenterBase" xml:space="preserve">
+    <value>{0} Columns.Count:{1}</value>
+  </data>
+  <data name="ListView_MissingParameterlessConstructor" xml:space="preserve">
+    <value>'{0}' ne possède pas de constructeur sans paramètre. GridViewHeaderRowPresenter a besoin que le constructeur crée un en-tête flottant pendant l'opération de réorganisation des colonnes.</value>
+  </data>
+  <data name="ListView_NotAllowShareColumnToTwoColumnCollection" xml:space="preserve">
+    <value>Le partage de GridViewColumn entre plusieurs GridViewColumnCollection ou l'ajout du même GridViewColumn à un GridViewColumnCollection plusieurs fois n'est pas autorisé.</value>
+  </data>
+  <data name="ListView_GridViewColumnCollectionIsReadOnly" xml:space="preserve">
+    <value>GridViewColumnCollection est maintenant en lecture seule.</value>
+  </data>
+  <data name="ToStringFormatString_GridViewRowPresenter" xml:space="preserve">
+    <value>{0} Content:{1} Columns.Count:{2}</value>
+  </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeLessOrEqual" xml:space="preserve">
+    <value>{0} ('{1}') doit être inférieur ou égal à '{2}'.</value>
+  </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeLess" xml:space="preserve">
+    <value>{0} ('{1}') doit être strictement inférieur à '{2}'.</value>
+  </data>
+  <data name="ListBoxInvalidAnchorItem" xml:space="preserve">
+    <value>AnchorItem '{0}' ne possède pas de conteneur réalisé et par conséquent n'est pas valide.</value>
+  </data>
 </root>

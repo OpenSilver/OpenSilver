@@ -169,6 +169,8 @@ namespace TestApplication
             Tests.Add(new Test("Trigger", "Trigger"));
             Tests.Add(new Test("GroupBox", "GroupBox"));
             Tests.Add(new Test("AccessText / AccessKeyManager", "AccessText"));
+
+            Tests.Add(new Test("ListView", "ListView"));
         }
     }
 }

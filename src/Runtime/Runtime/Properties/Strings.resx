@@ -1394,4 +1394,40 @@
   <data name="DisplayMemberPathAndItemTemplateSelectorDefined" xml:space="preserve">
     <value>Cannot set both DisplayMemberPath and ItemTemplateSelector. When one is nonempty, it must be cleared before the other can be set.</value>
   </data>
+  <data name="ListView_ViewCannotBeShared" xml:space="preserve">
+    <value>View can't be shared by more than one ListView.</value>
+  </data>
+  <data name="ListView_IllegalChildrenType" xml:space="preserve">
+    <value>Cannot add object data other than GridViewColumn type.</value>
+  </data>
+  <data name="ToStringFormatString_GridView" xml:space="preserve">
+    <value>{0} Columns.Count:{1}</value>
+  </data>
+  <data name="ToStringFormatString_GridViewColumn" xml:space="preserve">
+    <value>{0} Header:{1}</value>
+  </data>
+  <data name="ToStringFormatString_GridViewRowPresenterBase" xml:space="preserve">
+    <value>{0} Columns.Count:{1}</value>
+  </data>
+  <data name="ListView_MissingParameterlessConstructor" xml:space="preserve">
+    <value>'{0}' does not have a parameterless constructor. GridViewHeaderRowPresenter needs the constructor to create a floating header during column reorder operation.</value>
+  </data>
+  <data name="ListView_NotAllowShareColumnToTwoColumnCollection" xml:space="preserve">
+    <value>Sharing GridViewColumn among multiple GridViewColumnCollections or adding the same GridViewColumn into one GridViewColumnCollection more than once is not allowed.</value>
+  </data>
+  <data name="ListView_GridViewColumnCollectionIsReadOnly" xml:space="preserve">
+    <value>GridViewColumnCollection is read-only now.</value>
+  </data>
+  <data name="ToStringFormatString_GridViewRowPresenter" xml:space="preserve">
+    <value>{0} Content:{1} Columns.Count:{2}</value>
+  </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeLessOrEqual" xml:space="preserve">
+    <value>{0} ('{1}') must be less than or equal to '{2}'.</value>
+  </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeLess" xml:space="preserve">
+    <value>{0} ('{1}') must be less than '{2}'.</value>
+  </data>
+  <data name="ListBoxInvalidAnchorItem" xml:space="preserve">
+    <value>AnchorItem '{0}' does not have a realized container and hence is invalid.</value>
+  </data>
 </root>

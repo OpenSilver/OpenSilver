@@ -197,12 +197,17 @@ namespace System.Windows
                 {
                     StyleHelper.UpdateThemeStyleCache(this, oldStyle, newStyle, ref _themeStyleCache);
                 }
+
+                OnThemeChanged();
             }
             finally
             {
                 IsThemeStyleUpdateInProgress = false;
             }
         }
+
+        // Called when the theme changes so resources not in the tree can be updated by subclasses
+        internal virtual void OnThemeChanged() { }
 
         private void UpdateStyleProperty()
         {

@@ -47,6 +47,16 @@ internal struct ResourcesChangeInfo
 
     /// <summary>
     ///     This is a static accessor for a ResourcesChangeInfo that is used
+    ///     for theme change notifications
+    /// </summary>
+    internal static ResourcesChangeInfo ThemeChangeInfo { get; } =
+        new ResourcesChangeInfo
+        {
+            IsThemeChange = true
+        };
+
+    /// <summary>
+    ///     This is a static accessor for a ResourcesChangeInfo that is used
     ///     for any ResourceDictionary operations that we aren't able to provide
     ///     the precise 'key that changed' information
     /// </summary>

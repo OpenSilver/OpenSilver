@@ -34,11 +34,14 @@ namespace System.Windows.Controls
 
         private ScrollViewer _scrollHost;
         private ItemInfo _anchorItem;
+        private WeakReference<ListBoxItem> _lastActionItem;
 
         static ListBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBox), new PropertyMetadata(typeof(ListBox)));
             IsTextSearchEnabledProperty.OverrideMetadata(typeof(ListBox), new PropertyMetadata(BooleanBoxes.TrueBox));
+
+            EventManager.RegisterClassHandler<ListBox>(Keyboard.GotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnGotKeyboardFocus));
         }
 
         /// <summary>
@@ -153,6 +156,24 @@ namespace System.Windows.Controls
         /// </summary>
         public void UnselectAll() => UnselectAllImpl();
 
+        /// <inheritdoc />
+        protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+        {
+            base.OnSelectionChanged(e);
+
+            // In a single selection mode we want to move anchor to the selected element
+            if (SelectionMode == SelectionMode.Single)
+            {
+                ItemInfo info = InternalSelectedInfo;
+                ListBoxItem listItem = info != null ? info.Container as ListBoxItem : null;
+
+                if (listItem != null)
+                {
+                    UpdateAnchorAndActionItem(info);
+                }
+            }
+        }
+
         public override void OnApplyTemplate()
         {
             // _scrollHost must be set before calling base
@@ -184,6 +205,30 @@ namespace System.Windows.Controls
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
             return item is ListBoxItem;
+        }
+
+        private static void OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            ListBox listbox = (ListBox)sender;
+
+            // Focus drives the selection when keyboardnavigation is used
+            if (InputManager.Current.MostRecentInputDevice is not KeyboardDevice)
+            {
+                return;
+            }
+
+            // Only in case focus moves from one ListBoxItem to another we want the selection to follow focus
+            ListBoxItem newListBoxItem = e.NewFocus as ListBoxItem;
+            if (newListBoxItem != null && ItemsControlFromItemContainer(newListBoxItem) == listbox)
+            {
+                UIElement visualOldFocus = e.OldFocus as UIElement;
+
+                if ((visualOldFocus != null && listbox.IsAncestorOf(visualOldFocus)) || visualOldFocus == listbox)
+                {
+                    listbox.LastActionItem = newListBoxItem;
+                    listbox.MakeKeyboardSelection(newListBoxItem);
+                }
+            }
         }
 
         /// <summary>
@@ -299,6 +344,8 @@ namespace System.Windows.Controls
 
             if ((info.Container ?? ItemContainerGenerator.ContainerFromIndex(info.Index)) is ListBoxItem listItem)
             {
+                LastActionItem = listItem;
+
                 MakeKeyboardSelection(listItem);
             }
 
@@ -323,7 +370,7 @@ namespace System.Windows.Controls
                     break;
 
                 case SelectionMode.Multiple:
-                    UpdateAnchorItem(ItemInfoFromContainer(item));
+                    UpdateAnchorAndActionItem(ItemInfoFromContainer(item));
                     break;
 
                 case SelectionMode.Extended:
@@ -365,10 +412,65 @@ namespace System.Windows.Controls
             base.AdjustItemInfosAfterGeneratorChangeOverride();
         }
 
+        /// <summary>
+        /// Gets or sets the item that is initially selected when <see cref="SelectionMode"/> 
+        /// is <see cref="SelectionMode.Extended"/>.
+        /// </summary>
+        /// <returns>
+        /// The item that is initially selected when <see cref="SelectionMode"/> is 
+        /// <see cref="SelectionMode.Extended"/>.
+        /// </returns>
+        protected object AnchorItem
+        {
+            get => AnchorItemInternal;
+            set
+            {
+                if (value is not null && value != DependencyProperty.UnsetValue)
+                {
+                    ItemInfo info = NewItemInfo(value);
+
+                    if (info.Container is not ListBoxItem listBoxItem)
+                    {
+                        throw new InvalidOperationException(string.Format(Strings.ListBoxInvalidAnchorItem, value));
+                    }
+
+                    AnchorItemInternal = info;
+                    LastActionItem = listBoxItem;
+                }
+                else
+                {
+                    AnchorItemInternal = null;
+                    LastActionItem = null;
+                }
+            }
+        }
+
         internal ItemInfo AnchorItemInternal
         {
             get { return _anchorItem; }
             set { _anchorItem = value?.Clone(); } // clone, so that adjustments to selection and anchor don't double-adjust
+        }
+
+        internal ListBoxItem LastActionItem
+        {
+            get
+            {
+                if (_lastActionItem is not null && _lastActionItem.TryGetTarget(out ListBoxItem lastActionItem))
+                {
+                    return lastActionItem;
+                }
+                return null;
+            }
+            set
+            {
+                if (value is null)
+                {
+                    _lastActionItem = null;
+                    return;
+                }
+
+                _lastActionItem = new WeakReference<ListBoxItem>(value);
+            }
         }
 
         internal void NotifyListItemClicked(ListBoxItem item)
@@ -386,7 +488,7 @@ namespace System.Windows.Controls
                         item.SetCurrentValueInternal(ListBoxItem.IsSelectedProperty, BooleanBoxes.FalseBox);
                     }
 
-                    UpdateAnchorItem(ItemInfoFromContainer(item));
+                    UpdateAnchorAndActionItem(ItemInfoFromContainer(item));
                     break;
 
                 case SelectionMode.Multiple:
@@ -415,18 +517,23 @@ namespace System.Windows.Controls
             }
         }
 
-        private void UpdateAnchorItem(ItemInfo info)
+        private void UpdateAnchorAndActionItem(ItemInfo info)
         {
             object item = info.Item;
+            ListBoxItem listItem = info.Container as ListBoxItem;
 
             if (item == DependencyProperty.UnsetValue)
             {
                 AnchorItemInternal = null;
+                LastActionItem = null;
             }
             else
             {
                 AnchorItemInternal = info;
+                LastActionItem = listItem;
             }
+
+            KeyboardNavigation.SetTabOnceActiveElement(this, listItem);
         }
 
         private void MakeSingleSelection(ListBoxItem listItem)
@@ -439,7 +546,7 @@ namespace System.Windows.Controls
 
                 listItem.Focus();
 
-                UpdateAnchorItem(info);
+                UpdateAnchorAndActionItem(info);
             }
         }
 
@@ -447,7 +554,7 @@ namespace System.Windows.Controls
         {
             item.SetCurrentValueInternal(IsSelectedProperty, BooleanBoxes.Box(!item.IsSelected));
 
-            UpdateAnchorItem(ItemInfoFromContainer(item));
+            UpdateAnchorAndActionItem(ItemInfoFromContainer(item));
         }
 
         private void MakeAnchorSelection(ListBoxItem actionItem, bool clearCurrent)
@@ -530,6 +637,8 @@ namespace System.Windows.Controls
                     SelectionChange.End();
                 }
             }
+
+            LastActionItem = actionItem;
         }
     }
 }

@@ -247,6 +247,7 @@ namespace System.Windows
             CleanupTemplateTriggerStorage(fe);
 
             fe.TemplateChild = null;
+            fe.HasTemplateGeneratedSubTree = false;
         }
 
         internal static bool ApplyTemplateContent(FrameworkElement container, FrameworkTemplate template)

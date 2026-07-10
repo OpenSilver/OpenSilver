@@ -2007,10 +2007,19 @@ namespace System.Windows
                                 valueWasRetrieved = true;
                             }
 
+                            var valueSource = storage.Entry.BaseValueSourceInternal;
+
                             // Raise the "PropertyChanged" event
                             metadata.PropertyChangedCallback(
                                 this,
-                                new DependencyPropertyChangedEventArgs(value, value, dp, metadata));
+                                new DependencyPropertyChangedEventArgs(
+                                    value,
+                                    valueSource,
+                                    value,
+                                    valueSource,
+                                    dp,
+                                    metadata,
+                                    OperationType.Unknown));
                         }
                     }
                 }

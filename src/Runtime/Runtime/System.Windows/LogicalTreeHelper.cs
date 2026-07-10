@@ -216,6 +216,23 @@ public static class LogicalTreeHelper
         return current.Parent;
     }
 
+    internal static void RemoveLogicalChild(DependencyObject parent, object child)
+    {
+        if (child is not null && parent is not null)
+        {
+            switch (parent)
+            {
+                case FrameworkElement parentFE:
+                    parentFE.RemoveLogicalChild(child);
+                    break;
+
+                case IInternalFrameworkElement parentIFE:
+                    parentIFE.RemoveLogicalChild(child);
+                    break;
+            }
+        }
+    }
+
     private static IEnumerator GetLogicalChildren(DependencyObject current)
     {
         if (current is IInternalFrameworkElement fe)

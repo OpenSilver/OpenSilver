@@ -29,6 +29,19 @@ public sealed class ControlTemplate : FrameworkTemplate
     public ControlTemplate() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="ControlTemplate"/> class with the specified 
+    /// target type.
+    /// </summary>
+    /// <param name="targetType">
+    /// The type this template is intended for.
+    /// </param>
+    public ControlTemplate(Type targetType)
+    {
+        ArgumentNullException.ThrowIfNull(targetType);
+        _targetType = targetType;
+    }
+
+    /// <summary>
     /// Gets or sets the type to which the ControlTemplate is applied.
     /// </summary>
     [Ambient]

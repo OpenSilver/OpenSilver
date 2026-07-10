@@ -43,5 +43,55 @@ namespace System
                 }
             }
         }
+
+        extension(ArgumentOutOfRangeException)
+        {
+            [DebuggerStepThrough]
+            public static void ThrowIfNegative(double value, [CallerArgumentExpression(nameof(value))] string paramName = null)
+            {
+                if (value < 0)
+                {
+                    ThrowNegative(value, paramName);
+                }
+            }
+
+            [DebuggerStepThrough]
+            public static void ThrowIfNegative(int value, [CallerArgumentExpression(nameof(value))] string paramName = null)
+            {
+                if (value < 0)
+                {
+                    ThrowNegative(value, paramName);
+                }
+            }
+
+            [DebuggerStepThrough]
+            public static void ThrowIfGreaterThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string paramName = null)
+                where T : IComparable<T>
+            {
+                if (value.CompareTo(other) > 0)
+                {
+                    ThrowGreaterEqual(value, other, paramName);
+                }
+            }
+
+            [DebuggerStepThrough]
+            public static void ThrowIfGreaterThanOrEqual<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string paramName = null)
+                where T : IComparable<T>
+            {
+                if (value.CompareTo(other) >= 0)
+                {
+                    ThrowGreaterEqual(value, other, paramName);
+                }
+            }
+
+            private static void ThrowNegative<T>(T value, string paramName) =>
+                throw new ArgumentOutOfRangeException(paramName, value, string.Format(Strings.ArgumentOutOfRange_Generic_MustBeNonNegative, paramName, value));
+
+            private static void ThrowGreater<T>(T value, T other, string paramName) =>
+                throw new ArgumentOutOfRangeException(paramName, value, string.Format(Strings.ArgumentOutOfRange_Generic_MustBeLessOrEqual, paramName, value, other));
+
+            private static void ThrowGreaterEqual<T>(T value, T other, string paramName) =>
+                throw new ArgumentOutOfRangeException(paramName, value, string.Format(Strings.ArgumentOutOfRange_Generic_MustBeLess, paramName, value, other));
+        }
     }
 }

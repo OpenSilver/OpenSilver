@@ -957,7 +957,9 @@ internal static class DependencyObjectStore
             d.NotifyPropertyChange(
                 new DependencyPropertyChangedEventArgs(
                     oldValue,
+                    oldValueSource,
                     newValue,
+                    newValueSource,
                     dp,
                     metadata,
                     operationType));

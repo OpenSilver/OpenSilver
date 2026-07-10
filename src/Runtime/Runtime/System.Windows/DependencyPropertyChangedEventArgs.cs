@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows;
 
 /// <summary>
@@ -25,7 +27,9 @@ public readonly struct DependencyPropertyChangedEventArgs
         PropertyMetadata metadata)
     {
         OldValue = oldValue;
+        OldValueSource = BaseValueSourceInternal.Unknown;
         NewValue = newValue;
+        NewValueSource = BaseValueSourceInternal.Unknown;
         Property = property;
         Metadata = metadata;
         OperationType = OperationType.Unknown;
@@ -33,13 +37,17 @@ public readonly struct DependencyPropertyChangedEventArgs
 
     internal DependencyPropertyChangedEventArgs(
         object oldValue,
+        BaseValueSourceInternal oldValueSource,
         object newValue,
+        BaseValueSourceInternal newValueSource,
         DependencyProperty property,
         PropertyMetadata metadata,
         OperationType operationType)
     {
         OldValue = oldValue;
+        OldValueSource = oldValueSource;
         NewValue = newValue;
+        NewValueSource = newValueSource;
         Property = property;
         Metadata = metadata;
         OperationType = operationType;
@@ -73,6 +81,16 @@ public readonly struct DependencyPropertyChangedEventArgs
     /// Metadata for the property
     /// </summary>
     internal PropertyMetadata Metadata { get; }
+
+    /// <summary>
+    /// The source of the old value
+    /// </summary>
+    internal BaseValueSourceInternal OldValueSource { get; }
+
+    /// <summary>
+    /// The source of the new value
+    /// </summary>
+    internal BaseValueSourceInternal NewValueSource { get; }
 
     internal OperationType OperationType { get; }
 }

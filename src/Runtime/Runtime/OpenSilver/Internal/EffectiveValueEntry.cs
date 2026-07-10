@@ -206,8 +206,9 @@ internal enum FullValueSource : short
 // Note that these enum values are arranged in the reverse order of
 // precendence for these sources. Local value has highest
 // precedence and Default value has the least.
-internal enum BaseValueSourceInternal : short
+internal enum BaseValueSourceInternal : byte
 {
+    Unknown = 0,
     Default = 1,
     Inherited = 2,
     ThemeStyle = 3,
