@@ -3142,6 +3142,9 @@ Object.defineProperty(window, 'osjs', {
                                 width: bounds.width,
                                 height: bounds.height,
                                 pixelRatio: pixelRatio,
+                                style: {
+                                    position: 'static',
+                                },
                             });
                         } catch (error) { }
 

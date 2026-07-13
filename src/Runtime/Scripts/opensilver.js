@@ -188,12 +188,12 @@ window._openSilverRuntime = (function () {
                     htmlToImage.toPixelData(element, {
                         width: width,
                         height: height,
+                        pixelRatio: 1,
                         style: {
                             position: 'static',
                             transform: transform,
                             transformOrigin: '0% 0%',
                             backgroundColor: 'transparent',
-                            pixelRatio: 1,
                         },
                     }).then(function (pixels) {
                         _tempPixelsData = new Int32Array(pixels.buffer);
