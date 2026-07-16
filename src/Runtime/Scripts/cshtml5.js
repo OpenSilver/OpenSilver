@@ -3137,10 +3137,9 @@ Object.defineProperty(window, 'osjs', {
 
                         let blob = null;
                         try {
-                            const bounds = element.getBoundingClientRect();
                             blob = await htmlToImage.toBlob(element, {
-                                width: bounds.width,
-                                height: bounds.height,
+                                width: element.scrollWidth,
+                                height: element.scrollHeight,
                                 pixelRatio: pixelRatio,
                                 style: {
                                     position: 'static',
