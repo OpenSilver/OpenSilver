@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -163,12 +164,13 @@ namespace System.Windows.Controls
                 if (parent != null)
                 {
                     // Traverse logical children
-                    int count = VisualTreeHelper.GetChildrenCount(parent);
-                    for (int i = 0; i < count; ++i)
+                    IEnumerable children = LogicalTreeHelper.GetChildren(parent);
+                    IEnumerator itor = children.GetEnumerator();
+                    while (itor.MoveNext())
                     {
-                        RadioButton rb = VisualTreeHelper.GetChild(parent, i) as RadioButton;
+                        RadioButton rb = itor.Current as RadioButton;
                         if (rb != null && rb != this && string.IsNullOrEmpty(rb.GroupName) && (rb.IsChecked == true))
-                        {
+                        { 
                             rb.UncheckRadioButton();
                         }
                     }
