@@ -6301,6 +6301,8 @@
            TargetType="controls:ScrollViewer">
         <Setter Property="Focusable"
                 Value="False" />
+        <Setter Property="Padding"
+                Value="0" />
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:ScrollViewer">
@@ -6320,7 +6322,8 @@
                             <controls:ScrollViewer controls:DockPanel.Dock="Top"
                                                    Focusable="false"
                                                    HorizontalScrollBarVisibility="Hidden"
-                                                   VerticalScrollBarVisibility="Hidden">
+                                                   VerticalScrollBarVisibility="Hidden"
+                                                   Padding="0">
                                 <!-- Set a Margin here because ListViewItem has a 2-width border around. Otherwise the horizontal scrolling of header bar and item will not keep the same pace -->
                                 <controls:GridViewHeaderRowPresenter Margin="2,0,2,0"
                                                                      AllowsColumnReorder="{data:Binding Path=TemplatedParent.View.AllowsColumnReorder, RelativeSource={data:RelativeSource TemplatedParent}}"
