@@ -52,7 +52,6 @@ public class Window : ContentControl, IResizeObserverListener
     private bool _isModal;
     internal bool _isClosed;
     private bool _isFullScreen;
-    private bool _hasExplicitWindowProps;
     private HtmlElementReference _overlayDiv;
     private TaskCompletionSource<bool?> _dialogResultTcs;
     private WindowHost _windowHost;
@@ -1142,8 +1141,7 @@ public class Window : ContentControl, IResizeObserverListener
 
         _windowHost.Show(_overlayDiv);
 
-        // Determine display mode before positioning (centering sets Left/Top which would
-        // make HasExplicitWindowProps return true).
+        // Determine display mode before positioning
         UpdateFullScreenMode();
 
         if (!_isFullScreen)
@@ -1337,24 +1335,15 @@ public class Window : ContentControl, IResizeObserverListener
 
         if (previousState == WindowState.Normal)
         {
-            // Save current position, size, and constraints for later restoration
+            // Save current position and size for later restoration
             _restoreLeft = double.IsNaN(Left) ? 0 : Left;
             _restoreTop = double.IsNaN(Top) ? 0 : Top;
             _restoreWidth = Width;
             _restoreHeight = Height;
-            _restoreMinWidth = MinWidth;
-            _restoreMinHeight = MinHeight;
-            _restoreMaxWidth = MaxWidth;
-            _restoreMaxHeight = MaxHeight;
         }
 
-        // Clear all size constraints so the window fills the available space.
         Width = double.NaN;
         Height = double.NaN;
-        MinWidth = 0;
-        MinHeight = 0;
-        MaxWidth = double.PositiveInfinity;
-        MaxHeight = double.PositiveInfinity;
 
         // Fill the overlay: position at origin with full size
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Left, "0px");
@@ -1396,15 +1385,12 @@ public class Window : ContentControl, IResizeObserverListener
         // Restore resize borders
         _windowHost.SetResizeBordersVisible(ResizeMode >= ResizeMode.CanResize, ResizeMode == ResizeMode.CanResizeWithGrip);
 
-        // Restore position, size, and constraints
+        // Restore position and size. Min/Max constraints are never cleared on
+        // maximize, so they don't need to be restored here.
         Left = _restoreLeft;
         Top = _restoreTop;
         Width = _restoreWidth;
         Height = _restoreHeight;
-        MinWidth = _restoreMinWidth;
-        MinHeight = _restoreMinHeight;
-        MaxWidth = _restoreMaxWidth;
-        MaxHeight = _restoreMaxHeight;
 
         // Remove the 100% override so the layout system can size to content
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, string.Empty);
@@ -1437,10 +1423,6 @@ public class Window : ContentControl, IResizeObserverListener
     private double _restoreTop;
     private double _restoreWidth;
     private double _restoreHeight;
-    private double _restoreMinWidth;
-    private double _restoreMinHeight;
-    private double _restoreMaxWidth;
-    private double _restoreMaxHeight;
     private WindowState _stateBeforeMinimize;
 
 
@@ -1776,7 +1758,7 @@ public class Window : ContentControl, IResizeObserverListener
     internal void UpdateFullScreenMode()
     {
         bool shouldBeFullScreen = IsMainWindow
-            && !HasExplicitWindowProps()
+            && PropsAllowFullScreen()
             && Application.Current?.Windows.Count <= 1;
 
         if (shouldBeFullScreen && !_isFullScreen)
@@ -1813,27 +1795,10 @@ public class Window : ContentControl, IResizeObserverListener
         _windowHost?.ApplyWindowChromeMode();
     }
 
-    private bool HasExplicitWindowProps()
+    private bool PropsAllowFullScreen()
     {
-        if (_hasExplicitWindowProps) return true;
-
-        _hasExplicitWindowProps =
-            ReadLocalValue(WidthProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(HeightProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(LeftProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(TopProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(MinWidthProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(MinHeightProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(MaxWidthProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(MaxHeightProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(WindowStyleProperty) != DependencyProperty.UnsetValue ||
-            ReadLocalValue(ResizeModeProperty) != DependencyProperty.UnsetValue ||
-            WindowStartupLocation != WindowStartupLocation.Manual ||
-            ReadLocalValue(WindowChrome.WindowChromeProperty) != DependencyProperty.UnsetValue;
-
-        return _hasExplicitWindowProps;
+        return ResizeMode >= ResizeMode.CanResize;
     }
-
 
     #endregion
 }

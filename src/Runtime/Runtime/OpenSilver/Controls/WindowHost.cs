@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -102,6 +103,8 @@ public class WindowHost : ContentControl
         Content = window;
 
         SetBinding(TitleProperty, new Binding(Window.TitleProperty) { Source = window });
+        SetBinding(MaxWidthProperty, new Binding(MaxWidthProperty) { Source = window });
+        SetBinding(MinWidthProperty, new Binding(MinWidthProperty) { Source = window });
     }
 
     /// <summary>
@@ -567,8 +570,11 @@ public class WindowHost : ContentControl
         }
 
         double w = _window.Width;
-        return new Size(
-            double.IsNaN(w) ? double.PositiveInfinity : w,
-            double.PositiveInfinity);
+        double availW = double.IsNaN(w) ? double.PositiveInfinity : w;
+
+        if (!double.IsPositiveInfinity(MaxWidth))
+            availW = Math.Min(availW, MaxWidth);
+
+        return new Size(availW, double.PositiveInfinity);
     }
 }
