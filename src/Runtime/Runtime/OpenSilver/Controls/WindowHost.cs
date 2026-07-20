@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,12 +45,21 @@ public class WindowHost : ContentControl
     private const string PART_MaximizeButton = "PART_MaximizeButton";
     private const string PART_RestoreButton = "PART_RestoreButton";
     private const string PART_CloseButton = "PART_CloseButton";
+    private const string PART_ResizeTop = "PART_ResizeTop";
     private const string PART_ResizeLeft = "PART_ResizeLeft";
     private const string PART_ResizeRight = "PART_ResizeRight";
     private const string PART_ResizeBottom = "PART_ResizeBottom";
+    private const string PART_ResizeTopLeft = "PART_ResizeTopLeft";
+    private const string PART_ResizeTopRight = "PART_ResizeTopRight";
     private const string PART_ResizeBottomLeft = "PART_ResizeBottomLeft";
     private const string PART_ResizeBottomRight = "PART_ResizeBottomRight";
     private const string PART_ResizeGrip = "PART_ResizeGrip";
+    private const string PART_ChromeButtons = "PART_ChromeButtons";
+    private const string PART_ChromeMinimizeButton = "PART_ChromeMinimizeButton";
+    private const string PART_ChromeMaximizeButton = "PART_ChromeMaximizeButton";
+    private const string PART_ChromeRestoreButton = "PART_ChromeRestoreButton";
+    private const string PART_ChromeCloseButton = "PART_ChromeCloseButton";
+    private const string PART_DragArea = "PART_DragArea";
 
     private readonly Window _window;
     private FrameworkElement _titleBarPart;
@@ -57,13 +67,22 @@ public class WindowHost : ContentControl
     private ButtonBase _maximizeButtonPart;
     private ButtonBase _restoreButtonPart;
     private ButtonBase _closeButtonPart;
+    private FrameworkElement _resizeTopPart;
     private FrameworkElement _resizeLeftPart;
     private FrameworkElement _resizeRightPart;
     private FrameworkElement _resizeBottomPart;
+    private FrameworkElement _resizeTopLeftPart;
+    private FrameworkElement _resizeTopRightPart;
     private FrameworkElement _resizeBottomLeftPart;
     private FrameworkElement _resizeBottomRightPart;
     private FrameworkElement _resizeGripPart;
-    private bool _pendingTitleBarVisible = true;
+    private FrameworkElement _chromeButtonsPart;
+    private ButtonBase _chromeMinimizeButtonPart;
+    private ButtonBase _chromeMaximizeButtonPart;
+    private ButtonBase _chromeRestoreButtonPart;
+    private ButtonBase _chromeCloseButtonPart;
+    private FrameworkElement _dragAreaPart;
+    private bool _hasChromeOverride;
     private double _pendingTitleBarHeight = 30;
 
     static WindowHost()
@@ -84,6 +103,8 @@ public class WindowHost : ContentControl
         Content = window;
 
         SetBinding(TitleProperty, new Binding(Window.TitleProperty) { Source = window });
+        SetBinding(MaxWidthProperty, new Binding(MaxWidthProperty) { Source = window });
+        SetBinding(MinWidthProperty, new Binding(MinWidthProperty) { Source = window });
     }
 
     /// <summary>
@@ -162,80 +183,202 @@ public class WindowHost : ContentControl
         PropagateSuspendLayout(this);
     }
 
+    #region mine
+
     internal void UpdateResizeBorderThickness(Thickness thickness)
     {
+        _resizeTopPart?.Height = thickness.Top;
         _resizeLeftPart?.Width = thickness.Left;
         _resizeRightPart?.Width = thickness.Right;
         _resizeBottomPart?.Height = thickness.Bottom;
-        if (_resizeBottomLeftPart is not null)
-        {
-            _resizeBottomLeftPart.Width = thickness.Left;
-            _resizeBottomLeftPart.Height = thickness.Bottom;
-        }
-        if (_resizeBottomRightPart is not null)
-        {
-            _resizeBottomRightPart.Width = thickness.Right;
-            _resizeBottomRightPart.Height = thickness.Bottom;
-        }
+        if (_resizeTopLeftPart is not null) { _resizeTopLeftPart.Width = thickness.Left; _resizeTopLeftPart.Height = thickness.Top; }
+        if (_resizeTopRightPart is not null) { _resizeTopRightPart.Width = thickness.Right; _resizeTopRightPart.Height = thickness.Top; }
+        if (_resizeBottomLeftPart is not null) { _resizeBottomLeftPart.Width = thickness.Left; _resizeBottomLeftPart.Height = thickness.Bottom; }
+        if (_resizeBottomRightPart is not null) { _resizeBottomRightPart.Width = thickness.Right; _resizeBottomRightPart.Height = thickness.Bottom; }
     }
 
-    internal void SetResizeBordersVisible(bool visible)
+
+    
+
+    internal void UpdateMaximizeRestoreButton(bool isMaximized)
     {
-        var visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-
-        _resizeLeftPart?.Visibility = visibility;
-        _resizeRightPart?.Visibility = visibility;
-        _resizeBottomPart?.Visibility = visibility;
-        _resizeBottomLeftPart?.Visibility = visibility;
-        _resizeBottomRightPart?.Visibility = visibility;
+        Visibility maxVisibility = _window.ResizeMode == ResizeMode.NoResize ? Visibility.Collapsed : Visibility.Visible;
+        _maximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : maxVisibility;
+        _restoreButtonPart?.Visibility = isMaximized ? maxVisibility : Visibility.Collapsed;
+        _chromeMaximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : maxVisibility;
+        _chromeRestoreButtonPart?.Visibility = isMaximized ? maxVisibility : Visibility.Collapsed;
     }
+
+
+    #region Handling WindowChrome
+
+    internal void ApplyWindowChromeMode()
+    {
+        ApplyWindowChromeMode(WindowChrome.GetWindowChrome(_window));
+    }
+
+    internal void ApplyWindowChromeMode(WindowChrome windowChrome)
+    {
+        
+        _hasChromeOverride = windowChrome != null;
+        Thickness resizeThickness = new Thickness(8);
+        if (_hasChromeOverride)
+        {
+            _dragAreaPart?.Visibility = Visibility.Visible;
+            resizeThickness = windowChrome.ResizeBorderThickness != null ? windowChrome.ResizeBorderThickness : resizeThickness;
+        }
+        else
+        {
+            _dragAreaPart?.Visibility = Visibility.Collapsed;
+        }
+        ApplyWindowStyle();
+        UpdateResizeBorderThickness(resizeThickness);
+    }
+
+    #endregion
+
+    #region handle WindowStyle
+
+    internal void ApplyWindowStyle()
+    {
+        //For now, they basically look the same, except None.
+        switch (_window.WindowStyle)
+        {
+            case WindowStyle.None:
+                _titleBarPart?.Visibility = Visibility.Collapsed;
+                _chromeButtonsPart?.Visibility = Visibility.Collapsed;
+                break;
+            default:
+                _titleBarPart?.Visibility = _hasChromeOverride ? Visibility.Collapsed : Visibility.Visible;
+                _chromeButtonsPart?.Visibility = _hasChromeOverride ? Visibility.Visible : Visibility.Collapsed;
+                break;
+        }
+    }
+
+    internal void HideTitleBar()
+    {
+        _titleBarPart?.Visibility = Visibility.Collapsed;
+        _chromeButtonsPart?.Visibility = Visibility.Collapsed;
+    }
+
+    #endregion
+
+
+    #region handle ResizeMode
 
     internal void UpdateResizeMode(ResizeMode mode)
     {
-        bool canResize = mode >= ResizeMode.CanResize;
+        Visibility buttonsVisibility = Visibility.Visible;
+        bool isGripVisible = false;
+        bool areResizeBordersVisible = true;
 
-        _minimizeButtonPart?.Visibility = mode == ResizeMode.NoResize ? Visibility.Collapsed : Visibility.Visible;
+        bool canMaximize = true;
+        double maximizeButtonOpacity = 1.0;
 
-        if (_maximizeButtonPart is not null)
+        switch (mode)
         {
-            _maximizeButtonPart.Visibility = mode == ResizeMode.NoResize ? Visibility.Collapsed : Visibility.Visible;
-            _maximizeButtonPart.IsHitTestVisible = canResize;
-            _maximizeButtonPart.Opacity = canResize ? 1.0 : 0.4;
+            case ResizeMode.NoResize:
+                buttonsVisibility = Visibility.Collapsed;
+                areResizeBordersVisible = false;
+                break;
+            case ResizeMode.CanMinimize:
+                canMaximize = false;
+                areResizeBordersVisible = false;
+                maximizeButtonOpacity = 0.4;
+                break;
+            case ResizeMode.CanResize:
+                break;
+            case ResizeMode.CanResizeWithGrip:
+                isGripVisible = true;
+                break;
+            default:
+                break;
         }
 
-        if (_restoreButtonPart is not null)
-        {
-            if (mode == ResizeMode.NoResize)
-            {
-                _restoreButtonPart.Visibility = Visibility.Collapsed;
-            }
+        // Buttons:
+        _minimizeButtonPart?.Visibility = buttonsVisibility;
+        _chromeMinimizeButtonPart?.Visibility = buttonsVisibility;
+        _maximizeButtonPart?.Visibility = buttonsVisibility;
+        _chromeMaximizeButtonPart?.Visibility = buttonsVisibility;
+        _restoreButtonPart?.Visibility = buttonsVisibility;
 
-            _restoreButtonPart.IsHitTestVisible = canResize;
-            _restoreButtonPart.Opacity = canResize ? 1.0 : 0.4;
-        }
+        //Maximize button specifics:
+        _maximizeButtonPart.IsHitTestVisible = canMaximize;
+        _maximizeButtonPart.Opacity = maximizeButtonOpacity;
+        _restoreButtonPart.IsHitTestVisible = canMaximize;
+        _restoreButtonPart.Opacity = maximizeButtonOpacity;
 
-        SetResizeBordersVisible(canResize);
+
+        SetResizeBordersVisible(areResizeBordersVisible, isGripVisible);
 
         _resizeGripPart?.Visibility = mode == ResizeMode.CanResizeWithGrip ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    internal void UpdateMaximizeRestoreButton(bool isMaximized)
+
+    internal void SetResizeBordersVisible(bool visible, bool gripVisible)
     {
-        _maximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : Visibility.Visible;
-        _restoreButtonPart?.Visibility = isMaximized ? Visibility.Visible : Visibility.Collapsed;
+        var visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        var gripVisibility = (visible && gripVisible) ? Visibility.Visible : Visibility.Collapsed;
+
+        _resizeTopPart?.Visibility = visibility;
+        _resizeLeftPart?.Visibility = visibility;
+        _resizeRightPart?.Visibility = visibility;
+        _resizeBottomPart?.Visibility = visibility;
+        _resizeTopLeftPart?.Visibility = visibility;
+        _resizeTopRightPart?.Visibility = visibility;
+        _resizeBottomLeftPart?.Visibility = visibility;
+        _resizeBottomRightPart?.Visibility = visibility;
+        _resizeGripPart?.Visibility = gripVisibility;
+    }
+    #endregion
+
+
+    internal double GetMinDraggableMargin()
+    {
+        // We need at least some pixels of draggable title bar area visible.
+        // Measure the buttons' total width + a small grab area.
+        double buttonsWidth = 0;
+        if (_minimizeButtonPart?.Visibility == Visibility.Visible)
+            buttonsWidth += _minimizeButtonPart.ActualWidth;
+        if (_maximizeButtonPart?.Visibility == Visibility.Visible)
+            buttonsWidth += _maximizeButtonPart.ActualWidth;
+        if (_restoreButtonPart?.Visibility == Visibility.Visible)
+            buttonsWidth += _restoreButtonPart.ActualWidth;
+        if (_closeButtonPart?.Visibility == Visibility.Visible)
+            buttonsWidth += _closeButtonPart.ActualWidth;
+
+        // Add a minimum grab area (at least 40px of draggable space beyond buttons)
+        return buttonsWidth + 40;
     }
 
-    internal void UpdateTitleBarVisibility(bool visible)
-    {
-        _pendingTitleBarVisible = visible;
-        _titleBarPart?.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-    }
+
+    #region temporarily accepted
 
     internal void UpdateTitleBarHeight(double captionHeight)
     {
         _pendingTitleBarHeight = captionHeight;
         _titleBarPart?.Height = captionHeight;
+        _dragAreaPart?.Height = captionHeight;
     }
+
+    internal double GetTitleBarHeight()
+    {
+        if (_titleBarPart?.Visibility == Visibility.Visible)
+        {
+            return _titleBarPart.ActualHeight > 0 ? _titleBarPart.ActualHeight : _pendingTitleBarHeight;
+        }
+        return _pendingTitleBarHeight;
+    }
+
+    #endregion
+
+
+    #endregion
+
+
+
+
+
 
     public override void OnApplyTemplate()
     {
@@ -248,27 +391,30 @@ public class WindowHost : ContentControl
         _maximizeButtonPart = GetTemplateChild(PART_MaximizeButton) as ButtonBase;
         _restoreButtonPart = GetTemplateChild(PART_RestoreButton) as ButtonBase;
         _closeButtonPart = GetTemplateChild(PART_CloseButton) as ButtonBase;
+        _resizeTopPart = GetTemplateChild(PART_ResizeTop) as FrameworkElement;
         _resizeLeftPart = GetTemplateChild(PART_ResizeLeft) as FrameworkElement;
         _resizeRightPart = GetTemplateChild(PART_ResizeRight) as FrameworkElement;
         _resizeBottomPart = GetTemplateChild(PART_ResizeBottom) as FrameworkElement;
+        _resizeTopLeftPart = GetTemplateChild(PART_ResizeTopLeft) as FrameworkElement;
+        _resizeTopRightPart = GetTemplateChild(PART_ResizeTopRight) as FrameworkElement;
         _resizeBottomLeftPart = GetTemplateChild(PART_ResizeBottomLeft) as FrameworkElement;
         _resizeBottomRightPart = GetTemplateChild(PART_ResizeBottomRight) as FrameworkElement;
         _resizeGripPart = GetTemplateChild(PART_ResizeGrip) as FrameworkElement;
+        _chromeButtonsPart = GetTemplateChild(PART_ChromeButtons) as FrameworkElement;
+        _chromeMinimizeButtonPart = GetTemplateChild(PART_ChromeMinimizeButton) as ButtonBase;
+        _chromeMaximizeButtonPart = GetTemplateChild(PART_ChromeMaximizeButton) as ButtonBase;
+        _chromeRestoreButtonPart = GetTemplateChild(PART_ChromeRestoreButton) as ButtonBase;
+        _chromeCloseButtonPart = GetTemplateChild(PART_ChromeCloseButton) as ButtonBase;
+        _dragAreaPart = GetTemplateChild(PART_DragArea) as FrameworkElement;
 
         SubscribeToTemplateParts();
 
-        if (_titleBarPart is not null)
-        {
-            _titleBarPart.Visibility = _pendingTitleBarVisible ? Visibility.Visible : Visibility.Collapsed;
-            _titleBarPart.Height = _pendingTitleBarHeight;
-        }
+        _titleBarPart?.Height = _pendingTitleBarHeight;
+        _dragAreaPart?.Height = _pendingTitleBarHeight;
 
+
+        ApplyWindowChromeMode();
         UpdateResizeMode(_window.ResizeMode);
-        var chrome = WindowChrome.GetWindowChrome(_window);
-        if (chrome is not null)
-        {
-            UpdateResizeBorderThickness(chrome.ResizeBorderThickness);
-        }
     }
 
     private void SubscribeToTemplateParts()
@@ -278,12 +424,20 @@ public class WindowHost : ContentControl
         _maximizeButtonPart?.Click += MaximizeButton_Click;
         _restoreButtonPart?.Click += MaximizeButton_Click;
         _closeButtonPart?.Click += CloseButton_Click;
+        _resizeTopPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
         _resizeLeftPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
         _resizeRightPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
         _resizeBottomPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _resizeTopLeftPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _resizeTopRightPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
         _resizeBottomLeftPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
         _resizeBottomRightPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
         _resizeGripPart?.MouseLeftButtonDown += ResizeEdge_MouseLeftButtonDown;
+        _chromeMinimizeButtonPart?.Click += MinimizeButton_Click;
+        _chromeMaximizeButtonPart?.Click += MaximizeButton_Click;
+        _chromeRestoreButtonPart?.Click += MaximizeButton_Click;
+        _chromeCloseButtonPart?.Click += CloseButton_Click;
+        _dragAreaPart?.MouseLeftButtonDown += DragArea_MouseLeftButtonDown;
     }
 
     private void UnsubscribeFromTemplateParts()
@@ -293,20 +447,58 @@ public class WindowHost : ContentControl
         _maximizeButtonPart?.Click -= MaximizeButton_Click;
         _restoreButtonPart?.Click -= MaximizeButton_Click;
         _closeButtonPart?.Click -= CloseButton_Click;
+        _resizeTopPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
         _resizeLeftPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
         _resizeRightPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
         _resizeBottomPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _resizeTopLeftPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _resizeTopRightPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
         _resizeBottomLeftPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
         _resizeBottomRightPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
         _resizeGripPart?.MouseLeftButtonDown -= ResizeEdge_MouseLeftButtonDown;
+        _chromeMinimizeButtonPart?.Click -= MinimizeButton_Click;
+        _chromeMaximizeButtonPart?.Click -= MaximizeButton_Click;
+        _chromeRestoreButtonPart?.Click -= MaximizeButton_Click;
+        _chromeCloseButtonPart?.Click -= CloseButton_Click;
+        _dragAreaPart?.MouseLeftButtonDown -= DragArea_MouseLeftButtonDown;
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_window.IsVisible)
+        if (!_window.IsVisible || _window.WindowState == WindowState.Maximized) return;
+
+        // Check if the click is within the top resize zone of the title bar.
+        // In WPF, the draggable area starts below the ResizeBorderThickness.Top.
+        if (_window.ResizeMode >= ResizeMode.CanResize)
         {
-            _window.DragMove();
+            Point pos = e.GetPosition(_titleBarPart);
+            double topThreshold = 8;
+            var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(_window);
+            if (chrome is not null)
+            {
+                topThreshold = chrome.ResizeBorderThickness.Top;
+            }
+
+            if (pos.Y < topThreshold)
+            {
+                double leftThreshold = topThreshold;
+                double rightThreshold = _titleBarPart.ActualWidth - topThreshold;
+
+                WindowResizeEdge edge;
+                if (pos.X < leftThreshold)
+                    edge = WindowResizeEdge.TopLeft;
+                else if (pos.X > rightThreshold)
+                    edge = WindowResizeEdge.TopRight;
+                else
+                    edge = WindowResizeEdge.Top;
+
+                _window.DragResize(edge);
+                e.Handled = true;
+                return;
+            }
         }
+
+        _window.DragMove();
     }
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e) => _window.WindowState = WindowState.Minimized;
@@ -315,6 +507,14 @@ public class WindowHost : ContentControl
         _window.WindowState = _window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) => _window.Close();
+
+    private void DragArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (_window.IsVisible)
+        {
+            _window.DragMove();
+        }
+    }
 
     private void ResizeEdge_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
@@ -333,9 +533,12 @@ public class WindowHost : ContentControl
 
     private WindowResizeEdge GetEdgeFromSender(object sender)
     {
+        if (sender == _resizeTopPart) return WindowResizeEdge.Top;
         if (sender == _resizeLeftPart) return WindowResizeEdge.Left;
         if (sender == _resizeRightPart) return WindowResizeEdge.Right;
         if (sender == _resizeBottomPart) return WindowResizeEdge.Bottom;
+        if (sender == _resizeTopLeftPart) return WindowResizeEdge.TopLeft;
+        if (sender == _resizeTopRightPart) return WindowResizeEdge.TopRight;
         if (sender == _resizeBottomLeftPart) return WindowResizeEdge.BottomLeft;
         if (sender == _resizeBottomRightPart || sender == _resizeGripPart) return WindowResizeEdge.BottomRight;
 
@@ -367,8 +570,11 @@ public class WindowHost : ContentControl
         }
 
         double w = _window.Width;
-        return new Size(
-            double.IsNaN(w) ? double.PositiveInfinity : w,
-            double.PositiveInfinity);
+        double availW = double.IsNaN(w) ? double.PositiveInfinity : w;
+
+        if (!double.IsPositiveInfinity(MaxWidth))
+            availW = Math.Min(availW, MaxWidth);
+
+        return new Size(availW, double.PositiveInfinity);
     }
 }

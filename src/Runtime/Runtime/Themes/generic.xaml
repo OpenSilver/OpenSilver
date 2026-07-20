@@ -153,12 +153,6 @@
 
     <!--  Window  -->
     <Style TargetType="Window">
-        <Setter Property="shell:WindowChrome.WindowChrome">
-            <Setter.Value>
-                <shell:WindowChrome CaptionHeight="30"
-                                    ResizeBorderThickness="8,8,8,8" />
-            </Setter.Value>
-        </Setter>
         <Setter Property="Background"
                 Value="#FFFFFFFF" />
         <Setter Property="BorderBrush"
@@ -4856,120 +4850,189 @@
                         <controls:Grid>
                             <controls:Grid.RowDefinitions>
                                 <controls:RowDefinition Height="Auto" />
+                                <controls:RowDefinition Height="Auto" />
                                 <controls:RowDefinition Height="*" />
                             </controls:Grid.RowDefinitions>
                             <controls:Grid.Effect>
                                 <effects:DropShadowEffect BlurRadius="5" Color="Black" Opacity="0.3" ShadowDepth="4"/>
                             </controls:Grid.Effect>
 
-                            <!-- Title Bar -->
-                            <controls:Border x:Name="PART_TitleBar"
+                            <!-- Layer 1 (back): Title bar + Content -->
+                            <controls:Grid controls:Grid.RowSpan="3">
+                                <controls:Grid.RowDefinitions>
+                                    <controls:RowDefinition Height="Auto" />
+                                    <controls:RowDefinition Height="*" />
+                                </controls:Grid.RowDefinitions>
+                                <controls:Border x:Name="PART_TitleBar"
+                                             controls:Grid.Row="0"
+                                             Background="{TemplateBinding Property={x:Static oscontrols:WindowHost.ChromeBackgroundProperty}}">
+                                    <controls:Grid>
+                                        <controls:Grid.ColumnDefinitions>
+                                            <controls:ColumnDefinition Width="*" />
+                                            <controls:ColumnDefinition Width="Auto" />
+                                            <controls:ColumnDefinition Width="Auto" />
+                                            <controls:ColumnDefinition Width="Auto" />
+                                        </controls:Grid.ColumnDefinitions>
+                                        <controls:TextBlock controls:Grid.Column="0"
+                                                        Text="{TemplateBinding Property={x:Static oscontrols:WindowHost.TitleProperty}}"
+                                                        VerticalAlignment="Center"
+                                                        Margin="10,0,0,0"
+                                                        Foreground="White"
+                                                        FontSize="12"
+                                                        TextTrimming="CharacterEllipsis" />
+                                        <controls:Button x:Name="PART_MinimizeButton"
+                                                     controls:Grid.Column="1"
+                                                     Content="&#x2500;"
+                                                     Style="{markup:StaticResource WindowChromeButtonStyle}" />
+                                        <controls:Button x:Name="PART_MaximizeButton"
+                                                     controls:Grid.Column="2"
+                                                     Content="&#x2610;"
+                                                     Style="{markup:StaticResource WindowChromeButtonStyle}" />
+                                        <controls:Button x:Name="PART_RestoreButton"
+                                                     controls:Grid.Column="2"
+                                                     Content="&#x29C9;"
+                                                     Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                     Visibility="Collapsed" />
+                                        <controls:Button x:Name="PART_CloseButton"
+                                                     controls:Grid.Column="3"
+                                                     Style="{markup:StaticResource WindowChromeButtonStyle}">
+                                            <controls:Button.Content>
+                                                <shapes:Path Data="M 0,0 L 8,8 M 0,8 L 8,0"
+                                                             Stroke="White"
+                                                             StrokeThickness="1"
+                                                             Width="10"
+                                                             Height="10"
+                                                             Stretch="Uniform" />
+                                            </controls:Button.Content>
+                                        </controls:Button>
+                                    </controls:Grid>
+                                </controls:Border>
+                                <controls:ContentPresenter controls:Grid.Row="1" />
+                            </controls:Grid>
+
+                            <!-- Layer 2: Top resize border -->
+                            <controls:Border x:Name="PART_ResizeTop"
                                          controls:Grid.Row="0"
-                                         Background="{TemplateBinding Property={x:Static oscontrols:WindowHost.ChromeBackgroundProperty}}">
-                                <controls:Grid>
-                                    <controls:Grid.ColumnDefinitions>
-                                        <controls:ColumnDefinition Width="*" />
-                                        <controls:ColumnDefinition Width="Auto" />
-                                        <controls:ColumnDefinition Width="Auto" />
-                                        <controls:ColumnDefinition Width="Auto" />
-                                    </controls:Grid.ColumnDefinitions>
-                                    <controls:TextBlock controls:Grid.Column="0"
-                                                    Text="{TemplateBinding Property={x:Static oscontrols:WindowHost.TitleProperty}}"
-                                                    VerticalAlignment="Center"
-                                                    Margin="10,0,0,0"
-                                                    Foreground="White"
-                                                    FontSize="12"
-                                                    TextTrimming="CharacterEllipsis" />
-                                    <controls:Button x:Name="PART_MinimizeButton"
-                                                 controls:Grid.Column="1"
-                                                 Content="&#x2500;"
-                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
-                                    <controls:Button x:Name="PART_MaximizeButton"
-                                                 controls:Grid.Column="2"
-                                                 Content="&#x2610;"
-                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
-                                    <controls:Button x:Name="PART_RestoreButton"
-                                                 controls:Grid.Column="2"
-                                                 Content="&#x29C9;"
+                                         HorizontalAlignment="Stretch"
+                                         VerticalAlignment="Top"
+                                         Height="8"
+                                         Background="Transparent"
+                                         Cursor="SizeNS"
+                                         Visibility="Collapsed" />
+
+                            <!-- Layer 3: Side and bottom resize borders -->
+                            <controls:Border x:Name="PART_ResizeLeft"
+                                         controls:Grid.Row="1"
+                                         controls:Grid.RowSpan="2"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Stretch"
+                                         Width="8"
+                                         Background="Transparent"
+                                         Cursor="SizeWE"
+                                         Visibility="Collapsed" />
+                            <controls:Border x:Name="PART_ResizeRight"
+                                         controls:Grid.Row="1"
+                                         controls:Grid.RowSpan="2"
+                                         HorizontalAlignment="Right"
+                                         VerticalAlignment="Stretch"
+                                         Width="8"
+                                         Background="Transparent"
+                                         Cursor="SizeWE"
+                                         Visibility="Collapsed" />
+                            <controls:Border x:Name="PART_ResizeBottom"
+                                         controls:Grid.Row="2"
+                                         HorizontalAlignment="Stretch"
+                                         VerticalAlignment="Bottom"
+                                         Height="8"
+                                         Background="Transparent"
+                                         Cursor="SizeNS"
+                                         Visibility="Collapsed" />
+
+                            <!-- Layer 4: Corner resize borders (on top of edges) -->
+                            <controls:Border x:Name="PART_ResizeTopLeft"
+                                         controls:Grid.Row="0"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Top"
+                                         Width="8"
+                                         Height="8"
+                                         Background="Transparent"
+                                         Cursor="SizeNWSE"
+                                         Visibility="Collapsed" />
+                            <controls:Border x:Name="PART_ResizeTopRight"
+                                         controls:Grid.Row="0"
+                                         HorizontalAlignment="Right"
+                                         VerticalAlignment="Top"
+                                         Width="8"
+                                         Height="8"
+                                         Background="Transparent"
+                                         Cursor="SizeNESW"
+                                         Visibility="Collapsed" />
+                            <controls:Border x:Name="PART_ResizeBottomLeft"
+                                         controls:Grid.Row="2"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Bottom"
+                                         Width="8"
+                                         Height="8"
+                                         Background="Transparent"
+                                         Cursor="SizeNESW"
+                                         Visibility="Collapsed" />
+                            <controls:Border x:Name="PART_ResizeBottomRight"
+                                         controls:Grid.Row="2"
+                                         HorizontalAlignment="Right"
+                                         VerticalAlignment="Bottom"
+                                         Width="8"
+                                         Height="8"
+                                         Background="Transparent"
+                                         Cursor="SizeNWSE"
+                                         Visibility="Collapsed" />
+
+                            <!-- Layer 5: Drag area (for WindowChrome mode, collapsed by default) -->
+                            <controls:Border x:Name="PART_DragArea"
+                                         controls:Grid.Row="1"
+                                         VerticalAlignment="Top"
+                                         Height="30"
+                                         Background="Transparent"
+                                         Visibility="Collapsed" />
+
+                            <!-- Layer 6: Chrome buttons (for WindowChrome mode, collapsed by default) -->
+                            <controls:StackPanel x:Name="PART_ChromeButtons"
+                                                 controls:Grid.Row="0"
+                                                 controls:Grid.RowSpan="2"
+                                                 Orientation="Horizontal"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Top"
+                                                 Visibility="Collapsed">
+                                <controls:Button x:Name="PART_ChromeMinimizeButton" Opacity="0"
                                                  Style="{markup:StaticResource WindowChromeButtonStyle}"
-                                                 Visibility="Collapsed" />
-                                    <controls:Button x:Name="PART_CloseButton"
-                                                 controls:Grid.Column="3"
-                                                 Style="{markup:StaticResource WindowChromeButtonStyle}">
-                                        <controls:Button.Content>
-                                            <shapes:Path Data="M 0,0 L 8,8 M 0,8 L 8,0"
-                                                         Stroke="White"
-                                                         StrokeThickness="1"
-                                                         Width="10"
-                                                         Height="10"
-                                                         Stretch="Uniform" />
-                                        </controls:Button.Content>
-                                    </controls:Button>
-                                </controls:Grid>
+                                                 Width="20" Height="20" />
+                                <controls:Button x:Name="PART_ChromeMaximizeButton" Opacity="0"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Width="20" Height="20" />
+                                <controls:Button x:Name="PART_ChromeRestoreButton" Opacity="0"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Width="20" Height="20" Visibility="Collapsed" />
+                                <controls:Button x:Name="PART_ChromeCloseButton" Opacity="0"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Width="20" Height="20" />
+                            </controls:StackPanel>  
+
+                            <!-- Resize Grip (visible indicator for CanResizeWithGrip) -->
+                            <controls:Border x:Name="PART_ResizeGrip"
+                                         controls:Grid.Row="2"
+                                         HorizontalAlignment="Right"
+                                         VerticalAlignment="Bottom"
+                                         Width="16"
+                                         Height="16"
+                                         Background="Transparent"
+                                         Cursor="SizeNWSE"
+                                         Visibility="Collapsed">
+                                <controls:TextBlock Text="&#x25E2;"
+                                                 FontSize="12"
+                                                 Foreground="#888888"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Bottom"
+                                                 Margin="0,0,2,0" />
                             </controls:Border>
-                        <!-- Window Content -->
-                        <controls:ContentPresenter controls:Grid.Row="1" />
-                        <!-- Resize edges (full height/width strips) -->
-                        <controls:Border x:Name="PART_ResizeLeft"
-                                     controls:Grid.RowSpan="2"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Stretch"
-                                     Width="8"
-                                     Background="Transparent"
-                                     Cursor="SizeWE"
-                                     Visibility="Collapsed" />
-                        <controls:Border x:Name="PART_ResizeRight"
-                                     controls:Grid.RowSpan="2"
-                                     HorizontalAlignment="Right"
-                                     VerticalAlignment="Stretch"
-                                     Width="8"
-                                     Background="Transparent"
-                                     Cursor="SizeWE"
-                                     Visibility="Collapsed" />
-                        <controls:Border x:Name="PART_ResizeBottom"
-                                     controls:Grid.Row="1"
-                                     HorizontalAlignment="Stretch"
-                                     VerticalAlignment="Bottom"
-                                     Height="8"
-                                     Background="Transparent"
-                                     Cursor="SizeNS"
-                                     Visibility="Collapsed" />
-                        <!-- Resize corners (on top of edges) -->
-                        <controls:Border x:Name="PART_ResizeBottomLeft"
-                                     controls:Grid.Row="1"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Bottom"
-                                     Width="8"
-                                     Height="8"
-                                     Background="Transparent"
-                                     Cursor="SizeNESW"
-                                     Visibility="Collapsed" />
-                        <controls:Border x:Name="PART_ResizeBottomRight"
-                                     controls:Grid.Row="1"
-                                     HorizontalAlignment="Right"
-                                     VerticalAlignment="Bottom"
-                                     Width="8"
-                                     Height="8"
-                                     Background="Transparent"
-                                     Cursor="SizeNWSE"
-                                     Visibility="Collapsed" />
-                        <!-- Resize Grip (visible indicator for CanResizeWithGrip) -->
-                        <controls:Border x:Name="PART_ResizeGrip"
-                                     controls:Grid.Row="1"
-                                     HorizontalAlignment="Right"
-                                     VerticalAlignment="Bottom"
-                                     Width="16"
-                                     Height="16"
-                                     Background="Transparent"
-                                     Cursor="SizeNWSE"
-                                     Visibility="Collapsed">
-                            <controls:TextBlock Text="&#x25E2;"
-                                             FontSize="12"
-                                             Foreground="#888888"
-                                             HorizontalAlignment="Right"
-                                             VerticalAlignment="Bottom"
-                                             Margin="0,0,2,0" />
-                        </controls:Border>
                         </controls:Grid>
                     </controls:Border>
                 </controls:ControlTemplate>
