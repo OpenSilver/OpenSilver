@@ -1288,11 +1288,19 @@ public class Window : ContentControl, IResizeObserverListener
         string currentOverlayId = _overlayDiv.Uid;
 
         string nextId = OpenSilver.Interop.ExecuteJavaScriptString(
-            $"(function(){{ var root=document.getElementById('{rootId}');" +
-            $"var children=root.querySelectorAll('.opensilver-window-overlay');" +
-            $"for(var i=children.length-1;i>=0;i--){{" +
-            $"  var c=children[i]; if(c.id!=='{currentOverlayId}' && c.style.display!=='none') return c.id;" +
-            $"}} return ''; }})()");
+            $$"""
+            (function() {
+              const root = document.getElementById('{{rootId}}');
+              const children = root.querySelectorAll('.opensilver-window-overlay');
+              for (let i = children.length-1; i >= 0; i--) {
+                const c = children[i];
+                if (c.id !== '{{currentOverlayId}}' && c.style.display !== 'none') {
+                  return c.id;
+                }
+              }
+              return '';
+            })()
+            """);
 
         if (!string.IsNullOrEmpty(nextId))
         {
