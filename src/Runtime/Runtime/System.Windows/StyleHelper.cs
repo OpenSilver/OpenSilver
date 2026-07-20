@@ -58,6 +58,8 @@ namespace System.Windows
 
             UpdateInstanceData(fe, oldStyle, effectiveStyle, _setLocalStyleValueDelegate);
 
+            DoStyleResourcesInvalidations(fe, oldStyle, newStyle);
+
             // Initialize triggers for the new style
             if (effectiveStyle is not null && effectiveStyle.HasTriggers)
             {
@@ -94,6 +96,8 @@ namespace System.Windows
 
             UpdateInstanceData(fe, oldStyle, newStyle, _setThemeStyleValueDelegate);
 
+            DoStyleResourcesInvalidations(fe, oldStyle, newStyle);
+
             // Initialize triggers for the new theme style
             if (newStyle is not null && newStyle.HasTriggers)
             {
@@ -123,6 +127,8 @@ namespace System.Windows
                 CleanupStyleTriggerStorage(fe);
 
                 UpdateInstanceData(fe, oldStyle, newStyle, _setLocalStyleValueDelegate);
+
+                DoStyleResourcesInvalidations(fe, oldStyle, newStyle);
 
                 // Initialize triggers for the new implicit style
                 if (newStyle is not null && newStyle.HasTriggers)
@@ -248,6 +254,8 @@ namespace System.Windows
 
             fe.TemplateChild = null;
             fe.HasTemplateGeneratedSubTree = false;
+
+            DoTemplateResourcesInvalidations(fe, oldTemplate, newTemplate);
         }
 
         internal static bool ApplyTemplateContent(FrameworkElement container, FrameworkTemplate template)
@@ -306,6 +314,90 @@ namespace System.Windows
             dp != FrameworkElement.OverridesDefaultStyleProperty &&
             dp != Control.TemplateProperty &&
             dp != ContentPresenter.TemplateProperty;
+
+        private static void DoStyleResourcesInvalidations(FrameworkElement fe, Style oldStyle, Style newStyle)
+        {
+            Debug.Assert(fe is not null);
+
+            if (HasResources(oldStyle) || HasResources(newStyle))
+            {
+                // Set the ShouldLookupImplicitStyles flag if the given style's Resources has implicit styles.
+                SetShouldLookupImplicitStyles(fe, newStyle);
+
+                TreeWalkHelper.InvalidateOnResourcesChange(fe, new ResourcesChangeInfo(oldStyle, newStyle));
+            }
+
+            static void SetShouldLookupImplicitStyles(FrameworkElement fe, Style style)
+            {
+                if (fe.ShouldLookupImplicitStyles)
+                {
+                    return;
+                }
+
+                while (style is not null)
+                {
+                    if (style.HasResources && style.Resources.HasImplicitStyles)
+                    {
+                        fe.ShouldLookupImplicitStyles = true;
+                        break;
+                    }
+
+                    style = style.BasedOn;
+                }
+            }
+
+            static bool HasResources(Style style)
+            {
+                while (style is not null)
+                {
+                    if (style.HasResources)
+                    {
+                        return true;
+                    }
+
+                    style = style.BasedOn;
+                }
+
+                return false;
+            }
+        }
+
+        private static void DoTemplateResourcesInvalidations(FrameworkElement fe, FrameworkTemplate oldTemplate, FrameworkTemplate newTemplate)
+        {
+            ResourceDictionary oldResourceTable = GetResourceDictionaryFromTemplate(oldTemplate);
+            ResourceDictionary newResourceTable = GetResourceDictionaryFromTemplate(newTemplate);
+
+            if (oldResourceTable != newResourceTable)
+            {
+                // Set the ShouldLookupImplicitStyles flag if the given template's Resources has implicit styles.
+                SetShouldLookupImplicitStyles(fe, newTemplate);
+
+                TreeWalkHelper.InvalidateOnResourcesChange(fe, new ResourcesChangeInfo(oldTemplate, newTemplate));
+            }
+
+            static void SetShouldLookupImplicitStyles(FrameworkElement fe, FrameworkTemplate template)
+            {
+                if (fe.ShouldLookupImplicitStyles)
+                {
+                    return;
+                }
+
+                if (template is not null && template.HasResources && template.Resources.HasImplicitStyles)
+                {
+                    fe.ShouldLookupImplicitStyles = true;
+                }
+            }
+
+            static ResourceDictionary GetResourceDictionaryFromTemplate(FrameworkTemplate template)
+            {
+                if (template is not null && template.HasResources)
+                {
+                    return template.Resources;
+                }
+
+                return null;
+            }
+        }
 
         private static readonly UncommonField<TriggerStorage> TriggerStorageField = new();
 

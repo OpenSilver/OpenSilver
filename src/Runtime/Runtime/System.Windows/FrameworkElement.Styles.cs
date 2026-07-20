@@ -299,7 +299,7 @@ namespace System.Windows
         internal bool ShouldLookupImplicitStyles
         {
             get { return ReadInternalFlag(InternalFlags.ShouldLookupImplicitStyles); }
-            private set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
+            set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
         }
 
         // Indicates if this instance has a style set by a generator

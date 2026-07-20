@@ -403,9 +403,7 @@ namespace System.Windows
                         break;
                 }
             }
-            else if (info.IsCatastrophicDictionaryChange ||
-                (info.NewDictionary != null && ResourceDictionary.Helpers.HasImplicitResources(info.NewDictionary)) ||
-                (info.OldDictionary != null && ResourceDictionary.Helpers.HasImplicitResources(info.OldDictionary)))
+            else if (info.IsCatastrophicDictionaryChange || info.IsImplicitResourcesChange())
             {
                 _implicitResourcesCache = HasResources && ResourceDictionary.Helpers.HasImplicitResources(Resources) ?
                     ResourceDictionary.Helpers.BuildImplicitResourcesCache(Resources) :

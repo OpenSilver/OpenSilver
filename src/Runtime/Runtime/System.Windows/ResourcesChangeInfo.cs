@@ -27,8 +27,8 @@ internal struct ResourcesChangeInfo
     /// </summary>
     internal ResourcesChangeInfo(object key)
     {
-        OldDictionary = null;
-        NewDictionary = null;
+        _oldResources = null;
+        _newResources = null;
         Key = key;
         _flags = 0;
     }
@@ -39,10 +39,28 @@ internal struct ResourcesChangeInfo
     /// </summary>
     internal ResourcesChangeInfo(ResourceDictionary oldDictionary, ResourceDictionary newDictionary)
     {
-        OldDictionary = oldDictionary;
-        NewDictionary = newDictionary;
+        _oldResources = oldDictionary;
+        _newResources = newDictionary;
         Key = null;
         _flags = 0;
+    }
+
+    internal ResourcesChangeInfo(Style oldStyle, Style newStyle)
+    {
+        _oldResources = oldStyle;
+        _newResources = newStyle;
+        Key = null;
+        _flags = 0;
+        IsStyleResourcesChange = true;
+    }
+
+    internal ResourcesChangeInfo(FrameworkTemplate oldTemplate, FrameworkTemplate newTemplate)
+    {
+        _oldResources = oldTemplate;
+        _newResources = newTemplate;
+        Key = null;
+        _flags = 0;
+        IsTemplateResourcesChange = true;
     }
 
     /// <summary>
@@ -113,13 +131,9 @@ internal struct ResourcesChangeInfo
     }
 
     // This flag is used to indicate if the current operation is an effective add operation
-    internal bool IsResourceAddOperation => Key != null || NewDictionary != null;
+    internal bool IsResourceAddOperation => Key != null || _newResources != null;
 
     internal object Key { get; }
-
-    internal ResourceDictionary NewDictionary { get; }
-
-    internal ResourceDictionary OldDictionary { get; }
 
     // Says if either the old or the new dictionaries contain the given key
     internal bool Contains(object key, bool isImplicitStyleKey)
@@ -137,19 +151,19 @@ internal struct ResourcesChangeInfo
             return !isImplicitStyleKey;
         }
 
-        Debug.Assert(OldDictionary != null || NewDictionary != null || Key != null, "Must have a dictionary or a key that has changed");
+        Debug.Assert(_oldResources != null || _newResources != null || Key != null, "Must have a dictionary or a key that has changed");
 
         if (Key != null && Equals(Key, key))
         {
             return true;
         }
 
-        if (OldDictionary != null && OldDictionary.Contains(key))
+        if (ContainsHelper(_oldResources, key))
         {
             return true;
         }
 
-        if (NewDictionary != null && NewDictionary.Contains(key))
+        if (ContainsHelper(_newResources, key))
         {
             return true;
         }
@@ -157,28 +171,128 @@ internal struct ResourcesChangeInfo
         return false;
     }
 
+    private bool ContainsHelper(object o, object key)
+    {
+        if (o is null)
+        {
+            return false;
+        }
+
+        if (IsStyleResourcesChange)
+        {
+            var style = (Style)o;
+
+            while (style is not null)
+            {
+                if (style.HasResources && style.Resources.ContainsKey(key))
+                {
+                    return true;
+                }
+
+                style = style.BasedOn;
+            }
+
+            return false;
+        }
+
+        if (IsTemplateResourcesChange)
+        {
+            var template = (FrameworkTemplate)o;
+            return template.HasResources && template.Resources.Contains(key);
+        }
+
+        Debug.Assert(o is ResourceDictionary);
+        return ((ResourceDictionary)o).Contains(key);
+    }
+
+    internal bool IsImplicitResourcesChange()
+    {
+        return HasImplicitResourcesHelper(_oldResources) || HasImplicitResourcesHelper(_newResources);
+    }
+
+    private bool HasImplicitResourcesHelper(object o)
+    {
+        if (o is null)
+        {
+            return false;
+        }
+
+        if (IsStyleResourcesChange)
+        {
+            var style = (Style)o;
+            while (style is not null)
+            {
+                if (style.HasResources && ResourceDictionary.Helpers.HasImplicitResources(style.Resources))
+                {
+                    return true;
+                }
+
+                style = style.BasedOn;
+            }
+
+            return false;
+        }
+
+        if (IsTemplateResourcesChange)
+        {
+            var template = (FrameworkTemplate)o;
+            return template.HasResources && ResourceDictionary.Helpers.HasImplicitResources(template.Resources);
+        }
+
+        Debug.Assert(o is ResourceDictionary);
+        return ResourceDictionary.Helpers.HasImplicitResources((ResourceDictionary)o);
+    }
+
     // determine whether this change affects implicit data templates
     internal void SetIsImplicitDataTemplateChange()
     {
         bool isImplicitDataTemplateChange = IsCatastrophicDictionaryChange || Key is DataTemplateKey;
 
-        if (!isImplicitDataTemplateChange && OldDictionary != null)
+        if (!isImplicitDataTemplateChange && GetHasImplicitDataTemplatesHelper(_oldResources))
         {
-            if (OldDictionary.HasImplicitDataTemplates)
-            {
-                isImplicitDataTemplateChange = true;
-            }
+            isImplicitDataTemplateChange = true;
         }
 
-        if (!isImplicitDataTemplateChange && NewDictionary != null)
+        if (!isImplicitDataTemplateChange && GetHasImplicitDataTemplatesHelper(_newResources))
         {
-            if (NewDictionary.HasImplicitDataTemplates)
-            {
-                isImplicitDataTemplateChange = true;
-            }
+            isImplicitDataTemplateChange = true;
         }
 
         IsImplicitDataTemplateChange = isImplicitDataTemplateChange;
+    }
+
+    private bool GetHasImplicitDataTemplatesHelper(object o)
+    {
+        if (o is null)
+        {
+            return false;
+        }
+
+        if (IsStyleResourcesChange)
+        {
+            var style = (Style)o;
+
+            while (style is not null)
+            {
+                if (style.HasResources && style.Resources.HasImplicitDataTemplates)
+                {
+                    return true;
+                }
+
+                style = style.BasedOn;
+            }
+
+            return false;
+        }
+
+        if (IsTemplateResourcesChange)
+        {
+            var template = (FrameworkTemplate)o;
+            return template.HasResources && template.Resources.HasImplicitDataTemplates;
+        }
+
+        Debug.Assert(o is ResourceDictionary);
+        return ((ResourceDictionary)o).HasImplicitDataTemplates;
     }
 
     private void WritePrivateFlag(PrivateFlags bit, bool value)
@@ -206,5 +320,7 @@ internal struct ResourcesChangeInfo
         IsImplicitDataTemplateChange = 0x40,
     }
 
+    private object _oldResources;
+    private object _newResources;
     private PrivateFlags _flags;
 }
