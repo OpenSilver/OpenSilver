@@ -8,7 +8,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using OpenSilver.Internal;
-using OpenSilver.Internal.Controls.Primitives;
 
 namespace System.Windows.Controls;
 
@@ -227,6 +226,14 @@ public class ContextMenu : MenuBase
     /// The event data for the <see cref="Closed"/> event.
     /// </param>
     protected virtual void OnClosed(RoutedEventArgs e) => Closed?.Invoke(this, e);
+
+    /// <inheritdoc />
+    protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+    {
+        base.PrepareContainerForItemOverride(element, item);
+
+        MenuItem.PrepareMenuItem(element, item);
+    }
 
     /// <inheritdoc />
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

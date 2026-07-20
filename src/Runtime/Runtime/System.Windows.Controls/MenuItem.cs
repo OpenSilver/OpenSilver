@@ -57,6 +57,7 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
 {
     private const string SubMenuPopupPartName = "PART_Popup";
 
+    private static SystemThemeKey _separatorStyleKey;
     private static ComponentResourceKey _topLevelItemTemplateKey;
     private static ComponentResourceKey _topLevelHeaderTemplateKey;
     private static ComponentResourceKey _submenuItemTemplateKey;
@@ -175,6 +176,27 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
             }
 
             return _submenuHeaderTemplateKey;
+        }
+    }
+
+    /// <summary>
+    /// Gets the resource key for a style applied to a <see cref="MenuItem"/> when 
+    /// the <see cref="MenuItem"/> is a <see cref="Separator"/>.
+    /// </summary>
+    /// <returns>
+    /// The resource key for a style applied to a <see cref="MenuItem"/> when the 
+    /// <see cref="MenuItem"/> is a <see cref="Separator"/>.
+    /// </returns>
+    public static ResourceKey SeparatorStyleKey
+    {
+        get
+        {
+            if (_separatorStyleKey is null)
+            {
+                Interlocked.CompareExchange(ref _separatorStyleKey, new SystemThemeKey(SystemResourceKeyID.MenuItemSeparatorStyle), null);
+            }
+
+            return _separatorStyleKey;
         }
     }
 
@@ -1176,6 +1198,33 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
                     menuItem.Header = item;
                 }
             }
+        }
+
+        PrepareMenuItem(element, item);
+    }
+
+    /// <summary>
+    ///     Automatically set the Command property if the data item that this MenuItem represents is a command.
+    /// </summary>
+    internal static void PrepareMenuItem(DependencyObject element, object item)
+    {
+        switch (element)
+        {
+            case MenuItem menuItem:
+                if (item is ICommand command && menuItem.HasDefaultValue(CommandProperty))
+                {
+                    menuItem.Command = command;
+                }
+                break;
+
+            case Separator separator:
+                ValueSource vs = DependencyPropertyHelper.GetValueSource(separator, StyleProperty);
+                if (vs.BaseValueSource <= BaseValueSource.StyleTrigger)
+                {
+                    separator.SetResourceReference(StyleProperty, SeparatorStyleKey);
+                }
+                separator.DefaultStyleKey = SeparatorStyleKey;
+                break;
         }
     }
 

@@ -53,6 +53,14 @@ public class Menu : MenuBase
         set => SetValueInternal(IsMainMenuProperty, value);
     }
 
+    /// <inheritdoc />
+    protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+    {
+        base.PrepareContainerForItemOverride(element, item);
+
+        MenuItem.PrepareMenuItem(element, item);
+    }
+
     /// <summary>
     /// Called when the left mouse button is pressed.
     /// </summary>

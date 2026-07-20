@@ -4192,6 +4192,28 @@
     </Style>
 
     <!--  controls:MenuItem  -->
+    <Style x:Key="{x:Static controls:MenuItem.SeparatorStyleKey}"
+           TargetType="controls:Separator">
+        <Setter Property="Background"
+                Value="#FFD7D7D7" />
+        <Setter Property="BorderBrush"
+                Value="#FFD7D7D7" />
+        <Setter Property="MinHeight"
+                Value="1" />
+        <Setter Property="SnapsToDevicePixels"
+                Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="controls:Separator">
+                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                     Margin="30,0,0,0" />
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <controls:ControlTemplate x:Key="{x:Static controls:MenuItem.TopLevelItemTemplateKey}"
                               TargetType="controls:MenuItem">
         <controls:Grid>
