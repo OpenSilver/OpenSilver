@@ -5001,27 +5001,18 @@
                                                  HorizontalAlignment="Right"
                                                  VerticalAlignment="Top"
                                                  Visibility="Collapsed">
-                                <controls:Button x:Name="PART_ChromeMinimizeButton"
-                                                 Content="&#x2500;"
-                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
-                                <controls:Button x:Name="PART_ChromeMaximizeButton"
-                                                 Content="&#x2610;"
-                                                 Style="{markup:StaticResource WindowChromeButtonStyle}" />
-                                <controls:Button x:Name="PART_ChromeRestoreButton"
-                                                 Content="&#x29C9;"
+                                <controls:Button x:Name="PART_ChromeMinimizeButton" Opacity="0"
                                                  Style="{markup:StaticResource WindowChromeButtonStyle}"
-                                                 Visibility="Collapsed" />
-                                <controls:Button x:Name="PART_ChromeCloseButton"
-                                                 Style="{markup:StaticResource WindowChromeButtonStyle}">
-                                    <controls:Button.Content>
-                                        <shapes:Path Data="M 0,0 L 8,8 M 0,8 L 8,0"
-                                                     Stroke="White"
-                                                     StrokeThickness="1"
-                                                     Width="10"
-                                                     Height="10"
-                                                     Stretch="Uniform" />
-                                    </controls:Button.Content>
-                                </controls:Button>
+                                                 Width="20" Height="20" />
+                                <controls:Button x:Name="PART_ChromeMaximizeButton" Opacity="0"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Width="20" Height="20" />
+                                <controls:Button x:Name="PART_ChromeRestoreButton" Opacity="0"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Width="20" Height="20" Visibility="Collapsed" />
+                                <controls:Button x:Name="PART_ChromeCloseButton" Opacity="0"
+                                                 Style="{markup:StaticResource WindowChromeButtonStyle}"
+                                                 Width="20" Height="20" />
                             </controls:StackPanel>  
 
                             <!-- Resize Grip (visible indicator for CanResizeWithGrip) -->
