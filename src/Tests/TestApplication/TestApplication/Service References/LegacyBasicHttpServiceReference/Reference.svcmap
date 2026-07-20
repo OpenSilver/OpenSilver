@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="45efae6a-dc2e-440d-bdee-2cfaf4e5f17f" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:50506/BasicHttpService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="BasicHttpService.wsdl" MetadataType="Wsdl" ID="5f798e36-31d7-47b6-a36d-dd714b6e6f46" SourceId="1" SourceUrl="http://localhost:50506/BasicHttpService.svc?wsdl" />
+    <MetadataFile FileName="BasicHttpService.xsd" MetadataType="Schema" ID="77459775-feed-4769-8db4-a472d4dfa572" SourceId="1" SourceUrl="http://localhost:50506/BasicHttpService.svc?xsd=xsd1" />
+    <MetadataFile FileName="BasicHttpService1.wsdl" MetadataType="Wsdl" ID="f309e467-5bd1-4c91-be8a-624167e8822c" SourceId="1" SourceUrl="http://localhost:50506/BasicHttpService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="BasicHttpService1.xsd" MetadataType="Schema" ID="ce939745-aa91-4d35-af37-68ed3f36d9c5" SourceId="1" SourceUrl="http://localhost:50506/BasicHttpService.svc?xsd=xsd0" />
+    <MetadataFile FileName="BasicHttpService.disco" MetadataType="Disco" ID="26b0326f-ba3d-4fe5-b7b9-e716ca2538a3" SourceId="1" SourceUrl="http://localhost:50506/BasicHttpService.svc?disco" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

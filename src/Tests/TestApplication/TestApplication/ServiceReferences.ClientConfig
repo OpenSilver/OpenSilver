@@ -1,0 +1,25 @@
+﻿<configuration>
+    <system.serviceModel>
+        <bindings>
+            <basicHttpBinding>
+                <binding name="BasicHttpBinding_BasicHttpService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+                <binding name="BasicHttpBinding_BasicHttpService1" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+            </basicHttpBinding>
+        </bindings>
+        <client>
+            <endpoint address="http://localhost:50506/BasicHttpService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_BasicHttpService"
+                contract="BasicHttpServiceReference.BasicHttpService" name="BasicHttpBinding_BasicHttpService" />
+            <endpoint address="http://localhost:50506/BasicHttpService.svc" binding="basicHttpBinding"
+                bindingConfiguration="BasicHttpBinding_BasicHttpService1"
+                contract="LegacyBasicHttpServiceReference.BasicHttpService"
+                name="BasicHttpBinding_BasicHttpService1" />
+        </client>
+    </system.serviceModel>
+</configuration>

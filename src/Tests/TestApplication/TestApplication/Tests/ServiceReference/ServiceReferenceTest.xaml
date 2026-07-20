@@ -1,0 +1,50 @@
+﻿<sdk:Page
+    x:Class="TestApplication.Tests.ServiceReferenceTest"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Legacy Service References (Add Service Reference... in Visual Studio 2015/Silverlight)"/>
+
+        <TextBlock Text="Enter message:" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        <TextBox Name="LegacyBasicHttpEchoTextBox" Width="300"/>
+        <Button Content="Legacy BasicHttp Echo() - Event Based" Click="LegacyBasicHttpEchoButton_OnClick" Width="300"/>
+        <TextBlock Text="Result:" HorizontalAlignment="Center"/>
+        <TextBlock Name="LegacyBasicHttpEchoTextBlock" HorizontalAlignment="Center"/>
+
+        <TextBlock Text="Enter message:" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        <TextBox Name="LegacyBasicHttpBodyMemberTextBox" Width="300"/>
+        <Button Content="Legacy BasicHttp BodyMember()" Click="LegacyBasicHttpBodyMemberButton_OnClick" Width="350"/>
+        <TextBlock Text="Result:" HorizontalAlignment="Center"/>
+        <TextBlock Name="LegacyBasicHttpBodyMemberTextBlock" HorizontalAlignment="Center"/>
+
+        <TextBlock Margin="0,30,0,0" Text="Modern Service References (Add Service Reference... in Visual Studio 2022+)"/>
+
+        <TextBlock Text="Enter message:" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        <TextBox Name="BasicHttpEchoTextBox" Width="300"/>
+        <Button Content="BasicHttp Echo() - async await" Click="BasicHttpEchoButton_OnClick" Width="300"/>
+        <TextBlock Text="Result:" HorizontalAlignment="Center"/>
+        <TextBlock Name="BasicHttpEchoTextBlock" HorizontalAlignment="Center"/>
+
+        <TextBlock Text="Enter message:" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        <TextBox Name="BasicHttpEndpointConfigEchoTextBox" Width="300"/>
+        <Button Content="BasicHttp Echo() - EndpointConfiguration Constructor" Click="BasicHttpEndpointConfigEchoButton_OnClick" Width="300"/>
+        <TextBlock Text="Result:" HorizontalAlignment="Center"/>
+        <TextBlock Name="BasicHttpEndpointConfigEchoTextBlock" HorizontalAlignment="Center"/>
+
+        <TextBlock Text="Enter message:" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        <TextBox Name="BasicHttpBodyMemberTextBox" Width="300"/>
+        <Button Content="BasicHttp BodyMember()" Click="BasicHttpBodyMemberButton_OnClick" Width="350"/>
+        <TextBlock Text="Result:" HorizontalAlignment="Center"/>
+        <TextBlock Name="BasicHttpBodyMemberTextBlock" HorizontalAlignment="Center"/>
+
+        <TextBlock Margin="0,30,0,0" Text="Custom clients:"/>
+
+        <TextBlock Text="Enter message:" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        <TextBox Name="CustomLegacyBasicHttpBodyMemberTextBox" Width="300"/>
+        <Button Content="Custom Client Legacy BasicHttp BodyMember()" Click="CustomLegacyBasicHttpBodyMemberButton_OnClick" Width="350"/>
+        <TextBlock Text="Result:" HorizontalAlignment="Center"/>
+        <TextBlock Name="CustomBasicHttpBodyMemberTextBlock" HorizontalAlignment="Center"/>
+    </StackPanel>
+</sdk:Page>

@@ -171,6 +171,8 @@ namespace TestApplication
             Tests.Add(new Test("AccessText / AccessKeyManager", "AccessText"));
 
             Tests.Add(new Test("ListView", "ListView"));
+
+            Tests.Add(new Test("Service References", "ServiceReference/ServiceReference"));
         }
     }
 }
