@@ -1428,4 +1428,10 @@
   <data name="ListBoxInvalidAnchorItem" xml:space="preserve">
     <value>AnchorItem '{0}' ne possède pas de conteneur réalisé et par conséquent n'est pas valide.</value>
   </data>
+  <data name="ToolBar_InvalidStyle_ToolBarPanel" xml:space="preserve">
+    <value>Le style ToolBar nécessite le type ToolBarPanel. Impossible d'assigner StyleName="ToolBarPanel" à '{0}'.</value>
+  </data>
+  <data name="ToolBar_InvalidStyle_ToolBarOverflowPanel" xml:space="preserve">
+    <value>Le style ToolBar nécessite le type ToolBarOverflowPanel. Impossible d'assigner StyleName="ToolBarOverflowPanel" à '{0}'.</value>
+  </data>
 </root>

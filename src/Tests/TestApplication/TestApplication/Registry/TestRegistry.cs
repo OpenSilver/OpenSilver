@@ -171,6 +171,7 @@ namespace TestApplication
             Tests.Add(new Test("AccessText / AccessKeyManager", "AccessText"));
 
             Tests.Add(new Test("ListView", "ListView"));
+            Tests.Add(new Test("ToolBar", "ToolBar"));
         }
     }
 }

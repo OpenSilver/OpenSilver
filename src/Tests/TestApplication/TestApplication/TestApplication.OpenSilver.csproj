@@ -330,6 +330,9 @@
     <Compile Include="Tests\VisibilityTest.xaml.cs">
       <DependentUpon>VisibilityTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\ToolBarTest.xaml.cs">
+      <DependentUpon>ToolBarTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\WrapPanelTest.xaml.cs">
       <DependentUpon>WrapPanelTest.xaml</DependentUpon>
     </Compile>
@@ -649,6 +652,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="Tests\TextPropertiesTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Tests\ToolBarTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>

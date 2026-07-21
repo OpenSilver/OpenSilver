@@ -106,4 +106,11 @@ public class GroupItem : ContentControl
 
         ClearContentControl(item);
     }
+
+    internal override void OnTemplateChangedInternal(FrameworkTemplate oldTemplate, FrameworkTemplate newTemplate)
+    {
+        base.OnTemplateChangedInternal(oldTemplate, newTemplate);
+
+        ItemsHost = null;
+    }
 }

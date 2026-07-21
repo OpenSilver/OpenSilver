@@ -162,8 +162,11 @@
     <Compile Include="System.Windows.Automation.Peers\GroupBoxAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\IViewAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\ListViewAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\ToolBarAutomationPeer.cs" />
     <Compile Include="System.Windows.Controls.Primitives\GridViewRowPresenterBase.cs" />
     <Compile Include="System.Windows.Controls.Primitives\MultiSelector.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\ToolBarOverflowPanel.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\ToolBarPanel.cs" />
     <Compile Include="System.Windows.Controls\AccessText.cs" />
     <Compile Include="System.Windows.Controls\BorderGapClipConverter.cs" />
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
@@ -182,6 +185,8 @@
     <Compile Include="System.Windows.Controls\GridViewRowPresenter.cs" />
     <Compile Include="System.Windows.Controls\ListView.cs" />
     <Compile Include="System.Windows.Controls\ListViewItem.cs" />
+    <Compile Include="System.Windows.Controls\ToolBar.cs" />
+    <Compile Include="System.Windows.Controls\ToolBarTray.cs" />
     <Compile Include="System.Windows.Controls\ViewBase.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />

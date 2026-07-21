@@ -125,7 +125,8 @@ namespace System.Windows.Controls
                 nameof(Orientation),
                 typeof(Orientation),
                 typeof(Slider),
-                new PropertyMetadata(Orientation.Horizontal, OnOrientationPropertyChanged));
+                new PropertyMetadata(Orientation.Horizontal, OnOrientationPropertyChanged),
+                ScrollBar.IsValidOrientation);
 
         /// <summary> 
         /// OrientationProperty property changed handler. 

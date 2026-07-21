@@ -97,6 +97,15 @@ internal enum SystemResourceKeyID
     GridViewStyle,
     GridViewItemContainerStyle,
 
+    ToolBarButtonStyle,
+    ToolBarToggleButtonStyle,
+    ToolBarSeparatorStyle,
+    ToolBarCheckBoxStyle,
+    ToolBarRadioButtonStyle,
+    ToolBarComboBoxStyle,
+    ToolBarTextBoxStyle,
+    ToolBarMenuStyle,
+
     InternalSystemThemeStylesEnd,
 }
 

@@ -938,7 +938,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        ///  Called when the value of the <see cref="ItemsControl.Items"/> property changes.
+        /// Called when the value of the <see cref="Items"/> property changes.
         /// </summary>
         /// <param name="e">
         /// A <see cref="NotifyCollectionChangedEventArgs"/> that contains the event data

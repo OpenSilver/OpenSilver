@@ -301,7 +301,8 @@ namespace System.Windows.Controls.Primitives
                 nameof(Orientation),
                 typeof(Orientation),
                 typeof(ScrollBar),
-                new PropertyMetadata(Orientation.Vertical, OnOrientationPropertyChanged));
+                new PropertyMetadata(Orientation.Vertical, OnOrientationPropertyChanged),
+                IsValidOrientation);
 
         /// <summary> 
         /// OrientationProperty property changed handler.
@@ -314,6 +315,12 @@ namespace System.Windows.Controls.Primitives
             Debug.Assert(s != null);
 
             s.OnOrientationChanged();
+        }
+
+        internal static bool IsValidOrientation(object o)
+        {
+            var value = (Orientation)o;
+            return value == Orientation.Horizontal || value == Orientation.Vertical;
         }
 
         /// <summary>

@@ -3643,6 +3643,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ToolBar style requires ToolBarOverflowPanel type. Cannot assign StyleName=&quot;ToolBarOverflowPanel&quot; to &apos;{0}&apos;..
+        /// </summary>
+        internal static string ToolBar_InvalidStyle_ToolBarOverflowPanel {
+            get {
+                return ResourceManager.GetString("ToolBar_InvalidStyle_ToolBarOverflowPanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ToolBar style requires ToolBarPanel type. Cannot assign StyleName=&quot;ToolBarPanel&quot; to &apos;{0}&apos;..
+        /// </summary>
+        internal static string ToolBar_InvalidStyle_ToolBarPanel {
+            get {
+                return ResourceManager.GetString("ToolBar_InvalidStyle_ToolBarPanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RoutedEvent limit exceeded. Routed events for CLR events are typically static class members registered with field initializers or static constructors. In this case, routed events might be getting initialized in instance constructors, causing the limit to be exceeded..
         /// </summary>
         internal static string TooManyRoutedEvents {

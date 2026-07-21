@@ -55,6 +55,11 @@ public class ItemsPresenter : FrameworkElement
         set => _templateCache = (ItemsPanelTemplate)value;
     }
 
+    internal override void OnTemplateChangedInternal(FrameworkTemplate oldTemplate, FrameworkTemplate newTemplate)
+    {
+        OnTemplateChanged((ItemsPanelTemplate)oldTemplate, (ItemsPanelTemplate)newTemplate);
+    }
+
     /// <summary>
     /// TemplateProperty
     /// </summary>
@@ -82,7 +87,6 @@ public class ItemsPresenter : FrameworkElement
 
         ip.ClearPanel();
         StyleHelper.UpdateTemplateCache(ip, oldTemplate, newTemplate, TemplateProperty);
-        ip.OnTemplateChanged(oldTemplate, newTemplate);
     }
 
     /// <summary>

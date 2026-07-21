@@ -383,6 +383,24 @@ namespace System.Windows.Controls
             set => _templateCache = (DataTemplate)value;
         }
 
+        /// <summary>
+        /// Invoked when the <see cref="ContentTemplate"/> changes.
+        /// </summary>
+        /// <param name="oldTemplate">
+        /// The old <see cref="DataTemplate"/> object value.
+        /// </param>
+        /// <param name="newTemplate">
+        /// The new <see cref="DataTemplate"/> object value.
+        /// </param>
+        protected virtual void OnTemplateChanged(DataTemplate oldTemplate, DataTemplate newTemplate)
+        {
+        }
+
+        internal override void OnTemplateChangedInternal(FrameworkTemplate oldTemplate, FrameworkTemplate newTemplate)
+        {
+            OnTemplateChanged((DataTemplate)oldTemplate, (DataTemplate)newTemplate);
+        }
+
         internal static DataTemplate DefaultContentTemplate { get; }
 
         internal static DataTemplate StringContentTemplate { get; }

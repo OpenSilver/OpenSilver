@@ -493,6 +493,24 @@ public partial class Control : FrameworkElement, IInternalControl
         set { _templateCache = (ControlTemplate)value; }
     }
 
+    internal override void OnTemplateChangedInternal(FrameworkTemplate oldTemplate, FrameworkTemplate newTemplate)
+    {
+        OnTemplateChanged((ControlTemplate)oldTemplate, (ControlTemplate)newTemplate);
+    }
+
+    /// <summary>
+    /// Called whenever the control's template changes.
+    /// </summary>
+    /// <param name="oldTemplate">
+    /// The old template.
+    /// </param>
+    /// <param name="newTemplate">
+    /// The new template.
+    /// </param>
+    protected virtual void OnTemplateChanged(ControlTemplate oldTemplate, ControlTemplate newTemplate)
+    {
+    }
+
     /// <summary>
     /// Identifies the <see cref="Control.Template"/> dependency property.
     /// </summary>

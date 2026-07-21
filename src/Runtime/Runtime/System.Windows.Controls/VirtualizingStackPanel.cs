@@ -193,7 +193,8 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             nameof(Orientation),
             typeof(Orientation),
             typeof(VirtualizingStackPanel),
-            new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure, OnOrientationChanged));
+            new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure, OnOrientationChanged),
+            ScrollBar.IsValidOrientation);
 
     /// <summary>
     /// Gets or sets a value that describes the horizontal or vertical orientation of stacked content.

@@ -1,0 +1,257 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.ToolBarTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:tk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+           mc:Ignorable="d"
+           d:DesignHeight="1400"
+           d:DesignWidth="900"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+
+    <Page.Resources>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,14,0,4" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="15">
+            <TextBlock Text="ToolBar / ToolBarTray Tests"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Margin="0,0,0,4" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="These controls are ported from WPF and share the same APIs and behavior (overflow, bands, dragging, IsLocked, item styling, etc.)." />
+
+            <!-- Output area -->
+            <Border Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1"
+                    Padding="10" Margin="0,0,0,10">
+                <StackPanel>
+                    <TextBlock Text="Last Action:" FontWeight="Bold" />
+                    <TextBlock x:Name="OutputTextBlock"
+                               Text="(Interact with the toolbars to see output)"
+                               Foreground="#555555" />
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 1: BASIC TOOLBAR (buttons, separators, toggles) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="1 · Basic ToolBar (standalone, no tray)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="A ToolBar can be used on its own. Known item types (Button, ToggleButton, Separator, CheckBox, RadioButton, ComboBox, TextBox, Menu) get an automatic ToolBar-specific style." />
+            <ToolBar Margin="0,0,0,10">
+                <Button Content="New" Click="OnToolBarItemClick" />
+                <Button Content="Open" Click="OnToolBarItemClick" />
+                <Button Content="Save" Click="OnToolBarItemClick" />
+                <Separator />
+                <ToggleButton Content="Bold" Click="OnToolBarItemClick" />
+                <ToggleButton Content="Italic" Click="OnToolBarItemClick" />
+                <ToggleButton Content="Underline" Click="OnToolBarItemClick" />
+                <Separator />
+                <CheckBox Content="Word Wrap" Click="OnToolBarItemClick" />
+            </ToolBar>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 2: MIXED ITEM TYPES (auto restyled to ToolBar look) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="2 · Mixed item types (ComboBox / TextBox / RadioButton)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="ComboBox, TextBox and RadioButton placed in a ToolBar are automatically restyled through the ToolBar's *StyleKey resources." />
+            <ToolBar Margin="0,0,0,10">
+                <TextBlock Text="Font:" VerticalAlignment="Center" Margin="4,0" />
+                <ComboBox Width="120" SelectionChanged="OnFontComboChanged">
+                    <ComboBoxItem Content="Arial" IsSelected="True" />
+                    <ComboBoxItem Content="Calibri" />
+                    <ComboBoxItem Content="Consolas" />
+                    <ComboBoxItem Content="Times New Roman" />
+                </ComboBox>
+                <Separator />
+                <TextBlock Text="Size:" VerticalAlignment="Center" Margin="4,0" />
+                <TextBox Width="50" Text="12" />
+                <Separator />
+                <RadioButton Content="Left" IsChecked="True" Click="OnToolBarItemClick" />
+                <RadioButton Content="Center" Click="OnToolBarItemClick" />
+                <RadioButton Content="Right" Click="OnToolBarItemClick" />
+            </ToolBar>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 3: OVERFLOW (OverflowMode + IsOverflowOpen + HasOverflowItems) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="3 · Overflow behavior" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="This ToolBar is width-constrained so items overflow into the drop-down. 'Always' items live permanently in the overflow, 'Never' items stay in the main bar. Use the button to toggle IsOverflowOpen." />
+            <ToolBar x:Name="OverflowToolBar" Width="260" Margin="0,0,0,6">
+                <Button Content="Cut" Click="OnToolBarItemClick" />
+                <Button Content="Copy" Click="OnToolBarItemClick" />
+                <Button Content="Paste" Click="OnToolBarItemClick" />
+                <Button Content="Undo" Click="OnToolBarItemClick" />
+                <Button Content="Redo" Click="OnToolBarItemClick" />
+                <Separator />
+                <Button Content="Find" Click="OnToolBarItemClick" />
+                <Button Content="Replace" Click="OnToolBarItemClick" />
+                <Button Content="Always Overflow"
+                        ToolBar.OverflowMode="Always"
+                        Click="OnToolBarItemClick" />
+                <Button Content="Never Overflow"
+                        ToolBar.OverflowMode="Never"
+                        Click="OnToolBarItemClick" />
+            </ToolBar>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <Button Content="Toggle IsOverflowOpen"
+                        Click="OnToggleOverflowClick"
+                        Margin="0,0,8,0" />
+                <TextBlock VerticalAlignment="Center">
+                    <Run Text="IsOverflowOpen = " />
+                    <Run Text="{Binding IsOverflowOpen, ElementName=OverflowToolBar, Mode=OneWay}"
+                         FontWeight="Bold" />
+                    <Run Text="   HasOverflowItems = " />
+                    <Run Text="{Binding HasOverflowItems, ElementName=OverflowToolBar, Mode=OneWay}"
+                         FontWeight="Bold" />
+                </TextBlock>
+            </StackPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 4: HORIZONTAL TOOLBARTRAY WITH BANDS -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="4 · Horizontal ToolBarTray with multiple bands" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="ToolBars are placed into rows ('bands') via ToolBar.Band and ordered within a band via ToolBar.BandIndex. Drag the grip on the left of a ToolBar to move / reorder them (tray is unlocked)." />
+            <ToolBarTray x:Name="HorizontalTray" Background="#ECEFF1" Margin="0,0,0,10">
+                <ToolBar Band="0" BandIndex="0">
+                    <Button Content="New" Click="OnToolBarItemClick" />
+                    <Button Content="Open" Click="OnToolBarItemClick" />
+                    <Button Content="Save" Click="OnToolBarItemClick" />
+                </ToolBar>
+                <ToolBar Band="0" BandIndex="1">
+                    <ToggleButton Content="B" Click="OnToolBarItemClick" />
+                    <ToggleButton Content="I" Click="OnToolBarItemClick" />
+                    <ToggleButton Content="U" Click="OnToolBarItemClick" />
+                </ToolBar>
+                <ToolBar Band="1" BandIndex="0">
+                    <Button Content="Zoom In" Click="OnToolBarItemClick" />
+                    <Button Content="Zoom Out" Click="OnToolBarItemClick" />
+                    <Separator />
+                    <Button Content="Reset" Click="OnToolBarItemClick" />
+                </ToolBar>
+            </ToolBarTray>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 5: IsLocked (attached property on the tray) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="5 · ToolBarTray.IsLocked (attached, per-ToolBar)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="IsLocked is an inheritable attached property. Set on the tray it locks every ToolBar through inheritance; set directly on a single ToolBar it locks only that ToolBar (overriding the inherited value). The global checkbox drives the tray's IsLocked, while each ToolBar's own 'Lock' checkbox overrides just that ToolBar (unchecking it makes the ToolBar fall back to the inherited tray value)." />
+            <CheckBox x:Name="LockTrayCheckBox"
+                      Content="Lock entire tray (ToolBarTray.IsLocked)"
+                      Margin="0,0,0,6"
+                      Checked="OnLockTrayChanged"
+                      Unchecked="OnLockTrayChanged" />
+            <ToolBarTray x:Name="LockableTray"
+                         Background="#E8EAF6"
+                         IsLocked="{Binding IsChecked, ElementName=LockTrayCheckBox}"
+                         Margin="0,0,0,10">
+                <ToolBar Band="0" BandIndex="0">
+                    <CheckBox x:Name="Lock1" Content="Lock" Tag="ToolBar 1"
+                              Checked="OnLockToolBarChanged" Unchecked="OnLockToolBarChanged" />
+                    <Separator />
+                    <Button Content="One" Click="OnToolBarItemClick" />
+                    <Button Content="Two" Click="OnToolBarItemClick" />
+                </ToolBar>
+                <ToolBar Band="0" BandIndex="1">
+                    <CheckBox x:Name="Lock2" Content="Lock" Tag="ToolBar 2"
+                              Checked="OnLockToolBarChanged" Unchecked="OnLockToolBarChanged" />
+                    <Separator />
+                    <Button Content="Three" Click="OnToolBarItemClick" />
+                    <Button Content="Four" Click="OnToolBarItemClick" />
+                </ToolBar>
+                <ToolBar Band="1" BandIndex="0">
+                    <CheckBox x:Name="Lock3" Content="Lock" Tag="ToolBar 3"
+                              Checked="OnLockToolBarChanged" Unchecked="OnLockToolBarChanged" />
+                    <Separator />
+                    <Button Content="Five" Click="OnToolBarItemClick" />
+                    <Button Content="Six" Click="OnToolBarItemClick" />
+                </ToolBar>
+                <ToolBar Band="1" BandIndex="1">
+                    <CheckBox x:Name="Lock4" Content="Lock" Tag="ToolBar 4"
+                              Checked="OnLockToolBarChanged" Unchecked="OnLockToolBarChanged" />
+                    <Separator />
+                    <Button Content="Seven" Click="OnToolBarItemClick" />
+                    <Button Content="Eight" Click="OnToolBarItemClick" />
+                </ToolBar>
+            </ToolBarTray>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 6: VERTICAL TOOLBARTRAY -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="6 · Vertical ToolBarTray (Orientation = Vertical)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="Setting Orientation on the tray flows bands into columns and coerces the read-only ToolBar.Orientation of every child toolbar. Use the button to switch between Horizontal and Vertical at runtime." />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <TextBlock Text="Tray Orientation:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <RadioButton x:Name="VerticalOrientationRadio"
+                             Content="Vertical"
+                             GroupName="TrayOrientation"
+                             VerticalAlignment="Center"
+                             IsChecked="True"
+                             Margin="0,0,12,0"
+                             Checked="OnOrientationRadioChecked" />
+                <RadioButton x:Name="HorizontalOrientationRadio"
+                             Content="Horizontal"
+                             GroupName="TrayOrientation"
+                             VerticalAlignment="Center"
+                             Checked="OnOrientationRadioChecked" />
+            </StackPanel>
+            <ToolBarTray x:Name="VerticalTray"
+                         Orientation="Vertical"
+                         HorizontalAlignment="Left"
+                         Background="#E0F2F1"
+                         Height="200"
+                         Margin="0,0,0,10">
+                <ToolBar Band="0" BandIndex="0">
+                    <Button Content="Top" Click="OnToolBarItemClick" />
+                    <Button Content="Mid" Click="OnToolBarItemClick" />
+                    <Button Content="Bot" Click="OnToolBarItemClick" />
+                </ToolBar>
+                <ToolBar Band="1" BandIndex="0">
+                    <ToggleButton Content="A" Click="OnToolBarItemClick" />
+                    <ToggleButton Content="B" Click="OnToolBarItemClick" />
+                </ToolBar>
+            </ToolBarTray>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 7: RUNTIME MUTATION (add / remove toolbars & items) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="7 · Runtime mutation" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="Add / remove ToolBars from the tray's ToolBars collection and add items to a ToolBar at runtime." />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="Add ToolBar" Click="OnAddToolBarClick" Margin="0,0,6,0" />
+                <Button Content="Remove ToolBar" Click="OnRemoveToolBarClick" Margin="0,0,6,0" />
+                <Button Content="Add Button to first ToolBar" Click="OnAddItemClick" />
+            </StackPanel>
+            <ToolBarTray x:Name="MutableTray" Background="#FBE9E7" Margin="0,0,0,10">
+                <ToolBar Band="0" BandIndex="0">
+                    <Button Content="Item 1" Click="OnToolBarItemClick" />
+                </ToolBar>
+            </ToolBarTray>
+
+        </StackPanel>
+    </ScrollViewer>
+</sdk:Page>

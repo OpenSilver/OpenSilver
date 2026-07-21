@@ -256,6 +256,8 @@ namespace System.Windows
             fe.HasTemplateGeneratedSubTree = false;
 
             DoTemplateResourcesInvalidations(fe, oldTemplate, newTemplate);
+
+            fe.OnTemplateChangedInternal(oldTemplate, newTemplate);
         }
 
         internal static bool ApplyTemplateContent(FrameworkElement container, FrameworkTemplate template)

@@ -16,6 +16,7 @@ using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace System.Windows.Controls
@@ -65,7 +66,8 @@ namespace System.Windows.Controls
                 nameof(Orientation),
                 typeof(Orientation),
                 typeof(StackPanel),
-                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure));
+                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure),
+                ScrollBar.IsValidOrientation);
 
         /// <summary>
         /// Gets or sets the dimension by which child elements are stacked.

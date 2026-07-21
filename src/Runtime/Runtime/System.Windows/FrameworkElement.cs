@@ -124,6 +124,13 @@ namespace System.Windows
         #region Visual Children
 
         /// <summary>
+        ///     Invoked when ancestor is changed.  This is invoked after
+        ///     the ancestor has changed, and the purpose is to allow elements to
+        ///     perform actions based on the changed ancestor.
+        /// </summary>
+        internal virtual void OnAncestorChanged() { }
+
+        /// <summary>
         /// Invoked when the parent of this element in the visual tree is changed. Overrides
         /// <see cref="UIElement.OnVisualParentChanged(DependencyObject)"/>.
         /// </summary>
@@ -316,6 +323,9 @@ namespace System.Windows
                 SetShouldLookupImplicitStyles();
             }
 
+            // Call OnAncestorChanged
+            OnAncestorChanged();
+
             ResourcesChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -456,6 +466,12 @@ namespace System.Windows
         {
             get { return null; }
             set { }
+        }
+
+        // Internal so that StyleHelper could uniformly call the TemplateChanged
+        // virtual on any templated parent
+        internal virtual void OnTemplateChangedInternal(FrameworkTemplate oldTemplate, FrameworkTemplate newTemplate)
+        {
         }
 
         internal bool HasTemplateGeneratedSubTree
