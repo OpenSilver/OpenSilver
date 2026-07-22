@@ -21,6 +21,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace OpenSilver.Controls;
 
@@ -60,8 +61,10 @@ public class WindowHost : ContentControl
     private const string PART_ChromeRestoreButton = "PART_ChromeRestoreButton";
     private const string PART_ChromeCloseButton = "PART_ChromeCloseButton";
     private const string PART_DragArea = "PART_DragArea";
+    private const string PART_ContentHost = "PART_ContentHost";
 
     private readonly Window _window;
+    private FrameworkElement _contentHostPart;
     private FrameworkElement _titleBarPart;
     private ButtonBase _minimizeButtonPart;
     private ButtonBase _maximizeButtonPart;
@@ -103,8 +106,13 @@ public class WindowHost : ContentControl
         Content = window;
 
         SetBinding(TitleProperty, new Binding(Window.TitleProperty) { Source = window });
-        SetBinding(MaxWidthProperty, new Binding(MaxWidthProperty) { Source = window });
-        SetBinding(MinWidthProperty, new Binding(MinWidthProperty) { Source = window });
+    }
+
+    /// <inheritdoc />
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        Size size = base.MeasureOverride(availableSize);
+        return _contentHostPart?.DesiredSize ?? size;
     }
 
     /// <summary>
@@ -155,6 +163,12 @@ public class WindowHost : ContentControl
         UpdateIsVisibleCache();
         PropagateResumeLayout(null, this);
 
+        // Build the template (and apply the chrome mode) before the first layout, so
+        // GetAvailableSize sees the correct chrome state (_hasChromeOverride, title bar)
+        // rather than stale defaults, which would otherwise size the host wrong until the
+        // next layout pass (e.g. a resize drag).
+        ApplyTemplate();
+
         InvalidateMeasure();
         SetLayoutSize();
     }
@@ -182,8 +196,6 @@ public class WindowHost : ContentControl
         UpdateIsVisibleCache();
         PropagateSuspendLayout(this);
     }
-
-    #region mine
 
     internal void UpdateResizeBorderThickness(Thickness thickness)
     {
@@ -241,7 +253,6 @@ public class WindowHost : ContentControl
 
     internal void ApplyWindowStyle()
     {
-        //For now, they basically look the same, except None.
         switch (_window.WindowStyle)
         {
             case WindowStyle.None:
@@ -352,8 +363,6 @@ public class WindowHost : ContentControl
     }
 
 
-    #region temporarily accepted
-
     internal void UpdateTitleBarHeight(double captionHeight)
     {
         _pendingTitleBarHeight = captionHeight;
@@ -370,22 +379,13 @@ public class WindowHost : ContentControl
         return _pendingTitleBarHeight;
     }
 
-    #endregion
-
-
-    #endregion
-
-
-
-
-
-
     public override void OnApplyTemplate()
     {
         UnsubscribeFromTemplateParts();
 
         base.OnApplyTemplate();
 
+        _contentHostPart = GetTemplateChild(PART_ContentHost) as FrameworkElement;
         _titleBarPart = GetTemplateChild(PART_TitleBar) as FrameworkElement;
         _minimizeButtonPart = GetTemplateChild(PART_MinimizeButton) as ButtonBase;
         _maximizeButtonPart = GetTemplateChild(PART_MaximizeButton) as ButtonBase;
@@ -467,8 +467,6 @@ public class WindowHost : ContentControl
     {
         if (!_window.IsVisible || _window.WindowState == WindowState.Maximized) return;
 
-        // Check if the click is within the top resize zone of the title bar.
-        // In WPF, the draggable area starts below the ResizeBorderThickness.Top.
         if (_window.ResizeMode >= ResizeMode.CanResize)
         {
             Point pos = e.GetPosition(_titleBarPart);
@@ -550,8 +548,34 @@ public class WindowHost : ContentControl
         Size availableSize = GetAvailableSize();
         InvalidateMeasure();
         Measure(availableSize);
-        Arrange(new Rect(new Point(), DesiredSize));
+
+        if (_window.WindowState == WindowState.Maximized)
+        {
+            Arrange(new Rect(new Point(), availableSize));
+            UpdateLayout();
+
+            if (OuterDiv.IsConnected)
+            {
+                OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, $"{Math.Round(availableSize.Width, 2).ToInvariantString()}px");
+                OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, $"{Math.Round(availableSize.Height, 2).ToInvariantString()}px");
+            }
+            return;
+        }
+
+        double frameW = double.IsNaN(_window.Width) ? DesiredSize.Width : availableSize.Width;
+        double frameH = double.IsNaN(_window.Height) ? DesiredSize.Height : availableSize.Height;
+
+        Arrange(new Rect(new Point(), new Size(frameW, frameH)));
         UpdateLayout();
+
+        // Size the OuterDiv (bypass-layout, so not sized by ArrangeNative) to the frame.
+        // Its CSS overflow:hidden clips the chrome/content overflow, while its own
+        // box-shadow renders the frame's shadow unclipped.
+        if (OuterDiv.IsConnected)
+        {
+            OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, $"{Math.Round(frameW, 2).ToInvariantString()}px");
+            OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, $"{Math.Round(frameH, 2).ToInvariantString()}px");
+        }
     }
 
     private Size GetAvailableSize()
@@ -564,17 +588,49 @@ public class WindowHost : ContentControl
                 Rect bounds = viewport.Bounds;
                 if (bounds.Width > 0 && bounds.Height > 0)
                 {
-                    return bounds.Size;
+                    double chrome = GetStackedChromeHeight();
+                    double vMaxW = _window.MaxWidth;
+                    double vMaxH = _window.MaxHeight;
+                    double mw = double.IsPositiveInfinity(vMaxW) ? bounds.Width : Math.Min(bounds.Width, vMaxW);
+                    double mh = double.IsPositiveInfinity(vMaxH) ? bounds.Height : Math.Min(bounds.Height, vMaxH + chrome);
+                    return new Size(mw, mh);
                 }
             }
         }
 
+        // Window.Width/Height (and their Max) describe the CONTENT (the inner Window). When
+        // a real title bar is stacked above the content (no WindowChrome, WindowStyle != None),
+        // the frame is taller by that title bar. With WindowChrome, the caption overlays the
+        // content, so nothing is added.
+        double chromeH = GetStackedChromeHeight();
         double w = _window.Width;
+        double h = _window.Height;
+        double maxW = _window.MaxWidth;
+        double maxH = _window.MaxHeight;
+
         double availW = double.IsNaN(w) ? double.PositiveInfinity : w;
+        double availH = double.IsNaN(h) ? double.PositiveInfinity : h + chromeH;
 
-        if (!double.IsPositiveInfinity(MaxWidth))
-            availW = Math.Min(availW, MaxWidth);
+        if (!double.IsPositiveInfinity(maxW))
+            availW = Math.Min(availW, maxW);
+        if (!double.IsPositiveInfinity(maxH))
+            availH = Math.Min(availH, maxH + chromeH);
 
-        return new Size(availW, double.PositiveInfinity);
+        return new Size(availW, availH);
+    }
+
+    /// <summary>
+    /// Height added by chrome that is stacked above the content (rather than overlaying it).
+    /// This is the title bar height in the default chrome; it is 0 when a WindowChrome is set
+    /// (the caption overlays the content) or when there is no title bar (WindowStyle.None).
+    /// </summary>
+    private double GetStackedChromeHeight()
+    {
+        if (_hasChromeOverride || _window.WindowStyle == WindowStyle.None)
+        {
+            return 0;
+        }
+
+        return GetTitleBarHeight();
     }
 }

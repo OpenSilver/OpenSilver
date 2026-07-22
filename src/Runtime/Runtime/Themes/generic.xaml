@@ -4862,18 +4862,23 @@
                 <controls:ControlTemplate TargetType="oscontrols:WindowHost">
                     <controls:Border BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
                                      BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}">
-                        <controls:Grid>
+                        <controls:Border.Effect>
+                            <effects:DropShadowEffect BlurRadius="5" Color="Black" Opacity="0.3" ShadowDepth="4"/>
+                        </controls:Border.Effect>
+                    <controls:Grid>
                             <controls:Grid.RowDefinitions>
                                 <controls:RowDefinition Height="Auto" />
                                 <controls:RowDefinition Height="Auto" />
                                 <controls:RowDefinition Height="*" />
                             </controls:Grid.RowDefinitions>
-                            <controls:Grid.Effect>
-                                <effects:DropShadowEffect BlurRadius="5" Color="Black" Opacity="0.3" ShadowDepth="4"/>
-                            </controls:Grid.Effect>
 
-                            <!-- Layer 1 (back): Title bar + Content -->
-                            <controls:Grid controls:Grid.RowSpan="3">
+                            <!-- Layer 1 (back): Title bar + Content.
+                                 PART_ContentHost is the ONLY layer that drives the WindowHost's
+                                 measured size (see WindowHost.MeasureOverride). The chrome sits in
+                                 fixed-height rows stacked one above the other; when the frame is
+                                 smaller than that stack, the bottom of the stack overflows and is
+                                 clipped by the OuterDiv (WPF-like non-client behavior). -->
+                            <controls:Grid x:Name="PART_ContentHost" controls:Grid.RowSpan="3">
                                 <controls:Grid.RowDefinitions>
                                     <controls:RowDefinition Height="Auto" />
                                     <controls:RowDefinition Height="*" />
@@ -4922,7 +4927,7 @@
                                         </controls:Button>
                                     </controls:Grid>
                                 </controls:Border>
-                                <controls:ContentPresenter controls:Grid.Row="1" />
+                                <controls:ContentPresenter controls:Grid.Row="1" VerticalAlignment="Top" />
                             </controls:Grid>
 
                             <!-- Layer 2: Top resize border -->

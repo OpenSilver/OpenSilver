@@ -1368,11 +1368,10 @@ public class Window : ContentControl, IResizeObserverListener
         Width = double.NaN;
         Height = double.NaN;
 
-        // Fill the overlay: position at origin with full size
+        // Pin to the top-left. The size (viewport, capped by the Window's Max like WPF)
+        // is applied by WindowHost.SetLayoutSize below.
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Left, "0px");
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Top, "0px");
-        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, "100%");
-        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, "100%");
 
         _windowHost.VisualOffset = new Vector(0, 0);
 
