@@ -96,7 +96,6 @@
     <Compile Include="DoubleUtil.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="InvalidEnumArgumentException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource.Designer.cs">
       <DesignTime>True</DesignTime>
