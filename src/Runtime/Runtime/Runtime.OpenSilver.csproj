@@ -190,6 +190,7 @@
     <Compile Include="System.Windows.Controls\ViewBase.cs" />
     <Compile Include="System.Windows.Controls\Menu.cs" />
     <Compile Include="System.Windows.Controls\RowDefinitionCollectionConverter.cs" />
+    <Compile Include="System.Windows.Controls\WrapPanel.cs" />
     <Compile Include="System.Windows.Data\BindingStatus.cs" />
     <Compile Include="System.Windows.Documents\List.cs" />
     <Compile Include="System.Windows.Documents\ListItem.cs" />

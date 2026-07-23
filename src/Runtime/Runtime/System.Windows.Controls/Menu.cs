@@ -1,9 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml.Context;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls;
 
@@ -17,6 +18,26 @@ public class Menu : MenuBase
     static Menu()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Menu), new PropertyMetadata(typeof(Menu)));
+        ItemsPanelProperty.OverrideMetadata(typeof(Menu), new PropertyMetadata(GetDefaultPanel()));
+    }
+
+    private static ItemsPanelTemplate GetDefaultPanel()
+    {
+        var template = new ItemsPanelTemplate
+        {
+            Template = new CompiledTemplateContent(
+                new XamlContext(),
+                static (owner, context) =>
+                {
+                    var panel = new WrapPanel();
+                    panel.SetTemplatedParent(context.TemplateOwnerReference);
+                    return panel;
+                }),
+        };
+
+        template.Seal();
+
+        return template;
     }
 
     /// <summary>

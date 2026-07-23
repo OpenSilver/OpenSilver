@@ -4170,13 +4170,6 @@
                 Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="Padding"
                 Value="0" />
-        <Setter Property="ItemsPanel">
-            <Setter.Value>
-                <controls:ItemsPanelTemplate>
-                    <controls:StackPanel Orientation="Horizontal" />
-                </controls:ItemsPanelTemplate>
-            </Setter.Value>
-        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:Menu">
@@ -7381,13 +7374,6 @@
                 Value="Center" />
         <Setter Property="input:KeyboardNavigation.TabNavigation"
                 Value="Continue" />
-        <Setter Property="ItemsPanel">
-            <Setter.Value>
-                <controls:ItemsPanelTemplate>
-                    <controls:StackPanel Orientation="Horizontal" />
-                </controls:ItemsPanelTemplate>
-            </Setter.Value>
-        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:Menu">
