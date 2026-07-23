@@ -169,6 +169,7 @@
     <Compile Include="System.Windows.Controls.Primitives\ToolBarPanel.cs" />
     <Compile Include="System.Windows.Controls\AccessText.cs" />
     <Compile Include="System.Windows.Controls\BorderGapClipConverter.cs" />
+    <Compile Include="System.Windows.Controls\CharacterCasing.cs" />
     <Compile Include="System.Windows.Controls\ColumnDefinitionCollectionConverter.cs" />
     <Compile Include="System.Windows.Controls\Decorator.cs" />
     <Compile Include="System.Windows.Controls\Dock.cs" />

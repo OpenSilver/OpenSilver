@@ -552,6 +552,42 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="CharacterCasing"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CharacterCasingProperty =
+            DependencyProperty.Register(
+                nameof(CharacterCasing),
+                typeof(CharacterCasing),
+                typeof(TextBox),
+                new FrameworkPropertyMetadata(CharacterCasing.Normal, OnCharacterCasingChanged),
+                IsValidCharacterCasing);
+
+        /// <summary>
+        /// Gets or sets how characters are cased when they are manually entered into the text box.
+        /// </summary>
+        /// <returns>
+        /// One of the <see cref="Controls.CharacterCasing"/> values that specifies how manually entered 
+        /// characters are cased. The default is <see cref="CharacterCasing.Normal"/>.
+        /// </returns>
+        public CharacterCasing CharacterCasing
+        {
+            get => (CharacterCasing)GetValue(CharacterCasingProperty);
+            set => SetValueInternal(CharacterCasingProperty, value);
+        }
+
+        private static void OnCharacterCasingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var tb = (TextBox)d;
+            tb._textViewHost?.View.OnCharacterCasingChanged((CharacterCasing)e.NewValue);
+        }
+
+        private static bool IsValidCharacterCasing(object o)
+        {
+            var value = (CharacterCasing)o;
+            return value == CharacterCasing.Normal || value == CharacterCasing.Lower || value == CharacterCasing.Upper;
+        }
+
+        /// <summary>
         /// Gets or sets the value that determines if the user can change the text in the text box.
         /// </summary>
         /// <returns>

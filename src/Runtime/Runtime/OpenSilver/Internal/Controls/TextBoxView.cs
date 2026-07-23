@@ -88,6 +88,7 @@ internal sealed class TextBoxView : TextViewBase
         TextBox host = Host;
 
         this.SetTextDecorations(host.TextDecorations);
+        this.SetTextTransform(host.CharacterCasing);
         this.SetTextWrapping(host.TextWrapping);
         this.SetCaretColor(host.CaretBrush);
 
@@ -167,6 +168,14 @@ internal sealed class TextBoxView : TextViewBase
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
         {
             this.SetTextDecorations(tdc);
+        }
+    }
+
+    internal void OnCharacterCasingChanged(CharacterCasing characterCasing)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv.IsConnected)
+        {
+            this.SetTextTransform(characterCasing);
         }
     }
 

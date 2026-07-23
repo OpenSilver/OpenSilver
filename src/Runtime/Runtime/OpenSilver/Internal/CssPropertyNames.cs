@@ -55,6 +55,7 @@ internal static class CssPropertyNames
     public const string TextDecoration = "text-decoration";
     public const string TextOverflow = "text-overflow";
     public const string TextShadow = "text-shadow";
+    public const string TextTransform = "text-transform";
     public const string Top = "top";
     public const string Transform = "transform";
     public const string TransformOrigin = "transform-origin";

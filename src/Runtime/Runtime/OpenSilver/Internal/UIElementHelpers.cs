@@ -149,6 +149,17 @@ internal static class UIElementHelpers
         uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextDecoration, FontProperties.ToCssTextDecoration(tdc));
     }
 
+    internal static void SetTextTransform(this UIElement uie, CharacterCasing characterCasing)
+    {
+        Debug.Assert(uie is not null);
+        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextTransform, characterCasing switch
+        {
+            CharacterCasing.Lower => "lowercase",
+            CharacterCasing.Upper => "uppercase",
+            _ => string.Empty,
+        });
+    }
+
     internal static void SetTextTrimming(this UIElement uie, TextTrimming textTrimming)
     {
         uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.TextOverflow, textTrimming switch
