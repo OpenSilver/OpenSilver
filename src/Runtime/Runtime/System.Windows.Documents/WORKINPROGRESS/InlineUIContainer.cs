@@ -26,8 +26,30 @@ namespace System.Windows.Documents
         private UIElement _child;
 
         /// <summary>
-        /// Gets or sets the UIElement hosted by the InlineUIContainer.
+        /// Initializes a new, empty instance of the <see cref="InlineUIContainer"/> class.
         /// </summary>
+        public InlineUIContainer()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InlineUIContainer"/> class, taking a specified 
+        /// <see cref="UIElement"/> object as the initial contents of the new <see cref="InlineUIContainer"/>.
+        /// </summary>
+        /// <param name="child">
+        /// An <see cref="UIElement"/> object specifying the initial contents of the new <see cref="InlineUIContainer"/>.
+        /// </param>
+        public InlineUIContainer(UIElement child)
+        {
+            Child = child;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="UIElement"/> hosted by the <see cref="InlineUIContainer"/>.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="UIElement"/> hosted by the <see cref="InlineUIContainer"/>.
+        /// </returns>
         public UIElement Child
         {
             get
