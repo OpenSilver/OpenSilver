@@ -631,6 +631,11 @@ public class WindowHost : ContentControl
             return 0;
         }
 
+        if (_titleBarPart is null || _titleBarPart.Visibility != Visibility.Visible)
+        {
+            return 0;
+        }
+
         return GetTitleBarHeight();
     }
 }
