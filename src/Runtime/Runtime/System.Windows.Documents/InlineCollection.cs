@@ -54,12 +54,28 @@ public class InlineCollection : TextElementCollection<Inline>, IList
         Add(new Run(text));
     }
 
+    /// <summary>
+    /// Adds an implicit <see cref="InlineUIContainer"/> with the supplied <see cref="UIElement"/> already
+    /// in it.
+    /// </summary>
+    /// <param name="uiElement">
+    /// <see cref="UIElement"/> set as the <see cref="InlineUIContainer.Child"/> property for the implicit 
+    /// <see cref="InlineUIContainer"/>.
+    /// </param>
+    public void Add(UIElement uiElement)
+    {
+        ArgumentNullException.ThrowIfNull(uiElement);
+
+        Add(new InlineUIContainer(uiElement));
+    }
+
     int IList.Add(object value)
     {
         Inline inline = value switch
         {
             string text => new Run(text ?? string.Empty),
             Inline i => i,
+            UIElement element => new InlineUIContainer(element),
             _ => null,
         };
 
