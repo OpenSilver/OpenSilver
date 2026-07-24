@@ -1780,7 +1780,6 @@ public class Window : ContentControl, IResizeObserverListener
     internal void UpdateFullScreenMode()
     {
         bool shouldBeFullScreen = IsMainWindow
-            && PropsAllowFullScreen()
             && Application.Current?.Windows.Count <= 1;
 
         if (shouldBeFullScreen && !_isFullScreen)
@@ -1817,10 +1816,6 @@ public class Window : ContentControl, IResizeObserverListener
         _windowHost?.ApplyWindowChromeMode();
     }
 
-    private bool PropsAllowFullScreen()
-    {
-        return ResizeMode >= ResizeMode.CanResize;
-    }
 
     #endregion
 }
