@@ -30,11 +30,11 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
     private readonly UIElement _owner;
     private bool _isModel;
 
-    internal TextElementCollection(UIElement owner)
+    internal TextElementCollection(UIElement owner, ITextContainer textContainer)
     {
         Debug.Assert(owner is not null);
         _owner = owner;
-        TextContainer = TextContainersHelper.Create(owner);
+        TextContainer = textContainer;
     }
 
     internal ITextContainer TextContainer { get; }

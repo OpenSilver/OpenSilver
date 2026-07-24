@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Documents;
 using System.Collections;
 
 namespace System.Windows.Documents;
@@ -20,8 +21,8 @@ namespace System.Windows.Documents;
 /// </summary>
 public class InlineCollection : TextElementCollection<Inline>, IList
 {
-    internal InlineCollection(UIElement owner)
-        : base(owner)
+    internal InlineCollection(UIElement owner, ITextContainer textContainer)
+        : base(owner, textContainer)
     {
     }
 
@@ -52,21 +53,6 @@ public class InlineCollection : TextElementCollection<Inline>, IList
         ArgumentNullException.ThrowIfNull(text);
 
         Add(new Run(text));
-    }
-
-    /// <summary>
-    /// Adds an implicit <see cref="InlineUIContainer"/> with the supplied <see cref="UIElement"/> already
-    /// in it.
-    /// </summary>
-    /// <param name="uiElement">
-    /// <see cref="UIElement"/> set as the <see cref="InlineUIContainer.Child"/> property for the implicit 
-    /// <see cref="InlineUIContainer"/>.
-    /// </param>
-    public void Add(UIElement uiElement)
-    {
-        ArgumentNullException.ThrowIfNull(uiElement);
-
-        Add(new InlineUIContainer(uiElement));
     }
 
     int IList.Add(object value)

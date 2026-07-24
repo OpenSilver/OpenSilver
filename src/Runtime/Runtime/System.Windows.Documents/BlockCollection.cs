@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Documents;
+
 namespace System.Windows.Documents;
 
 /// <summary>
@@ -18,8 +20,8 @@ namespace System.Windows.Documents;
 /// </summary>
 public sealed class BlockCollection : TextElementCollection<Block>
 {
-    internal BlockCollection(UIElement owner)
-        : base(owner)
+    internal BlockCollection(UIElement owner, ITextContainer textContainer)
+        : base(owner, textContainer)
     {
     }
 

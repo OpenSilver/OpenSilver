@@ -14,7 +14,11 @@
 using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Documents;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace System.Windows.Documents;
 
@@ -30,7 +34,7 @@ public class List : Block
     /// </summary>
     public List()
     {
-        ListItems = new ListItemCollection(this);
+        ListItems = new ListItemCollection(this, TextContainer);
     }
 
     /// <summary>
@@ -223,6 +227,29 @@ public class List : Block
         foreach (var listItem in ListItems.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(listItem, this);
+        }
+    }
+
+    internal sealed override ITextContainer OnCreateTextContainer() => new TextContainerList(this);
+
+    private sealed class TextContainerList : ITextContainer
+    {
+        private readonly List _list;
+
+        public TextContainerList(List list)
+        {
+            Debug.Assert(list is not null);
+            _list = list;
+        }
+
+        public string Text => string.Join("\n", _list.ListItems.Select(li => li.TextContainer.Text));
+
+        public void OnTextContentChanged()
+        {
+            if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_list)) is ITextContainer parent)
+            {
+                parent.OnTextContentChanged();
+            }
         }
     }
 }

@@ -11,62 +11,85 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Documents;
+using System.Windows.Markup;
+using System.Windows.Media;
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+// This class is not finished because there is an issue displaying the element "inline" instead of on a new line.
+/// <summary>
+/// Provides an inline content element that enables UIElement types to be embedded in the content of a (Rich)TextBlock.
+/// </summary>
+[ContentProperty(nameof(Child))]
+public sealed class InlineUIContainer : Inline
 {
-    // This class is not finished because there is an issue displaying the element "inline" instead of on a new line.
+    private UIElement _child;
+
     /// <summary>
-    /// Provides an inline content element that enables UIElement types to be embedded in the content of a (Rich)TextBlock.
+    /// Initializes a new, empty instance of the <see cref="InlineUIContainer"/> class.
     /// </summary>
-    [ContentProperty(nameof(Child))]
-    public sealed class InlineUIContainer : Inline
+    public InlineUIContainer()
     {
-        private UIElement _child;
+    }
 
-        /// <summary>
-        /// Initializes a new, empty instance of the <see cref="InlineUIContainer"/> class.
-        /// </summary>
-        public InlineUIContainer()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InlineUIContainer"/> class, taking a specified 
+    /// <see cref="UIElement"/> object as the initial contents of the new <see cref="InlineUIContainer"/>.
+    /// </summary>
+    /// <param name="child">
+    /// An <see cref="UIElement"/> object specifying the initial contents of the new <see cref="InlineUIContainer"/>.
+    /// </param>
+    public InlineUIContainer(UIElement child)
+    {
+        Child = child;
+    }
+
+    /// <summary>
+    /// Gets or sets the <see cref="UIElement"/> hosted by the <see cref="InlineUIContainer"/>.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="UIElement"/> hosted by the <see cref="InlineUIContainer"/>.
+    /// </returns>
+    public UIElement Child
+    {
+        get
         {
+            return _child;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InlineUIContainer"/> class, taking a specified 
-        /// <see cref="UIElement"/> object as the initial contents of the new <see cref="InlineUIContainer"/>.
-        /// </summary>
-        /// <param name="child">
-        /// An <see cref="UIElement"/> object specifying the initial contents of the new <see cref="InlineUIContainer"/>.
-        /// </param>
-        public InlineUIContainer(UIElement child)
+        set
         {
-            Child = child;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="UIElement"/> hosted by the <see cref="InlineUIContainer"/>.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="UIElement"/> hosted by the <see cref="InlineUIContainer"/>.
-        /// </returns>
-        public UIElement Child
-        {
-            get
+            if (IsLoadedCache)
             {
-                return _child;
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
             }
-            set
-            {
-                if (IsLoadedCache)
-                {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
-                }
-                _child = value;
-            }
+            _child = value;
+        }
+    }
+
+    internal sealed override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+
+    internal override ITextContainer OnCreateTextContainer() => new TextContainerInlineUIContainer(this);
+
+    private sealed class TextContainerInlineUIContainer : ITextContainer
+    {
+        private readonly InlineUIContainer _uiContainer;
+
+        internal TextContainerInlineUIContainer(InlineUIContainer uiContainer)
+        {
+            _uiContainer = uiContainer;
         }
 
-        internal sealed override void AttachVisualChildren() => INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+        public string Text => string.Empty;
+
+        public void OnTextContentChanged()
+        {
+            if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_uiContainer)) is ITextContainer parent)
+            {
+                parent.OnTextContentChanged();
+            }
+        }
     }
 }

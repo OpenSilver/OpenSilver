@@ -27,8 +27,6 @@
     <Compile Include="OpenSilver\HtmlElementReference.cs" />
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerInlineUIContainer.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerList.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\AnimationType.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\IAnimation.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\Animator.cs" />
@@ -85,7 +83,6 @@
     <Compile Include="OpenSilver\Internal\Data\TypeHelper.cs" />
     <Compile Include="OpenSilver\Internal\Data\ViewManager.cs" />
     <Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerInlineImageContainer.cs" />
     <Compile Include="OpenSilver\Internal\DOMEvents.cs" />
     <Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
     <Compile Include="OpenSilver\Internal\InternalAPIAttribute.cs" />
@@ -99,16 +96,7 @@
     <Compile Include="OpenSilver\Internal\DependencyObjectStore.cs" />
     <Compile Include="OpenSilver\Internal\Controls\EmptyEnumerator.cs" />
     <Compile Include="OpenSilver\Internal\InheritablePropertyChangeInfo.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerLineBreak.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerParagraph.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBlock.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBox.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerRun.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerSection.cs" />
     <Compile Include="OpenSilver\Internal\Documents\TextContainer.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainersHelper.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerSpan.cs" />
-    <Compile Include="OpenSilver\Internal\Documents\TextContainerTextBlock.cs" />
     <Compile Include="OpenSilver\Internal\Controls\TextViewBase.cs" />
     <Compile Include="OpenSilver\Internal\Controls\TextViewBase.IScrollInfo.cs" />
     <Compile Include="OpenSilver\Internal\Controls\TextViewHosts.cs" />

@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Documents;
+
 namespace System.Windows.Documents;
 
 /// <summary>
@@ -19,8 +21,8 @@ namespace System.Windows.Documents;
 /// </summary>
 public class ListItemCollection : TextElementCollection<ListItem>
 {
-    internal ListItemCollection(List owner)
-        : base(owner)
+    internal ListItemCollection(List owner, ITextContainer textContainer)
+        : base(owner, textContainer)
     {
     }
 

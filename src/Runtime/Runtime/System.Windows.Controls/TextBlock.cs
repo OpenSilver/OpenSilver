@@ -11,15 +11,18 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Documents;
+using OpenSilver.Internal.Media;
 using System.Collections.Generic;
-using System.Windows.Markup;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
+using System.Windows.Markup;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Media;
-using OpenSilver;
 
 namespace System.Windows.Controls
 {
@@ -60,7 +63,7 @@ namespace System.Windows.Controls
 
         public TextBlock()
         {
-            SetValueInternal(InlinesProperty, new InlineCollection(this));
+            SetValueInternal(InlinesProperty, new InlineCollection(this, new TextContainerTextBlock(this)));
         }
 
         /// <summary>
@@ -1178,6 +1181,21 @@ namespace System.Windows.Controls
             }
 
             return new Size(0, 0);
+        }
+
+        private sealed class TextContainerTextBlock : ITextContainer
+        {
+            private readonly TextBlock _textblock;
+
+            internal TextContainerTextBlock(TextBlock tb)
+            {
+                Debug.Assert(tb is not null);
+                _textblock = tb;
+            }
+
+            public string Text => string.Join(string.Empty, _textblock.Inlines.InternalItems.Select(i => i.TextContainer.Text));
+
+            public void OnTextContentChanged() => _textblock.OnTextContentChanged();
         }
     }
 }

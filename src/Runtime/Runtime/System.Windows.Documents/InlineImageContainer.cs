@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Documents;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Media;
@@ -184,6 +185,28 @@ public sealed class InlineImageContainer : Inline
         };
 
     internal static ImageSource ParseSource(string str) => ExtendedImageSourceConverter.FromString(str);
+
+    internal override ITextContainer OnCreateTextContainer() => new TextContainerInlineImageContainer(this);
+
+    private sealed class TextContainerInlineImageContainer : ITextContainer
+    {
+        private readonly InlineImageContainer _image;
+
+        internal TextContainerInlineImageContainer(InlineImageContainer image)
+        {
+            _image = image;
+        }
+
+        public string Text => string.Empty;
+
+        public void OnTextContentChanged()
+        {
+            if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_image)) is ITextContainer parent)
+            {
+                parent.OnTextContentChanged();
+            }
+        }
+    }
 
     private sealed class ExtendedImageSourceConverter : TypeConverter
     {

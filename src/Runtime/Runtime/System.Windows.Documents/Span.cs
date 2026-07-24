@@ -11,9 +11,13 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal.Documents;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Windows.Markup;
-using CSHTML5.Internal;
+using System.Windows.Media;
 
 namespace System.Windows.Documents;
 
@@ -30,7 +34,7 @@ public class Span : Inline
     /// </summary>
     public Span()
     {
-        SetValueInternal(InlinesProperty, new InlineCollection(this));
+        SetValueInternal(InlinesProperty, new InlineCollection(this, TextContainer));
     }
 
     private static readonly DependencyProperty InlinesProperty =
@@ -82,6 +86,8 @@ public class Span : Inline
         return Inlines.InternalItems[index];
     }
 
+    internal sealed override ITextContainer OnCreateTextContainer() => new TextContainerSpan(this);
+
     internal sealed override void AppendHtml(StringBuilder builder)
     {
         builder.Append($"<{TagName} class=\"opensilver-inline\">");
@@ -91,4 +97,26 @@ public class Span : Inline
         }
         builder.Append($"</{TagName}>");
     }
+
+    private sealed class TextContainerSpan : ITextContainer
+    {
+        private readonly Span _span;
+
+        internal TextContainerSpan(Span span)
+        {
+            Debug.Assert(span is not null);
+            _span = span;
+        }
+
+        public string Text => string.Join(string.Empty, _span.Inlines.InternalItems.Select(i => i.TextContainer.Text));
+
+        public void OnTextContentChanged()
+        {
+            if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_span)) is ITextContainer parent)
+            {
+                parent.OnTextContentChanged();
+            }
+        }
+    }
+
 }

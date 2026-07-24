@@ -11,13 +11,15 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Documents;
+using OpenSilver.Internal.Media;
+using System.Diagnostics;
 using System.Text;
 using System.Web;
 using System.Windows.Markup;
 using System.Windows.Media;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Media;
 
 namespace System.Windows.Documents;
 
@@ -229,6 +231,8 @@ public sealed class Run : Inline
         }
     }
 
+    internal override ITextContainer OnCreateTextContainer() => new TextContainerRun(this);
+
     internal override void AppendHtml(StringBuilder builder)
     {
         builder.Append("<span class=\"opensilver-inline\" style=\"font: ");
@@ -236,5 +240,26 @@ public sealed class Run : Inline
         builder.Append($"; letter-spacing: {FontProperties.ToCssLetterSpacing(CharacterSpacing)}\">")
                .Append(HttpUtility.HtmlEncode(Text))
                .Append("</span>");
+    }
+
+    private sealed class TextContainerRun : ITextContainer
+    {
+        private readonly Run _run;
+
+        public TextContainerRun(Run run)
+        {
+            Debug.Assert(run is not null);
+            _run = run;
+        }
+
+        public string Text => _run.Text;
+
+        public void OnTextContentChanged()
+        {
+            if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_run)) is ITextContainer parent)
+            {
+                parent.OnTextContentChanged();
+            }
+        }
     }
 }

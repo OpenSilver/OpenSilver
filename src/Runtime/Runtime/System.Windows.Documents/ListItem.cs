@@ -14,6 +14,9 @@
 using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Documents;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows.Markup;
 using System.Windows.Media;
 
@@ -31,7 +34,7 @@ public class ListItem : TextElement
     /// </summary>
     public ListItem()
     {
-        Blocks = new BlockCollection(this);
+        Blocks = new BlockCollection(this, TextContainer);
     }
 
     /// <summary>
@@ -311,4 +314,28 @@ public class ListItem : TextElement
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);
         }
     }
+
+    internal sealed override ITextContainer OnCreateTextContainer() => new TextContainerListItem(this);
+
+    private sealed class TextContainerListItem : ITextContainer
+    {
+        private readonly ListItem _listItem;
+
+        public TextContainerListItem(ListItem listItem)
+        {
+            Debug.Assert(listItem is not null);
+            _listItem = listItem;
+        }
+
+        public string Text => string.Join("\n", _listItem.Blocks.Select(block => block.TextContainer.Text));
+
+        public void OnTextContentChanged()
+        {
+            if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_listItem)) is ITextContainer parent)
+            {
+                parent.OnTextContentChanged();
+            }
+        }
+    }
+
 }

@@ -36,7 +36,7 @@ public abstract class TextElement : UIElement
     /// </summary>
     protected TextElement() { }
 
-    internal ITextContainer TextContainer => _textContainer ??= TextContainersHelper.Create(this);
+    internal ITextContainer TextContainer => _textContainer ??= OnCreateTextContainer();
 
     internal virtual bool IsModel { get; set; }
 
@@ -635,6 +635,8 @@ public abstract class TextElement : UIElement
 
     internal virtual string TagName => "span";
 
+    internal virtual ITextContainer OnCreateTextContainer() => EmptyTextContainer.Instance;
+
     internal virtual void AppendHtml(StringBuilder builder) { }
 
     internal override sealed void SetPointerEvents(bool hitTestable) { }
@@ -664,10 +666,22 @@ public abstract class TextElement : UIElement
         }
     }
 
+    /// <inheritdoc />
     protected internal override void OnVisualParentChanged(DependencyObject oldParent)
     {
         InvalidateInheritedProperties(this, VisualTreeHelper.GetParent(this));
 
         base.OnVisualParentChanged(oldParent);
+    }
+
+    private sealed class EmptyTextContainer : ITextContainer
+    {
+        private EmptyTextContainer() { }
+
+        public static EmptyTextContainer Instance { get; } = new();
+
+        string ITextContainer.Text => string.Empty;
+
+        void ITextContainer.OnTextContentChanged() { }
     }
 }

@@ -11,10 +11,27 @@
 *  
 \*====================================================================================*/
 
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+
 namespace OpenSilver.Internal.Documents;
 
 internal interface ITextContainer
 {
     string Text { get; }
     void OnTextContentChanged();
+}
+
+internal static class TextContainersHelper
+{
+    public static ITextContainer Get(DependencyObject d) =>
+        d switch
+        {
+            TextElement textElement => textElement.TextContainer,
+            TextBlock textBlock => textBlock.Inlines.TextContainer,
+            RichTextBlock richTextBlock => richTextBlock.Blocks.TextContainer,
+            RichTextBox richTextBox => richTextBox.InternalBlocks.TextContainer,
+            _ => null,
+        };
 }

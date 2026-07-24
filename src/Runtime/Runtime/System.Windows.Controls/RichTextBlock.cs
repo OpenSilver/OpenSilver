@@ -11,14 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using System.Windows.Markup;
-using System.Windows.Documents;
-using System.Windows.Media;
 using CSHTML5.Internal;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Media;
 using OpenSilver;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Documents;
+using OpenSilver.Internal.Media;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows.Documents;
+using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace System.Windows.Controls
 {
@@ -50,7 +53,7 @@ namespace System.Windows.Controls
         /// </summary>
         public RichTextBlock()
         {
-            SetValueInternal(BlocksProperty, new BlockCollection(this));
+            SetValueInternal(BlocksProperty, new BlockCollection(this, new TextContainerRichTextBlock(this)));
         }
 
         internal sealed override bool EnablePointerEventsCore => true;
@@ -572,5 +575,20 @@ namespace System.Windows.Controls
 
         internal sealed override bool ShouldApplyMirrorTransform() =>
             GetFlowDirectionFromVisual(VisualTreeHelper.GetParent(this)) == FlowDirection.RightToLeft;
+
+        private sealed class TextContainerRichTextBlock : ITextContainer
+        {
+            private readonly RichTextBlock _rtb;
+
+            public TextContainerRichTextBlock(RichTextBlock rtb)
+            {
+                Debug.Assert(rtb is not null);
+                _rtb = rtb;
+            }
+
+            public string Text => string.Join("\n", _rtb.Blocks.InternalItems.Select(b => b.TextContainer.Text));
+
+            public void OnTextContentChanged() => _rtb.InvalidateMeasure();
+        }
     }
 }

@@ -15,7 +15,9 @@ using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal.Documents;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
@@ -63,7 +65,7 @@ namespace System.Windows.Controls
         /// </summary>
         public RichTextBox()
         {
-            SetValueInternal(BlocksPropertyKey, new BlockCollection(this));
+            SetValueInternal(BlocksPropertyKey, new BlockCollection(this, new TextContainerRichTextBox(this)));
             Selection = new TextSelection(this);
             ContentStart = new TextPointer(this, 0, LogicalDirection.Backward);
             ContentEnd = new TextPointer(this, 0, LogicalDirection.Forward);
@@ -1003,6 +1005,21 @@ namespace System.Windows.Controls
 
                 _richTextBox.EndRefresh();
             }
+        }
+
+        private sealed class TextContainerRichTextBox : ITextContainer
+        {
+            private readonly RichTextBox _richTextBox;
+
+            public TextContainerRichTextBox(RichTextBox richTextBox)
+            {
+                Debug.Assert(richTextBox is not null);
+                _richTextBox = richTextBox;
+            }
+
+            public string Text => string.Empty;
+
+            public void OnTextContentChanged() => _richTextBox.InvalidateUI();
         }
     }
 }

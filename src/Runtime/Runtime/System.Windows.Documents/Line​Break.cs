@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal.Documents;
 using System.Text;
 
 namespace System.Windows.Documents;
@@ -23,5 +24,18 @@ public sealed class LineBreak : Inline
 {
     internal override string TagName => "br";
 
+    internal override ITextContainer OnCreateTextContainer() => TextContainerLineBreak.Instance;
+
     internal override void AppendHtml(StringBuilder builder) => builder.Append("<br />");
+
+    private sealed class TextContainerLineBreak : ITextContainer
+    {
+        private TextContainerLineBreak() { }
+
+        public static TextContainerLineBreak Instance { get; } = new();
+
+        public string Text => "\n";
+
+        public void OnTextContentChanged() => throw new NotSupportedException();
+    }
 }

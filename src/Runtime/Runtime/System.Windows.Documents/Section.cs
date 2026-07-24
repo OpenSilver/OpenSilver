@@ -11,8 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Documents;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace System.Windows.Documents;
 
@@ -27,7 +31,7 @@ public sealed class Section : Block
 
     public Section()
     {
-        SetValueInternal(BlocksProperty, new BlockCollection(this));
+        SetValueInternal(BlocksProperty, new BlockCollection(this, TextContainer));
     }
 
     internal override string TagName => "section";
@@ -70,6 +74,8 @@ public sealed class Section : Block
         }
     }
 
+    internal override ITextContainer OnCreateTextContainer() => new TextContainerSection(this);
+
     internal sealed override bool IsModel
     {
         get => _blocks.IsModel;
@@ -86,5 +92,26 @@ public sealed class Section : Block
         }
 
         return Blocks.InternalItems[index];
+    }
+
+    private sealed class TextContainerSection : ITextContainer
+    {
+        private readonly Section _section;
+
+        public TextContainerSection(Section section)
+        {
+            Debug.Assert(section is not null);
+            _section = section;
+        }
+
+        public string Text => string.Join("\n", _section.Blocks.InternalItems.Select(b => b.TextContainer.Text));
+
+        public void OnTextContentChanged()
+        {
+            if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_section)) is ITextContainer parent)
+            {
+                parent.OnTextContentChanged();
+            }
+        }
     }
 }
