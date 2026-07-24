@@ -22,36 +22,41 @@
 //
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Text;
-using System.Xaml.Schema;
+using System.Threading.Tasks;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-    internal class PropertyDefinition : MemberDefinition
+	[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public sealed class XamlDeferLoadAttribute : Attribute
 	{
-		public PropertyDefinition()
+		public XamlDeferLoadAttribute(string loaderType, string contentType)
 		{
-			attributes = new List<Attribute>();
+			LoaderTypeName = loaderType;
+			ContentTypeName = contentType;
 		}
 
-		List<Attribute> attributes;
-		public IList<Attribute> Attributes
+		public XamlDeferLoadAttribute(Type loaderType, Type contentType)
 		{
-			get { return attributes; }
+			LoaderType = loaderType;
+			ContentType = contentType;
 		}
 
-		[DefaultValue("public")]
-		public string Modifier { get; set; }
+		public Type ContentType { get; private set; }
+		public string ContentTypeName { get; private set; }
+		public Type LoaderType { get; private set; }
+		public string LoaderTypeName { get; private set; }
 
-		string name;
-		public override string Name
+		internal Type GetLoaderType()
 		{
-			get { return name; }
-			set { name = value; }
+			return LoaderType ?? Type.GetType(LoaderTypeName);
 		}
 
-		[TypeConverter(typeof(XamlTypeTypeConverter))]
-		public XamlType Type { get; set; }
+		internal Type GetContentType()
+		{
+			return ContentType ?? Type.GetType(ContentTypeName);
+		}
+
 	}
 }

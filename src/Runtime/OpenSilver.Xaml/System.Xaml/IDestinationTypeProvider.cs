@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-    internal interface IDestinationTypeProvider
+    public interface IDestinationTypeProvider
 	{
 		Type GetDestinationType();
 	}

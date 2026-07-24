@@ -22,28 +22,44 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Markup;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-    internal class XamlSetMarkupExtensionEventArgs : XamlSetValueEventArgs
+    public class DateTimeValueSerializer : ValueSerializer
 	{
-		public XamlSetMarkupExtensionEventArgs(XamlMember member, MarkupExtension value, IServiceProvider serviceProvider)
-			: base(member, null)
+		const DateTimeStyles styles = DateTimeStyles.RoundtripKind | DateTimeStyles.NoCurrentDateDefault | DateTimeStyles.AllowLeadingWhite | DateTimeStyles.AllowTrailingWhite;
+
+		public override bool CanConvertFromString(string value, IValueSerializerContext context)
 		{
-			MarkupExtension = value;
-			ServiceProvider = serviceProvider;
+			return true; // documented
 		}
 
-		public MarkupExtension MarkupExtension { get; private set; }
-		public IServiceProvider ServiceProvider { get; private set; }
-
-		public override void CallBase()
+		public override bool CanConvertToString(object value, IValueSerializerContext context)
 		{
-			throw new NotImplementedException();
+			return value is DateTime;
+		}
+
+		public override object ConvertFromString(string value, IValueSerializerContext context)
+		{
+			if (value == null)
+				throw new NotSupportedException();
+			if (value.Length == 0)
+				return DateTime.MinValue;
+			return DateTime.Parse(value, CultureInfo.InvariantCulture, styles);
+		}
+
+		public override string ConvertToString(object value, IValueSerializerContext context)
+		{
+			if (!(value is DateTime))
+				throw new NotSupportedException();
+			DateTime date = (DateTime)value;
+			if (date.TimeOfDay.TotalSeconds > 0)
+				return date.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK", CultureInfo.InvariantCulture);
+			return date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 		}
 	}
 }

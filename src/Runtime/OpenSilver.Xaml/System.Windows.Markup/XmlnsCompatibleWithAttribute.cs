@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
 	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    internal sealed class XmlnsCompatibleWithAttribute : Attribute
+    public sealed class XmlnsCompatibleWithAttribute : Attribute
 	{
 		public XmlnsCompatibleWithAttribute(string oldNamespace, string newNamespace)
 		{

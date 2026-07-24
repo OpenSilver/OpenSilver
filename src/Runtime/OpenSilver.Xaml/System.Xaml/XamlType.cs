@@ -45,7 +45,7 @@ namespace System.Xaml
 		public int GetHashCode(object obj) => obj.GetHashCode();
 	}
 
-    internal class XamlType : IEquatable<XamlType>
+    public class XamlType : IEquatable<XamlType>
 	{
 		FlagValue flags;
 		static class TypeFlags

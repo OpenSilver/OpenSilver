@@ -4,7 +4,7 @@ using System.Text;
 
 namespace System.Xaml
 {
-    internal class NamespaceDeclaration
+    public class NamespaceDeclaration
 	{
 		public NamespaceDeclaration(string ns, string prefix)
 		{

@@ -22,18 +22,28 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Xaml;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal sealed class UidPropertyAttribute : Attribute
+    public class XamlSetMarkupExtensionEventArgs : XamlSetValueEventArgs
 	{
-		public UidPropertyAttribute(string name)
+		public XamlSetMarkupExtensionEventArgs(XamlMember member, MarkupExtension value, IServiceProvider serviceProvider)
+			: base(member, null)
 		{
-			Name = name;
+			MarkupExtension = value;
+			ServiceProvider = serviceProvider;
 		}
 
-		public string Name { get; private set; }
+		public MarkupExtension MarkupExtension { get; private set; }
+		public IServiceProvider ServiceProvider { get; private set; }
+
+		public override void CallBase()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

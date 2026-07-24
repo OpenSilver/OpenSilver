@@ -31,7 +31,7 @@ using System.Xml;
 
 namespace System.Xaml
 {
-    internal class XamlXmlReader : XamlReader, IXamlLineInfo
+    public class XamlXmlReader : XamlReader, IXamlLineInfo
 	{
 		#region constructors
 

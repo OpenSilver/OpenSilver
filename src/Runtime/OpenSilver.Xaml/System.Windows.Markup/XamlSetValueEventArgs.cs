@@ -22,39 +22,28 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Windows.Markup;
+using System.Threading.Tasks;
+using System.Xaml;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[ContentProperty("Name")]
-    internal class Reference : MarkupExtension
+    public class XamlSetValueEventArgs : EventArgs
 	{
-		public Reference()
+		public XamlSetValueEventArgs(XamlMember member, object value)
 		{
+			Member = member;
+			Value = value;
 		}
 
-		public Reference(string name)
+		public bool Handled { get; set; }
+		public XamlMember Member { get; private set; }
+		public object Value { get; private set; }
+
+		public virtual void CallBase()
 		{
-			Name = name;
-		}
-
-		[ConstructorArgument("name")]
-		public string Name { get; set; }
-
-		public override object ProvideValue(IServiceProvider serviceProvider)
-		{
-			ArgumentNullException.ThrowIfNull(serviceProvider);
-
-            if (Name == null)
-				throw new InvalidOperationException("Name property is not set");
-			var r = serviceProvider.GetService(typeof(IXamlNameResolver)) as IXamlNameResolver;
-			if (r == null)
-				throw new InvalidOperationException("serviceProvider does not implement IXamlNameResolver");
-			var ret = r.Resolve(Name);
-			if (ret == null)
-				ret = r.GetFixupToken([Name], true);
-			return ret;
+			throw new NotImplementedException();
 		}
 	}
 }

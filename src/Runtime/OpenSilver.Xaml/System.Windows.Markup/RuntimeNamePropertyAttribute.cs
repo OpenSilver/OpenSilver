@@ -22,27 +22,18 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-    internal class XamlSetValueEventArgs : EventArgs
+	[AttributeUsage(AttributeTargets.Class)]
+    public sealed class RuntimeNamePropertyAttribute : Attribute
 	{
-		public XamlSetValueEventArgs(XamlMember member, object value)
+		public RuntimeNamePropertyAttribute(string name)
 		{
-			Member = member;
-			Value = value;
+			Name = name;
 		}
 
-		public bool Handled { get; set; }
-		public XamlMember Member { get; private set; }
-		public object Value { get; private set; }
-
-		public virtual void CallBase()
-		{
-			throw new NotImplementedException();
-		}
+		public string Name { get; private set; }
 	}
 }

@@ -22,33 +22,39 @@
 //
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Xaml;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-    internal class XamlSetTypeConverterEventArgs : XamlSetValueEventArgs
+	[ContentProperty("Name")]
+    public class Reference : MarkupExtension
 	{
-		public XamlSetTypeConverterEventArgs(XamlMember member, TypeConverter typeConverter, object value, ITypeDescriptorContext serviceProvider, CultureInfo cultureInfo)
-			: base(member, value)
+		public Reference()
 		{
-			CultureInfo = cultureInfo;
-			ServiceProvider = serviceProvider;
-			TypeConverter = typeConverter;
 		}
 
-		public CultureInfo CultureInfo { get; private set; }
-
-		public ITypeDescriptorContext ServiceProvider { get; private set; }
-
-		public TypeConverter TypeConverter { get; private set; }
-
-		public override void CallBase()
+		public Reference(string name)
 		{
-			throw new NotImplementedException();
+			Name = name;
+		}
+
+		[ConstructorArgument("name")]
+		public string Name { get; set; }
+
+		public override object ProvideValue(IServiceProvider serviceProvider)
+		{
+			ArgumentNullException.ThrowIfNull(serviceProvider);
+
+            if (Name == null)
+				throw new InvalidOperationException("Name property is not set");
+			var r = serviceProvider.GetService(typeof(IXamlNameResolver)) as IXamlNameResolver;
+			if (r == null)
+				throw new InvalidOperationException("serviceProvider does not implement IXamlNameResolver");
+			var ret = r.Resolve(Name);
+			if (ret == null)
+				ret = r.GetFixupToken([Name], true);
+			return ret;
 		}
 	}
 }

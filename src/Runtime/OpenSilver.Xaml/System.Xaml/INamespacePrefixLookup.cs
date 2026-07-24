@@ -4,7 +4,7 @@ using System.Text;
 
 namespace System.Xaml
 {
-    internal interface INamespacePrefixLookup
+    public interface INamespacePrefixLookup
 	{
 		string LookupPrefix(string ns);
 	}

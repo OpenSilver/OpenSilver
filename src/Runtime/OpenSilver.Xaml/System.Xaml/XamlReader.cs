@@ -4,7 +4,7 @@ using System.Text;
 
 namespace System.Xaml
 {
-	internal abstract class XamlReader : IDisposable
+	public abstract class XamlReader : IDisposable
 	{
 		/// <summary>
 		///	When implemented in a derived class, gets the type of the current node.

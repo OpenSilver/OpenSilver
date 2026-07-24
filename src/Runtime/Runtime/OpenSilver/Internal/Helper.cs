@@ -13,7 +13,7 @@
 
 using System;
 using System.Windows;
-using System.Xaml.Markup;
+using System.Windows.Markup;
 
 namespace OpenSilver.Internal;
 

@@ -69,7 +69,7 @@ State transition:
 
 namespace System.Xaml
 {
-    internal class XamlObjectWriter : XamlWriter, IXamlLineInfoConsumer
+    public class XamlObjectWriter : XamlWriter, IXamlLineInfoConsumer
     {
         public XamlObjectWriter(XamlSchemaContext schemaContext)
             : this(schemaContext, null)

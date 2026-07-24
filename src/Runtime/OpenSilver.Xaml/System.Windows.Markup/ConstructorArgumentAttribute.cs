@@ -24,16 +24,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[AttributeUsageAttribute(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-    internal sealed class XamlSetMarkupExtensionAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    public sealed class ConstructorArgumentAttribute : Attribute
 	{
-		public XamlSetMarkupExtensionAttribute(string xamlSetMarkupExtensionHandler)
+		public ConstructorArgumentAttribute(string argumentName)
 		{
-			XamlSetMarkupExtensionHandler = xamlSetMarkupExtensionHandler;
+			ArgumentName = argumentName;
 		}
 
-		public string XamlSetMarkupExtensionHandler { get; private set; }
+		public string ArgumentName { get; private set; }
 	}
 }

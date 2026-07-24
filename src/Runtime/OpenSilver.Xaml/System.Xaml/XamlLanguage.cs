@@ -28,11 +28,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Markup;
-using System.Xaml.Markup;
+using System.Xaml.Schema;
 
 namespace System.Xaml
 {
-    internal static class XamlLanguage
+    public static class XamlLanguage
 	{
 		public const string Xaml2006Namespace = "http://schemas.microsoft.com/winfx/2006/xaml";
 		public const string Xml1998Namespace = "http://www.w3.org/XML/1998/namespace";

@@ -53,7 +53,7 @@ namespace System.Xaml
 		DeferCompile = 3
 	}
 
-    internal class XamlSchemaContextSettings
+    public class XamlSchemaContextSettings
 	{
 		public XamlSchemaContextSettings()
 		{
@@ -75,7 +75,7 @@ namespace System.Xaml
 		public bool SupportMarkupExtensionsWithDuplicateArity { get; set; }
 
 		[EnhancedXaml]
-		public XamlInvokerOptions InvokerOptions { get; set; } = XamlInvokerOptions.DeferCompile;
+		internal XamlInvokerOptions InvokerOptions { get; set; } = XamlInvokerOptions.DeferCompile;
 
 	}
 }

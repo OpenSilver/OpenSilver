@@ -20,7 +20,7 @@ namespace System.Windows.Markup
     /// <summary>
     /// Provides a XAML processor engine for parsing XAML and creating corresponding Silverlight object trees.
     /// </summary>
-    public static class XamlReader
+    public class XamlReader
     {
         private static readonly Lazy<XamlSchemaContext> _sharedXamlContext = new(() => new OpenSilverXamlSchemaContext());
 

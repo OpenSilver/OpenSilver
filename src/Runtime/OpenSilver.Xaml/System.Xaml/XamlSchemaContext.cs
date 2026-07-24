@@ -37,7 +37,7 @@ using Pair = System.Collections.Generic.KeyValuePair<string, string>;
 
 namespace System.Xaml
 {
-    internal class XamlSchemaContext
+    public class XamlSchemaContext
 	{
 		public XamlSchemaContext()
 			: this(null, null)
@@ -83,7 +83,7 @@ namespace System.Xaml
 		Dictionary<string, AssemblyInfo> assembly_cache = new Dictionary<string, AssemblyInfo>();
 
 		[EnhancedXaml]
-		public XamlInvokerOptions InvokerOptions { get; private set; } = XamlInvokerOptions.DeferCompile;
+		internal XamlInvokerOptions InvokerOptions { get; private set; } = XamlInvokerOptions.DeferCompile;
 
 		public bool SupportMarkupExtensionsWithDuplicateArity { get; private set; }
 

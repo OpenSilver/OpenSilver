@@ -26,12 +26,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Xaml.Markup;
+using System.Windows.Markup;
 using System.Xaml.Schema;
 
 namespace System.Xaml
 {
-    internal class XamlDirective : XamlMember
+    public class XamlDirective : XamlMember
 	{
 		class DirectiveMemberInvoker : XamlMemberInvoker
 		{

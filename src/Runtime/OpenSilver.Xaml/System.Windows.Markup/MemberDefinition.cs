@@ -24,16 +24,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-    internal sealed class XamlSetTypeConverterAttribute : Attribute
+    public abstract class MemberDefinition
 	{
-		public XamlSetTypeConverterAttribute(string xamlSetTypeConverterHandler)
-		{
-			XamlSetTypeConverterHandler = xamlSetTypeConverterHandler;
-		}
-
-		public string XamlSetTypeConverterHandler { get; private set; }
+		public abstract string Name { get; set; }
 	}
 }

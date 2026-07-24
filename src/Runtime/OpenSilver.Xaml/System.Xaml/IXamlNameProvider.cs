@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-    internal interface IXamlNameProvider
+    public interface IXamlNameProvider
 	{
 		string GetName(object value);
 	}

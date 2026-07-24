@@ -22,16 +22,14 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	[AttributeUsageAttribute(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    internal sealed class DictionaryKeyPropertyAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public sealed class UidPropertyAttribute : Attribute
 	{
-		public DictionaryKeyPropertyAttribute(string name)
+		public UidPropertyAttribute(string name)
 		{
 			Name = name;
 		}
