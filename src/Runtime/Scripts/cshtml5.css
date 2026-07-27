@@ -31,7 +31,6 @@ body {
     font-size: 11px;
     overflow-x: hidden;
     overflow-y: hidden;
-    cursor: default;
     font-family: 'Segoe UI', Verdana, 'DejaVu Sans', Lucida, 'MS Sans Serif', sans-serif;
     -webkit-touch-callout: none; /* prevents callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none; /* prevents webkit from resizing text to fit */
@@ -48,6 +47,7 @@ body {
 .opensilver-root-element {
     touch-action: none; /* prevents the browser from cancelling pointermove events */
     pointer-events: auto;
+    cursor: default;
     display: grid;
     grid-template-rows: 1fr auto;
     grid-template-columns: 1fr;
@@ -66,7 +66,7 @@ body {
 }
 
 .opensilver-hyperlink {
-    cursor: pointer;
+    cursor: var(--cursor-override, pointer);
 }
 
 .opensilver-hyperlink:hover {
@@ -196,9 +196,9 @@ body {
     background: transparent;
     padding: 0;
     resize: none;
-    cursor: text;
     overflow: hidden;
     tab-size: 4;
+    cursor: inherit;
 }
 
     .opensilver-textboxview:focus::selection {
@@ -214,6 +214,7 @@ body {
     border: none;
     background: transparent;
     padding: 0;
+    cursor: inherit;
 }
 
     .opensilver-passwordboxview:focus::selection {

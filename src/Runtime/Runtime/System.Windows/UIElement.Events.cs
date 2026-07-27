@@ -51,6 +51,7 @@ namespace System.Windows
             EventManager.RegisterClassHandler<UIElement>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk), false);
             EventManager.RegisterClassHandler<UIElement>(Mouse.GotMouseCaptureEvent, new MouseEventHandler(OnGotMouseCaptureThunk), true);
             EventManager.RegisterClassHandler<UIElement>(Mouse.LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk), true);
+            EventManager.RegisterClassHandler<UIElement>(Mouse.QueryCursorEvent, new QueryCursorEventHandler(OnQueryCursorThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextCompositionManager.TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextCompositionManager.PreviewTextInputEvent, new TextCompositionEventHandler(OnPreviewTextInputThunk), false);
             EventManager.RegisterClassHandler<UIElement>(TextCompositionManager.TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk), false);
@@ -250,6 +251,8 @@ namespace System.Windows
                 uie.OnLostMouseCapture(e);
             }
         }
+
+        private static void OnQueryCursorThunk(object sender, QueryCursorEventArgs e) => ((UIElement)sender).OnQueryCursor(e);
 
         private static void OnDragEnterThunk(object sender, DragEventArgs e) => ((UIElement)sender).OnDragEnter(e);
 
@@ -1647,6 +1650,37 @@ namespace System.Windows
         /// A <see cref="MouseEventArgs"/> that contains the event data.
         /// </param>
         protected virtual void OnLostMouseCapture(MouseEventArgs e) { }
+
+        #endregion
+
+        #region QueryCursor
+
+        /// <summary>
+        /// Identifies the <see cref="QueryCursor"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent QueryCursorEvent = Mouse.QueryCursorEvent.AddOwner(typeof(UIElement));
+
+        /// <summary>
+        /// Occurs when the cursor is requested to display. This event is raised on 
+        /// an element each time that the mouse pointer moves to a new location, 
+        /// which means the cursor object might need to be changed based on its new 
+        /// position.
+        /// </summary>
+        public event QueryCursorEventHandler QueryCursor
+        {
+            add => AddHandler(Mouse.QueryCursorEvent, value, false);
+            remove => RemoveHandler(Mouse.QueryCursorEvent, value);
+        }
+
+        /// <summary>
+        /// Invoked when an unhandled <b>Mouse.QueryCursor</b> attached event reaches 
+        /// an element in its route that is derived from this class. Implement this
+        /// method to add class handling for this event.
+        /// </summary>
+        /// <param name="e">
+        /// The <see cref="QueryCursorEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnQueryCursor(QueryCursorEventArgs e) { }
 
         #endregion
 

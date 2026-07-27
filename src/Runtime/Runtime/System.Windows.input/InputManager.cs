@@ -249,7 +249,6 @@ public sealed class InputManager : DispatcherObject
             UpdateMostRecentDevice(eventType);
 
             _primaryKeyboardDevice.ProcessInput(uie, eventType, jsEventArg);
-            _primaryMouseDevice.ProcessInput(eventType);
         }
     }
 
@@ -352,12 +351,34 @@ public sealed class InputManager : DispatcherObject
 
     private sealed class BrowserMouseDevice : MouseDevice
     {
+        private Cursor _cursor = Cursors.Arrow;
+        private bool _forceCursor = false;
+
         public BrowserMouseDevice(InputManager inputManager)
            : base(inputManager)
         {
         }
 
-        internal override bool SetCapture(UIElement capture)
+        internal override bool SetCursorNative(Cursor cursor, bool forceCursor)
+        {
+            if (_cursor == cursor && _forceCursor == forceCursor)
+            {
+                return true;
+            }
+
+            bool success = OpenSilver.Interop.ExecuteJavaScriptBoolean(
+                $"osjs.inputManager.setCursor('{cursor?.ToHtmlString() ?? string.Empty}', {(forceCursor ? "true" : "false")})");
+
+            if (success)
+            {
+                _cursor = cursor;
+                _forceCursor = forceCursor;
+            }
+
+            return success;
+        }
+
+        internal override bool SetCaptureNative(UIElement capture)
         {
             if (capture is null)
             {

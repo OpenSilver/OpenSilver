@@ -215,6 +215,7 @@ Object.defineProperty(window, 'osjs', {
                 };
             })();
 
+            let _root = null;
             let _modifiers = MODIFIERKEYS.NONE;
             let _pointerOver = null;
             let _pointerCapture = null;
@@ -272,14 +273,10 @@ Object.defineProperty(window, 'osjs', {
                 return (_pressedButtons & button) == button;
             }
 
-            function updatePointerOver(pointerOver, rootElement, e) {
+            function updatePointerOver(pointerOver, e) {
                 if (_pointerOver !== pointerOver) {
                     _pointerOver = pointerOver;
-                    if (_pointerOver !== null) {
-                        invokePointerCallback(_pointerOver, EVENTS.POINTER_OVER, e);
-                    } else {
-                        invokePointerCallbackOnRoot(rootElement, EVENTS.POINTER_OVER, e);
-                    }
+                    invokePointerCallback(_pointerOver, EVENTS.POINTER_OVER, e);
                 }
             }
 
@@ -295,18 +292,9 @@ Object.defineProperty(window, 'osjs', {
             }
 
             function invokePointerCallback(element, type, e) {
-                if (!element) {
-                    _callbacks.inputManagerEvent('', type, e);
-                    return;
-                }
-
-                const [pageX, pageY] = getPointerPosition(e.pageX, e.pageY, document.getElementById(element.windowid));
+                const relativeTo = element ? document.getElementById(element.windowid) : _root;
+                const [pageX, pageY] = getPointerPosition(e.pageX, e.pageY, relativeTo);
                 _callbacks.inputManagerPointerEvent(getClosestElementId(element), type, e, e.pointerType === 'touch', pageX, pageY, _modifiers);
-            }
-
-            function invokePointerCallbackOnRoot(rootElement, type, e) {
-                const [pageX, pageY] = getPointerPosition(e.pageX, e.pageY, rootElement);
-                _callbacks.inputManagerPointerEvent('', type, e, e.pointerType === 'touch', pageX, pageY, _modifiers);
             }
 
             function initDom() {
@@ -315,13 +303,13 @@ Object.defineProperty(window, 'osjs', {
                         setActivePointer(e);
                         switch (e.button) {
                             case 0:
-                                _callbacks.inputManagerEvent('', EVENTS.POINTER_LEFT_DOWN, e);
+                                _callbacks.inputManagerPointerEvent('', EVENTS.POINTER_LEFT_DOWN, e, e.pointerType === 'touch', 0, 0, _modifiers);
                                 break;
                             case 1:
-                                _callbacks.inputManagerEvent('', EVENTS.POINTER_MIDDLE_DOWN, e);
+                                _callbacks.inputManagerPointerEvent('', EVENTS.POINTER_MIDDLE_DOWN, e, e.pointerType === 'touch', 0, 0, _modifiers);
                                 break;
                             case 2:
-                                _callbacks.inputManagerEvent('', EVENTS.POINTER_RIGHT_DOWN, e);
+                                _callbacks.inputManagerPointerEvent('', EVENTS.POINTER_RIGHT_DOWN, e, e.pointerType === 'touch', 0, 0, _modifiers);
                                 break;
                         }
                     }
@@ -375,8 +363,12 @@ Object.defineProperty(window, 'osjs', {
 
             return {
                 registerRoot: function (rootId) {
+                    if (_root !== null) return;
+
                     const root = document.getElementById(rootId);
                     if (!root) return;
+
+                    _root = root;
 
                     // Set windowid on the root element for coordinate translation.
                     Object.defineProperty(root, 'windowid', {
@@ -423,12 +415,7 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('pointermove', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
-                        const target = getClosestElement(e.target);
-                        if (target) {
-                            invokePointerCallback(target, EVENTS.POINTER_MOVE, e);
-                        } else {
-                            invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MOVE, e);
-                        }
+                        invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_MOVE, e);
                     });
 
                     root.addEventListener('wheel', function (e) {
@@ -438,40 +425,25 @@ Object.defineProperty(window, 'osjs', {
                         if (e.deltaY === 0) return;
                         e.isHandled = true;
                         setModifiers(e);
-                        const target = getClosestElement((_pointerCapture !== null ? _pointerCapture.element : null) || e.target);
-                        if (target) {
-                            invokePointerCallback(target, EVENTS.WHEEL, e);
-                        } else {
-                            invokePointerCallbackOnRoot(e.currentTarget, EVENTS.WHEEL, e);
-                        }
+                        invokePointerCallback(
+                            getClosestElement((_pointerCapture !== null ? _pointerCapture.element : null) || e.target),
+                            EVENTS.WHEEL,
+                            e);
                     });
 
                     root.addEventListener('pointerdown', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
                         setActivePointer(e);
-                        const target = getClosestElement(e.target);
                         switch (e.button) {
                             case 0:
-                                if (target) {
-                                    invokePointerCallback(target, EVENTS.POINTER_LEFT_DOWN, e);
-                                } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_LEFT_DOWN, e);
-                                }
+                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_LEFT_DOWN, e);
                                 break;
                             case 1:
-                                if (target) {
-                                    invokePointerCallback(target, EVENTS.POINTER_MIDDLE_DOWN, e);
-                                } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_DOWN, e);
-                                }
+                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_MIDDLE_DOWN, e);
                                 break;
                             case 2:
-                                if (target) {
-                                    invokePointerCallback(target, EVENTS.POINTER_RIGHT_DOWN, e);
-                                } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_RIGHT_DOWN, e);
-                                }
+                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_RIGHT_DOWN, e);
                                 break;
                         }
                     });
@@ -480,28 +452,15 @@ Object.defineProperty(window, 'osjs', {
                         e.isHandled = true;
                         setModifiers(e);
                         setActivePointer(e);
-                        const target = getClosestElement(e.target);
                         switch (e.button) {
                             case 0:
-                                if (target) {
-                                    invokePointerCallback(target, EVENTS.POINTER_LEFT_UP, e);
-                                } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_LEFT_UP, e);
-                                }
+                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_LEFT_UP, e);
                                 break;
                             case 1:
-                                if (target) {
-                                    invokePointerCallback(target, EVENTS.POINTER_MIDDLE_UP, e);
-                                } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_MIDDLE_UP, e); 
-                                }
+                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_MIDDLE_UP, e);
                                 break;
                             case 2:
-                                if (target) {
-                                    invokePointerCallback(target, EVENTS.POINTER_RIGHT_UP, e);
-                                } else {
-                                    invokePointerCallbackOnRoot(e.currentTarget, EVENTS.POINTER_RIGHT_UP, e);
-                                }
+                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_RIGHT_UP, e);
                                 break;
                         }
                     });
@@ -519,7 +478,7 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('lostpointercapture', function (e) {
                         if (_pointerCapture !== null && _pointerCapture.element === e.target) {
                             _pointerCapture = null;
-                            _callbacks.inputManagerEvent('', EVENTS.POINTER_CAPTURE_LOST, e);
+                            invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_CAPTURE_LOST, e);
                         }
                     });
 
@@ -527,12 +486,12 @@ Object.defineProperty(window, 'osjs', {
                         const target = e.relatedTarget !== null && e.currentTarget.contains(e.relatedTarget) ?
                             getClosestElement(e.relatedTarget) :
                             null;
-                        updatePointerOver(target, e.currentTarget, e);
+                        updatePointerOver(target, e);
                     });
 
                     root.addEventListener('pointerover', function (e) {
                         const target = getClosestElement(e.target);
-                        updatePointerOver(target, e.currentTarget, e);
+                        updatePointerOver(target, e);
                     });
 
                     root.addEventListener('keypress', function (e) {
@@ -605,6 +564,14 @@ Object.defineProperty(window, 'osjs', {
                 },
                 suppressContextMenu: function (value) {
                     _suppressContextMenu = value;
+                },
+                setCursor: function (cursor, forceCursor) {
+                    if (_root === null) return false;
+
+                    _root.style.cursor = cursor;
+                    _root.style.setProperty('--cursor-override', forceCursor ? cursor : '');
+
+                    return true;
                 },
                 focus: function (id) {
                     return FocusManager.focus(document.getElementById(id));

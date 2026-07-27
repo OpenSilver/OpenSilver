@@ -76,10 +76,9 @@ public class MouseEventArgs : InputEventArgs
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
         ((MouseEventHandler)genericHandler)(genericTarget, this);
 
-    internal double _pointerAbsoluteX;
-    internal double _pointerAbsoluteY;
-
-    internal bool IsTouchEvent { get; private set; }
+    internal readonly double _pointerAbsoluteX;
+    internal readonly double _pointerAbsoluteY;
+    internal readonly bool IsTouchEvent;
 
     /// <summary>
     /// Gets the mouse device associated with this event.

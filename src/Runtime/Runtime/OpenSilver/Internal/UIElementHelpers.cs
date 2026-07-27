@@ -271,12 +271,6 @@ internal static class UIElementHelpers
         uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.ZIndex, value.ToInvariantString());
     }
 
-    internal static void SetCursor(this UIElement uie, Cursor cursor)
-    {
-        Debug.Assert(uie is not null);
-        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Cursor, cursor?.ToHtmlString() ?? string.Empty);
-    }
-
     internal static void SetBorderRadius(this UIElement uie, CornerRadius radius)
     {
         Debug.Assert(uie is not null);

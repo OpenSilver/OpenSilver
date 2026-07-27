@@ -434,6 +434,40 @@ public static class Mouse
         => UIElement.RemoveHandler(element, MouseWheelEvent, handler);
 
     /// <summary>
+    /// Identifies the <b>Mouse.QueryCursor</b> attached event.
+    /// </summary>
+    public static readonly RoutedEvent QueryCursorEvent =
+        EventManager.RegisterRoutedEvent(
+            "QueryCursor",
+            RoutingStrategy.Bubble,
+            typeof(QueryCursorEventHandler),
+            typeof(Mouse));
+
+    /// <summary>
+    /// Adds a handler for the <b>Mouse.QueryCursor</b> attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void AddQueryCursorHandler(DependencyObject element, QueryCursorEventHandler handler)
+        => UIElement.AddHandler(element, QueryCursorEvent, handler);
+
+    /// <summary>
+    /// Removes a handler for the <b>Mouse.QueryCursor</b> attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="UIElement"/> that listens to this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler.
+    /// </param>
+    public static void RemoveQueryCursorHandler(DependencyObject element, QueryCursorEventHandler handler)
+        => UIElement.RemoveHandler(element, QueryCursorEvent, handler);
+
+    /// <summary>
     /// Gets the primary mouse device.
     /// </summary>
     /// <returns>
@@ -482,6 +516,18 @@ public static class Mouse
     public static MouseButtonState RightButton => PrimaryDevice.RightButton;
 
     /// <summary>
+    /// Gets or sets the cursor for the entire application.
+    /// </summary>
+    /// <returns>
+    /// The override cursor or null if the <see cref="OverrideCursor"/> is not set.
+    /// </returns>
+    public static Cursor OverrideCursor
+    {
+        get => PrimaryDevice.OverrideCursor;
+        set => PrimaryDevice.OverrideCursor = value;
+    }
+
+    /// <summary>
     /// Captures mouse input to the specified element.
     /// </summary>
     /// <param name="element">
@@ -503,6 +549,22 @@ public static class Mouse
     /// </returns>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static bool Capture(IInputElement element) => PrimaryDevice.Capture(element);
+
+    /// <summary>
+    /// Sets the mouse pointer to the specified <see cref="Cursor"/>.
+    /// </summary>
+    /// <param name="cursor">
+    /// The cursor to set the mouse pointer to.
+    /// </param>
+    /// <returns>
+    /// true, if the cursor was set; otherwise, false.
+    /// </returns>
+    public static bool SetCursor(Cursor cursor) => PrimaryDevice.SetCursor(cursor);
+
+    /// <summary>
+    /// Forces the mouse cursor to be updated.
+    /// </summary>
+    public static void UpdateCursor() => PrimaryDevice.UpdateCursor();
 
     /// <summary>
     /// Gets the position of the mouse relative to a specified element.

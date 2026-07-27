@@ -403,6 +403,7 @@ namespace System.Windows
                     CoerceFlowDirection));
 
             EventManager.RegisterClassHandler<FrameworkElement>(Validation.ErrorEvent,new EventHandler<ValidationErrorEventArgs>(OnValidationError));
+            EventManager.RegisterClassHandler<FrameworkElement>(Mouse.QueryCursorEvent, new QueryCursorEventHandler(OnQueryCursorOverride), true);
             EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnPreviewGotKeyboardFocus));
             EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.GotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnGotKeyboardFocus));
             EventManager.RegisterClassHandler<FrameworkElement>(Keyboard.LostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnLostKeyboardFocus));
@@ -753,32 +754,86 @@ namespace System.Windows
 
         #region Cursor
 
-        // Returns:
-        //     The cursor to display. The default value is defined as null per this dependency
-        //     property. However, the practical default at run time will come from a variety
-        //     of factors.
-        /// <summary>
-        /// Gets or sets the cursor that displays when the mouse pointer is over this
-        /// element.
-        /// </summary>
-        public Cursor Cursor
-        {
-            get { return (Cursor)GetValue(CursorProperty); }
-            set { SetValueInternal(CursorProperty, value); }
-        }
-
         /// <summary>
         /// Identifies the <see cref="Cursor"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CursorProperty =
             DependencyProperty.Register(
-                nameof(Cursor), 
-                typeof(Cursor), 
-                typeof(FrameworkElement), 
-                new PropertyMetadata((object)null)
+                nameof(Cursor),
+                typeof(Cursor),
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(null, OnCursorChanged));
+
+        /// <summary>
+        /// Gets or sets the cursor that displays when the mouse pointer is over this element.
+        /// </summary>
+        /// <returns>
+        /// The cursor to display. The default value is defined as null per this dependency property.
+        /// However, the practical default at run time will come from a variety of factors.
+        /// </returns>
+        public Cursor Cursor
+        {
+            get => (Cursor)GetValue(CursorProperty);
+            set => SetValueInternal(CursorProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ForceCursor"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ForceCursorProperty =
+            DependencyProperty.Register(
+                nameof(ForceCursor),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, OnCursorChanged));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether this <see cref="FrameworkElement"/> should 
+        /// force the user interface (UI) to render the cursor as declared by the <see cref="Cursor"/>
+        /// property.
+        /// </summary>
+        /// <returns>
+        /// true if cursor presentation while over this element is forced to use current <see cref="Cursor"/>
+        /// settings for the cursor (including on all child elements); otherwise false. The default 
+        /// value is false.
+        /// </returns>
+        public bool ForceCursor
+        {
+            get => (bool)GetValue(ForceCursorProperty);
+            set => SetValueInternal(ForceCursorProperty, value);
+        }
+
+        // If the cursor is changed, we may need to set the actual cursor.
+        private static void OnCursorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var fe = (FrameworkElement)d;
+
+            if (fe.IsMouseOver)
+            {
+                Mouse.UpdateCursor();
+            }
+        }
+
+        private static void OnQueryCursorOverride(object sender, QueryCursorEventArgs e)
+        {
+            var fe = (FrameworkElement)sender;
+
+            // We respond to querying the cursor by specifying the cursor set
+            // as a property on this element.
+            if (fe.Cursor is Cursor cursor)
+            {
+                // We specify the cursor if the QueryCursor event is not
+                // handled by the time it gets to us, or if we are configured
+                // to force our cursor anyways.  Since the QueryCursor event
+                // bubbles, this has the effect of overriding whatever cursor
+                // a child of ours specified.
+                if (!e.Handled || fe.ForceCursor)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((FrameworkElement)d).SetCursor((Cursor)newValue),
-                });
+                    e.Cursor = cursor;
+                    e.Handled = true;
+                }
+            }
+        }
 
         #endregion
 

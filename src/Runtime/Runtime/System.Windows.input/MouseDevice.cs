@@ -40,6 +40,7 @@ public abstract class MouseDevice : InputDevice
     private int _clickCount;
     private int _lastClickTime;
     private Point _clientPosition;
+    private Cursor _overrideCursor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MouseDevice"/> class.
@@ -102,6 +103,22 @@ public abstract class MouseDevice : InputDevice
     public MouseButtonState RightButton => GetButtonState(MouseButton.Right);
 
     /// <summary>
+    /// Gets or sets the cursor for the entire application.
+    /// </summary>
+    /// <returns>
+    /// The override cursor or null if <see cref="OverrideCursor"/> is not set.
+    /// </returns>
+    public Cursor OverrideCursor
+    {
+        get => _overrideCursor;
+        set
+        {
+            _overrideCursor = value;
+            UpdateCursorPrivate();
+        }
+    }
+
+    /// <summary>
     /// Captures mouse events to the specified element.
     /// </summary>
     /// <param name="element">
@@ -123,7 +140,7 @@ public abstract class MouseDevice : InputDevice
 
         if (element is null || _mouseCapture is null)
         {
-            success = SetCapture(element);
+            success = SetCaptureNative(element);
         }
 
         if (success)
@@ -222,6 +239,36 @@ public abstract class MouseDevice : InputDevice
     }
 
     /// <summary>
+    /// Forces the mouse cursor to update.
+    /// </summary>
+    public void UpdateCursor() => UpdateCursorPrivate();
+
+    /// <summary>
+    /// Sets the mouse pointer to the specified <see cref="Cursor"/>.
+    /// </summary>
+    /// <param name="cursor">
+    /// The cursor to set the mouse pointer to.
+    /// </param>
+    /// <returns>
+    /// true if the mouse cursor is set; otherwise, false.
+    /// </returns>
+    public bool SetCursor(Cursor cursor) => SetCursor(cursor, true);
+
+    private bool SetCursor(Cursor cursor, bool forceCursor)
+    {
+        // Override the cursor if one is set.
+        if (_overrideCursor is not null)
+        {
+            cursor = _overrideCursor;
+            forceCursor = true;
+        }
+
+        cursor ??= Cursors.None;
+
+        return SetCursorNative(cursor, forceCursor);
+    }
+
+    /// <summary>
     /// Gets the state of the specified mouse button.
     /// </summary>
     /// <param name="mouseButton">
@@ -240,7 +287,9 @@ public abstract class MouseDevice : InputDevice
     /// </returns>
     protected Point GetClientPosition() => _clientPosition;
 
-    internal abstract bool SetCapture(UIElement capture);
+    internal abstract bool SetCursorNative(Cursor cursor, bool forceCursor);
+
+    internal abstract bool SetCaptureNative(UIElement capture);
 
     internal abstract MouseButtonState GetButtonStateFromSystem(MouseButton mouseButton);
 
@@ -293,6 +342,27 @@ public abstract class MouseDevice : InputDevice
         }
     }
 
+    private void UpdateCursorPrivate() => UpdateCursorPrivate(false, Keyboard.Modifiers, _clientPosition.X, _clientPosition.Y);
+
+    private void UpdateCursorPrivate(bool isTouchEvent, ModifierKeys modifiers, double x, double y)
+    {
+        if (_mouseOver is null)
+        {
+            SetCursor(Cursors.Arrow, false);
+            return;
+        }
+
+        var queryCursor = new QueryCursorEventArgs(this, Environment.TickCount, isTouchEvent, modifiers, x, y)
+        {
+            Cursor = Cursors.Arrow,
+            RoutedEvent = Mouse.QueryCursorEvent,
+        };
+
+        _mouseOver?.RaiseTrustedEvent(queryCursor);
+
+        SetCursor(queryCursor.Cursor, false);
+    }
+
     internal void ProcessInput(UIElement uie, EVENTS eventType, PointerCallbackParameters parameters)
     {
         _clientPosition = new Point(parameters.PageX, parameters.PageY);
@@ -306,8 +376,6 @@ public abstract class MouseDevice : InputDevice
             DispatchEvent(uie, eventType, parameters);
         }
     }
-
-    internal void ProcessInput(EVENTS eventType) => ProcessUnmappedEvent(eventType);
 
     private void DispatchEvent(UIElement uie, EVENTS eventType, PointerCallbackParameters parameters)
     {
@@ -390,6 +458,8 @@ public abstract class MouseDevice : InputDevice
 
     private void ProcessOnMouseMove(UIElement uie, PointerCallbackParameters parameters)
     {
+        UpdateCursorPrivate(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY);
+
         int timestamp = Environment.TickCount;
 
         var previewMove = new MouseEventArgs(this, timestamp, parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
@@ -424,12 +494,15 @@ public abstract class MouseDevice : InputDevice
             MouseButton.Left,
             refreshClickCount: true,
             closeToolTips: true);
+
+        UpdateCursorPrivate(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY);
     }
 
     private void ProcessOnMouseLeftButtonUp(UIElement uie, PointerCallbackParameters parameters)
     {
         ProcessMouseUpEvent(uie, parameters, MouseButton.Left);
         ProcessOnTapped(uie, parameters);
+        UpdateCursorPrivate(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY);
     }
 
     private void ProcessOnMouseRightButtonDown(UIElement uie, PointerCallbackParameters parameters)
@@ -445,11 +518,14 @@ public abstract class MouseDevice : InputDevice
         {
             OpenSilver.Interop.ExecuteJavaScriptVoid("osjs.inputManager.suppressContextMenu(true)");
         }
+
+        UpdateCursorPrivate(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY);
     }
 
     private void ProcessOnMouseRightButtonUp(UIElement uie, PointerCallbackParameters parameters)
     {
         ProcessMouseUpEvent(uie, parameters, MouseButton.Right);
+        UpdateCursorPrivate(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY);
     }
 
     private void ProcessOnMouseMiddleButtonDown(UIElement uie, PointerCallbackParameters parameters)
@@ -460,11 +536,14 @@ public abstract class MouseDevice : InputDevice
             MouseButton.Middle,
             refreshClickCount: true,
             closeToolTips: false);
+
+        UpdateCursorPrivate(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY);
     }
 
     private void ProcessOnMouseMiddleButtonUp(UIElement uie, PointerCallbackParameters parameters)
     {
         ProcessMouseUpEvent(uie, parameters, MouseButton.Middle);
+        UpdateCursorPrivate(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY);
     }
 
     private void ProcessOnWheel(UIElement uie, PointerCallbackParameters parameters)

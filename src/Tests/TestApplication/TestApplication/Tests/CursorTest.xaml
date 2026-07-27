@@ -5,45 +5,140 @@
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
-    <StackPanel Orientation="Vertical">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Border Background="Beige" Cursor="Arrow" Margin="1,2" Grid.Row="0" Grid.Column="0">
-                <TextBlock Text="Arrow"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Orientation="Vertical" Margin="8">
+
+            <!-- ========================================================= -->
+            <!-- 1) Built-in cursors (Cursor property + Cursors class)      -->
+            <!-- ========================================================= -->
+            <TextBlock Text="1) Built-in cursors" FontSize="16" FontWeight="Bold" Margin="0,0,0,4"/>
+            <TextBlock Text="Hover each box below: the FrameworkElement.Cursor property is set to a different value from the Cursors class." TextWrapping="Wrap" Margin="0,0,0,4"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Border Background="Beige" Cursor="Arrow" Margin="1,2" Grid.Row="0" Grid.Column="0">
+                    <TextBlock Text="Arrow" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="Hand" Margin="1,2" Grid.Row="0" Grid.Column="1">
+                    <TextBlock Text="Hand" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="IBeam" Margin="1,2" Grid.Row="0" Grid.Column="2">
+                    <TextBlock Text="IBeam" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="Cross" Margin="1,2" Grid.Row="0" Grid.Column="3">
+                    <TextBlock Text="Cross" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="Help" Margin="1,2" Grid.Row="0" Grid.Column="4">
+                    <TextBlock Text="Help" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="None" Margin="1,2" Grid.Row="1" Grid.Column="0">
+                    <TextBlock Text="None" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="No" Margin="1,2" Grid.Row="1" Grid.Column="1">
+                    <TextBlock Text="No" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="AppStarting" Margin="1,2" Grid.Row="1" Grid.Column="2">
+                    <TextBlock Text="AppStarting" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="SizeAll" Margin="1,2" Grid.Row="1" Grid.Column="3">
+                    <TextBlock Text="SizeAll" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="ScrollAll" Margin="1,2" Grid.Row="1" Grid.Column="4">
+                    <TextBlock Text="ScrollAll" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="SizeNESW" Margin="1,2" Grid.Row="2" Grid.Column="0">
+                    <TextBlock Text="SizeNESW" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="SizeNS" Margin="1,2" Grid.Row="2" Grid.Column="1">
+                    <TextBlock Text="SizeNS" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="SizeNWSE" Margin="1,2" Grid.Row="2" Grid.Column="2">
+                    <TextBlock Text="SizeNWSE" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="SizeWE" Margin="1,2" Grid.Row="2" Grid.Column="3">
+                    <TextBlock Text="SizeWE" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Background="Beige" Cursor="Wait" Margin="1,2" Grid.Row="2" Grid.Column="4">
+                    <TextBlock Text="Wait" HorizontalAlignment="Center"/>
+                </Border>
+            </Grid>
+
+            <!-- ========================================================= -->
+            <!-- 2) FrameworkElement.ForceCursor                           -->
+            <!-- ========================================================= -->
+            <TextBlock Text="2) FrameworkElement.ForceCursor" FontSize="16" FontWeight="Bold" Margin="0,20,0,4"/>
+            <TextBlock Text="By default, the cursor of the topmost (innermost) element under the pointer wins. Setting ForceCursor='True' on a parent makes its Cursor value win over its children's, even though the QueryCursor event still bubbles up from the child first." TextWrapping="Wrap" Margin="0,0,0,4"/>
+            <CheckBox x:Name="ForceCursorCheckBox" Content="Set ForceCursor='True' on the outer (light blue) border"
+                      Checked="ForceCursorCheckBox_CheckedChanged" Unchecked="ForceCursorCheckBox_CheckedChanged" Margin="0,0,0,4"/>
+            <Border x:Name="ForceCursorOuterBorder" Background="LightBlue" Cursor="Hand" Padding="20" Margin="4" HorizontalAlignment="Left">
+                <StackPanel>
+                    <TextBlock Text="Outer Border: Cursor='Hand'" TextWrapping="Wrap" FontWeight="Bold"/>
+                    <Border Background="Salmon" Cursor="Wait" Width="220" Height="70" Margin="0,8,0,0" HorizontalAlignment="Left">
+                        <TextBlock Text="Inner Border: Cursor='Wait'. While the checkbox above is unchecked, hovering here wins: cursor is Wait. Check the box and hover again: the outer border now forces its own Hand cursor." TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" Margin="4"/>
+                    </Border>
+                </StackPanel>
             </Border>
-            <Border Background="Beige" Cursor="Hand" Margin="1,2" Grid.Row="0" Grid.Column="1">
-                <TextBlock Text="Hand"/>
+
+            <!-- ========================================================= -->
+            <!-- 3) UIElement.QueryCursor / Mouse.QueryCursor              -->
+            <!-- ========================================================= -->
+            <TextBlock Text="3) QueryCursor event" FontSize="16" FontWeight="Bold" Margin="0,20,0,4"/>
+            <TextBlock Text="The QueryCursor event (instance event on UIElement, or attached Mouse.QueryCursor event) is raised every time the mouse moves over an element, letting code choose the cursor dynamically. Move the pointer across the three zones below." TextWrapping="Wrap" Margin="0,0,0,4"/>
+            <Border x:Name="QueryCursorZone" Background="LightYellow" BorderBrush="Gray" BorderThickness="1" Height="80"
+                    QueryCursor="QueryCursorZone_QueryCursor">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1">
+                        <TextBlock Text="Left third: IBeam" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+                        <TextBlock Text="Middle third: Cross" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1">
+                        <TextBlock Text="Right third: Hand" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
             </Border>
-            <Border Background="Beige" Cursor="IBeam" Margin="1,2" Grid.Row="0" Grid.Column="2">
-                <TextBlock Text="IBeam"/>
+            <TextBlock x:Name="QueryCursorStatus" Text="Current zone: (move the mouse over the box above)" Margin="0,4,0,0" TextWrapping="Wrap"/>
+
+            <TextBlock Text="Mouse.AddQueryCursorHandler / Mouse.RemoveQueryCursorHandler (attached event):" Margin="0,12,0,4" TextWrapping="Wrap"/>
+            <CheckBox x:Name="AttachedQueryCursorCheckBox" Content="Enable a SizeAll cursor on the box below via the attached Mouse.QueryCursor event"
+                      Checked="AttachedQueryCursorCheckBox_CheckedChanged" Unchecked="AttachedQueryCursorCheckBox_CheckedChanged"/>
+            <Border x:Name="AttachedQueryCursorZone" Background="Lavender" BorderBrush="Gray" BorderThickness="1" Height="50" Margin="0,4,0,0">
+                <TextBlock Text="Hover here while the checkbox above is checked." HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <Border Background="Beige" Cursor="None" Margin="1,2" Grid.Row="1" Grid.Column="0">
-                <TextBlock Text="None"/>
-            </Border>
-            <Border Background="Beige" Cursor="SizeNESW" Margin="1,2" Grid.Row="1" Grid.Column="1">
-                <TextBlock Text="SizeNESW"/>
-            </Border>
-            <Border Background="Beige" Cursor="SizeNS" Margin="1,2" Grid.Row="1" Grid.Column="2">
-                <TextBlock Text="SizeNS"/>
-            </Border>
-            <Border Background="Beige" Cursor="SizeNWSE" Margin="1,2" Grid.Row="2" Grid.Column="0">
-                <TextBlock Text="SizeNWSE"/>
-            </Border>
-            <Border Background="Beige" Cursor="SizeWE" Margin="1,2" Grid.Row="2" Grid.Column="1">
-                <TextBlock Text="SizeWE"/>
-            </Border>
-            <Border Background="Beige" Cursor="Wait" Margin="1,2" Grid.Row="2" Grid.Column="2">
-                <TextBlock Text="Wait"/>
-            </Border>
-        </Grid>
-    </StackPanel>
+
+            <!-- ========================================================= -->
+            <!-- 4) Mouse.OverrideCursor                                   -->
+            <!-- ========================================================= -->
+            <TextBlock Text="4) Mouse.OverrideCursor" FontSize="16" FontWeight="Bold" Margin="0,20,0,4"/>
+            <TextBlock Text="Mouse.OverrideCursor forces a single cursor for the whole application, regardless of what any element's Cursor property is set to. Check the box, then hover any of the elements above: they should all show the Wait cursor." TextWrapping="Wrap" Margin="0,0,0,4"/>
+            <CheckBox x:Name="OverrideCursorCheckBox" Content="Set Mouse.OverrideCursor = Cursors.Wait"
+                      Checked="OverrideCursorCheckBox_CheckedChanged" Unchecked="OverrideCursorCheckBox_CheckedChanged"/>
+
+            <!-- ========================================================= -->
+            <!-- 5) Mouse.SetCursor / Mouse.UpdateCursor                   -->
+            <!-- ========================================================= -->
+            <TextBlock Text="5) Mouse.SetCursor / Mouse.UpdateCursor" FontSize="16" FontWeight="Bold" Margin="0,20,0,4"/>
+            <TextBlock Text="Mouse.SetCursor imperatively sets the mouse pointer once, bypassing the normal QueryCursor resolution. Mouse.UpdateCursor forces the cursor to be recomputed (as if the mouse had just moved), restoring whatever cursor is appropriate for the current pointer position." TextWrapping="Wrap" Margin="0,0,0,4"/>
+            <TextBlock Text="Note: any mouse movement also triggers a cursor recomputation, so moving the mouse (or clicking) after pressing the button below will reset the cursor immediately, before the 1 second delay elapses. Click the button, then keep the mouse still to see the cursor stay as Cursors.Cross until it is automatically restored." TextWrapping="Wrap" FontStyle="Italic" Margin="0,0,0,4"/>
+            <Button x:Name="SetCursorButton" Content="Mouse.SetCursor(Cursors.Cross) for 1 second" Click="SetCursorButton_Click" HorizontalAlignment="Left" Margin="0,0,8,0"/>
+            <TextBlock x:Name="SetCursorStatus" Margin="0,4,0,0" TextWrapping="Wrap"/>
+
+        </StackPanel>
+    </ScrollViewer>
 </sdk:Page>

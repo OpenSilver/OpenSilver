@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
 
@@ -25,6 +26,8 @@ internal abstract partial class TextViewBase : FrameworkElement
 {
     static TextViewBase()
     {
+        CursorProperty.OverrideMetadata(typeof(TextViewBase), new FrameworkPropertyMetadata(Cursors.IBeam));
+
         TextElement.CharacterSpacingProperty.AddOwner(
             typeof(TextViewBase),
             new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)

@@ -186,6 +186,7 @@
     <Compile Include="System.Windows.Documents\ListItem.cs" />
     <Compile Include="System.Windows.Documents\ListItemCollection.cs" />
     <Compile Include="OpenSilver\Internal\Media\CapacityStreamGeometryContext.cs" />
+    <Compile Include="System.Windows.Input\QueryCursorEventArgs.cs" />
     <Compile Include="System.Windows.Input\TextCompositionManager.cs" />
     <Compile Include="System.Windows.Input\AccessKeyEventArgs.cs" />
     <Compile Include="System.Windows.Input\AccessKeyManager.cs" />
