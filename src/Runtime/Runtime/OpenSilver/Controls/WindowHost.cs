@@ -148,6 +148,26 @@ public class WindowHost : ContentControl
             typeof(WindowHost),
             new PropertyMetadata(null));
 
+    /// <summary>
+    /// Gets a value indicating whether the hosted window is maximized (including full screen).
+    /// Exposed so the template can react to it (e.g. via triggers).
+    /// </summary>
+    public bool IsMaximized
+    {
+        get => (bool)GetValue(IsMaximizedProperty);
+        internal set => SetValueInternal(IsMaximizedProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="IsMaximized"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty IsMaximizedProperty =
+        DependencyProperty.Register(
+            nameof(IsMaximized),
+            typeof(bool),
+            typeof(WindowHost),
+            new PropertyMetadata(BooleanBoxes.FalseBox));
+
 
     internal bool IsOpen { get; private set; }
 
@@ -214,6 +234,8 @@ public class WindowHost : ContentControl
 
     internal void UpdateMaximizeRestoreButton(bool isMaximized)
     {
+        IsMaximized = isMaximized;
+
         Visibility maxVisibility = _window.ResizeMode == ResizeMode.NoResize ? Visibility.Collapsed : Visibility.Visible;
         _maximizeButtonPart?.Visibility = isMaximized ? Visibility.Collapsed : maxVisibility;
         _restoreButtonPart?.Visibility = isMaximized ? maxVisibility : Visibility.Collapsed;
@@ -541,6 +563,28 @@ public class WindowHost : ContentControl
         if (sender == _resizeBottomRightPart || sender == _resizeGripPart) return WindowResizeEdge.BottomRight;
 
         return (WindowResizeEdge)(-1);
+    }
+
+    /// <summary>
+    /// Forces a re-measure of the host and its entire content subtree. Needed on
+    /// maximize/restore: the hosted Window's constraint changes (fill vs. content) while the
+    /// host's available size can stay identical, which would otherwise let the intermediate
+    /// elements short-circuit their Measure and keep a stale desired size.
+    /// </summary>
+    internal void InvalidateContentMeasure() => InvalidateMeasureDeep(this);
+
+    private static void InvalidateMeasureDeep(DependencyObject element)
+    {
+        if (element is UIElement uie)
+        {
+            uie.InvalidateMeasure();
+        }
+
+        int count = VisualTreeHelper.GetChildrenCount(element);
+        for (int i = 0; i < count; i++)
+        {
+            InvalidateMeasureDeep(VisualTreeHelper.GetChild(element, i));
+        }
     }
 
     internal void SetLayoutSize()

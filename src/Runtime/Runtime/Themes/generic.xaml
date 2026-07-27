@@ -4927,7 +4927,11 @@
                                         </controls:Button>
                                     </controls:Grid>
                                 </controls:Border>
-                                <controls:ContentPresenter controls:Grid.Row="1" VerticalAlignment="Top" />
+                                <controls:ContentPresenter x:Name="PART_WindowContent"
+                                                           controls:Grid.Row="1"
+                                                           VerticalAlignment="Top" />
+                                <!-- Note: the ContentPresenter is Top because the Resize borders + CaptionHeight may force the containg grid to be bigger than the Window if we reduce the size too much.
+                                     Having it Top allows them to overflow without moving the Window. When Maximizing, we make it Stretch so the Window can place itself within the ContentPresenter. -->
                             </controls:Grid>
 
                             <!-- Layer 2: Top resize border -->
@@ -5055,6 +5059,11 @@
                             </controls:Border>
                         </controls:Grid>
                     </controls:Border>
+                    <controls:ControlTemplate.Triggers>
+                        <Trigger Property="IsMaximized" Value="True">
+                            <Setter TargetName="PART_WindowContent" Property="VerticalAlignment" Value="Stretch" />
+                        </Trigger>
+                    </controls:ControlTemplate.Triggers>
                 </controls:ControlTemplate>
             </Setter.Value>
         </Setter>
