@@ -91,6 +91,19 @@ namespace System.Windows
             StyleHelper.UpdateStyleCache(fe, oldStyle, newStyle, ref fe._styleCache);
         }
 
+        /// <summary>
+        /// Invoked when the style in use on this element changes, which will invalidate the layout.
+        /// </summary>
+        /// <param name="oldStyle">
+        /// The old style.
+        /// </param>
+        /// <param name="newStyle">
+        /// The new style.
+        /// </param>
+        protected internal virtual void OnStyleChanged(Style oldStyle, Style newStyle)
+        {
+        }
+
         internal static Style DefaultFocusVisualStyle { get; } = CreateDefaultFocusVisualStyle();
 
         private static Style CreateDefaultFocusVisualStyle()

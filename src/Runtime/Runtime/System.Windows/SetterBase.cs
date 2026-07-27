@@ -33,9 +33,9 @@ public abstract class SetterBase : DependencyObject
     internal new virtual void Seal() => _sealed = true;
 
     /// <summary>
-    /// Subclasses need to call this method before any changes to their state.
+    /// Checks whether this object is read-only and cannot be changed.
     /// </summary>
-    private protected void CheckSealed()
+    protected void CheckSealed()
     {
         if (_sealed)
         {

@@ -532,7 +532,7 @@ public struct Matrix : IFormattable
     /// <param name="centerY">
     /// The y-coordinate of the scale operation's center point.
     /// </param>
-    internal void ScaleAt(double scaleX, double scaleY, double centerX, double centerY)
+    public void ScaleAt(double scaleX, double scaleY, double centerX, double centerY)
         => this *= CreateScaling(scaleX, scaleY, centerX, centerY);
 
     /// <summary>

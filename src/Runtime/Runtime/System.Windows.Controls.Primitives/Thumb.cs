@@ -116,17 +116,24 @@ namespace System.Windows.Controls.Primitives
         public bool IsDragging
         {
             get { return (bool)GetValue(IsDraggingProperty); }
-            private set { SetValueInternal(IsDraggingPropertyKey, value); }
+            protected set { SetValueInternal(IsDraggingPropertyKey, value); }
         }
 
         private static void OnIsDraggingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((Thumb)d).OnDraggingChanged();
+            var thumb = (Thumb)d;
+            thumb.OnDraggingChanged(e);
+            thumb.UpdateVisualState();
         }
 
-        private void OnDraggingChanged()
+        /// <summary>
+        /// Responds to a change in the value of the <see cref="IsDragging"/> property.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+        protected virtual void OnDraggingChanged(DependencyPropertyChangedEventArgs e)
         {
-            UpdateVisualState();
         }
 
         private new static readonly DependencyPropertyKey IsFocusedPropertyKey =

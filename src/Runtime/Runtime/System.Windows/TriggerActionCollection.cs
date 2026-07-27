@@ -27,6 +27,18 @@ public sealed class TriggerActionCollection : PresentationFrameworkCollection<Tr
     /// </summary>
     public TriggerActionCollection() { }
 
+    /// <summary>
+    /// Initializes an instance of the <see cref="TriggerActionCollection"/> class that 
+    /// has the specified initial size.
+    /// </summary>
+    /// <param name="initialSize">
+    /// The size of the collection.
+    /// </param>
+    public TriggerActionCollection(int initialSize)
+        : base(initialSize)
+    {
+    }
+
     internal TriggerActionCollection(DependencyObject owner)
     {
         owner.ProvideSelfAsInheritanceContext(this, null);

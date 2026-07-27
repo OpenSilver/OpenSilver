@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls;
 
@@ -35,6 +36,59 @@ public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection
         Debug.Assert(owner is not null);
         _owner = owner;
         PrivateOnModified();
+    }
+
+    /// <summary>
+    /// Removes a range of <see cref="ColumnDefinition"/> objects from a <see cref="ColumnDefinitionCollection"/>.
+    /// </summary>
+    /// <param name="index">
+    /// The position within the collection at which the first <see cref="ColumnDefinition"/> is removed.
+    /// </param>
+    /// <param name="count">
+    /// The total number of <see cref="ColumnDefinition"/> objects to remove from the collection.
+    /// </param>
+    public void RemoveRange(int index, int count)
+    {
+        VerifyWriteAccess();
+
+        List<ColumnDefinition> items = InternalItems;
+        int itemsCount = items.Count;
+
+        if (index < 0 || index >= itemsCount)
+        {
+            throw new ArgumentOutOfRangeException(Strings.TableCollectionOutOfRange);
+        }
+
+        if (count < 0)
+        {
+            throw new ArgumentOutOfRangeException(Strings.TableCollectionCountNeedNonNegNum);
+        }
+
+        if (itemsCount - index < count)
+        {
+            throw new ArgumentException(Strings.TableCollectionRangeOutOfRange);
+        }
+
+        if (count > 0)
+        {
+            PrivateOnModified();
+
+            for (int i = index + count - 1; i >= index; --i)
+            {
+                Debug.Assert(items[i] is not null && items[i].Parent == _owner);
+
+                PrivateDisconnectChild(items[i]);
+            }
+
+            items.RemoveRange(index, count);
+
+            for (int i = index; i < items.Count; i++)
+            {
+                items[i].Index = i;
+            }
+
+            UpdateCountProperty(itemsCount, items.Count);
+        }
     }
 
     internal Grid Owner

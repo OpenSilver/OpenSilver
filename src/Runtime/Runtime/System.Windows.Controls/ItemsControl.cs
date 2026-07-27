@@ -1317,12 +1317,15 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Return true if the item is (or should be) its own item container
+        /// Determines if the specified item is (or is eligible to be) its own container.
         /// </summary>
-        internal bool IsItemItsOwnContainer(object item)
-        {
-            return IsItemItsOwnContainerOverride(item);
-        }
+        /// <param name="item">
+        /// The item to check.
+        /// </param>
+        /// <returns>
+        /// true if the item is (or is eligible to be) its own container; otherwise, false.
+        /// </returns>
+        public bool IsItemItsOwnContainer(object item) => IsItemItsOwnContainerOverride(item);
 
         private void OnItemCollectionChanged1(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -1503,6 +1506,77 @@ namespace System.Windows.Controls
             ui = VisualTreeHelper.GetParent(ui) as UIElement;
 
             return GetItemsOwner(ui);
+        }
+
+        /// <summary>
+        /// Returns the container that belongs to the specified <see cref="ItemsControl"/> that 
+        /// owns the given container element.
+        /// </summary>
+        /// <param name="itemsControl">
+        /// The <see cref="ItemsControl"/> to return the container for.
+        /// </param>
+        /// <param name="element">
+        /// The element to return the container for.
+        /// </param>
+        /// <returns>
+        /// The container that belongs to the specified <see cref="ItemsControl"/> that owns the 
+        /// given element, if itemsControl is not null. If itemsControl is null, returns the 
+        /// closest container that belongs to any <see cref="ItemsControl"/>.
+        /// </returns>
+        public static DependencyObject ContainerFromElement(ItemsControl itemsControl, DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            // if the element is itself the desired container, return it
+            if (IsContainerForItemsControl(element, itemsControl))
+            {
+                return element;
+            }
+
+            // start the tree walk at the element's parent
+            var fo = VisualTreeHelper.GetParent(element) ?? LogicalTreeHelper.GetParent(element) ?? element.InheritanceContext;
+
+            // walk up, stopping when we reach the desired container
+            while (fo is not null)
+            {
+                if (IsContainerForItemsControl(fo, itemsControl))
+                {
+                    break;
+                }
+
+                fo = VisualTreeHelper.GetParent(fo) ?? LogicalTreeHelper.GetParent(fo) ?? fo.InheritanceContext;
+            }
+
+            return fo;
+        }
+
+        /// <summary>
+        /// Returns the container that belongs to the current <see cref="ItemsControl"/> that 
+        /// owns the given element.
+        /// </summary>
+        /// <param name="element">
+        /// The element to return the container for.
+        /// </param>
+        /// <returns>
+        /// The container that belongs to the current <see cref="ItemsControl"/> that owns the 
+        /// given element or null if no such container exists.
+        /// </returns>
+        public DependencyObject ContainerFromElement(DependencyObject element) => ContainerFromElement(this, element);
+
+        // helper method used by ContainerFromElement
+        private static bool IsContainerForItemsControl(DependencyObject element, ItemsControl itemsControl)
+        {
+            // is the element a container?
+            if (element.ContainsValue(ItemContainerGenerator.ItemForItemContainerProperty))
+            {
+                // does the element belong to the itemsControl?
+                if (itemsControl is null || itemsControl == ItemsControlFromItemContainer(element))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <inheritdoc />

@@ -47,6 +47,11 @@ namespace System.Windows
         public static FontStretch Normal => new FontStretch(5);
 
         /// <summary>
+        /// Specifies a medium font stretch.
+        /// </summary>
+        public static FontStretch Medium => new FontStretch(5);
+
+        /// <summary>
         /// Specifies a semi-expanded font stretch.
         /// </summary>
         public static FontStretch SemiExpanded => new FontStretch(6);
@@ -74,6 +79,11 @@ namespace System.Windows
                     if (s.Equals("Normal", StringComparison.OrdinalIgnoreCase))
                     {
                         fontStretch = Normal;
+                        return true;
+                    }
+                    if (s.Equals("Medium", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fontStretch = Medium;
                         return true;
                     }
                     break;

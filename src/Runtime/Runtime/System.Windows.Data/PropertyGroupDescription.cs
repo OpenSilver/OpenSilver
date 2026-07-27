@@ -7,6 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 using OpenSilver.Internal.Data;
@@ -168,6 +169,22 @@ public class PropertyGroupDescription : GroupDescription
     }
 
     /// <summary>
+    /// Gets an <see cref="IComparer"/> value that orders groups in ascending order of name.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="IComparer"/> value that orders groups in ascending order of name.
+    /// </returns>
+    public static IComparer CompareNameAscending { get; } = new NameComparer(ListSortDirection.Ascending);
+
+    /// <summary>
+    /// Gets an <see cref="IComparer"/> value that orders groups in descending order of name.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="IComparer"/> value that orders groups in descending order of name.
+    /// </returns>
+    public static IComparer CompareNameDescending { get; } = new NameComparer(ListSortDirection.Descending);
+
+    /// <summary>
     /// Returns the group name(s) for the specified item.
     /// </summary>
     /// <param name="item">
@@ -231,4 +248,29 @@ public class PropertyGroupDescription : GroupDescription
     }
 
     private void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+    private sealed class NameComparer : IComparer
+    {
+        public NameComparer(ListSortDirection direction)
+        {
+            _direction = direction;
+        }
+
+        int IComparer.Compare(object x, object y)
+        {
+            CollectionViewGroup group;
+            object xName, yName;
+
+            group = x as CollectionViewGroup;
+            xName = group?.Name ?? x;
+
+            group = y as CollectionViewGroup;
+            yName = group?.Name ?? y;
+
+            int value = Comparer.DefaultInvariant.Compare(xName, yName);
+            return _direction == ListSortDirection.Ascending ? value : -value;
+        }
+
+        private readonly ListSortDirection _direction;
+    }
 }

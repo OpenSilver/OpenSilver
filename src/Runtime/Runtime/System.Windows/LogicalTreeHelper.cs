@@ -63,7 +63,7 @@ public static class LogicalTreeHelper
         DependencyObject childNode;
 
         // Check given node against named element.
-        if (logicalTreeNode is IInternalFrameworkElement selfNode)
+        if (logicalTreeNode is IFrameworkInputElement selfNode)
         {
             if (selfNode.Name == elementName)
             {

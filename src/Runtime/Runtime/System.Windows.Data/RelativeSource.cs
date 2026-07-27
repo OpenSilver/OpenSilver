@@ -21,39 +21,57 @@ namespace System.Windows.Data
     [ContentProperty(nameof(Mode))]
     public class RelativeSource : MarkupExtension
     {
+        private RelativeSourceMode _mode = RelativeSourceMode.None;
+        private int _ancestorLevel = 1;
+        private Type _ancestorType = null;
+
         /// <summary>
-        /// Initializes a new instance of the RelativeSource class by using default relative source mode.
+        /// Initializes a new instance of the <see cref="RelativeSource"/> class.
         /// </summary>
         public RelativeSource() { }
 
         /// <summary>
-        /// Initializes a new instance of the RelativeSource class by using provided relative source mode.
+        /// Initializes a new instance of the <see cref="RelativeSource"/> class with an initial mode.
         /// </summary>
-        /// <param name="relativeSourceMode">The relative source mode</param>
+        /// <param name="relativeSourceMode">
+        /// One of the <see cref="RelativeSourceMode"/> values.
+        /// </param>
         public RelativeSource(RelativeSourceMode relativeSourceMode)
         {
             _mode = relativeSourceMode;
         }
 
-        RelativeSourceMode _mode = RelativeSourceMode.None;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelativeSource"/> class with an initial mode and 
+        /// additional tree-walking qualifiers for finding the desired relative source.
+        /// </summary>
+        /// <param name="mode">
+        /// One of the <see cref="RelativeSourceMode"/> values. For this signature to be relevant, this 
+        /// should be <see cref="RelativeSourceMode.FindAncestor"/>.
+        /// </param>
+        /// <param name="ancestorType">
+        /// The <see cref="Type"/> of ancestor to look for.
+        /// </param>
+        /// <param name="ancestorLevel">
+        /// The ordinal position of the desired ancestor among all ancestors of the given type.
+        /// </param>
+        public RelativeSource(RelativeSourceMode mode, Type ancestorType, int ancestorLevel)
+        {
+            _mode = mode;
+            AncestorType = ancestorType;
+            AncestorLevel = ancestorLevel;
+        }
+
         /// <summary>
         /// Gets or sets a value that describes the location of the binding source relative to the position of the binding target.
         /// Returns a value of the enumeration.
         /// </summary>
         public RelativeSourceMode Mode
         {
-            get
-            {
-                return _mode;
-            }
-            set
-            {
-                _mode = value;
-            }
+            get => _mode;
+            set => _mode = value;
         }
 
-
-        private int _ancestorLevel = 1;
         /// <summary>
         /// Gets or sets the level of ancestor to look for, in System.Windows.Data.RelativeSourceMode.FindAncestor
         /// mode. Use 1 to indicate the one nearest to the binding target element.
@@ -63,7 +81,7 @@ namespace System.Windows.Data
             get { return _ancestorLevel; }
             set
             {
-                if(value < 1)
+                if (value < 1)
                 {
                     throw new ArgumentOutOfRangeException("The ancestor level cannot be less than one.");
                 }
@@ -71,7 +89,6 @@ namespace System.Windows.Data
             }
         }
 
-        private Type _ancestorType = null;
         /// <summary>
         /// Gets or sets the type of ancestor to look for.
         /// </summary>

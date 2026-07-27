@@ -44,6 +44,18 @@ public class UIElementCollection : PresentationFrameworkCollection<UIElement>
         LogicalParent = logicalParent;
     }
 
+    /// <summary>
+    /// Gets or sets the number of elements that the <see cref="UIElementCollection"/> can contain.
+    /// </summary>
+    /// <returns>
+    /// The total number of elements the collection can contain.
+    /// </returns>
+    public virtual int Capacity
+    {
+        get => InternalItems.Capacity;
+        set => InternalItems.Capacity = value;
+    }
+
     internal UIElement VisualParent { get; }
 
     internal FrameworkElement LogicalParent { get; }

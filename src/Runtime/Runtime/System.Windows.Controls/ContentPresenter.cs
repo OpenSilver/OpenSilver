@@ -199,11 +199,23 @@ namespace System.Windows.Controls
         {
             ContentPresenter ctrl = (ContentPresenter)d;
             ctrl._templateIsCurrent = false;
-
-            // if ContentTemplate is really changing, remove the old template
-            ctrl.Template = null;
-
+            ctrl.OnContentTemplateChanged((DataTemplate)e.OldValue, (DataTemplate)e.NewValue);
             ctrl.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="ContentTemplate"/> changes.
+        /// </summary>
+        /// <param name="oldContentTemplate">
+        /// The old value of the <see cref="ContentTemplate"/> property.
+        /// </param>
+        /// <param name="newContentTemplate">
+        /// The new value of the <see cref="ContentTemplate"/> property.
+        /// </param>
+        protected virtual void OnContentTemplateChanged(DataTemplate oldContentTemplate, DataTemplate newContentTemplate)
+        {
+            // if ContentTemplate is really changing, remove the old template
+            Template = null;
         }
 
         /// <summary>
@@ -564,9 +576,11 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Return the template to use.  This may depend on the Content, or
-        /// other properties.
+        /// Returns the template to use. This may depend on the content or other properties.
         /// </summary>
+        /// <returns>
+        /// The <see cref="DataTemplate"/> to use.
+        /// </returns>
         /// <remarks>
         /// The base class implements the following rules:
         ///   (a) If ContentTemplate is set, use it.
@@ -579,7 +593,7 @@ namespace System.Windows.Controls
         ///   (d) Otherwise, use a default template that essentially converts
         ///         Content to a string and displays it in a TextBlock.
         /// </remarks>
-        private DataTemplate ChooseTemplate()
+        protected virtual DataTemplate ChooseTemplate()
         {
             object content = Content;
 

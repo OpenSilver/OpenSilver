@@ -65,9 +65,27 @@ public class Style : DependencyObject, ISealable
     /// <param name="targetType">
     /// The type to which the style will apply.
     /// </param>
-    public Style(Type targetType) : this()
+    public Style(Type targetType)
+        : this()
     {
         TargetType = targetType;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Style"/> class to use on the specified <see cref="Type"/> 
+    /// and based on the specified <see cref="Style"/>.
+    /// </summary>
+    /// <param name="targetType">
+    /// The type to which the style will apply.
+    /// </param>
+    /// <param name="basedOn">
+    /// The style to base this style on.
+    /// </param>
+    public Style(Type targetType, Style basedOn)
+        : this()
+    {
+        TargetType = targetType;
+        BasedOn = basedOn;
     }
 
     /// <summary>

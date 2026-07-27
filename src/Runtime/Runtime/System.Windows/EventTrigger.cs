@@ -51,6 +51,17 @@ public sealed class EventTrigger : TriggerBase
     public EventTrigger() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="EventTrigger"/> class with the specified event.
+    /// </summary>
+    /// <param name="routedEvent">
+    /// The <see cref="RoutedEvent"/> that activates this trigger.
+    /// </param>
+    public EventTrigger(RoutedEvent routedEvent)
+    {
+        RoutedEvent = routedEvent;
+    }
+
+    /// <summary>
     /// Gets the collection of <see cref="BeginStoryboard"/> objects
     /// that this <see cref="EventTrigger"/> maintains.
     /// </summary>

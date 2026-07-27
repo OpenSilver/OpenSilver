@@ -1436,4 +1436,13 @@
   <data name="ToolBar_InvalidStyle_ToolBarOverflowPanel" xml:space="preserve">
     <value>ToolBar style requires ToolBarOverflowPanel type. Cannot assign StyleName="ToolBarOverflowPanel" to '{0}'.</value>
   </data>
+  <data name="TableCollectionOutOfRange" xml:space="preserve">
+    <value>Index is out of collection's boundary.</value>
+  </data>
+  <data name="TableCollectionCountNeedNonNegNum" xml:space="preserve">
+    <value>Count must be zero or positive.</value>
+  </data>
+  <data name="TableCollectionRangeOutOfRange" xml:space="preserve">
+    <value>Requested range is out of collection's boundary.</value>
+  </data>
 </root>

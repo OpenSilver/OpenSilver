@@ -23,7 +23,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.Xaml.Markup;
+using System.Windows.Media.Animation;
 
 namespace System.Windows
 {
@@ -35,7 +35,7 @@ namespace System.Windows
     [RuntimeNameProperty(nameof(Name))]
     [XmlLangProperty(nameof(Language))]
     [UsableDuringInitialization(true)]
-    public abstract partial class FrameworkElement : UIElement, ISupportInitialize, IResourceDictionaryOwner
+    public abstract partial class FrameworkElement : UIElement, IFrameworkInputElement, ISupportInitialize, IResourceDictionaryOwner
     {
         #region Inheritance Context
 
@@ -480,7 +480,14 @@ namespace System.Windows
             set => WriteInternalFlag(InternalFlags.HasTemplateGeneratedSubTree, value);
         }
 
-        internal bool ApplyTemplate()
+        /// <summary>
+        /// Builds the current template's visual tree if necessary, and returns a value that indicates 
+        /// whether the visual tree was rebuilt by this call.
+        /// </summary>
+        /// <returns>
+        /// true if visuals were added to the tree; returns false otherwise.
+        /// </returns>
+        public bool ApplyTemplate()
         {
             // Notify the ContentPresenter/ItemsPresenter that we are about to generate the
             // template tree and allow them to choose the right template to be applied.
@@ -611,6 +618,22 @@ namespace System.Windows
         /// </exception>
         public BindingExpression SetBinding(DependencyProperty dependencyProperty, Binding binding)
             => BindingOperations.SetBinding(this, dependencyProperty, binding);
+
+        /// <summary>
+        /// Attaches a binding to this element, based on the provided source property name as a 
+        /// path qualification to the data source.
+        /// </summary>
+        /// <param name="dp">
+        /// Identifies the destination property where the binding should be established.
+        /// </param>
+        /// <param name="path">
+        /// The source property name or the path to the property used for the binding.
+        /// </param>
+        /// <returns>
+        /// Records the conditions of the binding. This return value can be useful for error checking.
+        /// </returns>
+        public BindingExpression SetBinding(DependencyProperty dp, string path)
+            => SetBinding(dp, new Binding(path));
 
         /// <summary>
         /// Retrieves the <see cref="BindingExpression"/> for a dependency property where a 
@@ -1000,6 +1023,37 @@ namespace System.Windows
         {
             get => IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
             set => SetValueInternal(FlowDirectionProperty, value);
+        }
+
+        /// <summary>
+        /// Gets the value of the <see cref="FlowDirection"/> attached property for the specified 
+        /// <see cref="DependencyObject"/>.
+        /// </summary>
+        /// <param name="element">
+        /// The element to return a <see cref="Windows.FlowDirection"/> for.
+        /// </param>
+        /// <returns>
+        /// The requested flow direction, as a value of the enumeration.
+        /// </returns>
+        public static FlowDirection GetFlowDirection(DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            return (FlowDirection)element.GetValue(FlowDirectionProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="FlowDirection"/> attached property for the provided element.
+        /// </summary>
+        /// <param name="element">
+        /// The element that specifies a flow direction.
+        /// </param>
+        /// <param name="value">
+        /// A value of the enumeration, specifying the direction.
+        /// </param>
+        public static void SetFlowDirection(DependencyObject element, FlowDirection value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            element.SetValueInternal(FlowDirectionProperty, value);
         }
 
         private static bool IsValidFlowDirection(object o)
@@ -1413,6 +1467,30 @@ namespace System.Windows
             }
 
             base.OnGotFocus(e);
+        }
+
+        /// <summary>
+        /// Begins the sequence of actions that are contained in the provided storyboard.
+        /// </summary>
+        /// <param name="storyboard">
+        /// The storyboard to begin.
+        /// </param>
+        public void BeginStoryboard(Storyboard storyboard) => BeginStoryboard(storyboard, false);
+
+        /// <summary>
+        /// Begins the sequence of actions contained in the provided storyboard, with specified 
+        /// state for control of the animation after it is started.
+        /// </summary>
+        /// <param name="storyboard">
+        /// The storyboard to begin.
+        /// </param>
+        /// <param name="isControllable">
+        /// Declares whether the animation is controllable (can be paused) after it is started.
+        /// </param>
+        public void BeginStoryboard(Storyboard storyboard, bool isControllable)
+        {
+            ArgumentNullException.ThrowIfNull(storyboard);
+            storyboard.Begin(this, isControllable);
         }
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()

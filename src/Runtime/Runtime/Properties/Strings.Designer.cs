@@ -3481,6 +3481,33 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Count must be zero or positive..
+        /// </summary>
+        internal static string TableCollectionCountNeedNonNegNum {
+            get {
+                return ResourceManager.GetString("TableCollectionCountNeedNonNegNum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Index is out of collection&apos;s boundary..
+        /// </summary>
+        internal static string TableCollectionOutOfRange {
+            get {
+                return ResourceManager.GetString("TableCollectionOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requested range is out of collection&apos;s boundary..
+        /// </summary>
+        internal static string TableCollectionRangeOutOfRange {
+            get {
+                return ResourceManager.GetString("TableCollectionRangeOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find a FrameworkElement with Name &apos;{0}&apos;..
         /// </summary>
         internal static string TargetNameNotFound {

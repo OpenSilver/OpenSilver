@@ -60,6 +60,8 @@ namespace System.Windows
 
             DoStyleResourcesInvalidations(fe, oldStyle, newStyle);
 
+            fe.OnStyleChanged(oldStyle, newStyle);
+
             // Initialize triggers for the new style
             if (effectiveStyle is not null && effectiveStyle.HasTriggers)
             {
