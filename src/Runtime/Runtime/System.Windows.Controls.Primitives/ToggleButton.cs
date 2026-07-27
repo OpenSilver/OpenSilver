@@ -79,15 +79,15 @@ namespace System.Windows.Controls.Primitives
 
             if (newValue == true)
             {
-                button.OnChecked(new RoutedEventArgs { Source = button });
+                button.OnChecked(new RoutedEventArgs(CheckedEvent));
             }
             else if (newValue == false)
             {
-                button.OnUnchecked(new RoutedEventArgs { Source = button });
+                button.OnUnchecked(new RoutedEventArgs(UncheckedEvent));
             }
             else
             {
-                button.OnIndeterminate(new RoutedEventArgs { Source = button });
+                button.OnIndeterminate(new RoutedEventArgs(IndeterminateEvent));
             }
 
             button.UpdateVisualStates();
@@ -122,20 +122,61 @@ namespace System.Windows.Controls.Primitives
         #region Public Events
 
         /// <summary>
-        /// Occurs when a <see cref="ToggleButton"/> is checked.
+        /// Identifies the <see cref="Checked"/> routed event.
         /// </summary>
-        public event RoutedEventHandler Checked;
+        public static readonly RoutedEvent CheckedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(Checked),
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(ToggleButton));
 
         /// <summary>
-        /// Occurs when the state of a <see cref="ToggleButton"/> is
-        /// switched to the indeterminate state.
+        /// Occurs when a <see cref="ToggleButton"/> is checked.
         /// </summary>
-        public event RoutedEventHandler Indeterminate;
+        public event RoutedEventHandler Checked
+        {
+            add => AddHandler(CheckedEvent, value);
+            remove => RemoveHandler(CheckedEvent, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Unchecked"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent UncheckedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(Unchecked),
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(ToggleButton));
 
         /// <summary>
         /// Occurs when a <see cref="ToggleButton"/> is unchecked.
         /// </summary>
-        public event RoutedEventHandler Unchecked;
+        public event RoutedEventHandler Unchecked
+        {
+            add => AddHandler(UncheckedEvent, value);
+            remove => RemoveHandler(UncheckedEvent, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Indeterminate"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent IndeterminateEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(Indeterminate),
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(ToggleButton));
+
+        /// <summary>
+        /// Occurs when the state of a <see cref="ToggleButton"/> is switched to the indeterminate state.
+        /// </summary>
+        public event RoutedEventHandler Indeterminate
+        {
+            add => AddHandler(IndeterminateEvent, value);
+            remove => RemoveHandler(IndeterminateEvent, value);
+        }
 
         #endregion Public Events
 
@@ -214,19 +255,28 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
-        /// Raises the Checked event.
+        /// Called when a <see cref="ToggleButton"/> raises a <see cref="Checked"/> event.
         /// </summary>
-        protected virtual void OnChecked(RoutedEventArgs e) => Checked?.Invoke(this, e);
+        /// <param name="e">
+        /// The event data for the <see cref="Checked"/> event.
+        /// </param>
+        protected virtual void OnChecked(RoutedEventArgs e) => RaiseEvent(e);
 
         /// <summary>
-        /// Raises the Indeterminate event.
+        /// Called when a <see cref="ToggleButton"/> raises an <see cref="Unchecked"/> event.
         /// </summary>
-        protected virtual void OnIndeterminate(RoutedEventArgs e) => Indeterminate?.Invoke(this, e);
+        /// <param name="e">
+        /// The event data for the <see cref="Unchecked"/> event.
+        /// </param>
+        protected virtual void OnUnchecked(RoutedEventArgs e) => RaiseEvent(e);
 
         /// <summary>
-        /// Raises the Unchecked event.
+        /// Called when a <see cref="ToggleButton"/> raises an <see cref="Indeterminate"/> event.
         /// </summary>
-        protected virtual void OnUnchecked(RoutedEventArgs e) => Unchecked?.Invoke(this, e);
+        /// <param name="e">
+        /// The event data for the <see cref="Indeterminate"/> event.
+        /// </param>
+        protected virtual void OnIndeterminate(RoutedEventArgs e) => RaiseEvent(e);
 
         #endregion Protected Methods
 
