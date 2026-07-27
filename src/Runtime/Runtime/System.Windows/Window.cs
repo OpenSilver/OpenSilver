@@ -41,6 +41,7 @@ public class Window : ContentControl, IResizeObserverListener
         KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
         KeyboardNavigation.ControlTabNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
         KeyboardNavigation.DirectionalNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
+        FocusManager.IsFocusScopeProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(BooleanBoxes.TrueBox));
         EventManager.RegisterClassHandler<Window>(Keyboard.GotKeyboardFocusEvent, new RoutedEventHandler(OnGotKeyboardFocus), true);
         EventManager.RegisterClassHandler<Window>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
     }
@@ -128,7 +129,18 @@ public class Window : ContentControl, IResizeObserverListener
     /// <param name="e">
     /// An <see cref="EventArgs"/> that contains the event data.
     /// </param>
-    protected virtual void OnContentRendered(EventArgs e) => ContentRendered?.Invoke(this, e);
+    protected virtual void OnContentRendered(EventArgs e)
+    {
+        // After the content is rendered we want to check if there is an element that needs to be focused
+        // If there is - set focus to it
+        if (Content is DependencyObject doContent)
+        {
+            IInputElement focusedElement = FocusManager.GetFocusedElement(doContent);
+            focusedElement?.Focus();
+        }
+
+        ContentRendered?.Invoke(this, e);
+    }
 
     private static void OnGotKeyboardFocus(object sender, RoutedEventArgs e)
     {
@@ -256,6 +268,9 @@ public class Window : ContentControl, IResizeObserverListener
             OnActivated(EventArgs.Empty);
 
             WindowTaskbar.OnWindowActivated(this);
+
+            UIElement focusedElement = FocusManager.GetFocusedElement(this) as UIElement ?? this;
+            focusedElement.Focus();
         }
     }
 

@@ -347,9 +347,27 @@ namespace System.Windows
         /// true if keyboard focus and logical focus were set to this element; false if only logical focus was set to this element, 
         /// or if the call to this method did not force the focus to change.
         /// </returns>
-        public bool Focus() =>
-            KeyboardNavigation.Current.Focus(this) is UIElement uie &&
-            Keyboard.Focus(uie) == uie;
+        public bool Focus()
+        {
+            if (KeyboardNavigation.Current.Focus(this) is UIElement uie && Keyboard.Focus(uie) == uie)
+            {
+                return true;
+            }
+
+            if (Focusable && KeyboardNavigation.GetIsTabStop(this) && IsEnabled)
+            {
+                // If we cannot set keyboard focus then set the logical focus only
+                // Find element's FocusScope and set its FocusedElement if not already set
+                // If FocusedElement is already set we don't want to steal focus for that scope
+                DependencyObject focusScope = FocusManager.GetFocusScope(this);
+                if (FocusManager.GetFocusedElement(focusScope) is null)
+                {
+                    FocusManager.SetFocusedElement(focusScope, this);
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Attempts to move focus from this element to another element. The direction to move focus is specified 

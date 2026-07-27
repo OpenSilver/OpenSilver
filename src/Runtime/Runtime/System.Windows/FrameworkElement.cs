@@ -1365,8 +1365,8 @@ namespace System.Windows
 
                 // If element has an FocusedElement we need to delegate focus to it
                 // and handle the event if focus successfully delegated
-                UIElement activeElement = FocusManager.GetFocusedElement(fe, true);
-                if (activeElement is not null && activeElement != sender && Keyboard.IsFocusable(activeElement))
+                IInputElement activeElement = FocusManager.GetFocusedElement(fe, true);
+                if (activeElement is not null && activeElement != sender && Keyboard.IsFocusable(activeElement as DependencyObject))
                 {
                     IInputElement oldFocus = Keyboard.FocusedElement;
                     activeElement.Focus();

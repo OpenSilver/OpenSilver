@@ -1961,7 +1961,7 @@ public sealed class KeyboardNavigation
     // The element is focus scope if it is the visual tree root
     private bool IsFocusScope(DependencyObject e)
     {
-        return GetParent(e) == null;
+        return FocusManager.GetIsFocusScope(e) || GetParent(e) == null;
     }
 
     private sealed class WeakReferenceList<T> : DispatcherObject

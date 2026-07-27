@@ -1455,12 +1455,7 @@ namespace System.Windows
         /// <summary>
         /// Identifies the <see cref="GotFocus"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent GotFocusEvent =
-            EventManager.RegisterCoreEvent(
-                nameof(GotFocus),
-                RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent GotFocusEvent = FocusManager.GotFocusEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when the pointer device that previously initiated a Press action is
@@ -1486,12 +1481,7 @@ namespace System.Windows
         /// <summary>
         /// Identifies the <see cref="LostFocus"/> routed event.
         /// </summary>
-        public static readonly RoutedEvent LostFocusEvent =
-            EventManager.RegisterCoreEvent(
-                nameof(LostFocus),
-                RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(UIElement));
+        public static readonly RoutedEvent LostFocusEvent = FocusManager.LostFocusEvent.AddOwner(typeof(UIElement));
 
         /// <summary>
         /// Occurs when a UIElement loses focus.
