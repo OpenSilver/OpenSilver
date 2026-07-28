@@ -4944,6 +4944,14 @@
                                          Cursor="SizeNS"
                                          Visibility="Collapsed" />
 
+                            <!-- Layer 5: Drag area (for WindowChrome mode, collapsed by default) -->
+                            <controls:Border x:Name="PART_DragArea"
+                                             controls:Grid.Row="1"
+                                             VerticalAlignment="Top"
+                                             Height="30"
+                                             Background="Transparent"
+                                             Visibility="Collapsed" />
+
                             <!-- Layer 3: Side and bottom resize borders -->
                             <controls:Border x:Name="PART_ResizeLeft"
                                          controls:Grid.Row="1"
@@ -5008,14 +5016,6 @@
                                          Height="8"
                                          Background="Transparent"
                                          Cursor="SizeNWSE"
-                                         Visibility="Collapsed" />
-
-                            <!-- Layer 5: Drag area (for WindowChrome mode, collapsed by default) -->
-                            <controls:Border x:Name="PART_DragArea"
-                                         controls:Grid.Row="1"
-                                         VerticalAlignment="Top"
-                                         Height="30"
-                                         Background="Transparent"
                                          Visibility="Collapsed" />
 
                             <!-- Layer 6: Chrome buttons (for WindowChrome mode, collapsed by default) -->
