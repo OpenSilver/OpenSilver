@@ -595,13 +595,20 @@ public class WindowHost : ContentControl
 
         if (_window.WindowState == WindowState.Maximized)
         {
-            Arrange(new Rect(new Point(), availableSize));
+            // The maximized size is the viewport (capped by Max). If the viewport isn't
+            // available yet (e.g. Bounds are 0 before the DOM is laid out), GetAvailableSize
+            // yields infinity; fall back to the content's desired size so we never Arrange at
+            // an infinite size (which would throw).
+            double mw = double.IsPositiveInfinity(availableSize.Width) ? DesiredSize.Width : availableSize.Width;
+            double mh = double.IsPositiveInfinity(availableSize.Height) ? DesiredSize.Height : availableSize.Height;
+
+            Arrange(new Rect(new Point(), new Size(mw, mh)));
             UpdateLayout();
 
             if (OuterDiv.IsConnected)
             {
-                OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, $"{Math.Round(availableSize.Width, 2).ToInvariantString()}px");
-                OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, $"{Math.Round(availableSize.Height, 2).ToInvariantString()}px");
+                OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, $"{Math.Round(mw, 2).ToInvariantString()}px");
+                OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, $"{Math.Round(mh, 2).ToInvariantString()}px");
             }
             return;
         }
