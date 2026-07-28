@@ -14,11 +14,33 @@
 namespace System.Windows.Controls;
 
 /// <summary>
+/// Represents the method that handles the <see cref="VirtualizingStackPanel.CleanUpVirtualizedItemEvent"/>
+/// attached events.
+/// </summary>
+/// <param name="sender">
+/// The source of the event.
+/// </param>
+/// <param name="e">
+/// The event data.
+/// </param>
+public delegate void CleanUpVirtualizedItemEventHandler(object sender, CleanUpVirtualizedItemEventArgs e);
+
+/// <summary>
 /// Provides data for the <see cref="VirtualizingStackPanel.CleanUpVirtualizedItemEvent"/> event.
 /// </summary>
 public class CleanUpVirtualizedItemEventArgs : RoutedEventArgs
 {
-    internal CleanUpVirtualizedItemEventArgs(object value, UIElement element)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CleanUpVirtualizedItemEventArgs"/>
+    /// </summary>
+    /// <param name="value">
+    /// The <see cref="object"/> that represents the original data value.
+    /// </param>
+    /// <param name="element">
+    /// The <see cref="Windows.UIElement"/> that represents the data value.
+    /// </param>
+    public CleanUpVirtualizedItemEventArgs(object value, UIElement element)
+        : base(VirtualizingStackPanel.CleanUpVirtualizedItemEvent)
     {
         Value = value;
         UIElement = element;
@@ -47,4 +69,8 @@ public class CleanUpVirtualizedItemEventArgs : RoutedEventArgs
     /// The <see cref="object"/> that represents the original data value.
     /// </returns>
     public object Value { get; }
+
+    /// <inheritdoc />
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget)
+        => ((CleanUpVirtualizedItemEventHandler)genericHandler)(genericTarget, this);
 }

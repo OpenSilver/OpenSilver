@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -338,9 +337,38 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     public double ViewportHeight => _scrollData is null ? 0.0 : _scrollData._viewport.Height;
 
     /// <summary>
-    /// Occurs when an item that is hosted by the <see cref="VirtualizingStackPanel"/> is re-virtualized.
+    /// Identifies the <b>VirtualizingStackPanel.CleanUpVirtualizedItem</b> attached event.
     /// </summary>
-    public event CleanUpVirtualizedItemEventHandler CleanUpVirtualizedItemEvent;
+    public static readonly RoutedEvent CleanUpVirtualizedItemEvent =
+        EventManager.RegisterRoutedEvent(
+            "CleanUpVirtualizedItemEvent",
+            RoutingStrategy.Direct,
+            typeof(CleanUpVirtualizedItemEventHandler),
+            typeof(VirtualizingStackPanel));
+
+    /// <summary>
+    /// Adds an event handler for the <b>VirtualizingStackPanel.CleanUpVirtualizedItem</b> attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="DependencyObject"/> that is listening for this event.
+    /// </param>
+    /// <param name="handler">
+    /// The event handler that is to be added.
+    /// </param>
+    public static void AddCleanUpVirtualizedItemHandler(DependencyObject element, CleanUpVirtualizedItemEventHandler handler)
+        => AddHandler(element, CleanUpVirtualizedItemEvent, handler);
+
+    /// <summary>
+    /// Removes an event handler for the <b>VirtualizingStackPanel.CleanUpVirtualizedItem</b> attached event.
+    /// </summary>
+    /// <param name="element">
+    /// The <see cref="DependencyObject"/> from which the handler is being removed.
+    /// </param>
+    /// <param name="handler">
+    /// Specifies the event handler that is to be removed.
+    /// </param>
+    public static void RemoveCleanUpVirtualizedItemHandler(DependencyObject element, CleanUpVirtualizedItemEventHandler handler)
+        => RemoveHandler(element, CleanUpVirtualizedItemEvent, handler);
 
     /// <summary>
     /// Measures the child elements of a <see cref="VirtualizingStackPanel"/> in anticipation of arranging them during 
@@ -920,22 +948,39 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         return iNewOffset;
     }
 
-    private void VerifyScrollingData(Size viewport, Size extent, Vector offset)
+    private void VerifyScrollingData(Size viewportSize, Size extentSize, Vector viewportOffset)
     {
-        bool fValid = true;
-
         Debug.Assert(IsScrolling);
 
-        fValid &= DoubleUtil.AreClose(viewport, _scrollData._viewport);
-        fValid &= DoubleUtil.AreClose(extent, _scrollData._extent);
-        fValid &= DoubleUtil.AreClose(offset, _scrollData._computedOffset);
-        _scrollData._offset = offset;
+        // Detect changes to the viewportSize, extentSize, and computedViewportOffset
+        bool viewportSizeChanged = !DoubleUtil.AreClose(viewportSize, _scrollData._viewport);
+        bool extentSizeChanged = !DoubleUtil.AreClose(extentSize, _scrollData._extent);
+        bool computedViewportOffsetChanged = !DoubleUtil.AreClose(viewportOffset, _scrollData._computedOffset);
 
-        if (!fValid)
+        _scrollData._offset = viewportOffset;
+
+        // Update data and fire scroll change notifications
+        if (viewportSizeChanged || extentSizeChanged || computedViewportOffsetChanged)
         {
-            _scrollData._viewport = viewport;
-            _scrollData._extent = extent;
-            _scrollData._computedOffset = offset;
+            Vector oldViewportOffset = _scrollData._computedOffset;
+            Size oldViewportSize = _scrollData._viewport;
+
+            _scrollData._viewport = viewportSize;
+            _scrollData._extent = extentSize;
+            _scrollData._computedOffset = viewportOffset;
+
+            // Report changes to the viewportSize
+            if (viewportSizeChanged)
+            {
+                OnViewportSizeChanged(oldViewportSize, viewportSize);
+            }
+
+            // Report changes to the computedViewportOffset
+            if (computedViewportOffsetChanged)
+            {
+                OnViewportOffsetChanged(oldViewportOffset, viewportOffset);
+            }
+
             OnScrollChange();
         }
     }
@@ -1179,12 +1224,42 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     }
 
     /// <summary>
+    /// Called when the size of the viewport changes.
+    /// </summary>
+    /// <param name="oldViewportSize">
+    /// The old size of the viewport.
+    /// </param>
+    /// <param name="newViewportSize">
+    /// The new size of the viewport.
+    /// </param>
+    protected virtual void OnViewportSizeChanged(Size oldViewportSize, Size newViewportSize)
+    {
+    }
+
+    /// <summary>
+    /// Called when the offset of the viewport changes as a user scrolls through content.
+    /// </summary>
+    /// <param name="oldViewportOffset">
+    /// The old offset of the viewport.
+    /// </param>
+    /// <param name="newViewportOffset">
+    /// The new offset of the viewport.
+    /// </param>
+    protected virtual void OnViewportOffsetChanged(Vector oldViewportOffset, Vector newViewportOffset)
+    {
+    }
+
+    /// <summary>
     /// Called when an item that is hosted by the <see cref="VirtualizingStackPanel"/> is re-virtualized.
     /// </summary>
     /// <param name="e">
     /// Data about the event.
     /// </param>
-    protected virtual void OnCleanUpVirtualizedItem(CleanUpVirtualizedItemEventArgs e) => CleanUpVirtualizedItemEvent?.Invoke(this, e);
+    protected virtual void OnCleanUpVirtualizedItem(CleanUpVirtualizedItemEventArgs e)
+    {
+        ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
+        itemsControl?.RaiseEvent(e);
+    }
 
     /// <summary>
     /// Generates the item at the specified index and calls BringIntoView on it.
@@ -1367,8 +1442,14 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         double scrollX = ScrollContentPresenter.ValidateInputOffset(offset, nameof(HorizontalOffset));
         if (!DoubleUtil.AreClose(scrollX, _scrollData._offset.X))
         {
+            Vector oldViewportOffset = _scrollData._offset;
+
             // Store the new offset
             _scrollData._offset.X = scrollX;
+
+            // Report the change in offset
+            OnViewportOffsetChanged(oldViewportOffset, _scrollData._offset);
+
             InvalidateMeasure();
         }
     }
@@ -1386,8 +1467,14 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         double scrollY = ScrollContentPresenter.ValidateInputOffset(offset, nameof(VerticalOffset));
         if (!DoubleUtil.AreClose(scrollY, _scrollData._offset.Y))
         {
+            Vector oldViewportOffset = _scrollData._offset;
+
             // Store the new offset
             _scrollData._offset.Y = scrollY;
+
+            // Report the change in offset
+            OnViewportOffsetChanged(oldViewportOffset, _scrollData._offset);
+
             InvalidateMeasure();
         }
     }
@@ -1448,7 +1535,11 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         if (!LayoutDoubleUtil.AreClose(newOffset.X, _scrollData._offset.X) ||
             !LayoutDoubleUtil.AreClose(newOffset.Y, _scrollData._offset.Y))
         {
+            Vector oldOffset = _scrollData._offset;
             _scrollData._offset = newOffset;
+
+            OnViewportOffsetChanged(oldOffset, newOffset);
+
             InvalidateMeasure();
             OnScrollChange();
 

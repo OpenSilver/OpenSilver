@@ -655,7 +655,6 @@
     <Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
     <Compile Include="System.Windows\FullScreenOptions.cs" />
     <Compile Include="System.Windows\InstallState.cs" />
-    <Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
     <Compile Include="System.Windows\UIElement.Automation.cs" />
     <Compile Include="System.Windows\UIElement.Interfaces.cs" />
     <Compile Include="System.Windows\UIElement.Layout.cs" />
