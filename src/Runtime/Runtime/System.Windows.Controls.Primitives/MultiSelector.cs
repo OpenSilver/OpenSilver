@@ -32,7 +32,7 @@ public abstract class MultiSelector : Selector
     /// <returns>
     /// The items in the <see cref="MultiSelector"/> that are selected.
     /// </returns>
-    public IList SelectedItems => SelectedItemsImpl;
+    public new IList SelectedItems => base.SelectedItems;
 
     /// <summary>
     /// Gets or sets a value that indicates whether the multiple items in the <see cref="MultiSelector"/> can 
@@ -55,7 +55,7 @@ public abstract class MultiSelector : Selector
     /// true if the <see cref="MultiSelector"/> is currently performing a bulk update to the <see cref="SelectedItems"/>
     /// collection; otherwise, false.
     /// </returns>
-    protected bool IsUpdatingSelectedItems => SelectedItemsImpl.IsUpdatingSelectedItems;
+    protected bool IsUpdatingSelectedItems => base.SelectedItems.IsUpdatingSelectedItems;
 
     /// <summary>
     /// Selects all of the items in the <see cref="MultiSelector"/>.
@@ -84,7 +84,7 @@ public abstract class MultiSelector : Selector
     /// <exception cref="InvalidOperationException">
     /// <see cref="IsUpdatingSelectedItems"/> is true when this method is called.
     /// </exception>
-    protected void BeginUpdateSelectedItems() => SelectedItemsImpl.BeginUpdateSelectedItems();
+    protected void BeginUpdateSelectedItems() => base.SelectedItems.BeginUpdateSelectedItems();
 
     /// <summary>
     /// Commits the selected items to the <see cref="MultiSelector"/>.
@@ -92,5 +92,5 @@ public abstract class MultiSelector : Selector
     /// <exception cref="InvalidOperationException">
     /// <see cref="IsUpdatingSelectedItems"/> is false when this method is called.
     /// </exception>
-    protected void EndUpdateSelectedItems() => SelectedItemsImpl.EndUpdateSelectedItems();
+    protected void EndUpdateSelectedItems() => base.SelectedItems.EndUpdateSelectedItems();
 }

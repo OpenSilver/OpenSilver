@@ -77,8 +77,9 @@ namespace System.Windows.Controls.Primitives
         {
             ItemContainerGenerator.StatusChanged += new EventHandler(OnGeneratorStatusChanged);
 
-            SelectedItemsImpl = new SelectedItemCollection(this);
-            SelectedItemsImpl.CollectionChanged += new NotifyCollectionChangedEventHandler(OnSelectedItemsCollectionChanged);
+            var selectedItems = new SelectedItemCollection(this);
+            SetValueInternal(SelectedItemsPropertyKey, selectedItems);
+            selectedItems.CollectionChanged += new NotifyCollectionChangedEventHandler(OnSelectedItemsCollectionChanged);
             SelectionChange = new SelectionChanger(this);
 
             // to prevent this inherited property from bleeding into nested selectors, set this locally to
@@ -843,7 +844,19 @@ namespace System.Windows.Controls.Primitives
 
         internal SelectionChanger SelectionChange { get; }
 
-        internal SelectedItemCollection SelectedItemsImpl { get; }
+        private static readonly DependencyPropertyKey SelectedItemsPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(SelectedItems),
+                typeof(IList),
+                typeof(Selector),
+                new PropertyMetadata((object)null));
+
+        /// <summary>
+        /// A read-only IList containing the currently selected items
+        /// </summary>
+        internal static readonly DependencyProperty SelectedItemsProperty = SelectedItemsPropertyKey.DependencyProperty;
+
+        internal SelectedItemCollection SelectedItems => (SelectedItemCollection)GetValue(SelectedItemsProperty);
 
         internal InternalSelectedItemsStorage SelectedItemsInternal
         {
@@ -906,6 +919,60 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
+        /// <summary>
+        /// Select multiple items.
+        /// </summary>
+        /// <param name="selectedItems">Collection of items to be selected.</param>
+        /// <returns>true if all items have been selected.</returns>
+        internal bool SetSelectedItemsImpl(IEnumerable selectedItems)
+        {
+            bool succeeded = false;
+
+            if (!SelectionChange.IsActive)
+            {
+                SelectionChange.Begin();
+                SelectionChange.CleanupDeferSelection();
+                SelectedItemCollection oldSelectedItems = SelectedItems;
+
+                try
+                {
+                    // Unselect everything in oldSelectedItems.
+                    if (oldSelectedItems != null)
+                    {
+                        foreach (object currentlySelectedItem in oldSelectedItems)
+                        {
+                            SelectionChange.Unselect(NewUnresolvedItemInfo(currentlySelectedItem));
+                        }
+                    }
+
+                    if (selectedItems != null)
+                    {
+                        // Make sure that we can select every items.
+                        foreach (object item in selectedItems)
+                        {
+                            if (!SelectionChange.Select(NewUnresolvedItemInfo(item), false /* assumeInItemsCollection */))
+                            {
+                                SelectionChange.Cancel();
+                                return false;
+                            }
+                        }
+                    }
+
+                    SelectionChange.End();
+                    succeeded = true;
+                }
+                finally
+                {
+                    if (!succeeded)
+                    {
+                        SelectionChange.Cancel();
+                    }
+                }
+            }
+
+            return succeeded;
+        }
+
         // called by SelectedItemsCollection after every change event
         internal void FinishSelectedItemsChange()
         {
@@ -933,7 +1000,7 @@ namespace System.Windows.Controls.Primitives
         private void UpdateSelectedItems(InternalSelectedItemsStorage toAdd, InternalSelectedItemsStorage toRemove)
         {
             Debug.Assert(SelectionChange.IsActive, "SelectionChange.IsActive should be true");
-            var userSelectedItems = SelectedItemsImpl;
+            var userSelectedItems = SelectedItems;
 
             _changeInfo = null;
 
@@ -961,7 +1028,7 @@ namespace System.Windows.Controls.Primitives
             // If this is ever called from another location, ensure that SC.IsActive is true.
             Debug.Assert(SelectionChange.IsActive, "SelectionChange.IsActive should be true");
 
-            SelectedItemCollection userSelectedItems = SelectedItemsImpl;
+            SelectedItemCollection userSelectedItems = SelectedItems;
             if (userSelectedItems != null)
             {
                 InternalSelectedItemsStorage toAdd = new InternalSelectedItemsStorage(0, MatchExplicitEqualityComparer);

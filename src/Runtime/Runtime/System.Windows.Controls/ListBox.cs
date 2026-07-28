@@ -58,16 +58,28 @@ namespace System.Windows.Controls
         internal sealed override ScrollViewer ScrollHost => _scrollHost;
 
         /// <summary>
+        /// Identifies the <see cref="SelectedItems"/> dependency property.
+        /// </summary>
+        public static readonly new DependencyProperty SelectedItemsProperty = Selector.SelectedItemsProperty;
+
+        /// <summary>
         /// Gets the list of currently selected items for the <see cref="ListBox"/>
         /// control.
         /// </summary>
         /// <returns>
         /// The list of currently selected items for the <see cref="ListBox"/>.
         /// </returns>
-        public IList SelectedItems
-        {
-            get { return SelectedItemsImpl; }
-        }
+        public new IList SelectedItems => base.SelectedItems;
+
+        /// <summary>
+        /// Identifies the <see cref="SelectionMode"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectionModeProperty =
+            DependencyProperty.Register(
+                nameof(SelectionMode),
+                typeof(SelectionMode),
+                typeof(ListBox),
+                new PropertyMetadata(SelectionMode.Single, OnSelectionModeChanged));
 
         /// <summary>
         /// Gets or sets the selection behavior for the <see cref="ListBox"/> control.
@@ -80,16 +92,6 @@ namespace System.Windows.Controls
             get { return (SelectionMode)GetValue(SelectionModeProperty); }
             set { SetValueInternal(SelectionModeProperty, value); }
         }
-
-        /// <summary>
-        /// Identifies the <see cref="SelectionMode"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty SelectionModeProperty =
-            DependencyProperty.Register(
-                nameof(SelectionMode), 
-                typeof(SelectionMode), 
-                typeof(ListBox), 
-                new PropertyMetadata(SelectionMode.Single, OnSelectionModeChanged));
 
         private static void OnSelectionModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -155,6 +157,17 @@ namespace System.Windows.Controls
         /// Clears all the selection in a <see cref="ListBox"/>.
         /// </summary>
         public void UnselectAll() => UnselectAllImpl();
+
+        /// <summary>
+        /// Sets a collection of selected items.
+        /// </summary>
+        /// <param name="selectedItems">
+        /// Collection of items to be selected.
+        /// </param>
+        /// <returns>
+        /// true if all items have been selected; otherwise, false.
+        /// </returns>
+        protected bool SetSelectedItems(IEnumerable selectedItems) => SetSelectedItemsImpl(selectedItems);
 
         /// <inheritdoc />
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
