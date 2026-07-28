@@ -1002,7 +1002,6 @@
     <Compile Include="System.Windows.Controls\TextBlock.cs" />
     <Compile Include="System.Windows.Controls\TextBox.cs" />
     <Compile Include="System.Windows.Controls\TextChangedEventArgs.cs" />
-    <Compile Include="System.Windows.Controls\TextChangedEventHandler.cs" />
     <Compile Include="System.Windows.Controls\ToolTip.cs" />
     <Compile Include="System.Windows.Controls\ToolTipService.cs" />
     <Compile Include="System.Windows.Controls\UIElementCollection.cs" />

@@ -187,7 +187,10 @@ namespace System.Windows.Controls
                 tb._textViewHost?.View.SetTextNative((string)e.NewValue);
             }
 
-            tb.OnTextChanged(new TextChangedEventArgs() { Source = tb });
+            tb.OnTextChanged(new TextChangedEventArgs()
+            {
+                RoutedEvent = TextChangedEvent,
+            });
         }
 
         private static object CoerceText(DependencyObject d, object value)
@@ -773,18 +776,31 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Occurs when the text is changed.
+        /// Identifies the <see cref="TextChanged"/> routed event.
         /// </summary>
-        public event TextChangedEventHandler TextChanged;
+        public static readonly RoutedEvent TextChangedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(TextChanged),
+                RoutingStrategy.Bubble,
+                typeof(TextChangedEventHandler),
+                typeof(TextBox));
 
         /// <summary>
-        /// Raises the TextChanged event
+        /// Occurs when content changes in the text element.
         /// </summary>
-        /// <param name="eventArgs">The arguments for the event.</param>
-        protected virtual void OnTextChanged(TextChangedEventArgs eventArgs)
+        public event TextChangedEventHandler TextChanged
         {
-            TextChanged?.Invoke(this, eventArgs);
+            add => AddHandler(TextChangedEvent, value);
+            remove => RemoveHandler(TextChangedEvent, value);
         }
+
+        /// <summary>
+        /// Is called when content in this editing control changes.
+        /// </summary>
+        /// <param name="e">
+        /// The arguments that are associated with the <see cref="TextChanged"/> event.
+        /// </param>
+        protected virtual void OnTextChanged(TextChangedEventArgs e) => RaiseEvent(e);
 
         /// <summary>
         /// Clears all the content from the text box.
