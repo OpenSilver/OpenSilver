@@ -254,7 +254,7 @@ namespace System.Windows.Controls
                 pwb._textViewHost?.View.SetPasswordNative((string)e.NewValue);
             }
 
-            pwb.OnPasswordChanged(new RoutedEventArgs { Source = pwb });
+            pwb.OnPasswordChanged(new RoutedEventArgs(PasswordChangedEvent));
         }
 
         private static object CoercePassword(DependencyObject d, object baseValue) => baseValue ?? string.Empty;
@@ -275,17 +275,28 @@ namespace System.Windows.Controls
         #region password changed event
 
         /// <summary>
-        /// Occurs when the value of the Password property changes.
+        /// Identifies the <see cref="PasswordChanged"/> routed event.
         /// </summary>
-        public event RoutedEventHandler PasswordChanged;
+        public static readonly RoutedEvent PasswordChangedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(PasswordChanged),
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(PasswordBox));
 
         /// <summary>
-        /// Raises the PasswordChanged event
+        /// Occurs when the value of the <see cref="Password"/> property changes.
         /// </summary>
-        protected void OnPasswordChanged(RoutedEventArgs eventArgs)
+        public event RoutedEventHandler PasswordChanged
         {
-            PasswordChanged?.Invoke(this, eventArgs);
+            add => AddHandler(PasswordChangedEvent, value);
+            remove => RemoveHandler(PasswordChangedEvent, value);
         }
+
+        /// <summary>
+        /// Raises the <see cref="PasswordChanged"/> event.
+        /// </summary>
+        protected void OnPasswordChanged(RoutedEventArgs e) => RaiseEvent(e);
 
         #endregion
 
