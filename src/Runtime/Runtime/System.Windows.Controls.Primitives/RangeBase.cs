@@ -283,9 +283,23 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
+        /// Identifies the <see cref="ValueChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent ValueChangedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(ValueChanged),
+                RoutingStrategy.Bubble,
+                typeof(RoutedPropertyChangedEventHandler<double>),
+                typeof(RangeBase));
+
+        /// <summary>
         /// Occurs when the range value changes.
         /// </summary> 
-        public event RoutedPropertyChangedEventHandler<double> ValueChanged;
+        public event RoutedPropertyChangedEventHandler<double> ValueChanged
+        {
+            add => AddHandler(ValueChangedEvent, value);
+            remove => RemoveHandler(ValueChangedEvent, value);
+        }
 
         /// <summary> 
         /// Initializes a new instance of the <see cref="RangeBase"/> class.
@@ -331,7 +345,7 @@ namespace System.Windows.Controls.Primitives
         /// </param>
         protected virtual void OnValueChanged(double oldValue, double newValue)
         {
-            ValueChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
+            RaiseEvent(new RoutedPropertyChangedEventArgs<double>(oldValue, newValue, ValueChangedEvent));
         }
 
         /// <summary> 
