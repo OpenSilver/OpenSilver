@@ -46,6 +46,8 @@ namespace OpenSilver
             };
         }
 
+        public Popup Popup => _popup;
+
         public override void Dispose()
         {
             if (_isDisposed)

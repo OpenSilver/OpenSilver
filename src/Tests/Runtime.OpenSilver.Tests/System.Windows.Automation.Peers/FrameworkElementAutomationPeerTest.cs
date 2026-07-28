@@ -294,7 +294,7 @@ namespace System.Windows.Automation.Peers.Tests
 
                 peer.SetFocus();
 
-                Assert.AreSame(FocusManager.GetFocusedElement(), wrapper.Control);
+                Assert.AreSame(FocusManager.GetFocusedElement(wrapper.Popup), wrapper.Control);
 
                 FocusManager.SetFocusedElement(Window.Current, null);
 

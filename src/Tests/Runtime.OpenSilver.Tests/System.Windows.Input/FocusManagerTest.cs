@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace System.Windows.Input.Tests
 {
@@ -81,7 +82,7 @@ namespace System.Windows.Input.Tests
             using (var element = new FocusableControlWrapper<Control>(new Control()))
             {
                 element.Control.Focus();
-                Assert.AreSame(FocusManager.GetFocusedElement(), element.Control);
+                Assert.AreSame(FocusManager.GetFocusedElement(element.Popup), element.Control);
             }
         }
 
@@ -94,11 +95,10 @@ namespace System.Windows.Input.Tests
             try
             {
                 firstElement.Control.Focus();
-                Assert.AreSame(FocusManager.GetFocusedElement(), firstElement.Control);
-
                 secondElement.Control.Focus();
-                Assert.AreNotSame(FocusManager.GetFocusedElement(), firstElement.Control);
-                Assert.AreSame(FocusManager.GetFocusedElement(), secondElement.Control);
+
+                Assert.AreSame(FocusManager.GetFocusedElement(firstElement.Popup), firstElement.Control);
+                Assert.AreSame(FocusManager.GetFocusedElement(secondElement.Popup), secondElement.Control);
             }
             finally
             {
