@@ -902,10 +902,24 @@ public partial class FrameworkElement
     }
 
     /// <summary>
+    /// Identifies the <see cref="SizeChanged"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent SizeChangedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(SizeChanged),
+            RoutingStrategy.Direct,
+            typeof(SizeChangedEventHandler),
+            typeof(FrameworkElement));
+
+    /// <summary>
     /// Occurs when either the <see cref="ActualHeight"/> or the <see cref="ActualWidth"/>
     /// properties change value on a <see cref="FrameworkElement"/>.
     /// </summary>
-    public event SizeChangedEventHandler SizeChanged;
+    public event SizeChangedEventHandler SizeChanged
+    {
+        add => AddHandler(SizeChangedEvent, value, false);
+        remove => RemoveHandler(SizeChangedEvent, value);
+    }
 
     /// <summary>
     /// Raises the <see cref="SizeChanged"/> event, using the specified information as part of the eventual event data.
@@ -915,10 +929,10 @@ public partial class FrameworkElement
     /// </param>
     protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
     {
-        //first, invalidate ActualWidth and/or ActualHeight
-        //Note: if any handler of invalidation will dirtyfy layout,
-        //subsequent handlers will run on effectively dirty layouts
-        //we only guarantee cleaning between elements, not between handlers here
+        // first, invalidate ActualWidth and/or ActualHeight
+        // Note: if any handler of invalidation will dirtyfy layout,
+        // subsequent handlers will run on effectively dirty layouts
+        // we only guarantee cleaning between elements, not between handlers here
         if (info.WidthChanged)
         {
             NotifyPropertyChange(
@@ -939,7 +953,10 @@ public partial class FrameworkElement
                     _actualHeightMetadata));
         }
 
-        SizeChanged?.Invoke(this, new SizeChangedEventArgs(info));
+        RaiseEvent(new SizeChangedEventArgs(info)
+        {
+            RoutedEvent = SizeChangedEvent
+        });
     }
 
     // Method FindMaximalAreaLocalSpaceRect - used only if LayoutTransform is specified

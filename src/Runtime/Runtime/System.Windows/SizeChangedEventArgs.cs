@@ -68,4 +68,8 @@ public sealed class SizeChangedEventArgs : RoutedEventArgs
     /// true if the <see cref="FrameworkElement.Height"/> component of the size changed; otherwise, false.
     /// </returns>
     public bool HeightChanged { get; }
+
+    /// <inheritdoc />
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget)
+        => ((SizeChangedEventHandler)genericHandler)(genericHandler, this);
 }
