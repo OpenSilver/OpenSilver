@@ -269,7 +269,7 @@ namespace System.Windows
 
             bool visualsCreated;
 
-            if (template.Template is not null)
+            if (template.HasContent)
             {
                 FrameworkElement visualTree = (FrameworkElement)template.Template.LoadContent(container);
                 container.TemplateChild = visualTree;

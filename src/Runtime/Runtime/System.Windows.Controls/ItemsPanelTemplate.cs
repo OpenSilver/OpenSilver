@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Controls;
 
 /// <summary>
@@ -25,4 +27,29 @@ public class ItemsPanelTemplate : FrameworkTemplate
     public ItemsPanelTemplate() { }
 
     internal override Type TargetTypeInternal => typeof(ItemsPresenter);
+
+    /// <summary>
+    /// Checks that the templated parent is a non-null <see cref="ItemsPresenter"/> object.
+    /// </summary>
+    /// <param name="templatedParent">
+    /// The element this template is applied to. This must be an <see cref="ItemsPresenter"/> object.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="templatedParent"/> is null.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="templatedParent"/> is not an <see cref="ItemsPresenter"/>.
+    /// </exception>
+    protected override void ValidateTemplatedParent(FrameworkElement templatedParent)
+    {
+        // Must have a non-null feTemplatedParent
+        ArgumentNullException.ThrowIfNull(templatedParent);
+
+        // A ItemsPanelTemplate must be applied to an ItemsPresenter
+        if (templatedParent is not ItemsPresenter)
+        {
+            throw new ArgumentException(
+                string.Format(Strings.TemplateTargetTypeMismatch, nameof(ItemsPresenter), templatedParent.GetType().Name));
+        }
+    }
 }

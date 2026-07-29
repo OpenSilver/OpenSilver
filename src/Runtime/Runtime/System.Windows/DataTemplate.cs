@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
@@ -93,15 +94,30 @@ namespace System.Windows
         /// <returns>
         /// The root <see cref="UIElement"/> of the <see cref="DataTemplate"/>.
         /// </returns>
-        public DependencyObject LoadContent()
+        public new DependencyObject LoadContent() => base.LoadContent();
+
+        /// <summary>
+        /// Checks the templated parent against a set of rules.
+        /// </summary>
+        /// <param name="templatedParent">
+        /// The element this template is applied to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="templatedParent"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="templatedParent"/> is not a <see cref="ContentPresenter"/>.
+        /// </exception>
+        protected override void ValidateTemplatedParent(FrameworkElement templatedParent)
         {
-            if (Template is not null)
+            // Must have a non-null feTemplatedParent
+            ArgumentNullException.ThrowIfNull(templatedParent);
+
+            // A DataTemplate must be applied to a ContentPresenter
+            if (templatedParent is not ContentPresenter)
             {
-                return Template.LoadContent<FrameworkElement>(null) as DependencyObject;
-            }
-            else
-            {
-                return null;
+                throw new ArgumentException(
+                    string.Format(Strings.TemplateTargetTypeMismatch, nameof(ContentPresenter), templatedParent.GetType().Name));
             }
         }
 

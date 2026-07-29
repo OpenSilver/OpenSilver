@@ -1446,4 +1446,10 @@
   <data name="InvalidItemContainer" xml:space="preserve">
     <value>'{0}' peut héberger uniquement '{1}' ou '{2}'. '{3}' est un conteneur non valide.</value>
   </data>
+  <data name="TemplateTargetTypeMismatch" xml:space="preserve">
+    <value>Le TargetType de ControlTemplate '{0}' ne correspond pas au type '{1}' basé sur un modèle.</value>
+  </data>
+  <data name="MustNotTemplateUnassociatedControl" xml:space="preserve">
+    <value>ControlTemplate doit être associé à un Control en définissant la propriété Control.Template avant de l'utiliser comme modèle pour ce Control.</value>
+  </data>
 </root>

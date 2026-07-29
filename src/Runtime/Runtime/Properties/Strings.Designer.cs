@@ -2284,6 +2284,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ControlTemplate must be associated with a Control by setting the Control.Template property before it is used to template that Control..
+        /// </summary>
+        internal static string MustNotTemplateUnassociatedControl {
+            get {
+                return ResourceManager.GetString("MustNotTemplateUnassociatedControl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a type derived from FrameworkElement..
         /// </summary>
         internal static string NamedObjectMustBeFrameworkElement {
@@ -3540,6 +3549,15 @@ namespace OpenSilver.Internal {
         internal static string TemplateFindNameInInvalidElement {
             get {
                 return ResourceManager.GetString("TemplateFindNameInInvalidElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; ControlTemplate TargetType does not match templated type &apos;{1}&apos;..
+        /// </summary>
+        internal static string TemplateTargetTypeMismatch {
+            get {
+                return ResourceManager.GetString("TemplateTargetTypeMismatch", resourceCulture);
             }
         }
         

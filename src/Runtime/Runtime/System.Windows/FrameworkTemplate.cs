@@ -16,7 +16,6 @@ using OpenSilver.Internal.Xaml;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
-using System.Xaml.Markup;
 
 namespace System.Windows;
 
@@ -110,13 +109,44 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
         }
     }
 
-    internal bool ApplyTemplateContent(FrameworkElement container) => StyleHelper.ApplyTemplateContent(container, this);
+    /// <summary>
+    /// Gets a value that indicates whether this template has optimized content.
+    /// </summary>
+    /// <returns>
+    /// true if this template has optimized content; otherwise, false.
+    /// </returns>
+    public bool HasContent => _template is not null;
+
+    /// <summary>
+    /// Loads the content of the template as an instance of an object and returns the
+    /// root element of the content.
+    /// </summary>
+    /// <returns>
+    /// The root element of the content. Calling this multiple times returns separate 
+    /// instances.
+    /// </returns>
+    public DependencyObject LoadContent()
+    {
+        if (!HasContent)
+        {
+            return null;
+        }
+
+        return Template.LoadContent<FrameworkElement>(null) as DependencyObject;
+    }
+
+    internal bool ApplyTemplateContent(FrameworkElement container)
+    {
+        ValidateTemplatedParent(container);
+
+        return StyleHelper.ApplyTemplateContent(container, this);
+    }
 
     internal bool ApplyTemplateContent<T>(T container) where T : DependencyObject, IInternalFrameworkElement
     {
         Debug.Assert(container is not null, "Must have a non-null TemplatedParent.");
 
-        if (Template is not null)
+        if (HasContent)
         {
             IFrameworkElement visualTree = Template.LoadContent(container);
             container.TemplateChild = visualTree;
@@ -130,25 +160,6 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
     }
 
     internal virtual bool BuildVisualTree(IFrameworkElement container) => false;
-
-    // The following property is used during the "InsertImplicitNodes" step of the compilation,
-    // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
-    [Obsolete(Helper.ObsoleteMemberMessage)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public IUIElement ContentPropertyUsefulOnlyDuringTheCompilation
-    {
-        get { return (IUIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
-        set { SetValueInternal(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
-    }
-
-    [Obsolete(Helper.ObsoleteMemberMessage)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
-        DependencyProperty.Register(
-            nameof(ContentPropertyUsefulOnlyDuringTheCompilation),
-            typeof(IUIElement),
-            typeof(FrameworkTemplate),
-            null);
 
     /// <summary>
     /// Locks the template so it cannot be changed.
@@ -212,6 +223,17 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
         return null;
     }
 
+    /// <summary>
+    /// When overridden in a derived class, supplies rules for the element this template is applied to.
+    /// </summary>
+    /// <param name="templatedParent">
+    /// The element this template is applied to.
+    /// </param>
+    protected virtual void ValidateTemplatedParent(FrameworkElement templatedParent)
+    {
+        Debug.Assert(templatedParent is not null, "Must have a non-null FE TemplatedParent.");
+    }
+
     internal static readonly UncommonField<INameScope> TemplateNameScopeField = new();
 
     internal static INameScope GetTemplateNameScope(DependencyObject templatedParent)
@@ -231,4 +253,23 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
     bool ISealable.IsSealed => IsSealed();
 
     void ISealable.Seal() => Seal();
+
+    // The following property is used during the "InsertImplicitNodes" step of the compilation,
+    // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public IUIElement ContentPropertyUsefulOnlyDuringTheCompilation
+    {
+        get { return (IUIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
+        set { SetValueInternal(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
+    }
+
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
+        DependencyProperty.Register(
+            nameof(ContentPropertyUsefulOnlyDuringTheCompilation),
+            typeof(IUIElement),
+            typeof(FrameworkTemplate),
+            null);
 }

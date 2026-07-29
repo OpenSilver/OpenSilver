@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows.Markup;
 
 namespace System.Windows.Controls;
@@ -72,6 +73,40 @@ public sealed class ControlTemplate : FrameworkTemplate
                 }
             }
             return _triggers;
+        }
+    }
+
+    /// <summary>
+    /// Checks the templated parent against a set of rules.
+    /// </summary>
+    /// <param name="templatedParent">
+    /// The element this template is applied to.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// The <paramref name="templatedParent"/> must not be null.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// You must associate the <see cref="ControlTemplate"/> with a <see cref="Control"/>
+    /// by setting the <see cref="Control.Template"/> property before using the 
+    /// <see cref="ControlTemplate"/> on the <see cref="Control"/>.
+    /// </exception>
+    protected override void ValidateTemplatedParent(FrameworkElement templatedParent)
+    {
+        // Must have a non-null feTemplatedParent
+        ArgumentNullException.ThrowIfNull(templatedParent);
+
+        // The target type of a ControlTemplate must match the 
+        // type of the Control that it is being applied to
+        if (_targetType is not null && !_targetType.IsInstanceOfType(templatedParent))
+        {
+            throw new ArgumentException(
+                string.Format(Strings.TemplateTargetTypeMismatch, _targetType.Name, templatedParent.GetType().Name));
+        }
+
+        // One cannot use a ControlTemplate to template a Control that isn't associated with it
+        if (templatedParent.TemplateInternal != this)
+        {
+            throw new ArgumentException(Strings.MustNotTemplateUnassociatedControl);
         }
     }
 
