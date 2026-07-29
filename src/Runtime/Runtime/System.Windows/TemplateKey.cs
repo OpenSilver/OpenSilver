@@ -204,5 +204,10 @@ public abstract class TemplateKey : ResourceKey, ISupportInitialize
         /// A type that is a <see cref="Windows.DataTemplate"/>.
         /// </summary>
         DataTemplate,
+
+        /// <summary>
+        /// A type that is a TableTemplate. This is obsolete.
+        /// </summary>
+        TableTemplate,
     }
 }

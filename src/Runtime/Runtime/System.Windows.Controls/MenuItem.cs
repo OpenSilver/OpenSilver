@@ -69,6 +69,7 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     private bool _isFocused;
     private CanExecuteChangedWeakEventListener _canExecuteChangedListener;
     private DispatcherTimer _openHierarchyTimer;
+    private object _currentItem;
 
     static MenuItem()
     {
@@ -496,6 +497,46 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
         }
 
         return value;
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="UsesItemContainerTemplate"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty UsesItemContainerTemplateProperty =
+        MenuBase.UsesItemContainerTemplateProperty.AddOwner(typeof(MenuItem));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the menu selects different item containers,
+    /// depending on the type of the item in the underlying collection or some other heuristic.
+    /// </summary>
+    /// <returns>
+    /// true the menu selects different item containers; otherwise, false. The registered default 
+    /// is false.
+    /// </returns>
+    public bool UsesItemContainerTemplate
+    {
+        get => (bool)GetValue(UsesItemContainerTemplateProperty);
+        set => SetValueInternal(UsesItemContainerTemplateProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ItemContainerTemplateSelector"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ItemContainerTemplateSelectorProperty =
+        MenuBase.ItemContainerTemplateSelectorProperty.AddOwner(
+            typeof(MenuItem),
+            new FrameworkPropertyMetadata(MenuBase.ItemContainerTemplateSelectorProperty.DefaultMetadata.DefaultValue));
+
+    /// <summary>
+    /// Gets or sets the custom logic for choosing a template used to display each item.
+    /// </summary>
+    /// <returns>
+    /// A custom object that provides logic and returns an item container.
+    /// </returns>
+    public ItemContainerTemplateSelector ItemContainerTemplateSelector
+    {
+        get => (ItemContainerTemplateSelector)GetValue(ItemContainerTemplateSelectorProperty);
+        set => SetValueInternal(ItemContainerTemplateSelectorProperty, value);
     }
 
     /// <summary>
@@ -1133,18 +1174,51 @@ public class MenuItem : HeaderedItemsControl, ICommandSource
     }
 
     /// <summary>
-    /// Determines whether the specified item is, or is eligible to be, its own item container.
+    /// Determines if the specified item is (or is eligible to be) its own ItemContainer.
     /// </summary>
+    /// <param name="item">
+    /// Specified item.
+    /// </param>
+    /// <returns>
+    /// true if the item is its own ItemContainer; otherwise, false.
+    /// </returns>
     protected override bool IsItemItsOwnContainerOverride(object item)
     {
-        return item is MenuItem || item is Separator;
+        bool ret = item is MenuItem || item is Separator;
+        if (!ret)
+        {
+            _currentItem = item;
+        }
+        return ret;
     }
 
     /// <summary>
-    /// Creates or identifies the element used to display the specified item.
+    /// Creates or identifies the element used to display a specified item.
     /// </summary>
+    /// <returns>
+    /// The element used to display a specified item.
+    /// </returns>
     protected override DependencyObject GetContainerForItemOverride()
     {
+        (object currentItem, _currentItem) = (_currentItem, null);
+
+        if (UsesItemContainerTemplate)
+        {
+            if (ItemContainerTemplateSelector.SelectTemplate(currentItem, this) is DataTemplate itemContainerTemplate)
+            {
+                object itemContainer = itemContainerTemplate.LoadContent();
+                if (itemContainer is MenuItem || itemContainer is Separator)
+                {
+                    return itemContainer as DependencyObject;
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        string.Format(Strings.InvalidItemContainer, GetType().Name, nameof(MenuItem), nameof(Separator), itemContainer));
+                }
+            }
+        }
+
         return new MenuItem();
     }
 

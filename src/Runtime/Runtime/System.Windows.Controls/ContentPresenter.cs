@@ -615,7 +615,7 @@ namespace System.Windows.Controls
                 // Lookup template for typeof(Content) in resource dictionaries.
                 if (content is not null)
                 {
-                    template = (DataTemplate)FindTemplateResourceInternal(this, content);
+                    template = (DataTemplate)FindTemplateResourceInternal(this, content, typeof(DataTemplate));
                 }
 
                 // default templates for well known types
@@ -655,7 +655,7 @@ namespace System.Windows.Controls
         //  that matches the type of the 'item' parameter.  Failing an exact
         //  match of the type, return something that matches one of its parent
         //  types.
-        internal static object FindTemplateResourceInternal(DependencyObject target, object item)
+        internal static object FindTemplateResourceInternal(DependencyObject target, object item, Type templateType)
         {
             // Data styling doesn't apply to UIElement.
             if (item is null || item is UIElement)
@@ -665,7 +665,7 @@ namespace System.Windows.Controls
 
             Type dataType = item.GetType();
 
-            var keys = new List<DataTemplateKey>();
+            var keys = new List<TemplateKey>();
 
             // construct the list of acceptable keys, in priority ord
             int exactMatch = 1;    // number of entries that count as an exact match
@@ -673,7 +673,18 @@ namespace System.Windows.Controls
             // add compound keys for the dataType and all its base types
             while (dataType is not null)
             {
-                keys.Add(new DataTemplateKey(dataType));
+                if (templateType == typeof(DataTemplate))
+                {
+                    keys.Add(new DataTemplateKey(dataType));
+                }
+                else if (templateType == typeof(ItemContainerTemplate))
+                {
+                    keys.Add(new ItemContainerTemplateKey(dataType));
+                }
+                else
+                {
+                    Debug.Assert(false);
+                }
 
                 dataType = dataType.BaseType;
                 if (dataType == typeof(object)) // don't search for Object - perf (Note: Silverlight also includes object)
@@ -702,7 +713,7 @@ namespace System.Windows.Controls
         // Find a data template resource
         private static object FindTemplateResourceFromApp(
             DependencyObject target,
-            List<DataTemplateKey> keys,
+            List<TemplateKey> keys,
             int exactMatch,
             ref int bestMatch)
         {
@@ -733,7 +744,7 @@ namespace System.Windows.Controls
         // Search the parent chain for a DataTemplate in a ResourceDictionary.
         private static object FindTemplateResourceInTree(
             DependencyObject target,
-            List<DataTemplateKey> keys,
+            List<TemplateKey> keys,
             int exactMatch,
             ref int bestMatch)
         {
@@ -861,7 +872,7 @@ namespace System.Windows.Controls
         //  match in the resource dictionary.
         private static object FindBestMatchInResourceDictionary(
             ResourceDictionary table,
-            List<DataTemplateKey> keys,
+            List<TemplateKey> keys,
             int exactMatch,
             ref int bestMatch)
         {

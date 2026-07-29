@@ -1443,4 +1443,7 @@
   <data name="TableCollectionRangeOutOfRange" xml:space="preserve">
     <value>La plage demandée est en dehors de la frontière de la collection.</value>
   </data>
+  <data name="InvalidItemContainer" xml:space="preserve">
+    <value>'{0}' peut héberger uniquement '{1}' ou '{2}'. '{3}' est un conteneur non valide.</value>
+  </data>
 </root>

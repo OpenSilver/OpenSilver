@@ -92,6 +92,9 @@ namespace OpenSilver.Compiler
         public static bool IsDataTemplate(XElement element, ConversionSettings settings) =>
             IsXElementOfType(element, "DataTemplate", KnownNamespaces.SystemWindows, settings);
 
+        public static bool IsItemContainerTemplate(XElement element, ConversionSettings settings) =>
+            IsXElementOfType(element, "ItemContainerTemplate", KnownNamespaces.SystemWindowsControls, settings);
+
         public static bool IsItemsPanelTemplate(XElement element, ConversionSettings settings) =>
             IsXElementOfType(element, "ItemsPanelTemplate", KnownNamespaces.SystemWindowsControls, settings);
 

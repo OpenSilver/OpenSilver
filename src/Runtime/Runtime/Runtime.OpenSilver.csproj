@@ -173,6 +173,9 @@
     <Compile Include="System.Windows.Controls\GridViewColumnHeader.cs" />
     <Compile Include="System.Windows.Controls\GridViewHeaderRowPresenter.cs" />
     <Compile Include="System.Windows.Controls\GridViewRowPresenter.cs" />
+    <Compile Include="System.Windows.Controls\ItemContainerTemplate.cs" />
+    <Compile Include="System.Windows.Controls\ItemContainerTemplateKey.cs" />
+    <Compile Include="System.Windows.Controls\ItemContainerTemplateSelector.cs" />
     <Compile Include="System.Windows.Controls\ListView.cs" />
     <Compile Include="System.Windows.Controls\ListViewItem.cs" />
     <Compile Include="System.Windows.Controls\ToolBar.cs" />

@@ -1375,6 +1375,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; can only host a &apos;{1}&apos; or a &apos;{2}&apos;. &apos;{3}&apos; is an invalid container..
+        /// </summary>
+        internal static string InvalidItemContainer {
+            get {
+                return ResourceManager.GetString("InvalidItemContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid value for property &apos;{1}&apos;..
         /// </summary>
         internal static string InvalidPropertyValue {

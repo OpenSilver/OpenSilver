@@ -1445,4 +1445,7 @@
   <data name="TableCollectionRangeOutOfRange" xml:space="preserve">
     <value>Requested range is out of collection's boundary.</value>
   </data>
+  <data name="InvalidItemContainer" xml:space="preserve">
+    <value>'{0}' can only host a '{1}' or a '{2}'. '{3}' is an invalid container.</value>
+  </data>
 </root>

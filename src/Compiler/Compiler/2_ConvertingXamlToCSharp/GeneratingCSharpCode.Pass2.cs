@@ -1249,7 +1249,7 @@ namespace OpenSilver.Compiler
                 if (styleElement.Attribute(isDataType ? "DataType" : "TargetType") is not XAttribute targetTypeAttribute)
                 {
                     throw new XamlParseException(
-                        isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.",
+                        isDataType ? "DataTemplate and ItemContainerTemplate must declare a DataType or have a key." : "Style must declare a TargetType.",
                         styleElement);
                 }
 
@@ -1312,6 +1312,11 @@ namespace OpenSilver.Compiler
                 if (GeneratingCode.IsDataTemplate(element, _settings) && element.Attribute("DataType") != null)
                 {
                     return $"new global::{KnownNamespaces.SystemWindows}.DataTemplateKey(typeof({GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true)}))";
+                }
+
+                if (GeneratingCode.IsItemContainerTemplate(element, _settings) && element.Attribute("DataType") != null)
+                {
+                    return $"new global::{KnownNamespaces.SystemWindowsControls}.ItemContainerTemplateKey(typeof({GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true)}))";
                 }
 
                 throw new XamlParseException(

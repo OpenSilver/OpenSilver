@@ -17,6 +17,7 @@ public abstract class MenuBase : ItemsControl
 {
     private MenuItem _currentSelection;
     private bool _isMenuMode;
+    private object _currentItem;
 
     static MenuBase()
     {
@@ -27,6 +28,54 @@ public abstract class MenuBase : ItemsControl
     /// Initializes a new instance of the <see cref="MenuBase"/> class.
     /// </summary>
     public MenuBase() { }
+
+    /// <summary>
+    /// Identifies the <see cref="UsesItemContainerTemplate"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty UsesItemContainerTemplateProperty =
+        DependencyProperty.Register(
+            nameof(UsesItemContainerTemplate),
+            typeof(bool),
+            typeof(MenuBase));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the menu selects different item containers,
+    /// depending on the type of the item in the underlying collection or some other heuristic.
+    /// </summary>
+    /// <returns>
+    /// true if the menu selects different item containers; otherwise, false. The registered 
+    /// default is false.
+    /// </returns>
+    public bool UsesItemContainerTemplate
+    {
+        get => (bool)GetValue(UsesItemContainerTemplateProperty);
+        set => SetValueInternal(UsesItemContainerTemplateProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ItemContainerTemplateSelector"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ItemContainerTemplateSelectorProperty =
+        DependencyProperty.Register(
+            nameof(ItemContainerTemplateSelector),
+            typeof(ItemContainerTemplateSelector),
+            typeof(MenuBase),
+            new FrameworkPropertyMetadata(new DefaultItemContainerTemplateSelector()),
+            IsItemContainerTemplateSelectorValid);
+
+    /// <summary>
+    /// Gets or sets the custom logic for choosing a template used to display each item.
+    /// </summary>
+    /// <returns>
+    /// A custom object that provides logic and returns an item container.
+    /// </returns>
+    public ItemContainerTemplateSelector ItemContainerTemplateSelector
+    {
+        get => (ItemContainerTemplateSelector)GetValue(ItemContainerTemplateSelectorProperty);
+        set => SetValueInternal(ItemContainerTemplateSelectorProperty, value);
+    }
+
+    private static bool IsItemContainerTemplateSelectorValid(object o) => o is not null;
 
     /// <summary>
     /// Identifies the <see cref="ItemContainerStyle"/> dependency property.
@@ -78,19 +127,49 @@ public abstract class MenuBase : ItemsControl
     /// <summary>
     /// Determines whether the specified item is, or is eligible to be, its own item container.
     /// </summary>
-    /// <param name="item">The item to check whether it is an item container.</param>
-    /// <returns>True if the item is a MenuItem or a Separator; otherwise, false.</returns>
+    /// <param name="item">
+    /// The item to check whether it is an item container.
+    /// </param>
+    /// <returns>
+    /// true if the item is a <see cref="MenuItem"/> or a <see cref="Separator"/>; otherwise, false.
+    /// </returns>
     protected override bool IsItemItsOwnContainerOverride(object item)
     {
-        return item is MenuItem || item is Separator;
+        bool ret = item is MenuItem || item is Separator;
+        if (!ret)
+        {
+            _currentItem = item;
+        }
+        return ret;
     }
 
     /// <summary>
     /// Creates or identifies the element used to display the specified item.
     /// </summary>
-    /// <returns>A MenuItem.</returns>
+    /// <returns>
+    /// The element used to display the specified item.
+    /// </returns>
     protected override DependencyObject GetContainerForItemOverride()
     {
+        (object currentItem, _currentItem) = (_currentItem, null);
+
+        if (UsesItemContainerTemplate)
+        {
+            if (ItemContainerTemplateSelector.SelectTemplate(currentItem, this) is DataTemplate itemContainerTemplate)
+            {
+                object itemContainer = itemContainerTemplate.LoadContent();
+                if (itemContainer is MenuItem || itemContainer is Separator)
+                {
+                    return itemContainer as DependencyObject;
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        string.Format(Strings.InvalidItemContainer, GetType().Name, nameof(MenuItem), nameof(Separator), itemContainer));
+                }
+            }
+        }
+
         return new MenuItem();
     }
 
