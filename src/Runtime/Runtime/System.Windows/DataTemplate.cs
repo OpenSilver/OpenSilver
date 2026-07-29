@@ -12,12 +12,14 @@
 \*====================================================================================*/
 
 using System.Windows.Controls;
+using System.Windows.Markup;
 
 namespace System.Windows
 {
     /// <summary>
     /// Describes the visual structure of a data object.
     /// </summary>
+    [DictionaryKeyProperty(nameof(DataTemplateKey))]
     public class DataTemplate : FrameworkTemplate
     {
         private Type _dataType;
