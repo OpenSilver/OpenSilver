@@ -107,7 +107,7 @@ public abstract class BindingExpressionBase : Expression
     /// <returns>
     /// The <see cref="BindingBase"/> object from which this <see cref="BindingExpressionBase"/> object is created.
     /// </returns>
-    internal BindingBase ParentBindingBase { get; }
+    public BindingBase ParentBindingBase { get; }
 
     /// <summary>
     /// Gets the element that is the binding target object of this binding expression.
@@ -115,7 +115,7 @@ public abstract class BindingExpressionBase : Expression
     /// <returns>
     /// The element that is the binding target object of this binding expression.
     /// </returns>
-    internal DependencyObject Target { get; private set; }
+    public DependencyObject Target { get; private set; }
 
     /// <summary>
     /// Gets the binding target property of this binding expression.
@@ -123,7 +123,7 @@ public abstract class BindingExpressionBase : Expression
     /// <returns>
     /// The binding target property of this binding expression.
     /// </returns>
-    internal DependencyProperty TargetProperty { get; private set; }
+    public DependencyProperty TargetProperty { get; private set; }
 
     /// <summary> The parent MultiBindingExpression (if any) </summary>
     internal BindingExpressionBase ParentBindingExpressionBase { get; }

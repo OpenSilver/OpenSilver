@@ -111,6 +111,15 @@ namespace System.Windows.Controls
         protected internal virtual Orientation LogicalOrientation => Orientation.Vertical;
 
         /// <summary>
+        /// The <see cref="Orientation"/> of the panel, if the panel supports layout in only a single 
+        /// dimension.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Orientation"/> of the panel. This property has no default value.
+        /// </returns>
+        public Orientation LogicalOrientationPublic => LogicalOrientation;
+
+        /// <summary>
         /// Gets a value that indicates whether this <see cref="Panel"/> arranges its descendants 
         /// in a single dimension.
         /// </summary>
@@ -118,6 +127,15 @@ namespace System.Windows.Controls
         /// true if the orientation of the <see cref="Panel"/> is in one dimension; otherwise, false.
         /// </returns>
         protected internal virtual bool HasLogicalOrientation => false;
+
+        /// <summary>
+        /// Gets a value that indicates whether this <see cref="Panel"/> arranges its descendants in a 
+        /// single dimension.
+        /// </summary>
+        /// <returns>
+        /// true if the orientation of the <see cref="Panel"/>is in one dimension; otherwise, false.
+        /// </returns>
+        public bool HasLogicalOrientationPublic => HasLogicalOrientation;
 
         /// <summary>
         /// The generator associated with this panel.

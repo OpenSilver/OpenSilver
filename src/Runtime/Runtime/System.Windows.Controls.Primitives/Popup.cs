@@ -54,14 +54,26 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public event EventHandler Opened;
 
-        private void OnOpened() => Opened?.Invoke(this, EventArgs.Empty);
+        /// <summary>
+        /// Responds to the condition in which the value of the <see cref="IsOpen"/> property changes from false to true.
+        /// </summary>
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
+        protected virtual void OnOpened(EventArgs e) => Opened?.Invoke(this, e);
 
         /// <summary>
         /// Occurs when the <see cref="IsOpen"/> property changes to false.
         /// </summary>
         public event EventHandler Closed;
 
-        private void OnClosed() => Closed?.Invoke(this, EventArgs.Empty);
+        /// <summary>
+        /// Responds when the value of the <see cref="IsOpen"/> property changes from to true to false.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+        protected virtual void OnClosed(EventArgs e) => Closed?.Invoke(this, e);
 
         /// <summary>
         /// Gets or Sets the UIElement that the Popup will stick to. A null value will make the Popup stay at its originally defined position.
@@ -340,7 +352,7 @@ namespace System.Windows.Controls.Primitives
             if (isOpen)
             {
                 popup.ShowPopupRootIfNotAlreadyVisible();
-                popup.OnOpened();
+                popup.OnOpened(EventArgs.Empty);
 
                 // The popup can be closed during during the Opened event
                 if (popup.IsOpen)
@@ -351,7 +363,7 @@ namespace System.Windows.Controls.Primitives
             }
             else
             {
-                popup.OnClosed();
+                popup.OnClosed(EventArgs.Empty);
                 popup.HidePopupRootIfVisible();
                 popup.Unloaded -= new RoutedEventHandler(CloseOnUnloaded);
                 popup.IsVisibleChanged -= new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);

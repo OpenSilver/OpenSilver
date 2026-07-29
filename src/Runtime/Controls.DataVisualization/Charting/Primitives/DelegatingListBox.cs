@@ -17,7 +17,7 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
         /// Gets or sets a function to call when the
         /// IsItemItsOwnContainerOverride method executes.
         /// </summary>
-        public Func<object, bool> IsItemItsOwnContainer { get; set; }
+        public new Func<object, bool> IsItemItsOwnContainer { get; set; }
 
         /// <summary>
         /// Gets or sets a function to call when the

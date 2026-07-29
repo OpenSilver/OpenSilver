@@ -34,6 +34,19 @@ namespace System.Windows.Media
         /// </summary>
         protected GradientBrush() { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GradientBrush"/> class with the 
+        /// specified <see cref="GradientStopCollection"/>.
+        /// </summary>
+        /// <param name="gradientStopCollection">
+        /// The <see cref="GradientStopCollection"/> used to specify the location and color 
+        /// of the transition points in a gradient.
+        /// </param>
+        protected GradientBrush(GradientStopCollection gradientStopCollection)
+        {
+            GradientStops = gradientStopCollection;
+        }
+
         private protected GradientBrush(GradientBrush original)
             : base(original)
         {

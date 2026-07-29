@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
@@ -54,6 +55,37 @@ public class UIElementCollection : PresentationFrameworkCollection<UIElement>
     {
         get => InternalItems.Capacity;
         set => InternalItems.Capacity = value;
+    }
+
+    /// <summary>
+    /// Removes a range of elements from a <see cref="UIElementCollection"/>.
+    /// </summary>
+    /// <param name="index">
+    /// The index position of the element where removal begins.
+    /// </param>
+    /// <param name="count">
+    /// The number of elements to remove.
+    /// </param>
+    public virtual void RemoveRange(int index, int count)
+    {
+        List<UIElement> items = InternalItems;
+        count = Math.Min(count, items.Count - index);
+
+        if (count > 0)
+        {
+            UIElement[] uies = new UIElement[count];
+            items.CopyTo(index, uies, 0, count);
+
+            for (int i = 0; i < count; ++i)
+            {
+                ClearVisualParent(uies[i]);
+                ClearLogicalParent(uies[i]);
+            }
+
+            items.RemoveRange(index, count);
+
+            VisualParent.InvalidateMeasure();
+        }
     }
 
     internal UIElement VisualParent { get; }

@@ -39,6 +39,18 @@ namespace System.Windows.Media
         public LinearGradientBrush() { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="LinearGradientBrush"/> class that has
+        /// the specified gradient stops.
+        /// </summary>
+        /// <param name="gradientStopCollection">
+        /// The <see cref="GradientBrush.GradientStops"/> to set on this brush.
+        /// </param>
+        public LinearGradientBrush(GradientStopCollection gradientStopCollection)
+            : base(gradientStopCollection)
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="LinearGradientBrush"/> class
         /// that has the specified <see cref="GradientStopCollection"/> and angle.
         /// </summary>
@@ -54,6 +66,73 @@ namespace System.Windows.Media
         {
             GradientStops = gradientStopCollection;
             EndPoint = EndPointFromAngle(angle);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinearGradientBrush"/> class that has 
+        /// the specified gradient stops, <see cref="StartPoint"/>, and <see cref="EndPoint"/>.
+        /// </summary>
+        /// <param name="gradientStopCollection">
+        /// The <see cref="GradientBrush.GradientStops"/> to set on this brush.
+        /// </param>
+        /// <param name="startPoint">
+        /// The <see cref="StartPoint"/> of the gradient.
+        /// </param>
+        /// <param name="endPoint">
+        /// The <see cref="EndPoint"/> of the gradient.
+        /// </param>
+        public LinearGradientBrush(GradientStopCollection gradientStopCollection, Point startPoint, Point endPoint)
+            : base(gradientStopCollection)
+        {
+            StartPoint = startPoint;
+            EndPoint = endPoint;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinearGradientBrush"/> class that has 
+        /// the specified start <see cref="Color"/>, end <see cref="Color"/>, and angle.
+        /// </summary>
+        /// <param name="startColor">
+        /// The <see cref="Color"/> at offset 0.0.
+        /// </param>
+        /// <param name="endColor">
+        /// The <see cref="Color"/> at offset 1.0.
+        /// </param>
+        /// <param name="angle">
+        /// A <see cref="double"/> that represents the angle, in degrees, of the gradient. A 
+        /// value of 0.0 creates a horizontal gradient, and a value of 90.0 creates a vertical 
+        /// gradient.
+        /// </param>
+        public LinearGradientBrush(Color startColor, Color endColor, double angle)
+        {
+            EndPoint = EndPointFromAngle(angle);
+            GradientStops.Add(new GradientStop(startColor, 0.0));
+            GradientStops.Add(new GradientStop(endColor, 1.0));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinearGradientBrush"/> class that has the 
+        /// specified start <see cref="Color"/>, end <see cref="Color"/>, <see cref="StartPoint"/>,
+        /// and <see cref="EndPoint"/>.
+        /// </summary>
+        /// <param name="startColor">
+        /// The <see cref="Color"/> at offset 0.0.
+        /// </param>
+        /// <param name="endColor">
+        /// The <see cref="Color"/> at offset 1.0.
+        /// </param>
+        /// <param name="startPoint">
+        /// The <see cref="StartPoint"/> of the gradient.
+        /// </param>
+        /// <param name="endPoint">
+        /// The <see cref="EndPoint"/> of the gradient.
+        /// </param>
+        public LinearGradientBrush(Color startColor, Color endColor, Point startPoint, Point endPoint)
+        {
+            StartPoint = startPoint;
+            EndPoint = endPoint;
+            GradientStops.Add(new GradientStop(startColor, 0.0));
+            GradientStops.Add(new GradientStop(endColor, 1.0));
         }
 
         private LinearGradientBrush(LinearGradientBrush original)

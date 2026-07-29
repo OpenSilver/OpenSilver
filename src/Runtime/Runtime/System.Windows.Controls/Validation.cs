@@ -44,8 +44,21 @@ namespace System.Windows.Controls
         public static void AddErrorHandler(UIElement element, EventHandler<ValidationErrorEventArgs> handler)
         {
             ArgumentNullException.ThrowIfNull(element);
-
             element.AddHandler(ErrorEvent, handler);
+        }
+
+        /// <summary>
+        /// Adds an event handler for the Validation.Error attached event to the specified object.
+        /// </summary>
+        /// <param name="element">
+        /// The <see cref="UIElement"/> object to add <paramref name="handler"/> to.
+        /// </param>
+        /// <param name="handler">
+        /// The handler to add.
+        /// </param>
+        public static void AddErrorHandler(DependencyObject element, EventHandler<ValidationErrorEventArgs> handler)
+        {
+            UIElement.AddHandler(element, ErrorEvent, handler);
         }
 
         /// <summary>
@@ -60,8 +73,21 @@ namespace System.Windows.Controls
         public static void RemoveErrorHandler(UIElement element, EventHandler<ValidationErrorEventArgs> handler)
         {
             ArgumentNullException.ThrowIfNull(element);
-
             element.RemoveHandler(ErrorEvent, handler);
+        }
+
+        /// <summary>
+        /// Adds an event handler for the Validation.Error attached event from the specified object.
+        /// </summary>
+        /// <param name="element">
+        /// The <see cref="UIElement"/> object to remove <paramref name="handler"/> from.
+        /// </param>
+        /// <param name="handler">
+        /// The handler to remove.
+        /// </param>
+        public static void RemoveErrorHandler(DependencyObject element, EventHandler<ValidationErrorEventArgs> handler)
+        {
+            UIElement.RemoveHandler(element, ErrorEvent, handler);
         }
 
         /// <summary>

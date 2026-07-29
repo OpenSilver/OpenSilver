@@ -149,7 +149,25 @@ namespace System.Windows.Automation.Peers
         /// or <see cref="string.Empty" /> if there is no automation identifier.
         /// </returns>
         protected override string GetAutomationIdCore()
-            => (string)Owner.GetValue(AutomationProperties.AutomationIdProperty);
+        {
+            // 1. fetch AutomationProperties.AutomationIdProperty
+            string result = (string)Owner.GetValue(AutomationProperties.AutomationIdProperty);
+
+            if (string.IsNullOrEmpty(result))
+            {
+                // 2. fetch x:Uid
+                FrameworkElement owner = (FrameworkElement)Owner;
+                result = Owner.Uid;
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    // 3. fetch FrameworkElement.NameProperty
+                    result = owner.Name;
+                }
+            }
+
+            return result ?? string.Empty;
+        }
 
         /// <summary>
         /// Returns the string that describes the functionality of the <see cref="FrameworkElement" /> 

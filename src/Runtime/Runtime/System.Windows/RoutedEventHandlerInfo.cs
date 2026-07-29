@@ -13,7 +13,11 @@
 
 namespace System.Windows;
 
-internal readonly struct RoutedEventHandlerInfo
+/// <summary>
+/// Provides special handling information to inform event listeners whether specific handlers 
+/// should be invoked.
+/// </summary>
+public readonly struct RoutedEventHandlerInfo
 {
     /// <summary>
     ///     Construtor for RoutedEventHandlerInfo
@@ -32,13 +36,21 @@ internal readonly struct RoutedEventHandlerInfo
     }
 
     /// <summary>
-    ///     Returns associated handler instance
+    /// Gets the event handler.
     /// </summary>
+    /// <returns>
+    /// The event handler.
+    /// </returns>
     public Delegate Handler { get; }
 
     /// <summary>
-    ///     Returns HandledEventsToo Flag
+    /// Gets a value that indicates whether the event handler is invoked when the routed event
+    /// is marked handled.
     /// </summary>
+    /// <returns>
+    /// true if the event handler is invoked when the routed event is marked handled; otherwise, 
+    /// false.
+    /// </returns>
     public bool InvokeHandledEventsToo { get; }
 
     // Invokes handler instance as per specified 
@@ -63,31 +75,66 @@ internal readonly struct RoutedEventHandlerInfo
     }
 
     /// <summary>
-    ///     Is the given object equivalent to the current one
+    /// Determines whether the specified object is equivalent to the current <see cref="RoutedEventHandlerInfo"/>.
     /// </summary>
+    /// <param name="obj">
+    /// The object to compare to the current <see cref="RoutedEventHandlerInfo"/>.
+    /// </param>
+    /// <returns>
+    /// true if the specified object is equivalent to the current <see cref="RoutedEventHandlerInfo"/>; 
+    /// otherwise, false.
+    /// </returns>
     public override bool Equals(object obj) => obj is RoutedEventHandlerInfo info && Equals(info);
 
     /// <summary>
-    ///     Is the given RoutedEventHandlerInfo equals the current
+    /// Determines whether the specified <see cref="RoutedEventHandlerInfo"/> is equivalent to the current
+    /// <see cref="RoutedEventHandlerInfo"/>.
     /// </summary>
+    /// <param name="handlerInfo">
+    /// The <see cref="RoutedEventHandlerInfo"/> to compare to the current <see cref="RoutedEventHandlerInfo"/>.
+    /// </param>
+    /// <returns>
+    /// true if the specified <see cref="RoutedEventHandlerInfo"/> is equivalent to the current 
+    /// <see cref="RoutedEventHandlerInfo"/>; otherwise, false.
+    /// </returns>
     public bool Equals(RoutedEventHandlerInfo handlerInfo)
         => Handler == handlerInfo.Handler && InvokeHandledEventsToo == handlerInfo.InvokeHandledEventsToo;
 
     /// <summary>
-    ///     Serves as a hash function for a particular type, suitable for use in 
-    ///     hashing algorithms and data structures like a hash table
+    /// Returns a hash code for the current <see cref="RoutedEventHandlerInfo"/>.
     /// </summary>
+    /// <returns>
+    /// A hash code for the current <see cref="RoutedEventHandlerInfo"/>.
+    /// </returns>
     public override int GetHashCode() => base.GetHashCode();
 
     /// <summary>
-    ///     Equals operator overload
+    /// Determines whether the specified objects are equivalent.
     /// </summary>
+    /// <param name="handlerInfo1">
+    /// The first object to compare.
+    /// </param>
+    /// <param name="handlerInfo2">
+    /// The second object to compare.
+    /// </param>
+    /// <returns>
+    /// true if the objects are equivalent; otherwise, false.
+    /// </returns>
     public static bool operator ==(RoutedEventHandlerInfo handlerInfo1, RoutedEventHandlerInfo handlerInfo2)
         => handlerInfo1.Equals(handlerInfo2);
 
     /// <summary>
-    ///     NotEquals operator overload
+    /// Determines whether the specified objects are not equivalent.
     /// </summary>
+    /// <param name="handlerInfo1">
+    /// The first object to compare.
+    /// </param>
+    /// <param name="handlerInfo2">
+    /// The second object to compare.
+    /// </param>
+    /// <returns>
+    /// true if the objects are not equivalent; otherwise, false.
+    /// </returns>
     public static bool operator !=(RoutedEventHandlerInfo handlerInfo1, RoutedEventHandlerInfo handlerInfo2)
         => !handlerInfo1.Equals(handlerInfo2);
 }

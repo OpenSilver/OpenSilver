@@ -1025,6 +1025,32 @@ namespace System.Windows
 
         #endregion
 
+        #region Uid
+
+        /// <summary>
+        /// Identifies the <see cref="Uid"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UidProperty =
+            DependencyProperty.Register(
+                nameof(Uid),
+                typeof(string),
+                typeof(UIElement),
+                new UIPropertyMetadata(string.Empty));
+
+        /// <summary>
+        /// Gets or sets the unique identifier (for localization) for this element. This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// A string that is the unique identifier for this element.
+        /// </returns>
+        public string Uid
+        {
+            get => (string)GetValue(UidProperty);
+            set => SetValueInternal(UidProperty, value);
+        }
+
+        #endregion
+
         #region Visibility
 
         private Visibility VisibilityCache
