@@ -8051,5 +8051,90 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
+    <!-- StatusBar styles -->
+
+    <Style TargetType="primitives:StatusBar">
+        <Setter Property="Background"
+                Value="#FFF1EDED" />
+        <Setter Property="Foreground"
+                Value="{x:Static media:Brushes.Black}" />
+        <Setter Property="FontFamily"
+                Value="Segoe UI" />
+        <Setter Property="FontSize"
+                Value="12" />
+        <Setter Property="FontStyle"
+                Value="Normal" />
+        <Setter Property="FontWeight"
+                Value="Normal" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="primitives:StatusBar">
+                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                     Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                     SnapsToDevicePixels="true">
+                        <controls:ItemsPresenter SnapsToDevicePixels="{TemplateBinding Property={x:Static UIElement.SnapsToDevicePixelsProperty}}" />
+                    </controls:Border>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="primitives:StatusBarItem">
+        <Setter Property="Padding"
+                Value="3" />
+        <Setter Property="Background"
+                Value="{x:Static media:Brushes.Transparent}" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="primitives:StatusBarItem">
+                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                     Padding="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
+                                     SnapsToDevicePixels="true">
+                        <controls:ContentPresenter HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
+                                                   VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}"
+                                                   SnapsToDevicePixels="{TemplateBinding Property={x:Static UIElement.SnapsToDevicePixelsProperty}}" />
+                    </controls:Border>
+                    <controls:ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled"
+                                 Value="false">
+                            <Setter Property="Foreground"
+                                    Value="#FF6D6D6D" />
+                        </Trigger>
+                    </controls:ControlTemplate.Triggers>
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="{x:Static primitives:StatusBar.SeparatorStyleKey}"
+           TargetType="controls:Separator">
+        <Setter Property="Background"
+                Value="#FF696969" />
+        <Setter Property="MinWidth"
+                Value="1" />
+        <Setter Property="MinHeight"
+                Value="1" />
+        <Setter Property="Margin"
+                Value="2" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <controls:ControlTemplate TargetType="controls:Separator">
+                    <controls:Border Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
+                                     BorderBrush="{TemplateBinding Property={x:Static controls:Control.BorderBrushProperty}}"
+                                     BorderThickness="{TemplateBinding Property={x:Static controls:Control.BorderThicknessProperty}}"
+                                     SnapsToDevicePixels="true" />
+                </controls:ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 </ResourceDictionary>

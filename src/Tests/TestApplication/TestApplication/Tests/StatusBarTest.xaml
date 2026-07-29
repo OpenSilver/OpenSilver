@@ -1,0 +1,194 @@
+﻿<Page x:Class="TestApplication.Tests.StatusBarTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:TestApplication.Tests"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      mc:Ignorable="d"
+      d:DesignHeight="1600"
+      d:DesignWidth="900">
+
+    <Page.Resources>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,14,0,4" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
+        <!-- Item template used by the data-bound StatusBar in section 4. -->
+        <DataTemplate x:Key="NotificationItemTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse Width="8" Height="8" Fill="#FF4CAF50" Margin="0,0,6,0" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding}" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Style applied to every auto-generated StatusBarItem container in section 4. -->
+        <Style x:Key="NotificationItemContainerStyle" TargetType="StatusBarItem">
+            <Setter Property="Padding" Value="0,0,12,0" />
+            <Setter Property="BorderBrush" Value="#FFB0BEC5" />
+            <Setter Property="BorderThickness" Value="0,0,1,0" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- ================================================================
+             Section 6: UsesItemContainerTemplate / ItemContainerTemplateSelector.
+             Each item container template's root is itself the container
+             (a StatusBarItem or a Separator) rather than merely its content,
+             which is what lets a plain data-bound collection produce real
+             Separator containers alongside StatusBarItem containers. -->
+        <DataTemplate x:Key="MixedStatusItemTemplate">
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="8" Height="8" Fill="#FF2196F3" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding}" />
+                </StackPanel>
+            </StatusBarItem>
+        </DataTemplate>
+        <DataTemplate x:Key="MixedSeparatorTemplate">
+            <Separator Background="#FF2196F3" />
+        </DataTemplate>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="15">
+            <TextBlock Text="StatusBar Tests"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Margin="0,0,0,4" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="StatusBar / StatusBarItem are ported from WPF and share the same API and behavior: the default ItemsPanel is a DockPanel, non-StatusBarItem/Separator items are automatically wrapped into a StatusBarItem, and Separator items automatically pick up the StatusBar.SeparatorStyleKey style." />
+
+            <!-- Output area -->
+            <Border Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1"
+                    Padding="10" Margin="0,0,0,10">
+                <StackPanel>
+                    <TextBlock Text="Last Action:" FontWeight="Bold" />
+                    <TextBlock x:Name="OutputTextBlock"
+                               Text="(Interact with the status bars below to see output)"
+                               Foreground="#555555" />
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 1: BASIC STATUSBAR (StatusBarItem, Separator, plain items) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="1 · Basic StatusBar (StatusBarItem, Separator, auto-wrapped items)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="Explicit StatusBarItem/Separator objects are used as-is. The last plain string below is not a StatusBarItem, so StatusBar automatically wraps it in one (IsItemItsOwnContainerOverride / GetContainerForItemOverride)." />
+            <StatusBar Margin="0,0,0,10">
+                <StatusBarItem Content="Ready" />
+                <Separator />
+                <StatusBarItem Content="Ln 12, Col 8" />
+                <Separator />
+                <StatusBarItem Content="100%" />
+                <Separator />
+                <sys:String>I'm a plain string, auto-wrapped!</sys:String>
+            </StatusBar>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 2: DOCKPANEL LAYOUT (DockPanel.Dock + fill behavior) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="2 · DockPanel layout (DockPanel.Dock='Right' + last-child-fill)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="StatusBar's items panel is a DockPanel. Items dock Left by default; setting DockPanel.Dock='Right' on an item docks it to the right edge. Whichever item is LAST in the Items collection fills the remaining space, which is why the middle item below stretches." />
+            <StatusBar Margin="0,0,0,10">
+                <StatusBarItem Content="Ready" />
+                <Separator />
+                <StatusBarItem DockPanel.Dock="Right">
+                    <TextBlock x:Name="ClockTextBlock" Text="00:00:00" />
+                </StatusBarItem>
+                <Separator DockPanel.Dock="Right" />
+                <StatusBarItem DockPanel.Dock="Right" Content="Zoom: 100%" />
+                <StatusBarItem HorizontalContentAlignment="Right">
+                    <TextBlock x:Name="FillTextBlock" Text="(this item is last, so it fills the remaining space)" />
+                </StatusBarItem>
+            </StatusBar>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 3: INTERACTIVE CONTENT (ProgressBar, ToggleButton, Button) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="3 · Interactive content inside StatusBarItem" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="A StatusBarItem is a ContentControl, so it can host any interactive element: a ProgressBar, a ToggleButton, or a Button." />
+            <StatusBar Margin="0,0,0,6">
+                <StatusBarItem Content="Task progress:" />
+                <StatusBarItem HorizontalContentAlignment="Right">
+                    <ProgressBar x:Name="TaskProgressBar" Width="140" Height="14" Minimum="0" Maximum="100" Value="35" />
+                </StatusBarItem>
+                <StatusBarItem Content="{Binding Value, ElementName=TaskProgressBar, StringFormat='{}{0:0}%'}" />
+                <Separator />
+                <StatusBarItem>
+                    <ToggleButton x:Name="CapsLockToggle" Content="Caps Lock: Off"
+                                  Checked="OnCapsLockChanged" Unchecked="OnCapsLockChanged" />
+                </StatusBarItem>
+                <StatusBarItem DockPanel.Dock="Right">
+                    <Button Content="Reset progress" Click="OnResetProgressClick" />
+                </StatusBarItem>
+            </StatusBar>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <TextBlock Text="Set progress: " VerticalAlignment="Center" Margin="0,0,6,0" />
+                <Slider x:Name="ProgressSlider" Width="200" Minimum="0" Maximum="100" Value="35"
+                        ValueChanged="OnProgressSliderChanged" />
+            </StackPanel>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 4: DATA-BOUND STATUSBAR (ItemsSource, ItemTemplate, ItemContainerStyle) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="4 · Data-bound StatusBar (ItemsSource / ItemTemplate / ItemContainerStyle)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="Like any ItemsControl, StatusBar supports ItemsSource + ItemTemplate. Every generated container is styled through ItemContainerStyle (here: a light separator border between notifications)." />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="Add notification" Click="OnAddNotificationClick" Margin="0,0,6,0" />
+                <Button Content="Clear notifications" Click="OnClearNotificationsClick" />
+            </StackPanel>
+            <StatusBar x:Name="NotificationsStatusBar"
+                       ItemTemplate="{StaticResource NotificationItemTemplate}"
+                       ItemContainerStyle="{StaticResource NotificationItemContainerStyle}"
+                       Margin="0,0,0,10" />
+
+            <!-- ============================================================ -->
+            <!-- SECTION 5: RUNTIME MUTATION (add / remove items directly) -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="5 · Runtime mutation (StatusBar.Items)" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="Add or remove StatusBarItems and Separators directly from the Items collection at runtime." />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="Add item" Click="OnAddItemClick" Margin="0,0,6,0" />
+                <Button Content="Add separator" Click="OnAddSeparatorClick" Margin="0,0,6,0" />
+                <Button Content="Remove last" Click="OnRemoveLastClick" Margin="0,0,6,0" />
+                <Button Content="Clear all" Click="OnClearItemsClick" />
+            </StackPanel>
+            <StatusBar x:Name="MutableStatusBar" Margin="0,0,0,10">
+                <StatusBarItem Content="Item 1" />
+            </StatusBar>
+
+            <!-- ============================================================ -->
+            <!-- SECTION 6: UsesItemContainerTemplate / ItemContainerTemplateSelector -->
+            <!-- ============================================================ -->
+            <TextBlock Style="{StaticResource SectionTitle}"
+                       Text="6 · UsesItemContainerTemplate / ItemContainerTemplateSelector" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="The data-bound collection below is made of plain objects (strings and SeparatorPlaceholder markers) — no StatusBarItem or Separator is created by the view model. UsesItemContainerTemplate='True' plus a custom ItemContainerTemplateSelector decides, per item, whether the generated container is a StatusBarItem or a real Separator, which is the only clean way to get inline separators out of an ItemsSource." />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="Add status entry" Click="OnAddMixedEntryClick" Margin="0,0,6,0" />
+                <Button Content="Add separator" Click="OnAddMixedSeparatorClick" Margin="0,0,6,0" />
+                <Button Content="Clear" Click="OnClearMixedEntriesClick" />
+            </StackPanel>
+            <StatusBar x:Name="MixedStatusBar" Margin="0,0,0,10" />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

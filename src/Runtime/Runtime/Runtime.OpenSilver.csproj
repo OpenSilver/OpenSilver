@@ -151,6 +151,8 @@
     <Compile Include="System.Windows.Automation.Peers\GroupBoxAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\IViewAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\ListViewAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\StatusBarAutomationPeer.cs" />
+    <Compile Include="System.Windows.Automation.Peers\StatusBarItemAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\ToolBarAutomationPeer.cs" />
     <Compile Include="System.Windows.Controls.Primitives\GridViewRowPresenterBase.cs" />
     <Compile Include="System.Windows.Controls.Primitives\MultiSelector.cs" />
@@ -178,6 +180,8 @@
     <Compile Include="System.Windows.Controls\ItemContainerTemplateSelector.cs" />
     <Compile Include="System.Windows.Controls\ListView.cs" />
     <Compile Include="System.Windows.Controls\ListViewItem.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\StatusBar.cs" />
+    <Compile Include="System.Windows.Controls.Primitives\StatusBarItem.cs" />
     <Compile Include="System.Windows.Controls\ToolBar.cs" />
     <Compile Include="System.Windows.Controls\ToolBarTray.cs" />
     <Compile Include="System.Windows.Controls\ViewBase.cs" />

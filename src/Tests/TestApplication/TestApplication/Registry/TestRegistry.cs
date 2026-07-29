@@ -172,6 +172,7 @@ namespace TestApplication
 
             Tests.Add(new Test("ListView", "ListView"));
             Tests.Add(new Test("ToolBar", "ToolBar"));
+            Tests.Add(new Test("StatusBar", "StatusBar"));
         }
     }
 }

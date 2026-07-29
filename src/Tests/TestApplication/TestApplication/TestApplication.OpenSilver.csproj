@@ -285,6 +285,9 @@
     <Compile Include="Tests\StackPanels\VerticalTest.xaml.cs">
       <DependentUpon>VerticalTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\StatusBarTest.xaml.cs">
+      <DependentUpon>StatusBarTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\StyleTest.xaml.cs">
       <DependentUpon>StyleTest.xaml</DependentUpon>
     </Compile>
@@ -700,6 +703,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\GroupBoxTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\StatusBarTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\TileBrush\ImageBrushTest.xaml">
