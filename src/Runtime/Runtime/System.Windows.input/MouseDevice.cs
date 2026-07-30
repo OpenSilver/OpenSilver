@@ -448,6 +448,7 @@ public abstract class MouseDevice : InputDevice
 
             case EVENTS.POINTER_OVER:
                 ProcessOnPointerOut();
+                UpdateCursorPrivate();
                 break;
 
             case EVENTS.POINTER_CAPTURE_LOST:
