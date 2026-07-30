@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Windows.Navigation;
 
 namespace TestApplication.Tests.GradientBrushes
 {
     public partial class LinearGradientBrushTest : Page
     {
+        private LinearGradientBrush _borderBrushEndPointBrush;
+        private LinearGradientBrush _gridBorderBrush;
+        private LinearGradientBrush _stackPanelBorderBrush;
+
         public LinearGradientBrushTest()
         {
             InitializeComponent();
@@ -51,7 +47,63 @@ namespace TestApplication.Tests.GradientBrushes
                         Offset = 1.0
                     }
                 }, 60);
+
+            Point start = new Point(0, 0.5);
+            Point end = new Point(1, 0.5);
+
+            _borderBrushEndPointBrush = CreateBlueToRedBrush(start, end);
+            BorderBrushEndPointTest.BorderBrush = _borderBrushEndPointBrush;
+
+            _gridBorderBrush = CreateBlueToRedBrush(start, end);
+            GridBorderBrushTest.BorderBrush = _gridBorderBrush;
+
+            _stackPanelBorderBrush = CreateBlueToRedBrush(start, end);
+            StackPanelBorderBrushTest.BorderBrush = _stackPanelBorderBrush;
         }
 
+        private void BorderBrushDirectionRight_Click(object sender, RoutedEventArgs e)
+        {
+            SetBorderBrushDirection(new Point(0, 0.5), new Point(1, 0.5));
+        }
+
+        private void BorderBrushDirectionDown_Click(object sender, RoutedEventArgs e)
+        {
+            SetBorderBrushDirection(new Point(0.5, 0), new Point(0.5, 1));
+        }
+
+        private void BorderBrushDirectionLeft_Click(object sender, RoutedEventArgs e)
+        {
+            SetBorderBrushDirection(new Point(1, 0.5), new Point(0, 0.5));
+        }
+
+        private void BorderBrushDirectionUp_Click(object sender, RoutedEventArgs e)
+        {
+            SetBorderBrushDirection(new Point(0.5, 1), new Point(0.5, 0));
+        }
+
+        private void SetBorderBrushDirection(Point startPoint, Point endPoint)
+        {
+            ApplyDirection(_borderBrushEndPointBrush, startPoint, endPoint);
+            ApplyDirection(_gridBorderBrush, startPoint, endPoint);
+            ApplyDirection(_stackPanelBorderBrush, startPoint, endPoint);
+        }
+
+        private static void ApplyDirection(LinearGradientBrush brush, Point startPoint, Point endPoint)
+        {
+            brush.StartPoint = startPoint;
+            brush.EndPoint = endPoint;
+        }
+
+        private static LinearGradientBrush CreateBlueToRedBrush(Point startPoint, Point endPoint)
+        {
+            return new LinearGradientBrush(
+                new GradientStopCollection
+                {
+                    new GradientStop(Colors.Blue, 0),
+                    new GradientStop(Colors.Red, 1),
+                },
+                startPoint,
+                endPoint);
+        }
     }
 }

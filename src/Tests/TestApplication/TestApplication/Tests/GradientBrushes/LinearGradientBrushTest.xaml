@@ -389,6 +389,198 @@
                         </Border>
                     </StackPanel>
                 </StackPanel>
+
+                <TextBlock Text="BorderBrush vs Stroke (direction should match)" Margin="0,15,0,5" FontWeight="Bold"/>
+                <TextBlock Text="Blue → Red. Stroke (top) and BorderBrush (bottom) in each column should share the same gradient direction."
+                           TextWrapping="Wrap" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Right"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Down"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Left"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="1,0.5" EndPoint="0,0.5">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="1,0.5" EndPoint="0,0.5">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Up"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="0.5,1" EndPoint="0.5,0">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="0.5,1" EndPoint="0.5,0">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="45°"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="135°"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="225°"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="1,1" EndPoint="0,0">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="1,1" EndPoint="0,0">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="315°"/>
+                        <Rectangle Width="60" Height="60" StrokeThickness="12" Fill="Transparent">
+                            <Rectangle.Stroke>
+                                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Stroke>
+                        </Rectangle>
+                        <Border Width="60" Height="60" BorderThickness="12" Background="Transparent" Margin="0,8,0,0">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                                    <GradientStop Color="Blue" Offset="0"/>
+                                    <GradientStop Color="Red" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <TextBlock Text="BorderBrush EndPoint change (live)" Margin="0,15,0,5" FontWeight="Bold"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border x:Name="BorderBrushEndPointTest"
+                            Width="80"
+                            Height="80"
+                            BorderThickness="14"
+                            Background="Transparent"
+                            Margin="5"/>
+                    <StackPanel Margin="10,5,0,0" VerticalAlignment="Center">
+                        <Button Content="Right (0.5 → 1,0.5)" Click="BorderBrushDirectionRight_Click" Margin="0,0,0,4" Width="160"/>
+                        <Button Content="Down (0.5,0 → 0.5,1)" Click="BorderBrushDirectionDown_Click" Margin="0,0,0,4" Width="160"/>
+                        <Button Content="Left (1,0.5 → 0,0.5)" Click="BorderBrushDirectionLeft_Click" Margin="0,0,0,4" Width="160"/>
+                        <Button Content="Up (0.5,1 → 0.5,0)" Click="BorderBrushDirectionUp_Click" Width="160"/>
+                    </StackPanel>
+                    <StackPanel Margin="20,5,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Grid BorderBrush"/>
+                        <Grid x:Name="GridBorderBrushTest"
+                              Width="80"
+                              Height="80"
+                              BorderThickness="14"
+                              Background="Transparent"
+                              Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Margin="20,5,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="StackPanel BorderBrush"/>
+                        <StackPanel x:Name="StackPanelBorderBrushTest"
+                                    Width="80"
+                                    Height="80"
+                                    BorderThickness="14"
+                                    Background="Transparent"
+                                    Margin="0,4,0,0"/>
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
         </Border>
     </StackPanel>
