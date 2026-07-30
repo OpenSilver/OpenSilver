@@ -171,7 +171,7 @@ namespace Microsoft.Expression.Interactivity.Core
             ["MaxWidth"] = FrameworkElement.MaxWidthProperty,
             ["MaxHeight"] = FrameworkElement.MaxHeightProperty,
             ["Margin"] = FrameworkElement.MarginProperty,
-            ["HorizontAlalignment"] = FrameworkElement.HorizontalAlignmentProperty,
+            ["HorizontalAlignment"] = FrameworkElement.HorizontalAlignmentProperty,
             ["VerticalAlignment"] = FrameworkElement.VerticalAlignmentProperty,
             ["Visibility"] = UIElement.VisibilityProperty,
             ["Orientation"] = StackPanel.OrientationProperty

@@ -26,4 +26,10 @@ using System.Windows.Markup;
 [assembly: XmlnsPrefix(@"http://schemas.microsoft.com/expression/2010/effects", "ee")]
 [assembly: XmlnsDefinition(@"http://schemas.microsoft.com/expression/2010/effects", "Microsoft.Expression.Media.Effects")]
 
+[assembly: XmlnsPrefix(@"http://schemas.microsoft.com/xaml/behaviors", "b")]
+[assembly: XmlnsDefinition(@"http://schemas.microsoft.com/xaml/behaviors", "Microsoft.Expression.Interactivity.Core")]
+[assembly: XmlnsDefinition(@"http://schemas.microsoft.com/xaml/behaviors", "Microsoft.Expression.Interactivity.Input")]
+[assembly: XmlnsDefinition(@"http://schemas.microsoft.com/xaml/behaviors", "Microsoft.Expression.Interactivity.Layout")]
+[assembly: XmlnsDefinition(@"http://schemas.microsoft.com/xaml/behaviors", "Microsoft.Expression.Interactivity.Media")]
+
 [assembly: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Microsoft.Expression.Interactivity")]
