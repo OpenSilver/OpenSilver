@@ -416,10 +416,14 @@ public class Window : ContentControl, IResizeObserverListener
     {
         if (WindowState == WindowState.Maximized)
         {
-            // Use whatever space the parent allocated (fills the WindowHost)
+            // Regular maximize fills the available space (the WindowHost).
             return availableSize;
         }
 
+        // Full-screen (and normal windows) respect the explicit size, or size to content.
+        // The Window then positions itself within the available area via its alignment
+        // (Stretch, the default, still fills). This lets a full-screened window honor its
+        // Width/Height/HorizontalAlignment/VerticalAlignment instead of filling the screen.
         double w = Width;
         double h = Height;
         if (!double.IsNaN(w) && !double.IsNaN(h))
@@ -1159,7 +1163,17 @@ public class Window : ContentControl, IResizeObserverListener
         // Determine display mode before positioning
         UpdateFullScreenMode();
 
-        if (!_isFullScreen)
+        if (WindowState == WindowState.Maximized)
+        {
+            // A window shown maximized ignores WindowStartupLocation and sits at the top-left.
+            // Apply the maximized layout now if a state transition didn't already do it
+            // (e.g. the window was created with WindowState = Maximized before Show).
+            if (!_maximizeLayoutApplied)
+            {
+                MaximizeSecondaryWindow(WindowState.Normal);
+            }
+        }
+        else if (!_isFullScreen)
         {
             ApplyStartupLocation();
         }
@@ -1365,14 +1379,16 @@ public class Window : ContentControl, IResizeObserverListener
             _restoreHeight = Height;
         }
 
-        Width = double.NaN;
-        Height = double.NaN;
+        if (ResizeMode != ResizeMode.NoResize)
+        {
+            Width = double.NaN;
+            Height = double.NaN;
+        }
 
-        // Fill the overlay: position at origin with full size
+        // Pin to the top-left. The size (viewport, capped by the Window's Max like WPF)
+        // is applied by WindowHost.SetLayoutSize below.
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Left, "0px");
         _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Top, "0px");
-        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Width, "100%");
-        _windowHost.OuterDiv.SetCssStyleProperty(CssPropertyNames.Height, "100%");
 
         _windowHost.VisualOffset = new Vector(0, 0);
 
@@ -1386,10 +1402,13 @@ public class Window : ContentControl, IResizeObserverListener
         // Hide resize borders when maximized
         _windowHost.SetResizeBordersVisible(false, false);
 
-        // Invalidate both the Window and WindowHost so the constraint is re-evaluated
+        // Deep-invalidate so the content re-measures with the maximized constraint even if
+        // the host's available size is unchanged (avoids a stale desired size).
         InvalidateMeasure();
-        _windowHost.InvalidateMeasure();
+        _windowHost.InvalidateContentMeasure();
         _windowHost.SetLayoutSize();
+
+        _maximizeLayoutApplied = true;
     }
 
     private void RestoreFromMaximized()
@@ -1423,10 +1442,14 @@ public class Window : ContentControl, IResizeObserverListener
 
         _windowHost.VisualOffset = new Vector(_restoreLeft, _restoreTop);
 
-        // Re-layout: Width/Height are restored so the layout uses those, or infinity if NaN
+        // Deep-invalidate so the content re-measures with the restored (content) constraint
+        // even though the host's available size may match the maximized one — otherwise the
+        // intermediate elements short-circuit and keep the stale, filled size.
         InvalidateMeasure();
-        _windowHost.InvalidateMeasure();
+        _windowHost.InvalidateContentMeasure();
         _windowHost.SetLayoutSize();
+
+        _maximizeLayoutApplied = false;
 
         EnsureWithinBoundaries();
     }
@@ -1444,8 +1467,11 @@ public class Window : ContentControl, IResizeObserverListener
 
     private double _restoreLeft;
     private double _restoreTop;
-    private double _restoreWidth;
-    private double _restoreHeight;
+    // NaN so that if a window is shown already-maximized (restore values never captured),
+    // restoring auto-sizes to content instead of collapsing to 0x0.
+    private double _restoreWidth = double.NaN;
+    private double _restoreHeight = double.NaN;
+    private bool _maximizeLayoutApplied;
     private WindowState _stateBeforeMinimize;
 
 
@@ -1781,7 +1807,6 @@ public class Window : ContentControl, IResizeObserverListener
     internal void UpdateFullScreenMode()
     {
         bool shouldBeFullScreen = IsMainWindow
-            && PropsAllowFullScreen()
             && Application.Current?.Windows.Count <= 1;
 
         if (shouldBeFullScreen && !_isFullScreen)
@@ -1818,10 +1843,6 @@ public class Window : ContentControl, IResizeObserverListener
         _windowHost?.ApplyWindowChromeMode();
     }
 
-    private bool PropsAllowFullScreen()
-    {
-        return ResizeMode >= ResizeMode.CanResize;
-    }
 
     #endregion
 }
