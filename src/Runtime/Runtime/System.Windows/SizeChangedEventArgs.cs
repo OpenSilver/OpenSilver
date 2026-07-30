@@ -71,5 +71,5 @@ public sealed class SizeChangedEventArgs : RoutedEventArgs
 
     /// <inheritdoc />
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget)
-        => ((SizeChangedEventHandler)genericHandler)(genericHandler, this);
+        => ((SizeChangedEventHandler)genericHandler)(genericTarget, this);
 }
