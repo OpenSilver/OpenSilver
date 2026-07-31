@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -152,7 +152,7 @@ namespace System.Windows.Media
                 nameof(EndPoint),
                 typeof(Point),
                 typeof(LinearGradientBrush),
-                new PropertyMetadata(new Point(1, 1)));
+                new PropertyMetadata(new Point(1, 1), OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the ending two-dimensional coordinates of the linear gradient.
@@ -175,7 +175,7 @@ namespace System.Windows.Media
                 nameof(StartPoint),
                 typeof(Point),
                 typeof(LinearGradientBrush),
-                new PropertyMetadata(new Point()));
+                new PropertyMetadata(new Point(), OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the starting two-dimensional coordinates of the linear gradient.

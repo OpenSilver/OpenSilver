@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -54,6 +54,7 @@ public class Border : Decorator, IBorderElement
     private WeakEventToken _weakBackgroundEventToken;
     private WeakEventToken _weakBorderBrushEventToken;
     private bool _refreshBackgroundOnSizeChange;
+    private bool _refreshBorderBrushOnSizeChange;
 
     // We only check the Background property even if BorderBrush not null
     // and BorderThickness > 0 is a sufficient condition to enable pointer
@@ -148,9 +149,20 @@ public class Border : Decorator, IBorderElement
     {
         base.OnRenderSizeChanged(info);
 
-        if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            return;
+        }
+
+        if (_refreshBackgroundOnSizeChange)
         {
             this.SetBackground(Background);
+        }
+
+        if (_refreshBorderBrushOnSizeChange)
+        {
+            Brush borderBrush = BorderBrush;
+            this.SetBorderColor(borderBrush, borderBrush);
         }
     }
 
@@ -182,6 +194,8 @@ public class Border : Decorator, IBorderElement
     private static void OnBorderBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var border = (Border)d;
+
+        border._refreshBorderBrushOnSizeChange = e.NewValue is LinearGradientBrush;
 
         border._weakBorderBrushEventToken?.Dispose();
         border._weakBorderBrushEventToken = null;

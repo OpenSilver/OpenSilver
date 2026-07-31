@@ -297,6 +297,14 @@ internal static class UIElementHelpers
                 uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderColor, solid.ToHtmlString());
                 break;
 
+            case (GradientBrush, LinearGradientBrush linear):
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSource, linear.ToHtmlString(uie));
+                break;
+
+            case (GradientBrush, RadialGradientBrush radial):
+                uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSource, radial.ToHtmlString(uie));
+                break;
+
             case (_, LinearGradientBrush linear):
                 uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderColor, string.Empty);
                 uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.BorderImageSource, linear.ToHtmlString(uie));

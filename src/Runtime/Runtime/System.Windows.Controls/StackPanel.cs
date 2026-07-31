@@ -41,6 +41,7 @@ namespace System.Windows.Controls
     public class StackPanel : Panel, IBorderElement
     {
         private WeakEventToken _weakEventToken;
+        private bool _refreshBorderBrushOnSizeChange;
 
         /// <summary>
         /// Gets a value that represents the <see cref="Controls.Orientation"/> of the <see cref="StackPanel"/>.
@@ -149,11 +150,10 @@ namespace System.Windows.Controls
         {
             var panel = (StackPanel)d;
 
-            if (panel._weakEventToken != null)
-            {
-                panel._weakEventToken.Dispose();
-                panel._weakEventToken= null;
-            }
+            panel._refreshBorderBrushOnSizeChange = e.NewValue is LinearGradientBrush;
+
+            panel._weakEventToken?.Dispose();
+            panel._weakEventToken = null;
 
             if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
@@ -221,6 +221,19 @@ namespace System.Windows.Controls
             set => SetValueInternal(CornerRadiusProperty, value);
         }
 
+        /// <inheritdoc />
+        protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
+        {
+            base.OnRenderSizeChanged(info);
+
+            if (_refreshBorderBrushOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                Brush borderBrush = BorderBrush;
+                this.SetBorderColor(borderBrush, borderBrush);
+            }
+        }
+
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size constraint)
         {
             Size stackDesiredSize = new();
@@ -298,6 +311,7 @@ namespace System.Windows.Controls
             return stackDesiredSize;
         }
 
+        /// <inheritdoc />
         protected override Size ArrangeOverride(Size arrangeSize)
         {
             List<UIElement> children = UnsafeGetChildren();

@@ -28,6 +28,7 @@ namespace System.Windows.Controls;
 public class Grid : Panel, IBorderElement
 {
     private WeakEventToken _weakEventToken;
+    private bool _refreshBorderBrushOnSizeChange;
 
     static Grid()
     {
@@ -398,11 +399,10 @@ public class Grid : Panel, IBorderElement
     {
         var panel = (Grid)d;
 
-        if (panel._weakEventToken != null)
-        {
-            panel._weakEventToken.Dispose();
-            panel._weakEventToken = null;
-        }
+        panel._refreshBorderBrushOnSizeChange = e.NewValue is LinearGradientBrush;
+
+        panel._weakEventToken?.Dispose();
+        panel._weakEventToken = null;
 
         if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
         {
@@ -568,6 +568,18 @@ public class Grid : Panel, IBorderElement
     protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
         return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parent, this);
+    }
+
+    /// <inheritdoc />
+    protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
+    {
+        base.OnRenderSizeChanged(info);
+
+        if (_refreshBorderBrushOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            Brush borderBrush = BorderBrush;
+            this.SetBorderColor(borderBrush, borderBrush);
+        }
     }
 
     /// <summary>
