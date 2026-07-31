@@ -12,9 +12,11 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using OpenSilver.Internal.Commands;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -63,10 +65,36 @@ namespace System.Windows.Controls
         static ScrollViewer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollViewer), new PropertyMetadata(typeof(ScrollViewer)));
+
             EventManager.RegisterClassHandler<ScrollViewer>(RequestBringIntoViewEvent, new RequestBringIntoViewEventHandler(OnRequestBringIntoView));
             EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnTouchStartThunk), true);
             EventManager.RegisterClassHandler<ScrollViewer>(PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler(OnTouchEndThunk), true);
             EventManager.RegisterClassHandler<ScrollViewer>(Mouse.MouseMoveEvent, new MouseEventHandler(OnTouchMoveThunk), true);
+
+            var executeScrollCommandEventHandler = new ExecutedRoutedEventHandler(OnScrollCommand);
+            var canExecuteScrollCommandEventHandler = new CanExecuteRoutedEventHandler(OnQueryScrollCommand);
+
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.LineLeftCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.LineRightCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.PageLeftCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.PageRightCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.LineUpCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.LineDownCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.PageUpCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.PageDownCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToLeftEndCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToRightEndCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToEndCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToHomeCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToTopCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToBottomCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToHorizontalOffsetCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.ScrollToVerticalOffsetCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.DeferScrollToHorizontalOffsetCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ScrollBar.DeferScrollToVerticalOffsetCommand, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ComponentCommands.ScrollPageUp, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollViewer), ComponentCommands.ScrollPageDown, executeScrollCommandEventHandler, canExecuteScrollCommandEventHandler);
         }
 
         /// <summary>
@@ -203,6 +231,54 @@ namespace System.Windows.Controls
         /// </summary>
         public static readonly DependencyProperty HorizontalOffsetProperty = HorizontalOffsetPropertyKey.DependencyProperty;
 
+        private static readonly DependencyPropertyKey ContentVerticalOffsetPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ContentVerticalOffset),
+                typeof(double),
+                typeof(ScrollViewer),
+                new FrameworkPropertyMetadata(0d));
+
+        /// <summary>
+        /// Identifies the <see cref="ContentVerticalOffset"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentVerticalOffsetProperty = ContentVerticalOffsetPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets the vertical offset of the visible content.
+        /// </summary>
+        /// <returns>
+        /// The vertical offset of the visible content.
+        /// </returns>
+        public double ContentVerticalOffset
+        {
+            get => (double)GetValue(ContentVerticalOffsetProperty);
+            private set => SetValueInternal(ContentVerticalOffsetPropertyKey, value);
+        }
+
+        private static readonly DependencyPropertyKey ContentHorizontalOffsetPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ContentHorizontalOffset),
+                typeof(double),
+                typeof(ScrollViewer),
+                new FrameworkPropertyMetadata(0d));
+
+        /// <summary>
+        /// Identifies the <see cref="ContentHorizontalOffset"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContentHorizontalOffsetProperty = ContentHorizontalOffsetPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets the horizontal offset of the visible content.
+        /// </summary>
+        /// <returns>
+        /// The horizontal offset of the visible content.
+        /// </returns>
+        public double ContentHorizontalOffset
+        {
+            get => (double)GetValue(ContentHorizontalOffsetProperty);
+            private set => SetValueInternal(ContentHorizontalOffsetPropertyKey, value);
+        }
+
         /// <summary>
         /// Gets or sets a value that indicates whether a horizontal <see cref="ScrollBar"/> 
         /// should be displayed.
@@ -322,6 +398,24 @@ namespace System.Windows.Controls
             EnqueueCommand(Commands.SetVerticalOffset, validatedOffset, null);
         }
 
+        private void DeferScrollToHorizontalOffset(double offset)
+        {
+            double validatedOffset = ScrollContentPresenter.ValidateInputOffset(offset, nameof(offset));
+
+            // Update the offset property but not the deferred (content offset)
+            // property, which will be updated when the drag operation is complete.
+            HorizontalOffset = validatedOffset;
+        }
+
+        private void DeferScrollToVerticalOffset(double offset)
+        {
+            double validatedOffset = ScrollContentPresenter.ValidateInputOffset(offset, nameof(offset));
+
+            // Update the offset property but not the deferred (content offset)
+            // property, which will be updated when the drag operation is complete.
+            VerticalOffset = validatedOffset;
+        }
+
         /// <summary>
         /// Gets the value of the <see cref="HorizontalScrollBarVisibility"/> dependency property 
         /// from a specified element.
@@ -429,6 +523,30 @@ namespace System.Windows.Controls
         /// </param>
         protected virtual void OnScrollChanged(ScrollChangedEventArgs e) => RaiseEvent(e);
 
+        internal override void OnPreApplyTemplate()
+        {
+            base.OnPreApplyTemplate();
+
+            if (TemplatedParent is not null)
+            {
+                BindToTemplatedParent(IsDeferredScrollingEnabledProperty);
+            }
+        }
+
+        private void BindToTemplatedParent(DependencyProperty property)
+        {
+            if (HasDefaultValue(property))
+            {
+                var binding = new Binding
+                {
+                    RelativeSource = RelativeSource.TemplatedParent,
+                    Path = new PropertyPath(property)
+                };
+                SetBinding(property, binding);
+            }
+        }
+
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -437,75 +555,8 @@ namespace System.Windows.Controls
             ElementHorizontalScrollBar = GetTemplateChild(ElementHorizontalScrollBarName) as ScrollBar;
             ElementVerticalScrollBar = GetTemplateChild(ElementVerticalScrollBarName) as ScrollBar;
 
-            if (ElementHorizontalScrollBar is not null)
-            {
-                ElementHorizontalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Horizontal, e); };
-            }
-            if (ElementVerticalScrollBar is not null)
-            {
-                ElementVerticalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Vertical, e); };
-            }
-        }
-
-        /// <summary> 
-        /// Handles the ScrollBar.Scroll event and updates the UI.
-        /// </summary>
-        /// <param name="orientation">Orientation of the ScrollBar.</param> 
-        /// <param name="e">A ScrollEventArgs that contains the event data.</param> 
-        private void HandleScroll(Orientation orientation, ScrollEventArgs e)
-        {
-            if (ScrollInfo is not null)
-            {
-                bool horizontal = orientation == Orientation.Horizontal;
-
-                // Calculate new offset 
-                switch (e.ScrollEventType)
-                {
-                    case ScrollEventType.ThumbPosition:
-                    case ScrollEventType.ThumbTrack:
-                        if (horizontal)
-                            ScrollToHorizontalOffset(e.NewValue);
-                        else
-                            ScrollToVerticalOffset(e.NewValue);
-                        break;
-                    case ScrollEventType.LargeDecrement:
-                        if (horizontal)
-                            PageLeft();
-                        else
-                            PageUp();
-                        break;
-                    case ScrollEventType.LargeIncrement:
-                        if (horizontal)
-                            PageRight();
-                        else
-                            PageDown();
-                        break;
-                    case ScrollEventType.SmallDecrement:
-                        if (horizontal)
-                            LineLeft();
-                        else
-                            LineUp();
-                        break;
-                    case ScrollEventType.SmallIncrement:
-                        if (horizontal)
-                            LineRight();
-                        else
-                            LineDown();
-                        break;
-                    case ScrollEventType.First:
-                        if (horizontal)
-                            ScrollToLeftEnd();
-                        else
-                            ScrollToTop();
-                        break;
-                    case ScrollEventType.Last:
-                        if (horizontal)
-                            ScrollToRightEnd();
-                        else
-                            ScrollToBottom();
-                        break;
-                }
-            }
+            ElementHorizontalScrollBar?.IsStandalone = false;
+            ElementVerticalScrollBar?.IsStandalone = false;
         }
 
         private static readonly DependencyPropertyKey ScrollableHeightPropertyKey =
@@ -675,6 +726,62 @@ namespace System.Windows.Controls
         public double ExtentWidth => _xExtent;
 
         /// <summary>
+        /// Identifies the <see cref="IsDeferredScrollingEnabled"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsDeferredScrollingEnabledProperty =
+            DependencyProperty.RegisterAttached(
+                nameof(IsDeferredScrollingEnabled),
+                typeof(bool),
+                typeof(ScrollViewer),
+                new FrameworkPropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Returns the value of the <see cref="IsDeferredScrollingEnabled"/> property for the specified object.
+        /// </summary>
+        /// <param name="element">
+        /// The object from which to get <see cref="IsDeferredScrollingEnabled"/>.
+        /// </param>
+        /// <returns>
+        /// true if the content is stationary when the user drags the <see cref="Thumb"/> of a <see cref="ScrollBar"/>;
+        /// otherwise, false.
+        /// </returns>
+        public static bool GetIsDeferredScrollingEnabled(DependencyObject element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            return (bool)element.GetValue(IsDeferredScrollingEnabledProperty);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IsDeferredScrollingEnabled"/> property for the specified object.
+        /// </summary>
+        /// <param name="element">
+        /// The object on which to set the <see cref="IsDeferredScrollingEnabled"/> property.
+        /// </param>
+        /// <param name="value">
+        /// true to have the content remain stationary when the user drags the <see cref="Thumb"/> of a 
+        /// <see cref="ScrollBar"/>; otherwise, false.
+        /// </param>
+        public static void SetIsDeferredScrollingEnabled(DependencyObject element, bool value)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            element.SetValueInternal(IsDeferredScrollingEnabledProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the content is stationary when the user drags the 
+        /// <see cref="Thumb"/> of a <see cref="ScrollBar"/>.
+        /// </summary>
+        /// <returns>
+        /// true if the content is stationary when the user drags the <see cref="Thumb"/> of a <see cref="ScrollBar"/>;
+        /// otherwise, false.
+        /// </returns>
+        public bool IsDeferredScrollingEnabled
+        {
+            get => (bool)GetValue(IsDeferredScrollingEnabledProperty);
+            set => SetValueInternal(IsDeferredScrollingEnabledProperty, value);
+        }
+
+        /// <summary>
         /// Called when the value of properties that describe the size and location of the scroll area change.
         /// </summary>
         public void InvalidateScrollInfo()
@@ -818,6 +925,134 @@ namespace System.Windows.Controls
         private static void OnTouchMoveThunk(object sender, MouseEventArgs e) => ((ScrollViewer)sender).OnTouchMove(e);
 
         private void OnTouchMove(MouseEventArgs e) => _panHelper.HandleMouseMove(e);
+
+        private static void OnScrollCommand(object target, ExecutedRoutedEventArgs args)
+        {
+            if (args.Command == ScrollBar.DeferScrollToHorizontalOffsetCommand)
+            {
+                if (args.Parameter is double hOffset)
+                {
+                    ((ScrollViewer)target).DeferScrollToHorizontalOffset(hOffset);
+                }
+            }
+            else if (args.Command == ScrollBar.DeferScrollToVerticalOffsetCommand)
+            {
+                if (args.Parameter is double vOffset)
+                {
+                    ((ScrollViewer)target).DeferScrollToVerticalOffset(vOffset);
+                }
+            }
+            else if (args.Command == ScrollBar.LineLeftCommand)
+            {
+                ((ScrollViewer)target).LineLeft();
+            }
+            else if (args.Command == ScrollBar.LineRightCommand)
+            {
+                ((ScrollViewer)target).LineRight();
+            }
+            else if (args.Command == ScrollBar.PageLeftCommand)
+            {
+                ((ScrollViewer)target).PageLeft();
+            }
+            else if (args.Command == ScrollBar.PageRightCommand)
+            {
+                ((ScrollViewer)target).PageRight();
+            }
+            else if (args.Command == ScrollBar.LineUpCommand)
+            {
+                ((ScrollViewer)target).LineUp();
+            }
+            else if (args.Command == ScrollBar.LineDownCommand)
+            {
+                ((ScrollViewer)target).LineDown();
+            }
+            else if (args.Command == ScrollBar.PageUpCommand || args.Command == ComponentCommands.ScrollPageUp)
+            {
+                ((ScrollViewer)target).PageUp();
+            }
+            else if (args.Command == ScrollBar.PageDownCommand || args.Command == ComponentCommands.ScrollPageDown)
+            {
+                ((ScrollViewer)target).PageDown();
+            }
+            else if (args.Command == ScrollBar.ScrollToEndCommand)
+            {
+                ((ScrollViewer)target).ScrollToEnd();
+            }
+            else if (args.Command == ScrollBar.ScrollToHomeCommand)
+            {
+                ((ScrollViewer)target).ScrollToHome();
+            }
+            else if (args.Command == ScrollBar.ScrollToLeftEndCommand)
+            {
+                ((ScrollViewer)target).ScrollToLeftEnd();
+            }
+            else if (args.Command == ScrollBar.ScrollToRightEndCommand)
+            {
+                ((ScrollViewer)target).ScrollToRightEnd();
+            }
+            else if (args.Command == ScrollBar.ScrollToTopCommand)
+            {
+                ((ScrollViewer)target).ScrollToTop();
+            }
+            else if (args.Command == ScrollBar.ScrollToBottomCommand)
+            {
+                ((ScrollViewer)target).ScrollToBottom();
+            }
+            else if (args.Command == ScrollBar.ScrollToHorizontalOffsetCommand)
+            {
+                if (args.Parameter is double hOffset)
+                {
+                    ((ScrollViewer)target).ScrollToHorizontalOffset(hOffset);
+                }
+            }
+            else if (args.Command == ScrollBar.ScrollToVerticalOffsetCommand)
+            {
+                if (args.Parameter is double vOffset)
+                {
+                    ((ScrollViewer)target).ScrollToVerticalOffset(vOffset);
+                }
+            }
+        }
+
+        private static void OnQueryScrollCommand(object target, CanExecuteRoutedEventArgs args)
+        {
+            args.CanExecute = true;
+
+            //  ScrollViewer is capable of execution of the majority of commands.
+            //  The only special case is the component commands below.
+            //  When scroll viewer is a primitive / part of another control
+            //  capable to handle scrolling - scroll viewer leaves it up
+            //  to the control to deal with component commands...
+            if (args.Command == ComponentCommands.ScrollPageUp || args.Command == ComponentCommands.ScrollPageDown)
+            {
+                Control templatedParentControl = target is ScrollViewer scrollViewer ? scrollViewer.TemplatedParent as Control : null;
+
+                if (templatedParentControl is not null && templatedParentControl.HandlesScrolling)
+                {
+                    args.CanExecute = false;
+                    args.ContinueRouting = true;
+
+                    // It is important to handle this event to prevent any
+                    // other ScrollViewers in the ancestry from claiming it.
+                    args.Handled = true;
+                }
+            }
+            else if (args.Command == ScrollBar.DeferScrollToHorizontalOffsetCommand || args.Command == ScrollBar.DeferScrollToVerticalOffsetCommand)
+            {
+                // The scroll bar has indicated that a drag operation is in progress.
+                // If deferred scrolling is disabled, then mark the command as
+                // not executable so that the scroll bar will fire the regular scroll
+                // command, and the scroll viewer will do live scrolling.
+                if (target is ScrollViewer scrollViewer && !scrollViewer.IsDeferredScrollingEnabled)
+                {
+                    args.CanExecute = false;
+
+                    // It is important to handle this event to prevent any
+                    // other ScrollViewers in the ancestry from claiming it.
+                    args.Handled = true;
+                }
+            }
+        }
 
         private bool TemplatedParentHandlesScrolling => TemplatedParent is Control c && c.HandlesScrolling;
 
@@ -1379,6 +1614,7 @@ namespace System.Windows.Controls
                 {
                     _xPositionISI = isi.HorizontalOffset;
                     HorizontalOffset = _xPositionISI;
+                    ContentHorizontalOffset = _xPositionISI;
                     changed = true;
                 }
 
@@ -1386,6 +1622,7 @@ namespace System.Windows.Controls
                 {
                     _yPositionISI = isi.VerticalOffset;
                     VerticalOffset = _yPositionISI;
+                    ContentVerticalOffset = _yPositionISI;
                     changed = true;
                 }
 
@@ -1434,16 +1671,6 @@ namespace System.Windows.Controls
 
                 if (changed)
                 {
-                    if (ElementHorizontalScrollBar != null && !DoubleUtil.AreClose(oldActualHorizontalOffset, HorizontalOffset))
-                    {
-                        ElementHorizontalScrollBar.Value = HorizontalOffset;
-                    }
-
-                    if (ElementVerticalScrollBar != null && !DoubleUtil.AreClose(oldActualVerticalOffset, VerticalOffset))
-                    {
-                        ElementVerticalScrollBar.Value = VerticalOffset;
-                    }
-
                     // Fire ScrollChange event
                     var args = new ScrollChangedEventArgs(
                         new Vector(HorizontalOffset, VerticalOffset),

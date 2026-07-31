@@ -3,11 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Diagnostics;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Commands;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -32,90 +33,155 @@ namespace System.Windows.Controls.Primitives
     [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
     public sealed class ScrollBar : RangeBase
     {
-        private DebounceDispatcher _debounceDispatcher;
-
-        internal static TimeSpan DefaultDebounceInterval { get; set; } = TimeSpan.Zero;
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static readonly DependencyProperty DebounceProperty =
-            DependencyProperty.RegisterAttached(
-                nameof(Debounce),
-                typeof(TimeSpan?),
-                typeof(ScrollBar),
-                new PropertyMetadata((TimeSpan?)null));
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public TimeSpan Debounce
-        {
-            get => (TimeSpan?)GetValue(DebounceProperty) ?? DefaultDebounceInterval;
-            set => SetValueInternal(DebounceProperty, value);
-        }
-
-        private TimeSpan DebounceInterval
-        {
-            get
-            {
-                // We attempt to get a debounce interval in 3 steps
-                // 1 - From the ScrollBar.
-                // 2 - From the ScrollBar's Templated parent (usually a ScrollViewer)
-                // 3 - Attempt to get interval from the ScrollViewer's templated parent
-                TimeSpan? debounce = (TimeSpan?)GetValue(DebounceProperty);
-                if (debounce.HasValue)
-                {
-                    return debounce.Value;
-                }
-
-                if (TemplatedParent is FrameworkElement parent1)
-                {
-                    debounce = (TimeSpan?)parent1.GetValue(DebounceProperty);
-                    if (debounce.HasValue)
-                    {
-                        return debounce.Value;
-                    }
-
-                    if (parent1.TemplatedParent is FrameworkElement parent2)
-                    {
-                        debounce = (TimeSpan?)parent2.GetValue(DebounceProperty);
-                        if (debounce.HasValue)
-                        {
-                            return debounce.Value;
-                        }
-                    }
-                }
-
-                return DefaultDebounceInterval;
-            }
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static TimeSpan GetDebounce(FrameworkElement fe)
-        {
-            ArgumentNullException.ThrowIfNull(fe);
-
-            return (TimeSpan?)fe.GetValue(DebounceProperty) ?? DefaultDebounceInterval;
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public static void SetDebounce(FrameworkElement fe, TimeSpan debounce)
-        {
-            ArgumentNullException.ThrowIfNull(fe);
-
-            fe.SetValueInternal(DebounceProperty, (TimeSpan?)debounce);
-        }
-
         static ScrollBar()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollBar), new PropertyMetadata(typeof(ScrollBar)));
             IsEnabledProperty.OverrideMetadata(typeof(ScrollBar), new PropertyMetadata(OnIsEnabledChanged));
+
+            // Register Event Handler for the Thumb
+            EventManager.RegisterClassHandler<ScrollBar>(Thumb.DragStartedEvent, new DragStartedEventHandler(OnThumbDragStarted));
+            EventManager.RegisterClassHandler<ScrollBar>(Thumb.DragDeltaEvent, new DragDeltaEventHandler(OnThumbDragDelta));
+            EventManager.RegisterClassHandler<ScrollBar>(Thumb.DragCompletedEvent, new DragCompletedEventHandler(OnThumbDragCompleted));
+
+            EventManager.RegisterClassHandler<ScrollBar>(SizeChangedEvent, new SizeChangedEventHandler(OnSizeChanged));
+
+            var onScrollCommand = new ExecutedRoutedEventHandler(OnScrollCommand);
+            var onQueryScrollCommand = new CanExecuteRoutedEventHandler(OnQueryScrollCommand);
+
+            // Vertical Commands
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), LineUpCommand, onScrollCommand, onQueryScrollCommand,  new KeyGesture(Key.Up));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), LineDownCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.Down));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), PageUpCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.PageUp));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), PageDownCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.PageDown));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), ScrollToTopCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.Home, ModifierKeys.Control));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), ScrollToBottomCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.End, ModifierKeys.Control));
+
+            // Horizontal Commands
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), LineLeftCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.Left));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), LineRightCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.Right));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), PageLeftCommand, onScrollCommand, onQueryScrollCommand);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), PageRightCommand, onScrollCommand, onQueryScrollCommand);
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), ScrollToLeftEndCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.Home));
+            CommandHelpers.RegisterCommandHandler(typeof(ScrollBar), ScrollToRightEndCommand, onScrollCommand, onQueryScrollCommand, new KeyGesture(Key.End));
         }
 
         /// <summary> 
         /// Initializes a new instance of the <see cref="ScrollBar"/> class.
         /// </summary> 
-        public ScrollBar()
-        {
-            SizeChanged += delegate { UpdateTrackLayout(GetTrackLength()); };
-        }
+        public ScrollBar() { }
+
+        // Is the scrollbar outside of a scrollviewer?
+        internal bool IsStandalone { get; set; } = true;
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a small amount in the vertical direction,
+        /// decreasing its value.
+        /// </summary>
+        public static readonly RoutedCommand LineUpCommand = new RoutedCommand("LineUp", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a small amount in the vertical direction,
+        /// increasing its value.
+        /// </summary>
+        public static readonly RoutedCommand LineDownCommand = new RoutedCommand("LineDown", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a small amount in the horizontal direction,
+        /// decreasing its value.
+        /// </summary>
+        public static readonly RoutedCommand LineLeftCommand = new RoutedCommand("LineLeft", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a small amount in the horizontal direction,
+        /// increasing its value.
+        /// </summary>
+        public static readonly RoutedCommand LineRightCommand = new RoutedCommand("LineRight", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a large amount in the vertical direction,
+        /// decreasing its value.
+        /// </summary>
+        public static readonly RoutedCommand PageUpCommand = new RoutedCommand("PageUp", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a large amount in the vertical direction,
+        /// increasing its value.
+        /// </summary>
+        public static readonly RoutedCommand PageDownCommand = new RoutedCommand("PageDown", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a large amount in the horizontal direction,
+        /// decreasing its value.
+        /// </summary>
+        public static readonly RoutedCommand PageLeftCommand = new RoutedCommand("PageLeft", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> by a large amount in the horizontal direction,
+        /// increasing its value.
+        /// </summary>
+        public static readonly RoutedCommand PageRightCommand = new RoutedCommand("PageRight", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls the content to the lower-right corner of a <see cref="ScrollViewer"/> 
+        /// control.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToEndCommand = new RoutedCommand("ScrollToEnd", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls the content to the upper-left corner of a <see cref="ScrollViewer"/> 
+        /// control.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToHomeCommand = new RoutedCommand("ScrollToHome", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> to the <see cref="RangeBase.Maximum"/> value 
+        /// for a horizontal <see cref="ScrollBar"/>.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToRightEndCommand = new RoutedCommand("ScrollToRightEnd", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> to the <see cref="RangeBase.Minimum"/> value 
+        /// for a horizontal <see cref="ScrollBar"/>.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToLeftEndCommand = new RoutedCommand("ScrollToLeftEnd", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> to the <see cref="RangeBase.Maximum"/> value 
+        /// for a vertical <see cref="ScrollBar"/>.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToTopCommand = new RoutedCommand("ScrollToTop", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a <see cref="ScrollBar"/> to the <see cref="RangeBase.Maximum"/> value
+        /// for a horizontal <see cref="ScrollBar"/>.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToBottomCommand = new RoutedCommand("ScrollToBottom", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a horizontal <see cref="ScrollBar"/> in a <see cref="ScrollViewer"/> 
+        /// to the value that is provided in <see cref="ExecutedRoutedEventArgs.Parameter"/>.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToHorizontalOffsetCommand = new RoutedCommand("ScrollToHorizontalOffset", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that scrolls a vertical <see cref="ScrollBar"/> in a <see cref="ScrollViewer"/> 
+        /// to the value that is provided in <see cref="ExecutedRoutedEventArgs.Parameter"/>.
+        /// </summary>
+        public static readonly RoutedCommand ScrollToVerticalOffsetCommand = new RoutedCommand("ScrollToVerticalOffset", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that notifies the <see cref="ScrollViewer"/> that the user is dragging the 
+        /// <see cref="Thumb"/> of the horizontal <see cref="ScrollBar"/> to the value that is provided 
+        /// in <see cref="ExecutedRoutedEventArgs.Parameter"/>.
+        /// </summary>
+        public static readonly RoutedCommand DeferScrollToHorizontalOffsetCommand = new RoutedCommand("DeferScrollToToHorizontalOffset", typeof(ScrollBar));
+
+        /// <summary>
+        /// The command that notifies the <see cref="ScrollViewer"/> that the user is dragging the 
+        /// <see cref="Thumb"/> of the vertical <see cref="ScrollBar"/> to the value that is provided 
+        /// in <see cref="ExecutedRoutedEventArgs.Parameter"/>.
+        /// </summary>
+        public static readonly RoutedCommand DeferScrollToVerticalOffsetCommand = new RoutedCommand("DeferScrollToVerticalOffset", typeof(ScrollBar));
 
         /// <summary> 
         /// Builds the visual tree for the <see cref="ScrollBar"/> control
@@ -139,58 +205,99 @@ namespace System.Windows.Controls.Primitives
             ElementVerticalSmallDecrease = GetTemplateChild(ElementVerticalSmallDecreaseName) as RepeatButton;
             ElementVerticalThumb = GetTemplateChild(ElementVerticalThumbName) as Thumb;
 
-            if (ElementHorizontalThumb != null)
-            {
-                ElementHorizontalThumb.DragStarted += delegate (object sender, DragStartedEventArgs e) { OnThumbDragStarted(); };
-                ElementHorizontalThumb.DragDelta += delegate (object sender, DragDeltaEventArgs e) { OnThumbDragDelta(e); };
-                ElementHorizontalThumb.DragCompleted += delegate (object sender, DragCompletedEventArgs e) { OnThumbDragCompleted(); };
-            }
-            if (ElementHorizontalLargeDecrease != null)
-            {
-                ElementHorizontalLargeDecrease.Click += delegate (object sender, RoutedEventArgs e) { LargeDecrement(); };
-            }
-            if (ElementHorizontalLargeIncrease != null)
-            {
-                ElementHorizontalLargeIncrease.Click += delegate (object sender, RoutedEventArgs e) { LargeIncrement(); };
-            }
-            if (ElementHorizontalSmallDecrease != null)
-            {
-                ElementHorizontalSmallDecrease.Click += delegate (object sender, RoutedEventArgs e) { SmallDecrement(); };
-            }
-            if (ElementHorizontalSmallIncrease != null)
-            {
-                ElementHorizontalSmallIncrease.Click += delegate (object sender, RoutedEventArgs e) { SmallIncrement(); };
-            }
-            if (ElementVerticalThumb != null)
-            {
-                ElementVerticalThumb.DragStarted += delegate (object sender, DragStartedEventArgs e) { OnThumbDragStarted(); };
-                ElementVerticalThumb.DragDelta += delegate (object sender, DragDeltaEventArgs e) { OnThumbDragDelta(e); };
-                ElementVerticalThumb.DragCompleted += delegate (object sender, DragCompletedEventArgs e) { OnThumbDragCompleted(); };
-            }
-            if (ElementVerticalLargeDecrease != null)
-            {
-                ElementVerticalLargeDecrease.Click += delegate (object sender, RoutedEventArgs e) { LargeDecrement(); };
-            }
-            if (ElementVerticalLargeIncrease != null)
-            {
-                ElementVerticalLargeIncrease.Click += delegate (object sender, RoutedEventArgs e) { LargeIncrement(); };
-            }
-            if (ElementVerticalSmallDecrease != null)
-            {
-                ElementVerticalSmallDecrease.Click += delegate (object sender, RoutedEventArgs e) { SmallDecrement(); };
-            }
-            if (ElementVerticalSmallIncrease != null)
-            {
-                ElementVerticalSmallIncrease.Click += delegate (object sender, RoutedEventArgs e) { SmallIncrement(); };
-            }
+            ElementHorizontalLargeDecrease?.Command = PageLeftCommand;
+            ElementHorizontalLargeIncrease?.Command = PageRightCommand;
+            ElementHorizontalSmallDecrease?.Command = LineLeftCommand;
+            ElementHorizontalSmallIncrease?.Command = LineRightCommand;
+
+            ElementVerticalLargeDecrease?.Command = PageUpCommand;
+            ElementVerticalLargeIncrease?.Command = PageDownCommand;
+            ElementVerticalSmallDecrease?.Command = LineUpCommand;
+            ElementVerticalSmallIncrease?.Command = LineDownCommand;
+
             // Updating states for parts where properties might have been updated through 
             // XAML before the template was loaded.
             OnOrientationChanged();
             UpdateVisualState(false);
         }
 
+        /// <inheritdoc />
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ScrollBarAutomationPeer(this);
+
+        private static void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var scrollBar = (ScrollBar)sender;
+            scrollBar.UpdateTrackLayout(scrollBar.GetTrackLength());
+        }
+
+        private static void OnScrollCommand(object target, ExecutedRoutedEventArgs args)
+        {
+            ScrollBar scrollBar = (ScrollBar)target;
+
+            if (scrollBar.IsStandalone)
+            {
+                if (scrollBar.Orientation == Orientation.Vertical)
+                {
+                    if (args.Command == LineUpCommand)
+                    {
+                        scrollBar.LineUp();
+                    }
+                    else if (args.Command == LineDownCommand)
+                    {
+                        scrollBar.LineDown();
+                    }
+                    else if (args.Command == PageUpCommand)
+                    {
+                        scrollBar.PageUp();
+                    }
+                    else if (args.Command == PageDownCommand)
+                    {
+                        scrollBar.PageDown();
+                    }
+                    else if (args.Command == ScrollToTopCommand)
+                    {
+                        scrollBar.ScrollToTop();
+                    }
+                    else if (args.Command == ScrollToBottomCommand)
+                    {
+                        scrollBar.ScrollToBottom();
+                    }
+                }
+                else
+                {
+                    if (args.Command == LineLeftCommand)
+                    {
+                        scrollBar.LineLeft();
+                    }
+                    else if (args.Command == LineRightCommand)
+                    {
+                        scrollBar.LineRight();
+                    }
+                    else if (args.Command == PageLeftCommand)
+                    {
+                        scrollBar.PageLeft();
+                    }
+                    else if (args.Command == PageRightCommand)
+                    {
+                        scrollBar.PageRight();
+                    }
+                    else if (args.Command == ScrollToLeftEndCommand)
+                    {
+                        scrollBar.ScrollToLeftEnd();
+                    }
+                    else if (args.Command == ScrollToRightEndCommand)
+                    {
+                        scrollBar.ScrollToRightEnd();
+                    }
+                }
+            }
+        }
+
+        private static void OnQueryScrollCommand(object target, CanExecuteRoutedEventArgs args)
+        {
+            args.CanExecute = ((ScrollBar)target).IsStandalone;
+        }
 
         private void SmallDecrement()
         {
@@ -201,6 +308,7 @@ namespace System.Windows.Controls.Primitives
                 RaiseScrollEvent(ScrollEventType.SmallDecrement);
             }
         }
+
         private void SmallIncrement()
         {
             double newValue = Math.Min(Value + SmallChange, Maximum);
@@ -210,6 +318,7 @@ namespace System.Windows.Controls.Primitives
                 RaiseScrollEvent(ScrollEventType.SmallIncrement);
             }
         }
+
         private void LargeDecrement()
         {
             double newValue = Math.Max(Value - LargeChange, Minimum);
@@ -219,6 +328,7 @@ namespace System.Windows.Controls.Primitives
                 RaiseScrollEvent(ScrollEventType.LargeDecrement);
             }
         }
+
         private void LargeIncrement()
         {
             double newValue = Math.Min(Value + LargeChange, Maximum);
@@ -229,52 +339,193 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        /// <summary>
-        /// Called whenever the Thumb drag operation is complete
-        /// </summary> 
-        private void OnThumbDragCompleted()
+        private void ToMinimum()
         {
-            RaiseScrollEvent(ScrollEventType.EndScroll);
+            if (Value != Minimum)
+            {
+                Value = Minimum;
+                RaiseScrollEvent(ScrollEventType.First);
+            }
         }
 
-        /// <summary> 
-        /// Called whenever the Thumb drag operation is started
-        /// </summary>
+        private void ToMaximum()
+        {
+            if (Value != Maximum)
+            {
+                Value = Maximum;
+                RaiseScrollEvent(ScrollEventType.Last);
+            }
+        }
+
+        private void LineUp() => SmallDecrement();
+
+        private void LineDown() => SmallIncrement();
+
+        private void PageUp() => LargeDecrement();
+
+        private void PageDown() => LargeIncrement();
+
+        private void ScrollToTop() => ToMinimum();
+
+        private void ScrollToBottom() => ToMaximum();
+
+        private void LineLeft() => SmallDecrement();
+
+        private void LineRight() => SmallIncrement();
+
+        private void PageLeft() => LargeDecrement();
+
+        private void PageRight() => LargeIncrement();
+
+        private void ScrollToLeftEnd() => ToMinimum();
+
+        private void ScrollToRightEnd() => ToMaximum();
+
+        private static void OnThumbDragStarted(object sender, DragStartedEventArgs e) => ((ScrollBar)sender).OnThumbDragStarted();
+
         private void OnThumbDragStarted()
         {
-            this._dragValue = this.Value;
+            _hasScrolled = false;
+            _previousValue = Value;
+            _dragDelta = new Vector();
         }
 
-        /// <summary>
-        /// Whenever the thumb gets dragged, we handle the event through 
-        /// this function to update the current value depending upon the
-        /// thumb drag delta.
-        /// </summary> 
-        /// <param name="e">DragEventArgs</param> 
-        private void OnThumbDragDelta(DragDeltaEventArgs e)
+        private static void OnThumbDragCompleted(object sender, DragCompletedEventArgs e) => ((ScrollBar)sender).OnThumbDragCompleted();
+
+        private void OnThumbDragCompleted()
+        {
+            if (_hasScrolled)
+            {
+                FinishDrag();
+                RaiseScrollEvent(ScrollEventType.EndScroll);
+            }
+        }
+
+        private void FinishDrag()
+        {
+            double value = Value;
+            IInputElement target = CommandTarget;
+            RoutedCommand command = Orientation == Orientation.Horizontal ? DeferScrollToHorizontalOffsetCommand : DeferScrollToVerticalOffsetCommand;
+
+            if (command.CanExecute(value, target))
+            {
+                // If we were reporting drag commands, we need to give a final scroll command
+                ChangeValue(value, false /* defer */);
+            }
+        }
+
+        // Event handler to listen to thumb events.
+        private static void OnThumbDragDelta(object sender, DragDeltaEventArgs e) => ((ScrollBar)sender).UpdateValue(e.HorizontalChange, e.VerticalChange);
+
+        private void UpdateValue(double horizontalDragDelta, double verticalDragDelta)
         {
             double offset = 0;
+            bool horizontal = Orientation == Orientation.Horizontal;
 
-            if (Orientation == Orientation.Horizontal && ElementHorizontalThumb != null)
+            double perpendicularDragDelta;
+
+            if (horizontal)
             {
-                offset = e.HorizontalChange / (GetTrackLength() - ElementHorizontalThumb.ActualWidth) * (Maximum - Minimum);
+                _dragDelta.Y += verticalDragDelta;
+                perpendicularDragDelta = Math.Abs(_dragDelta.Y);
+
+                if (ElementHorizontalThumb != null)
+                {
+                    offset = horizontalDragDelta / (GetTrackLength() - ElementHorizontalThumb.ActualWidth) * (Maximum - Minimum);
+                }
             }
-            else if (Orientation == Orientation.Vertical && ElementVerticalThumb != null)
+            else
             {
-                offset = e.VerticalChange / (GetTrackLength() - ElementVerticalThumb.ActualHeight) * (Maximum - Minimum);
+                _dragDelta.X += horizontalDragDelta;
+                perpendicularDragDelta = Math.Abs(_dragDelta.X);
+
+                if (ElementVerticalThumb != null)
+                {
+                    offset = verticalDragDelta / (GetTrackLength() - ElementVerticalThumb.ActualHeight) * (Maximum - Minimum);
+                }
             }
 
             if (!double.IsNaN(offset) && !double.IsInfinity(offset))
             {
-                _dragValue += offset;
+                double dragValue;
 
-                double newValue = Math.Min(Maximum, Math.Max(Minimum, _dragValue));
-
-                if (newValue != Value)
+                if (horizontal)
                 {
-                    Value = newValue;
+                    _dragDelta.X += offset;
+                    dragValue = _dragDelta.X;
+                }
+                else
+                {
+                    _dragDelta.Y += offset;
+                    dragValue = _dragDelta.Y;
+                }
+
+                double newValue = Math.Min(Maximum, Math.Max(Minimum, _previousValue + dragValue));
+
+                if (DoubleUtil.GreaterThan(perpendicularDragDelta, MaxPerpendicularDelta))
+                {
+                    newValue = _previousValue;
+                }
+
+                if (!DoubleUtil.AreClose(newValue, Value))
+                {
+                    _hasScrolled = true;
+                    ChangeValue(newValue, true);
                     RaiseScrollEvent(ScrollEventType.ThumbTrack);
                 }
+            }
+        }
+
+        private void ChangeValue(double newValue, bool defer)
+        {
+            if (IsStandalone)
+            {
+                Value = newValue;
+            }
+            else
+            {
+                IInputElement target = CommandTarget;
+                RoutedCommand command = null;
+                bool horizontal = Orientation == Orientation.Horizontal;
+
+                // Fire the deferred (drag) version of the command
+                if (defer)
+                {
+                    command = horizontal ? DeferScrollToHorizontalOffsetCommand : DeferScrollToVerticalOffsetCommand;
+                    if (command.CanExecute(newValue, target))
+                    {
+                        // The defer version of the command is enabled, fire this command and not the scroll version
+                        command.Execute(newValue, target);
+                    }
+                    else
+                    {
+                        // The defer version of the command is not enabled, reset and try the scroll version
+                        command = null;
+                    }
+                }
+
+                if (command is null)
+                {
+                    // Either we're not dragging or the drag command is not enabled, try the scroll version
+                    command = horizontal ? ScrollToHorizontalOffsetCommand : ScrollToVerticalOffsetCommand;
+                    if (command.CanExecute(newValue, target))
+                    {
+                        command.Execute(newValue, target);
+                    }
+                }
+            }
+        }
+
+        private IInputElement CommandTarget
+        {
+            get
+            {
+                if (TemplatedParent is IInputElement target)
+                {
+                    return target;
+                }
+
+                return this;
             }
         }
 
@@ -340,7 +591,7 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public static readonly DependencyProperty ViewportSizeProperty =
             DependencyProperty.Register(
-                "ViewportSize",
+                nameof(ViewportSize),
                 typeof(double),
                 typeof(ScrollBar),
                 new PropertyMetadata(0.0d, OnViewportSizeChanged));
@@ -463,10 +714,24 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
+        /// Identifies the <see cref="Scroll"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent ScrollEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(Scroll),
+                RoutingStrategy.Bubble,
+                typeof(ScrollEventHandler),
+                typeof(ScrollBar));
+
+        /// <summary>
         /// Occurs one or more times as content scrolls in a <see cref="ScrollBar"/>
         /// when the user moves the <see cref="Thumb"/> by using the mouse.
         /// </summary>
-        public event ScrollEventHandler Scroll;
+        public event ScrollEventHandler Scroll
+        {
+            add => AddHandler(ScrollEvent, value);
+            remove => RemoveHandler(ScrollEvent, value);
+        }
 
         /// <summary> 
         /// This raises the Scroll event, passing in the scrollEventType 
@@ -482,11 +747,14 @@ namespace System.Windows.Controls.Primitives
 
                 _debounceDispatcher.Debounce(
                     debounce,
-                    () => Scroll?.Invoke(this, new ScrollEventArgs(scrollEventType, Value)));
+                    () => RaiseEvent(new ScrollEventArgs(scrollEventType, Value) { Source = this }));
             }
             else
             {
-                Scroll?.Invoke(this, new ScrollEventArgs(scrollEventType, Value));
+                RaiseEvent(new ScrollEventArgs(scrollEventType, Value)
+                {
+                    Source = this,
+                });
             }
         }
 
@@ -753,9 +1021,92 @@ namespace System.Windows.Controls.Primitives
         internal Thumb ElementVerticalThumb { get; set; }
         internal const string ElementVerticalThumbName = "VerticalThumb";
 
-        /// <summary>
-        /// Accumulates drag offsets in case the mouse drags off the end of the track.
-        /// </summary> 
-        private double _dragValue;
+        // Maximum distance you can drag from thumb before it snaps back
+        private const double MaxPerpendicularDelta = 150;
+
+        private double _previousValue;
+        private Vector _dragDelta;
+        private bool _hasScrolled;  // Has the thumb been dragged
+
+        #region Obsolete
+
+        private DebounceDispatcher _debounceDispatcher;
+
+        internal static TimeSpan DefaultDebounceInterval { get; set; } = TimeSpan.Zero;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        public static readonly DependencyProperty DebounceProperty =
+            DependencyProperty.RegisterAttached(
+                nameof(Debounce),
+                typeof(TimeSpan?),
+                typeof(ScrollBar),
+                new PropertyMetadata((TimeSpan?)null));
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        public TimeSpan Debounce
+        {
+            get => (TimeSpan?)GetValue(DebounceProperty) ?? DefaultDebounceInterval;
+            set => SetValueInternal(DebounceProperty, value);
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        private TimeSpan DebounceInterval
+        {
+            get
+            {
+                // We attempt to get a debounce interval in 3 steps
+                // 1 - From the ScrollBar.
+                // 2 - From the ScrollBar's Templated parent (usually a ScrollViewer)
+                // 3 - Attempt to get interval from the ScrollViewer's templated parent
+                TimeSpan? debounce = (TimeSpan?)GetValue(DebounceProperty);
+                if (debounce.HasValue)
+                {
+                    return debounce.Value;
+                }
+
+                if (TemplatedParent is FrameworkElement parent1)
+                {
+                    debounce = (TimeSpan?)parent1.GetValue(DebounceProperty);
+                    if (debounce.HasValue)
+                    {
+                        return debounce.Value;
+                    }
+
+                    if (parent1.TemplatedParent is FrameworkElement parent2)
+                    {
+                        debounce = (TimeSpan?)parent2.GetValue(DebounceProperty);
+                        if (debounce.HasValue)
+                        {
+                            return debounce.Value;
+                        }
+                    }
+                }
+
+                return DefaultDebounceInterval;
+            }
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        public static TimeSpan GetDebounce(FrameworkElement fe)
+        {
+            ArgumentNullException.ThrowIfNull(fe);
+
+            return (TimeSpan?)fe.GetValue(DebounceProperty) ?? DefaultDebounceInterval;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        public static void SetDebounce(FrameworkElement fe, TimeSpan debounce)
+        {
+            ArgumentNullException.ThrowIfNull(fe);
+
+            fe.SetValueInternal(DebounceProperty, (TimeSpan?)debounce);
+        }
+
+        #endregion Obsolete
     }
 }

@@ -947,7 +947,6 @@
     <Compile Include="System.Windows.Controls.Primitives\RepeatButton.cs" />
     <Compile Include="System.Windows.Controls.Primitives\ScrollBar.cs" />
     <Compile Include="System.Windows.Controls.Primitives\ScrollEventArgs.cs" />
-    <Compile Include="System.Windows.Controls.Primitives\ScrollEventHandler.cs" />
     <Compile Include="System.Windows.Controls.Primitives\ScrollEventType.cs" />
     <Compile Include="System.Windows.Controls.Primitives\Selector.cs" />
     <Compile Include="System.Windows.Controls.Primitives\SelectorItem.cs" />

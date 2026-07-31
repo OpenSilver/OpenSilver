@@ -58,12 +58,16 @@ public class Settings
         EnableBindingErrorsLogging = false;
         EnableBindingErrorsThrowing = false;
         EnableInvalidPropertyMetadataDefaultValueExceptions = true;
+#pragma warning disable CS0618 // Type or member is obsolete
         ScrollDebounce = TimeSpan.Zero;
+#pragma warning restore CS0618 // Type or member is obsolete
         DefaultResourceLookupMode = InheritanceBehavior.Default;
     }
 
     public InheritanceBehavior DefaultResourceLookupMode { get; set; }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
     public TimeSpan ScrollDebounce
     {
         get => ScrollBar.DefaultDebounceInterval;

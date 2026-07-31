@@ -3554,13 +3554,15 @@
                                                      IsTabStop="False"
                                                      Interval="50"
                                                      Template="{markup:StaticResource HorizontalDecrementTemplate}"
-                                                     Margin="1" />
+                                                     Margin="1"
+                                                     Command="{x:Static primitives:ScrollBar.LineLeftCommand}" />
                             <primitives:RepeatButton x:Name="HorizontalLargeDecrease"
                                                      controls:Grid.Column="1"
                                                      Width="0"
                                                      Template="{markup:StaticResource RepeatButtonTemplate}"
                                                      Interval="50"
-                                                     IsTabStop="False" />
+                                                     IsTabStop="False"
+                                                     Command="{x:Static primitives:ScrollBar.PageLeftCommand}" />
                             <primitives:Thumb x:Name="HorizontalThumb"
                                               Background="{TemplateBinding Property={x:Static controls:Control.BackgroundProperty}}"
                                               MinWidth="18"
@@ -3571,14 +3573,16 @@
                                                      controls:Grid.Column="3"
                                                      Template="{markup:StaticResource RepeatButtonTemplate}"
                                                      Interval="50"
-                                                     IsTabStop="False" />
+                                                     IsTabStop="False"
+                                                     Command="{x:Static primitives:ScrollBar.PageRightCommand}" />
                             <primitives:RepeatButton x:Name="HorizontalSmallIncrease"
                                                      controls:Grid.Column="4"
                                                      Width="16"
                                                      IsTabStop="False"
                                                      Interval="50"
                                                      Template="{markup:StaticResource HorizontalIncrementTemplate}"
-                                                     Margin="1" />
+                                                     Margin="1"
+                                                     Command="{x:Static primitives:ScrollBar.LineRightCommand}" />
                         </controls:Grid>
 
                         <!-- Vertical Template -->
@@ -3650,13 +3654,15 @@
                                                      IsTabStop="False"
                                                      Interval="50"
                                                      Template="{markup:StaticResource VerticalDecrementTemplate}"
-                                                     Margin="1" />
+                                                     Margin="1"
+                                                     Command="{x:Static primitives:ScrollBar.LineUpCommand}" />
                             <primitives:RepeatButton x:Name="VerticalLargeDecrease"
                                                      controls:Grid.Row="1"
                                                      Height="0"
                                                      Template="{markup:StaticResource RepeatButtonTemplate}"
                                                      Interval="50"
-                                                     IsTabStop="False" />
+                                                     IsTabStop="False"
+                                                     Command="{x:Static primitives:ScrollBar.PageUpCommand}" />
                             <primitives:Thumb x:Name="VerticalThumb"
                                               MinHeight="18"
                                               Height="18"
@@ -3666,14 +3672,16 @@
                                                      controls:Grid.Row="3"
                                                      Template="{markup:StaticResource RepeatButtonTemplate}"
                                                      Interval="50"
-                                                     IsTabStop="False" />
+                                                     IsTabStop="False"
+                                                     Command="{x:Static primitives:ScrollBar.PageDownCommand}" />
                             <primitives:RepeatButton x:Name="VerticalSmallIncrease"
                                                      controls:Grid.Row="4"
                                                      Height="16"
                                                      IsTabStop="False"
                                                      Interval="50"
                                                      Template="{markup:StaticResource VerticalIncrementTemplate}"
-                                                     Margin="1" />
+                                                     Margin="1"
+                                                     Command="{x:Static primitives:ScrollBar.LineDownCommand}" />
                         </controls:Grid>
                     </controls:Grid>
                 </controls:ControlTemplate>

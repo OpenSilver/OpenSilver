@@ -11,52 +11,88 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls.Primitives
+namespace System.Windows.Controls.Primitives;
+
+/// <summary>
+/// Represents the method that will handle the <see cref="ScrollBar.Scroll"/> routed event that 
+/// occurs when the <see cref="Thumb"/> of a <see cref="ScrollBar"/> moves.
+/// </summary>
+public delegate void ScrollEventHandler(object sender, ScrollEventArgs e);
+
+/// <summary>
+/// Provides data for a <see cref="ScrollBar.Scroll"/> event that occurs when the <see cref="Thumb"/> 
+/// of a <see cref="ScrollBar"/> moves.
+/// </summary>
+public sealed class ScrollEventArgs : RoutedEventArgs
 {
     /// <summary>
-    /// Provides data for the Scroll event.
+    /// Initializes an instance of the <see cref="ScrollEventArgs"/> class by using the specified
+    /// <see cref="Primitives.ScrollEventType"/> enumeration value and the new location of the 
+    /// <see cref="Thumb"/> control in the <see cref="ScrollBar"/>.
     /// </summary>
-    public sealed class ScrollEventArgs : RoutedEventArgs
+    /// <param name="newValue">
+    /// The value that corresponds to the new location of the <see cref="Thumb"/> in the 
+    /// <see cref="ScrollBar"/>.
+    /// </param>
+    /// <param name="scrollEventType">
+    /// A <see cref="Primitives.ScrollEventType"/> enumeration value that describes the type of 
+    /// <see cref="Thumb"/> movement that caused the event.
+    /// </param>
+    public ScrollEventArgs(double newValue, ScrollEventType scrollEventType)
+        : this(scrollEventType, newValue)
     {
-        /// <summary>
-        /// Initializes a new instance of the ScrollEventArgs class.
-        /// </summary>
-        /// <param name="newValue">The new Value of the ScrollBar.</param>
-        /// <param name="scrollEventType">A ScrollEventType describing the event.</param>
-        public ScrollEventArgs(double newValue, ScrollEventType scrollEventType)
-            : this(scrollEventType, newValue)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScrollEventArgs"/> class.
-        /// </summary>
-        /// <param name="scrollEventType">
-        /// A <see cref="ScrollEventType"/> describing the event.
-        /// </param>
-        /// <param name="newValue">
-        /// The new <see cref="RangeBase.Value"/> of the <see cref="ScrollBar"/>.
-        /// </param>
-        public ScrollEventArgs(ScrollEventType scrollEventType, double newValue)
-        {
-            NewValue = newValue;
-            ScrollEventType = scrollEventType;
-        }
-
-        /// <summary>
-        /// Gets the new <see cref="RangeBase.Value"/> of the <see cref="ScrollBar"/>.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="RangeBase.Value"/> of the <see cref="ScrollBar"/> after the event.
-        /// </returns>
-        public double NewValue { get; }
-
-        /// <summary>
-        /// Gets a <see cref="ScrollEventType"/> describing the event.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="ScrollEventType"/> describing the event.
-        /// </returns>
-        public ScrollEventType ScrollEventType { get; }
     }
+
+    /// <summary>
+    /// Initializes an instance of the <see cref="ScrollEventArgs"/> class by using the specified
+    /// <see cref="Primitives.ScrollEventType"/> enumeration value and the new location of the 
+    /// <see cref="Thumb"/> control in the <see cref="ScrollBar"/>.
+    /// </summary>
+    /// <param name="scrollEventType">
+    /// A <see cref="Primitives.ScrollEventType"/> enumeration value that describes the type of 
+    /// <see cref="Thumb"/> movement that caused the event.
+    /// </param>
+    /// <param name="newValue">
+    /// The value that corresponds to the new location of the <see cref="Thumb"/> in the 
+    /// <see cref="ScrollBar"/>.
+    /// </param>
+    public ScrollEventArgs(ScrollEventType scrollEventType, double newValue)
+    {
+        NewValue = newValue;
+        ScrollEventType = scrollEventType;
+        RoutedEvent = ScrollBar.ScrollEvent;
+    }
+
+    /// <summary>
+    /// Gets a value that represents the new location of the <see cref="Thumb"/> in the 
+    /// <see cref="ScrollBar"/>.
+    /// </summary>
+    /// <returns>
+    /// The value that corresponds to the new position of the <see cref="Thumb"/> in the 
+    /// <see cref="ScrollBar"/>.
+    /// </returns>
+    public double NewValue { get; }
+
+    /// <summary>
+    /// Gets the <see cref="Primitives.ScrollEventType"/> enumeration value that describes 
+    /// the change in the <see cref="Thumb"/> position that caused this event.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Primitives.ScrollEventType"/> enumeration value that describes the type 
+    /// of <see cref="Thumb"/> movement that caused the <see cref="ScrollBar.Scroll"/> event.
+    /// </returns>
+    public ScrollEventType ScrollEventType { get; }
+
+    /// <summary>
+    /// Performs the appropriate type casting to call the type-safe <see cref="ScrollEventHandler"/>
+    /// delegate for the <see cref="ScrollBar.Scroll"/> event.
+    /// </summary>
+    /// <param name="genericHandler">
+    /// The event handler to call.
+    /// </param>
+    /// <param name="genericTarget">
+    /// The current object along the event's route.
+    /// </param>
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget)
+        => ((ScrollEventHandler)genericHandler)(genericTarget, this);
 }

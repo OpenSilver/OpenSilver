@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -18,6 +20,35 @@ namespace OpenSilver.Internal.Commands;
 
 internal static class CommandHelpers
 {
+    internal static void RegisterCommandHandler(
+        Type controlType,
+        RoutedCommand command,
+        ExecutedRoutedEventHandler executedRoutedEventHandler,
+        CanExecuteRoutedEventHandler canExecuteRoutedEventHandler)
+    {
+        // Validate parameters
+        Debug.Assert(controlType is not null);
+        Debug.Assert(command is not null);
+        Debug.Assert(executedRoutedEventHandler is not null);
+        // All other parameters may be null
+
+        // Create command link for this command
+        CommandManager.RegisterClassCommandBinding(controlType, new CommandBinding(command, executedRoutedEventHandler, canExecuteRoutedEventHandler));
+    }
+
+    internal static void RegisterCommandHandler(
+        Type controlType,
+        RoutedCommand command,
+        ExecutedRoutedEventHandler executedRoutedEventHandler,
+        CanExecuteRoutedEventHandler canExecuteRoutedEventHandler,
+        InputGesture inputGesture)
+    {
+        RegisterCommandHandler(controlType, command, executedRoutedEventHandler, canExecuteRoutedEventHandler);
+
+        // Create additional input binding for this command
+        CommandManager.RegisterClassInputBinding(controlType, new InputBinding(command, inputGesture));
+    }
+
     internal static bool CanExecuteCommandSource(ICommandSource commandSource)
     {
         if (commandSource.Command is ICommand command)
