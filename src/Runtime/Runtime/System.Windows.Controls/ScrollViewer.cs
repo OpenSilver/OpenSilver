@@ -65,6 +65,7 @@ namespace System.Windows.Controls
         static ScrollViewer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollViewer), new PropertyMetadata(typeof(ScrollViewer)));
+            KeyboardNavigation.DirectionalNavigationProperty.OverrideMetadata(typeof(ScrollViewer), new FrameworkPropertyMetadata(KeyboardNavigationMode.Local));
 
             EventManager.RegisterClassHandler<ScrollViewer>(RequestBringIntoViewEvent, new RequestBringIntoViewEventHandler(OnRequestBringIntoView));
             EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnTouchStartThunk), true);
@@ -1057,14 +1058,14 @@ namespace System.Windows.Controls
         private bool TemplatedParentHandlesScrolling => TemplatedParent is Control c && c.HandlesScrolling;
 
         /// <summary>
-        /// Responds to the KeyDown event. 
-        /// </summary> 
+        /// Responds to specific keyboard input and invokes associated scrolling behavior.
+        /// </summary>
         /// <param name="e">
-        /// Provides data for KeyEventArgs.
+        /// Required arguments for this event.
         /// </param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (e.Handled || ScrollInfo is not null || TemplatedParentHandlesScrolling)
+            if (e.Handled || ScrollInfo is null || TemplatedParentHandlesScrolling)
             {
                 return;
             }
