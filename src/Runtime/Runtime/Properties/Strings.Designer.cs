@@ -2869,6 +2869,60 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AncestorLevel cannot be set to less than 1..
+        /// </summary>
+        internal static string RelativeSourceInvalidAncestorLevel {
+            get {
+                return ResourceManager.GetString("RelativeSourceInvalidAncestorLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid value for RelativeSourceMode enum..
+        /// </summary>
+        internal static string RelativeSourceModeInvalid {
+            get {
+                return ResourceManager.GetString("RelativeSourceModeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RelativeSource.Mode is immutable after initialization; instead of changing the Mode on this instance, create a new RelativeSource or use a different static instance..
+        /// </summary>
+        internal static string RelativeSourceModeIsImmutable {
+            get {
+                return ResourceManager.GetString("RelativeSourceModeIsImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AncestorType must be specified for RelativeSource in FindAncestor mode..
+        /// </summary>
+        internal static string RelativeSourceNeedsAncestorType {
+            get {
+                return ResourceManager.GetString("RelativeSourceNeedsAncestorType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mode must be specified for RelativeSource..
+        /// </summary>
+        internal static string RelativeSourceNeedsMode {
+            get {
+                return ResourceManager.GetString("RelativeSourceNeedsMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RelativeSource is not in FindAncestor mode..
+        /// </summary>
+        internal static string RelativeSourceNotInFindAncestorMode {
+            get {
+                return ResourceManager.GetString("RelativeSourceNotInFindAncestorMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collection Remove event must specify item position..
         /// </summary>
         internal static string RemovedItemNotFound {

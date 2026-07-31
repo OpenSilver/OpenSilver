@@ -1454,4 +1454,22 @@
   <data name="MustNotTemplateUnassociatedControl" xml:space="preserve">
     <value>ControlTemplate must be associated with a Control by setting the Control.Template property before it is used to template that Control.</value>
   </data>
+  <data name="RelativeSourceModeInvalid" xml:space="preserve">
+    <value>Invalid value for RelativeSourceMode enum.</value>
+  </data>
+  <data name="RelativeSourceNeedsAncestorType" xml:space="preserve">
+    <value>AncestorType must be specified for RelativeSource in FindAncestor mode.</value>
+  </data>
+  <data name="RelativeSourceNeedsMode" xml:space="preserve">
+    <value>Mode must be specified for RelativeSource.</value>
+  </data>
+  <data name="RelativeSourceNotInFindAncestorMode" xml:space="preserve">
+    <value>RelativeSource is not in FindAncestor mode.</value>
+  </data>
+  <data name="RelativeSourceInvalidAncestorLevel" xml:space="preserve">
+    <value>AncestorLevel cannot be set to less than 1.</value>
+  </data>
+  <data name="RelativeSourceModeIsImmutable" xml:space="preserve">
+    <value>RelativeSource.Mode is immutable after initialization; instead of changing the Mode on this instance, create a new RelativeSource or use a different static instance.</value>
+  </data>
 </root>

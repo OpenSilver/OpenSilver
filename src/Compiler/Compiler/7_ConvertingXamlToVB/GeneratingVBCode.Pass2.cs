@@ -978,11 +978,7 @@ namespace OpenSilver.Compiler
                         // PROPERTY TYPE IS NOT A COLLECTION
                         //------------------------
 
-                        // Note about "RelativeSource": even though it inherits from "MarkupExtension", we do not was
-                        // to consider "RelativeSource" as a markup extension for the compilation because it is only
-                        // meant to be used WITHIN another markup extension (sort of a "nested" markup extension),
-                        // such as in: "{Binding Background, RelativeSource={RelativeSource Mode=TemplatedParent}}"
-                        if (!_settings.Inspector.IsElementAMarkupExtension(valueTypeDefinition) || _settings.Inspector.IsRelativeSource(valueTypeDefinition))
+                        if (!_settings.Inspector.IsElementAMarkupExtension(valueTypeDefinition))
                         {
                             parameters.AppendLine(SetMember(targetUid, declaringType, memberName, valueUid, isAttachedProperty));
                         }
@@ -993,7 +989,8 @@ namespace OpenSilver.Compiler
                             //------------------------------
 
                             if (_settings.Inspector.IsStaticResourceExtension(valueTypeDefinition) ||
-                                _settings.Inspector.IsThemeResourceExtension(valueTypeDefinition))
+                                _settings.Inspector.IsThemeResourceExtension(valueTypeDefinition) ||
+                                _settings.Inspector.IsRelativeSource(valueTypeDefinition))
                             {
                                 //------------------------------
                                 // {StaticResource ...}

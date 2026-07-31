@@ -363,7 +363,7 @@ public class ToolBarPanel : StackPanel
         {
             Binding binding = new Binding
             {
-                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent),
+                RelativeSource = RelativeSource.TemplatedParent,
                 Path = new PropertyPath(ToolBar.OrientationProperty)
             };
             SetBinding(OrientationProperty, binding);
