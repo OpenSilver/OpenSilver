@@ -150,9 +150,10 @@ public class Border : Decorator, IBorderElement
         base.OnRenderSizeChanged(info);
 
         if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
             return;
+        }
 
-        // LinearGradientBrush CSS conversion depends on the actual size to compute the angle.
         if (_refreshBackgroundOnSizeChange)
         {
             this.SetBackground(Background);
