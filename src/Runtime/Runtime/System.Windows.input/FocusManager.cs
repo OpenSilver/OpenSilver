@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -95,7 +95,7 @@ public static class FocusManager
     /// <summary>
     /// The DependencyProperty for the FocusedElement property.
     /// </summary>
-    private static readonly DependencyProperty FocusedElementProperty =
+    public static readonly DependencyProperty FocusedElementProperty =
         DependencyProperty.RegisterAttached(
             "FocusedElement",
             typeof(IInputElement),
@@ -198,7 +198,7 @@ public static class FocusManager
     /// <summary>
     /// Identifies the <b>FocusManager.IsFocusScope</b> attached property.
     /// </summary>
-    internal static readonly DependencyProperty IsFocusScopeProperty =
+    public static readonly DependencyProperty IsFocusScopeProperty =
         DependencyProperty.RegisterAttached(
             "IsFocusScope",
             typeof(bool),
@@ -214,7 +214,7 @@ public static class FocusManager
     /// <returns>
     /// true if <b>FocusManager.IsFocusScope</b> is set to true on the specified element; otherwise, false.
     /// </returns>
-    internal static bool GetIsFocusScope(DependencyObject element)
+    public static bool GetIsFocusScope(DependencyObject element)
     {
         ArgumentNullException.ThrowIfNull(element);
         return (bool)element.GetValue(IsFocusScopeProperty);
@@ -229,7 +229,7 @@ public static class FocusManager
     /// <param name="value">
     /// true if element is a focus scope; otherwise, false.
     /// </param>
-    internal static void SetIsFocusScope(DependencyObject element, bool value)
+    public static void SetIsFocusScope(DependencyObject element, bool value)
     {
         ArgumentNullException.ThrowIfNull(element);
         element.SetValueInternal(IsFocusScopeProperty, value);

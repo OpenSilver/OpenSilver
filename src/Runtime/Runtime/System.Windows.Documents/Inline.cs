@@ -62,6 +62,12 @@ public abstract class Inline : TextElement
     public new static readonly DependencyProperty LanguageProperty = TextElement.LanguageProperty;
 
     /// <summary>
+    /// Identifies the FlowDirection dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(Inline));
+
+    /// <summary>
     /// Identifies the <see cref="TextDecorations"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty TextDecorationsProperty =

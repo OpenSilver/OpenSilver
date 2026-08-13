@@ -542,7 +542,7 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         /// <param name="args">Inherited code: Requires comment 1.</param>
-        private void OnDisplayModeChanged(CalendarModeChangedEventArgs args)
+        protected virtual void OnDisplayModeChanged(CalendarModeChangedEventArgs args)
         {
             EventHandler<CalendarModeChangedEventArgs> handler = DisplayModeChanged;
 

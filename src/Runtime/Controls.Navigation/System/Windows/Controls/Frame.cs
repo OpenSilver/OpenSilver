@@ -406,7 +406,10 @@ namespace System.Windows.Controls
 
         #region Properties
 
-        internal NavigationService NavigationService
+        /// <summary>
+        /// Gets the <see cref="Navigation.NavigationService"/> associated with this frame.
+        /// </summary>
+        public NavigationService NavigationService
         {
             get { return this._navigationService; }
         }

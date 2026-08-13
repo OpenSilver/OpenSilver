@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -27,6 +27,12 @@ public abstract class Block : TextElement
     /// Initializes a new instance of the <see cref="Block" /> class. 
     /// </summary>
     protected Block() { }
+
+    /// <summary>
+    /// Identifies the FlowDirection dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(Block));
 
     /// <summary>
     /// Identifies the <see cref="LineHeight" /> dependency property.

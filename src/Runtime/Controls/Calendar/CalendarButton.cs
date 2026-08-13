@@ -58,10 +58,10 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Gets or sets a value indicating whether the button is inactive.
         /// </summary>
-        internal bool IsInactive
+        public bool IsInactive
         {
             get { return _isInactive; }
-            set
+            internal set
             {
                 _isInactive = value;
                 ChangeVisualState(true);

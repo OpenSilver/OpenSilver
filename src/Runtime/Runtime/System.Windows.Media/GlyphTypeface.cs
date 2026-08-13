@@ -19,7 +19,7 @@ namespace System.Windows.Media;
 [OpenSilver.NotImplemented]
 public sealed class GlyphTypeface
 {
-    internal GlyphTypeface() { }
+    public GlyphTypeface() { }
 
     /// <summary>
     /// Gets or sets the font file name for the <see cref="GlyphTypeface"/> object.

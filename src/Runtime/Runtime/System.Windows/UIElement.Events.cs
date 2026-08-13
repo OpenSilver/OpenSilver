@@ -670,7 +670,7 @@ namespace System.Windows
         /// The event data that is used to add the handlers. This method uses the <see cref="RoutedEventArgs.RoutedEvent"/>
         /// property of the event data to create the handlers.
         /// </param>
-        private void AddToEventRoute(EventRoute route, RoutedEventArgs e)
+        public void AddToEventRoute(EventRoute route, RoutedEventArgs e)
         {
             ArgumentNullException.ThrowIfNull(route);
             ArgumentNullException.ThrowIfNull(e);

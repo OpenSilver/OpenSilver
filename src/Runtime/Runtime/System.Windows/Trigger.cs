@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -146,7 +146,7 @@ public sealed class Trigger : TriggerBase, ISupportInitialize
         base.Seal();
     }
 
-    internal static void ReceiveTypeConverter(object targetObject, XamlSetTypeConverterEventArgs eventArgs)
+    public static void ReceiveTypeConverter(object targetObject, XamlSetTypeConverterEventArgs eventArgs)
     {
         if (targetObject is not Trigger trigger)
         {

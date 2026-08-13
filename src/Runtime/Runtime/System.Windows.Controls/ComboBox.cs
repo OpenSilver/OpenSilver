@@ -707,7 +707,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="SelectionBoxItem"/> dependency property.
         /// </summary>
-        private static readonly DependencyProperty SelectionBoxItemProperty =
+        public static readonly DependencyProperty SelectionBoxItemProperty =
             DependencyProperty.Register(
                 nameof(SelectionBoxItem),
                 typeof(object),
@@ -726,7 +726,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="SelectionBoxItemTemplate"/> dependency property.
         /// </summary>
-        private static readonly DependencyProperty SelectionBoxItemTemplateProperty =
+        public static readonly DependencyProperty SelectionBoxItemTemplateProperty =
             DependencyProperty.Register(
                 nameof(SelectionBoxItemTemplate),
                 typeof(DataTemplate),

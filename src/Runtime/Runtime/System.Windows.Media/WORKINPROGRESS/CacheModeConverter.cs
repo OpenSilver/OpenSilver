@@ -19,7 +19,7 @@ namespace System.Windows.Media
     /// <summary>
     /// CacheModeConverter - Converter class for converting instances of other types to and from CacheMode instances
     /// </summary>
-    internal sealed class CacheModeConverter : TypeConverter
+    public sealed class CacheModeConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.

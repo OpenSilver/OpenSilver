@@ -23,7 +23,7 @@ namespace System.Windows.Markup;
 /// <summary>
 /// Converts from a string to a <see cref="DependencyProperty"/> object.
 /// </summary>
-internal sealed class DependencyPropertyConverter : TypeConverter
+public sealed class DependencyPropertyConverter : TypeConverter
 {
     /// <summary>
     /// Determines whether an object of the specified type can be converted to an instance of 

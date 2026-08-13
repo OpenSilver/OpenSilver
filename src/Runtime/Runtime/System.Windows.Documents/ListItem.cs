@@ -52,6 +52,12 @@ public class ListItem : TextElement
     }
 
     /// <summary>
+    /// Identifies the FlowDirection dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(ListItem));
+
+    /// <summary>
     /// Gets a block collection that contains the top-level <see cref="Block"/> elements of the <see cref="ListItem"/>.
     /// </summary>
     /// <returns>
