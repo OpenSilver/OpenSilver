@@ -521,7 +521,10 @@ namespace System.Windows.Controls
             set;
         }
 
-        internal bool IsEditing
+        /// <summary>
+        /// Gets a value that indicates whether the row is in editing mode.
+        /// </summary>
+        public bool IsEditing
         {
             get
             {
@@ -578,7 +581,10 @@ namespace System.Windows.Controls
             }
         }
 
-        internal bool IsSelected
+        /// <summary>
+        /// Gets a value that indicates whether the row is selected.
+        /// </summary>
+        public bool IsSelected
         {
             get
             {

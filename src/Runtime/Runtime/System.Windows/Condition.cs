@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -255,7 +255,7 @@ public sealed class Condition : ISupportInitialize
         }
     }
 
-    internal static void ReceiveTypeConverter(object targetObject, XamlSetTypeConverterEventArgs eventArgs)
+    public static void ReceiveTypeConverter(object targetObject, XamlSetTypeConverterEventArgs eventArgs)
     {
         if (targetObject is not Condition condition)
         {
@@ -284,7 +284,7 @@ public sealed class Condition : ISupportInitialize
         }
     }
 
-    internal static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
+    public static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
     {
         ArgumentNullException.ThrowIfNull(targetObject);
         ArgumentNullException.ThrowIfNull(eventArgs);

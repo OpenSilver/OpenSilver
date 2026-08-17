@@ -34,7 +34,7 @@ public abstract class KeyboardDevice : InputDevice
     /// <param name="inputManager">
     /// The input manager associated with this <see cref="KeyboardDevice"/>.
     /// </param>
-    internal KeyboardDevice(InputManager inputManager)
+    protected KeyboardDevice(InputManager inputManager)
     {
         ArgumentNullException.ThrowIfNull(inputManager);
         _inputManager = inputManager;

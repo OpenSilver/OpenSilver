@@ -23,7 +23,7 @@ public sealed class WindowCollection : ICollection
 {
     private readonly WeakReferenceList<Window> _windows;
 
-    internal WindowCollection()
+    public WindowCollection()
     {
         _windows = new();
     }

@@ -522,7 +522,7 @@ namespace System.Windows.Controls
         /// thumb drag delta.
         /// </summary> 
         /// <param name="e">DragEventArgs</param> 
-        private void OnThumbDragDelta(DragDeltaEventArgs e)
+        protected virtual void OnThumbDragDelta(DragDeltaEventArgs e)
         {
             double offset = 0;
 

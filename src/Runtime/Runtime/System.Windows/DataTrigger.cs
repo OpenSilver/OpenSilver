@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -117,7 +117,7 @@ public sealed class DataTrigger : TriggerBase
         base.Seal();
     }
 
-    internal static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
+    public static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
     {
         ArgumentNullException.ThrowIfNull(targetObject);
         ArgumentNullException.ThrowIfNull(eventArgs);

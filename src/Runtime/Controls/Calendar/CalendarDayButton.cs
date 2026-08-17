@@ -113,10 +113,10 @@ namespace System.Windows.Controls.Primitives
         /// Gets or sets a value indicating whether this button represents
         /// today.
         /// </summary>
-        internal bool IsToday
+        public bool IsToday
         {
             get { return _isToday; }
-            set
+            internal set
             {
                 _isToday = value;
                 ChangeVisualState(true);
@@ -155,10 +155,10 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Gets or sets a value indicating whether the button is inactive.
         /// </summary>
-        internal bool IsInactive
+        public bool IsInactive
         {
             get { return _isInactive; }
-            set
+            internal set
             {
                 _isInactive = value;
                 ChangeVisualState(true);
@@ -175,10 +175,10 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Gets or sets a value indicating whether the button is selected.
         /// </summary>
-        internal bool IsSelected
+        public bool IsSelected
         {
             get { return _isSelected; }
-            set
+            internal set
             {
                 _isSelected = value;
                 ChangeVisualState(true);

@@ -58,7 +58,7 @@ namespace System.Windows.Markup
             LinePosition = linePosition;
         }
 
-        internal int LineNumber { get; private set; }
-        internal int LinePosition { get; private set; }
+        public int LineNumber { get; private set; }
+        public int LinePosition { get; private set; }
     }
 }

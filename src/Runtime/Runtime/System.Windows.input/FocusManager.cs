@@ -1,4 +1,4 @@
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -93,9 +93,9 @@ public static class FocusManager
         => UIElement.RemoveHandler(element, LostFocusEvent, handler);
 
     /// <summary>
-    /// The DependencyProperty for the FocusedElement property.
+    /// Identifies the <b>FocusManager.FocusedElement</b> attached property.
     /// </summary>
-    private static readonly DependencyProperty FocusedElementProperty =
+    public static readonly DependencyProperty FocusedElementProperty =
         DependencyProperty.RegisterAttached(
             "FocusedElement",
             typeof(IInputElement),

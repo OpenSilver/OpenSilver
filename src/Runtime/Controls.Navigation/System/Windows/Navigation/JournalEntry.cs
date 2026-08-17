@@ -16,7 +16,7 @@ namespace System.Windows.Navigation
     /// A journal history entry.
     /// </summary>
     /// <seealso cref="Journal"/>
-    internal sealed class JournalEntry : DependencyObject
+    public sealed class JournalEntry : DependencyObject
     {
 #region Fields
 

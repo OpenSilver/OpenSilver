@@ -402,7 +402,11 @@ namespace System.Windows.Controls
             InvalidateRowHeightEstimate();
         }
 
-        internal void OnColumnHeaderDragStarted(DragStartedEventArgs e)
+        /// <summary>
+        /// Raises the <see cref="ColumnHeaderDragStarted"/> event.
+        /// </summary>
+        /// <param name="e">The event data.</param>
+        protected internal virtual void OnColumnHeaderDragStarted(DragStartedEventArgs e)
         {
             if (this.ColumnHeaderDragStarted != null)
             {
@@ -410,7 +414,11 @@ namespace System.Windows.Controls
             }
         }
 
-        internal void OnColumnHeaderDragDelta(DragDeltaEventArgs e)
+        /// <summary>
+        /// Raises the <see cref="ColumnHeaderDragDelta"/> event.
+        /// </summary>
+        /// <param name="e">The event data.</param>
+        protected internal virtual void OnColumnHeaderDragDelta(DragDeltaEventArgs e)
         {
             if (this.ColumnHeaderDragDelta != null)
             {
@@ -418,7 +426,11 @@ namespace System.Windows.Controls
             }
         }
 
-        internal void OnColumnHeaderDragCompleted(DragCompletedEventArgs e)
+        /// <summary>
+        /// Raises the <see cref="ColumnHeaderDragCompleted"/> event.
+        /// </summary>
+        /// <param name="e">The event data.</param>
+        protected internal virtual void OnColumnHeaderDragCompleted(DragCompletedEventArgs e)
         {
             if (this.ColumnHeaderDragCompleted != null)
             {

@@ -24,7 +24,7 @@ namespace System.Windows.Markup;
 /// <see cref="Condition"/> types that deal with DependencyProperty values. This converter only supports 
 /// ConvertFrom.
 /// </summary>
-internal sealed class SetterTriggerConditionValueConverter : TypeConverter
+public sealed class SetterTriggerConditionValueConverter : TypeConverter
 {
     /// <summary>
     /// Returns a value that indicates whether the converter can convert from a source object to a 

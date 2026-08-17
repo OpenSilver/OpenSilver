@@ -279,6 +279,25 @@ public class ListItem : TextElement
         set => SetValueInternal(TextAlignmentProperty, value);
     }
 
+    /// <summary>
+    /// Identifies the <see cref="FlowDirection"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(ListItem));
+
+    /// <summary>
+    /// Gets or sets the relative direction for flow of content within a <see cref="ListItem"/> element.
+    /// </summary>
+    /// <returns>
+    /// One of the <see cref="Windows.FlowDirection"/> values that specifies the relative flow direction.
+    /// The default is <see cref="FlowDirection.LeftToRight"/>.
+    /// </returns>
+    public FlowDirection FlowDirection
+    {
+        get => (FlowDirection)GetValue(FlowDirectionProperty);
+        set => SetValueInternal(FlowDirectionProperty, value);
+    }
+
     /// <inheritdoc />
     protected sealed override int VisualChildrenCount => Blocks.InternalCount;
 

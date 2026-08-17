@@ -704,15 +704,17 @@ namespace System.Windows.Controls
             set => SetValueInternal(IsEditableProperty, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="SelectionBoxItem"/> dependency property.
-        /// </summary>
-        private static readonly DependencyProperty SelectionBoxItemProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey SelectionBoxItemPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(SelectionBoxItem),
                 typeof(object),
                 typeof(ComboBox),
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(string.Empty));
+
+        /// <summary>
+        /// Identifies the <see cref="SelectionBoxItem"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectionBoxItemProperty = SelectionBoxItemPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets the item displayed in the selection box.
@@ -720,18 +722,20 @@ namespace System.Windows.Controls
         public object SelectionBoxItem
         {
             get { return GetValue(SelectionBoxItemProperty); }
-            private set { SetValueInternal(SelectionBoxItemProperty, value); }
+            private set { SetValueInternal(SelectionBoxItemPropertyKey, value); }
         }
+
+        private static readonly DependencyPropertyKey SelectionBoxItemTemplatePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(SelectionBoxItemTemplate),
+                typeof(DataTemplate),
+                typeof(ComboBox),
+                new PropertyMetadata((DataTemplate)null));
 
         /// <summary>
         /// Identifies the <see cref="SelectionBoxItemTemplate"/> dependency property.
         /// </summary>
-        private static readonly DependencyProperty SelectionBoxItemTemplateProperty =
-            DependencyProperty.Register(
-                nameof(SelectionBoxItemTemplate),
-                typeof(DataTemplate),
-                typeof(ComboBox),
-                new PropertyMetadata((object)null));
+        public static readonly DependencyProperty SelectionBoxItemTemplateProperty = SelectionBoxItemTemplatePropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets the template applied to the selection box content.
@@ -739,7 +743,7 @@ namespace System.Windows.Controls
         public DataTemplate SelectionBoxItemTemplate
         {
             get { return (DataTemplate)GetValue(SelectionBoxItemTemplateProperty); }
-            private set { SetValueInternal(SelectionBoxItemTemplateProperty, value); }
+            private set { SetValueInternal(SelectionBoxItemTemplatePropertyKey, value); }
         }
 
         /// <summary>

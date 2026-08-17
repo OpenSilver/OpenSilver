@@ -32,7 +32,7 @@ namespace System.Windows;
 ///     and also allows for the handlers in the list 
 ///     to be invoked
 /// </remarks>
-internal sealed class EventRoute
+public sealed class EventRoute
 {
     /// <summary>
     ///     Constructor for <see cref="EventRoute"/> given

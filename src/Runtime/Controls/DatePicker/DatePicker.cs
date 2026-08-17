@@ -1248,7 +1248,7 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         /// <param name="e">Inherited code: Requires comment 1.</param>
-        private void OnCalendarClosed(RoutedEventArgs e)
+        protected virtual void OnCalendarClosed(RoutedEventArgs e)
         {
             RoutedEventHandler handler = this.CalendarClosed;
             if (null != handler)
@@ -1261,7 +1261,7 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         /// <param name="e">Inherited code: Requires comment 1.</param>
-        private void OnCalendarOpened(RoutedEventArgs e)
+        protected virtual void OnCalendarOpened(RoutedEventArgs e)
         {
             RoutedEventHandler handler = this.CalendarOpened;
             if (null != handler)
