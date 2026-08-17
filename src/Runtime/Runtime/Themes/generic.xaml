@@ -2343,9 +2343,7 @@
                                     </shapes:Path>
                                 </primitives:ToggleButton>
                                 <controls:ContentPresenter x:Name="ContentPresenter"
-                                                           Content="{markup:Null}"
                                                            ContentTemplate="{markup:Null}"
-                                                           ContentTemplateSelector="{markup:Null}"
                                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                            HorizontalAlignment="{TemplateBinding Property={x:Static controls:Control.HorizontalContentAlignmentProperty}}"
                                                            VerticalAlignment="{TemplateBinding Property={x:Static controls:Control.VerticalContentAlignmentProperty}}">
@@ -7245,7 +7243,6 @@
                                 <controls:ContentPresenter x:Name="ContentPresenter"
                                                            Content="{x:Null}"
                                                            ContentTemplate="{x:Null}"
-                                                           ContentTemplateSelector="{x:Null}"
                                                            Margin="{TemplateBinding Property={x:Static controls:Control.PaddingProperty}}"
                                                            VerticalAlignment="Center"
                                                            SnapsToDevicePixels="{TemplateBinding Property={x:Static UIElement.SnapsToDevicePixelsProperty}}" />

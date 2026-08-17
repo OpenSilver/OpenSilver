@@ -329,7 +329,7 @@ namespace System.Windows.Controls
 
                 if (itemStringFormat is not null)
                 {
-                    SetValue(ContentStringFormatProperty, itemStringFormat);
+                    ContentStringFormat = itemStringFormat;
                 }
             }
             else

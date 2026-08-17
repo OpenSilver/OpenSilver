@@ -87,50 +87,58 @@ namespace System.Windows.Controls
 
         private void UpdatePresenter()
         {
-            object content;
-            DataTemplate template;
-            object selectionBoxItem;
-            DataTemplate selectionBoxItemTemplate;
+            // propagate the new selected item to the SelectionBoxItem property;
+            // this displays it in the selection box
+            object item = InternalSelectedItem;
+            DataTemplate itemTemplate;
+            DataTemplateSelector itemTemplateSelector;
+            string stringFormat;
 
-            int index = SelectedIndex;
-            if (index <= -1 || (IsDropDownOpen && SelectedItem is FrameworkElement))
+            int index = InternalSelectedIndex;
+            if (index <= -1 || (IsDropDownOpen && item is FrameworkElement))
             {
-                content = _emptyContent;
-                selectionBoxItem = null;
-                template = selectionBoxItemTemplate = null;
+                item = _emptyContent;
+                itemTemplate = null;
+                itemTemplateSelector = null;
+                stringFormat = null;
             }
             else
             {
-                ComboBoxItem cbi = (ItemContainerGenerator.ContainerFromIndex(index) ?? Items[index]) as ComboBoxItem;
-                if (cbi != null)
+                // if Items contains an explicit ContentControl, use its content instead
+                // (this handles the case of ComboBoxItem)
+                if (item is ContentControl contentControl)
                 {
-                    content = selectionBoxItem = cbi.Content;
-                    template = selectionBoxItemTemplate = cbi.ContentTemplate;
+                    item = contentControl.Content;
+                    itemTemplate = contentControl.ContentTemplate;
+                    stringFormat = contentControl.ContentStringFormat;
                 }
                 else
                 {
-                    object item = Items[index];
-                    content = selectionBoxItem = item;
-                    if (item is UIElement)
-                    {
-                        template = selectionBoxItemTemplate = null;
-                    }
-                    else
-                    {
-                        template = selectionBoxItemTemplate = ItemTemplate ?? GetDisplayMemberPathTemplate(this);
-                    }
+                    itemTemplate = ItemTemplate;
+                    stringFormat = ItemStringFormat;
                 }
+
+                itemTemplateSelector = ItemTemplateSelector;
             }
 
-            if (_contentPresenter != null)
+            // display a null item by an empty string
+            if (item is null)
             {
-                _contentPresenter.Content = content;
-                _contentPresenter.ContentTemplate = template;
+                item = string.Empty;
+                itemTemplate = ContentPresenter.StringContentTemplate;
             }
 
-            // Update the SelectionBoxItem and SelectionBoxItemTemplate properties
-            SelectionBoxItem = selectionBoxItem;
-            SelectionBoxItemTemplate = selectionBoxItemTemplate;
+            SelectionBoxItem = item;
+            SelectionBoxItemTemplate = itemTemplate;
+            SelectionBoxItemStringFormat = stringFormat;
+
+            if (_contentPresenter is not null)
+            {
+                _contentPresenter.Content = item;
+                _contentPresenter.ContentTemplate = itemTemplate;
+                _contentPresenter.ContentTemplateSelector = itemTemplateSelector;
+                _contentPresenter.ContentStringFormat = stringFormat;
+            }
         }
 
         public override void OnApplyTemplate()
@@ -744,6 +752,32 @@ namespace System.Windows.Controls
         {
             get { return (DataTemplate)GetValue(SelectionBoxItemTemplateProperty); }
             private set { SetValueInternal(SelectionBoxItemTemplatePropertyKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey SelectionBoxItemStringFormatPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(SelectionBoxItemStringFormat),
+                typeof(string),
+                typeof(ComboBox),
+                new PropertyMetadata((string)null));
+
+        /// <summary>
+        /// Identifies the <see cref="SelectionBoxItemStringFormat"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SelectionBoxItemStringFormatProperty = SelectionBoxItemStringFormatPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a composite string that specifies how to format the selected item in the selection box if it is 
+        /// displayed as a string.
+        /// </summary>
+        /// <returns>
+        /// A composite string that specifies how to format the selected item in the selection box if it is 
+        /// displayed as a string.
+        /// </returns>
+        public string SelectionBoxItemStringFormat
+        {
+            get => (string)GetValue(SelectionBoxItemStringFormatProperty);
+            private set => SetValueInternal(SelectionBoxItemStringFormatPropertyKey, value);
         }
 
         /// <summary>
