@@ -93,7 +93,7 @@ public static class FocusManager
         => UIElement.RemoveHandler(element, LostFocusEvent, handler);
 
     /// <summary>
-    /// The DependencyProperty for the FocusedElement property.
+    /// Identifies the <b>FocusManager.FocusedElement</b> attached property.
     /// </summary>
     public static readonly DependencyProperty FocusedElementProperty =
         DependencyProperty.RegisterAttached(
@@ -198,7 +198,7 @@ public static class FocusManager
     /// <summary>
     /// Identifies the <b>FocusManager.IsFocusScope</b> attached property.
     /// </summary>
-    public static readonly DependencyProperty IsFocusScopeProperty =
+    internal static readonly DependencyProperty IsFocusScopeProperty =
         DependencyProperty.RegisterAttached(
             "IsFocusScope",
             typeof(bool),
@@ -214,7 +214,7 @@ public static class FocusManager
     /// <returns>
     /// true if <b>FocusManager.IsFocusScope</b> is set to true on the specified element; otherwise, false.
     /// </returns>
-    public static bool GetIsFocusScope(DependencyObject element)
+    internal static bool GetIsFocusScope(DependencyObject element)
     {
         ArgumentNullException.ThrowIfNull(element);
         return (bool)element.GetValue(IsFocusScopeProperty);
@@ -229,7 +229,7 @@ public static class FocusManager
     /// <param name="value">
     /// true if element is a focus scope; otherwise, false.
     /// </param>
-    public static void SetIsFocusScope(DependencyObject element, bool value)
+    internal static void SetIsFocusScope(DependencyObject element, bool value)
     {
         ArgumentNullException.ThrowIfNull(element);
         element.SetValueInternal(IsFocusScopeProperty, value);
