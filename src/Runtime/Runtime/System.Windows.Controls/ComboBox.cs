@@ -102,7 +102,7 @@ namespace System.Windows.Controls
             string stringFormat;
 
             int index = InternalSelectedIndex;
-            if (index <= -1 || (!UseWpfBehavior && IsDropDownOpen && item is FrameworkElement))
+            if (index <= -1 || (!_useWpfTemplate && IsDropDownOpen && item is FrameworkElement))
             {
                 item = _emptyContent;
                 itemTemplate = null;
@@ -128,7 +128,7 @@ namespace System.Windows.Controls
                 // When dropdown is open and the content is a UIElement, it can't be in two places.
                 // In WPF mode, use a VisualBrush to paint a copy in the display area.
                 // In SL mode, show empty content (original behavior).
-                if (IsDropDownOpen && UseWpfBehavior && content is FrameworkElement fe)
+                if (IsDropDownOpen && _useWpfTemplate && content is FrameworkElement fe)
                 {
                     content = selectionBoxItem = new Rectangle
                     {
@@ -163,6 +163,8 @@ namespace System.Windows.Controls
 
         public override void OnApplyTemplate()
         {
+            ResolveUseWpfTemplate();
+
             if (_popup != null)
             {
                 _popup.PlacementTarget = null;
@@ -178,12 +180,12 @@ namespace System.Windows.Controls
             }
 
             // _scrollHost must be set before calling base
-            string scrollViewerName = UseWpfBehavior ? WpfScrollViewerName : ScrollViewerTemplateName;
+            string scrollViewerName = _useWpfTemplate ? WpfScrollViewerName : ScrollViewerTemplateName;
             _scrollHost = GetTemplateChild(scrollViewerName) as ScrollViewer;
 
             base.OnApplyTemplate();
 
-            string popupName = UseWpfBehavior ? WpfPopupName : PopupTemplateName;
+            string popupName = _useWpfTemplate ? WpfPopupName : PopupTemplateName;
             _popup = GetTemplateChild(popupName) as Popup;
 
             //this will enable virtualization in combo box without templating the whole style
@@ -207,7 +209,7 @@ namespace System.Windows.Controls
                 }
             }
 
-            string contentPresenterName = UseWpfBehavior ? WpfContentPresenterName : ContentPresenterTemplateName;
+            string contentPresenterName = _useWpfTemplate ? WpfContentPresenterName : ContentPresenterTemplateName;
             _contentPresenter = GetTemplateChild(contentPresenterName) as ContentPresenter;
             if (_contentPresenter != null)
             {
@@ -219,7 +221,7 @@ namespace System.Windows.Controls
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
             }
 
-            string toggleName = UseWpfBehavior ? WpfToggleButtonName : DropDownToggleTemplateName;
+            string toggleName = _useWpfTemplate ? WpfToggleButtonName : DropDownToggleTemplateName;
             _dropDownToggle = GetTemplateChild(toggleName) as ToggleButton;
             if (_dropDownToggle != null)
             {
@@ -835,19 +837,47 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// Identifies the <see cref="TemplateMode"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty UseWpfBehaviorProperty =
-            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(ComboBox), new PropertyMetadata(false));
+        public static readonly DependencyProperty TemplateModeProperty =
+            DependencyProperty.Register(
+                nameof(TemplateMode),
+                typeof(TemplateMode),
+                typeof(ComboBox),
+                new PropertyMetadata(TemplateMode.Auto));
 
         /// <summary>
-        /// When true, the ComboBox keeps showing the selected item (via VisualBrush)
-        /// when the dropdown is open, matching WPF behavior.
+        /// Gets or sets a value that determines whether the <see cref="ComboBox"/> uses WPF template
+        /// parts and behaviors (e.g. keeping the selected item shown via a VisualBrush when the
+        /// dropdown is open), the Silverlight template parts and behaviors, or automatically detects
+        /// the applied template. The default is <see cref="TemplateMode.Auto"/>.
         /// </summary>
-        public bool UseWpfBehavior
+        public TemplateMode TemplateMode
         {
-            get { return (bool)GetValue(UseWpfBehaviorProperty); }
-            set { SetValue(UseWpfBehaviorProperty, value); }
+            get { return (TemplateMode)GetValue(TemplateModeProperty); }
+            set { SetValue(TemplateModeProperty, value); }
+        }
+
+        private bool _useWpfTemplate;
+
+        /// <summary>
+        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
+        /// <see cref="_useWpfTemplate"/>.
+        /// </summary>
+        private void ResolveUseWpfTemplate()
+        {
+            switch (TemplateMode)
+            {
+                case TemplateMode.Wpf:
+                    _useWpfTemplate = true;
+                    break;
+                case TemplateMode.Silverlight:
+                    _useWpfTemplate = false;
+                    break;
+                default:
+                    _useWpfTemplate = GetTemplateChild(WpfPopupName) is Popup;
+                    break;
+            }
         }
 
         internal override void UpdateVisualStates(bool useTransitions)

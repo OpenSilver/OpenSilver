@@ -56,19 +56,47 @@ namespace System.Windows.Controls
         public ProgressBar() { }
 
         /// <summary>
-        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// Identifies the <see cref="TemplateMode"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty UseWpfBehaviorProperty =
-            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(ProgressBar), new PropertyMetadata(false));
+        public static readonly DependencyProperty TemplateModeProperty =
+            DependencyProperty.Register(
+                nameof(TemplateMode),
+                typeof(TemplateMode),
+                typeof(ProgressBar),
+                new PropertyMetadata(TemplateMode.Auto));
 
         /// <summary>
-        /// Defines whether the ProgressBar should use WPF-style template parts (PART_Track, PART_Indicator,
-        /// PART_GlowRect) and indeterminate animation, or the Silverlight-style parts and behavior.
+        /// Gets or sets a value that determines whether the <see cref="ProgressBar"/> uses WPF-style
+        /// template parts (PART_Track, PART_Indicator, PART_GlowRect) and indeterminate animation,
+        /// the Silverlight-style parts and behavior, or automatically detects the applied template.
+        /// The default is <see cref="TemplateMode.Auto"/>.
         /// </summary>
-        public bool UseWpfBehavior
+        public TemplateMode TemplateMode
         {
-            get { return (bool)GetValue(UseWpfBehaviorProperty); }
-            set { SetValue(UseWpfBehaviorProperty, value); }
+            get { return (TemplateMode)GetValue(TemplateModeProperty); }
+            set { SetValue(TemplateModeProperty, value); }
+        }
+
+        private bool _useWpfTemplate;
+
+        /// <summary>
+        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
+        /// <see cref="_useWpfTemplate"/>.
+        /// </summary>
+        private void ResolveUseWpfTemplate()
+        {
+            switch (TemplateMode)
+            {
+                case TemplateMode.Wpf:
+                    _useWpfTemplate = true;
+                    break;
+                case TemplateMode.Silverlight:
+                    _useWpfTemplate = false;
+                    break;
+                default:
+                    _useWpfTemplate = GetTemplateChild(WpfIndicatorName) is FrameworkElement;
+                    break;
+            }
         }
 
         /// <summary>
@@ -100,7 +128,7 @@ namespace System.Windows.Controls
         private static void IsIndeterminatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var pb = (ProgressBar)d;
-            if (pb.UseWpfBehavior)
+            if (pb._useWpfTemplate)
             {
                 pb.SetProgressBarIndicatorLength();
                 pb.SetProgressBarGlowElementBrush();
@@ -121,7 +149,9 @@ namespace System.Windows.Controls
                 _track.SizeChanged -= new SizeChangedEventHandler(OnTrackSizeChanged);
             }
 
-            if (UseWpfBehavior)
+            ResolveUseWpfTemplate();
+
+            if (_useWpfTemplate)
             {
                 _indicator = GetTemplateChild(WpfIndicatorName) as FrameworkElement;
                 _track = GetTemplateChild(WpfTrackName) as FrameworkElement;
@@ -139,7 +169,7 @@ namespace System.Windows.Controls
                 _track.SizeChanged += new SizeChangedEventHandler(OnTrackSizeChanged);
             }
 
-            if (UseWpfBehavior && IsIndeterminate)
+            if (_useWpfTemplate && IsIndeterminate)
             {
                 SetProgressBarGlowElementBrush();
             }
@@ -221,7 +251,7 @@ namespace System.Windows.Controls
             double max = Maximum;
             double val = Value;
 
-            if (UseWpfBehavior)
+            if (_useWpfTemplate)
             {
                 double percent = IsIndeterminate || max <= min ? 1.0 : (val - min) / (max - min);
                 _indicator.Width = percent * _track.ActualWidth;
@@ -256,7 +286,7 @@ namespace System.Windows.Controls
         /// </summary>
         private void UpdateGlowAnimation()
         {
-            if (!UseWpfBehavior || _glow == null)
+            if (!_useWpfTemplate || _glow == null)
                 return;
 
             if (IsIndeterminate && _glow.Width > 0 && _indicator.Width > 0)

@@ -78,22 +78,49 @@ namespace System.Windows.Controls.Primitives
         private const string ElementDisabledVisual = "DisabledVisual";
 
         /// <summary>
-        /// Identifies the <see cref="UseWpfBehavior"/> dependency property.
+        /// Identifies the <see cref="TemplateMode"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty UseWpfBehaviorProperty =
-            DependencyProperty.Register(nameof(UseWpfBehavior), typeof(bool), typeof(CalendarItem), new PropertyMetadata(false));
+        public static readonly DependencyProperty TemplateModeProperty =
+            DependencyProperty.Register(
+                nameof(TemplateMode),
+                typeof(TemplateMode),
+                typeof(CalendarItem),
+                new PropertyMetadata(TemplateMode.Auto));
 
         /// <summary>
-        /// Defines whether the CalendarItem should use WPF-style template parts
-        /// (PART_ prefix) or the Silverlight-style parts.
+        /// Gets or sets a value that determines whether the <see cref="CalendarItem"/> looks for
+        /// WPF-style template parts (PART_ prefix), Silverlight-style parts, or automatically detects
+        /// the applied template. The default is <see cref="TemplateMode.Auto"/>.
         /// </summary>
-        public bool UseWpfBehavior
+        public TemplateMode TemplateMode
         {
-            get { return (bool)GetValue(UseWpfBehaviorProperty); }
-            set { SetValue(UseWpfBehaviorProperty, value); }
+            get { return (TemplateMode)GetValue(TemplateModeProperty); }
+            set { SetValue(TemplateModeProperty, value); }
         }
 
-        private string PartPrefix => UseWpfBehavior ? "PART_" : "";
+        private bool _useWpfTemplate;
+
+        private string PartPrefix => _useWpfTemplate ? "PART_" : "";
+
+        /// <summary>
+        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
+        /// <see cref="_useWpfTemplate"/>.
+        /// </summary>
+        private void ResolveUseWpfTemplate()
+        {
+            switch (TemplateMode)
+            {
+                case TemplateMode.Wpf:
+                    _useWpfTemplate = true;
+                    break;
+                case TemplateMode.Silverlight:
+                    _useWpfTemplate = false;
+                    break;
+                default:
+                    _useWpfTemplate = GetTemplateChild("PART_" + ElementMonthView) is Grid;
+                    break;
+            }
+        }
 
         /// <summary>
         /// The button that allows switching between month mode, year mode, and
@@ -359,6 +386,8 @@ namespace System.Windows.Controls.Primitives
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            ResolveUseWpfTemplate();
 
             string p = PartPrefix;
 

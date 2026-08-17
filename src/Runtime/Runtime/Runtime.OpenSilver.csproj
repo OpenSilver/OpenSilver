@@ -1001,6 +1001,7 @@
     <Compile Include="System.Windows.Controls\StretchDirection.cs" />
     <Compile Include="System.Windows.Controls\TextBlock.cs" />
     <Compile Include="System.Windows.Controls\TextBox.cs" />
+    <Compile Include="System.Windows.Controls\TemplateMode.cs" />
     <Compile Include="System.Windows.Controls\TextChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\ToolTip.cs" />
     <Compile Include="System.Windows.Controls\ToolTipService.cs" />
