@@ -17,7 +17,6 @@ using OpenSilver.Internal.Documents;
 using System.Text;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.Xaml.Markup;
 
 namespace System.Windows.Documents;
 
@@ -547,9 +546,6 @@ public abstract class TextElement : UIElement
         get => (XmlLanguage)GetValue(LanguageProperty);
         set => SetValueInternal(LanguageProperty, value);
     }
-
-    internal static readonly DependencyProperty FlowDirectionProperty =
-        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(TextElement));
 
     /// <summary>
     /// Gets or sets a unique identification for the object.

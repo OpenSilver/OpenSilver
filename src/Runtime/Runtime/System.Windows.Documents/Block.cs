@@ -29,12 +29,6 @@ public abstract class Block : TextElement
     protected Block() { }
 
     /// <summary>
-    /// Identifies the FlowDirection dependency property.
-    /// </summary>
-    public new static readonly DependencyProperty FlowDirectionProperty =
-        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(Block));
-
-    /// <summary>
     /// Identifies the <see cref="LineHeight" /> dependency property.
     /// </summary>
     public static readonly DependencyProperty LineHeightProperty =
@@ -363,6 +357,25 @@ public abstract class Block : TextElement
             return false;
         }
         return true;
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="FlowDirection"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(Block));
+
+    /// <summary>
+    /// Gets or sets the relative direction for flow of content within a <see cref="Block"/> element.
+    /// </summary>
+    /// <returns>
+    /// One of the <see cref="Windows.FlowDirection"/> values that specifies the relative flow direction.
+    /// The default is <see cref="FlowDirection.LeftToRight"/>.
+    /// </returns>
+    public FlowDirection FlowDirection
+    {
+        get => (FlowDirection)GetValue(FlowDirectionProperty);
+        set => SetValueInternal(FlowDirectionProperty, value);
     }
 
     /// <inheritdoc />

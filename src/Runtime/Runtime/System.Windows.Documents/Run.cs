@@ -100,6 +100,13 @@ public sealed class Run : Inline
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetTextDecorations((TextDecorationCollection)newValue),
             });
+
+        FlowDirectionProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(FlowDirection.LeftToRight, FrameworkPropertyMetadataOptions.Inherits)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetDirection((FlowDirection)newValue),
+            });
     }
 
     private WeakEventToken _weakEventToken;
@@ -157,13 +164,7 @@ public sealed class Run : Inline
     /// <summary>
     /// Identifies the <see cref="FlowDirection"/> dependency property.
     /// </summary>
-    public new static readonly DependencyProperty FlowDirectionProperty =
-        TextElement.FlowDirectionProperty.AddOwner(
-            typeof(Run),
-            new FrameworkPropertyMetadata(FlowDirection.LeftToRight, FrameworkPropertyMetadataOptions.Inherits)
-            {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetDirection((FlowDirection)newValue),
-            });
+    public new static readonly DependencyProperty FlowDirectionProperty = Inline.FlowDirectionProperty;
 
     /// <summary>
     /// Gets or sets the direction that text and other user interface elements flow within
@@ -173,10 +174,10 @@ public sealed class Run : Inline
     /// The direction that text and other UI elements flow within the <see cref="Run"/>
     /// element. The default value is <see cref="FlowDirection.LeftToRight"/>.
     /// </returns>
-    public FlowDirection FlowDirection
+    public new FlowDirection FlowDirection
     {
-        get => (FlowDirection)GetValue(FlowDirectionProperty);
-        set => SetValueInternal(FlowDirectionProperty, value);
+        get => base.FlowDirection;
+        set => base.FlowDirection = value;
     }
 
     private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

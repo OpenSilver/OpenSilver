@@ -62,12 +62,6 @@ public abstract class Inline : TextElement
     public new static readonly DependencyProperty LanguageProperty = TextElement.LanguageProperty;
 
     /// <summary>
-    /// Identifies the FlowDirection dependency property.
-    /// </summary>
-    public new static readonly DependencyProperty FlowDirectionProperty =
-        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(Inline));
-
-    /// <summary>
     /// Identifies the <see cref="TextDecorations"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty TextDecorationsProperty =
@@ -89,6 +83,28 @@ public abstract class Inline : TextElement
     {
         get => (TextDecorationCollection)GetValue(TextDecorationsProperty);
         set => SetValueInternal(TextDecorationsProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="FlowDirection"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(Inline));
+
+    /// <summary>
+    /// Gets or sets a value that specifies the relative direction for flow of content 
+    /// within a <see cref="Inline"/> element.
+    /// </summary>
+    /// <returns>
+    /// A member of the <see cref="Windows.FlowDirection"/> enumeration specifying the 
+    /// relative flow direction. Getting this property returns the currently effective 
+    /// flow direction. Setting this property causes the contents of the <see cref="Inline"/>
+    /// element to re-flow in the indicated direction. The default value is <see cref="FlowDirection.LeftToRight"/>.
+    /// </returns>
+    public FlowDirection FlowDirection
+    {
+        get => (FlowDirection)GetValue(FlowDirectionProperty);
+        set => SetValueInternal(FlowDirectionProperty, value);
     }
 
     // Defining an implicit conversion from string to Inline allows to
