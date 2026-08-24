@@ -128,15 +128,16 @@ namespace System.Windows.Controls
                 // When dropdown is open and the content is a UIElement, it can't be in two places.
                 // In WPF mode, use a VisualBrush to paint a copy in the display area.
                 // In SL mode, show empty content (original behavior).
-                if (IsDropDownOpen && _useWpfTemplate && content is FrameworkElement fe)
+                if (IsDropDownOpen && _useWpfTemplate && item is FrameworkElement fe)
                 {
-                    content = selectionBoxItem = new Rectangle
+                    item = new Rectangle
                     {
                         Width = fe.ActualWidth,
                         Height = fe.ActualHeight,
                         Fill = new VisualBrush(fe),
                     };
-                    template = selectionBoxItemTemplate = null;
+                    itemTemplate = null;
+                    itemTemplateSelector = null;
                 }
                 itemTemplateSelector = ItemTemplateSelector;
             }
