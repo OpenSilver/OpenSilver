@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Automation.Peers;
 using System.Windows.Shapes;
+using OpenSilver.Compatibility;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -30,13 +31,9 @@ namespace System.Windows.Controls
     public class ProgressBar : RangeBase
     {
         // Silverlight part names
-        private const string ProgressBarIndicatorName = "ProgressBarIndicator";
-        private const string ProgressBarTrackName = "ProgressBarTrack";
-
-        // WPF part names
-        private const string WpfTrackName = "PART_Track";
-        private const string WpfIndicatorName = "PART_Indicator";
-        private const string WpfGlowRectName = "PART_GlowRect";
+        private const string ProgressBarIndicatorName = "ProgressBarIndicator", WPF_ProgressBarIndicatorName = "PART_Indicator";
+        private const string ProgressBarTrackName = "ProgressBarTrack", WPF_ProgressBarTrackName = "PART_Track";
+        private const string WPF_ProgressBarGlowRectName = "PART_GlowRect";
 
         private const string StateIndeterminate = "Indeterminate";
         private const string StateDeterminate = "Determinate";
@@ -44,6 +41,8 @@ namespace System.Windows.Controls
         private FrameworkElement _track;
         private FrameworkElement _indicator;
         private FrameworkElement _glow;
+
+        private bool _useWpfTemplate;
 
         static ProgressBar()
         {
@@ -56,47 +55,33 @@ namespace System.Windows.Controls
         public ProgressBar() { }
 
         /// <summary>
-        /// Identifies the <see cref="TemplateMode"/> dependency property.
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TemplateModeProperty =
-            DependencyProperty.Register(
-                nameof(TemplateMode),
-                typeof(TemplateMode),
-                typeof(ProgressBar),
-                new PropertyMetadata(TemplateMode.Auto));
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(ProgressBar), new PropertyMetadata(TemplateKind.Auto));
 
         /// <summary>
-        /// Gets or sets a value that determines whether the <see cref="ProgressBar"/> uses WPF-style
-        /// template parts (PART_Track, PART_Indicator, PART_GlowRect) and indeterminate animation,
-        /// the Silverlight-style parts and behavior, or automatically detects the applied template.
-        /// The default is <see cref="TemplateMode.Auto"/>.
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="ProgressBar"/>
         /// </summary>
-        public TemplateMode TemplateMode
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
         {
-            get { return (TemplateMode)GetValue(TemplateModeProperty); }
-            set { SetValue(TemplateModeProperty, value); }
+            get { return (TemplateKind)GetValue(TemplateKindProperty); }
+            set { SetValue(TemplateKindProperty, value); }
         }
 
-        private bool _useWpfTemplate;
-
-        /// <summary>
-        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
-        /// <see cref="_useWpfTemplate"/>.
-        /// </summary>
-        private void ResolveUseWpfTemplate()
+        private bool IsWpfTemplate()
         {
-            switch (TemplateMode)
+            return TemplateKind switch
             {
-                case TemplateMode.Wpf:
-                    _useWpfTemplate = true;
-                    break;
-                case TemplateMode.Silverlight:
-                    _useWpfTemplate = false;
-                    break;
-                default:
-                    _useWpfTemplate = GetTemplateChild(WpfIndicatorName) is FrameworkElement;
-                    break;
-            }
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(WPF_ProgressBarIndicatorName) is FrameworkElement,
+            };
         }
 
         /// <summary>
@@ -107,7 +92,7 @@ namespace System.Windows.Controls
                 nameof(IsIndeterminate),
                 typeof(bool),
                 typeof(ProgressBar),
-                new PropertyMetadata(false, IsIndeterminatePropertyChanged));
+                new PropertyMetadata(BooleanBoxes.FalseBox, IsIndeterminatePropertyChanged));
 
         /// <summary>
         /// Gets or sets a value that indicates whether the progress bar reports generic
@@ -149,20 +134,11 @@ namespace System.Windows.Controls
                 _track.SizeChanged -= new SizeChangedEventHandler(OnTrackSizeChanged);
             }
 
-            ResolveUseWpfTemplate();
+            _useWpfTemplate = IsWpfTemplate();
 
-            if (_useWpfTemplate)
-            {
-                _indicator = GetTemplateChild(WpfIndicatorName) as FrameworkElement;
-                _track = GetTemplateChild(WpfTrackName) as FrameworkElement;
-                _glow = GetTemplateChild(WpfGlowRectName) as FrameworkElement;
-            }
-            else
-            {
-                _indicator = GetTemplateChild(ProgressBarIndicatorName) as FrameworkElement;
-                _track = GetTemplateChild(ProgressBarTrackName) as FrameworkElement;
-                _glow = null;
-            }
+            _indicator = GetIndicator(_useWpfTemplate);
+            _track = GetTrack(_useWpfTemplate);
+            _glow = GetGlow(_useWpfTemplate);
 
             if (_indicator != null && _track != null)
             {
@@ -237,6 +213,26 @@ namespace System.Windows.Controls
             VisualStateManager.GoToState(this, IsIndeterminate ? StateIndeterminate : StateDeterminate, useTransitions);
         }
 
+        private FrameworkElement GetIndicator(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? WPF_ProgressBarIndicatorName : ProgressBarIndicatorName) as FrameworkElement;
+        }
+
+        private FrameworkElement GetTrack(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? WPF_ProgressBarTrackName : ProgressBarTrackName) as FrameworkElement;
+        }
+
+        private FrameworkElement GetGlow(bool isWpfTemplate)
+        {
+            if (isWpfTemplate)
+            {
+                return GetTemplateChild(WPF_ProgressBarGlowRectName) as FrameworkElement;
+            }
+
+            return null;
+        }
+
         private void OnTrackSizeChanged(object sender, SizeChangedEventArgs e)
         {
             SetProgressBarIndicatorLength();
@@ -293,9 +289,8 @@ namespace System.Windows.Controls
             {
                 double endPos = _indicator.Width + _glow.Width;
                 double startPos = -1 * _glow.Width;
-                double speed = 200.0; // pixels per second
 
-                TimeSpan translateTime = TimeSpan.FromSeconds((endPos - startPos) / speed);
+                TimeSpan translateTime = TimeSpan.FromSeconds((endPos - startPos) / 200.0); // travel at 200px per second
                 TimeSpan pauseTime = TimeSpan.FromSeconds(1.0);
 
                 var animation = new ThicknessAnimation
@@ -306,11 +301,11 @@ namespace System.Windows.Controls
                     RepeatBehavior = RepeatBehavior.Forever
                 };
 
-                _glow.BeginAnimation(FrameworkElement.MarginProperty, animation);
+                _glow.BeginAnimation(MarginProperty, animation);
             }
             else
             {
-                _glow.BeginAnimation(FrameworkElement.MarginProperty, null);
+                _glow.BeginAnimation(MarginProperty, null);
             }
         }
 
@@ -320,25 +315,44 @@ namespace System.Windows.Controls
         /// </summary>
         private void SetProgressBarGlowElementBrush()
         {
-            if (_glow == null)
+            if (_glow is not Shape shape)
                 return;
 
-            if (IsIndeterminate && Foreground is SolidColorBrush scb)
+            if (IsIndeterminate)
             {
-                Color color = scb.Color;
-                var brush = new LinearGradientBrush
+                if (Foreground is SolidColorBrush scb)
                 {
-                    StartPoint = new Point(0, 0),
-                    EndPoint = new Point(1, 0)
-                };
-                brush.GradientStops.Add(new GradientStop { Color = Colors.Transparent, Offset = 0.0 });
-                brush.GradientStops.Add(new GradientStop { Color = color, Offset = 0.4 });
-                brush.GradientStops.Add(new GradientStop { Color = color, Offset = 0.6 });
-                brush.GradientStops.Add(new GradientStop { Color = Colors.Transparent, Offset = 1.0 });
+                    Color color = scb.Color;
+                    var brush = new LinearGradientBrush
+                    {
+                        StartPoint = new Point(0, 0),
+                        EndPoint = new Point(1, 0)
+                    };
 
-                if (_glow is Shape shape)
+                    brush.GradientStops.Add(new GradientStop(Colors.Transparent, 0.0));
+                    brush.GradientStops.Add(new GradientStop(color, 0.4));
+                    brush.GradientStops.Add(new GradientStop(color, 0.6));
+                    brush.GradientStops.Add(new GradientStop(Colors.Transparent, 1.0));
+
+                    shape.SetCurrentValue(OpacityMaskProperty, null);
+                    shape.SetCurrentValue(Shape.FillProperty, brush);
+                }
+                else
                 {
-                    shape.Fill = brush;
+                    // This is not a solid color brush so we will need an opacity mask.
+                    var mask = new LinearGradientBrush
+                    {
+                        StartPoint = new Point(0, 0),
+                        EndPoint = new Point(1, 0)
+                    };
+
+                    mask.GradientStops.Add(new GradientStop(Colors.Transparent, 0.0));
+                    mask.GradientStops.Add(new GradientStop(Colors.Black, 0.4));
+                    mask.GradientStops.Add(new GradientStop(Colors.Black, 0.6));
+                    mask.GradientStops.Add(new GradientStop(Colors.Transparent, 1.0));
+
+                    shape.SetCurrentValue(OpacityMaskProperty, mask);
+                    shape.SetCurrentValue(Shape.FillProperty, Foreground);
                 }
             }
         }

@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Compatibility;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -45,17 +46,17 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// The name of the HeaderButton template part.
         /// </summary>
-        private const string ElementHeaderButton = "HeaderButton";
+        private const string ElementHeaderButton = "HeaderButton", PART_ElementHeaderButton = "PART_HeaderButton"; // SL & WPF
 
         /// <summary>
         /// The name of the PreviousButton template part.
         /// </summary>
-        private const string ElementPreviousButton = "PreviousButton";
+        private const string ElementPreviousButton = "PreviousButton", PART_ElementPreviousButton = "PART_PreviousButton"; // SL & WPF
 
         /// <summary>
         /// The name of the NextButton template part.
         /// </summary>
-        private const string ElementNextButton = "NextButton";
+        private const string ElementNextButton = "NextButton", PART_ElementNextButton = "PART_NextButton"; // SL & WPF
 
         /// <summary>
         /// The name of the DayTitleTemplate template part.
@@ -65,62 +66,17 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// The name of the MonthView template part.
         /// </summary>
-        private const string ElementMonthView = "MonthView";
+        private const string ElementMonthView = "MonthView", PART_ElementMonthView = "PART_MonthView"; // SL & WPF
 
         /// <summary>
         /// The name of the YearView template part.
         /// </summary>
-        private const string ElementYearView = "YearView";
+        private const string ElementYearView = "YearView", PART_ElementYearView = "PART_YearView"; // SL & WPF
 
         /// <summary>
         /// The name of the DisabledVisual template part.
         /// </summary>
-        private const string ElementDisabledVisual = "DisabledVisual";
-
-        /// <summary>
-        /// Identifies the <see cref="TemplateMode"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TemplateModeProperty =
-            DependencyProperty.Register(
-                nameof(TemplateMode),
-                typeof(TemplateMode),
-                typeof(CalendarItem),
-                new PropertyMetadata(TemplateMode.Auto));
-
-        /// <summary>
-        /// Gets or sets a value that determines whether the <see cref="CalendarItem"/> looks for
-        /// WPF-style template parts (PART_ prefix), Silverlight-style parts, or automatically detects
-        /// the applied template. The default is <see cref="TemplateMode.Auto"/>.
-        /// </summary>
-        public TemplateMode TemplateMode
-        {
-            get { return (TemplateMode)GetValue(TemplateModeProperty); }
-            set { SetValue(TemplateModeProperty, value); }
-        }
-
-        private bool _useWpfTemplate;
-
-        private string PartPrefix => _useWpfTemplate ? "PART_" : "";
-
-        /// <summary>
-        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
-        /// <see cref="_useWpfTemplate"/>.
-        /// </summary>
-        private void ResolveUseWpfTemplate()
-        {
-            switch (TemplateMode)
-            {
-                case TemplateMode.Wpf:
-                    _useWpfTemplate = true;
-                    break;
-                case TemplateMode.Silverlight:
-                    _useWpfTemplate = false;
-                    break;
-                default:
-                    _useWpfTemplate = GetTemplateChild("PART_" + ElementMonthView) is Grid;
-                    break;
-            }
-        }
+        private const string ElementDisabledVisual = "DisabledVisual", PART_ElementDisabledVisual = "PART_DisabledVisual"; // SL & WPF
 
         /// <summary>
         /// The button that allows switching between month mode, year mode, and
@@ -306,6 +262,67 @@ namespace System.Windows.Controls.Primitives
         /// with existing templates.
         /// </remarks>
         private FrameworkElement _disabledVisual;
+
+        private Button GetElementHeaderButton(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementHeaderButton : ElementHeaderButton) as Button;
+        }
+
+        private Button GetElementPreviousButton(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementPreviousButton : ElementPreviousButton) as Button;
+        }
+
+        private Button GetElementNextButton(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementNextButton : ElementNextButton) as Button;
+        }
+
+        private Grid GetElementMonthView(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementMonthView : ElementMonthView) as Grid;
+        }
+
+        private Grid GetElementYearView(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementYearView : ElementYearView) as Grid;
+        }
+
+        private FrameworkElement GetElementDisabledVisual(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementDisabledVisual : ElementDisabledVisual) as FrameworkElement;
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(CalendarItem), new PropertyMetadata(TemplateKind.Auto));
+
+        /// <summary>
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="CalendarItem"/>
+        /// </summary>
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
+        {
+            get { return (TemplateKind)GetValue(TemplateKindProperty); }
+            set { SetValue(TemplateKindProperty, value); }
+        }
+
+        private bool IsWpfTemplate()
+        {
+            return TemplateKind switch
+            {
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(PART_ElementMonthView) is Grid,
+            };
+        }
+
         #endregion Template Parts
 
         /// <summary>
@@ -387,17 +404,15 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnApplyTemplate();
 
-            ResolveUseWpfTemplate();
+            bool isWpfTemplate = IsWpfTemplate();
 
-            string p = PartPrefix;
-
-            HeaderButton = GetTemplateChild(p + ElementHeaderButton) as Button;
-            PreviousButton = GetTemplateChild(p + ElementPreviousButton) as Button;
-            NextButton = GetTemplateChild(p + ElementNextButton) as Button;
+            HeaderButton = GetElementHeaderButton(isWpfTemplate);
+            PreviousButton = GetElementPreviousButton(isWpfTemplate);
+            NextButton = GetElementNextButton(isWpfTemplate);
             _dayTitleTemplate = GetTemplateChild(ElementDayTitleTemplate) as DataTemplate;
-            MonthView = GetTemplateChild(p + ElementMonthView) as Grid;
-            YearView = GetTemplateChild(p + ElementYearView) as Grid;
-            _disabledVisual = GetTemplateChild(p + ElementDisabledVisual) as FrameworkElement;
+            MonthView = GetElementMonthView(isWpfTemplate);
+            YearView = GetElementYearView(isWpfTemplate);
+            _disabledVisual = GetElementDisabledVisual(isWpfTemplate);
 
             if (Owner != null)
             {

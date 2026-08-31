@@ -18,6 +18,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using OpenSilver.Compatibility;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -44,15 +45,10 @@ namespace System.Windows.Controls
     {
         private const string ContentPresenterTemplateName = "ContentPresenter";
         private const string ContentPresenterBorderTemplateName = "ContentPresenterBorder";
-        private const string PopupTemplateName = "Popup";
+        private const string PopupTemplateName = "Popup", PART_PopupTemplateName = "PART_Popup";
         private const string DropDownToggleTemplateName = "DropDownToggle";
         private const string ScrollViewerTemplateName = "ScrollViewer";
         private const string FocusedDropDownState = "FocusedDropDown";
-
-        private const string WpfContentPresenterName = "contentPresenter";
-        private const string WpfPopupName = "PART_Popup";
-        private const string WpfToggleButtonName = "toggleButton";
-        private const string WpfScrollViewerName = "DropDownScrollViewer";
 
         private Popup _popup;
         private UIElement _popupChild;
@@ -60,6 +56,7 @@ namespace System.Windows.Controls
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
         private ScrollViewer _scrollHost;
+        private bool _useWpfTemplate;
 
         static ComboBox()
         {
@@ -128,7 +125,7 @@ namespace System.Windows.Controls
                 // When dropdown is open and the content is a UIElement, it can't be in two places.
                 // In WPF mode, use a VisualBrush to paint a copy in the display area.
                 // In SL mode, show empty content (original behavior).
-                if (IsDropDownOpen && _useWpfTemplate && item is FrameworkElement fe)
+                if (_useWpfTemplate && IsDropDownOpen && item is FrameworkElement fe)
                 {
                     item = new Rectangle
                     {
@@ -137,8 +134,8 @@ namespace System.Windows.Controls
                         Fill = new VisualBrush(fe),
                     };
                     itemTemplate = null;
-                    itemTemplateSelector = null;
                 }
+
                 itemTemplateSelector = ItemTemplateSelector;
             }
 
@@ -164,7 +161,7 @@ namespace System.Windows.Controls
 
         public override void OnApplyTemplate()
         {
-            ResolveUseWpfTemplate();
+            _useWpfTemplate = IsWpfTemplate();
 
             if (_popup != null)
             {
@@ -181,13 +178,18 @@ namespace System.Windows.Controls
             }
 
             // _scrollHost must be set before calling base
-            string scrollViewerName = _useWpfTemplate ? WpfScrollViewerName : ScrollViewerTemplateName;
-            _scrollHost = GetTemplateChild(scrollViewerName) as ScrollViewer;
+            if (_useWpfTemplate)
+            {
+                _scrollHost = GetScrollHost();
+            }
+            else
+            {
+                _scrollHost = GetTemplateChild(ScrollViewerTemplateName) as ScrollViewer;
+            }
 
             base.OnApplyTemplate();
 
-            string popupName = _useWpfTemplate ? WpfPopupName : PopupTemplateName;
-            _popup = GetTemplateChild(popupName) as Popup;
+            _popup = GetPopup(_useWpfTemplate);
 
             //this will enable virtualization in combo box without templating the whole style
             if (_popup != null)
@@ -210,27 +212,36 @@ namespace System.Windows.Controls
                 }
             }
 
-            string contentPresenterName = _useWpfTemplate ? WpfContentPresenterName : ContentPresenterTemplateName;
-            _contentPresenter = GetTemplateChild(contentPresenterName) as ContentPresenter;
-            if (_contentPresenter != null)
+            if (_useWpfTemplate)
             {
-                if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
+                _contentPresenter = null;
+                _dropDownToggle = null;
+                _emptyContent = null;
+            }
+            else
+            {
+                _contentPresenter = GetTemplateChild(ContentPresenterTemplateName) as ContentPresenter;
+                if (_contentPresenter != null)
                 {
-                    _contentPresenter.IsHitTestVisible = false;
+                    if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
+                    {
+                        _contentPresenter.IsHitTestVisible = false;
+                    }
+
+                    _emptyContent = _contentPresenter.Content as FrameworkElement;
                 }
 
-                _emptyContent = _contentPresenter.Content as FrameworkElement;
-            }
-
-            string toggleName = _useWpfTemplate ? WpfToggleButtonName : DropDownToggleTemplateName;
-            _dropDownToggle = GetTemplateChild(toggleName) as ToggleButton;
-            if (_dropDownToggle != null)
-            {
-                _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
+                _dropDownToggle = GetTemplateChild(DropDownToggleTemplateName) as ToggleButton;
+                _dropDownToggle?.Click += new RoutedEventHandler(OnDropDownToggleClick);
             }
 
             UpdatePresenter();
             UpdateVisualStates();
+        }
+
+        private Popup GetPopup(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_PopupTemplateName : PopupTemplateName) as Popup;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -838,47 +849,33 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="TemplateMode"/> dependency property.
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TemplateModeProperty =
-            DependencyProperty.Register(
-                nameof(TemplateMode),
-                typeof(TemplateMode),
-                typeof(ComboBox),
-                new PropertyMetadata(TemplateMode.Auto));
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(ComboBox), new PropertyMetadata(TemplateKind.Auto));
 
         /// <summary>
-        /// Gets or sets a value that determines whether the <see cref="ComboBox"/> uses WPF template
-        /// parts and behaviors (e.g. keeping the selected item shown via a VisualBrush when the
-        /// dropdown is open), the Silverlight template parts and behaviors, or automatically detects
-        /// the applied template. The default is <see cref="TemplateMode.Auto"/>.
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="ComboBox"/>
         /// </summary>
-        public TemplateMode TemplateMode
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
         {
-            get { return (TemplateMode)GetValue(TemplateModeProperty); }
-            set { SetValue(TemplateModeProperty, value); }
+            get => (TemplateKind)GetValue(TemplateKindProperty);
+            set => SetValueInternal(TemplateKindProperty, value);
         }
 
-        private bool _useWpfTemplate;
-
-        /// <summary>
-        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
-        /// <see cref="_useWpfTemplate"/>.
-        /// </summary>
-        private void ResolveUseWpfTemplate()
+        private bool IsWpfTemplate()
         {
-            switch (TemplateMode)
+            return TemplateKind switch
             {
-                case TemplateMode.Wpf:
-                    _useWpfTemplate = true;
-                    break;
-                case TemplateMode.Silverlight:
-                    _useWpfTemplate = false;
-                    break;
-                default:
-                    _useWpfTemplate = GetTemplateChild(WpfPopupName) is Popup;
-                    break;
-            }
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(PART_PopupTemplateName) is Popup,
+            };
         }
 
         internal override void UpdateVisualStates(bool useTransitions)

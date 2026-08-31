@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Compatibility;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Input;
@@ -27,52 +28,7 @@ namespace System.Windows.Controls.Primitives
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementContentName = "Watermark";
-
-        /// <summary>
-        /// Identifies the <see cref="TemplateMode"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TemplateModeProperty =
-            DependencyProperty.Register(
-                nameof(TemplateMode),
-                typeof(TemplateMode),
-                typeof(DatePickerTextBox),
-                new PropertyMetadata(TemplateMode.Auto));
-
-        /// <summary>
-        /// Gets or sets a value that determines whether the <see cref="DatePickerTextBox"/> looks for
-        /// WPF-style template parts (PART_ prefix), Silverlight-style parts, or automatically detects
-        /// the applied template. The default is <see cref="TemplateMode.Auto"/>.
-        /// </summary>
-        public TemplateMode TemplateMode
-        {
-            get { return (TemplateMode)GetValue(TemplateModeProperty); }
-            set { SetValue(TemplateModeProperty, value); }
-        }
-
-        private bool _useWpfTemplate;
-
-        private string PartPrefix => _useWpfTemplate ? "PART_" : "";
-
-        /// <summary>
-        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
-        /// <see cref="_useWpfTemplate"/>.
-        /// </summary>
-        private void ResolveUseWpfTemplate()
-        {
-            switch (TemplateMode)
-            {
-                case TemplateMode.Wpf:
-                    _useWpfTemplate = true;
-                    break;
-                case TemplateMode.Silverlight:
-                    _useWpfTemplate = false;
-                    break;
-                default:
-                    _useWpfTemplate = GetTemplateChild("PART_" + ElementContentName) is ContentControl;
-                    break;
-            }
-        }
+        private const string ElementContentName = "Watermark", PART_ElementContentName = "PART_Watermark"; // SL & WPF
 
         static DatePickerTextBox()
         {
@@ -184,13 +140,16 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnApplyTemplate();
 
-            ResolveUseWpfTemplate();
-
-            ElementContent = ExtractTemplatePart<ContentControl>(PartPrefix + ElementContentName);
+            ElementContent = GetElementContentName(IsWpfTemplate());
 
             OnWatermarkChanged();
 
             ChangeVisualState(false);
+        }
+
+        private ContentControl GetElementContentName(bool isWpfTemplate)
+        {
+            return ExtractTemplatePart<ContentControl>(isWpfTemplate ? PART_ElementContentName : ElementContentName);
         }
 
         #region Watermark
@@ -214,6 +173,38 @@ namespace System.Windows.Controls.Primitives
                 typeof(DatePickerTextBox),
                 new PropertyMetadata(OnWatermarkPropertyChanged));
         #endregion
+
+        #region TemplateKind
+        /// <summary>
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(DatePickerTextBox), new PropertyMetadata(TemplateKind.Auto));
+
+        /// <summary>
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="DatePickerTextBox"/>
+        /// </summary>
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
+        {
+            get { return (TemplateKind)GetValue(TemplateKindProperty); }
+            set { SetValue(TemplateKindProperty, value); }
+        }
+
+        private bool IsWpfTemplate()
+        {
+            return TemplateKind switch
+            {
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(PART_ElementContentName) is ContentControl,
+            };
+        }
+        #endregion TemplateKind
 
         /// <summary>
         /// Inherited code: Requires comment.

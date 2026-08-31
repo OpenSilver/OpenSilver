@@ -22,6 +22,8 @@
     <Compile Include="..\OpenSilver.Xaml\**\*.cs" LinkBase="XamlReader" />
     <Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
     <Compile Include="Core\Main\CopyOnWriteList.cs" />
+    <Compile Include="OpenSilver\Compatibility\FrameworkOptions.cs" />
+    <Compile Include="OpenSilver\Compatibility\TemplateKind.cs" />
     <Compile Include="OpenSilver\Controls\SaveFileDialog.cs" />
     <Compile Include="OpenSilver\Features.cs" />
     <Compile Include="OpenSilver\HtmlElementReference.cs" />
@@ -1001,7 +1003,6 @@
     <Compile Include="System.Windows.Controls\StretchDirection.cs" />
     <Compile Include="System.Windows.Controls\TextBlock.cs" />
     <Compile Include="System.Windows.Controls\TextBox.cs" />
-    <Compile Include="System.Windows.Controls\TemplateMode.cs" />
     <Compile Include="System.Windows.Controls\TextChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\ToolTip.cs" />
     <Compile Include="System.Windows.Controls\ToolTipService.cs" />

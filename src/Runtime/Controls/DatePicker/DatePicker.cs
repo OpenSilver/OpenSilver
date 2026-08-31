@@ -3,13 +3,14 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Compatibility;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Windows.Input;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using Resource = OpenSilver.Controls.Resources;
 
@@ -34,22 +35,22 @@ namespace System.Windows.Controls
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementRoot = "Root";
+        private const string ElementRoot = "Root", PART_ElementRoot = "PART_Root"; // SL & WPF
 
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementTextBox = "TextBox";
+        private const string ElementTextBox = "TextBox", PART_ElementTextBox = "PART_TextBox"; // SL & WPF
 
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementButton = "Button";
+        private const string ElementButton = "Button", PART_ElementButton = "PART_Button"; // SL & WPF
 
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementPopup = "Popup";
+        private const string ElementPopup = "Popup", PART_ElementPopup = "PART_Popup"; // SL & WPF
 
         /// <summary>
         /// Inherited code: Requires comment.
@@ -802,52 +803,37 @@ namespace System.Windows.Controls
         }
         #endregion Text
 
-        #region TemplateMode
+        #region TemplateKind
         /// <summary>
-        /// Identifies the <see cref="TemplateMode"/> dependency property.
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TemplateModeProperty =
-            DependencyProperty.Register(
-                nameof(TemplateMode),
-                typeof(TemplateMode),
-                typeof(DatePicker),
-                new PropertyMetadata(TemplateMode.Auto));
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(DatePicker), new PropertyMetadata(TemplateKind.Auto));
 
         /// <summary>
-        /// Gets or sets a value that determines whether the <see cref="DatePicker"/> looks for WPF-style
-        /// template parts (PART_ prefix), Silverlight-style parts, or automatically detects the applied
-        /// template. The default is <see cref="TemplateMode.Auto"/>.
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="DatePicker"/>
         /// </summary>
-        public TemplateMode TemplateMode
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
         {
-            get { return (TemplateMode)GetValue(TemplateModeProperty); }
-            set { SetValue(TemplateModeProperty, value); }
+            get { return (TemplateKind)GetValue(TemplateKindProperty); }
+            set { SetValue(TemplateKindProperty, value); }
         }
 
-        private bool _useWpfTemplate;
-
-        private string PartPrefix => _useWpfTemplate ? "PART_" : "";
-
-        /// <summary>
-        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
-        /// <see cref="_useWpfTemplate"/>.
-        /// </summary>
-        private void ResolveUseWpfTemplate()
+        private bool IsWpfTemplate()
         {
-            switch (TemplateMode)
+            return TemplateKind switch
             {
-                case TemplateMode.Wpf:
-                    _useWpfTemplate = true;
-                    break;
-                case TemplateMode.Silverlight:
-                    _useWpfTemplate = false;
-                    break;
-                default:
-                    _useWpfTemplate = GetTemplateChild("PART_" + ElementTextBox) is DatePickerTextBox;
-                    break;
-            }
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(PART_ElementTextBox) is DatePickerTextBox,
+            };
         }
-        #endregion
+        #endregion TemplateKind
 
         /// <summary>
         /// Builds the visual tree for the <see cref="DatePicker" /> control when a
@@ -857,16 +843,14 @@ namespace System.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            ResolveUseWpfTemplate();
-
-            string p = PartPrefix;
+            bool isWpfTemplate = IsWpfTemplate();
 
             if (_popUp != null)
             {
                 _popUp.Child = null;
             }
 
-            _popUp = GetTemplateChild(p + ElementPopup) as Popup;
+            _popUp = GetElementPopup(isWpfTemplate);
 
             if (_popUp != null)
             {
@@ -881,7 +865,7 @@ namespace System.Windows.Controls
                 }
 
                 _popUp.Child = this._outsideCanvas;
-                _root = GetTemplateChild(p + ElementRoot) as FrameworkElement;
+                _root = GetElementRoot(isWpfTemplate);
             }
 
             if (_dropDownButton != null)
@@ -889,7 +873,7 @@ namespace System.Windows.Controls
                 _dropDownButton.Click -= new RoutedEventHandler(DropDownButton_Click);
             }
 
-            _dropDownButton = GetTemplateChild(p + ElementButton) as Button;
+            _dropDownButton = GetElementButton(isWpfTemplate);
             if (_dropDownButton != null)
             {
                 _dropDownButton.Click += new RoutedEventHandler(DropDownButton_Click);
@@ -912,7 +896,7 @@ namespace System.Windows.Controls
                 _textBox.GotFocus -= new RoutedEventHandler(TextBox_GotFocus);
             }
 
-            _textBox = GetTemplateChild(p + ElementTextBox) as DatePickerTextBox;
+            _textBox = GetElementTextBox(isWpfTemplate);
 
             UpdateDisabledVisual();
             if (this.SelectedDate == null)
@@ -939,6 +923,26 @@ namespace System.Windows.Controls
                     _textBox.Text = this.DateTimeToString((DateTime) this.SelectedDate);
                 }
             }
+        }
+
+        private Popup GetElementPopup(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementPopup : ElementPopup) as Popup;
+        }
+
+        private FrameworkElement GetElementRoot(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementRoot : ElementRoot) as FrameworkElement;
+        }
+
+        private Button GetElementButton(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementButton : ElementButton) as Button;
+        }
+
+        private DatePickerTextBox GetElementTextBox(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementTextBox : ElementTextBox) as DatePickerTextBox;
         }
 
         /// <summary>

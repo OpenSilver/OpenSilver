@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Compatibility;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -119,62 +120,28 @@ namespace System.Windows.Controls
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementRoot = "Root";
+        private const string ElementRoot = "Root", PART_ElementRoot = "PART_Root"; // SL & WPF
 
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementMonth = "CalendarItem";
-
-        /// <summary>
-        /// Identifies the <see cref="TemplateMode"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TemplateModeProperty =
-            DependencyProperty.Register(
-                nameof(TemplateMode),
-                typeof(TemplateMode),
-                typeof(Calendar),
-                new PropertyMetadata(TemplateMode.Auto));
-
-        /// <summary>
-        /// Gets or sets a value that determines whether the <see cref="Calendar"/> looks for WPF-style
-        /// template parts (PART_ prefix), Silverlight-style parts, or automatically detects the applied
-        /// template. The default is <see cref="TemplateMode.Auto"/>.
-        /// </summary>
-        public TemplateMode TemplateMode
-        {
-            get { return (TemplateMode)GetValue(TemplateModeProperty); }
-            set { SetValue(TemplateModeProperty, value); }
-        }
-
-        private bool _useWpfTemplate;
-
-        private string PartPrefix => _useWpfTemplate ? "PART_" : "";
-
-        /// <summary>
-        /// Resolves whether the applied template is a WPF-style template and caches the outcome in
-        /// <see cref="_useWpfTemplate"/>.
-        /// </summary>
-        private void ResolveUseWpfTemplate()
-        {
-            switch (TemplateMode)
-            {
-                case TemplateMode.Wpf:
-                    _useWpfTemplate = true;
-                    break;
-                case TemplateMode.Silverlight:
-                    _useWpfTemplate = false;
-                    break;
-                default:
-                    _useWpfTemplate = GetTemplateChild("PART_" + ElementMonth) is CalendarItem;
-                    break;
-            }
-        }
+        private const string ElementMonth = "CalendarItem", PART_ElementMonth = "PART_CalendarItem"; // SL & WPF
 
         /// <summary>
         /// Gets or sets Inherited code: Requires comment.
         /// </summary>
         internal Panel Root { get; set; }
+
+        private Panel GetRootPart(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementRoot : ElementRoot) as Panel;
+        }
+
+        private CalendarItem GetElementMonthPart(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementMonth : ElementMonth) as CalendarItem;
+        }
+
         #endregion Template Parts
 
         /// <summary>
@@ -201,6 +168,38 @@ namespace System.Windows.Controls
         /// Gets or sets Inherited code: Requires comment.
         /// </summary>
         internal CalendarButton FocusCalendarButton { get; set; }
+
+        #region TemplateKind
+        /// <summary>
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(Calendar), new PropertyMetadata(TemplateKind.Auto));
+
+        /// <summary>
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="Calendar"/>
+        /// </summary>
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
+        {
+            get { return (TemplateKind)GetValue(TemplateKindProperty); }
+            set { SetValue(TemplateKindProperty, value); }
+        }
+
+        private bool IsWpfTemplate()
+        {
+            return TemplateKind switch
+            {
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(PART_ElementMonth) is CalendarItem,
+            };
+        }
+        #endregion TemplateKind
 
         #region CalendarButtonStyle
         /// <summary>
@@ -1497,18 +1496,16 @@ namespace System.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            ResolveUseWpfTemplate();
+            bool isWpfTemplate = IsWpfTemplate();
 
-            string p = PartPrefix;
-
-            Root = GetTemplateChild(p + ElementRoot) as Panel;
+            Root = GetRootPart(isWpfTemplate);
 
             SelectedMonth = DisplayDate;
             SelectedYear = DisplayDate;
 
             if (Root != null)
             {
-                CalendarItem month = GetTemplateChild(p + ElementMonth) as CalendarItem;
+                CalendarItem month = GetElementMonthPart(isWpfTemplate);
 
                 if (month != null)
                 {
