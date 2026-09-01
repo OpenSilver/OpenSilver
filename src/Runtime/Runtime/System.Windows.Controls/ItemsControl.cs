@@ -1252,6 +1252,20 @@ namespace System.Windows.Controls
             }
         }
 
+        internal ScrollViewer GetScrollHost()
+        {
+            // We have an itemshost, so walk up the visual tree looking for the ScrollViewer
+            for (DependencyObject current = ItemsHost; current != this && current is not null; current = VisualTreeHelper.GetParent(current))
+            {
+                if (current is ScrollViewer scrollViewer)
+                {
+                    return scrollViewer;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Returns a value that indicates whether to apply the style from the <see cref="ItemContainerStyle"/> or
         /// <see cref="ItemContainerStyleSelector"/> property to the container element of the specified item.
@@ -1612,15 +1626,6 @@ namespace System.Windows.Controls
                     }
                 }
             }
-        }
-
-        internal static DataTemplate GetDisplayMemberPathTemplate(ItemsControl itemsControl)
-        {
-            if (itemsControl.ItemTemplateSelector is DisplayMemberTemplateSelector itemTemplateSelector)
-            {
-                return itemTemplateSelector.ClrNodeContentTemplate;
-            }
-            return null;
         }
 
         private sealed class DisplayMemberTemplateSelector : DataTemplateSelector

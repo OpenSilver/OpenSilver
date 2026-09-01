@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Compatibility;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -119,17 +120,28 @@ namespace System.Windows.Controls
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementRoot = "Root";
+        private const string ElementRoot = "Root", PART_ElementRoot = "PART_Root"; // SL & WPF
 
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        private const string ElementMonth = "CalendarItem";
+        private const string ElementMonth = "CalendarItem", PART_ElementMonth = "PART_CalendarItem"; // SL & WPF
 
         /// <summary>
         /// Gets or sets Inherited code: Requires comment.
         /// </summary>
         internal Panel Root { get; set; }
+
+        private Panel GetRootPart(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementRoot : ElementRoot) as Panel;
+        }
+
+        private CalendarItem GetElementMonthPart(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_ElementMonth : ElementMonth) as CalendarItem;
+        }
+
         #endregion Template Parts
 
         /// <summary>
@@ -156,6 +168,38 @@ namespace System.Windows.Controls
         /// Gets or sets Inherited code: Requires comment.
         /// </summary>
         internal CalendarButton FocusCalendarButton { get; set; }
+
+        #region TemplateKind
+        /// <summary>
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(Calendar), new PropertyMetadata(TemplateKind.Auto));
+
+        /// <summary>
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="Calendar"/>
+        /// </summary>
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
+        {
+            get { return (TemplateKind)GetValue(TemplateKindProperty); }
+            set { SetValue(TemplateKindProperty, value); }
+        }
+
+        private bool IsWpfTemplate()
+        {
+            return TemplateKind switch
+            {
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(PART_ElementMonth) is CalendarItem,
+            };
+        }
+        #endregion TemplateKind
 
         #region CalendarButtonStyle
         /// <summary>
@@ -1452,14 +1496,16 @@ namespace System.Windows.Controls
         {
             base.OnApplyTemplate();
 
-            Root = GetTemplateChild(ElementRoot) as Panel;
+            bool isWpfTemplate = IsWpfTemplate();
+
+            Root = GetRootPart(isWpfTemplate);
 
             SelectedMonth = DisplayDate;
             SelectedYear = DisplayDate;
 
             if (Root != null)
             {
-                CalendarItem month = GetTemplateChild(ElementMonth) as CalendarItem;
+                CalendarItem month = GetElementMonthPart(isWpfTemplate);
 
                 if (month != null)
                 {

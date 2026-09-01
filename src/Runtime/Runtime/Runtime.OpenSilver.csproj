@@ -22,6 +22,8 @@
     <Compile Include="..\OpenSilver.Xaml\**\*.cs" LinkBase="XamlReader" />
     <Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
     <Compile Include="Core\Main\CopyOnWriteList.cs" />
+    <Compile Include="OpenSilver\Compatibility\FrameworkOptions.cs" />
+    <Compile Include="OpenSilver\Compatibility\TemplateKind.cs" />
     <Compile Include="OpenSilver\Controls\SaveFileDialog.cs" />
     <Compile Include="OpenSilver\Features.cs" />
     <Compile Include="OpenSilver\HtmlElementReference.cs" />

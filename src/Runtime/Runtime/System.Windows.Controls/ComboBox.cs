@@ -16,6 +16,9 @@ using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using OpenSilver.Compatibility;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -42,7 +45,7 @@ namespace System.Windows.Controls
     {
         private const string ContentPresenterTemplateName = "ContentPresenter";
         private const string ContentPresenterBorderTemplateName = "ContentPresenterBorder";
-        private const string PopupTemplateName = "Popup";
+        private const string PopupTemplateName = "Popup", PART_PopupTemplateName = "PART_Popup";
         private const string DropDownToggleTemplateName = "DropDownToggle";
         private const string ScrollViewerTemplateName = "ScrollViewer";
         private const string FocusedDropDownState = "FocusedDropDown";
@@ -53,6 +56,7 @@ namespace System.Windows.Controls
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
         private ScrollViewer _scrollHost;
+        private bool _useWpfTemplate;
 
         static ComboBox()
         {
@@ -95,7 +99,7 @@ namespace System.Windows.Controls
             string stringFormat;
 
             int index = InternalSelectedIndex;
-            if (index <= -1 || (IsDropDownOpen && item is FrameworkElement))
+            if (index <= -1 || (!_useWpfTemplate && IsDropDownOpen && item is FrameworkElement))
             {
                 item = _emptyContent;
                 itemTemplate = null;
@@ -116,6 +120,20 @@ namespace System.Windows.Controls
                 {
                     itemTemplate = ItemTemplate;
                     stringFormat = ItemStringFormat;
+                }
+
+                // When dropdown is open and the content is a UIElement, it can't be in two places.
+                // In WPF mode, use a VisualBrush to paint a copy in the display area.
+                // In SL mode, show empty content (original behavior).
+                if (_useWpfTemplate && IsDropDownOpen && item is FrameworkElement fe)
+                {
+                    item = new Rectangle
+                    {
+                        Width = fe.ActualWidth,
+                        Height = fe.ActualHeight,
+                        Fill = new VisualBrush(fe),
+                    };
+                    itemTemplate = null;
                 }
 
                 itemTemplateSelector = ItemTemplateSelector;
@@ -143,6 +161,8 @@ namespace System.Windows.Controls
 
         public override void OnApplyTemplate()
         {
+            _useWpfTemplate = IsWpfTemplate();
+
             if (_popup != null)
             {
                 _popup.PlacementTarget = null;
@@ -158,11 +178,18 @@ namespace System.Windows.Controls
             }
 
             // _scrollHost must be set before calling base
-            _scrollHost = GetTemplateChild(ScrollViewerTemplateName) as ScrollViewer;
+            if (_useWpfTemplate)
+            {
+                _scrollHost = GetScrollHost();
+            }
+            else
+            {
+                _scrollHost = GetTemplateChild(ScrollViewerTemplateName) as ScrollViewer;
+            }
 
             base.OnApplyTemplate();
 
-            _popup = GetTemplateChild(PopupTemplateName) as Popup;
+            _popup = GetPopup(_useWpfTemplate);
 
             //this will enable virtualization in combo box without templating the whole style
             if (_popup != null)
@@ -185,25 +212,36 @@ namespace System.Windows.Controls
                 }
             }
 
-            _contentPresenter = GetTemplateChild(ContentPresenterTemplateName) as ContentPresenter;
-            if (_contentPresenter != null)
+            if (_useWpfTemplate)
             {
-                if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
+                _contentPresenter = null;
+                _dropDownToggle = null;
+                _emptyContent = null;
+            }
+            else
+            {
+                _contentPresenter = GetTemplateChild(ContentPresenterTemplateName) as ContentPresenter;
+                if (_contentPresenter != null)
                 {
-                    _contentPresenter.IsHitTestVisible = false;
+                    if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
+                    {
+                        _contentPresenter.IsHitTestVisible = false;
+                    }
+
+                    _emptyContent = _contentPresenter.Content as FrameworkElement;
                 }
 
-                _emptyContent = _contentPresenter.Content as FrameworkElement;
-            }
-
-            _dropDownToggle = GetTemplateChild(DropDownToggleTemplateName) as ToggleButton;
-            if (_dropDownToggle != null)
-            {
-                _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
+                _dropDownToggle = GetTemplateChild(DropDownToggleTemplateName) as ToggleButton;
+                _dropDownToggle?.Click += new RoutedEventHandler(OnDropDownToggleClick);
             }
 
             UpdatePresenter();
             UpdateVisualStates();
+        }
+
+        private Popup GetPopup(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? PART_PopupTemplateName : PopupTemplateName) as Popup;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -808,6 +846,36 @@ namespace System.Windows.Controls
         {
             get { return (bool)GetValue(IsSelectionBoxHighlightedProperty); }
             private set { SetValueInternal(IsSelectionBoxHighlightedProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(ComboBox), new PropertyMetadata(TemplateKind.Auto));
+
+        /// <summary>
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="ComboBox"/>
+        /// </summary>
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
+        {
+            get => (TemplateKind)GetValue(TemplateKindProperty);
+            set => SetValueInternal(TemplateKindProperty, value);
+        }
+
+        private bool IsWpfTemplate()
+        {
+            return TemplateKind switch
+            {
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(PART_PopupTemplateName) is Popup,
+            };
         }
 
         internal override void UpdateVisualStates(bool useTransitions)

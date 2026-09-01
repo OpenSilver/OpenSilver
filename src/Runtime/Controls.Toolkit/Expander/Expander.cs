@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using OpenSilver.Compatibility;
 using System.Globalization;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -38,7 +39,9 @@ namespace System.Windows.Controls
         /// <summary>
         /// The name of the ExpanderButton template part.
         /// </summary>
-        private const string ElementExpanderButtonName = "ExpanderButton";
+        private const string ElementExpanderButtonName = "ExpanderButton", WPF_ElementExpanderButtonName = "HeaderSite";
+
+        private bool _useWpfTemplate;
 
         /// <summary>
         /// The ExpanderButton template part is a templated ToggleButton that's used 
@@ -62,13 +65,45 @@ namespace System.Windows.Controls
 
                 _expanderButton = value;
 
-                if (_expanderButton != null)
+                if (_expanderButton != null && !_useWpfTemplate)
                 {
                     _expanderButton.IsChecked = IsExpanded;
                     _expanderButton.Click += OnExpanderButtonClicked;
                 }
             }
         }
+
+        #region public TemplateKind TemplateKind
+        /// <summary>
+        /// Identifies the <see cref="TemplateKind"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TemplateKindProperty =
+            FrameworkOptions.TemplateKindProperty.AddOwner(typeof(Expander), new PropertyMetadata(TemplateKind.Auto));
+
+        /// <summary>
+        /// Gets or sets a value that determines which control template conventions are used for this
+        /// <see cref="Expander"/>
+        /// </summary>
+        /// <returns>
+        /// A <see cref="OpenSilver.Compatibility.TemplateKind"/> enumeration value that indicates how 
+        /// template parts are resolved. The default is <see cref="TemplateKind.Auto"/>.
+        /// </returns>
+        public TemplateKind TemplateKind
+        {
+            get { return (TemplateKind)GetValue(TemplateKindProperty); }
+            set { SetValue(TemplateKindProperty, value); }
+        }
+
+        private bool IsWpfTemplate()
+        {
+            return TemplateKind switch
+            {
+                TemplateKind.Wpf => true,
+                TemplateKind.Silverlight => false,
+                _ => GetTemplateChild(WPF_ElementExpanderButtonName) is ToggleButton,
+            };
+        }
+        #endregion public TemplateKind TemplateKind
 
         #region public ExpandDirection ExpandDirection
         /// <summary>
@@ -246,7 +281,11 @@ namespace System.Windows.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            ExpanderButton = GetTemplateChild(ElementExpanderButtonName) as ToggleButton;
+
+            _useWpfTemplate = IsWpfTemplate();
+
+            ExpanderButton = GetExpanderButton(_useWpfTemplate);
+
             Interaction.OnApplyTemplateBase();
         }
 
@@ -344,7 +383,7 @@ namespace System.Windows.Controls
         private void ToggleExpanded(RoutedEventHandler handler, RoutedEventArgs args)
         {
             ToggleButton expander = ExpanderButton;
-            if (expander != null)
+            if (expander != null && !_useWpfTemplate)
             {
                 expander.IsChecked = IsExpanded;
             }
@@ -374,6 +413,11 @@ namespace System.Windows.Controls
         private void OnExpanderButtonClicked(object sender, RoutedEventArgs e)
         {
             IsExpanded = !IsExpanded;
+        }
+
+        private ToggleButton GetExpanderButton(bool isWpfTemplate)
+        {
+            return GetTemplateChild(isWpfTemplate ? WPF_ElementExpanderButtonName : ElementExpanderButtonName) as ToggleButton;
         }
 
         /// <summary>
