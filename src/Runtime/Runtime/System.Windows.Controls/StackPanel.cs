@@ -41,7 +41,6 @@ namespace System.Windows.Controls
     public class StackPanel : Panel, IBorderElement
     {
         private WeakEventToken _weakEventToken;
-        private bool _refreshBorderBrushOnSizeChange;
 
         /// <summary>
         /// Gets a value that represents the <see cref="Controls.Orientation"/> of the <see cref="StackPanel"/>.
@@ -150,7 +149,7 @@ namespace System.Windows.Controls
         {
             var panel = (StackPanel)d;
 
-            panel._refreshBorderBrushOnSizeChange = e.NewValue is LinearGradientBrush;
+            panel.RefreshBorderBrushOnSizeChange = e.NewValue is LinearGradientBrush;
 
             panel._weakEventToken?.Dispose();
             panel._weakEventToken = null;
@@ -226,7 +225,7 @@ namespace System.Windows.Controls
         {
             base.OnRenderSizeChanged(info);
 
-            if (_refreshBorderBrushOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            if (RefreshBorderBrushOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 Brush borderBrush = BorderBrush;
                 this.SetBorderColor(borderBrush, borderBrush);

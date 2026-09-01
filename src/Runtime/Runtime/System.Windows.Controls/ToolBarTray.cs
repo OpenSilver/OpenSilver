@@ -80,7 +80,7 @@ public class ToolBarTray : FrameworkElement
     {
         var toolBarTray = (ToolBarTray)d;
 
-        toolBarTray._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+        toolBarTray.RefreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
         toolBarTray._weakEventToken?.Dispose();
         toolBarTray._weakEventToken = null;
@@ -317,7 +317,7 @@ public class ToolBarTray : FrameworkElement
     {
         base.OnRenderSizeChanged(info);
 
-        if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        if (RefreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
         {
             this.SetBackground(Background);
         }
@@ -982,7 +982,6 @@ public class ToolBarTray : FrameworkElement
     private bool _bandsDirty = true;
     private ToolBarCollection _toolBarsCollection = null;
     private WeakEventToken _weakEventToken;
-    private bool _refreshBackgroundOnSizeChange;
 
     #endregion
 }

@@ -44,7 +44,6 @@ namespace System.Windows.Controls
         private Size _noWrapSize = Size.Empty;
         private Size? _textSize;
         private bool _textContentChanging;
-        private bool _refreshBackgroundOnSizeChange;
         private WeakEventToken _weakForegroundChangedEventToken;
         private WeakEventToken _weakBackgroundChangedEventToken;
 
@@ -94,7 +93,7 @@ namespace System.Windows.Controls
         {
             var textBlock = (TextBlock)d;
 
-            textBlock._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+            textBlock.RefreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
             textBlock._weakBackgroundChangedEventToken?.Dispose();
             textBlock._weakBackgroundChangedEventToken = null;
@@ -1048,7 +1047,7 @@ namespace System.Windows.Controls
         {
             base.OnRenderSizeChanged(info);
 
-            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            if (RefreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 this.SetBackground(Background);
             }

@@ -36,7 +36,6 @@ namespace System.Windows.Controls
         private UIElementCollection _uiElementCollection;
         private ItemContainerGenerator _itemContainerGenerator;
         private WeakEventToken _weakEventToken;
-        private bool _refreshBackgroundOnSizeChange;
 
         /// <summary>
         /// Gets an enumerator that can iterate the logical child elements of this <see cref="Panel"/> element.
@@ -258,7 +257,7 @@ namespace System.Windows.Controls
         {
             Panel panel = (Panel)d;
 
-            panel._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+            panel.RefreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
             if (panel._weakEventToken != null)
             {
@@ -293,7 +292,7 @@ namespace System.Windows.Controls
         {
             base.OnRenderSizeChanged(info);
 
-            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            if (RefreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 this.SetBackground(Background);
             }

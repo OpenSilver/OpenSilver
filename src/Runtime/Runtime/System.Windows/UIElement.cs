@@ -1394,11 +1394,10 @@ namespace System.Windows
         {
             var uie = (UIElement)d;
 
-            if (uie._weakOpacityMaskChangedEventToken != null)
-            {
-                uie._weakOpacityMaskChangedEventToken.Dispose();
-                uie._weakOpacityMaskChangedEventToken = null;
-            }
+            uie.RefreshOpacityMaskOnSizeChange = e.NewValue is LinearGradientBrush;
+
+            uie._weakOpacityMaskChangedEventToken?.Dispose();
+            uie._weakOpacityMaskChangedEventToken = null;
 
             if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
@@ -1953,6 +1952,24 @@ namespace System.Windows
             set => WriteVisualFlag(VisualFlags.IsVisualTreeRoot, value);
         }
 
+        private bool RefreshOpacityMaskOnSizeChange
+        {
+            get => ReadVisualFlag(VisualFlags.RefreshOpacityMaskOnSizeChange);
+            set => WriteVisualFlag(VisualFlags.RefreshOpacityMaskOnSizeChange, value);
+        }
+
+        internal bool RefreshBackgroundOnSizeChange
+        {
+            get => ReadVisualFlag(VisualFlags.RefreshBackgroundOnSizeChange);
+            set => WriteVisualFlag(VisualFlags.RefreshBackgroundOnSizeChange, value);
+        }
+
+        internal bool RefreshBorderBrushOnSizeChange
+        {
+            get => ReadVisualFlag(VisualFlags.RefreshBorderBrushOnSizeChange);
+            set => WriteVisualFlag(VisualFlags.RefreshBorderBrushOnSizeChange, value);
+        }
+
         protected internal override void INTERNAL_OnAttachedToVisualTree() => AttachVisualChildren();
 
         internal virtual void AttachVisualChildren()
@@ -2238,5 +2255,16 @@ namespace System.Windows
 
         // Indicates if this Visual can be the target of pointer events.
         IsHitTestable = 0x01000000,
+
+        // Indicates if OpacityMask should be rendered after a size update. Used by UIElement.
+        RefreshOpacityMaskOnSizeChange = 0x02000000,
+
+        // Indicates if Background should be rendered after a size update. Used by Border, Panel,
+        // RichTextBlock, TextBlock, ToolBarTray.
+        RefreshBackgroundOnSizeChange = 0x04000000,
+
+        // Indicates if BorderBrush should be rendered after a size update. Used by Border, Grid,
+        // StackPanel.
+        RefreshBorderBrushOnSizeChange = 0x08000000,
     }
 }

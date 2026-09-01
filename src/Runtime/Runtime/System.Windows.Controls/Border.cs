@@ -53,8 +53,6 @@ public class Border : Decorator, IBorderElement
 {
     private WeakEventToken _weakBackgroundEventToken;
     private WeakEventToken _weakBorderBrushEventToken;
-    private bool _refreshBackgroundOnSizeChange;
-    private bool _refreshBorderBrushOnSizeChange;
 
     // We only check the Background property even if BorderBrush not null
     // and BorderThickness > 0 is a sufficient condition to enable pointer
@@ -117,7 +115,7 @@ public class Border : Decorator, IBorderElement
     {
         Border border = (Border)d;
 
-        border._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+        border.RefreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
         border._weakBackgroundEventToken?.Dispose();
         border._weakBackgroundEventToken = null;
@@ -154,12 +152,12 @@ public class Border : Decorator, IBorderElement
             return;
         }
 
-        if (_refreshBackgroundOnSizeChange)
+        if (RefreshBackgroundOnSizeChange)
         {
             this.SetBackground(Background);
         }
 
-        if (_refreshBorderBrushOnSizeChange)
+        if (RefreshBorderBrushOnSizeChange)
         {
             Brush borderBrush = BorderBrush;
             this.SetBorderColor(borderBrush, borderBrush);
@@ -195,7 +193,7 @@ public class Border : Decorator, IBorderElement
     {
         var border = (Border)d;
 
-        border._refreshBorderBrushOnSizeChange = e.NewValue is LinearGradientBrush;
+        border.RefreshBorderBrushOnSizeChange = e.NewValue is LinearGradientBrush;
 
         border._weakBorderBrushEventToken?.Dispose();
         border._weakBorderBrushEventToken = null;

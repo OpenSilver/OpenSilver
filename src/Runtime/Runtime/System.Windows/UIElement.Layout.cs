@@ -637,7 +637,13 @@ namespace System.Windows
         /// The packaged parameters (<see cref="SizeChangedInfo"/>), which includes old and new sizes, and which 
         /// dimension actually changes.
         /// </param>
-        protected internal virtual void OnRenderSizeChanged(SizeChangedInfo info) { }
+        protected internal virtual void OnRenderSizeChanged(SizeChangedInfo info)
+        {
+            if (RefreshOpacityMaskOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                this.SetMaskImage(OpacityMask);
+            }
+        }
 
         private bool MarkForSizeChangedIfNeeded(Size oldSize, Size newSize)
         {

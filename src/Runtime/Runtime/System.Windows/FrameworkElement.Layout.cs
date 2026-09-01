@@ -929,6 +929,8 @@ public partial class FrameworkElement
     /// </param>
     protected internal override void OnRenderSizeChanged(SizeChangedInfo info)
     {
+        base.OnRenderSizeChanged(info);
+
         // first, invalidate ActualWidth and/or ActualHeight
         // Note: if any handler of invalidation will dirtyfy layout,
         // subsequent handlers will run on effectively dirty layouts

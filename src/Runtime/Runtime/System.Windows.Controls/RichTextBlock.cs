@@ -45,7 +45,6 @@ namespace System.Windows.Controls
         }
 
         private BlockCollection _blocks;
-        private bool _refreshBackgroundOnSizeChange;
         private WeakEventToken _weakEventToken;
 
         /// <summary>
@@ -103,7 +102,7 @@ namespace System.Windows.Controls
         {
             var richTextBlock = (RichTextBlock)d;
 
-            richTextBlock._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
+            richTextBlock.RefreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
             richTextBlock._weakEventToken?.Dispose();
             richTextBlock._weakEventToken = null;
@@ -513,7 +512,7 @@ namespace System.Windows.Controls
         {
             base.OnRenderSizeChanged(info);
 
-            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            if (RefreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 this.SetBackground(Background);
             }
