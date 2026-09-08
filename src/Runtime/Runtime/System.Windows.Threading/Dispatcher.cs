@@ -347,6 +347,35 @@ public sealed class Dispatcher
         }
     }
 
+    /// <summary>
+    /// Creates an awaitable object that asynchronously yields control back to the current dispatcher and 
+    /// provides an opportunity for the dispatcher to process other events.
+    /// </summary>
+    /// <returns>
+    /// An awaitable object that asynchronously yields control back to the current dispatcher and provides 
+    /// an opportunity for the dispatcher to process other events.
+    /// </returns>
+    public static DispatcherPriorityAwaitable Yield() => Yield(DispatcherPriority.Background);
+
+    /// <summary>
+    /// Creates an awaitable object that asynchronously yields control back to the current dispatcher and 
+    /// provides an opportunity for the dispatcher to process other events. The work that occurs when control 
+    /// returns to the code awaiting the result of this method is scheduled with the specified priority.
+    /// </summary>
+    /// <param name="priority">
+    /// The priority at which to schedule the continuation.
+    /// </param>
+    /// <returns>
+    /// An awaitable object that asynchronously yields control back to the current dispatcher and provides 
+    /// an opportunity for the dispatcher to process other events.
+    /// </returns>
+    public static DispatcherPriorityAwaitable Yield(DispatcherPriority priority)
+    {
+        ValidatePriority(priority);
+
+        return new DispatcherPriorityAwaitable(CurrentDispatcher, priority);
+    }
+
     internal void EnableProcessing() => Interlocked.Decrement(ref _disableProcessingRequests);
 
     private DispatcherOperation BeginInvokeImpl(DispatcherPriority priority, Delegate method, object args, int numArgs)

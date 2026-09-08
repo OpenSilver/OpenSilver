@@ -934,6 +934,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The DispatcherPriorityAwaiter was not configured with a valid Dispatcher.  The only supported usage is from Dispatcher.Yield..
+        /// </summary>
+        internal static string DispatcherPriorityAwaiterInvalid {
+            get {
+                return ResourceManager.GetString("DispatcherPriorityAwaiterInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot set both DisplayMemberPath and ItemTemplate..
         /// </summary>
         internal static string DisplayMemberPathAndItemTemplateDefined {

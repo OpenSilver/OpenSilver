@@ -1470,4 +1470,7 @@
   <data name="RelativeSourceModeIsImmutable" xml:space="preserve">
     <value>RelativeSource.Mode ne peut pas être modifié après l'initialisation ; au lieu de changer le Mode de cette instance, créez un RelativeSource ou utilisez une instance statique différente.</value>
   </data>
+  <data name="DispatcherPriorityAwaiterInvalid" xml:space="preserve">
+    <value>DispatcherPriorityAwaiter n'a pas été configuré avec un répartiteur valide. La seule utilisation prise en charge est celle de Dispatcher.Yield.</value>
+  </data>
 </root>
