@@ -304,7 +304,7 @@ public sealed class VisualBrush : TileBrush
         {
             if (!string.IsNullOrEmpty(url))
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.visualBrush.release('{url}')");
+                OpenSilver.Interop.RevokeObjectURLAsync(url);
             }
         }
 

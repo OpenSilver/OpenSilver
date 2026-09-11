@@ -685,6 +685,9 @@ Object.defineProperty(window, 'osjs', {
             getRefCount: function () {
                 return _jsObjRef.size;
             },
+            revokeURL: function (url) {
+                URL.revokeObjectURL(url);
+            },
             addToPerformanceCounters: function (name, initialTime) {
                 const elapsedTime = performance.now() - initialTime;
                 let counter = _performanceCounters[name];
@@ -3075,9 +3078,6 @@ Object.defineProperty(window, 'osjs', {
                     const blob = new Blob([bytes], { type: 'image/x-icon' });
                     return URL.createObjectURL(blob);
                 },
-                release: function (url) {
-                    URL.revokeObjectURL(url);
-                },
             }),
             visualBrush: Object.freeze((function () {
                 return {
@@ -3120,10 +3120,23 @@ Object.defineProperty(window, 'osjs', {
                             callback('');
                         }
                     },
-                    release: function (url) {
-                        URL.revokeObjectURL(url);
-                    },
                 }
+            })()),
+            WBM: Object.freeze((function () {
+                return {
+                    createURL: function (base64) {
+                        const binary = atob(base64);
+                        const length = binary.length;
+                        const bytes = new Uint8Array(length);
+
+                        for (let i = 0; i < length; i++) {
+                            bytes[i] = binary.charCodeAt(i);
+                        }
+
+                        const blob = new Blob([bytes], { type: 'image/png' });
+                        return URL.createObjectURL(blob);
+                    }
+                };
             })()),
         };
     })()),

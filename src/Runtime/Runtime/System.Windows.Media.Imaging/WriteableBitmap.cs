@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Buffers;
 using System.Threading.Tasks;
 
 namespace System.Windows.Media.Imaging
@@ -22,8 +23,11 @@ namespace System.Windows.Media.Imaging
     {
         private readonly IWriteableBitmapImpl _impl;
         private readonly bool _isSilverlightCompatibilityMode;
+        private readonly object _lock = new();
 
         private int[] _pixels = [];
+        private string _cachedUrl = string.Empty;
+        private bool _isDirty = true;
 
         private WriteableBitmap()
         {
@@ -122,6 +126,22 @@ namespace System.Windows.Media.Imaging
             return bitmap;
         }
 
+        ~WriteableBitmap()
+        {
+            lock (_lock)
+            {
+                RevokeURL(_cachedUrl);
+            }
+        }
+
+        private static void RevokeURL(string url)
+        {
+            if (!string.IsNullOrEmpty(url))
+            {
+                OpenSilver.Interop.RevokeObjectURLAsync(url);
+            }
+        }
+
         /// <summary>
         /// Gets or sets a value indicating if <see cref="WriteableBitmap"/> should follow Silverlight's behavior 
         /// to set its <see cref="Pixels"/>. In Silverlight, a pixel is stored in an <see cref="int"/> in the format 
@@ -179,36 +199,47 @@ namespace System.Windows.Media.Imaging
         /// </summary>
         public void Invalidate()
         {
-            if (_pixels != null)
+            lock (_lock)
             {
-                int pixelWidth = PixelWidth;
-                int pixelHeight = PixelHeight;
-
-                int rowLenth = pixelWidth * 4 + 1;
-
-                var bytes = new byte[rowLenth * pixelHeight];
-
-                for (int y = 0; y < pixelHeight; y++)
-                {
-                    for (int x = 0; x < pixelWidth; x++)
-                    {
-                        var rgba = BitConverter.GetBytes(
-                            _isSilverlightCompatibilityMode ?
-                            SwapBytes(_pixels[pixelWidth * y + x]) :
-                            _pixels[pixelWidth * y + x]);
-
-                        rgba.CopyTo(bytes, rowLenth * y + x * 4 + 1);
-                    }
-                }
-
-                SetSourceInternal(PngEncoder.Encode(bytes, pixelWidth, pixelHeight));
+                _isDirty = true;
             }
+
+            RaiseChanged();
         }
 
         internal override async ValueTask<string> GetDataStringAsync(UIElement parent)
         {
             await WaitToInitialize();
-            return await base.GetDataStringAsync(parent);
+
+            string urlToRevoke = string.Empty;
+
+            lock (_lock)
+            {
+                if (_isDirty)
+                {
+                    int pixelWidth = PixelWidth;
+                    int pixelHeight = PixelHeight;
+
+                    byte[] bytes = ArrayPool<byte>.Shared.Rent(PngEncoder.GetRequiredBufferSize(pixelWidth, pixelHeight));
+
+                    try
+                    {
+                        int pngLength = PngEncoder.Encode(_pixels, pixelWidth, pixelHeight, _isSilverlightCompatibilityMode, bytes);
+
+                        string url = _impl.CreateResource(bytes, 0, pngLength);
+                        (urlToRevoke, _cachedUrl) = (_cachedUrl, url);
+                        _isDirty = false;
+                    }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(bytes);
+                    }
+                }
+            }
+
+            RevokeURL(urlToRevoke);
+
+            return _cachedUrl;
         }
 
         private static int SwapBytes(int number)
@@ -230,6 +261,8 @@ namespace System.Windows.Media.Imaging
 
         private interface IWriteableBitmapImpl
         {
+            string CreateResource(byte[] bytes, int offset, int length);
+
             Task CreateFromBitmapSourceAsync(BitmapSource source);
 
             Task CreateFromUIElementAsync(UIElement element, Transform transform);

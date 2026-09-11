@@ -186,7 +186,7 @@ public sealed class Cursor : IDisposable
             if (IsValid)
             {
                 (string url, _url) = (_url, null);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"osjs.cursors.release({url})");
+                OpenSilver.Interop.RevokeObjectURLAsync(url);
             }
         }
 

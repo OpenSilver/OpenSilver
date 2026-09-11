@@ -11,6 +11,12 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+using CSHTML5.Types;
+using DotNetForHtml5;
+using DotNetForHtml5.Core;
+using OpenSilver.Buffers;
+using OpenSilver.Internal;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -18,12 +24,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using CSHTML5.Internal;
-using CSHTML5.Types;
-using DotNetForHtml5;
-using DotNetForHtml5.Core;
-using OpenSilver.Buffers;
-using OpenSilver.Internal;
 
 namespace OpenSilver;
 
@@ -471,6 +471,12 @@ public static partial class Interop
 
     internal static string GetJavaScript(int id) => _javascriptCallsStore.Get(id);
 
+    internal static void RevokeObjectURLAsync(string url)
+    {
+        Debug.Assert(!string.IsNullOrEmpty(url));
+        ExecuteJavaScriptVoidAsync($"osjs.revokeURL('{url}')");
+    }
+
     /// <summary>
     /// Returns the HTML Div that is associated to the specified FrameworkElement.
     /// Note: the FrameworkElement must be in the visual tree. Consider calling this
@@ -529,7 +535,9 @@ public static partial class Interop
 
         public void InvokePendingJS(byte[] bytes, int length) => throw new NotImplementedException();
 
-        public void WriteableBitmap_FillBufferInt32(int[] buffer) => throw new NotImplementedException();
+        public string WriteableBitmap_CreateURL(Span<byte> bytes) => throw new NotImplementedException();
+
+        public void WriteableBitmap_FillBufferInt32(int[] buffer, int nativeBufferId) => throw new NotImplementedException();
 
         public void WriteableBitmap_CreateFromBitmapSource(string data, Action<int, int, int> onSuccess, Action<string> onError)
             => throw new NotImplementedException();

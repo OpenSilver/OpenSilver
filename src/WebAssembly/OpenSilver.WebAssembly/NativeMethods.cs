@@ -45,7 +45,9 @@ internal sealed partial class NativeMethods : INativeMethods
     public void WriteableBitmap_RenderUIElement(string id, int width, int height, string transform, Action<int, int, int> onSuccess, Action<string> onError)
         => WriteableBitmap_RenderUIElementImpl(id, width, height, transform, onSuccess, onError);
 
-    public void WriteableBitmap_FillBufferInt32(int[] buffer) => WriteableBitMap_FillInt32BufferImpl(buffer);
+    public void WriteableBitmap_FillBufferInt32(int[] buffer, int nativeBufferId) => WriteableBitMap_FillInt32BufferImpl(buffer, nativeBufferId);
+
+    public string WriteableBitmap_CreateURL(Span<byte> bytes) => WriteableBitmap_CreateURLImpl(bytes);
 
     [JSImport("globalThis._openSilverRuntime.invokePendingJS")]
     private static partial void InvokePendingJSImpl([JSMarshalAs<JSType.MemoryView>] Span<byte> bytes);
@@ -57,8 +59,11 @@ internal sealed partial class NativeMethods : INativeMethods
     [JSImport("globalThis._openSilverRuntime.invokeJSVoid")]
     private static partial void InvokeJSVoidImpl(string javascript);
 
+    [JSImport("globalThis._openSilverRuntime.WBM.createURL")]
+    private static partial string WriteableBitmap_CreateURLImpl([JSMarshalAs<JSType.MemoryView>] Span<byte> bytes);
+
     [JSImport("globalThis._openSilverRuntime.WBM.fillInt32Buffer")]
-    private static partial void WriteableBitMap_FillInt32BufferImpl([JSMarshalAs<JSType.MemoryView>] Span<int> buffer);
+    private static partial void WriteableBitMap_FillInt32BufferImpl([JSMarshalAs<JSType.MemoryView>] Span<int> buffer, int nativeBufferId);
 
     [JSImport("globalThis._openSilverRuntime.WBM.renderUIElement")]
     private static partial void WriteableBitmap_RenderUIElementImpl(

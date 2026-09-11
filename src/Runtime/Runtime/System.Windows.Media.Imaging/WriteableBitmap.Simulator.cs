@@ -30,6 +30,12 @@ namespace System.Windows.Media.Imaging
                 _bitmap = bitmap;
             }
 
+            public string CreateResource(byte[] bytes, int offset, int length)
+            {
+                string b64 = Convert.ToBase64String(bytes, offset, length);
+                return OpenSilver.Interop.ExecuteJavaScriptString($"osjs.WBM.createURL('{b64}')");
+            }
+
             public Task CreateFromBitmapSourceAsync(BitmapSource source) => Task.CompletedTask;
 
             public Task CreateFromUIElementAsync(UIElement element, Transform transform) => Task.CompletedTask;

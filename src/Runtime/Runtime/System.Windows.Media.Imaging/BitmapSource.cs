@@ -57,11 +57,6 @@ public abstract class BitmapSource : ImageSource
             stream.Seek(0, SeekOrigin.Begin);
         }
 
-        SetSourceInternal(stream);
-    }
-
-    internal void SetSourceInternal(MemoryStream stream)
-    {
         _streamSource?.Dispose();
         _b64String = null;
         _streamSource = stream;

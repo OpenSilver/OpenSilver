@@ -151,37 +151,39 @@ window._openSilverRuntime = (function () {
             eval(javaScriptToExecute);
         },
         WBM: (function () {
-            let _tempPixelsData;
+            const _pixelBuffers = new Map();
+            let _id = 0;
 
-            function smoothCanvasContext(ctx) {
+            function getImageData(img) {
+                const canvas = document.createElement('canvas');
+                canvas.height = img.height;
+                canvas.width = img.width;
+                const ctx = canvas.getContext('2d');
                 ctx.imageSmoothingEnabled = true;
                 ctx.webkitImageSmoothingEnabled = true;
                 ctx.mozImageSmoothingEnabled = true;
                 ctx.msImageSmoothingEnabled = true;
+                ctx.drawImage(img, 0, 0);
+                return ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
             }
 
             return {
-                createFromBitmapSource: function (data, callback) {
+                createFromBitmapSource: function (data, onSuccess, onError) {
                     const img = new Image();
                     img.src = data;
                     img.onload = function () {
                         try {
-                            const canvas = document.createElement('canvas');
-                            canvas.height = img.height;
-                            canvas.width = img.width;
-                            const ctx = canvas.getContext('2d');
-                            smoothCanvasContext(ctx);
-                            ctx.drawImage(img, 0, 0);
-                            const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-                            _tempPixelsData = new Int32Array(imgData.data.buffer);
-                            callback(imgData.data.length, imgData.width, imgData.height);
+                            const imgData = getImageData(img);
+                            const bufferId = _id++;
+                            _pixelBuffers.set(bufferId, new Int32Array(imgData.data.buffer));
+                            onSuccess(bufferId, imgData.width, imgData.height);
                         } catch (err) {
                             console.error(err);
-                            callback(err.message);
+                            onError(err.message);
                         }
                     }
                 },
-                renderUIElement: function (id, width, height, userTransform, callback) {
+                renderUIElement: function (id, width, height, userTransform, onSuccess, onError) {
                     const element = document.getElementById(id);
                     const transform = new DOMMatrix([1 / window.devicePixelRatio, 0, 0, 1 / window.devicePixelRatio, 0, 0])
                         .multiplySelf(new DOMMatrix(userTransform));
@@ -195,13 +197,27 @@ window._openSilverRuntime = (function () {
                             transformOrigin: '0% 0%',
                             backgroundColor: 'transparent',
                         },
-                    }).then(function (pixels) {
-                        _tempPixelsData = new Int32Array(pixels.buffer);
-                        callback(pixels.length, width, height);
-                    });
+                    }).then(
+                        function (pixels) {
+                            const bufferId = _id++;
+                            _pixelBuffers.set(bufferId, new Int32Array(pixels.buffer));
+                            onSuccess(bufferId, width, height);
+                        },
+                        function (error) {
+                            onError(error.message);
+                        },
+                    );
                 },
-                fillInt32Buffer: function (buffer) {
-                    buffer.set(new Int32Array(_tempPixelsData), 0);
+                fillInt32Buffer: function (buffer, id) {
+                    const pixels = _pixelBuffers.get(id);
+                    if (pixels) {
+                        buffer.set(pixels, 0);
+                    }
+                },
+                createURL: function (memoryView) {
+                    const view = memoryView._unsafe_create_view();
+                    const blob = new Blob([view], { type: 'image/png' });
+                    return URL.createObjectURL(blob);
                 },
             }
         })(),

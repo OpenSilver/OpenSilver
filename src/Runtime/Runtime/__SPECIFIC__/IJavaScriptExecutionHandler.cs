@@ -30,7 +30,8 @@ public interface INativeMethods : IJavaScriptExecutionHandler
 {
     void InvokePendingJS(byte[] bytes, int length);
     object InvokeJS(string javascript, int referenceId, bool wantsResult);
-    void WriteableBitmap_FillBufferInt32(int[] buffer);
+    string WriteableBitmap_CreateURL(Span<byte> bytes);
+    void WriteableBitmap_FillBufferInt32(int[] buffer, int nativeBufferId);
     void WriteableBitmap_CreateFromBitmapSource(string data, Action<int, int, int> onSuccess, Action<string> onError);
     void WriteableBitmap_RenderUIElement(string id, int width, int height, string transform, Action<int, int, int> onSuccess, Action<string> onError);
 }

@@ -30,6 +30,11 @@ namespace System.Windows.Media.Imaging
                 _bitmap = bitmap;
             }
 
+            public string CreateResource(byte[] bytes, int offset, int length)
+            {
+                return OpenSilver.Interop.NativeMethods.WriteableBitmap_CreateURL(bytes.AsSpan(offset, length));
+            }
+
             public Task CreateFromBitmapSourceAsync(BitmapSource source)
             {
                 _taskCompletion = new TaskCompletionSource<object>();
@@ -96,10 +101,20 @@ namespace System.Windows.Media.Imaging
                 return _taskCompletion.Task;
             }
 
-            private void OnImageDataLoadSuccess(int arrayLength, int width, int height)
+            private void OnImageDataLoadSuccess(int nativeBufferId, int width, int height)
             {
-                _bitmap._pixels = new int[arrayLength / 4];
-                FillBuffer(_bitmap);
+                int length = width * height;
+
+                if (_bitmap._pixels.Length == length)
+                {
+                    Array.Clear(_bitmap._pixels, 0, length);
+                }
+                else
+                {
+                    _bitmap._pixels = new int[length];
+                }
+
+                FillBuffer(_bitmap, nativeBufferId);
                 _bitmap.SetNaturalSize(width, height);
 
                 _taskCompletion.SetResult(null);
@@ -110,18 +125,18 @@ namespace System.Windows.Media.Imaging
 
             private void OnImageDataLoadError(string errorMessage) => _taskCompletion.SetResult(null);
 
-            private void OnRenderDataSuccess(int arrayLength, int width, int height)
+            private void OnRenderDataSuccess(int nativeBufferId, int width, int height)
             {
-                FillBuffer(_bitmap);
+                FillBuffer(_bitmap, nativeBufferId);
                 _taskCompletion.SetResult(null);
             }
 
             private void OnRenderDataError(string errorMessage) => _taskCompletion.SetResult(null);
 
-            private static void FillBuffer(WriteableBitmap bitmap)
+            private static void FillBuffer(WriteableBitmap bitmap, int nativeBufferId)
             {
                 OpenSilver.Interop.JavaScriptRuntime.Flush();
-                OpenSilver.Interop.NativeMethods.WriteableBitmap_FillBufferInt32(bitmap._pixels);
+                OpenSilver.Interop.NativeMethods.WriteableBitmap_FillBufferInt32(bitmap._pixels, nativeBufferId);
 
                 if (bitmap._isSilverlightCompatibilityMode)
                 {
