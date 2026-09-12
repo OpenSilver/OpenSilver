@@ -221,5 +221,19 @@ window._openSilverRuntime = (function () {
                 },
             }
         })(),
+        writeableImage: (function () {
+            return {
+                transferBytes: function (id, memoryView, width, height) {
+                    const canvas = document.getElementById(id);
+                    if (!canvas) return;
+                    if (canvas.width !== width) canvas.width = width;
+                    if (canvas.height !== height) canvas.height = height;
+                    const renderData = canvas.renderData;
+                    const imageData = renderData.getImageData(width, height);
+                    memoryView.copyTo(new Uint8Array(imageData.data.buffer, imageData.data.byteOffset, imageData.data.byteLength));
+                    renderData.context.putImageData(imageData, 0, 0);
+                },
+            };
+        })(),
     }
 })();

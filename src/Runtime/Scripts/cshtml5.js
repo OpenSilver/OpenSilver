@@ -42,6 +42,7 @@ Object.defineProperty(window, 'osjs', {
             BORDER: 'opensilver-border',
             SHAPE: 'opensilver-shape',
             IMAGE: 'opensilver-image',
+            WRITEABLEIMAGE: 'opensilver-writeableimage',
             TEXTBOXVIEW: 'opensilver-textboxview',
             PASSWORDBOXVIEW: 'opensilver-passwordboxview',
             INLINE: 'opensilver-inline',
@@ -2148,6 +2149,86 @@ Object.defineProperty(window, 'osjs', {
                     return 0.0;
                 },
             }),
+            writeableImage: Object.freeze((function () {
+                function createRenderData(canvas) {
+                    let _imageData = null;
+                    let _context = canvas.getContext('2d');
+
+                    // The simulator needs to render the frames asynchronously. This token 
+                    // is used to make sure old frames don't override newer frames.
+                    let _blitToken = 0;
+
+                    return Object.freeze({
+                        context: _context,
+                        getImageData: function (width, height) {
+                            if (_imageData === null || _imageData.width !== width || _imageData.height !== height) {
+                                _imageData = _context.createImageData(width, height);
+                            }
+                            return _imageData;
+                        },
+                        nextBlitToken: function () {
+                            return ++_blitToken;
+                        },
+                        isCurrentBlit: function (token) {
+                            return token === _blitToken;
+                        },
+                    });
+                }
+
+                function fromBase64(base64) {
+                    if (typeof Uint8Array.fromBase64 === 'function') {
+                        return Uint8Array.fromBase64(base64);
+                    }
+
+                    const binary = atob(base64);
+                    const length = binary.length;
+                    const bytes = new Uint8Array(length);
+                    for (let i = 0; i < length; i++) {
+                        bytes[i] = binary.charCodeAt(i);
+                    }
+                    return bytes;
+                }
+
+                async function inflate(compressed) {
+                    const buffer = await new Response(
+                        new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw'))
+                    ).arrayBuffer();
+                    return new Uint8Array(buffer);
+                }
+
+                return {
+                    create: function (id, canvasId, parentId) {
+                        const parent = document.getElementById(parentId);
+                        if (!parent) return;
+
+                        const element = createLayoutElement('div', id, parent.windowid);
+                        const canvas = createVisualElement('canvas', canvasId, parent.windowid);
+                        canvas.classList.add(CSS_CLASS.WRITEABLEIMAGE);
+
+                        Object.defineProperty(canvas, 'renderData', {
+                            value: createRenderData(canvas),
+                            writable: false,
+                            configurable: true,
+                        });
+
+                        element.appendChild(canvas);
+                        parent.appendChild(element);
+                    },
+                    transferBytesBase64: async function (id, base64, width, height) {
+                        const canvas = document.getElementById(id);
+                        if (!canvas) return;
+                        const renderData = canvas.renderData;
+                        const token = renderData.nextBlitToken();
+                        const bytes = await inflate(fromBase64(base64));
+                        if (!renderData.isCurrentBlit(token)) return;
+                        if (canvas.width !== width) canvas.width = width;
+                        if (canvas.height !== height) canvas.height = height;
+                        const imageData = renderData.getImageData(width, height);
+                        imageData.data.set(bytes);
+                        renderData.context.putImageData(imageData, 0, 0);
+                    },
+                };
+            })()),
             textviewManager: Object.freeze((function () {
                 function getSelectionLength(view) {
                     return view.selectionEnd - view.selectionStart;

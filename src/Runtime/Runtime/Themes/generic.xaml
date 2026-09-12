@@ -115,6 +115,12 @@
         <Setter Property="FlowDirection"
                 Value="LeftToRight" />
     </Style>
+    
+    <!-- WriteableImage -->
+    <Style TargetType="controls:WriteableImage">
+        <Setter Property="FlowDirection"
+                Value="LeftToRight" />
+    </Style>
 
     <!--  ContentControl  -->
     <Style TargetType="controls:ContentControl">

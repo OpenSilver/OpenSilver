@@ -339,6 +339,9 @@
     <Compile Include="Tests\WrapPanelTest.xaml.cs">
       <DependentUpon>WrapPanelTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\WriteableImageTest.xaml.cs">
+      <DependentUpon>WriteableImageTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VideoPlayerControl.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -712,6 +715,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\TileBrush\VisualBrushTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\WriteableImageTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\generic.xaml">

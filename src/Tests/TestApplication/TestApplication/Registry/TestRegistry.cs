@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace TestApplication
 {
@@ -145,6 +145,7 @@ namespace TestApplication
             Tests.Add(new Test("Font Precedence", "FontPrecedence"));
             Tests.Add(new Test("Async/Await", "AsyncAwait"));
             Tests.Add(new Test("Image", "Image"));
+            Tests.Add(new Test("WriteableImage", "WriteableImage"));
             Tests.Add(new Test("Custom Control", "CustomControl"));
             Tests.Add(new Test("(De)Serialization", "DeSerialization"));
             Tests.Add(new Test("Two TextBoxes Horizontally", "TwoTextBoxesHorizontally"));

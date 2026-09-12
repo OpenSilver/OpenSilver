@@ -270,6 +270,23 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return (new(uid), new(canvasUid));
         }
 
+        internal static (HtmlElementReference OuterDiv, HtmlElementReference Canvas) CreateWriteableImageDomElementAndAppendIt(
+            HtmlElementReference parent, WriteableImage image)
+        {
+            Debug.Assert(parent.IsConnected);
+            Debug.Assert(image is not null);
+
+            string uid = NewId();
+            string canvasUid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"osjs.writeableImage.create('{uid}','{canvasUid}','{parent.Uid}')");
+
+            AddToGlobalStore(uid, canvasUid, image);
+
+            return (new(uid), new(canvasUid));
+        }
+
         internal static HtmlElementReference CreateInlineDomElementAndAppendIt(HtmlElementReference parent, Inline inline)
         {
             string uniqueIdentifier = NewId();

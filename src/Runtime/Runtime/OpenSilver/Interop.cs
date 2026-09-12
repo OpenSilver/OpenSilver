@@ -544,5 +544,7 @@ public static partial class Interop
 
         public void WriteableBitmap_RenderUIElement(string id, int width, int height, string transform, Action<int, int, int> onSuccess, Action<string> onError)
             => throw new NotImplementedException();
+
+        public void WriteableImage_TransferBytes(string id, Span<byte> bytes, int width, int height) => throw new NotImplementedException();
     }
 }

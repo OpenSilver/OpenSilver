@@ -49,6 +49,8 @@ internal sealed partial class NativeMethods : INativeMethods
 
     public string WriteableBitmap_CreateURL(Span<byte> bytes) => WriteableBitmap_CreateURLImpl(bytes);
 
+    public void WriteableImage_TransferBytes(string id, Span<byte> bytes, int width, int height) => WriteableImage_TransferBytesImpl(id, bytes, width, height);
+
     [JSImport("globalThis._openSilverRuntime.invokePendingJS")]
     private static partial void InvokePendingJSImpl([JSMarshalAs<JSType.MemoryView>] Span<byte> bytes);
 
@@ -79,4 +81,11 @@ internal sealed partial class NativeMethods : INativeMethods
         string data,
         [JSMarshalAs<JSType.Function<JSType.Number, JSType.Number, JSType.Number>>] Action<int, int, int> onSuccess,
         [JSMarshalAs<JSType.Function<JSType.String>>] Action<string> onError);
+
+    [JSImport("globalThis._openSilverRuntime.writeableImage.transferBytes")]
+    private static partial void WriteableImage_TransferBytesImpl(
+        string id,
+        [JSMarshalAs<JSType.MemoryView>] Span<byte> bytes,
+        int width,
+        int height);
 }

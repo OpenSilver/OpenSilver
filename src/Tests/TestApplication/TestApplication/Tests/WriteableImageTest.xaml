@@ -1,0 +1,48 @@
+﻿<Page x:Class="TestApplication.Tests.WriteableImageTest"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="#FF202020">
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <TextBlock Text="WriteableImage refresh"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,8" />
+            <TextBlock Text="Time-based motion — lower the rate to see stutter, raise it to check smoothness"
+                       Foreground="#FFBBBBBB"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,8" />
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,12">
+                <TextBlock Text="Refresh"
+                           Foreground="#FFBBBBBB"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0" />
+                <ComboBox x:Name="RefreshRateBox"
+                          Width="168"
+                          SelectedIndex="4"
+                          SelectionChanged="RefreshRateBox_SelectionChanged">
+                    <ComboBoxItem Content="8 Hz" />
+                    <ComboBoxItem Content="30 Hz" />
+                    <ComboBoxItem Content="60 Hz" />
+                    <ComboBoxItem Content="120 Hz" />
+                    <ComboBoxItem Content="Display refresh" />
+                </ComboBox>
+                <TextBlock x:Name="FpsText"
+                           Foreground="#FF88CC88"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0" />
+            </StackPanel>
+            <Border Background="#FF111111"
+                    BorderBrush="#FF666666"
+                    BorderThickness="2"
+                    HorizontalAlignment="Center">
+                <WriteableImage x:Name="Board"
+                                Stretch="None" />
+            </Border>
+        </StackPanel>
+    </Grid>
+</Page>
