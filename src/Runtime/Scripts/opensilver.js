@@ -230,8 +230,10 @@ window._openSilverRuntime = (function () {
                     if (canvas.height !== height) canvas.height = height;
                     const renderData = canvas.renderData;
                     const imageData = renderData.getImageData(width, height);
-                    memoryView.copyTo(new Uint8Array(imageData.data.buffer, imageData.data.byteOffset, imageData.data.byteLength));
-                    renderData.context.putImageData(imageData, 0, 0);
+                    if (imageData) {
+                        memoryView.copyTo(new Uint8Array(imageData.data.buffer, imageData.data.byteOffset, imageData.data.byteLength));
+                        renderData.context.putImageData(imageData, 0, 0);
+                    }
                 },
             };
         })(),

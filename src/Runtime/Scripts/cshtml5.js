@@ -2161,9 +2161,15 @@ Object.defineProperty(window, 'osjs', {
                     return Object.freeze({
                         context: _context,
                         getImageData: function (width, height) {
+                            if (width === 0 || height === 0) {
+                                _imageData = null;
+                                return null;
+                            }
+
                             if (_imageData === null || _imageData.width !== width || _imageData.height !== height) {
                                 _imageData = _context.createImageData(width, height);
                             }
+
                             return _imageData;
                         },
                         nextBlitToken: function () {
@@ -2224,8 +2230,10 @@ Object.defineProperty(window, 'osjs', {
                         if (canvas.width !== width) canvas.width = width;
                         if (canvas.height !== height) canvas.height = height;
                         const imageData = renderData.getImageData(width, height);
-                        imageData.data.set(bytes);
-                        renderData.context.putImageData(imageData, 0, 0);
+                        if (imageData) {
+                            imageData.data.set(bytes);
+                            renderData.context.putImageData(imageData, 0, 0);
+                        }
                     },
                 };
             })()),
