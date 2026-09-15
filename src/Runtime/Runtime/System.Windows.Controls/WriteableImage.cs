@@ -32,7 +32,13 @@ namespace System.Windows.Controls;
 /// <example>
 /// <code lang="C#">
 /// var image = new WriteableImage(256, 256);
-/// image.Pixels[0] = unchecked((int)0xFF0000FF);
+/// // Fill with opaque blue (little-endian: A=0xFF, B=0xFF, G=0x00, R=0x00 → 0xFFFF0000)
+/// int opaqueBlue = unchecked((int)0xFFFF0000);
+/// int[] pixels = image.Pixels;
+/// for (int i = 0; i &lt; pixels.Length; i++)
+/// {
+///     pixels[i] = opaqueBlue;
+/// }
 /// image.Invalidate();
 /// </code>
 /// </example>
@@ -78,11 +84,27 @@ public sealed class WriteableImage : FrameworkElement
     internal sealed override bool EnablePointerEventsCore => true;
 
     /// <summary>
-    /// Gets a buffer representing the image pixels in the RGBA format.
+    /// Gets the pixel buffer of the image.
     /// </summary>
-    /// <returns>
-    /// An array of <see cref="int"/> values, one per pixel, in row-major order.
-    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// The buffer contains one <see cref="int"/> per pixel, in row-major order.
+    /// The index of the pixel at column <c>x</c>, row <c>y</c> is:
+    /// <c>y * <see cref="PixelWidth"/> + x</c>.
+    /// </para>
+    /// <para>
+    /// Each <see cref="int"/> encodes one pixel as four bytes. The bytes are read from the
+    /// <see cref="int"/> in the platform's native byte order and must appear in memory as
+    /// <c>[R, G, B, A]</c>: red first, then green, then blue, then alpha.
+    /// </para>
+    /// <para>
+    /// On little-endian platforms (including WebAssembly):
+    /// <c>int pixel = (A &lt;&lt; 24) | (B &lt;&lt; 16) | (G &lt;&lt; 8) | R;</c>
+    /// </para>
+    /// <para>
+    /// After modifying the buffer, call <see cref="Invalidate"/> to push the changes to the screen.
+    /// </para>
+    /// </remarks>
     public int[] Pixels => _pixels;
 
     private static readonly DependencyPropertyKey PixelWidthPropertyKey =
@@ -195,6 +217,11 @@ public sealed class WriteableImage : FrameworkElement
     /// <summary>
     /// Replaces the pixel buffer with a new one of the specified size.
     /// </summary>
+    /// <remarks>
+    /// The new buffer is initialized to all zeros (fully transparent black). Any existing pixel data is 
+    /// discarded. If <paramref name="pixelWidth"/> and <paramref name="pixelHeight"/> are equal to the 
+    /// current dimensions, this method is a no-op and the existing buffer is left unchanged.
+    /// </remarks>
     /// <param name="pixelWidth">
     /// The width of the image.
     /// </param>
