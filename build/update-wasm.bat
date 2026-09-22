@@ -26,9 +26,8 @@ DEL /Q %WASM_DIR%\build\*
 DEL /Q %WASM_DIR%\tools\*
 DEL /Q %WASM_DIR%\content\js\*
 DEL /Q %WASM_DIR%\content\css\*
-DEL /Q %WASM_DIR%\lib\net8.0\*
-DEL /Q %WASM_DIR%\lib\net9.0\*
-DEL /Q %WASM_DIR%\lib\net10.0\*
+DEL /Q %WASM_DIR%\lib\net10.0-browser\*
+DEL /Q %WASM_DIR%\lib\net11.0-browser\*
 
 ECHO. 
 ECHO %ESC%[95mBuilding %ESC%[0mOpenSilver.WebAssembly %ESC%[95min %ESC%[0m%CFG% %ESC%[95mconfiguration%ESC%[0m
@@ -66,8 +65,7 @@ ECHO.
 ECHO %ESC%[95mCopying Wasm DLLs.%ESC%[0m
 ECHO.
 
-COPY "%SRC_DIR%\WebAssembly\OpenSilver.WebAssembly\bin\%CFG%\net8.0\OpenSilver.WebAssembly.dll" "%WASM_DIR%\lib\net8.0"
-COPY "%SRC_DIR%\WebAssembly\OpenSilver.WebAssembly\bin\%CFG%\net9.0\OpenSilver.WebAssembly.dll" "%WASM_DIR%\lib\net9.0"
-COPY "%SRC_DIR%\WebAssembly\OpenSilver.WebAssembly\bin\%CFG%\net10.0\OpenSilver.WebAssembly.dll" "%WASM_DIR%\lib\net10.0"
+COPY "%SRC_DIR%\WebAssembly\OpenSilver.WebAssembly\bin\%CFG%\net10.0-browser\OpenSilver.WebAssembly.dll" "%WASM_DIR%\lib\net10.0-browser"
+COPY "%SRC_DIR%\WebAssembly\OpenSilver.WebAssembly\bin\%CFG%\net11.0-browser\OpenSilver.WebAssembly.dll" "%WASM_DIR%\lib\net11.0-browser"
 
 ENDLOCAL

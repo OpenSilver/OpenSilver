@@ -9,26 +9,22 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <description>OpenSilver is a modern cross-platform reimplementation of WPF and Silverlight that enables .NET developers to build apps for web (WebAssembly), mobile and desktop (MAUI Hybrid) using C# and XAML.</description>
-    <copyright>Copyright (c) 2025, Userware. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2026, Userware. All rights reserved.</copyright>
     <tags>silverlight wpf webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono windows android macos ios maui hybrid</tags>
     <icon>images/OpenSilver_icon.png</icon>
     <dependencies>
-      <group targetFramework=".NET8.0">
-        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
-      </group>
-      <group targetFramework=".NET9.0">
-        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
-      </group>
       <group targetFramework=".NET10.0">
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
+      <group targetFramework=".NET11.0">
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <!-- Runtime -->
-    <file src="../../src/Maui/Hybrid/bin/$Configuration$/net8.0/OpenSilver.MauiHybrid.dll" target="lib/net8.0/OpenSilver.MauiHybrid.dll" />
-    <file src="../../src/Maui/Hybrid/bin/$Configuration$/net9.0/OpenSilver.MauiHybrid.dll" target="lib/net9.0/OpenSilver.MauiHybrid.dll" />
     <file src="../../src/Maui/Hybrid/bin/$Configuration$/net10.0/OpenSilver.MauiHybrid.dll" target="lib/net10.0/OpenSilver.MauiHybrid.dll" />
+    <file src="../../src/Maui/Hybrid/bin/$Configuration$/net11.0/OpenSilver.MauiHybrid.dll" target="lib/net11.0/OpenSilver.MauiHybrid.dll" />
 
     <!-- Targets -->
     <file src="../../src/Targets/OpenSilver.MauiHybrid.targets" target="build/OpenSilver.MauiHybrid.targets" />

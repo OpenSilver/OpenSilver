@@ -26,9 +26,8 @@ DEL /Q %SIMULATOR_DIR%\build\*
 DEL /Q %SIMULATOR_DIR%\tools\*
 DEL /Q %SIMULATOR_DIR%\contentFiles\any\any\js_css\*
 DEL /Q %SIMULATOR_DIR%\contentFiles\any\any\*
-DEL /Q %SIMULATOR_DIR%\lib\net8.0-windows7.0\*
-DEL /Q %SIMULATOR_DIR%\lib\net9.0-windows7.0\*
 DEL /Q %SIMULATOR_DIR%\lib\net10.0-windows7.0\*
+DEL /Q %SIMULATOR_DIR%\lib\net11.0-windows7.0\*
 
 ECHO. 
 ECHO %ESC%[95mBuilding %ESC%[0mOpenSilver.Simulator %ESC%[95min %ESC%[0m%CFG% %ESC%[95mconfiguration%ESC%[0m
@@ -67,8 +66,7 @@ ECHO.
 ECHO %ESC%[95mCopying Simulator DLLs.%ESC%[0m
 ECHO.
 
-COPY "%SRC_DIR%\Simulator\Simulator\bin\%CFG%\net8.0-windows\OpenSilver.Simulator.dll" "%SIMULATOR_DIR%\lib\net8.0-windows7.0"
-COPY "%SRC_DIR%\Simulator\Simulator\bin\%CFG%\net9.0-windows\OpenSilver.Simulator.dll" "%SIMULATOR_DIR%\lib\net9.0-windows7.0"
 COPY "%SRC_DIR%\Simulator\Simulator\bin\%CFG%\net10.0-windows\OpenSilver.Simulator.dll" "%SIMULATOR_DIR%\lib\net10.0-windows7.0"
+COPY "%SRC_DIR%\Simulator\Simulator\bin\%CFG%\net11.0-windows\OpenSilver.Simulator.dll" "%SIMULATOR_DIR%\lib\net11.0-windows7.0"
 
 ENDLOCAL
