@@ -461,15 +461,13 @@ namespace System.Windows
 
         #region Explicit interface implementation
 
-        object ICollection.SyncRoot => throw new NotImplementedException();
+        object ICollection.SyncRoot => ((ICollection)_baseDictionary).SyncRoot;
 
         bool ICollection.IsSynchronized => false;
 
-        int ICollection<KeyValuePair<object, object>>.Count => throw new NotImplementedException();
+        ICollection<object> IDictionary<object, object>.Keys => _baseDictionary.Keys;
 
-        ICollection<object> IDictionary<object, object>.Keys => throw new NotImplementedException();
-
-        ICollection<object> IDictionary<object, object>.Values => throw new NotImplementedException();
+        ICollection<object> IDictionary<object, object>.Values => _baseDictionary.Values;
 
         bool IDictionary<object, object>.Remove(object key)
         {
@@ -482,8 +480,8 @@ namespace System.Windows
 
         void ICollection<KeyValuePair<object, object>>.Add(KeyValuePair<object, object> item) => Add(item.Key, item.Value);
 
-        void ICollection<KeyValuePair<object, object>>.CopyTo(KeyValuePair<object, object>[] array, int arrayIndex)
-            => throw new NotImplementedException();
+        void ICollection<KeyValuePair<object, object>>.CopyTo(KeyValuePair<object, object>[] array, int arrayIndex) =>
+            ((ICollection<KeyValuePair<object, object>>)_baseDictionary).CopyTo(array, arrayIndex);
 
         bool ICollection<KeyValuePair<object, object>>.Contains(KeyValuePair<object, object> item) => Contains(item.Key);
 
