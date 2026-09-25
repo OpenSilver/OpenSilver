@@ -864,6 +864,11 @@ namespace System.Windows.Data
 
         private void OnTargetInheritedContextChanged(object sender, EventArgs e)
         {
+            if (!IsAttached)
+            {
+                return;
+            }
+
             OnSourceAvailable(false);
         }
 
