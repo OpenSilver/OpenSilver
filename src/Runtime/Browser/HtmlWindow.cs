@@ -115,5 +115,17 @@ namespace System.Windows.Browser
                 return OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({OpenSilver.Interop.GetVariableStringForJS(confirmText)})");
             }
         }
+
+        /// <summary>
+        /// Displays a dialog box that prompts the user with a message and an input field.
+        /// </summary>
+        /// <param name="promptText">
+        /// Message to display in the dialog box.
+        /// </param>
+        /// <returns>
+        /// The user's input.
+        /// </returns>
+        public string Prompt(string promptText)
+            => OpenSilver.Interop.ExecuteJavaScriptString($"prompt({OpenSilver.Interop.GetVariableStringForJS(promptText)})");
     }
 }
