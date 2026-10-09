@@ -29,6 +29,7 @@
     <AvailableItemName Include="ApplicationDefinition" />
     <AvailableItemName Include="Page" />
     <AvailableItemName Include="Resource" />
+    <AvailableItemName Include="ServiceReferenceFile" />
   </ItemGroup>
 
   <!--============================================================
@@ -77,6 +78,7 @@
     <OutputExtension Condition="'$(Language)' == 'F#'">fs</OutputExtension>
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
+    <EnableDefaultServiceReferenceFileItems Condition="'$(EnableDefaultServiceReferenceFileItems)' == ''">true</EnableDefaultServiceReferenceFileItems>
     <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
     <!--
       ================================================================
@@ -188,70 +190,83 @@
                 Targets="CSharpXamlForHtml5BeforeCompile_NotDesignTime" />
   </Target>
 
-  <!--============================================================
-  BEFORE BUILD
-  ============================================================-->
-  <Target Name="CSharpXamlForHtml5BeforeBuild">
+  <Target Name="_OpenSilverBuildOnlySettings">
 
     <PropertyGroup>
       <IsNotDesignTimeCompilation>true</IsNotDesignTimeCompilation>
     </PropertyGroup>
+    
+  </Target>
+
+  <Target Name="_OpenSilverCheckUpdates" Condition="'$(OpenSilverType)' != ''">
 
     <!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
-    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;2"
+    <Exec Condition="$(OpenSilverType)&lt;2"
           Command="explorer.exe https://opensilver.net/how-to-migrate-to-1-0-0-alpha-007-or-newer/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;2"
+    <Error Condition="$(OpenSilverType)&lt;2"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/how-to-migrate-to-1-0-0-alpha-007-or-newer/"/>
-    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;3"
+    <Exec Condition="$(OpenSilverType)&lt;3"
           Command="explorer.exe https://opensilver.net/alpha19-2/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;3"
+    <Error Condition="$(OpenSilverType)&lt;3"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/alpha19-2/"/>
-    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;4"
+    <Exec Condition="$(OpenSilverType)&lt;4"
           Command="explorer.exe https://opensilver.net/permalinks/update/alpha20.aspx" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;4"
+    <Error Condition="$(OpenSilverType)&lt;4"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx"/>
-    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;5"
+    <Exec Condition="$(OpenSilverType)&lt;5"
           Command="explorer.exe https://opensilver.net/2-0/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;5"
+    <Error Condition="$(OpenSilverType)&lt;5"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/2-0/"/>
-    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;6"
+    <Exec Condition="$(OpenSilverType)&lt;6"
           Command="explorer.exe https://opensilver.net/upgrade-to-2.2/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;6"
+    <Error Condition="$(OpenSilverType)&lt;6"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-2.2/"/>
-    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;7"
+    <Exec Condition="$(OpenSilverType)&lt;7"
           Command="explorer.exe https://opensilver.net/upgrade-to-3.1/" Timeout="2000" ContinueOnError="True" />
-    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;7"
+    <Error Condition="$(OpenSilverType)&lt;7"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-3.1/" />
 
-    <!--============================================================
-      ServiceReferenceFixer (case insensitive) (only during Pass 2)
-      ============================================================-->
-    <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
-      <ServiceReferenceFile Include="%(Compile.RelativeDir)%(Compile.Filename).$(OutputExtension)"
-                            Condition="'%(Compile.Filename)%(Compile.Extension)'=='reference.$(OutputExtension)'" />
-      <!-- Note: users can specify additional files by adding ServiceReferenceFile tags to the .CSPROJ
-      Possible optional attributes are:
+  </Target>
+
+  <!--
+  ============================================================
+  ServiceReferenceFixer (case insensitive) (only during Pass 2)
+  ============================================================
+  -->
+  <Target Name="_OpenSilverProcessServiceReferenceFiles" Condition="'$(EnableServiceReferenceFixer)' == 'true'">
+
+    <ItemGroup  Condition="'$(EnableDefaultServiceReferenceFileItems)' == 'true'">
+      <!--
+      Note: users can specify additional files by adding ServiceReferenceFile tags to the .CSPROJ Possible optional attributes are:
       - ClientBaseToken to enforce a specific token representing the ClientBase object, if different from "base.Channel"
       - ClientBaseInterfaceName to enforce a specific interface for the Service Contract
       - EndpointCode to enforce a specific token to retrieve the endpoint address, if diffferent from "this.INTERNAL_RemoteAddressAsString"
-      - SoapVersion to set the SOAP version (default: 1.1) -->
+      - SoapVersion to set the SOAP version (default: 1.1)
+      -->
+      <ServiceReferenceFile Include="@(Compile->WithMetadataValue('Filename', 'reference')->WithMetadataValue('Extension', '.$(OutputExtension)'))" />
     </ItemGroup>
 
-    <ServiceReferenceFixer
-      Condition="'$(EnableServiceReferenceFixer)' == 'true'"
-      SourceFile="@(ServiceReferenceFile)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(ServiceReferenceFile.RelativeDir)%(ServiceReferenceFile.Filename).g.$(OutputExtension)"
-      />
-    <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
-      <ServiceReferenceFixerProcessedFiles Include="@(ServiceReferenceFile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename).g.$(OutputExtension)')" />
+    <ServiceReferenceFixer SourceFiles="@(ServiceReferenceFile)"
+                           IntermediateOutputPath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
+                           MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)">
+      <Output ItemName="_ServiceReferenceFixerGeneratedFiles" TaskParameter="GeneratedFiles" />
+    </ServiceReferenceFixer>
+
+    <ItemGroup>
       <Compile Remove="@(ServiceReferenceFile)" />
-      <Compile Include="@(ServiceReferenceFixerProcessedFiles)" />
-      <FileWrites Include="@(ServiceReferenceFixerProcessedFiles)" />
+      <Compile Include="@(_ServiceReferenceFixerGeneratedFiles)" />
+      <FileWrites Include="@(_ServiceReferenceFixerGeneratedFiles)" />
     </ItemGroup>
-
+  
   </Target>
+
+  <!--============================================================
+  BEFORE BUILD
+  ============================================================-->
+  <Target Name="CSharpXamlForHtml5BeforeBuild"
+          DependsOnTargets="_OpenSilverBuildOnlySettings;_OpenSilverCheckUpdates;_OpenSilverProcessServiceReferenceFiles" />
 
   <!--============================================================
   BEFORE COMPILE
@@ -401,6 +416,11 @@
       <ApplicationDefinition Remove="@(_XamlPreprocessorProcessedApplicationDefinitionFiles)" />
       <Content Remove="@(_XamlPreprocessorProcessedContentFiles)" />
       <Compile Include="@(_UpdateIncludesInFSharpProjectFileUpdatedItems)" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
+      <Compile Include="@(ServiceReferenceFile)" />
+      <ServiceReferenceFile Remove="@(ServiceReferenceFile)" />
     </ItemGroup>
 
   </Target>
