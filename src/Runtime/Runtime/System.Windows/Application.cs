@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -778,10 +779,10 @@ namespace System.Windows
         /// file.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// uriResource is null.
+        /// <paramref name="uriResource"/> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// uriResource is an absolute URI.
+        /// <paramref name="uriResource"/> is an absolute URI.
         /// </exception>
         public static Task<StreamResourceInfo> GetResourceStream(Uri uriResource)
         {
@@ -798,6 +799,77 @@ namespace System.Windows
             }
 
             return Task.FromResult<StreamResourceInfo>(null);
+        }
+
+        /// <summary>
+        /// Returns a resource file from a location in the specified zip package.
+        /// </summary>
+        /// <param name="zipPackageStreamResourceInfo">
+        /// A <see cref="StreamResourceInfo"/> that contains the zip package stream with the 
+        /// desired resource file.
+        /// </param>
+        /// <param name="uriResource">
+        /// A relative URI that identifies the resource file to be extracted from the zip package.
+        /// The URI is relative to the application package and does not need a leading forward slash.
+        /// </param>
+        /// <returns>
+        /// A <see cref="StreamResourceInfo"/> that contains the stream for the desired resource file.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="zipPackageStreamResourceInfo"/> is null or <paramref name="uriResource"/> 
+        /// is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="uriResource"/> is an absolute URI.
+        /// </exception>
+        public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
+        {
+            ArgumentNullException.ThrowIfNull(zipPackageStreamResourceInfo);
+            ArgumentNullException.ThrowIfNull(uriResource);
+
+            if (uriResource.IsAbsoluteUri)
+            {
+                throw new ArgumentException(Strings.AbsoluteUriNotAllowed);
+            }
+
+            MemoryStream resourceStream = null;
+
+            if (zipPackageStreamResourceInfo.Stream is Stream zipPackageStream)
+            {
+                using ZipArchive zipArchive = OpenZipArchive(zipPackageStream);
+
+                if (zipArchive is not null)
+                {
+                    long position = zipPackageStream.Position;
+
+                    if (zipArchive.GetEntry(uriResource.ToString()) is ZipArchiveEntry entry)
+                    {
+                        using var stream = entry.Open();
+                        resourceStream = new MemoryStream();
+                        stream.CopyTo(resourceStream);
+                        resourceStream.Seek(0, SeekOrigin.Begin);
+                    }
+
+                    if (zipPackageStream.CanSeek)
+                    {
+                        zipPackageStream.Seek(position, SeekOrigin.Begin);
+                    }
+                }
+            }
+
+            return resourceStream is not null ? new StreamResourceInfo(resourceStream, null) : null;
+
+            static ZipArchive OpenZipArchive(Stream zipPackageStream)
+            {
+                try
+                {
+                    return new ZipArchive(zipPackageStream, ZipArchiveMode.Read, true);
+                }
+                catch (InvalidDataException)
+                {
+                    return null;
+                }
+            }
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]

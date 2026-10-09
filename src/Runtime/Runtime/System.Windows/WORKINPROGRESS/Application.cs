@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Resources;
-
 namespace System.Windows
 {
     public delegate void CheckAndDownloadUpdateCompletedEventHandler(object sender,
@@ -41,12 +39,6 @@ namespace System.Windows
 
         [OpenSilver.NotImplemented]
         public bool HasElevatedPermissions { get; set; }
-
-        [OpenSilver.NotImplemented]
-        public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
-        {
-            return null;
-        }
 
         /// <summary>Attempts to install the application so that it can run outside the browser. </summary>
         /// <returns>true if the user gave consent to install the application or the application requires elevated trust; otherwise, false. See Remarks for more information. </returns>
