@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
 using System.Diagnostics;
@@ -374,7 +375,7 @@ public sealed class ThicknessAnimation : AnimationTimeline, IAnimation<Thickness
                 break;
         }
 
-        if (validateOrigin && !AnimatedTypeHelpers.IsValidAnimationValueThickness(initialValue))
+        if (OpenSilverCompatibilityPreferences.ValidateOriginValue(validateOrigin) && !AnimatedTypeHelpers.IsValidAnimationValueThickness(initialValue))
         {
             throw new InvalidOperationException(
                 string.Format(

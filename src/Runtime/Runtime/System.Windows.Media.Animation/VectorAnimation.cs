@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
 using System.Diagnostics;
@@ -374,7 +375,7 @@ public sealed class VectorAnimation : AnimationTimeline, IAnimation<Vector>
                 break;
         }
 
-        if (validateOrigin && !AnimatedTypeHelpers.IsValidAnimationValueVector(initialValue))
+        if (OpenSilverCompatibilityPreferences.ValidateOriginValue(validateOrigin) && !AnimatedTypeHelpers.IsValidAnimationValueVector(initialValue))
         {
             throw new InvalidOperationException(
                 string.Format(

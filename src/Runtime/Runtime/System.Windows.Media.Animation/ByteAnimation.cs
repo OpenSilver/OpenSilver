@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
 using System.Diagnostics;
@@ -365,7 +366,7 @@ public sealed class ByteAnimation : AnimationTimeline, IAnimation<byte>
                 break;
         }
 
-        if (validateOrigin && !AnimatedTypeHelpers.IsValidAnimationValueByte(initialValue))
+        if (OpenSilverCompatibilityPreferences.ValidateOriginValue(validateOrigin) && !AnimatedTypeHelpers.IsValidAnimationValueByte(initialValue))
         {
             throw new InvalidOperationException(
                 string.Format(

@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
 using System.Diagnostics;
@@ -373,7 +374,7 @@ public sealed class SingleAnimation : AnimationTimeline, IAnimation<float>
                 break;
         }
 
-        if (validateOrigin && !AnimatedTypeHelpers.IsValidAnimationValueSingle(initialValue))
+        if (OpenSilverCompatibilityPreferences.ValidateOriginValue(validateOrigin) && !AnimatedTypeHelpers.IsValidAnimationValueSingle(initialValue))
         {
             throw new InvalidOperationException(
                 string.Format(

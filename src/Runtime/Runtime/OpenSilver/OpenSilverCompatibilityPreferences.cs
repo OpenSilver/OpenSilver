@@ -14,6 +14,7 @@
 using OpenSilver.Internal;
 using System;
 using System.Windows;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace OpenSilver;
@@ -30,6 +31,7 @@ public static class OpenSilverCompatibilityPreferences
     private static bool _handleDispatcherExceptions = true;
     private static bool _handleDispatcherTimerExceptions = true;
     private static bool _handleJavaScriptCallbackExceptions = true;
+    private static bool _validateAnimationOriginValue = true;
 
     /// <summary>
     /// Gets or sets a value that indicates whether the errors fired by <see cref="Dispatcher"/> should be handled by
@@ -105,6 +107,34 @@ public static class OpenSilverCompatibilityPreferences
             }
         }
     }
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether From/To/By animations (such as <see cref="DoubleAnimation"/>,
+    /// <see cref="ColorAnimation"/>, <see cref="PointAnimation"/>, etc.) should validate the origin value of the
+    /// animated property before using it.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Cannot set a <see cref="OpenSilverCompatibilityPreferences"/> property after the <see cref="Application"/> startup. 
+    /// </exception>
+    public static bool ValidateAnimationOriginValue
+    {
+        get => _validateAnimationOriginValue;
+        set
+        {
+            lock (_lock)
+            {
+                if (_isSealed)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(Strings.CompatibilityPreferencesSealed, nameof(ValidateAnimationOriginValue), nameof(OpenSilverCompatibilityPreferences)));
+                }
+
+                _validateAnimationOriginValue = value;
+            }
+        }
+    }
+
+    internal static bool ValidateOriginValue(bool validate) => _validateAnimationOriginValue && validate;
 
     internal static void Seal()
     {
