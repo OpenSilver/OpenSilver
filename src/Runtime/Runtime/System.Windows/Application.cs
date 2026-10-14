@@ -793,12 +793,33 @@ namespace System.Windows
                 throw new ArgumentException(Strings.AbsoluteUriNotAllowed);
             }
 
-            if (AppResourcesManager.GetResourceStream(uriResource.ToString()) is Stream stream)
+            return Task.FromResult(GetResourceStream(uriResource.ToString()));
+        }
+
+        /// <summary>
+        /// Returns a resource file from a location in the application package.
+        /// </summary>
+        /// <param name="uriResource">
+        /// A relative URI that identifies the resource file to be loaded. The URI is relative
+        /// to the application package and does not need a leading forward slash.
+        /// </param>
+        /// <returns>
+        /// A <see cref="StreamResourceInfo"/> that contains the stream for the desired resource 
+        /// file.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="uriResource"/> is null.
+        /// </exception>
+        public static StreamResourceInfo GetResourceStream(string uriResource)
+        {
+            ArgumentNullException.ThrowIfNull(uriResource);
+
+            if (AppResourcesManager.GetResourceStream(uriResource) is Stream stream)
             {
-                return Task.FromResult(new StreamResourceInfo(stream, null));
+                return new StreamResourceInfo(stream, null);
             }
 
-            return Task.FromResult<StreamResourceInfo>(null);
+            return null;
         }
 
         /// <summary>

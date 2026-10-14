@@ -72,25 +72,25 @@ namespace OpenSilver.MauiHybrid.Controls
                     return fallback;
                 }
 
-                var trimmed = resourceString.Substring(prefix.Length);
+                var trimmed = resourceString.AsSpan(prefix.Length);
                 var slashIndex = trimmed.IndexOf('/');
                 if (slashIndex <= 0)
                 {
                     return fallback;
                 }
 
-                var assemblyName = trimmed.Substring(0, slashIndex);
-                var subPath = trimmed.Substring(slashIndex + 1);
+                var assemblyName = trimmed.Slice(0, slashIndex);
+                var subPath = trimmed.Slice(slashIndex + 1);
 
-                var uri = new Uri($"/{assemblyName};component/{subPath}", UriKind.Relative);
+                var uri = $"/{assemblyName};component/{subPath}";
 
-                var streamInfo = System.Windows.Application.GetResourceStream(uri).Result;
+                var streamInfo = System.Windows.Application.GetResourceStream(uri);
                 if (streamInfo?.Stream == null)
                 {
                     return fallback;
                 }
 
-                return new InMemoryFileInfo(Path.GetFileName(trimmed), streamInfo.Stream);
+                return new InMemoryFileInfo(new string(Path.GetFileName(trimmed)), streamInfo.Stream);
             }
 
             public IFileInfo GetFileInfo(string subpath)
