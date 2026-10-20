@@ -194,14 +194,14 @@ Object.defineProperty(window, 'osjs', {
                     get isManagingFocus() {
                         return _managedFocusUpdateCount > 0;
                     },
-                    focus: function (element) {
+                    focus: function (element, preventScroll = true) {
                         if (!element) return false;
 
                         element.setAttribute('tabindex', 0);
 
                         _managedFocusUpdateCount++;
                         try {
-                            element.focus({ preventScroll: true });
+                            element.focus({ preventScroll: preventScroll });
                         } finally {
                             _managedFocusUpdateCount--;
                         }
@@ -209,9 +209,12 @@ Object.defineProperty(window, 'osjs', {
                         return document.activeElement === element;
                     },
                     clearFocus: function () {
-                        _isManagedFocusUpdate = true;
-                        document.body.focus({ preventScroll: true });
-                        _isManagedFocusUpdate = false;
+                        _managedFocusUpdateCount++;
+                        try {
+                            document.body.focus({ preventScroll: true });
+                        } finally {
+                            _managedFocusUpdateCount--;
+                        }
                     },
                 };
             })();
@@ -221,6 +224,7 @@ Object.defineProperty(window, 'osjs', {
             let _pointerOver = null;
             let _pointerCapture = null;
             let _activePointerId = null;
+            let _activePointerType = null;
             let _pressedButtons = 0;
             let _suppressContextMenu = false;
 
@@ -243,6 +247,7 @@ Object.defineProperty(window, 'osjs', {
             function setActivePointer(e) {
                 setMouseButtons(e);
                 _activePointerId = isPointerDown() ? e.pointerId : null;
+                _activePointerType = isPointerDown() ? e.pointerType : null;
             }
 
             function getClosestElement(element) {
@@ -575,7 +580,11 @@ Object.defineProperty(window, 'osjs', {
                     return true;
                 },
                 focus: function (id) {
-                    return FocusManager.focus(document.getElementById(id));
+                    const element = document.getElementById(id);
+                    // On a tap the on-screen keyboard opens for this focus; preventScroll would leave it covering the input.
+                    const isTapOnTextInput = _activePointerType === 'touch' && element !== null &&
+                        (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT');
+                    return FocusManager.focus(element, !isTapOnTextInput);
                 },
                 clearFocus: function () {
                     FocusManager.clearFocus();
