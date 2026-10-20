@@ -209,9 +209,12 @@ Object.defineProperty(window, 'osjs', {
                         return document.activeElement === element;
                     },
                     clearFocus: function () {
-                        _isManagedFocusUpdate = true;
-                        document.body.focus({ preventScroll: true });
-                        _isManagedFocusUpdate = false;
+                        _managedFocusUpdateCount++;
+                        try {
+                            document.body.focus({ preventScroll: true });
+                        } finally {
+                            _managedFocusUpdateCount--;
+                        }
                     },
                 };
             })();
