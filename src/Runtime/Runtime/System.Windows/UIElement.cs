@@ -1131,6 +1131,8 @@ namespace System.Windows
 
             // The IsVisible property depends on this property.
             uie.UpdateIsVisibleCache();
+
+            OpenSilver.LayoutObserver.NotifyVisibilityChanged(uie, (Visibility)e.OldValue, newVisibility);
         }
 
         private static bool ValidateVisibility(object o)
