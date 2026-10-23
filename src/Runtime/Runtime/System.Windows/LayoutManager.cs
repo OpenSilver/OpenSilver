@@ -155,6 +155,8 @@ namespace System.Windows
                 _layoutRequestPosted = false;
                 _isInUpdateLayout = false;
 
+                OpenSilver.LayoutObserver.NotifyLayoutPassCompleted();
+
                 UIRenderer.ProcessRenderQueue(true);
 
                 if (gotException)
