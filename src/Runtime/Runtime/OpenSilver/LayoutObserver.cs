@@ -178,6 +178,23 @@ public abstract class LayoutObserver
     protected internal virtual void OnDetaching(UIElement child, UIElement parent) { }
 
     /// <summary>
+    /// Called when the value of a <see cref="ResponsiveExtension"/> switches because the width it watches
+    /// crossed a breakpoint, after the new value has been applied. This happens in the <see cref="FrameworkElement.SizeChanged"/>
+    /// event of the watched element, so during a layout pass, between its measure and arrange rounds.
+    /// </summary>
+    /// <param name="element">
+    /// The element the value applies to, or the element that owns the object it applies to, for example
+    /// the <see cref="System.Windows.Controls.Grid"/> of a <see cref="System.Windows.Controls.ColumnDefinition"/>.
+    /// </param>
+    /// <param name="target">
+    /// The object whose property changed.
+    /// </param>
+    /// <param name="property">
+    /// The property that changed.
+    /// </param>
+    protected internal virtual void OnResponsiveValueChanged(FrameworkElement element, DependencyObject target, DependencyProperty property) { }
+
+    /// <summary>
     /// Called at the end of each layout pass, before the pending JavaScript is sent to the browser.
     /// </summary>
     protected internal virtual void OnLayoutPassCompleted() { }
@@ -233,6 +250,17 @@ public abstract class LayoutObserver
             foreach (LayoutObserver observer in observers)
             {
                 observer.OnDetaching(child, parent);
+            }
+        }
+    }
+
+    internal static void NotifyResponsiveValueChanged(FrameworkElement element, DependencyObject target, DependencyProperty property)
+    {
+        if (_observers is LayoutObserver[] observers)
+        {
+            foreach (LayoutObserver observer in observers)
+            {
+                observer.OnResponsiveValueChanged(element, target, property);
             }
         }
     }

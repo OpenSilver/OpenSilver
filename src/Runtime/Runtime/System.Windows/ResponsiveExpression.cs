@@ -225,9 +225,17 @@ internal sealed class ResponsiveExpression : Expression
 
     private void OnSourceElementSizeChanged(object sender, SizeChangedEventArgs e)
     {
+        bool hadValue = ReadInternalState(InternalState.HasCachedValue);
+        object oldValue = _cachedValue;
+
         InvalidateCacheValue();
 
         _targetObject.ApplyExpression(_targetProperty, this);
+
+        if (hadValue && ReadInternalState(InternalState.HasCachedValue) && !Equals(oldValue, _cachedValue) && _mentorCache is not null)
+        {
+            OpenSilver.LayoutObserver.NotifyResponsiveValueChanged(_mentorCache, _targetObject, _targetProperty);
+        }
     }
 
     private void OnMentorLoaded(object sender, RoutedEventArgs e)
