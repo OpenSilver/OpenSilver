@@ -82,6 +82,43 @@
     <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
     <!--
       ================================================================
+                     OpenSilverEmitIntermediateXamlFiles
+      ================================================================
+      
+      When set to true, the XAML compiler saves, for each XAML file it processes, the intermediate XAML
+      tree from which the code was generated. This is the XAML as the compiler sees it after all of its
+      transformations have been applied. It is meant as a diagnostic aid to understand how a XAML file 
+      was interpreted by the compiler.
+      
+      The intermediate file is written to the intermediate output directory (IntermediateOutputPath),
+      next to the generated code file. It keeps the relative path of the XAML file (or its Link
+      metadata, if any) and replaces the .xaml extension with:
+      
+        .g.i.xaml
+          Emitted during the first compilation pass
+      
+        .g.xaml
+          Emitted during the second compilation pass
+      
+      Available values:
+      
+        false
+          No intermediate XAML file is emitted. This is the default value.
+      
+        true
+          An intermediate XAML file is emitted for every XAML file processed by the XAML compiler.
+      
+      This property applies to the entire project. Individual XAML files can override it by setting
+      OpenSilverEmitIntermediateXamlFiles as item metadata, which accepts the same values and takes
+      precedence over the project-wide property:
+      
+        <Page Update="Views\MainPage.xaml">
+          <OpenSilverEmitIntermediateXamlFiles>true</OpenSilverEmitIntermediateXamlFiles>
+        </Page>
+    -->
+    <OpenSilverEmitIntermediateXamlFiles Condition=" '$(OpenSilverEmitIntermediateXamlFiles)' == '' ">false</OpenSilverEmitIntermediateXamlFiles>
+    <!--
+      ================================================================
                      OpenSilverXamlPreprocessorFeatures
       ================================================================
       
@@ -289,6 +326,7 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
+      EmitIntermediateXamlFiles="$(OpenSilverEmitIntermediateXamlFiles)"
       Features="$(OpenSilverXamlPreprocessorFeatures)"
       MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)"
       Language="$(Language)"
@@ -382,6 +420,7 @@
       VerifyHash="false"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
+      EmitIntermediateXamlFiles="$(OpenSilverEmitIntermediateXamlFiles)"
       Features="$(OpenSilverXamlPreprocessorFeatures)"
       MaxDegreeOfParallelism="$(OpenSilverMaxDegreeOfParallelism)"
       Language="$(Language)"

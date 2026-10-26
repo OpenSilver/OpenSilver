@@ -18,7 +18,7 @@ namespace OpenSilver.Compiler
 {
     internal static class ConvertingXamlToCSharp
     {
-        public static string Convert(
+        public static GeneratorItem Convert(
             string xaml,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
@@ -57,12 +57,14 @@ namespace OpenSilver.Compiler
             GeneratingUniqueNames.ProcessDocument(doc, settings);
 
             // Generate C# code from the tree:
-            return GeneratingCSCode.GenerateCode(
+            string generatedCode = GeneratingCSCode.GenerateCode(
                 doc,
                 sourceFile,
                 fileNameWithPathRelativeToProjectRoot,
                 isFirstPass,
                 settings);
+
+            return new GeneratorItem(generatedCode, doc);
         }
     }
 }

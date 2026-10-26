@@ -60,6 +60,7 @@
     <Compile Include="1_ConvertingXaml\SetterTriggerConditionHelpers.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass1.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />
+    <Compile Include="1_ConvertingXaml\GeneratorItem.cs" />
     <Compile Include="OtherHelpersAndHandlers\MemberFlags.cs" />
     <Compile Include="OtherHelpersAndHandlers\MemberKind.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\ConvertingXamlToFS.cs" />

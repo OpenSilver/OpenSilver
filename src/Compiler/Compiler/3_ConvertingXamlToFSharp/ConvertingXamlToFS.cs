@@ -18,7 +18,7 @@ namespace OpenSilver.Compiler
 {
     internal static class ConvertingXamlToFS
     {
-        public static string Convert(
+        public static GeneratorItem Convert(
             string xaml,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
@@ -58,13 +58,15 @@ namespace OpenSilver.Compiler
             GeneratingUniqueNames.ProcessDocument(doc, settings);
 
             // Generate Vb code from the tree:
-            return GeneratingFSCode.GenerateCode(
+            string generatedCode = GeneratingFSCode.GenerateCode(
                 doc,
                 sourceFile,
                 fileNameWithPathRelativeToProjectRoot,
                 rootNamespace,
                 isFirstPass,
                 settings);
+
+            return new GeneratorItem(generatedCode, doc);
         }
     }
 }

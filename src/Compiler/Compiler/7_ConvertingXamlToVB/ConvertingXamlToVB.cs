@@ -18,7 +18,7 @@ namespace OpenSilver.Compiler
 {
     internal static class ConvertingXamlToVB
     {
-        public static string Convert(
+        public static GeneratorItem Convert(
             string xaml,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
@@ -58,13 +58,15 @@ namespace OpenSilver.Compiler
             GeneratingUniqueNames.ProcessDocument(doc, settings);
 
             // Generate Vb code from the tree:
-            return GeneratingVBCode.GenerateCode(
+            string generatedCode = GeneratingVBCode.GenerateCode(
                 doc,
                 sourceFile,
                 fileNameWithPathRelativeToProjectRoot,
                 rootNamespace,
                 isFirstPass,
                 settings);
+
+            return new GeneratorItem(generatedCode, doc);
         }
     }
 }

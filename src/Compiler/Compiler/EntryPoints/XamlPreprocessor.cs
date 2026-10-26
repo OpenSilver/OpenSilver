@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 using MSTask = Microsoft.Build.Utilities.Task;
 
 namespace OpenSilver.Compiler
@@ -109,6 +110,9 @@ namespace OpenSilver.Compiler
 
         [Required]
         public bool IsDesignTime { get; set; }
+
+        [Required]
+        public bool EmitIntermediateXamlFiles { get; set; }
 
         [Output]
         public ITaskItem[] GeneratedFiles { get; set; }
@@ -263,61 +267,46 @@ namespace OpenSilver.Compiler
             };
         }
 
-        private string GenerateCode(string xaml, string sourceFile, string fileIdentity, XamlPreprocessorOptions options, XamlPreprocessorFeatures features)
+        private GeneratorItem GenerateCode(string xaml, string sourceFile, string fileIdentity, XamlPreprocessorOptions options, XamlPreprocessorFeatures features)
         {
-            string generatedCode = string.Empty;
+            GeneratorItem item = null;
             switch (_supportedLanguage)
             {
                 case SupportedLanguage.CSharp:
-                    generatedCode = ConvertingXamlToCSharp.Convert(
+                    item = ConvertingXamlToCSharp.Convert(
                         xaml,
                         sourceFile,
                         fileIdentity,
                         new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.CSharp, TypeReferenceHelper.CSharp, options, features),
                         !IsSecondPass);
-
-                    generatedCode = CreateCSHeaderContainingHash(xaml)
-                        + Environment.NewLine
-                        + Environment.NewLine
-                        + generatedCode;
                     break;
 
                 case SupportedLanguage.VBNet:
-                    generatedCode = ConvertingXamlToVB.Convert(
+                    item = ConvertingXamlToVB.Convert(
                         xaml,
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
                         new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.VisualBasic, TypeReferenceHelper.VisualBasic, options, features),
                         !IsSecondPass);
-
-                    generatedCode = CreateVBHeaderContainingHash(xaml)
-                        + Environment.NewLine
-                        + Environment.NewLine
-                        + generatedCode;
                     break;
 
                 case SupportedLanguage.FSharp:
-                    generatedCode = ConvertingXamlToFS.Convert(
+                    item = ConvertingXamlToFS.Convert(
                         xaml,
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
                         new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.FSharp, TypeReferenceHelper.FSharp, options, features),
                         !IsSecondPass);
-
-                    generatedCode = CreateFSHeaderContainingHash(xaml)
-                        + Environment.NewLine
-                        + Environment.NewLine
-                        + generatedCode;
                     break;
             };
-            return generatedCode;
+            return item;
         }
 
         private ITaskItem GenerateOutputFile(ITaskItem item)
         {
-            string outputFilePath = GetOutputFile(item);
+            string outputFilePath = GetOutputFile(GetFileName(item));
             string sourceFilePath = item.GetMetadata("FullPath");
             string fileIdentity = GetFileIdentity(item);
             string xaml = ReadFileContent(sourceFilePath);
@@ -328,12 +317,20 @@ namespace OpenSilver.Compiler
             {
                 TimeSpan start = _watch.Elapsed;
 
-                string generatedCode = GenerateCode(xaml, sourceFilePath, fileIdentity, options, features);
+                GeneratorItem generatedItem = GenerateCode(xaml, sourceFilePath, fileIdentity, options, features);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
                 using (var sw = new StreamWriter(outputFilePath))
                 {
-                    sw.Write(generatedCode);
+                    sw.Write(CreateHeaderContainingHash(xaml));
+                    sw.Write(Environment.NewLine);
+                    sw.Write(Environment.NewLine);
+                    sw.Write(generatedItem.GenerateCode);
+                }
+
+                if (GetEmitIntermediateXamlFile(item))
+                {
+                    generatedItem.XamlDocument.Save(GetOutputFile(GetIntermediateXamlFileName(item)));
                 }
 
                 Log.LogMessage($"  {fileIdentity} -> {outputFilePath} ({(_watch.Elapsed - start).TotalMilliseconds} ms).");
@@ -354,6 +351,17 @@ namespace OpenSilver.Compiler
                 return fallback;
             }
             return options;
+        }
+
+        private bool ParseEmitIntermediateXamlFile(string value, bool fallback)
+        {
+            if (!bool.TryParse(value, out bool emitIntermediateXamlFile))
+            {
+                Log.LogWarning($"Invalid value '{value}' for OpenSilverEmitIntermediateXamlFiles. Expected a boolean (true or false).");
+                return fallback;
+            }
+
+            return emitIntermediateXamlFile;
         }
 
         private XamlPreprocessorFeatures ParseXamlFeatures(string value, XamlPreprocessorFeatures fallback)
@@ -414,7 +422,7 @@ namespace OpenSilver.Compiler
         private static bool IsXamlFile(ITaskItem item) =>
             string.Equals(item.GetMetadata("Extension"), ".xaml", StringComparison.OrdinalIgnoreCase);
 
-        private string GetOutputFile(ITaskItem item) => Path.Combine(IntermediateOutputPath, GetFileName(item));
+        private string GetOutputFile(string fileName) => Path.Combine(IntermediateOutputPath, fileName);
 
         private string GetFileName(ITaskItem item)
         {
@@ -430,6 +438,20 @@ namespace OpenSilver.Compiler
             }
         }
 
+        private string GetIntermediateXamlFileName(ITaskItem item)
+        {
+            string fileIdentity = GetFileIdentity(item);
+
+            if (IsSecondPass)
+            {
+                return Path.ChangeExtension(fileIdentity, ".g.xaml");
+            }
+            else
+            {
+                return Path.ChangeExtension(fileIdentity, ".g.i.xaml");
+            }
+        }
+
         private XamlPreprocessorOptions GetXamlProcessorOptions(ITaskItem item)
         {
             string options = item.GetMetadata("OpenSilverXamlPreprocessorOptions");
@@ -438,6 +460,16 @@ namespace OpenSilver.Compiler
                 return _options;
             }
             return ParseOptions(options, _options);
+        }
+
+        private bool GetEmitIntermediateXamlFile(ITaskItem item)
+        {
+            string emit = item.GetMetadata("OpenSilverEmitIntermediateXamlFiles");
+            if (string.IsNullOrEmpty(emit))
+            {
+                return EmitIntermediateXamlFiles;
+            }
+            return ParseEmitIntermediateXamlFile(emit, EmitIntermediateXamlFiles);
         }
 
         private XamlPreprocessorFeatures GetXamlFeatures(ITaskItem item)
@@ -466,6 +498,17 @@ namespace OpenSilver.Compiler
                 identity = item.GetMetadata("Identity");
             }
             return identity;
+        }
+
+        private string CreateHeaderContainingHash(string xaml)
+        {
+            return _supportedLanguage switch
+            {
+                SupportedLanguage.CSharp => CreateCSHeaderContainingHash(xaml),
+                SupportedLanguage.VBNet => CreateVBHeaderContainingHash(xaml),
+                SupportedLanguage.FSharp => CreateFSHeaderContainingHash(xaml),
+                _ => string.Empty,
+            };
         }
 
         private static string CreateCSHeaderContainingHash(string xaml)
