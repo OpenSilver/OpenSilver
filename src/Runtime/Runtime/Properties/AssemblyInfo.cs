@@ -20,6 +20,7 @@ using System.Windows.Markup;
 [assembly: InternalsVisibleTo("XRSharp")]
 [assembly: InternalsVisibleTo("Xaml3D")]
 [assembly: InternalsVisibleTo("OpenSilver.WpfCompat")]
+[assembly: InternalsVisibleTo("OpenSilver.Animations")]
 
 [assembly: OpenSilver.XamlDesigner(7)]
 

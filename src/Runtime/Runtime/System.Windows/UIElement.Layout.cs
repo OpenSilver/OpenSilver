@@ -256,7 +256,7 @@ namespace System.Windows
 
                 _desiredSize = desiredSize;
 
-                OpenSilver.LayoutObserver.NotifyMeasured(this, availableSize, isCloseToPreviousMeasure, prevSize, neverMeasured);
+                OpenSilver.LayoutObserver.NotifyMeasured(this, isCloseToPreviousMeasure, prevSize, neverMeasured);
 
                 // Contrary to WPF, Silverlight invalidates the parent when Measure in called during Arrange.
                 if (/* !MeasureDuringArrange && */

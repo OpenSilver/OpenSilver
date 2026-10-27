@@ -12,39 +12,33 @@
 \*====================================================================================*/
 
 using System;
-using System.ComponentModel;
-using System.Threading;
 using System.Windows;
 
 namespace OpenSilver;
 
 /// <summary>
 /// Receives notifications from the layout system. This is an extensibility point for
-/// libraries (such as animation libraries) and is not meant to be used by applications.
+/// OpenSilver.Animations, which sees it through InternalsVisibleTo while the API is not stable.
 /// </summary>
 /// <remarks>
 /// The measure and arrange notifications are raised while the dispatcher processing is
 /// disabled. Observers should only record data there, and post any work that needs the
 /// dispatcher. All notifications are raised on the UI thread.
 /// </remarks>
-[EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class LayoutObserver
+internal abstract class LayoutObserver
 {
     private static LayoutObserver[] _observers;
 
     /// <summary>
-    /// Registers an observer. Dispose the returned object to unregister it.
+    /// Registers an observer for the lifetime of the application.
     /// </summary>
     /// <param name="observer">
     /// The observer to register.
     /// </param>
-    /// <returns>
-    /// An object that unregisters the observer when disposed.
-    /// </returns>
     /// <exception cref="ArgumentNullException">
     /// observer is null.
     /// </exception>
-    public static IDisposable Register(LayoutObserver observer)
+    internal static void Register(LayoutObserver observer)
     {
         if (observer is null)
         {
@@ -63,34 +57,6 @@ public abstract class LayoutObserver
             copy[observers.Length] = observer;
             _observers = copy;
         }
-
-        return new Registration(observer);
-    }
-
-    private static void Unregister(LayoutObserver observer)
-    {
-        LayoutObserver[] observers = _observers;
-        if (observers is null)
-        {
-            return;
-        }
-
-        int index = Array.IndexOf(observers, observer);
-        if (index < 0)
-        {
-            return;
-        }
-
-        if (observers.Length == 1)
-        {
-            _observers = null;
-            return;
-        }
-
-        var copy = new LayoutObserver[observers.Length - 1];
-        Array.Copy(observers, 0, copy, 0, index);
-        Array.Copy(observers, index + 1, copy, index, observers.Length - index - 1);
-        _observers = copy;
     }
 
     /// <summary>
@@ -99,11 +65,8 @@ public abstract class LayoutObserver
     /// <param name="element">
     /// The measured element.
     /// </param>
-    /// <param name="availableSize">
-    /// The available size the element was measured with.
-    /// </param>
     /// <param name="sameAvailableSize">
-    /// true if availableSize is the same as the previous one.
+    /// true if the available size is the same as the previous one.
     /// </param>
     /// <param name="previousDesiredSize">
     /// The desired size before this measure. The new one is <see cref="UIElement.DesiredSize"/>.
@@ -111,7 +74,7 @@ public abstract class LayoutObserver
     /// <param name="isFirstMeasure">
     /// true if the element was never measured since it was attached to the visual tree.
     /// </param>
-    protected internal virtual void OnMeasured(UIElement element, Size availableSize, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure) { }
+    protected internal virtual void OnMeasured(UIElement element, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure) { }
 
     /// <summary>
     /// Called by <see cref="UIElement.Arrange(Rect)"/>, before the element arranges itself and its children.
@@ -199,13 +162,13 @@ public abstract class LayoutObserver
     /// </summary>
     protected internal virtual void OnLayoutPassCompleted() { }
 
-    internal static void NotifyMeasured(UIElement element, Size availableSize, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure)
+    internal static void NotifyMeasured(UIElement element, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure)
     {
         if (_observers is LayoutObserver[] observers)
         {
             foreach (LayoutObserver observer in observers)
             {
-                observer.OnMeasured(element, availableSize, sameAvailableSize, previousDesiredSize, isFirstMeasure);
+                observer.OnMeasured(element, sameAvailableSize, previousDesiredSize, isFirstMeasure);
             }
         }
     }
@@ -272,24 +235,6 @@ public abstract class LayoutObserver
             foreach (LayoutObserver observer in observers)
             {
                 observer.OnLayoutPassCompleted();
-            }
-        }
-    }
-
-    private sealed class Registration : IDisposable
-    {
-        private LayoutObserver _observer;
-
-        public Registration(LayoutObserver observer)
-        {
-            _observer = observer;
-        }
-
-        public void Dispose()
-        {
-            if (Interlocked.Exchange(ref _observer, null) is LayoutObserver observer)
-            {
-                Unregister(observer);
             }
         }
     }
