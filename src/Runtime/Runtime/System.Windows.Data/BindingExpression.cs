@@ -894,78 +894,83 @@ namespace System.Windows.Data
             _dataContextListener = null;
             SetMentor(null);
 
-            IInternalFrameworkElement mentor = FrameworkElement.FindMentor(Target);
-
-            if (mentor is null)
-            {
-                if (lastAttempt)
-                {
-                    SetStatus(BindingStatus.PathError);
-                    return;
-                }
-
-                Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
-                return;
-            }
-
             Binding binding = ParentBinding;
 
             object source;
             bool useMentor;
+            IInternalFrameworkElement mentor;
 
             if (binding.Source is not null)
             {
                 source = binding.Source;
                 useMentor = false;
-            }
-            else if (binding.ElementName is not null)
-            {
-                source = FindName(mentor, binding.ElementName);
-                useMentor = true;
-            }
-            else if (binding.RelativeSource is not null)
-            {
-                RelativeSource relativeSource = binding.RelativeSource;
-
-                (source, useMentor) = relativeSource.Mode switch
-                {
-                    RelativeSourceMode.Self => (Target, false),
-                    RelativeSourceMode.TemplatedParent => (mentor.TemplatedParent, true),
-                    RelativeSourceMode.FindAncestor => (FindAncestorOftype(mentor, relativeSource.AncestorType, relativeSource.AncestorLevel), true),
-                    _ => (null, false),
-                };
+                mentor = null;
             }
             else
             {
-                DependencyObject contextElement = mentor.AsDependencyObject();
+                mentor = FrameworkElement.FindMentor(Target);
 
-                // special cases:
-                // 1. if target property is DataContext, use the target's parent.
-                //      This enables <X DataContext="{Binding...}"/>
-                // 2. if the target is ContentPresenter and the target property
-                //      is Content, use the parent.  This enables
-                //          <ContentPresenter Content="{Binding...}"/>
-                if (TargetProperty == FrameworkElement.DataContextProperty ||
-                    (TargetProperty == ContentPresenter.ContentProperty && Target is ContentPresenter))
+                if (mentor is null)
                 {
-                    contextElement = LogicalTreeHelper.GetParent(contextElement) ?? VisualTreeHelper.GetParent(contextElement);
+                    if (lastAttempt)
+                    {
+                        SetStatus(BindingStatus.PathError);
+                        return;
+                    }
+
+                    Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
+                    return;
                 }
 
-                if (contextElement is IInternalFrameworkElement sourceFE)
+                if (binding.ElementName is not null)
                 {
-                    useMentor = false;
+                    source = FindName(mentor, binding.ElementName);
+                    useMentor = true;
+                }
+                else if (binding.RelativeSource is not null)
+                {
+                    RelativeSource relativeSource = binding.RelativeSource;
 
-                    _dataContextListener = PropertyChangeListener.CreateListener(
-                        sourceFE.AsDependencyObject(),
-                        FrameworkElement.DataContextProperty,
-                        OnDataContextChanged);
-
-                    source = sourceFE.GetValue(FrameworkElement.DataContextProperty);
+                    (source, useMentor) = relativeSource.Mode switch
+                    {
+                        RelativeSourceMode.Self => (Target, false),
+                        RelativeSourceMode.TemplatedParent => (mentor.TemplatedParent, true),
+                        RelativeSourceMode.FindAncestor => (FindAncestorOftype(mentor, relativeSource.AncestorType, relativeSource.AncestorLevel), true),
+                        _ => (null, false),
+                    };
                 }
                 else
                 {
-                    useMentor = true;
-                    source = null;
+                    DependencyObject contextElement = mentor.AsDependencyObject();
+
+                    // special cases:
+                    // 1. if target property is DataContext, use the target's parent.
+                    //      This enables <X DataContext="{Binding...}"/>
+                    // 2. if the target is ContentPresenter and the target property
+                    //      is Content, use the parent.  This enables
+                    //          <ContentPresenter Content="{Binding...}"/>
+                    if (TargetProperty == FrameworkElement.DataContextProperty ||
+                        (TargetProperty == ContentPresenter.ContentProperty && Target is ContentPresenter))
+                    {
+                        contextElement = LogicalTreeHelper.GetParent(contextElement) ?? VisualTreeHelper.GetParent(contextElement);
+                    }
+
+                    if (contextElement is IInternalFrameworkElement sourceFE)
+                    {
+                        useMentor = false;
+
+                        _dataContextListener = PropertyChangeListener.CreateListener(
+                            sourceFE.AsDependencyObject(),
+                            FrameworkElement.DataContextProperty,
+                            OnDataContextChanged);
+
+                        source = sourceFE.GetValue(FrameworkElement.DataContextProperty);
+                    }
+                    else
+                    {
+                        useMentor = true;
+                        source = null;
+                    }
                 }
             }
 
