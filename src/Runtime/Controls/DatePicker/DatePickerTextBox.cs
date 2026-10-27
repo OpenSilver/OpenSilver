@@ -6,6 +6,7 @@
 using OpenSilver.Compatibility;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Resource = OpenSilver.Controls.Resources;
 
@@ -32,6 +33,9 @@ namespace System.Windows.Controls.Primitives
 
         static DatePickerTextBox()
         {
+            // IMPORTANT: TextBox cctor must run before we override the IsEnabledProperty metadata
+            RuntimeHelpers.RunClassConstructor(typeof(TextBox).TypeHandle);
+
             EventManager.RegisterClassHandler<DatePickerTextBox>(Mouse.MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
             EventManager.RegisterClassHandler<DatePickerTextBox>(Mouse.MouseLeaveEvent, new MouseEventHandler(OnMouseLeave));
             EventManager.RegisterClassHandler<DatePickerTextBox>(GotFocusEvent, new RoutedEventHandler(OnGotFocus));

@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,7 +46,7 @@ internal sealed class RichTextBoxView : TextViewBase
     private static JsonSerializerOptions SerializerOptions { get; } =
         new JsonSerializerOptions
         {
-            IgnoreNullValues = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
     static RichTextBoxView()

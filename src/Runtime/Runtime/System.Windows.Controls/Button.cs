@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using System.Runtime.CompilerServices;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -42,6 +43,9 @@ public class Button : ButtonBase
 
     static Button()
     {
+        // IMPORTANT: ButtonBase cctor must run before we override the IsEnabledProperty metadata
+        RuntimeHelpers.RunClassConstructor(typeof(ButtonBase).TypeHandle);
+
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Button), new PropertyMetadata(typeof(Button)));
         IsEnabledProperty.OverrideMetadata(typeof(Button), new PropertyMetadata(OnIsEnabledChanged));
     }
