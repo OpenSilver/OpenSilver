@@ -234,7 +234,7 @@ internal sealed class ResponsiveExpression : Expression
 
         if (hadValue && ReadInternalState(InternalState.HasCachedValue) && !Equals(oldValue, _cachedValue) && _mentorCache is not null)
         {
-            OpenSilver.LayoutObserver.NotifyResponsiveValueChanged(_mentorCache, _targetObject, _targetProperty);
+            OpenSilver.InternalHooks.NotifyResponsiveValueChanged(_mentorCache, _targetObject, _targetProperty);
         }
     }
 

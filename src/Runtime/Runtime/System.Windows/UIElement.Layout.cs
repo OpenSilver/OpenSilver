@@ -256,7 +256,7 @@ namespace System.Windows
 
                 _desiredSize = desiredSize;
 
-                OpenSilver.LayoutObserver.NotifyMeasured(this, isCloseToPreviousMeasure, prevSize, neverMeasured);
+                OpenSilver.InternalHooks.NotifyMeasured(this, isCloseToPreviousMeasure, prevSize, neverMeasured);
 
                 // Contrary to WPF, Silverlight invalidates the parent when Measure in called during Arrange.
                 if (/* !MeasureDuringArrange && */
@@ -392,7 +392,7 @@ namespace System.Windows
                     bool sizeChanged = false;
                     bool gotException = true;
 
-                    OpenSilver.LayoutObserver.NotifyArranging(this, finalRect, PreviousArrangeRect, firstArrange);
+                    OpenSilver.InternalHooks.NotifyArranging(this, finalRect, PreviousArrangeRect, firstArrange);
 
                     try
                     {
@@ -444,7 +444,7 @@ namespace System.Windows
                         RenderingInvalidated = false;
                     }
 
-                    OpenSilver.LayoutObserver.NotifyArranged(
+                    OpenSilver.InternalHooks.NotifyArranged(
                         this,
                         new Rect(oldOffset.X, oldOffset.Y, oldSize.Width, oldSize.Height),
                         new Rect(VisualOffset.X, VisualOffset.Y, RenderSize.Width, RenderSize.Height),

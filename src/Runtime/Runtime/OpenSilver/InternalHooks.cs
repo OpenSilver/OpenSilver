@@ -17,17 +17,19 @@ using System.Windows;
 namespace OpenSilver;
 
 /// <summary>
-/// Receives notifications from the layout system. This is an extensibility point for
-/// OpenSilver.Animations, which sees it through InternalsVisibleTo while the API is not stable.
+/// Receives notifications from the runtime: layout passes, visibility changes, elements leaving
+/// the visual tree, and <see cref="ResponsiveExtension"/> values that switch.
 /// </summary>
 /// <remarks>
+/// Used by OpenSilver.Animations through InternalsVisibleTo (see AssemblyInfo.cs): when you change
+/// this class, update that library too.
 /// The measure and arrange notifications are raised while the dispatcher processing is
 /// disabled. Observers should only record data there, and post any work that needs the
 /// dispatcher. All notifications are raised on the UI thread.
 /// </remarks>
-internal abstract class LayoutObserver
+internal abstract class InternalHooks
 {
-    private static LayoutObserver[] _observers;
+    private static InternalHooks[] _observers;
 
     /// <summary>
     /// Registers an observer for the lifetime of the application.
@@ -38,21 +40,21 @@ internal abstract class LayoutObserver
     /// <exception cref="ArgumentNullException">
     /// observer is null.
     /// </exception>
-    internal static void Register(LayoutObserver observer)
+    internal static void Register(InternalHooks observer)
     {
         if (observer is null)
         {
             throw new ArgumentNullException(nameof(observer));
         }
 
-        LayoutObserver[] observers = _observers;
+        InternalHooks[] observers = _observers;
         if (observers is null)
         {
             _observers = new[] { observer };
         }
         else
         {
-            var copy = new LayoutObserver[observers.Length + 1];
+            var copy = new InternalHooks[observers.Length + 1];
             Array.Copy(observers, copy, observers.Length);
             copy[observers.Length] = observer;
             _observers = copy;
@@ -164,9 +166,9 @@ internal abstract class LayoutObserver
 
     internal static void NotifyMeasured(UIElement element, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure)
     {
-        if (_observers is LayoutObserver[] observers)
+        if (_observers is InternalHooks[] observers)
         {
-            foreach (LayoutObserver observer in observers)
+            foreach (InternalHooks observer in observers)
             {
                 observer.OnMeasured(element, sameAvailableSize, previousDesiredSize, isFirstMeasure);
             }
@@ -175,9 +177,9 @@ internal abstract class LayoutObserver
 
     internal static void NotifyArranging(UIElement element, Rect finalRect, Rect previousFinalRect, bool isFirstArrange)
     {
-        if (_observers is LayoutObserver[] observers)
+        if (_observers is InternalHooks[] observers)
         {
-            foreach (LayoutObserver observer in observers)
+            foreach (InternalHooks observer in observers)
             {
                 observer.OnArranging(element, finalRect, previousFinalRect, isFirstArrange);
             }
@@ -186,9 +188,9 @@ internal abstract class LayoutObserver
 
     internal static void NotifyArranged(UIElement element, Rect previousVisualRect, Rect visualRect, bool rendered)
     {
-        if (_observers is LayoutObserver[] observers)
+        if (_observers is InternalHooks[] observers)
         {
-            foreach (LayoutObserver observer in observers)
+            foreach (InternalHooks observer in observers)
             {
                 observer.OnArranged(element, previousVisualRect, visualRect, rendered);
             }
@@ -197,9 +199,9 @@ internal abstract class LayoutObserver
 
     internal static void NotifyVisibilityChanged(UIElement element, Visibility oldValue, Visibility newValue)
     {
-        if (_observers is LayoutObserver[] observers)
+        if (_observers is InternalHooks[] observers)
         {
-            foreach (LayoutObserver observer in observers)
+            foreach (InternalHooks observer in observers)
             {
                 observer.OnVisibilityChanged(element, oldValue, newValue);
             }
@@ -208,9 +210,9 @@ internal abstract class LayoutObserver
 
     internal static void NotifyDetaching(UIElement child, UIElement parent)
     {
-        if (_observers is LayoutObserver[] observers)
+        if (_observers is InternalHooks[] observers)
         {
-            foreach (LayoutObserver observer in observers)
+            foreach (InternalHooks observer in observers)
             {
                 observer.OnDetaching(child, parent);
             }
@@ -219,9 +221,9 @@ internal abstract class LayoutObserver
 
     internal static void NotifyResponsiveValueChanged(FrameworkElement element, DependencyObject target, DependencyProperty property)
     {
-        if (_observers is LayoutObserver[] observers)
+        if (_observers is InternalHooks[] observers)
         {
-            foreach (LayoutObserver observer in observers)
+            foreach (InternalHooks observer in observers)
             {
                 observer.OnResponsiveValueChanged(element, target, property);
             }
@@ -230,9 +232,9 @@ internal abstract class LayoutObserver
 
     internal static void NotifyLayoutPassCompleted()
     {
-        if (_observers is LayoutObserver[] observers)
+        if (_observers is InternalHooks[] observers)
         {
-            foreach (LayoutObserver observer in observers)
+            foreach (InternalHooks observer in observers)
             {
                 observer.OnLayoutPassCompleted();
             }
