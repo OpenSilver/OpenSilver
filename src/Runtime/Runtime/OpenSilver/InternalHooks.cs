@@ -130,7 +130,8 @@ internal abstract class InternalHooks
     protected internal virtual void OnVisibilityChanged(UIElement element, Visibility oldValue, Visibility newValue) { }
 
     /// <summary>
-    /// Called when an element that is in the visual tree is about to be detached from its visual parent.
+    /// Called when an element that is in the visual tree is about to be detached from its visual parent,
+    /// and when a popup closes, for the element that holds its content.
     /// The DOM of the element still exists at this point, and it is removed after any JavaScript
     /// queued by this method.
     /// </summary>
@@ -138,7 +139,8 @@ internal abstract class InternalHooks
     /// The element being detached.
     /// </param>
     /// <param name="parent">
-    /// The visual parent of the element.
+    /// The visual parent of the element. When a popup closes, its PopupRoot, which leaves the visual
+    /// tree with it.
     /// </param>
     protected internal virtual void OnDetaching(UIElement child, UIElement parent) { }
 
