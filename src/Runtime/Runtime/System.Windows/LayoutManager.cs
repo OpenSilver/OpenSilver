@@ -155,7 +155,7 @@ namespace System.Windows
                 _layoutRequestPosted = false;
                 _isInUpdateLayout = false;
 
-                OpenSilver.InternalHooks.NotifyLayoutPassCompleted();
+                InternalHooks.NotifyLayoutPassCompleted();
 
                 UIRenderer.ProcessRenderQueue(true);
 

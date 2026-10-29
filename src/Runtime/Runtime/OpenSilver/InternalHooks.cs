@@ -40,7 +40,7 @@ internal abstract class InternalHooks
     /// <exception cref="ArgumentNullException">
     /// observer is null.
     /// </exception>
-    internal static void Register(InternalHooks observer)
+    public static void Register(InternalHooks observer)
     {
         if (observer is null)
         {
@@ -50,7 +50,7 @@ internal abstract class InternalHooks
         InternalHooks[] observers = _observers;
         if (observers is null)
         {
-            _observers = new[] { observer };
+            _observers = [observer];
         }
         else
         {
@@ -59,6 +59,42 @@ internal abstract class InternalHooks
             copy[observers.Length] = observer;
             _observers = copy;
         }
+    }
+
+    /// <summary>
+    /// Unregisters an observer so that it no longer receives runtime notifications. If the observer 
+    /// is not registered, this method does nothing.
+    /// </summary>
+    /// <param name="observer">
+    /// The observer to unregister.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// observer is null.
+    /// </exception>
+    public static void Unregister(InternalHooks observer)
+    {
+        InternalHooks[] observers = _observers;
+        if (observers is null)
+        {
+            return;
+        }
+
+        int index = Array.IndexOf(observers, observer);
+        if (index < 0)
+        {
+            return;
+        }
+
+        if (observers.Length == 1)
+        {
+            _observers = null;
+            return;
+        }
+
+        var copy = new InternalHooks[observers.Length - 1];
+        Array.Copy(observers, 0, copy, 0, index);
+        Array.Copy(observers, index + 1, copy, index, observers.Length - index - 1);
+        _observers = copy;
     }
 
     /// <summary>
@@ -76,7 +112,7 @@ internal abstract class InternalHooks
     /// <param name="isFirstMeasure">
     /// true if the element was never measured since it was attached to the visual tree.
     /// </param>
-    protected internal virtual void OnMeasured(UIElement element, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure) { }
+    protected virtual void OnMeasured(UIElement element, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure) { }
 
     /// <summary>
     /// Called by <see cref="UIElement.Arrange(Rect)"/>, before the element arranges itself and its children.
@@ -93,7 +129,7 @@ internal abstract class InternalHooks
     /// <param name="isFirstArrange">
     /// true if the element was never arranged since it was attached to the visual tree.
     /// </param>
-    protected internal virtual void OnArranging(UIElement element, Rect finalRect, Rect previousFinalRect, bool isFirstArrange) { }
+    protected virtual void OnArranging(UIElement element, Rect finalRect, Rect previousFinalRect, bool isFirstArrange) { }
 
     /// <summary>
     /// Called by <see cref="UIElement.Arrange(Rect)"/>, after the element and its children have been arranged.
@@ -112,7 +148,7 @@ internal abstract class InternalHooks
     /// <param name="rendered">
     /// true if the new position and size were written to the DOM.
     /// </param>
-    protected internal virtual void OnArranged(UIElement element, Rect previousVisualRect, Rect visualRect, bool rendered) { }
+    protected virtual void OnArranged(UIElement element, Rect previousVisualRect, Rect visualRect, bool rendered) { }
 
     /// <summary>
     /// Called after the <see cref="UIElement.Visibility"/> of an element has changed and the layout
@@ -127,7 +163,7 @@ internal abstract class InternalHooks
     /// <param name="newValue">
     /// The new visibility.
     /// </param>
-    protected internal virtual void OnVisibilityChanged(UIElement element, Visibility oldValue, Visibility newValue) { }
+    protected virtual void OnVisibilityChanged(UIElement element, Visibility oldValue, Visibility newValue) { }
 
     /// <summary>
     /// Called when an element that is in the visual tree is about to be detached from its visual parent,
@@ -142,7 +178,7 @@ internal abstract class InternalHooks
     /// The visual parent of the element. When a popup closes, its PopupRoot, which leaves the visual
     /// tree with it.
     /// </param>
-    protected internal virtual void OnDetaching(UIElement child, UIElement parent) { }
+    protected virtual void OnDetaching(UIElement child, UIElement parent) { }
 
     /// <summary>
     /// Called when the value of a <see cref="ResponsiveExtension"/> switches because the width it watches
@@ -159,12 +195,12 @@ internal abstract class InternalHooks
     /// <param name="property">
     /// The property that changed.
     /// </param>
-    protected internal virtual void OnResponsiveValueChanged(FrameworkElement element, DependencyObject target, DependencyProperty property) { }
+    protected virtual void OnResponsiveValueChanged(FrameworkElement element, DependencyObject target, DependencyProperty property) { }
 
     /// <summary>
     /// Called at the end of each layout pass, before the pending JavaScript is sent to the browser.
     /// </summary>
-    protected internal virtual void OnLayoutPassCompleted() { }
+    protected virtual void OnLayoutPassCompleted() { }
 
     internal static void NotifyMeasured(UIElement element, bool sameAvailableSize, Size previousDesiredSize, bool isFirstMeasure)
     {

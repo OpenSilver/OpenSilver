@@ -1132,7 +1132,7 @@ namespace System.Windows
             // The IsVisible property depends on this property.
             uie.UpdateIsVisibleCache();
 
-            OpenSilver.InternalHooks.NotifyVisibilityChanged(uie, (Visibility)e.OldValue, newVisibility);
+            InternalHooks.NotifyVisibilityChanged(uie, (Visibility)e.OldValue, newVisibility);
         }
 
         private static bool ValidateVisibility(object o)

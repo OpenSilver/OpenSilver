@@ -392,11 +392,11 @@ namespace System.Windows
                     bool sizeChanged = false;
                     bool gotException = true;
 
-                    OpenSilver.InternalHooks.NotifyArranging(this, finalRect, PreviousArrangeRect, firstArrange);
-
                     try
                     {
                         layoutManager.EnterArrange();
+
+                        OpenSilver.InternalHooks.NotifyArranging(this, finalRect, PreviousArrangeRect, firstArrange);
 
                         // This has to update RenderSize
                         ArrangeCore(finalRect);
