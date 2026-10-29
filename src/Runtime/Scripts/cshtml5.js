@@ -656,6 +656,21 @@ Object.defineProperty(window, 'osjs', {
             return element;
         }
 
+        // Elements marked with 'data-os-foreign' are added by libraries (for example animation
+        // ghosts and overlays) and are not counted as children of the visual tree.
+        function getChildAtVisualIndex(parent, index) {
+            const children = parent.children;
+            if (index < 0 || index >= children.length) return null;
+
+            let i = 0;
+            for (const child of children) {
+                if (child.hasAttribute('data-os-foreign')) continue;
+                if (i++ === index) return child;
+            }
+
+            return null;
+        }
+
         return {
             initialize: function (
                 inputManagerCallback,
@@ -770,10 +785,11 @@ Object.defineProperty(window, 'osjs', {
 
                 const element = createVisualElement(tagName, id, parent.windowid);
 
-                if (index < 0 || index >= parent.children.length) {
+                const next = getChildAtVisualIndex(parent, index);
+                if (next === null) {
                     parent.appendChild(element);
                 } else {
-                    parent.insertBefore(element, parent.children[index]);
+                    parent.insertBefore(element, next);
                 }
 
                 return element;

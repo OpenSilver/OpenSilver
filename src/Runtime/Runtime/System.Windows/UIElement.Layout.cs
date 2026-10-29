@@ -256,6 +256,8 @@ namespace System.Windows
 
                 _desiredSize = desiredSize;
 
+                OpenSilver.InternalHooks.NotifyMeasured(this, isCloseToPreviousMeasure, prevSize, neverMeasured);
+
                 // Contrary to WPF, Silverlight invalidates the parent when Measure in called during Arrange.
                 if (/* !MeasureDuringArrange && */
                     !DoubleUtil.AreClose(prevSize, desiredSize))
@@ -394,6 +396,8 @@ namespace System.Windows
                     {
                         layoutManager.EnterArrange();
 
+                        OpenSilver.InternalHooks.NotifyArranging(this, finalRect, PreviousArrangeRect, firstArrange);
+
                         // This has to update RenderSize
                         ArrangeCore(finalRect);
 
@@ -432,12 +436,19 @@ namespace System.Windows
                         LayoutManager.Current.ArrangeQueue.Remove(this);
                     }
 
-                    if (sizeChanged || RenderingInvalidated || firstArrange)
+                    bool rendered = sizeChanged || RenderingInvalidated || firstArrange;
+                    if (rendered)
                     {
                         // Render with new size & location
                         RenderLayout();
                         RenderingInvalidated = false;
                     }
+
+                    OpenSilver.InternalHooks.NotifyArranged(
+                        this,
+                        new Rect(oldOffset.X, oldOffset.Y, oldSize.Width, oldSize.Height),
+                        new Rect(VisualOffset.X, VisualOffset.Y, RenderSize.Width, RenderSize.Height),
+                        rendered && !BypassLayoutPolicies);
                 }
             }
         }

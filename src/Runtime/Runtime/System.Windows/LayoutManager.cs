@@ -155,6 +155,8 @@ namespace System.Windows
                 _layoutRequestPosted = false;
                 _isInUpdateLayout = false;
 
+                InternalHooks.NotifyLayoutPassCompleted();
+
                 UIRenderer.ProcessRenderQueue(true);
 
                 if (gotException)

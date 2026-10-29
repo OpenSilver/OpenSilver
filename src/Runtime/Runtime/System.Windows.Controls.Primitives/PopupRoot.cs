@@ -88,6 +88,7 @@ internal sealed class PopupRoot : FrameworkElement
 
         IsOpen = false;
 
+        InternalHooks.NotifyDetaching(_transformLayer, this);
         INTERNAL_VisualTreeManager.DetachPopupRoot(this);
         UpdateIsRenderableCache();
         UpdateIsVisibleCache();

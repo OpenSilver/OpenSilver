@@ -67,6 +67,7 @@ namespace CSHTML5.Internal
                 {
                     if (parent.VisualChildrenInformation is not null && parent.VisualChildrenInformation.Remove(child))
                     {
+                        InternalHooks.NotifyDetaching(child, parent);
                         InternalDetachVisual(child);
                     }
                     else
