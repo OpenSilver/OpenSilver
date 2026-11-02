@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,6 +53,33 @@ namespace TestApplication.Tests.ScrollViewers
 
             NativeListBox.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Item {i}").ToList();
             VirtualizedListBox.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Virtualized item {i}").ToList();
+            VariableListBox.ItemsSource = _variableItems;
+            for (int i = 0; i < 1000; i++)
+            {
+                _variableItems.Add(new VariableItem(i));
+            }
+            HorizontalListBox.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Column {i}").ToList();
+
+            // The templates of the ListBoxes are applied during the first layout.
+            var listBoxes = new List<ListBox> { VirtualizedListBox, VariableListBox, HorizontalListBox };
+            EventHandler hookScrollChanged = null;
+            hookScrollChanged = (o, e) =>
+            {
+                for (int i = listBoxes.Count - 1; i >= 0; i--)
+                {
+                    if (FindDescendant<ScrollViewer>(listBoxes[i]) is ScrollViewer sv)
+                    {
+                        sv.ScrollChanged += (s, args) => UpdateVirtualizedReadout();
+                        listBoxes.RemoveAt(i);
+                    }
+                }
+                if (listBoxes.Count == 0)
+                {
+                    LayoutUpdated -= hookScrollChanged;
+                    UpdateVirtualizedReadout();
+                }
+            };
+            LayoutUpdated += hookScrollChanged;
 
             foreach (ComboBox comboBox in new[] { HorizontalVisibilityComboBox, VerticalVisibilityComboBox })
             {
@@ -193,6 +221,97 @@ namespace TestApplication.Tests.ScrollViewers
         private void HeavyScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             HeavyReadout.Text = $"V={HeavyScrollViewer.VerticalOffset:0}";
+        }
+
+        private sealed class VariableItem
+        {
+            private static readonly double[] Heights = { 24, 60, 32, 90, 40 };
+
+            private static int _created;
+
+            public VariableItem(int index)
+            {
+                int id = _created++;
+                Text = $"Variable item {index} ({Heights[id % Heights.Length]}px)";
+                Height = Heights[id % Heights.Length];
+                Brush = new SolidColorBrush(Color.FromArgb(255, (byte)(200 + id % 5 * 10), 230, (byte)(255 - id % 5 * 20)));
+            }
+
+            public string Text { get; }
+
+            public double Height { get; }
+
+            public Brush Brush { get; }
+        }
+
+        private readonly System.Collections.ObjectModel.ObservableCollection<VariableItem> _variableItems = new();
+
+        private static T FindDescendant<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result || (result = FindDescendant<T>(child)) is not null)
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
+
+        private void UpdateVirtualizedReadout()
+        {
+            string Describe(ListBox listBox)
+            {
+                var sv = FindDescendant<ScrollViewer>(listBox);
+                var panel = FindDescendant<VirtualizingStackPanel>(listBox);
+                if (sv is null || panel is null)
+                {
+                    return "-";
+                }
+
+                bool isHorizontal = panel.Orientation == Orientation.Horizontal;
+                double offset = isHorizontal ? sv.HorizontalOffset : sv.VerticalOffset;
+                double viewport = isHorizontal ? sv.ViewportWidth : sv.ViewportHeight;
+                double extent = isHorizontal ? sv.ExtentWidth : sv.ExtentHeight;
+                return $"{offset:0.##}/{extent - viewport:0.##} vp={viewport:0.##} n={panel.Children.Count}";
+            }
+
+            VirtualizedReadout.Text =
+                $"Fixed: {Describe(VirtualizedListBox)} | Variable: {Describe(VariableListBox)} | Horizontal: {Describe(HorizontalListBox)}";
+        }
+
+        private void VirtualizedIntoView_Click(object sender, RoutedEventArgs e)
+        {
+            VirtualizedListBox.SelectedIndex = 500;
+            VirtualizedListBox.ScrollIntoView(VirtualizedListBox.SelectedItem);
+            VariableListBox.SelectedIndex = 500;
+            VariableListBox.ScrollIntoView(VariableListBox.SelectedItem);
+            HorizontalListBox.SelectedIndex = 500;
+            HorizontalListBox.ScrollIntoView(HorizontalListBox.SelectedItem);
+        }
+
+        private void VirtualizedOffset_Click(object sender, RoutedEventArgs e)
+        {
+            FindDescendant<ScrollViewer>(VirtualizedListBox)?.ScrollToVerticalOffset(600);
+            FindDescendant<ScrollViewer>(VariableListBox)?.ScrollToVerticalOffset(600);
+            FindDescendant<ScrollViewer>(HorizontalListBox)?.ScrollToHorizontalOffset(600);
+        }
+
+        private void VirtualizedInsert_Click(object sender, RoutedEventArgs e) => _variableItems.Insert(0, new VariableItem(-1));
+
+        private void VirtualizedRemove_Click(object sender, RoutedEventArgs e)
+        {
+            if (_variableItems.Count > 0)
+            {
+                _variableItems.RemoveAt(0);
+            }
+        }
+
+        private void VirtualizedNative_Click(object sender, RoutedEventArgs e)
+        {
+            NativeScrolling.SetIsEnabled(ListBoxes, VirtualizedNativeCheckBox.IsChecked == true);
+            NativeScrolling.SetIsEnabled(HorizontalListBox, VirtualizedNativeCheckBox.IsChecked == true);
         }
     }
 }

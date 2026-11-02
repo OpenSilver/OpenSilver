@@ -460,6 +460,15 @@ public partial class ItemsControl
                     }
                 }
                 scrollHost.UpdateLayout();
+
+                // With native scrolling, item sizes vary: bring the (now realized) container fully into view.
+                if (virtualizing &&
+                    scrollHost.ScrollInfo is VirtualizingStackPanel { IsNativeScrolling: true } &&
+                    ItemContainerGenerator.ContainerFromIndex(index) is UIElement container)
+                {
+                    scrollHost.MakeVisible(container, new Rect(container.RenderSize));
+                    scrollHost.UpdateLayout();
+                }
             }
         }
     }

@@ -172,7 +172,7 @@ Object.defineProperty(window, 'osjs', {
             // (in other words, the pointer is over an area of the scroller not covered by its content).
             function getScrollerFromHost(element) {
                 if (!element) return null;
-                if (isNativeScroller(element)) return element;
+                if (isNativeScroller(element)) return getState(element).opaque ? null : element;
                 const owner = element._osScrollOwner;
                 if (owner && isNativeScroller(owner)) return owner;
                 return null;
@@ -274,15 +274,18 @@ Object.defineProperty(window, 'osjs', {
                         scroller.appendChild(content);
 
                         Object.defineProperty(scroller, '_osScroll', {
-                            value: { mode: MODE.NONE, content: content, lastX: 0, lastY: 0, listening: false },
+                            value: { mode: MODE.NONE, opaque: false, content: content, lastX: 0, lastY: 0, listening: false },
                         });
                     },
-                    setMode: function (id, mode, canScrollX, canScrollY) {
+                    // An opaque scroller is hit-testable by itself: the pointer is not routed to the elements
+                    // underneath when it is over an area not covered by the content.
+                    setMode: function (id, mode, canScrollX, canScrollY, opaque = false) {
                         const scroller = document.getElementById(id);
                         const state = getState(scroller);
                         if (!state) return;
 
                         state.mode = mode;
+                        state.opaque = opaque;
 
                         if (mode === MODE.NATIVE) {
                             scroller.classList.add(CSS_CLASS.NATIVE_SCROLLER);
@@ -323,6 +326,11 @@ Object.defineProperty(window, 'osjs', {
                         const scroller = document.getElementById(id);
                         if (!isNativeScroller(scroller)) return;
                         scroller.scrollTo({ left: x, top: y, behavior: 'instant' });
+                    },
+                    scrollBy: function (id, dx, dy) {
+                        const scroller = document.getElementById(id);
+                        if (!isNativeScroller(scroller)) return;
+                        scroller.scrollBy({ left: dx, top: dy, behavior: 'instant' });
                     },
                     // 0: the scroller cannot scroll in the wheel direction.
                     // 1: the browser will scroll the scroller natively (the target is inside it).

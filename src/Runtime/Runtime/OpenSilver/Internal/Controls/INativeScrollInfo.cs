@@ -13,6 +13,7 @@
 
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -32,4 +33,14 @@ internal interface INativeScrollInfo
     /// rendered shifted by the opposite of this value.
     /// </summary>
     Vector NativeOffset { get; }
+
+    /// <summary>
+    /// Called when the browser has scrolled the DOM element.
+    /// </summary>
+    void OnNativeScroll(double scrollLeft, double scrollTop);
+
+    /// <summary>
+    /// Lets the browser scroll the DOM element for a mouse wheel event.
+    /// </summary>
+    void HandleNativeMouseWheel(MouseWheelEventArgs e);
 }

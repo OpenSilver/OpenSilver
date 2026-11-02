@@ -71,6 +71,7 @@
     <Compile Include="OpenSilver\Controls\WindowHost.cs" />
     <Compile Include="OpenSilver\Controls\WindowTaskbar.cs" />
     <Compile Include="OpenSilver\Internal\Controls\INativeScrollInfo.cs" />
+    <Compile Include="OpenSilver\Internal\Controls\ItemSizeCache.cs" />
     <Compile Include="OpenSilver\Internal\Controls\NativeScrollManager.cs" />
     <Compile Include="OpenSilver\Internal\Controls\TextViewManager.cs" />
     <Compile Include="OpenSilver\Internal\Data\ClrFieldAccessor.cs" />
@@ -815,6 +816,7 @@
     <Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
     <Compile Include="System.Windows.Controls\VirtualizingPanel.cs" />
     <Compile Include="System.Windows.Controls\VirtualizingStackPanel.cs" />
+    <Compile Include="System.Windows.Controls\VirtualizingStackPanel.Native.cs" />
     <Compile Include="System.Windows.Controls.Primitives\IItemContainerGenerator.cs" />
     <Compile Include="System.Windows.Controls.Primitives\IRecyclingItemContainerGenerator.cs" />
     <Compile Include="System.Windows.Controls.Primitives\IScrollInfo.cs" />

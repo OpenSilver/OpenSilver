@@ -881,11 +881,9 @@ namespace System.Windows.Controls
                 return;
             }
 
-            if (ScrollInfo is ScrollContentPresenter { IsNativeScrolling: true } scp)
+            if (ScrollInfo is INativeScrollInfo { IsNativeScrolling: true } nativeScrollInfo)
             {
-                // The browser scrolls with its own (smooth) wheel behavior. At the limits, the event
-                // keeps bubbling so that outer ScrollViewers can scroll.
-                scp.HandleNativeMouseWheel(e);
+                nativeScrollInfo.HandleNativeMouseWheel(e);
                 return;
             }
 
