@@ -73,9 +73,15 @@ public static class NativeScrolling
 
     private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is ScrollContentPresenter scp)
+        switch (d)
         {
-            scp.UpdateNativeScrolling();
+            case ScrollContentPresenter scp:
+                scp.UpdateNativeScrolling();
+                break;
+
+            case VirtualizingStackPanel vsp:
+                vsp.UpdateNativeScrolling();
+                break;
         }
     }
 }

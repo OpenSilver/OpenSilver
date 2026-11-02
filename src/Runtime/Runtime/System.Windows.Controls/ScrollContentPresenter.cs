@@ -463,7 +463,9 @@ namespace System.Windows.Controls
         private Vector GetKnownNativeOffset() =>
             new(double.IsNaN(_nativeOffset.X) ? 0.0 : _nativeOffset.X, double.IsNaN(_nativeOffset.Y) ? 0.0 : _nativeOffset.Y);
 
-        internal void OnNativeScroll(double x, double y)
+        void INativeScrollInfo.OnNativeScroll(double x, double y) => OnNativeScroll(x, y);
+
+        private void OnNativeScroll(double x, double y)
         {
             if (!_isNative || !IsScrollClient)
             {
@@ -557,24 +559,11 @@ namespace System.Windows.Controls
 
         private bool IsNativeOffsetUnknown => double.IsNaN(_nativeOffset.X);
 
-        internal bool HandleNativeMouseWheel(MouseWheelEventArgs e)
+        void INativeScrollInfo.HandleNativeMouseWheel(MouseWheelEventArgs e)
         {
             Debug.Assert(_isNative);
 
-            switch (NativeScrollManager.OnWheel(OuterDiv, e))
-            {
-                case NativeScrollManager.WheelResult.ScrolledByBrowser:
-                    e.Handled = true;
-                    e.Cancellable = false;
-                    return true;
-
-                case NativeScrollManager.WheelResult.Scrolled:
-                    e.Handled = true;
-                    return true;
-
-                default:
-                    return false;
-            }
+            NativeScrollManager.HandleMouseWheel(OuterDiv, e);
         }
 
         protected override Size MeasureOverride(Size constraint)

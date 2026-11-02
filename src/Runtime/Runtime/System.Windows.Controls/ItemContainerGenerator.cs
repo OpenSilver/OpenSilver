@@ -2317,7 +2317,7 @@ namespace System.Windows.Controls
             // tell layout what happened
             if (ItemsChanged != null)
             {
-                ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Add, position, 1, 0));
+                ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Add, position, 1, 0) { ItemIndex = index });
             }
         }
 
@@ -2362,7 +2362,7 @@ namespace System.Windows.Controls
             // tell layout what happened
             if (ItemsChanged != null)
             {
-                ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Remove, position, 1, containerCount));
+                ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Remove, position, 1, containerCount) { ItemIndex = correctIndex });
             }
 
             // unhook the container.  Do this after layout has (presumably) removed it from
@@ -2421,7 +2421,7 @@ namespace System.Windows.Controls
 
                     if (ItemsChanged != null)
                     {
-                        ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Replace, position, 1, 1));
+                        ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Replace, position, 1, 1) { ItemIndex = correctIndex });
                     }
 
                     // after layout has removed the old container, unlink it
@@ -2530,7 +2530,11 @@ namespace System.Windows.Controls
             // tell layout what happened
             if (ItemsChanged != null)
             {
-                ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Move, position, oldPosition, 1, containerCount));
+                ItemsChanged(this, new ItemsChangedEventArgs(NotifyCollectionChangedAction.Move, position, oldPosition, 1, containerCount)
+                {
+                    ItemIndex = newIndex,
+                    OldItemIndex = correctIndex,
+                });
             }
 
             // unhook the container.  Do this after layout has (presumably) removed it from

@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
-using System.Windows.Controls;
 using System.Windows.Input;
 using CSHTML5.Internal;
 
@@ -45,13 +44,17 @@ internal static class NativeScrollManager
         return new HtmlElementReference(id);
     }
 
-    public static void SetMode(HtmlElementReference scroller, Mode mode, bool canScrollX, bool canScrollY)
+    // An opaque scroller is hit-testable by itself (it has a background): the pointer is not routed
+    // to the elements underneath when it is over an area not covered by the content.
+    public static void SetMode(HtmlElementReference scroller, Mode mode, bool canScrollX, bool canScrollY, bool isOpaque = false)
     {
         Debug.Assert(scroller.IsConnected);
 
         Interop.ExecuteJavaScriptVoidAsync(
-            $"osjs.nativeScroll.setMode('{scroller.Uid}',{(int)mode},{(canScrollX ? "true" : "false")},{(canScrollY ? "true" : "false")})");
+            $"osjs.nativeScroll.setMode('{scroller.Uid}',{(int)mode},{ToJs(canScrollX)},{ToJs(canScrollY)}{(isOpaque ? ",true" : string.Empty)})");
     }
+
+    private static string ToJs(bool value) => value ? "true" : "false";
 
     public static void SetExtent(HtmlElementReference scroller, double width, double height)
     {
@@ -69,7 +72,34 @@ internal static class NativeScrollManager
             $"osjs.nativeScroll.scrollTo('{scroller.Uid}',{x.ToInvariantString()},{y.ToInvariantString()})");
     }
 
-    public static WheelResult OnWheel(HtmlElementReference scroller, MouseWheelEventArgs e)
+    // Relative to the current offset of the DOM element, which can be ahead of the last offset
+    // reported to C# while the user is scrolling.
+    public static void ScrollBy(HtmlElementReference scroller, double dx, double dy)
+    {
+        Debug.Assert(scroller.IsConnected);
+
+        Interop.ExecuteJavaScriptVoidAsync(
+            $"osjs.nativeScroll.scrollBy('{scroller.Uid}',{dx.ToInvariantString()},{dy.ToInvariantString()})");
+    }
+
+    // The browser scrolls with its own (smooth) wheel behavior. At the limits, the event keeps
+    // bubbling so that outer ScrollViewers can scroll.
+    public static void HandleMouseWheel(HtmlElementReference scroller, MouseWheelEventArgs e)
+    {
+        switch (OnWheel(scroller, e))
+        {
+            case WheelResult.ScrolledByBrowser:
+                e.Handled = true;
+                e.Cancellable = false;
+                break;
+
+            case WheelResult.Scrolled:
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private static WheelResult OnWheel(HtmlElementReference scroller, MouseWheelEventArgs e)
     {
         Debug.Assert(scroller.IsConnected);
         Debug.Assert(e is not null);
@@ -85,9 +115,9 @@ internal static class NativeScrollManager
 
     internal static void OnScrollNative(string id, double scrollLeft, double scrollTop)
     {
-        if (INTERNAL_HtmlDomManager.GetElementById(id) is ScrollContentPresenter scp)
+        if (INTERNAL_HtmlDomManager.GetElementById(id) is INativeScrollInfo scroller)
         {
-            scp.OnNativeScroll(scrollLeft, scrollTop);
+            scroller.OnNativeScroll(scrollLeft, scrollTop);
         }
     }
 }

@@ -130,18 +130,49 @@
         </Border>
 
         <!-- 5. ListBox -->
-        <TextBlock Style="{StaticResource Title}" Text="5. ListBox (StackPanel: native) and ListBox (VirtualizingStackPanel: managed fallback)"/>
-        <TextBlock Style="{StaticResource Hint}" Text="Both must scroll, select with click/tap and with the arrow keys (the selected item is scrolled into view). The virtualized one keeps today's behavior (item-based scrolling)."/>
-        <StackPanel Orientation="Horizontal">
+        <TextBlock Style="{StaticResource Title}" Text="5. ListBox (StackPanel) and virtualized ListBoxes (VirtualizingStackPanel)"/>
+        <TextBlock Style="{StaticResource Hint}" Text="All lists scroll natively (smooth wheel, inertia on touch, scrollbar drag) and select with click/tap and the arrow keys, PageUp/PageDown, Home/End (the selected item is fully scrolled into view). Virtualized lists keep item-based offsets (V is an item index) and only realize the items around the viewport: Ctrl+F finds the visible ones. In the variable-height list, scrolling up from the middle must not make the visible items jump, and the top of the list must be reached exactly. Inserting or removing an item at the top shifts the list by one item."/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <Button Content="Into view: 500" Click="VirtualizedIntoView_Click" Margin="0,0,4,0"/>
+            <Button Content="V=600" Click="VirtualizedOffset_Click" Margin="0,0,4,0"/>
+            <Button Content="Insert at 0" Click="VirtualizedInsert_Click" Margin="0,0,4,0"/>
+            <Button Content="Remove at 0" Click="VirtualizedRemove_Click" Margin="0,0,4,0"/>
+            <CheckBox x:Name="VirtualizedNativeCheckBox" Content="Native" IsChecked="True" Click="VirtualizedNative_Click" VerticalAlignment="Center" Margin="4,0"/>
+        </StackPanel>
+        <TextBlock x:Name="VirtualizedReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <StackPanel x:Name="ListBoxes" Orientation="Horizontal">
             <ListBox x:Name="NativeListBox" Width="200" Height="150" Margin="0,0,12,0"/>
-            <ListBox x:Name="VirtualizedListBox" Width="200" Height="150">
+            <ListBox x:Name="VirtualizedListBox" Width="200" Height="150" Margin="0,0,12,0">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
+            <ListBox x:Name="VariableListBox" Width="200" Height="150">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Height="{Binding Height}" Background="{Binding Brush}" Width="150">
+                            <TextBlock Text="{Binding Text}" VerticalAlignment="Center" Margin="4,0"/>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
+        <TextBlock Text="Horizontal virtualized ListBox:" Margin="0,8,0,4"/>
+        <ListBox x:Name="HorizontalListBox" Width="500" Height="60" HorizontalAlignment="Left"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
 
         <!-- 6. Opt-out -->
         <TextBlock Style="{StaticResource Title}" Text="6. Opt-out (os:NativeScrolling.IsEnabled=False on a container)"/>
