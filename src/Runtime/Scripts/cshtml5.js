@@ -29,6 +29,7 @@ Object.defineProperty(window, 'osjs', {
                 this.imageError = NOOP;
                 this.resizeObserverSizeChange = NOOP;
                 this.hyperlinkClick = NOOP;
+                this.nativeScroll = NOOP;
             }
         }
 
@@ -52,7 +53,9 @@ Object.defineProperty(window, 'osjs', {
             HYPERLINK: 'opensilver-hyperlink',
             POPUP: 'opensilver-popup',
             INKPRESENTER: 'opensilver-inkpresenter',
-            POINTER_CAPTURED: 'opensilver-pointer-captured'
+            POINTER_CAPTURED: 'opensilver-pointer-captured',
+            NATIVE_SCROLLER: 'opensilver-native-scroller',
+            SCROLL_CONTENT: 'opensilver-scroll-content',
         });
 
         // This enum must remain in sync with the enum in Key.cs
@@ -148,6 +151,197 @@ Object.defineProperty(window, 'osjs', {
         const _callbacks = new CALLBACKS();
         const _performanceCounters = [];
         let _nextCallbackArgsId = 0;
+
+        const _nativeScroll = Object.freeze((function () {
+            const MODE = Object.freeze({
+                NONE: 0,
+                NATIVE: 1,
+                MANAGED: 2,
+            });
+
+            function getState(element) {
+                return element ? element._osScroll : undefined;
+            }
+
+            function isNativeScroller(element) {
+                const state = getState(element);
+                return state !== undefined && state.mode === MODE.NATIVE;
+            }
+
+            // Returns the native scroller if the element is the scroller itself or its content host
+            // (in other words, the pointer is over an area of the scroller not covered by its content).
+            function getScrollerFromHost(element) {
+                if (!element) return null;
+                if (isNativeScroller(element)) return element;
+                const owner = element._osScrollOwner;
+                if (owner && isNativeScroller(owner)) return owner;
+                return null;
+            }
+
+            function isInNativeScroller(element) {
+                while (element) {
+                    if (isNativeScroller(element)) return true;
+                    element = element.parentElement;
+                }
+                return false;
+            }
+
+            function onScroll(e) {
+                const scroller = e.currentTarget;
+                const state = getState(scroller);
+                if (!state || state.mode !== MODE.NATIVE || state.frozen) return;
+
+                const x = scroller.scrollLeft;
+                const y = scroller.scrollTop;
+                if (x === state.lastX && y === state.lastY) return;
+
+                state.lastX = x;
+                state.lastY = y;
+                _callbacks.nativeScroll(scroller.id, x, y);
+            }
+
+            function canScrollAxis(position, scrollSize, clientSize, delta) {
+                if (delta > 0) return Math.ceil(position) < scrollSize - clientSize;
+                if (delta < 0) return position > 0;
+                return false;
+            }
+
+            function canScroll(scroller, dx, dy) {
+                const style = scroller.style;
+                return (style.overflowY === 'scroll' && canScrollAxis(scroller.scrollTop, scroller.scrollHeight, scroller.clientHeight, dy)) ||
+                    (style.overflowX === 'scroll' && canScrollAxis(scroller.scrollLeft, scroller.scrollWidth, scroller.clientWidth, dx));
+            }
+
+            function getWheelDelta(scroller, e) {
+                let dx = e.deltaX;
+                let dy = e.deltaY;
+                if (e.shiftKey && dx === 0) {
+                    dx = dy;
+                    dy = 0;
+                }
+                switch (e.deltaMode) {
+                    case 1: // DOM_DELTA_LINE
+                        dx *= 16;
+                        dy *= 16;
+                        break;
+                    case 2: // DOM_DELTA_PAGE
+                        dx *= scroller.clientWidth;
+                        dy *= scroller.clientHeight;
+                        break;
+                }
+                return [dx, dy];
+            }
+
+            return {
+                getScrollerFromHost: getScrollerFromHost,
+                isInNativeScroller: isInNativeScroller,
+                api: Object.freeze({
+                    // Snapshots (html-to-image) clone the DOM, which loses scroll positions. While a snapshot
+                    // is taken, the scroll offsets are replaced by equivalent translations of the content.
+                    // Returns the function that restores the scroll offsets.
+                    freeze: function (element) {
+                        const frozen = [];
+                        if (element) {
+                            const scrollers = Array.from(element.querySelectorAll('.' + CSS_CLASS.NATIVE_SCROLLER));
+                            if (isNativeScroller(element)) scrollers.push(element);
+                            for (const scroller of scrollers) {
+                                const state = getState(scroller);
+                                const x = scroller.scrollLeft;
+                                const y = scroller.scrollTop;
+                                if (state.frozen || (x === 0 && y === 0)) continue;
+                                state.frozen = true;
+                                state.content.style.transform = `translate(${-x}px,${-y}px)`;
+                                scroller.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+                                frozen.push({ scroller: scroller, state: state, x: x, y: y });
+                            }
+                        }
+                        return function () {
+                            for (const f of frozen) {
+                                f.state.content.style.transform = '';
+                                f.scroller.scrollTo({ left: f.x, top: f.y, behavior: 'instant' });
+                                f.state.frozen = false;
+                            }
+                        };
+                    },
+                    createHost: function (id, contentId) {
+                        const scroller = document.getElementById(id);
+                        if (!scroller || scroller._osScroll) return;
+
+                        const content = document.createElement('div');
+                        content.setAttribute('id', contentId);
+                        content.classList.add(CSS_CLASS.SCROLL_CONTENT);
+                        Object.defineProperty(content, '_osScrollOwner', { value: scroller });
+                        scroller.appendChild(content);
+
+                        Object.defineProperty(scroller, '_osScroll', {
+                            value: { mode: MODE.NONE, content: content, lastX: 0, lastY: 0, listening: false },
+                        });
+                    },
+                    setMode: function (id, mode, canScrollX, canScrollY) {
+                        const scroller = document.getElementById(id);
+                        const state = getState(scroller);
+                        if (!state) return;
+
+                        state.mode = mode;
+
+                        if (mode === MODE.NATIVE) {
+                            scroller.classList.add(CSS_CLASS.NATIVE_SCROLLER);
+                            if (canScrollX || canScrollY) {
+                                scroller.style.overflowX = canScrollX ? 'scroll' : 'hidden';
+                                scroller.style.overflowY = canScrollY ? 'scroll' : 'hidden';
+                                // Both pan directions are allowed so that a pan along an axis this scroller does
+                                // not scroll can still chain to an outer scroller.
+                                scroller.style.touchAction = 'pan-x pan-y';
+                            } else {
+                                scroller.style.overflowX = 'clip';
+                                scroller.style.overflowY = 'clip';
+                                scroller.style.touchAction = '';
+                            }
+                            if (!state.listening) {
+                                scroller.addEventListener('scroll', onScroll, { passive: true });
+                                state.listening = true;
+                            }
+                        } else {
+                            scroller.classList.remove(CSS_CLASS.NATIVE_SCROLLER);
+                            scroller.style.overflowX = '';
+                            scroller.style.overflowY = '';
+                            // A managed scroller pans in C# and needs to receive every pointer move.
+                            scroller.style.touchAction = mode === MODE.MANAGED && (canScrollX || canScrollY) ? 'none' : '';
+                            state.content.style.width = '';
+                            state.content.style.height = '';
+                            state.lastX = 0;
+                            state.lastY = 0;
+                        }
+                    },
+                    setExtent: function (id, width, height) {
+                        const state = getState(document.getElementById(id));
+                        if (!state) return;
+                        state.content.style.width = width + 'px';
+                        state.content.style.height = height + 'px';
+                    },
+                    scrollTo: function (id, x, y) {
+                        const scroller = document.getElementById(id);
+                        if (!isNativeScroller(scroller)) return;
+                        scroller.scrollTo({ left: x, top: y, behavior: 'instant' });
+                    },
+                    // 0: the scroller cannot scroll in the wheel direction.
+                    // 1: the browser will scroll the scroller natively (the target is inside it).
+                    // 2: the target is outside the scroller (for instance on its scrollbars), so it was scrolled here.
+                    onWheel: function (id, e) {
+                        const scroller = document.getElementById(id);
+                        if (!isNativeScroller(scroller) || !e) return 0;
+
+                        const [dx, dy] = getWheelDelta(scroller, e);
+                        if (!canScroll(scroller, dx, dy)) return 0;
+
+                        if (scroller.contains(e.target)) return 1;
+
+                        scroller.scrollBy({ left: dx, top: dy, behavior: 'smooth' });
+                        return 2;
+                    },
+                }),
+            };
+        })());
 
         const _inputManager = Object.freeze((function () {
             // This must remain synchronized with the EVENTS enum defined in InputManager.cs.
@@ -268,6 +462,52 @@ Object.defineProperty(window, 'osjs', {
                     return e.xamlid;
                 }
                 return '';
+            }
+
+            // A native scroller must be hit-testable for the browser to scroll it from areas not covered by its
+            // content. Those areas are transparent in XAML, so the pointer is routed to the element underneath.
+            function getHitTarget(target, e) {
+                if (_pointerCapture !== null) return target;
+
+                const scroller = _nativeScroll.getScrollerFromHost(target);
+                if (scroller === null) return target;
+
+                const elements = document.elementsFromPoint(e.clientX, e.clientY);
+                for (let i = elements.indexOf(target) + 1; i < elements.length; i++) {
+                    const element = elements[i];
+                    if (element !== scroller && !scroller.contains(element)) {
+                        return element;
+                    }
+                }
+
+                return null;
+            }
+
+            function isScrollKey(e) {
+                switch (e.key) {
+                    case 'ArrowUp':
+                    case 'ArrowDown':
+                    case 'ArrowLeft':
+                    case 'ArrowRight':
+                    case 'PageUp':
+                    case 'PageDown':
+                    case 'Home':
+                    case 'End':
+                        return true;
+                }
+                return false;
+            }
+
+            function isEditable(element) {
+                if (!element) return false;
+                if (element.isContentEditable) return true;
+                switch (element.tagName) {
+                    case 'INPUT':
+                    case 'TEXTAREA':
+                    case 'SELECT':
+                        return true;
+                }
+                return false;
             }
 
             function isPointerDown() {
@@ -421,7 +661,11 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('pointermove', function (e) {
                         e.isHandled = true;
                         setModifiers(e);
-                        invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_MOVE, e);
+                        const target = getHitTarget(e.target, e);
+                        if (target !== e.target) {
+                            updatePointerOver(getClosestElement(target), e);
+                        }
+                        invokePointerCallback(getClosestElement(target), EVENTS.POINTER_MOVE, e);
                     });
 
                     root.addEventListener('wheel', function (e) {
@@ -432,7 +676,7 @@ Object.defineProperty(window, 'osjs', {
                         e.isHandled = true;
                         setModifiers(e);
                         invokePointerCallback(
-                            getClosestElement((_pointerCapture !== null ? _pointerCapture.element : null) || e.target),
+                            getClosestElement((_pointerCapture !== null ? _pointerCapture.element : null) || getHitTarget(e.target, e)),
                             EVENTS.WHEEL,
                             e);
                     });
@@ -441,15 +685,16 @@ Object.defineProperty(window, 'osjs', {
                         e.isHandled = true;
                         setModifiers(e);
                         setActivePointer(e);
+                        const target = getClosestElement(getHitTarget(e.target, e));
                         switch (e.button) {
                             case 0:
-                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_LEFT_DOWN, e);
+                                invokePointerCallback(target, EVENTS.POINTER_LEFT_DOWN, e);
                                 break;
                             case 1:
-                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_MIDDLE_DOWN, e);
+                                invokePointerCallback(target, EVENTS.POINTER_MIDDLE_DOWN, e);
                                 break;
                             case 2:
-                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_RIGHT_DOWN, e);
+                                invokePointerCallback(target, EVENTS.POINTER_RIGHT_DOWN, e);
                                 break;
                         }
                     });
@@ -458,17 +703,23 @@ Object.defineProperty(window, 'osjs', {
                         e.isHandled = true;
                         setModifiers(e);
                         setActivePointer(e);
+                        const target = getClosestElement(getHitTarget(e.target, e));
                         switch (e.button) {
                             case 0:
-                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_LEFT_UP, e);
+                                invokePointerCallback(target, EVENTS.POINTER_LEFT_UP, e);
                                 break;
                             case 1:
-                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_MIDDLE_UP, e);
+                                invokePointerCallback(target, EVENTS.POINTER_MIDDLE_UP, e);
                                 break;
                             case 2:
-                                invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_RIGHT_UP, e);
+                                invokePointerCallback(target, EVENTS.POINTER_RIGHT_UP, e);
                                 break;
                         }
+                    });
+
+                    // Fired when the browser takes over a touch to pan a native scroller: no pointerup follows.
+                    root.addEventListener('pointercancel', function (e) {
+                        setActivePointer(e);
                     });
 
                     root.addEventListener('mousedown', function (e) {
@@ -484,6 +735,8 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('lostpointercapture', function (e) {
                         if (_pointerCapture !== null && _pointerCapture.element === e.target) {
                             _pointerCapture = null;
+                            // The capture can be lost without being released, e.g. when the browser starts panning.
+                            document.body.classList.remove(CSS_CLASS.POINTER_CAPTURED);
                             invokePointerCallback(getClosestElement(e.target), EVENTS.POINTER_CAPTURE_LOST, e);
                         }
                     });
@@ -496,7 +749,7 @@ Object.defineProperty(window, 'osjs', {
                     });
 
                     root.addEventListener('pointerover', function (e) {
-                        const target = getClosestElement(e.target);
+                        const target = getClosestElement(getHitTarget(e.target, e));
                         updatePointerOver(target, e);
                     });
 
@@ -507,6 +760,12 @@ Object.defineProperty(window, 'osjs', {
                     root.addEventListener('keydown', function (e) {
                         setModifiers(e);
                         _callbacks.inputManagerEvent('', EVENTS.KEYDOWN, e);
+                        // Keyboard scrolling is done by ScrollViewer in C#. Keys left unhandled must not
+                        // scroll native scrollers, as nothing scrolls in that case in Silverlight.
+                        if (!e.defaultPrevented && isScrollKey(e) && !isEditable(e.target) &&
+                            _nativeScroll.isInNativeScroller(e.target)) {
+                            e.preventDefault();
+                        }
                     });
 
                     root.addEventListener('keyup', function (e) {
@@ -684,7 +943,8 @@ Object.defineProperty(window, 'osjs', {
                 imageLoadCallback,
                 imageErrorCallback,
                 resizeObserverSizeChangeCallback,
-                hyperlinkClickCallback) {
+                hyperlinkClickCallback,
+                nativeScrollCallback) {
                 _callbacks.inputManagerEvent = inputManagerCallback;
                 _callbacks.inputManagerPointerEvent = inputManagerPointerCallback;
                 _callbacks.textViewManagerInput = textViewManagerInputCallback;
@@ -697,6 +957,9 @@ Object.defineProperty(window, 'osjs', {
                 _callbacks.imageError = imageErrorCallback;
                 _callbacks.resizeObserverSizeChange = resizeObserverSizeChangeCallback;
                 _callbacks.hyperlinkClick = hyperlinkClickCallback;
+                if (nativeScrollCallback) {
+                    _callbacks.nativeScroll = nativeScrollCallback;
+                }
             },
             getRef: function (id) {
                 return _jsObjRef.get(id);
@@ -1658,6 +1921,7 @@ Object.defineProperty(window, 'osjs', {
 
                 return event.keyCode;
             },
+            nativeScroll: _nativeScroll.api,
             htmlPresenter: Object.freeze({
                 createView: function (id, contentId, parentId, useShadowDom) {
                     const parent = document.getElementById(parentId);
@@ -3217,6 +3481,7 @@ Object.defineProperty(window, 'osjs', {
                         }
 
                         let blob = null;
+                        const unfreeze = _nativeScroll.api.freeze(element);
                         try {
                             blob = await htmlToImage.toBlob(element, {
                                 width: element.scrollWidth,
@@ -3226,7 +3491,10 @@ Object.defineProperty(window, 'osjs', {
                                     position: 'static',
                                 },
                             });
-                        } catch (error) { }
+                        } catch (error) {
+                        } finally {
+                            unfreeze();
+                        }
 
                         if (blob) {
                             callback(URL.createObjectURL(blob));

@@ -20,6 +20,7 @@ html {
     height: 100%;
     width: 100%;
     margin: 0px;
+    overscroll-behavior: none; /* scrolls chained out of native scrollers must not trigger pull-to-refresh */
 }
 
 body {
@@ -81,6 +82,29 @@ body {
     z-index: 0;
     outline: none;
     transform-origin: 0% 0%;
+}
+
+.opensilver-native-scroller {
+    overflow-anchor: none; /* offsets are driven by ScrollViewer, the browser must not adjust them */
+    scrollbar-width: none !important; /* the scrollbars are defined in the ScrollViewer template */
+}
+
+.opensilver-native-scroller::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.opensilver-scroll-content {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    pointer-events: none;
+}
+
+.opensilver-native-scroller > .opensilver-scroll-content {
+    overflow: hidden;
+    overflow: clip; /* bounds the scroll range to the extent computed by ScrollContentPresenter */
 }
 
 .opensilver-shape {
