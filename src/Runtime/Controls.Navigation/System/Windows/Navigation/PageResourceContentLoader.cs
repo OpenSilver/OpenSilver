@@ -328,6 +328,13 @@ namespace System.Windows.Navigation
                 {
                     result.Content = factoryType.GetMethod("Instantiate").Invoke(null, null);
                 }
+                catch (Reflection.TargetInvocationException ex)
+                {
+                    // Silverlight reports an exception thrown while creating the page as is, without wrapping it in an
+                    // InvalidOperationException; content loaders that wrap this one rely on telling the two apart.
+                    result.Exception = ex.InnerException ?? ex;
+                    return;
+                }
                 catch (Exception ex)
                 {
                     result.Exception = new InvalidOperationException(
