@@ -29,6 +29,7 @@
     <Compile Include="OpenSilver\Controls\SaveFileDialog.cs" />
     <Compile Include="OpenSilver\Features.cs" />
     <Compile Include="OpenSilver\HtmlElementReference.cs" />
+    <Compile Include="OpenSilver\NativeScrolling.cs" />
     <Compile Include="OpenSilver\InternalHooks.cs" />
     <Compile Include="OpenSilver\HtmlElementStyleReference.cs" />
     <Compile Include="OpenSilver\Internal\CssPropertyNames.cs" />
@@ -69,6 +70,8 @@
     <Compile Include="OpenSilver\Controls\TaskbarItem.cs" />
     <Compile Include="OpenSilver\Controls\WindowHost.cs" />
     <Compile Include="OpenSilver\Controls\WindowTaskbar.cs" />
+    <Compile Include="OpenSilver\Internal\Controls\INativeScrollInfo.cs" />
+    <Compile Include="OpenSilver\Internal\Controls\NativeScrollManager.cs" />
     <Compile Include="OpenSilver\Internal\Controls\TextViewManager.cs" />
     <Compile Include="OpenSilver\Internal\Data\ClrFieldAccessor.cs" />
     <Compile Include="OpenSilver\Internal\Data\ClrIndexerAccessor.cs" />

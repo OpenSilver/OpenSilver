@@ -48,6 +48,21 @@ public static class Features
         public static bool UseNewLineSeparator { get; set; } = IsDebug();
     }
 
+    public static class Scrolling
+    {
+        /// <summary>
+        /// When enabled, <see cref="System.Windows.Controls.ScrollViewer"/> lets the browser scroll its content
+        /// natively (touch panning with inertia, smooth wheel scrolling, find-in-page, etc.), while the
+        /// ScrollViewer API and the scrollbars defined in its template keep working as in Silverlight.
+        /// The default value is true.
+        /// </summary>
+        /// <remarks>
+        /// Changing this value only affects ScrollViewers whose template is applied afterwards. Use
+        /// <see cref="NativeScrolling.IsEnabledProperty"/> to opt out a specific part of the visual tree.
+        /// </remarks>
+        public static bool UseNativeScrolling { get; set; } = true;
+    }
+
     private static bool IsDebug()
     {
         if (_isDebugging.HasValue)

@@ -181,7 +181,7 @@ namespace CSHTML5.Internal
                     }
 
                     (parent.VisualChildrenInformation ??= []).Add(child);
-                    InternalAttachVisual(child, parent.ParentWindow, parent.OuterDiv);
+                    InternalAttachVisual(child, parent.ParentWindow, parent.ChildrenHost);
 
                     if (EnablePerformanceLogging)
                     {

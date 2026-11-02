@@ -723,6 +723,11 @@ namespace System.Windows
         /// <returns>The "root" dom element of the UIElement.</returns>
         protected internal abstract HtmlElementReference CreateDomElement(HtmlElementReference parent);
 
+        /// <summary>
+        /// Gets the DOM element in which the DOM elements of the visual children are created.
+        /// </summary>
+        internal virtual HtmlElementReference ChildrenHost => OuterDiv;
+
         #region IsEnabled
 
         /// <summary>
@@ -1802,7 +1807,11 @@ namespace System.Windows
                 nameof(AllowScrollOnTouchMove),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(BooleanBoxes.TrueBox));
+                new PropertyMetadata(BooleanBoxes.TrueBox)
+                {
+                    // Native scrollers are panned by the browser, which decides when the touch starts.
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetTouchAction((bool)newValue ? string.Empty : "none"),
+                });
 
         #endregion
 
@@ -2096,6 +2105,12 @@ namespace System.Windows
             if (IsHitTestable)
             {
                 SetPointerEvents(true);
+            }
+
+            // Default values (e.g. Thumb overrides it to false) are not applied by the loop above.
+            if (!AllowScrollOnTouchMove)
+            {
+                this.SetTouchAction("none");
             }
         }
 
