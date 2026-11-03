@@ -37,8 +37,11 @@ namespace CSHTML5.Internal
             _callback = callback;
             _handleExceptions = handleExceptions;
             _unwrapExceptions = handleExceptions && !OnCallBackImpl.IsCommonType(callback);
+            ReturnsValue = callback.Method.ReturnType != typeof(void);
             _id = _store.Add(this);
         }
+
+        internal bool ReturnsValue { get; }
 
         public static JavaScriptCallback Create(Delegate callback, bool handleExceptions = true)
         {
