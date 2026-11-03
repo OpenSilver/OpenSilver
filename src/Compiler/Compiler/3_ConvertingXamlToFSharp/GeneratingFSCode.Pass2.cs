@@ -334,9 +334,9 @@ namespace OpenSilver.Compiler
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.Build(),
                         $"""
-                                let component = global.System.Activator.CreateInstance(typeof<{componentTypeFullName}>, true) :?> {componentTypeFullName}
-                                component.InitializeComponent()
-                                component
+                                let instance = global.System.Activator.CreateInstance(typeof<{componentTypeFullName}>, true) :?> {componentTypeFullName}
+                                instance.InitializeComponent()
+                                instance
                         """,
                         parameters.ResultingMethods,
                         $"global.{KnownNamespaces.SystemWindows}.UIElement",
@@ -1856,7 +1856,7 @@ namespace GlobalResource
                 }
                 else
                 {
-                    return $"({elementUid} :?> global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}).{memberName}";
+                    return $"({elementUid} :> global.{_settings.TypeReferenceHelper.ConvertToString(declaringType)}).{memberName}";
                 }
             }
 
