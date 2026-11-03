@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="UriMapper_MustNotHaveANullUriMappingCollection" xml:space="preserve">
     <value>{0} must not have a null {1}.</value>
@@ -134,9 +134,6 @@
   </data>
   <data name="PageResourceContentLoader_NoXAMLWasFound" xml:space="preserve">
     <value>No XAML was found at the location '{0}'.</value>
-  </data>
-  <data name="PageResourceContentLoader_XAMLWasUnloadable" xml:space="preserve">
-    <value>XAML at location '{0}' could not be loaded.</value>
   </data>
   <data name="PageResourceContentLoader_TheTypeSpecifiedInTheXClassCouldNotBeFound" xml:space="preserve">
     <value>The type '{0}', specified in the x:Class of '{1}' could not be found in any loaded assembly.</value>

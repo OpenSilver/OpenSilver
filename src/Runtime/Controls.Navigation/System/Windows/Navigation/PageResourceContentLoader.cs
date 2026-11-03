@@ -324,20 +324,8 @@ namespace System.Windows.Navigation
                     return;
                 }
 
-                try
-                {
-                    result.Content = factoryType.GetMethod("Instantiate").Invoke(null, null);
-                }
-                catch (Exception ex)
-                {
-                    result.Exception = new InvalidOperationException(
-                                            String.Format(
-                                                CultureInfo.CurrentCulture,
-                                                Resource.PageResourceContentLoader_XAMLWasUnloadable,
-                                                pagePathAndName),
-                                            ex);
-                    return;
-                }
+                result.Content = factoryType.GetMethod("Instantiate").Invoke(null, null);
+                return;
             }
             catch (Exception ex)
             {
