@@ -19,7 +19,7 @@ namespace OpenSilver.Internal.Navigation {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resource {
@@ -192,15 +192,6 @@ namespace OpenSilver.Internal.Navigation {
         internal static string PageResourceContentLoader_WrongIAsyncResult {
             get {
                 return ResourceManager.GetString("PageResourceContentLoader_WrongIAsyncResult", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to XAML at location &apos;{0}&apos; could not be loaded..
-        /// </summary>
-        internal static string PageResourceContentLoader_XAMLWasUnloadable {
-            get {
-                return ResourceManager.GetString("PageResourceContentLoader_XAMLWasUnloadable", resourceCulture);
             }
         }
         
