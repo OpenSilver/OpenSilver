@@ -45,14 +45,15 @@ namespace System.Xaml
 		public string LookupPrefix(string ns)
 		{
 			NamespaceDeclaration nd = null;
-			foreach (var nsd in Namespaces)
+			for (int i = Namespaces.Count - 1; i >= 0; i--)
 			{
-				if (nsd.Namespace == ns)
-				{
-					nd = nsd;
-					break;
-				}
-			}
+				var nsd = Namespaces[i];
+                if (nsd.Namespace == ns)
+                {
+                    nd = nsd;
+                    break;
+                }
+            }
 
 			if (nd == null && IsCollectingNamespaces)
 				return AddNamespace(ns);

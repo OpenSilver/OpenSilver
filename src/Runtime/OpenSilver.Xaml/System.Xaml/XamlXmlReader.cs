@@ -384,16 +384,6 @@ namespace System.Xaml
 				throw new XamlParseException(String.Format("Element is expected, but got {0}", r.NodeType));
 			}
 
-			if (r.MoveToFirstAttribute())
-			{
-				do
-				{
-					if (r.NamespaceURI == XamlLanguage.Xmlns2000Namespace)
-						yield return Node(XamlNodeType.NamespaceDeclaration, new NamespaceDeclaration(ResolveLocalNamespace(r.Value), r.Prefix == "xmlns" ? r.LocalName : String.Empty));
-				} while (r.MoveToNextAttribute());
-				r.MoveToElement();
-			}
-
 			var sti = GetStartTagInfo();
 
 			var xt = sctx.GetXamlType(sti.TypeName);
@@ -432,6 +422,16 @@ namespace System.Xaml
 					yield return ni;
 				yield return Node(XamlNodeType.EndObject, currentMember.Type);
 				yield break;
+			}
+
+			if (r.MoveToFirstAttribute())
+			{
+				do
+				{
+					if (r.NamespaceURI == XamlLanguage.Xmlns2000Namespace)
+						yield return Node(XamlNodeType.NamespaceDeclaration, new NamespaceDeclaration(ResolveLocalNamespace(r.Value), r.Prefix == "xmlns" ? r.LocalName : String.Empty));
+				} while (r.MoveToNextAttribute());
+				r.MoveToElement();
 			}
 
 			yield return Node(XamlNodeType.StartObject, xt);

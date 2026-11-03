@@ -83,13 +83,21 @@ namespace System.Xaml
 
         [EnhancedXaml]
         public XamlObjectWriter(XamlSchemaContext schemaContext, XamlObjectWriterSettings settings, IAmbientProvider parentAmbientProvider)
+            : this(schemaContext, settings, parentAmbientProvider, null)
+        {
+        }
+
+        internal XamlObjectWriter(XamlSchemaContext schemaContext,
+            XamlObjectWriterSettings settings,
+            IAmbientProvider parentAmbientProvider,
+            IXamlNamespaceResolver parentNsResolver)
         {
             ArgumentNullException.ThrowIfNull(schemaContext);
 
             this.sctx = schemaContext;
             this.settings = settings ?? new XamlObjectWriterSettings();
             var manager = new XamlWriterStateManager<XamlObjectWriterException, XamlObjectWriterException>(false);
-            intl = new XamlObjectWriterInternal(this, sctx, manager, parentAmbientProvider);
+            intl = new XamlObjectWriterInternal(this, sctx, manager, parentAmbientProvider, parentNsResolver);
         }
 
         XamlSchemaContext sctx;
@@ -304,27 +312,51 @@ namespace System.Xaml
     }
 
     // specific implementation
-    class XamlObjectWriterInternal : XamlWriterInternalBase, IXamlObjectWriterFactory, ITemplateOwnerProvider
+    class XamlObjectWriterInternal :
+        IProvideValueTarget,
+        IRootObjectProvider,
+        IDestinationTypeProvider,
+        ITemplateOwnerProvider
     {
         const string Xmlns2000Namespace = "http://www.w3.org/2000/xmlns/";
 
-        public XamlObjectWriterInternal(XamlObjectWriter source, XamlSchemaContext schemaContext, XamlWriterStateManager manager)
-            : this(source, schemaContext, manager, null)
-        {
-        }
         public XamlObjectWriterInternal(
-            XamlObjectWriter source, XamlSchemaContext schemaContext,
-            XamlWriterStateManager manager, IAmbientProvider parentAmbientProvider)
-            : base(schemaContext, manager, parentAmbientProvider)
+            XamlObjectWriter source,
+            XamlSchemaContext schemaContext,
+            XamlWriterStateManager manager,
+            IAmbientProvider parentAmbientProvider,
+            IXamlNamespaceResolver parentNsResolver)
         {
             this.source = source;
+            this.object_states = new ObjectStateStack(parentAmbientProvider);
+            this.sctx = schemaContext;
+            this.manager = manager;
+            var p = new PrefixLookup(sctx) { IsCollectingNamespaces = true }; // it does not raise unknown namespace error.
+            if (parentNsResolver != null)
+            {
+                p.Namespaces.AddRange(parentNsResolver.GetNamespacePrefixes());
+            }
+            service_provider = ValueSerializerContext.Create(p,
+                schemaContext,
+                object_states.GetAmbientProvider,
+                () => new XamlObjectWriterFactory(sctx, source.Settings, service_provider),
+                this,
+                this,
+                this,
+                this);
             var ext = source.Settings.ExternalNameScope;
             name_scope = ext != null && source.Settings.RegisterNamesOnExternalNamescope ? ext : new ExtendedNameScope(ext);
         }
 
-        XamlObjectWriter source;
-        INameScope name_scope;
-        List<NameFixupRequired> pending_name_references = new List<NameFixupRequired>();
+        private readonly ObjectStateStack object_states;
+        private readonly XamlSchemaContext sctx;
+        private readonly XamlWriterStateManager manager;
+        private readonly ValueSerializerContext service_provider;
+        private readonly Stack<object> escaped_objects = [];
+        private readonly XamlObjectWriter source;
+        private readonly INameScope name_scope;
+        private readonly List<NameFixupRequired> pending_name_references = [];
+        private ObjectState root_state;
 
         public INameScope NameScope
         {
@@ -333,7 +365,7 @@ namespace System.Xaml
 
         public object Result { get; set; }
 
-        protected override void OnWriteStartObject()
+        protected void OnWriteStartObject()
         {
             var state = object_states.Pop();
             if (object_states.Count > 0)
@@ -363,7 +395,7 @@ namespace System.Xaml
             state.IsXamlWriterCreated = true;
         }
 
-        protected override void OnWriteGetObject()
+        protected void OnWriteGetObject()
         {
             var state = object_states.Pop();
             InitializeObjectIfRequired(false, true);
@@ -382,7 +414,7 @@ namespace System.Xaml
             object_states.Push(state);
         }
 
-        protected override void OnWriteEndObject()
+        protected void OnWriteEndObject()
         {
             InitializeObjectIfRequired(false, true); // this is required for such case that there was no StartMember call.
 
@@ -460,9 +492,7 @@ namespace System.Xaml
             }
         }
 
-        Stack<object> escaped_objects = new Stack<object>();
-
-        protected override void OnWriteStartMember(XamlMember property)
+        protected void OnWriteStartMember(XamlMember property)
         {
             if (ReferenceEquals(property, XamlLanguage.PositionalParameters) ||
                 ReferenceEquals(property, XamlLanguage.Arguments))
@@ -511,7 +541,7 @@ namespace System.Xaml
 
         //static readonly BindingFlags static_flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
-        protected override void OnWriteEndMember()
+        protected void OnWriteEndMember()
         {
             var xm = CurrentMember;
             var state = object_states.Peek();
@@ -622,19 +652,19 @@ namespace System.Xaml
             source.OnBeforeProperties(state.Value);
         }
 
-        protected override void OnWriteValue(object value)
+        protected void OnWriteValue(object value)
         {
             if (CurrentMemberState.Value != null)
                 throw WithLineInfo(new XamlDuplicateMemberException(CurrentMember, object_states.Peek().Type));
             StoreAppropriatelyTypedValue(value, null);
         }
 
-        protected override void OnWriteNamespace(NamespaceDeclaration nd)
+        protected void OnWriteNamespace(NamespaceDeclaration nd)
         {
             // nothing to do here.
         }
 
-        protected override XamlException WithLineInfo(XamlException ex)
+        protected XamlException WithLineInfo(XamlException ex)
         {
             ex.SetLineInfo(source.Line, source.Column);
             return ex;
@@ -1048,6 +1078,463 @@ namespace System.Xaml
                 return owner;
             }
             return null;
+        }
+
+        internal PrefixLookup prefix_lookup => (PrefixLookup)service_provider.GetService(typeof(INamespacePrefixLookup));
+
+        public Type GetDestinationType() => CurrentMember?.Type.UnderlyingType;
+
+        List<NamespaceDeclaration> Namespaces => prefix_lookup.Namespaces;
+
+        internal class ObjectState
+        {
+            public XamlType Type;
+            public IAmbientProvider AmbientProvider;
+            public List<NamespaceDeclaration> Namespaces;
+            FlagValue _flags;
+            static class ObjectStateFlags
+            {
+                public const int IsGetObject = 1 << 0;
+                public const int IsInstantiated = 1 << 1;
+                public const int IsXamlWriterCreated = 1 << 2;
+                public const int IsValueProvidedByParent = 1 << 3;
+                public const int HasSeparator = 1 << 4;
+            }
+
+            public bool IsGetObject
+            {
+                get { return _flags.Get(ObjectStateFlags.IsGetObject) ?? false; }
+                set { _flags.Set(ObjectStateFlags.IsGetObject, value); }
+            }
+            public bool IsInstantiated
+            {
+                get { return _flags.Get(ObjectStateFlags.IsInstantiated) ?? false; }
+                set { _flags.Set(ObjectStateFlags.IsInstantiated, value); }
+            }
+            public bool IsXamlWriterCreated // affects AfterProperties() calls.
+            {
+                get { return _flags.Get(ObjectStateFlags.IsXamlWriterCreated) ?? false; }
+                set { _flags.Set(ObjectStateFlags.IsXamlWriterCreated, value); }
+            }
+            public bool HasSeparator
+            {
+                get { return _flags.Get(ObjectStateFlags.HasSeparator) ?? false; }
+                set { _flags.Set(ObjectStateFlags.HasSeparator, value); }
+            }
+
+            public int PositionalParameterIndex = -1;
+
+            public bool IsValueProvidedByParent // affects AfterProperties() calls.
+            {
+                get { return _flags.Get(ObjectStateFlags.IsValueProvidedByParent) ?? false; }
+                set { _flags.Set(ObjectStateFlags.IsValueProvidedByParent, value); }
+            }
+            public string FactoryMethod;
+            public object Value;
+            public object KeyValue;
+            public List<MemberAndValue> WrittenProperties = new List<MemberAndValue>();
+
+            public XamlMember CurrentMember => CurrentMemberState?.Member;
+
+            public MemberAndValue CurrentMemberState
+            {
+                get { return WrittenProperties.Count > 0 ? WrittenProperties[WrittenProperties.Count - 1] : null; }
+            }
+        }
+
+        object IProvideValueTarget.TargetObject => object_states.Peek().Value;
+
+        object IProvideValueTarget.TargetProperty => GetTargetProperty(this);
+
+        private static object GetTargetProperty(XamlObjectWriterInternal intl)
+        {
+            if (intl.CurrentMember is IProvideValueTarget ipvt)
+            {
+                return ipvt.TargetProperty;
+            }
+
+            //
+            // We should never have a null ParentProperty here but
+            // protect against null refs since we are going to dereference it
+            if (intl.CurrentMember is not XamlMember parentProperty)
+            {
+                return null;
+            }
+
+            if (parentProperty.IsAttachable)
+            {
+                //
+                // IPVT returns the static Set method for attached properties in 3.0
+                return parentProperty.UnderlyingSetter;
+            }
+            else
+            {
+                //
+                // This branch cover regular property (will return non null)
+                // and items in a collection/diction (will return null - IPVT returns null in 3.0 for collections/dictionaries).
+                return parentProperty.UnderlyingMember;
+            }
+        }
+
+        object IRootObjectProvider.RootObject => root_state.Value;
+
+        internal class MemberAndValue
+        {
+            public MemberAndValue(XamlMember xm)
+            {
+                Member = xm;
+            }
+
+            public XamlMember Member;
+            public object Value;
+            public AllowedMemberLocations OccuredAs = AllowedMemberLocations.None;
+            public bool IsAlreadySet;
+        }
+
+        public virtual void CloseAll()
+        {
+            while (object_states.Count > 0)
+            {
+                switch (manager.State)
+                {
+                    case XamlWriteState.MemberDone:
+                    case XamlWriteState.ObjectStarted: // StartObject without member
+                        WriteEndObject();
+                        break;
+                    case XamlWriteState.ValueWritten:
+                    case XamlWriteState.ObjectWritten:
+                    case XamlWriteState.MemberStarted: // StartMember without content
+                        manager.OnClosingItem();
+                        WriteEndMember();
+                        break;
+                    default:
+                        throw new NotImplementedException(manager.State.ToString()); // there shouldn't be anything though
+                }
+            }
+        }
+
+        internal string GetPrefix(string ns)
+        {
+            foreach (var nd in Namespaces)
+                if (nd.Namespace == ns)
+                    return nd.Prefix;
+            return null;
+        }
+
+        protected ObjectState CurrentState => object_states.Count > 0 ? object_states.Peek() : null;
+        protected MemberAndValue CurrentMemberState => CurrentState?.CurrentMemberState;
+        protected XamlMember CurrentMember => CurrentMemberState?.Member;
+
+        protected XamlMember LastMember => LastState?.CurrentMemberState?.Member;
+        protected ObjectState LastState
+        {
+            get
+            {
+                if (object_states.Count > 1)
+                {
+                    var state = object_states.Pop();
+                    var last = object_states.Peek();
+                    object_states.Push(state);
+                    return last;
+                }
+                return null;
+            }
+
+        }
+
+        public void WriteGetObject()
+        {
+            manager.GetObject();
+
+            var xm = CurrentMember;
+
+            var state = new ObjectState() { Type = xm.Type, IsGetObject = true };
+
+            object_states.Push(state);
+
+            OnWriteGetObject();
+            manager.GotObject(object_states.Peek().Type);
+        }
+
+        public void WriteNamespace(NamespaceDeclaration namespaceDeclaration)
+        {
+            ArgumentNullException.ThrowIfNull(namespaceDeclaration);
+
+            manager.Namespace();
+
+            var state = object_states.Count > 0 ? object_states.Peek() : null;
+            if (state is null || state.Type is not null)
+            {
+                state = new ObjectState() { Namespaces = [] };
+                object_states.Push(state);
+            }
+            state.Namespaces.Add(namespaceDeclaration);
+
+            Namespaces.Add(namespaceDeclaration);
+            OnWriteNamespace(namespaceDeclaration);
+        }
+
+        public void WriteStartObject(XamlType xamlType)
+        {
+            ArgumentNullException.ThrowIfNull(xamlType);
+
+            manager.StartObject(xamlType);
+
+            var cstate = object_states.Count > 0 ? object_states.Peek() : null;
+            if (cstate is null || cstate.Type is not null)
+            {
+                cstate = new ObjectState();
+                object_states.Push(cstate);
+            }
+            cstate.Type = xamlType;
+
+            OnWriteStartObject();
+        }
+
+        public void WriteValue(object value)
+        {
+            manager.Value();
+
+            OnWriteValue(value);
+        }
+
+        public void WriteStartMember(XamlMember property)
+        {
+            ArgumentNullException.ThrowIfNull(property);
+
+            manager.StartMember();
+            if (ReferenceEquals(property, XamlLanguage.PositionalParameters))
+                // this is an exception that indicates the state manager to accept more than values within this member.
+                manager.AcceptMultipleValues = true;
+
+            var state = object_states.Peek();
+            var wpl = state.WrittenProperties;
+            for (int i = 0; i < wpl.Count; i++)
+            {
+                var wp = wpl[i];
+                if (ReferenceEquals(wp.Member, property))
+                    throw WithLineInfo(new XamlDuplicateMemberException(property, object_states.Peek().Type));
+            }
+
+            wpl.Add(new MemberAndValue(property));
+            if (ReferenceEquals(property, XamlLanguage.PositionalParameters))
+                state.PositionalParameterIndex = 0;
+
+            OnWriteStartMember(property);
+        }
+
+        public void WriteEndObject()
+        {
+            manager.EndObject(object_states.Count > 1);
+
+            OnWriteEndObject();
+
+            var state = object_states.Pop();
+            if (state.Namespaces is not null)
+            {
+                foreach (var ns in state.Namespaces)
+                {
+                    Namespaces.Remove(ns);
+                }
+            }
+        }
+
+        public void WriteEndMember()
+        {
+            manager.EndMember();
+
+            OnWriteEndMember();
+
+            var state = object_states.Peek();
+            if (ReferenceEquals(CurrentMember, XamlLanguage.PositionalParameters))
+            {
+                manager.AcceptMultipleValues = false;
+                state.PositionalParameterIndex = -1;
+            }
+        }
+
+        protected string GetValueString(XamlMember xm, object value)
+        {
+            // change XamlXmlReader too if we change here.
+            if (value is string stringValue)
+                return stringValue;
+
+            var xt = value == null ? XamlLanguage.Null : sctx.GetXamlType(value.GetType());
+            var vs = xm.ValueSerializer ?? xt.ValueSerializer;
+            if (vs != null)
+                return vs.ConverterInstance.ConvertToString(value, service_provider);
+            else
+                throw new XamlXmlWriterException(String.Format("Value type is '{0}' but it must be either string or any type that is convertible to string indicated by TypeConverterAttribute.", value != null ? value.GetType() : null));
+        }
+
+        internal class ObjectStateStack
+        {
+            private readonly Stack<ObjectState> stack = new Stack<ObjectState>();
+            private readonly IAmbientProvider parentAmbientProvider;
+
+            public ObjectStateStack(IAmbientProvider parentAmbientProvider = null)
+            {
+                this.parentAmbientProvider = parentAmbientProvider;
+            }
+
+            public ObjectState Peek() => stack.Peek();
+
+            public ObjectState Pop() => stack.Pop();
+
+            public void Push(ObjectState item) => stack.Push(item);
+
+            public int Count => stack.Count;
+
+            public IAmbientProvider GetAmbientProvider()
+            {
+                // if we already have one for this stack state, provide
+                var existingProvider = Peek().AmbientProvider;
+                if (existingProvider != null)
+                {
+                    return existingProvider;
+                }
+                // else, create one, add it to stack state and return.
+                var provider = CreateAmbientProvider();
+                var state = Peek();
+                state.AmbientProvider = provider;
+                return provider;
+            }
+            private IAmbientProvider CreateAmbientProvider()
+            {
+                IAmbientProvider basicAmbientProvider = new ObjectStatesAmbientProvider(stack);
+                var ambientProvider =
+                    parentAmbientProvider == null ? basicAmbientProvider
+                        : new StackAmbientProvider(basicAmbientProvider, parentAmbientProvider);
+                return ambientProvider;
+            }
+        }
+
+        private class ObjectStatesAmbientProvider : IAmbientProvider
+        {
+            public ObjectStatesAmbientProvider(IEnumerable<ObjectState> objectStates)
+            {
+                object_states = objectStates.ToArray();
+            }
+
+            private IReadOnlyCollection<ObjectState> object_states { get; }
+
+            public IEnumerable<object> GetAllAmbientValues(params XamlType[] types)
+            {
+                return GetAllAmbientValues(null, false, types).Select(r => r.Value);
+            }
+
+            public IEnumerable<AmbientPropertyValue> GetAllAmbientValues(IEnumerable<XamlType> ceilingTypes, params XamlMember[] properties)
+            {
+                return GetAllAmbientValues(ceilingTypes, false, null, properties);
+            }
+
+            public IEnumerable<AmbientPropertyValue> GetAllAmbientValues(IEnumerable<XamlType> ceilingTypes, bool searchLiveStackOnly, IEnumerable<XamlType> types, params XamlMember[] properties)
+            {
+                // check arguments
+                ArgumentNullException.ThrowIfNull(properties);
+
+                var nonAmbientProperty = properties.FirstOrDefault(r => !r.IsAmbient);
+                if (nonAmbientProperty != null)
+                    throw new ArgumentException(nonAmbientProperty.ToString() + "is not an ambient property", "properties");
+
+                return DoGetAllAmbientValues(ceilingTypes, searchLiveStackOnly, types, properties);
+            }
+
+            private IEnumerable<AmbientPropertyValue> DoGetAllAmbientValues(IEnumerable<XamlType> ceilingTypes, bool searchLiveStackOnly, IEnumerable<XamlType> types, params XamlMember[] properties)
+            {
+                foreach (var state in object_states)
+                {
+                    if (types != null)
+                    {
+                        if (types.Any(xt => xt.UnderlyingType != null && state.Type.CanAssignTo(xt)))
+                            yield return new AmbientPropertyValue(null, state.Value);
+                    }
+                    if (properties != null)
+                    {
+                        // get ambient properties in the stack
+                        foreach (var prop in properties)
+                        {
+                            if (!state.Type.CanAssignTo(prop.DeclaringType))
+                                continue;
+                            var value = prop.Invoker.GetValue(state.Value);
+                            yield return new AmbientPropertyValue(prop, value);
+                        }
+                    }
+
+                    if (ceilingTypes != null && ceilingTypes.Contains(state.Type))
+                        yield break;
+                }
+            }
+
+            public object GetFirstAmbientValue(params XamlType[] types)
+            {
+                return GetAllAmbientValues(types).FirstOrDefault();
+            }
+
+            public AmbientPropertyValue GetFirstAmbientValue(IEnumerable<XamlType> ceilingTypes, params XamlMember[] properties)
+            {
+                return GetAllAmbientValues(ceilingTypes, properties).FirstOrDefault();
+            }
+        }
+
+        internal class StackAmbientProvider : IAmbientProvider
+        {
+            public StackAmbientProvider(params IAmbientProvider[] providers)
+            {
+                Providers = providers;
+            }
+
+            private IAmbientProvider[] Providers { get; }
+
+            public IEnumerable<object> GetAllAmbientValues(params XamlType[] types)
+            {
+                return Providers.SelectMany(x => x.GetAllAmbientValues(types));
+            }
+
+            public IEnumerable<AmbientPropertyValue> GetAllAmbientValues(IEnumerable<XamlType> ceilingTypes, params XamlMember[] properties)
+            {
+                return Providers.SelectMany(x => x.GetAllAmbientValues(ceilingTypes, properties));
+            }
+
+            public IEnumerable<AmbientPropertyValue> GetAllAmbientValues(IEnumerable<XamlType> ceilingTypes, bool searchLiveStackOnly, IEnumerable<XamlType> types,
+                params XamlMember[] properties)
+            {
+                return Providers.SelectMany(x => x.GetAllAmbientValues(ceilingTypes, searchLiveStackOnly, types, properties));
+            }
+
+            public object GetFirstAmbientValue(params XamlType[] types)
+            {
+                return Providers.SelectMany(x => x.GetAllAmbientValues(types)).FirstOrDefault();
+            }
+
+            public AmbientPropertyValue GetFirstAmbientValue(IEnumerable<XamlType> ceilingTypes, params XamlMember[] properties)
+            {
+                return Providers.SelectMany(x => x.GetAllAmbientValues(ceilingTypes, properties)).FirstOrDefault();
+            }
+        }
+
+        private sealed class XamlObjectWriterFactory : IXamlObjectWriterFactory
+        {
+            private readonly XamlSchemaContext _sctx;
+            private readonly XamlObjectWriterSettings _parentSettings;
+            private readonly IAmbientProvider _parentAmbientProvider;
+            private readonly IXamlNamespaceResolver _parentNsResolver;
+
+            public XamlObjectWriterFactory(XamlSchemaContext schemaContext, XamlObjectWriterSettings settings, IServiceProvider serviceProvider)
+            {
+                _sctx = schemaContext;
+                _parentSettings = settings;
+                _parentAmbientProvider = (IAmbientProvider)serviceProvider.GetService(typeof(IAmbientProvider));
+                _parentNsResolver = new NamespaceResolver(
+                    [.. ((IXamlNamespaceResolver)serviceProvider.GetService(typeof(IXamlNamespaceResolver))).GetNamespacePrefixes()]);
+            }
+
+            public XamlObjectWriter GetXamlObjectWriter(XamlObjectWriterSettings settings)
+            {
+                return new XamlObjectWriter(_sctx, settings, _parentAmbientProvider, _parentNsResolver);
+            }
+
+            public XamlObjectWriterSettings GetParentSettings() => _parentSettings;
         }
     }
 }

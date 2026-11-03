@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace System.Xaml
 {
+    [DebuggerDisplay("Prefix={Prefix} Namespace={Namespace}")]
     public class NamespaceDeclaration
 	{
 		public NamespaceDeclaration(string ns, string prefix)

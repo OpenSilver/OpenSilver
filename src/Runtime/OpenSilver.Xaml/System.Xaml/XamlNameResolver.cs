@@ -214,10 +214,10 @@ namespace System.Xaml
 			Names = names.ToArray();
 		}
 
-		public XamlWriterInternalBase.ObjectState ParentState { get; set; }
-		public XamlWriterInternalBase.MemberAndValue ParentMemberState { get; set; }
-		public XamlWriterInternalBase.ObjectState State { get; set; }
-		public XamlWriterInternalBase.MemberAndValue MemberState { get; set; }
+		public XamlObjectWriterInternal.ObjectState ParentState { get; set; }
+		public XamlObjectWriterInternal.MemberAndValue ParentMemberState { get; set; }
+		public XamlObjectWriterInternal.ObjectState State { get; set; }
+		public XamlObjectWriterInternal.MemberAndValue MemberState { get; set; }
 		public XamlType Type => State.Type;
 		public XamlMember Member => MemberState.Member;
 		public object Value => State.Value;

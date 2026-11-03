@@ -223,7 +223,7 @@ namespace System.Xaml
 			return ci != null;
 		}
 
-		public static IEnumerable<XamlWriterInternalBase.MemberAndValue> GetSortedConstructorArguments(this XamlType type, IList<XamlWriterInternalBase.MemberAndValue> members)
+		public static IEnumerable<XamlObjectWriterInternal.MemberAndValue> GetSortedConstructorArguments(this XamlType type, IList<XamlObjectWriterInternal.MemberAndValue> members)
 		{
 			var constructors = type.UnderlyingType.GetTypeInfo().GetConstructors();
 			var preferredParameterCount = 0;
@@ -268,7 +268,7 @@ namespace System.Xaml
 					var mem = members.FirstOrDefault(r => r.Member.ConstructorArgumentName() == p.Name);
 					if (mem == null && p.HasDefaultValue())
 					{
-						mem = new XamlWriterInternalBase.MemberAndValue(type.SchemaContext.GetParameter(p));
+						mem = new XamlObjectWriterInternal.MemberAndValue(type.SchemaContext.GetParameter(p));
 						mem.Value = p.DefaultValue;
 					}
 					return mem;
