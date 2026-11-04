@@ -1335,14 +1335,15 @@ namespace System.Windows.Data
                 // has synthetic properties (via ICustomTypeDescriptor or
                 // TypeDescriptorProvider), they don't show up on the type -
                 // only on the item.
-                ICustomTypeProvider ictp = item as ICustomTypeProvider;
-                if (ictp == null)
+                // A null custom type has no synthetic properties. Use the item itself,
+                // matching Silverlight. WPF calls GetProperties on the null type.
+                if (item is ICustomTypeProvider provider && provider.GetCustomType() is Type customType)
                 {
-                    properties = TypeDescriptor.GetProperties(item);
+                    properties = customType.GetProperties();
                 }
                 else
                 {
-                    properties = ictp.GetCustomType().GetProperties();
+                    properties = TypeDescriptor.GetProperties(item);
                 }
             }
 
@@ -1416,22 +1417,10 @@ namespace System.Windows.Data
             {
                 // get type of a representative item
                 object item = GetRepresentativeItem();
-                return GetReflectionType(item);
+                return item == null ? null : TypeHelper.GetReflectionType(item);
             }
 
             return null;
-        }
-
-        private static Type GetReflectionType(object item)
-        {
-            if (item == null)
-                return null;
-
-            ICustomTypeProvider ictp = item as ICustomTypeProvider;
-            if (ictp == null)
-                return item.GetType();
-            else
-                return ictp.GetCustomType();
         }
 
         internal object GetRepresentativeItem()
