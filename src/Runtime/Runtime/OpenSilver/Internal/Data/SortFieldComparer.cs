@@ -57,12 +57,12 @@ internal sealed class SortFieldComparer : IComparer
             {
                 if (x is not null)
                 {
-                    _fields[k].PropertyType = TypeHelper.GetNestedPropertyType(x.GetType(), _fields[k].PropertyPath);
+                    _fields[k].PropertyType = TypeHelper.GetNestedPropertyType(TypeHelper.GetReflectionType(x), _fields[k].PropertyPath);
                     propertyType = _fields[k].PropertyType;
                 }
                 if (_fields[k].PropertyType is null && y is not null)
                 {
-                    _fields[k].PropertyType = TypeHelper.GetNestedPropertyType(y.GetType(), _fields[k].PropertyPath);
+                    _fields[k].PropertyType = TypeHelper.GetNestedPropertyType(TypeHelper.GetReflectionType(y), _fields[k].PropertyPath);
                     propertyType = _fields[k].PropertyType;
                 }
             }
@@ -181,7 +181,7 @@ internal sealed class SortFieldComparer : IComparer
             object value;
             if (string.IsNullOrEmpty(PropertyPath))
             {
-                value = (PropertyType == o.GetType()) ? o : null;
+                value = (PropertyType == TypeHelper.GetReflectionType(o)) ? o : null;
             }
             else
             {

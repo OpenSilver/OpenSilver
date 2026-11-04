@@ -132,11 +132,10 @@ namespace System.Windows.Controls
             {
                 // We haven't located a type yet.. try a different approach.
                 // Does the list have anything in it?
-
-                IEnumerator en = list.GetEnumerator();
-                if (en.MoveNext() && en.Current != null)
+                object item = GetFirstNonNullItem(list);
+                if (item != null)
                 {
-                    return en.Current.GetType();
+                    return GetReflectionType(item);
                 }
 
                 if (list is ICollectionView icv && icv.SourceCollection != null)
@@ -149,8 +148,50 @@ namespace System.Windows.Controls
                 }
             }
 
+            if (itemType != null && typeof(ICustomTypeProvider).IsAssignableFrom(itemType))
+            {
+                // The element type can point at a custom type for reflection.
+                // That type is only available from a representative item.
+                object item = GetFirstNonNullItem(list);
+                if (item != null)
+                {
+                    return GetReflectionType(item);
+                }
+            }
+
             // if we're null at this point, give up
             return itemType;
+        }
+
+        private static object GetFirstNonNullItem(IEnumerable list)
+        {
+            IEnumerator enumerator = list.GetEnumerator();
+            try
+            {
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Current != null)
+                    {
+                        return enumerator.Current;
+                    }
+                }
+            }
+            finally
+            {
+                (enumerator as IDisposable)?.Dispose();
+            }
+
+            return null;
+        }
+
+        private static Type GetReflectionType(object item)
+        {
+            if (item is ICustomTypeProvider provider && provider.GetCustomType() is Type customType)
+            {
+                return customType;
+            }
+
+            return item.GetType();
         }
 
         public static void SetStyleWithType(this FrameworkElement element, Style style)
