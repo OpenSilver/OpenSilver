@@ -666,6 +666,14 @@ namespace System.Windows.Controls
                     cb.Loaded += OpenOnLoad;
                     return false;
                 }
+
+                // A control hosted by a DataGrid can be loaded before its first
+                // measure applies the template and creates the popup.
+                if (cb._popup is null)
+                {
+                    cb.LayoutUpdated += cb.OnLayoutUpdated;
+                    return false;
+                }
             }
 
             return value;
