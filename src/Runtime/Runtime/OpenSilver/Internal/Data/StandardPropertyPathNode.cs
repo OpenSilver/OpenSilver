@@ -107,18 +107,28 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
 
         if (source is DependencyObject)
         {
-            Type type = _resolvedType ?? source.GetType();
-
-            if (DependencyProperty.FromName(_propertyName, type) is DependencyProperty dp)
+            // A path can name the owner explicitly. Otherwise WPF resolves the dependency
+            // property on the custom reflection type. TypeDelegator.BaseType skips the
+            // wrapped CLR type, so try that type too and keep Silverlight dependency properties.
+            Type reflectionType = _resolvedType ?? TypeHelper.GetReflectionType(source);
+            if (DependencyProperty.FromName(_propertyName, reflectionType) is DependencyProperty dp)
             {
                 dependencyProperty = dp;
                 return new DependencyPropertyAccessor(dp);
+            }
+
+            Type clrType = source.GetType();
+            if (_resolvedType is null && reflectionType != clrType &&
+                DependencyProperty.FromName(_propertyName, clrType) is DependencyProperty clrProperty)
+            {
+                dependencyProperty = clrProperty;
+                return new DependencyPropertyAccessor(clrProperty);
             }
         }
 
         dependencyProperty = null;
 
-        Type sourceType = source.GetType();
+        Type sourceType = TypeHelper.GetReflectionType(source);
 
         if (GetPropertyInfo(sourceType, _propertyName) is PropertyInfo propertyInfo)
         {

@@ -102,7 +102,7 @@ internal sealed class IndexedPropertyPathNode : PropertyPathNode
 
         int index;
         PropertyInfo indexer = null;
-        Type type = source.GetType();
+        Type type = TypeHelper.GetReflectionType(source);
 
         // 1 - Look for an Int32 indexer
         // 2 - Look for a String indexer

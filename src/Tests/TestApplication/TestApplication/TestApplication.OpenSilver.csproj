@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\..\Runtime\Blend\Interactions\Expression.Interactions.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Blend\Interactivity\Interactivity.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Browser\Browser.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Controls.Data\Controls.Data.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Controls.Input.Toolkit\Controls.Input.Toolkit.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Controls.Input\Controls.Input.OpenSilver.csproj" />
@@ -20,7 +21,9 @@
     <ProjectReference Include="..\..\..\Runtime\Controls.Toolkit\Controls.Toolkit.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Controls\Controls.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Data\Data.OpenSilver.csproj" />
-    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj">
+      <Aliases>global,opensilver</Aliases>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -135,6 +138,9 @@
     </Compile>
     <Compile Include="Tests\DataGrids\DataGridColumn_VisibilityTest.xaml.cs">
       <DependentUpon>DataGridColumn_VisibilityTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tests\DataGrids\DataGridCustomTypeProviderTest.xaml.cs">
+      <DependentUpon>DataGridCustomTypeProviderTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\DateTimeTest.xaml.cs">
       <DependentUpon>DateTimeTest.xaml</DependentUpon>
@@ -453,6 +459,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Page Include="Tests\DataGrids\DataGridCustomTypeProviderTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Content Include="Tests\DatePickerTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
