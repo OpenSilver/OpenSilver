@@ -346,6 +346,7 @@ type {className}() =
 #nowarn ""3391""
 #nowarn ""0067""
 #nowarn ""0044""
+#nowarn ""0066""
 
 /// <summary>
 /// {factoryName}
