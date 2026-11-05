@@ -19,6 +19,7 @@ using Moq;
 using OpenSilver;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -45,6 +46,9 @@ namespace Runtime.OpenSilver.Tests
             javaScriptExecutionHandlerMock
                 .Setup(x => x.InvokeJS(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .Returns<string, int, bool>((js, refId, wantsResult) => ExecuteJsMock(js));
+            javaScriptExecutionHandlerMock
+                .Setup(x => x.InvokePendingJS(It.IsAny<byte[]>(), It.IsAny<int>()))
+                .Callback<byte[], int>((bytes, length) => ExecuteJsMock(Encoding.Unicode.GetString(bytes, 0, length)));
 
             var javaScriptExecutionHandler2 = javaScriptExecutionHandlerMock.Object;
             INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;

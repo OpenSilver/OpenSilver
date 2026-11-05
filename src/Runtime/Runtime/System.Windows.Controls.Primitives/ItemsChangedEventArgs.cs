@@ -69,6 +69,13 @@ namespace System.Windows.Controls.Primitives
         /// <summary> How many UI elements were involved </summary>
         public int ItemUICount { get { return _itemUICount; } }
 
+        // Index of the item in the items collection (after the change for Add and Move, before it for
+        // Remove), or -1 if unknown.
+        internal int ItemIndex { get; set; } = -1;
+
+        // For Move, index of the item before the change, or -1 if unknown.
+        internal int OldItemIndex { get; set; } = -1;
+
 
         //------------------------------------------------------
         //

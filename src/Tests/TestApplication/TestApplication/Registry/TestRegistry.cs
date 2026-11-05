@@ -88,7 +88,12 @@ namespace TestApplication
             stackpanels.Add(new Test("Vertical", "StackPanels/Vertical"));
             Tests.Add(stackpanels);
             
-            Tests.Add(new Test("ScrollViewer", "ScrollViewer"));
+            TestCategory scrollViewers = new TestCategory("ScrollViewers");
+            scrollViewers.Add(new Test("ScrollViewer", "ScrollViewer"));
+#if OPENSILVER
+            scrollViewers.Add(new Test("Native scrolling", "ScrollViewers/NativeScrolling"));
+#endif
+            Tests.Add(scrollViewers);
             Tests.Add(new Test("ShadowDropEffect", "ShadowDropEffect"));
 
             TestCategory tileBrushes = new TestCategory("TileBrush");

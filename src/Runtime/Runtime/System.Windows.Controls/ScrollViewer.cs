@@ -13,6 +13,7 @@
 
 using OpenSilver.Internal;
 using OpenSilver.Internal.Commands;
+using OpenSilver.Internal.Controls;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -880,6 +881,12 @@ namespace System.Windows.Controls
                 return;
             }
 
+            if (ScrollInfo is INativeScrollInfo { IsNativeScrolling: true } nativeScrollInfo)
+            {
+                nativeScrollInfo.HandleNativeMouseWheel(e);
+                return;
+            }
+
             if (e.Delta < 0)
             {
                 if (ScrollInfo.VerticalOffset == ScrollableHeight) return;
@@ -1376,6 +1383,9 @@ namespace System.Windows.Controls
 
                 desiredSize = child.DesiredSize;
             }
+
+            // Managed scrolling captures touches only while a scrollbar is visible.
+            ElementScrollContentPresenter?.UpdateNativeScrolling();
 
             if (!ArrangeDirty && _invalidatedMeasureFromArrange)
             {
@@ -1917,6 +1927,7 @@ namespace System.Windows.Controls
 
                 if (e.IsTouchEvent &&
                     e.OriginalSource is UIElement el && el.AllowScrollOnTouchMove &&
+                    !IsInNativeScroller(el) &&
                     (IsVerticalScrollBarVisible || IsHorizontalScrollBarVisible) &&
                     _scrollViewer.ScrollInfo is IScrollInfo isi &&
                     _current is null) // prevents scrolling multiple nested ScrollViewers
@@ -2043,6 +2054,25 @@ namespace System.Windows.Controls
                 {
                     timer.Stop();
                 }
+            }
+
+            // The browser pans native scrollers (and chains to the outer ones) by itself.
+            private bool IsInNativeScroller(UIElement element)
+            {
+                for (DependencyObject d = element; d is not null; d = VisualTreeHelper.GetParent(d))
+                {
+                    if (d is INativeScrollInfo { IsNativeScrolling: true })
+                    {
+                        return true;
+                    }
+
+                    if (d == _scrollViewer)
+                    {
+                        break;
+                    }
+                }
+
+                return _scrollViewer.ScrollInfo is INativeScrollInfo { IsNativeScrolling: true };
             }
 
             private void OnUnloaded(object sender, RoutedEventArgs e) => Cancel();
