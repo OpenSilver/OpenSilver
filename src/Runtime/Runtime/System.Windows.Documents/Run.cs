@@ -239,7 +239,7 @@ public sealed class Run : Inline
         builder.Append("<span class=\"opensilver-inline\" style=\"font: ");
         FontProperties.AppendCssFontAsHtml(builder, FontStyle, FontWeight, FontSize, 0.0, FontFamily);
         builder.Append($"; letter-spacing: {FontProperties.ToCssLetterSpacing(CharacterSpacing)}\">")
-               .Append(HttpUtility.HtmlEncode(Text))
+               .Append(INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(HttpUtility.HtmlEncode(Text)))
                .Append("</span>");
     }
 
