@@ -234,12 +234,12 @@ public class VisualStateManager : DependencyObject
 
     #region VisualStateGroups
 
-    private static readonly DependencyPropertyKey VisualStateGroupsPropertyKey =
+    internal static readonly DependencyPropertyKey VisualStateGroupsPropertyKey =
         DependencyProperty.RegisterAttachedReadOnly(
             "VisualStateGroups",
             typeof(IList),
             typeof(VisualStateManager),
-            new PropertyMetadata((object)null));
+            new PropertyMetadata(new VisualStateGroupCollectionDefaultValueFactory()));
 
     /// <summary>
     /// Identifies the VisualStateManager.VisualStateGroup attached property.
@@ -249,7 +249,14 @@ public class VisualStateManager : DependencyObject
     internal static VisualStateGroupCollection GetVisualStateGroupsInternal(FrameworkElement obj)
     {
         Debug.Assert(obj is not null);
-        return (VisualStateGroupCollection)obj.GetValue(VisualStateGroupsProperty);
+
+        if (obj.GetStorage(VisualStateGroupsProperty.GlobalIndex) is Storage storage)
+        {
+            return (VisualStateGroupCollection)DependencyObjectStore.GetEffectiveValue(
+                ref storage.Entry, RequestFlags.FullyResolved);
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -269,13 +276,7 @@ public class VisualStateManager : DependencyObject
     {
         ArgumentNullException.ThrowIfNull(obj);
 
-        if (obj.GetValue(VisualStateGroupsProperty) is not VisualStateGroupCollection value)
-        {
-            value = new VisualStateGroupCollection(obj);
-            obj.SetValueInternal(VisualStateGroupsPropertyKey, value);
-        }
-
-        return value;
+        return (VisualStateGroupCollection)obj.GetValue(VisualStateGroupsProperty);
     }
 
     #endregion VisualStateGroups
@@ -474,4 +475,12 @@ public class VisualStateManager : DependencyObject
     }
 
     #endregion State Change
+
+    private sealed class VisualStateGroupCollectionDefaultValueFactory : DefaultValueFactory
+    {
+        internal override object DefaultValue => new VisualStateGroupCollection(null);
+
+        internal override object CreateDefaultValue(DependencyObject owner, DependencyProperty property)
+            => new VisualStateGroupCollection(owner);
+    }
 }

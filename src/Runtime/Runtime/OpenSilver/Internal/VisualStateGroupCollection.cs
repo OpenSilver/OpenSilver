@@ -13,7 +13,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows;
 
 namespace OpenSilver.Internal;
@@ -21,11 +20,12 @@ namespace OpenSilver.Internal;
 internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
 {
     private readonly WeakReference<DependencyObject> _owner;
+    private bool _isDefaultValue;
 
-    public VisualStateGroupCollection(DependencyObject owner)
+    internal VisualStateGroupCollection(DependencyObject owner)
     {
-        Debug.Assert(owner is not null);
         _owner = new(owner);
+        _isDefaultValue = true;
     }
 
     private DependencyObject Owner
@@ -44,7 +44,15 @@ internal sealed class VisualStateGroupCollection : Collection<VisualStateGroup>
 
         base.InsertItem(index, item);
 
-        SetParent(item, Owner);
+        DependencyObject owner = Owner;
+
+        SetParent(item, owner);
+
+        if (_isDefaultValue)
+        {
+            _isDefaultValue = false;
+            owner?.SetValueInternal(VisualStateManager.VisualStateGroupsPropertyKey, this);
+        }
     }
 
     /// <inheritdoc />
