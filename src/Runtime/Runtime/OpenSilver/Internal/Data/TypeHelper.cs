@@ -25,6 +25,16 @@ internal static class TypeHelper
     internal const char PropertyNameSeparator = '.';
     internal const char RightIndexerToken = ']';
 
+    internal static Type GetReflectionType(object item)
+    {
+        if (item is ICustomTypeProvider provider && provider.GetCustomType() is Type customType)
+        {
+            return customType;
+        }
+
+        return item.GetType();
+    }
+
     private static Type FindGenericType(Type definition, Type type)
     {
         while ((type != null) && (type != typeof(object)))
@@ -163,7 +173,7 @@ internal static class TypeHelper
         }
 
         object propertyValue = item;
-        Type itemType = item.GetType();
+        Type itemType = GetReflectionType(item);
         if (itemType != null)
         {
             PropertyInfo propertyInfo = GetNestedProperty(itemType, propertyPath, out exception, ref propertyValue);

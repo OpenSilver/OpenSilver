@@ -126,6 +126,7 @@ namespace TestApplication
             datagrids.Add(new Test("DataGrid 1", "DataGrids/DataGrid1"));
             datagrids.Add(new Test("DataGrid 2", "DataGrids/DataGrid2"));
             datagrids.Add(new Test("DataGridColumn.Visibility", "DataGrids/DataGridColumn_Visibility"));
+            datagrids.Add(new Test("DataGrid ICustomTypeProvider", "DataGrids/DataGridCustomTypeProvider"));
             Tests.Add(datagrids);
 
             Tests.Add(new Test("ICommand", "ICommand"));
