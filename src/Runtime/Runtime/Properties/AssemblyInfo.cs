@@ -22,7 +22,7 @@ using System.Windows.Markup;
 [assembly: InternalsVisibleTo("OpenSilver.WpfCompat")]
 [assembly: InternalsVisibleTo("OpenSilver.Animations")]
 
-[assembly: OpenSilver.XamlDesigner(7)]
+[assembly: OpenSilver.XamlDesigner(8)]
 
 // This is used for example in the {x:Static ...} markup extension.
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")]
