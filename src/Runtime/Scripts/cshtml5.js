@@ -307,9 +307,14 @@ Object.defineProperty(window, 'osjs', {
                                 // axes still reach the application, while pans can chain to outer scrollers.
                                 scroller.style.touchAction = 'var(--os-pan-x,) var(--os-pan-y,)';
                             } else {
+                                // There is nothing to scroll. Browsers restore the previous scroll position when the
+                                // element becomes a scroll container again, so it is reset first.
+                                scroller.scrollTo({ left: 0, top: 0, behavior: 'instant' });
                                 scroller.style.overflowX = 'clip';
                                 scroller.style.overflowY = 'clip';
                                 scroller.style.touchAction = '';
+                                state.lastX = 0;
+                                state.lastY = 0;
                             }
                             if (!state.listening) {
                                 scroller.addEventListener('scroll', onScroll, { passive: true });

@@ -55,6 +55,7 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     private bool _isNativeExtentTooLarge;
     private ItemSizeCache _itemSizes;
     private Size _nativeExtent;
+    private Size _arrangedSize = new(double.PositiveInfinity, double.PositiveInfinity);
     private Vector _nativeOffset = UnknownOffset;
     private Vector _nativeTargetOffset;
     private double _nativeShift;
@@ -69,7 +70,7 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
     bool INativeScrollInfo.IsNativeScrolling => _isNative;
 
-    bool INativeScrollInfo.CanNativelyScroll => _isNative;
+    bool INativeScrollInfo.CanNativelyScroll => _isNative && _appliedNativeState is { } state && (state.CanScrollX || state.CanScrollY);
 
     Vector INativeScrollInfo.NativeOffset => _isNative ? GetKnownNativeOffset() : default;
 
@@ -130,8 +131,13 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
             !_isNativeExtentTooLarge &&
             NativeScrolling.GetIsEnabled(this);
 
+        // The browser takes over touches along the axes it can scroll (even when the items fit), so the
+        // axes along which there is nothing to scroll are left to the application.
         var state = isNative ?
-            (NativeScrollManager.Mode.Native, CanHorizontallyScroll, CanVerticallyScroll, Background is not null) :
+            (NativeScrollManager.Mode.Native,
+             CanHorizontallyScroll && DoubleUtil.GreaterThan(_nativeExtent.Width, _arrangedSize.Width),
+             CanVerticallyScroll && DoubleUtil.GreaterThan(_nativeExtent.Height, _arrangedSize.Height),
+             Background is not null) :
             (NativeScrollManager.Mode.None, false, false, false);
 
         if (_appliedNativeState == state)
@@ -677,6 +683,9 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
                 _nativeExtent = extent;
                 NativeScrollManager.SetExtent(OuterDiv, extent.Width, extent.Height);
             }
+
+            _arrangedSize = arrangeSize;
+            UpdateNativeScrolling();
 
             // Written after layout, once the DOM size of this panel and of its content are up to
             // date, otherwise the browser would clamp the offset.

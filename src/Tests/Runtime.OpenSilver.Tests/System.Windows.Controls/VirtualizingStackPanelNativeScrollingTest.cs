@@ -37,7 +37,7 @@ public class VirtualizingStackPanelNativeScrollingTest
 
     private sealed class TestItemsControl : ItemsControl
     {
-        public TestItemsControl(Orientation orientation)
+        public TestItemsControl(Orientation orientation, ScrollBarVisibility crossScrollBarVisibility = ScrollBarVisibility.Disabled)
         {
             Width = ViewportSize;
             Height = ViewportSize;
@@ -68,8 +68,8 @@ public class VirtualizingStackPanelNativeScrollingTest
                         {
                             Padding = new Thickness(0),
                             BorderThickness = new Thickness(0),
-                            HorizontalScrollBarVisibility = orientation == Orientation.Horizontal ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled,
-                            VerticalScrollBarVisibility = orientation == Orientation.Horizontal ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto,
+                            HorizontalScrollBarVisibility = orientation == Orientation.Horizontal ? ScrollBarVisibility.Auto : crossScrollBarVisibility,
+                            VerticalScrollBarVisibility = orientation == Orientation.Horizontal ? crossScrollBarVisibility : ScrollBarVisibility.Auto,
                             Content = presenter,
                         };
                         sv.SetTemplatedParent(context.TemplateOwnerReference);
@@ -261,6 +261,51 @@ public class VirtualizingStackPanelNativeScrollingTest
         {
             ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, itemCount)),
         };
+    }
+
+    [TestMethod]
+    public void Axes_Along_Which_The_Items_Fit_Should_Leave_Touches_To_The_Application()
+    {
+        // As in the default ListBox style, the cross axis can scroll.
+        var itemsControl = new TestItemsControl(Orientation.Vertical, ScrollBarVisibility.Auto)
+        {
+            ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, 3)),
+        };
+        using var host = new Host(itemsControl);
+        string js = host.FlushJavaScript();
+
+        Assert.IsTrue(host.Panel.IsNativeScrolling);
+        Assert.IsFalse(((INativeScrollInfo)host.Panel).CanNativelyScroll);
+        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,false)");
+        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PanelId}',1,true"), js);
+        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true"), js);
+
+        var items = (ObservableCollection<int>)itemsControl.ItemsSource;
+        for (int i = 3; i < 20; i++)
+        {
+            items.Add(i);
+        }
+        host.UpdateLayout();
+
+        // The items are not wider than the viewport.
+        Assert.IsTrue(((INativeScrollInfo)host.Panel).CanNativelyScroll);
+        js = host.FlushJavaScript();
+        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true)");
+        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PanelId}',1,true"), js);
+
+        host.SimulateNativeScroll(0, 200);
+        Assert.AreEqual(10, host.ScrollViewer.VerticalOffset);
+
+        while (items.Count > 3)
+        {
+            items.RemoveAt(items.Count - 1);
+        }
+        host.UpdateLayout();
+
+        Assert.AreEqual(0, host.ScrollViewer.VerticalOffset);
+        Assert.IsFalse(((INativeScrollInfo)host.Panel).CanNativelyScroll);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,false)");
+        Assert.AreEqual(0, host.GetPositionInViewport(0));
     }
 
     [TestMethod]
