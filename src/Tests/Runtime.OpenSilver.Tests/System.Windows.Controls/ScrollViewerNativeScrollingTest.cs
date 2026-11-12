@@ -32,12 +32,12 @@ public class ScrollViewerNativeScrollingTest
         private readonly Popup _popup;
         private readonly List<string> _javascript = new();
 
-        public Host(ScrollViewer scrollViewer)
+        public Host(ScrollViewer scrollViewer, UIElement root = null)
         {
             TestSetup.ExecuteJavascript += OnExecuteJavascript;
 
             ScrollViewer = scrollViewer;
-            _popup = new Popup { Child = scrollViewer, IsOpen = true };
+            _popup = new Popup { Child = root ?? scrollViewer, IsOpen = true };
             UpdateLayout();
         }
 
@@ -304,6 +304,80 @@ public class ScrollViewerNativeScrollingTest
 
         Assert.AreEqual(Visibility.Collapsed, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
         StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PresenterId}',2,false,false)");
+    }
+
+    [TestMethod]
+    public void Native_Scrolling_Should_Leave_Touches_To_The_Application_While_The_Content_Fits()
+    {
+        ScrollViewer sv = CreateScrollViewer(out Border content);
+        sv.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        content.Height = ViewportSize;
+
+        using var host = new Host(sv);
+        string js = host.FlushJavaScript();
+
+        Assert.IsTrue(host.Presenter.IsNativeScrolling);
+        Assert.IsFalse(((INativeScrollInfo)host.Presenter).CanNativelyScroll);
+        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,false)");
+        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)"));
+
+        // The desired size of the presenter does not change, so the ScrollViewer is not measured again.
+        content.Height = ContentHeight;
+        host.UpdateLayout();
+
+        Assert.IsTrue(((INativeScrollInfo)host.Presenter).CanNativelyScroll);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)");
+
+        host.SimulateNativeScroll(0, 150);
+        host.FlushJavaScript();
+        content.Height = 10;
+        host.UpdateLayout();
+
+        Assert.AreEqual(0, host.ScrollViewer.VerticalOffset);
+        Assert.IsFalse(((INativeScrollInfo)host.Presenter).CanNativelyScroll);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,false)");
+    }
+
+    private sealed class ArrangeLargerThanMeasurePanel : Panel
+    {
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            foreach (UIElement child in Children)
+            {
+                child.Measure(new Size(ViewportSize, ViewportSize));
+            }
+            return new Size(ViewportSize, ViewportSize);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            foreach (UIElement child in Children)
+            {
+                child.Arrange(new Rect(0, 0, ViewportSize, 2 * ContentHeight));
+            }
+            return finalSize;
+        }
+    }
+
+    [TestMethod]
+    public void Measure_Should_Not_Toggle_Native_Axes_When_Arranged_Larger_Than_Measured()
+    {
+        ScrollViewer sv = CreateScrollViewer(out _);
+        sv.Width = double.NaN;
+        sv.Height = double.NaN;
+        var panel = new ArrangeLargerThanMeasurePanel();
+        panel.Children.Add(sv);
+
+        using var host = new Host(sv, panel);
+        Assert.IsFalse(((INativeScrollInfo)host.Presenter).CanNativelyScroll);
+        host.FlushJavaScript();
+
+        host.ScrollViewer.InvalidateMeasure();
+        host.UpdateLayout();
+
+        string js = host.FlushJavaScript();
+        Assert.IsFalse(js.Contains("osjs.nativeScroll.setMode"), js);
+        Assert.IsFalse(js.Contains("osjs.nativeScroll.scrollTo"), js);
     }
 
     [TestMethod]

@@ -69,6 +69,8 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
     bool INativeScrollInfo.IsNativeScrolling => _isNative;
 
+    bool INativeScrollInfo.CanNativelyScroll => _isNative;
+
     Vector INativeScrollInfo.NativeOffset => _isNative ? GetKnownNativeOffset() : default;
 
     internal bool IsNativeScrolling => _isNative;

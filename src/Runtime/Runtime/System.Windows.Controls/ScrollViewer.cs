@@ -2056,12 +2056,13 @@ namespace System.Windows.Controls
                 }
             }
 
-            // The browser pans native scrollers (and chains to the outer ones) by itself.
+            // The browser pans native scrollers (and chains to the outer ones) by itself. As with nested managed
+            // ScrollViewers, the innermost one that can scroll takes the touch.
             private bool IsInNativeScroller(UIElement element)
             {
                 for (DependencyObject d = element; d is not null; d = VisualTreeHelper.GetParent(d))
                 {
-                    if (d is INativeScrollInfo { IsNativeScrolling: true })
+                    if (d is INativeScrollInfo { CanNativelyScroll: true })
                     {
                         return true;
                     }

@@ -39,6 +39,7 @@ namespace System.Windows.Controls
         private bool _appliedCanScrollY;
         private bool _isNative;
         private Size _nativeExtent;
+        private Size _arrangedViewport = new(double.PositiveInfinity, double.PositiveInfinity);
         private Vector _nativeOffset;
         private bool _isNativeOffsetRequested;
         private bool _isNativeOffsetSyncPending;
@@ -329,6 +330,8 @@ namespace System.Windows.Controls
 
         bool INativeScrollInfo.IsNativeScrolling => _isNative;
 
+        bool INativeScrollInfo.CanNativelyScroll => _isNative && (_appliedCanScrollX || _appliedCanScrollY);
+
         Vector INativeScrollInfo.NativeOffset => _isNative ? GetKnownNativeOffset() : default;
 
         internal bool IsNativeScrolling => _isNative;
@@ -384,8 +387,12 @@ namespace System.Windows.Controls
             switch (mode)
             {
                 case NativeScrollManager.Mode.Native:
-                    canScrollX = _scrollData._canHorizontallyScroll;
-                    canScrollY = _scrollData._canVerticallyScroll;
+                    // The browser takes over touches along the axes it can scroll (even when the content fits),
+                    // so the axes along which there is nothing to scroll are left to the application.
+                    // The arranged viewport is used, as the measured one can differ and toggling the axes rewrites
+                    // the scroll offset, which would interrupt an inertial scroll.
+                    canScrollX = _scrollData._canHorizontallyScroll && DoubleUtil.GreaterThan(_scrollData._extent.Width, _arrangedViewport.Width);
+                    canScrollY = _scrollData._canVerticallyScroll && DoubleUtil.GreaterThan(_scrollData._extent.Height, _arrangedViewport.Height);
                     break;
 
                 case NativeScrollManager.Mode.Managed:
@@ -404,6 +411,11 @@ namespace System.Windows.Controls
                 return;
             }
 
+            if (_appliedMode != mode)
+            {
+                _isNativeOffsetRequested = false;
+            }
+
             _appliedMode = mode;
             _appliedCanScrollX = canScrollX;
             _appliedCanScrollY = canScrollY;
@@ -412,7 +424,6 @@ namespace System.Windows.Controls
 
             _nativeExtent = default;
             _nativeOffset = UnknownOffset;
-            _isNativeOffsetRequested = false;
 
             SetIsNative(mode == NativeScrollManager.Mode.Native);
             InvalidateArrange();
@@ -601,6 +612,11 @@ namespace System.Windows.Controls
             if (IsScrollClient)
             {
                 UpdateExtents(arrangeSize, _scrollData._extent);
+
+                _arrangedViewport = arrangeSize;
+
+                // The content can be resized without the ScrollViewer being measured again.
+                UpdateNativeScrolling();
             }
 
             int count = VisualChildrenCount;

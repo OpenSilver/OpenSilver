@@ -29,6 +29,12 @@ internal interface INativeScrollInfo
     bool IsNativeScrolling { get; }
 
     /// <summary>
+    /// Gets whether the browser can currently scroll the DOM element along at least one axis
+    /// (and therefore pans touches along that axis).
+    /// </summary>
+    bool CanNativelyScroll { get; }
+
+    /// <summary>
     /// Gets the scroll offset currently applied to the DOM element. Visual children are
     /// rendered shifted by the opposite of this value.
     /// </summary>
