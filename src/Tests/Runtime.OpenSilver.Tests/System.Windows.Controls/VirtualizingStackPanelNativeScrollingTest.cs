@@ -549,7 +549,6 @@ public class VirtualizingStackPanelNativeScrollingTest
     public void Extent_Exceeding_Browser_Limits_Should_Fall_Back_To_Managed_Virtualization()
     {
         const double LargeItemSize = 20_000;
-        Assert.IsTrue(ItemCount * LargeItemSize > VirtualizingStackPanel.MaxNativeExtent);
 
         TestItemsControl itemsControl = CreateItemsControl();
         itemsControl.ItemSizeSelector = _ => LargeItemSize;

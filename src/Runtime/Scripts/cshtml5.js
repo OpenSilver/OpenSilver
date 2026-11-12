@@ -174,8 +174,16 @@ Object.defineProperty(window, 'osjs', {
                 if (!element) return null;
                 if (isNativeScroller(element)) return getState(element).opaque ? null : element;
                 const owner = element._osScrollOwner;
-                if (owner && isNativeScroller(owner)) return owner;
+                if (owner && isNativeScroller(owner)) return getState(owner).opaque ? null : owner;
                 return null;
+            }
+
+            function setPanAxis(scroller, property, value, enabled) {
+                if (enabled) {
+                    scroller.style.setProperty(property, value);
+                } else {
+                    scroller.style.removeProperty(property);
+                }
             }
 
             function isInNativeScroller(element) {
@@ -289,12 +297,15 @@ Object.defineProperty(window, 'osjs', {
 
                         if (mode === MODE.NATIVE) {
                             scroller.classList.add(CSS_CLASS.NATIVE_SCROLLER);
+                            setPanAxis(scroller, '--os-pan-x', 'pan-x', canScrollX);
+                            setPanAxis(scroller, '--os-pan-y', 'pan-y', canScrollY);
                             if (canScrollX || canScrollY) {
                                 scroller.style.overflowX = canScrollX ? 'scroll' : 'hidden';
                                 scroller.style.overflowY = canScrollY ? 'scroll' : 'hidden';
-                                // Both pan directions are allowed so that a pan along an axis this scroller does
-                                // not scroll can still chain to an outer scroller.
-                                scroller.style.touchAction = 'pan-x pan-y';
+                                // Only the axes scrolled by this scroller or by an outer native scroller are panned
+                                // by the browser (the custom properties are inherited), so that pans along other
+                                // axes still reach the application, while pans can chain to outer scrollers.
+                                scroller.style.touchAction = 'var(--os-pan-x,) var(--os-pan-y,)';
                             } else {
                                 scroller.style.overflowX = 'clip';
                                 scroller.style.overflowY = 'clip';
@@ -306,6 +317,8 @@ Object.defineProperty(window, 'osjs', {
                             }
                         } else {
                             scroller.classList.remove(CSS_CLASS.NATIVE_SCROLLER);
+                            setPanAxis(scroller, '--os-pan-x', 'pan-x', false);
+                            setPanAxis(scroller, '--os-pan-y', 'pan-y', false);
                             scroller.style.overflowX = '';
                             scroller.style.overflowY = '';
                             // A managed scroller pans in C# and needs to receive every pointer move.
