@@ -519,6 +519,7 @@ Object.defineProperty(window, 'osjs', {
                     case 'PageDown':
                     case 'Home':
                     case 'End':
+                    case ' ':
                         return true;
                 }
                 return false;

@@ -57,7 +57,7 @@ public static class Features
         /// The default value is true.
         /// </summary>
         /// <remarks>
-        /// Changing this value only affects ScrollViewers whose template is applied afterwards. Use
+        /// Changing this value only affects ScrollViewers that are loaded afterwards. Use
         /// <see cref="NativeScrolling.IsEnabledProperty"/> to opt out a specific part of the visual tree.
         /// </remarks>
         public static bool UseNativeScrolling { get; set; } = true;
