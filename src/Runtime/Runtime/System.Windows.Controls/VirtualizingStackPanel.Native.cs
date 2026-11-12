@@ -45,9 +45,14 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     private const double NativeCacheLength = 0.5;
     private const double NativeCacheMargin = 0.25;
 
+    // Browsers limit the size of elements (about 17.9 million pixels in Firefox, 33.5 million in Chrome
+    // and Safari, less when zoomed in). Longer lists are scrolled by the managed code.
+    internal const double MaxNativeExtent = 10_000_000;
+
     private HtmlElementReference _contentHost;
     private (NativeScrollManager.Mode Mode, bool CanScrollX, bool CanScrollY, bool IsOpaque)? _appliedNativeState;
     private bool _isNative;
+    private bool _isNativeExtentTooLarge;
     private ItemSizeCache _itemSizes;
     private Size _nativeExtent;
     private Vector _nativeOffset = UnknownOffset;
@@ -109,20 +114,18 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
     // Natively scrolled when this panel scrolls the items of an ItemsControl (and native scrolling is
     // allowed). Otherwise, the ScrollContentPresenter of the ScrollViewer uses the managed scrolling.
-    internal void UpdateNativeScrolling() => UpdateNativeScrolling(false);
-
-    // During measure, the ScrollViewer updates its ScrollContentPresenter after this panel is measured.
-    private void UpdateNativeScrolling(bool isMeasuring)
+    internal void UpdateNativeScrolling()
     {
         if (!_contentHost.IsConnected)
         {
-            SetIsNative(false, isMeasuring);
+            SetIsNative(false);
             return;
         }
 
         bool isNative = IsItemsHost &&
             IsScrolling &&
             (Orientation == Orientation.Horizontal ? CanHorizontallyScroll : CanVerticallyScroll) &&
+            !_isNativeExtentTooLarge &&
             NativeScrolling.GetIsEnabled(this);
 
         var state = isNative ?
@@ -149,10 +152,10 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
             _realizedLastIndex = -1;
         }
 
-        SetIsNative(isNative, isMeasuring);
+        SetIsNative(isNative);
     }
 
-    private void SetIsNative(bool value, bool isMeasuring)
+    private void SetIsNative(bool value)
     {
         if (_isNative == value)
         {
@@ -165,13 +168,12 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         // an area that is not covered by the items.
         CoerceIsHitTestable();
 
-        if (!isMeasuring)
-        {
-            InvalidateMeasure();
+        // Both are ignored while being measured: in that case, this panel is measured with the new
+        // mode, then the ScrollViewer updates its ScrollContentPresenter.
+        InvalidateMeasure();
 
-            // The ScrollContentPresenter must stop (or start) scrolling the panel itself.
-            ScrollOwner?.InvalidateMeasure();
-        }
+        // The ScrollContentPresenter must stop (or start) scrolling the panel itself.
+        ScrollOwner?.InvalidateMeasure();
     }
 
     private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -188,6 +190,19 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         new(double.IsNaN(_nativeOffset.X) ? 0.0 : _nativeOffset.X, double.IsNaN(_nativeOffset.Y) ? 0.0 : _nativeOffset.Y);
 
     private bool IsNativeOffsetUnknown => double.IsNaN(_nativeOffset.X);
+
+    // The shift is ignored: the extent grows to the total size when the shift is resolved, and the
+    // mode must not change during a scroll.
+    private bool IsNativeExtentTooLarge() => _itemSizes is not null && _itemSizes.TotalSize > MaxNativeExtent;
+
+    // Called during measure. The logical offset is kept, so the same items remain visible.
+    private void FallBackToManagedScrolling()
+    {
+        _isNativeExtentTooLarge = true;
+        _itemSizes = null;
+        UpdateNativeScrolling();
+        Debug.Assert(!_isNative);
+    }
 
     void INativeScrollInfo.HandleNativeMouseWheel(MouseWheelEventArgs e)
     {
@@ -715,6 +730,12 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         // The indices of the realized range are not valid anymore.
         _realizedLastIndex = -1;
 
+        if (args.Action == NotifyCollectionChangedAction.Reset)
+        {
+            // The new items may fit in the size limit of the browser.
+            _isNativeExtentTooLarge = false;
+        }
+
         ItemSizeCache sizes = _itemSizes;
         if (sizes is null)
         {
@@ -749,6 +770,7 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     private void ResetNativeScrolling()
     {
         _itemSizes = null;
+        _isNativeExtentTooLarge = false;
         _nativeShift = 0.0;
         _isNativeOffsetRequested = _isNative;
     }

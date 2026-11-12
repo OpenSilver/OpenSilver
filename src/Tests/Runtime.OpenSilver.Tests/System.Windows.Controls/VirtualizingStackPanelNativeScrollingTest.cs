@@ -519,6 +519,71 @@ public class VirtualizingStackPanelNativeScrollingTest
     }
 
     [TestMethod]
+    public void Reset_While_Scrolled_After_Fallback_Should_Scroll_Natively()
+    {
+        TestItemsControl itemsControl = CreateItemsControl();
+        itemsControl.ItemSizeSelector = _ => 20_000;
+        using var host = new Host(itemsControl);
+        host.ScrollViewer.ScrollToVerticalOffset(ItemCount - 1);
+        host.UpdateLayout();
+        itemsControl.ItemSizeSelector = _ => ItemSize;
+        itemsControl.ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, ItemCount));
+        host.UpdateLayout();
+        Assert.IsTrue(host.Panel.IsNativeScrolling);
+        host.FlushJavaScript();
+
+        itemsControl.ItemSizeSelector = _ => 200;
+        itemsControl.ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, ItemCount));
+        host.UpdateLayout();
+
+        Assert.IsTrue(host.Panel.IsNativeScrolling);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setExtent('{host.PanelId}'");
+
+        // The visible item is rendered in the viewport.
+        int first = (int)host.ScrollViewer.VerticalOffset;
+        double position = host.GetPositionInViewport(first);
+        Assert.IsTrue(position <= 0 && position > -200, $"position={position}");
+    }
+
+    [TestMethod]
+    public void Extent_Exceeding_Browser_Limits_Should_Fall_Back_To_Managed_Virtualization()
+    {
+        const double LargeItemSize = 20_000;
+        Assert.IsTrue(ItemCount * LargeItemSize > VirtualizingStackPanel.MaxNativeExtent);
+
+        TestItemsControl itemsControl = CreateItemsControl();
+        itemsControl.ItemSizeSelector = _ => LargeItemSize;
+        using var host = new Host(itemsControl);
+        string scpId = host.ScrollViewer.ElementScrollContentPresenter.OuterDiv.Uid;
+
+        Assert.IsFalse(host.Panel.IsNativeScrolling);
+        Assert.IsFalse(host.ScrollViewer.ElementScrollContentPresenter.IsNativeScrolling);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{scpId}',2,false,true)");
+
+        host.ScrollViewer.ScrollToVerticalOffset(ItemCount - 1);
+        host.UpdateLayout();
+
+        Assert.AreEqual(ItemCount - 1, host.ScrollViewer.VerticalOffset);
+        Assert.AreEqual(0, host.ContainerFromIndex(ItemCount - 1).VisualOffset.Y);
+
+        // New items are scrolled natively again if they fit.
+        host.FlushJavaScript();
+        itemsControl.ItemSizeSelector = _ => ItemSize;
+        itemsControl.ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, ItemCount));
+        host.UpdateLayout();
+
+        Assert.IsTrue(host.Panel.IsNativeScrolling);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{scpId}',0,false,false)");
+
+        itemsControl.ItemSizeSelector = _ => LargeItemSize;
+        itemsControl.ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, ItemCount));
+        host.UpdateLayout();
+
+        Assert.IsFalse(host.Panel.IsNativeScrolling);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{scpId}',2,false,true)");
+    }
+
+    [TestMethod]
     public void NativeScrolling_IsEnabled_False_Should_Use_Managed_Virtualization()
     {
         TestItemsControl itemsControl = CreateItemsControl();

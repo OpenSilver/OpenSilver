@@ -1791,7 +1791,8 @@ Object.defineProperty(window, 'osjs', {
                 const hitTestResults = document.elementsFromPoint(x, y);
                 for (const el of hitTestResults) {
                     const xamlid = el.xamlid;
-                    if (xamlid) {
+                    // Native scrollers are hit-testable for the browser only (see getHitTarget).
+                    if (xamlid && _nativeScroll.getScrollerFromHost(el) === null) {
                         ids.push(xamlid);
                     }
                 }

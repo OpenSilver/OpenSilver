@@ -392,8 +392,19 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         if (IsItemsHost)
         {
-            UpdateNativeScrolling(true);
-            return _isNative ? MeasureItemsHostNative(constraint) : MeasureItemsHost(constraint);
+            UpdateNativeScrolling();
+            if (_isNative)
+            {
+                Size desiredSize = MeasureItemsHostNative(constraint);
+                if (!IsNativeExtentTooLarge())
+                {
+                    return desiredSize;
+                }
+
+                FallBackToManagedScrolling();
+            }
+
+            return MeasureItemsHost(constraint);
         }
         else
         {
