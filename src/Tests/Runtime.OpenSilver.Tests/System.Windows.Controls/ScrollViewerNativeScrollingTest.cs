@@ -380,6 +380,94 @@ public class ScrollViewerNativeScrollingTest
         Assert.IsFalse(js.Contains("osjs.nativeScroll.scrollTo"), js);
     }
 
+    private const double ItemHeight = 50;
+
+    private static StackPanel CreateFocusableItems(int count)
+    {
+        var panel = new StackPanel { HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
+        for (int i = 0; i < count; i++)
+        {
+            panel.Children.Add(new Control { Width = 50, Height = ItemHeight });
+        }
+        return panel;
+    }
+
+    [TestMethod]
+    public void Focus_Should_Bring_The_Focused_Element_Into_View_Natively()
+    {
+        ScrollViewer sv = CreateScrollViewer(out _);
+        StackPanel items = CreateFocusableItems(10);
+        sv.Content = items;
+
+        using var host = new Host(sv);
+        host.FlushJavaScript();
+
+        Assert.IsTrue(((Control)items.Children[5]).Focus());
+        host.UpdateLayout();
+
+        Assert.AreEqual(200, host.ScrollViewer.VerticalOffset);
+        Assert.AreEqual(new Vector(0, 0), items.VisualOffset);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.scrollTo('{host.PresenterId}',0,200)");
+    }
+
+    [TestMethod]
+    public void Focus_Should_Scroll_Minimally_From_The_Native_Offset()
+    {
+        ScrollViewer sv = CreateScrollViewer(out _);
+        StackPanel items = CreateFocusableItems(10);
+        sv.Content = items;
+
+        using var host = new Host(sv);
+        host.SimulateNativeScroll(0, 300);
+        host.FlushJavaScript();
+
+        Assert.IsTrue(((Control)items.Children[1]).Focus());
+        host.UpdateLayout();
+
+        Assert.AreEqual(50, host.ScrollViewer.VerticalOffset);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.scrollTo('{host.PresenterId}',0,50)");
+
+        Assert.IsTrue(((Control)items.Children[3]).Focus());
+        host.UpdateLayout();
+
+        Assert.AreEqual(100, host.ScrollViewer.VerticalOffset);
+        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.scrollTo('{host.PresenterId}',0,100)");
+
+        Assert.IsTrue(((Control)items.Children[2]).Focus());
+        host.UpdateLayout();
+
+        Assert.AreEqual(100, host.ScrollViewer.VerticalOffset);
+        Assert.IsFalse(host.FlushJavaScript().Contains("osjs.nativeScroll.scrollTo"));
+    }
+
+    [TestMethod]
+    public void Focus_Should_Bring_The_Focused_Element_Into_View_In_Nested_Native_ScrollViewers()
+    {
+        ScrollViewer inner = CreateScrollViewer(out _);
+        StackPanel items = CreateFocusableItems(10);
+        inner.Content = items;
+
+        ScrollViewer outer = CreateScrollViewer(out _);
+        outer.Content = new StackPanel
+        {
+            VerticalAlignment = VerticalAlignment.Top,
+            Children = { new Border { Height = 300 }, inner },
+        };
+
+        using var host = new Host(outer);
+        Assert.IsTrue(inner.ElementScrollContentPresenter.IsNativeScrolling);
+        host.FlushJavaScript();
+
+        Assert.IsTrue(((Control)items.Children[5]).Focus());
+        host.UpdateLayout();
+
+        Assert.AreEqual(200, inner.VerticalOffset);
+        Assert.AreEqual(300, outer.VerticalOffset);
+        string js = host.FlushJavaScript();
+        StringAssert.Contains(js, $"osjs.nativeScroll.scrollTo('{inner.ElementScrollContentPresenter.OuterDiv.Uid}',0,200)");
+        StringAssert.Contains(js, $"osjs.nativeScroll.scrollTo('{host.PresenterId}',0,300)");
+    }
+
     [TestMethod]
     public void Feature_Disabled_Should_Use_Managed_Scrolling()
     {
