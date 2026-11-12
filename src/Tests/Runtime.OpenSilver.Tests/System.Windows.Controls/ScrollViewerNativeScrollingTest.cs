@@ -280,6 +280,20 @@ public class ScrollViewerNativeScrollingTest
     }
 
     [TestMethod]
+    public void NativeScrolling_IsEnabled_Current_Value_Should_Be_Inherited()
+    {
+        // DragDropTarget opts out its content this way, so that touches can start drags.
+        var inner = CreateScrollViewer(out _);
+        var container = new ContentControl { Content = inner };
+        container.SetCurrentValue(NativeScrolling.IsEnabledProperty, false);
+
+        using var host = new Host(new ScrollViewer { Content = container });
+
+        Assert.IsTrue(host.Presenter.IsNativeScrolling);
+        Assert.IsFalse(inner.ElementScrollContentPresenter.IsNativeScrolling);
+    }
+
+    [TestMethod]
     public void Managed_Scrolling_Without_Visible_ScrollBar_Should_Not_Capture_Touches()
     {
         ScrollViewer sv = CreateScrollViewer(out Border content);

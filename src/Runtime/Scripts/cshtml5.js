@@ -769,8 +769,9 @@ Object.defineProperty(window, 'osjs', {
                         setModifiers(e);
                         _callbacks.inputManagerEvent('', EVENTS.KEYDOWN, e);
                         // Keyboard scrolling is done by ScrollViewer in C#. Keys left unhandled must not
-                        // scroll native scrollers, as nothing scrolls in that case in Silverlight.
-                        if (!e.defaultPrevented && isScrollKey(e) && !isEditable(e.target) &&
+                        // scroll native scrollers, as nothing scrolls in that case in Silverlight. Native HTML
+                        // content (e.g. HtmlPresenter, video controls) keeps its default key behavior.
+                        if (!e.defaultPrevented && isScrollKey(e) && e.target.xamlid && !isEditable(e.target) &&
                             _nativeScroll.isInNativeScroller(e.target)) {
                             e.preventDefault();
                         }
