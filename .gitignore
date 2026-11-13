@@ -338,3 +338,10 @@ build/temp
 src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/libs/
 src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/resources/
 
+OpenSilver.Animations/
+OpenSilver.Samples.Showcase/
+OpenSilver.Themes.Modern/
+Userware.XamlDesigner/
+Userware.AiAgent/
+CSHTML5
+OpenSilver.Themes.Wpf

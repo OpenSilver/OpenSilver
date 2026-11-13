@@ -37,6 +37,7 @@ namespace System.Windows.Controls
         private NativeScrollManager.Mode? _appliedMode;
         private bool _appliedCanScrollX;
         private bool _appliedCanScrollY;
+        private bool _appliedNativeScrollBars;
         private bool _isNative;
         private Size _nativeExtent;
         private Size _arrangedViewport = new(double.PositiveInfinity, double.PositiveInfinity);
@@ -383,6 +384,7 @@ namespace System.Windows.Controls
             NativeScrollManager.Mode mode = GetNativeScrollingMode();
             bool canScrollX = false;
             bool canScrollY = false;
+            bool useNativeScrollBars = false;
 
             switch (mode)
             {
@@ -393,6 +395,7 @@ namespace System.Windows.Controls
                     // the scroll offset, which would interrupt an inertial scroll.
                     canScrollX = _scrollData._canHorizontallyScroll && DoubleUtil.GreaterThan(_scrollData._extent.Width, _arrangedViewport.Width);
                     canScrollY = _scrollData._canVerticallyScroll && DoubleUtil.GreaterThan(_scrollData._extent.Height, _arrangedViewport.Height);
+                    useNativeScrollBars = _scrollInfo.ScrollOwner is { AllowsNativeScrollBars: true };
                     break;
 
                 case NativeScrollManager.Mode.Managed:
@@ -406,7 +409,8 @@ namespace System.Windows.Controls
                     break;
             }
 
-            if (_appliedMode == mode && _appliedCanScrollX == canScrollX && _appliedCanScrollY == canScrollY)
+            if (_appliedMode == mode && _appliedCanScrollX == canScrollX && _appliedCanScrollY == canScrollY &&
+                _appliedNativeScrollBars == useNativeScrollBars)
             {
                 return;
             }
@@ -419,8 +423,9 @@ namespace System.Windows.Controls
             _appliedMode = mode;
             _appliedCanScrollX = canScrollX;
             _appliedCanScrollY = canScrollY;
+            _appliedNativeScrollBars = useNativeScrollBars;
 
-            NativeScrollManager.SetMode(OuterDiv, mode, canScrollX, canScrollY);
+            NativeScrollManager.SetMode(OuterDiv, mode, canScrollX, canScrollY, useNativeScrollBars: useNativeScrollBars);
 
             _nativeExtent = default;
             _nativeOffset = UnknownOffset;
@@ -459,6 +464,13 @@ namespace System.Windows.Controls
             // The scroller must be hit-testable for the browser to scroll it when the pointer is over
             // an area that is not covered by the content.
             CoerceIsHitTestable();
+
+            // The ScrollBars of the template are collapsed while the platform scrollbars are used. Ignored
+            // while the ScrollViewer is measured, as it checks the mode again afterwards.
+            if (_scrollInfo?.ScrollOwner is { AllowsNativeScrollBars: true } sv)
+            {
+                sv.InvalidateMeasure();
+            }
         }
 
         private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

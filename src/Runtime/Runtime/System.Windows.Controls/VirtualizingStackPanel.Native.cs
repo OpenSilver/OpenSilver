@@ -50,7 +50,7 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     internal const double MaxNativeExtent = 10_000_000;
 
     private HtmlElementReference _contentHost;
-    private (NativeScrollManager.Mode Mode, bool CanScrollX, bool CanScrollY, bool IsOpaque)? _appliedNativeState;
+    private (NativeScrollManager.Mode Mode, bool CanScrollX, bool CanScrollY, bool IsOpaque, bool UseNativeScrollBars)? _appliedNativeState;
     private bool _isNative;
     private bool _isNativeExtentTooLarge;
     private ItemSizeCache _itemSizes;
@@ -137,8 +137,9 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
             (NativeScrollManager.Mode.Native,
              CanHorizontallyScroll && DoubleUtil.GreaterThan(_nativeExtent.Width, _arrangedSize.Width),
              CanVerticallyScroll && DoubleUtil.GreaterThan(_nativeExtent.Height, _arrangedSize.Height),
-             Background is not null) :
-            (NativeScrollManager.Mode.None, false, false, false);
+             Background is not null,
+             ScrollOwner is { AllowsNativeScrollBars: true }) :
+            (NativeScrollManager.Mode.None, false, false, false, false);
 
         if (_appliedNativeState == state)
         {
@@ -148,7 +149,7 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         bool modeChanged = _appliedNativeState?.Mode != state.Item1;
         _appliedNativeState = state;
 
-        NativeScrollManager.SetMode(OuterDiv, state.Item1, state.Item2, state.Item3, state.Item4);
+        NativeScrollManager.SetMode(OuterDiv, state.Item1, state.Item2, state.Item3, state.Item4, state.Item5);
 
         if (modeChanged)
         {

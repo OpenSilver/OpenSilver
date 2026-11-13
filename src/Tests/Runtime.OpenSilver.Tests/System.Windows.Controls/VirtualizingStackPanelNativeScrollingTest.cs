@@ -692,6 +692,35 @@ public class VirtualizingStackPanelNativeScrollingTest
     }
 
     [TestMethod]
+    public void NativeScrollBars_Should_Replace_The_Template_ScrollBars_Of_The_ScrollViewer()
+    {
+        NativeScrollManager.HasOverlayScrollBars = true;
+        try
+        {
+            TestItemsControl itemsControl = CreateItemsControl();
+            NativeScrolling.SetUseNativeScrollBars(itemsControl, true);
+
+            using var host = new Host(itemsControl);
+
+            Assert.IsTrue(host.Panel.IsNativeScrolling);
+            Assert.AreEqual(Visibility.Collapsed, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
+            Assert.AreEqual(ViewportSize, host.Panel.ActualWidth);
+            StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true,false,true)");
+
+            NativeScrolling.SetUseNativeScrollBars(itemsControl, false);
+            host.UpdateLayout();
+
+            Assert.AreEqual(Visibility.Visible, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
+            Assert.IsTrue(host.Panel.ActualWidth < ViewportSize);
+            StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true)");
+        }
+        finally
+        {
+            NativeScrollManager.HasOverlayScrollBars = false;
+        }
+    }
+
+    [TestMethod]
     public void Panel_With_Background_Should_Be_Opaque_Scroller()
     {
         using var host = new Host(CreateItemsControl());

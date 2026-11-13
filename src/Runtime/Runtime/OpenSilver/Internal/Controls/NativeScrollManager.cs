@@ -44,14 +44,26 @@ internal static class NativeScrollManager
         return new HtmlElementReference(id);
     }
 
+    private static bool? _hasOverlayScrollBars;
+
+    // Overlay scrollbars (mobile devices, macOS, ...) take no space, so the platform scrollbars do not
+    // change the viewport computed by the layout. Settable for tests.
+    internal static bool HasOverlayScrollBars
+    {
+        get => _hasOverlayScrollBars ??= Interop.ExecuteJavaScriptBoolean("osjs.nativeScroll.hasOverlayScrollbars()");
+        set => _hasOverlayScrollBars = value;
+    }
+
     // An opaque scroller is hit-testable by itself (it has a background): the pointer is not routed
     // to the elements underneath when it is over an area not covered by the content.
-    public static void SetMode(HtmlElementReference scroller, Mode mode, bool canScrollX, bool canScrollY, bool isOpaque = false)
+    public static void SetMode(HtmlElementReference scroller, Mode mode, bool canScrollX, bool canScrollY,
+        bool isOpaque = false, bool useNativeScrollBars = false)
     {
         Debug.Assert(scroller.IsConnected);
 
+        string options = useNativeScrollBars ? $",{ToJs(isOpaque)},true" : isOpaque ? ",true" : string.Empty;
         Interop.ExecuteJavaScriptVoidAsync(
-            $"osjs.nativeScroll.setMode('{scroller.Uid}',{(int)mode},{ToJs(canScrollX)},{ToJs(canScrollY)}{(isOpaque ? ",true" : string.Empty)})");
+            $"osjs.nativeScroll.setMode('{scroller.Uid}',{(int)mode},{ToJs(canScrollX)},{ToJs(canScrollY)}{options})");
     }
 
     private static string ToJs(bool value) => value ? "true" : "false";

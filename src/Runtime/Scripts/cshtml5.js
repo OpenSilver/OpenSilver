@@ -55,6 +55,7 @@ Object.defineProperty(window, 'osjs', {
             INKPRESENTER: 'opensilver-inkpresenter',
             POINTER_CAPTURED: 'opensilver-pointer-captured',
             NATIVE_SCROLLER: 'opensilver-native-scroller',
+            NATIVE_SCROLLBARS: 'opensilver-native-scrollbars',
             SCROLL_CONTENT: 'opensilver-scroll-content',
         });
 
@@ -194,6 +195,22 @@ Object.defineProperty(window, 'osjs', {
                 return false;
             }
 
+            // Overlay scrollbars take no space, so the browser cannot tell whether the pointer is over one:
+            // they are at most this thick, including when they expand under the pointer.
+            const SCROLLBAR_HIT_SIZE = 16;
+
+            // The target is the scroller itself when the pointer is over its scrollbar or over an area not
+            // covered by its content. The offsets are in the coordinates of the scroller (mirrored in RTL).
+            function isOverScrollbar(target, e) {
+                if (e.pointerType === 'touch' || !isNativeScroller(target) ||
+                    !target.classList.contains(CSS_CLASS.NATIVE_SCROLLBARS)) {
+                    return false;
+                }
+                const style = target.style;
+                return (style.overflowY === 'scroll' && target.offsetWidth - e.offsetX <= SCROLLBAR_HIT_SIZE) ||
+                    (style.overflowX === 'scroll' && target.offsetHeight - e.offsetY <= SCROLLBAR_HIT_SIZE);
+            }
+
             function onScroll(e) {
                 const scroller = e.currentTarget;
                 const state = getState(scroller);
@@ -243,6 +260,7 @@ Object.defineProperty(window, 'osjs', {
             return {
                 getScrollerFromHost: getScrollerFromHost,
                 isInNativeScroller: isInNativeScroller,
+                isOverScrollbar: isOverScrollbar,
                 api: Object.freeze({
                     // Snapshots (html-to-image) clone the DOM, which loses scroll positions. While a snapshot
                     // is taken, the scroll offsets are replaced by equivalent translations of the content.
@@ -285,9 +303,18 @@ Object.defineProperty(window, 'osjs', {
                             value: { mode: MODE.NONE, opaque: false, content: content, lastX: 0, lastY: 0, listening: false },
                         });
                     },
+                    // Overlay scrollbars (mobile devices, macOS, ...) take no space in the scroller.
+                    hasOverlayScrollbars: function () {
+                        const probe = document.createElement('div');
+                        probe.style.cssText = 'position:absolute;visibility:hidden;width:100px;height:100px;border:0;overflow:scroll;';
+                        document.body.appendChild(probe);
+                        const isOverlay = probe.offsetWidth === probe.clientWidth && probe.offsetHeight === probe.clientHeight;
+                        probe.remove();
+                        return isOverlay;
+                    },
                     // An opaque scroller is hit-testable by itself: the pointer is not routed to the elements
                     // underneath when it is over an area not covered by the content.
-                    setMode: function (id, mode, canScrollX, canScrollY, opaque = false) {
+                    setMode: function (id, mode, canScrollX, canScrollY, opaque = false, scrollbars = false) {
                         const scroller = document.getElementById(id);
                         const state = getState(scroller);
                         if (!state) return;
@@ -297,6 +324,7 @@ Object.defineProperty(window, 'osjs', {
 
                         if (mode === MODE.NATIVE) {
                             scroller.classList.add(CSS_CLASS.NATIVE_SCROLLER);
+                            scroller.classList.toggle(CSS_CLASS.NATIVE_SCROLLBARS, scrollbars);
                             setPanAxis(scroller, '--os-pan-x', 'pan-x', canScrollX);
                             setPanAxis(scroller, '--os-pan-y', 'pan-y', canScrollY);
                             if (canScrollX || canScrollY) {
@@ -321,7 +349,7 @@ Object.defineProperty(window, 'osjs', {
                                 state.listening = true;
                             }
                         } else {
-                            scroller.classList.remove(CSS_CLASS.NATIVE_SCROLLER);
+                            scroller.classList.remove(CSS_CLASS.NATIVE_SCROLLER, CSS_CLASS.NATIVE_SCROLLBARS);
                             setPanAxis(scroller, '--os-pan-x', 'pan-x', false);
                             setPanAxis(scroller, '--os-pan-y', 'pan-y', false);
                             scroller.style.overflowX = '';
@@ -447,6 +475,7 @@ Object.defineProperty(window, 'osjs', {
             let _activePointerType = null;
             let _pressedButtons = 0;
             let _suppressContextMenu = false;
+            let _scrollbarPointerId = null;
 
             function setModifiers(e) {
                 _modifiers = MODIFIERKEYS.NONE;
@@ -712,6 +741,13 @@ Object.defineProperty(window, 'osjs', {
                         e.isHandled = true;
                         setModifiers(e);
                         setActivePointer(e);
+                        // As with the ScrollBars of a template, pressing a platform scrollbar neither reaches the
+                        // elements underneath nor moves the focus. The browser handles it.
+                        if (_pointerCapture === null && _nativeScroll.isOverScrollbar(e.target, e)) {
+                            _scrollbarPointerId = e.pointerId;
+                            return;
+                        }
+                        _scrollbarPointerId = null;
                         const target = getClosestElement(getHitTarget(e.target, e));
                         switch (e.button) {
                             case 0:
@@ -730,6 +766,10 @@ Object.defineProperty(window, 'osjs', {
                         e.isHandled = true;
                         setModifiers(e);
                         setActivePointer(e);
+                        if (_scrollbarPointerId === e.pointerId) {
+                            _scrollbarPointerId = null;
+                            return;
+                        }
                         const target = getClosestElement(getHitTarget(e.target, e));
                         switch (e.button) {
                             case 0:

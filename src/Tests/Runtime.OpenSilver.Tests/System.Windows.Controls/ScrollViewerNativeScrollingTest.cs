@@ -13,6 +13,7 @@
 
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
+using System.Windows.Markup;
 using System.Windows.Media;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver;
@@ -466,6 +467,155 @@ public class ScrollViewerNativeScrollingTest
         string js = host.FlushJavaScript();
         StringAssert.Contains(js, $"osjs.nativeScroll.scrollTo('{inner.ElementScrollContentPresenter.OuterDiv.Uid}',0,200)");
         StringAssert.Contains(js, $"osjs.nativeScroll.scrollTo('{host.PresenterId}',0,300)");
+    }
+
+    private static ScrollViewer CreateScrollViewerWithNativeScrollBars()
+    {
+        ScrollViewer sv = CreateScrollViewer(out _);
+        sv.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        NativeScrolling.SetUseNativeScrollBars(sv, true);
+        return sv;
+    }
+
+    private static void AssertUsesNativeScrollBars(Host host, string js)
+    {
+        Assert.AreEqual(Visibility.Collapsed, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
+        Assert.AreEqual(Visibility.Collapsed, host.ScrollViewer.ElementVerticalScrollBar.Visibility);
+        Assert.AreEqual(ViewportSize, host.ScrollViewer.ViewportWidth);
+        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true,false,true)");
+    }
+
+    private static void AssertUsesTemplateScrollBars(Host host, string js)
+    {
+        Assert.AreEqual(Visibility.Visible, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
+        Assert.AreEqual(Visibility.Visible, host.ScrollViewer.ElementVerticalScrollBar.Visibility);
+        Assert.IsTrue(host.ScrollViewer.ViewportWidth < ViewportSize);
+        Assert.IsFalse(js.Contains(",true,false,true)"), js);
+    }
+
+    [TestMethod]
+    public void NativeScrollBars_Should_Replace_The_Template_ScrollBars_Where_They_Overlay_The_Content()
+    {
+        NativeScrollManager.HasOverlayScrollBars = true;
+        try
+        {
+            using var host = new Host(CreateScrollViewerWithNativeScrollBars());
+
+            AssertUsesNativeScrollBars(host, host.FlushJavaScript());
+        }
+        finally
+        {
+            NativeScrollManager.HasOverlayScrollBars = false;
+        }
+    }
+
+    [TestMethod]
+    public void NativeScrollBars_Should_Keep_The_Template_ScrollBars_Where_They_Take_Space()
+    {
+        NativeScrollManager.HasOverlayScrollBars = false;
+
+        using var host = new Host(CreateScrollViewerWithNativeScrollBars());
+
+        AssertUsesTemplateScrollBars(host, host.FlushJavaScript());
+    }
+
+    [TestMethod]
+    public void NativeScrollBars_Should_Keep_The_Template_ScrollBars_With_A_Hidden_Axis()
+    {
+        NativeScrollManager.HasOverlayScrollBars = true;
+        try
+        {
+            ScrollViewer sv = CreateScrollViewerWithNativeScrollBars();
+            sv.HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
+
+            using var host = new Host(sv);
+
+            AssertUsesTemplateScrollBars(host, host.FlushJavaScript());
+        }
+        finally
+        {
+            NativeScrollManager.HasOverlayScrollBars = false;
+        }
+    }
+
+    [TestMethod]
+    public void NativeScrollBars_Should_Not_Be_Added_To_A_Template_Without_ScrollBars()
+    {
+        NativeScrollManager.HasOverlayScrollBars = true;
+        try
+        {
+            ScrollViewer sv = CreateScrollViewerWithNativeScrollBars();
+            sv.Template = (ControlTemplate)XamlReader.Parse(
+                """
+                <ControlTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                 TargetType="ScrollViewer">
+                    <ScrollContentPresenter x:Name="ScrollContentPresenter" Content="{TemplateBinding Content}" />
+                </ControlTemplate>
+                """);
+
+            using var host = new Host(sv);
+
+            Assert.IsTrue(host.Presenter.IsNativeScrolling);
+            Assert.IsFalse(sv.AllowsNativeScrollBars);
+            string js = host.FlushJavaScript();
+            StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)");
+            Assert.IsFalse(js.Contains(",true,false,true)"), js);
+        }
+        finally
+        {
+            NativeScrollManager.HasOverlayScrollBars = false;
+        }
+    }
+
+    [TestMethod]
+    public void NativeScrollBars_Should_Be_Switched_At_Runtime()
+    {
+        NativeScrollManager.HasOverlayScrollBars = true;
+        try
+        {
+            ScrollViewer sv = CreateScrollViewerWithNativeScrollBars();
+            NativeScrolling.SetUseNativeScrollBars(sv, false);
+
+            using var host = new Host(sv);
+            AssertUsesTemplateScrollBars(host, host.FlushJavaScript());
+
+            NativeScrolling.SetUseNativeScrollBars(sv, true);
+            host.UpdateLayout();
+            AssertUsesNativeScrollBars(host, host.FlushJavaScript());
+
+            NativeScrolling.SetUseNativeScrollBars(sv, false);
+            host.UpdateLayout();
+            string js = host.FlushJavaScript();
+            AssertUsesTemplateScrollBars(host, js);
+            StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)");
+        }
+        finally
+        {
+            NativeScrollManager.HasOverlayScrollBars = false;
+        }
+    }
+
+    [TestMethod]
+    public void NativeScrollBars_Should_Follow_The_Scrolling_Mode()
+    {
+        NativeScrollManager.HasOverlayScrollBars = true;
+        try
+        {
+            ScrollViewer sv = CreateScrollViewerWithNativeScrollBars();
+            NativeScrolling.SetIsEnabled(sv, false);
+
+            using var host = new Host(sv);
+            AssertUsesTemplateScrollBars(host, host.FlushJavaScript());
+
+            NativeScrolling.SetIsEnabled(sv, true);
+            host.UpdateLayout();
+            AssertUsesNativeScrollBars(host, host.FlushJavaScript());
+        }
+        finally
+        {
+            NativeScrollManager.HasOverlayScrollBars = false;
+        }
     }
 
     [TestMethod]

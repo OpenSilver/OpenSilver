@@ -86,10 +86,15 @@ body {
 
 .opensilver-native-scroller {
     overflow-anchor: none; /* offsets are driven by ScrollViewer, the browser must not adjust them */
-    scrollbar-width: none !important; /* the scrollbars are defined in the ScrollViewer template */
 }
 
-.opensilver-native-scroller::-webkit-scrollbar {
+/* The scrollbars are defined in the ScrollViewer template, unless the platform scrollbars are used
+   (any ::-webkit-scrollbar style would replace them with custom ones in Chromium and Safari). */
+.opensilver-native-scroller:not(.opensilver-native-scrollbars) {
+    scrollbar-width: none !important;
+}
+
+.opensilver-native-scroller:not(.opensilver-native-scrollbars)::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
