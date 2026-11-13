@@ -160,6 +160,9 @@ Object.defineProperty(window, 'osjs', {
                 MANAGED: 2,
             });
 
+            // Unlike 'hidden', 'clip' does not make the element a scroll container (Safari 16+).
+            const OVERFLOW_CLIP = CSS.supports('overflow-x', 'clip') ? 'clip' : 'hidden';
+
             function getState(element) {
                 return element ? element._osScroll : undefined;
             }
@@ -338,8 +341,8 @@ Object.defineProperty(window, 'osjs', {
                                 // There is nothing to scroll. Browsers restore the previous scroll position when the
                                 // element becomes a scroll container again, so it is reset first.
                                 scroller.scrollTo({ left: 0, top: 0, behavior: 'instant' });
-                                scroller.style.overflowX = 'clip';
-                                scroller.style.overflowY = 'clip';
+                                scroller.style.overflowX = OVERFLOW_CLIP;
+                                scroller.style.overflowY = OVERFLOW_CLIP;
                                 scroller.style.touchAction = '';
                                 state.lastX = 0;
                                 state.lastY = 0;
