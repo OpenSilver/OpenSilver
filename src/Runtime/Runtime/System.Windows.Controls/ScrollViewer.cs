@@ -13,6 +13,7 @@
 
 using OpenSilver.Internal;
 using OpenSilver.Internal.Commands;
+using OpenSilver.Internal.Controls;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -120,6 +121,21 @@ namespace System.Windows.Controls
         /// Reference to the vertical ScrollBar child.
         /// </summary>
         internal ScrollBar ElementVerticalScrollBar { get; private set; }
+
+        // The platform scrollbars replace the ScrollBars of the template. They are only used when they overlay
+        // the content, as they would otherwise reduce the viewport computed by the layout, and they cannot be
+        // hidden along a single axis.
+        internal bool AllowsNativeScrollBars =>
+            OpenSilver.NativeScrolling.GetUseNativeScrollBars(this) &&
+            CanUseNativeScrollBar(HorizontalScrollBarVisibility, ElementHorizontalScrollBar) &&
+            CanUseNativeScrollBar(VerticalScrollBarVisibility, ElementVerticalScrollBar) &&
+            NativeScrollManager.HasOverlayScrollBars;
+
+        private bool UsesNativeScrollBars => AllowsNativeScrollBars && ScrollInfo is INativeScrollInfo { IsNativeScrolling: true };
+
+        private static bool CanUseNativeScrollBar(ScrollBarVisibility visibility, ScrollBar templateScrollBar) =>
+            visibility == ScrollBarVisibility.Disabled ||
+            (visibility != ScrollBarVisibility.Hidden && templateScrollBar is not null);
 
         /// <summary>
         /// Gets or sets the element that implements the <see cref="IScrollInfo"/> interface and provides 
@@ -314,6 +330,9 @@ namespace System.Windows.Controls
                 {
                     scrollViewer.ScrollInfo.CanHorizontallyScroll = scrollViewer.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled;
                     scrollViewer.ScrollInfo.CanVerticallyScroll = scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
+
+                    // The platform scrollbars depend on the visibilities (the ScrollContentPresenter is updated when measured).
+                    (scrollViewer.ScrollInfo as VirtualizingStackPanel)?.UpdateNativeScrolling();
                 }
             }
         }
@@ -880,6 +899,12 @@ namespace System.Windows.Controls
                 return;
             }
 
+            if (ScrollInfo is INativeScrollInfo { IsNativeScrolling: true } nativeScrollInfo)
+            {
+                nativeScrollInfo.HandleNativeMouseWheel(e);
+                return;
+            }
+
             if (e.Delta < 0)
             {
                 if (ScrollInfo.VerticalOffset == ScrollableHeight) return;
@@ -1268,6 +1293,35 @@ namespace System.Windows.Controls
         /// </returns>
         protected override Size MeasureOverride(Size constraint)
         {
+            bool useNativeScrollBars = UsesNativeScrollBars;
+            Size desiredSize = MeasureContent(constraint, useNativeScrollBars);
+
+            // Managed scrolling captures touches only while a scrollbar is visible.
+            ElementScrollContentPresenter?.UpdateNativeScrolling();
+
+            // Whether the content is natively scrolled is only known once it has been measured (the template
+            // can be applied, and the scrolling mode can change, during measure).
+            if (useNativeScrollBars != UsesNativeScrollBars)
+            {
+                desiredSize = MeasureContent(constraint, !useNativeScrollBars);
+                ElementScrollContentPresenter?.UpdateNativeScrolling();
+            }
+
+            if (!ArrangeDirty && _invalidatedMeasureFromArrange)
+            {
+                // If we invalidated measure from a previous arrange pass, but
+                // if after the following measure pass we are not dirty for
+                // arrange, then ArrangeOverride will not get called, and we
+                // need to clean up our state here.
+                _invalidatedMeasureFromArrange = false;
+            }
+
+            return desiredSize;
+        }
+
+        // The ScrollBars of the template are collapsed while the platform scrollbars are used.
+        private Size MeasureContent(Size constraint, bool useNativeScrollBars)
+        {
             IScrollInfo isi = ScrollInfo;
 
             UIElement child = VisualChildrenCount > 0 ? GetVisualChild(0) : null;
@@ -1277,12 +1331,12 @@ namespace System.Windows.Controls
 
             if (child != null)
             {
-                bool vsbAuto = vsbv == ScrollBarVisibility.Auto;
-                bool hsbAuto = hsbv == ScrollBarVisibility.Auto;
+                bool vsbAuto = vsbv == ScrollBarVisibility.Auto && !useNativeScrollBars;
+                bool hsbAuto = hsbv == ScrollBarVisibility.Auto && !useNativeScrollBars;
                 bool vDisableScroll = vsbv == ScrollBarVisibility.Disabled;
                 bool hDisableScroll = hsbv == ScrollBarVisibility.Disabled;
-                Visibility vv = vsbv == ScrollBarVisibility.Visible ? Visibility.Visible : Visibility.Collapsed;
-                Visibility hv = hsbv == ScrollBarVisibility.Visible ? Visibility.Visible : Visibility.Collapsed;
+                Visibility vv = vsbv == ScrollBarVisibility.Visible && !useNativeScrollBars ? Visibility.Visible : Visibility.Collapsed;
+                Visibility hv = hsbv == ScrollBarVisibility.Visible && !useNativeScrollBars ? Visibility.Visible : Visibility.Collapsed;
 
                 if (_scrollVisibilityY != vv)
                 {
@@ -1375,15 +1429,6 @@ namespace System.Windows.Controls
                 }
 
                 desiredSize = child.DesiredSize;
-            }
-
-            if (!ArrangeDirty && _invalidatedMeasureFromArrange)
-            {
-                // If we invalidated measure from a previous arrange pass, but
-                // if after the following measure pass we are not dirty for
-                // arrange, then ArrangeOverride will not get called, and we
-                // need to clean up our state here.
-                _invalidatedMeasureFromArrange = false;
             }
 
             return desiredSize;
@@ -1917,6 +1962,7 @@ namespace System.Windows.Controls
 
                 if (e.IsTouchEvent &&
                     e.OriginalSource is UIElement el && el.AllowScrollOnTouchMove &&
+                    !IsInNativeScroller(el) &&
                     (IsVerticalScrollBarVisible || IsHorizontalScrollBarVisible) &&
                     _scrollViewer.ScrollInfo is IScrollInfo isi &&
                     _current is null) // prevents scrolling multiple nested ScrollViewers
@@ -2043,6 +2089,26 @@ namespace System.Windows.Controls
                 {
                     timer.Stop();
                 }
+            }
+
+            // The browser pans native scrollers (and chains to the outer ones) by itself. As with nested managed
+            // ScrollViewers, the innermost one that can scroll takes the touch.
+            private bool IsInNativeScroller(UIElement element)
+            {
+                for (DependencyObject d = element; d is not null; d = VisualTreeHelper.GetParent(d))
+                {
+                    if (d is INativeScrollInfo { CanNativelyScroll: true })
+                    {
+                        return true;
+                    }
+
+                    if (d == _scrollViewer)
+                    {
+                        break;
+                    }
+                }
+
+                return _scrollViewer.ScrollInfo is INativeScrollInfo { IsNativeScrolling: true };
             }
 
             private void OnUnloaded(object sender, RoutedEventArgs e) => Cancel();
