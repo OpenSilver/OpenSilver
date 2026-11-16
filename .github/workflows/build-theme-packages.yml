@@ -37,9 +37,9 @@ jobs:
       - uses: microsoft/setup-msbuild@v1.1
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '10.x'
+          dotnet-version: '11.x'
           dotnet-quality: 'ga'
 
       - name: Clone OpenSilver repo
