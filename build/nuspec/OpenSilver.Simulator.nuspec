@@ -9,29 +9,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <description>OpenSilver is a modern cross-platform reimplementation of WPF and Silverlight that enables .NET developers to build apps for web (WebAssembly), mobile and desktop (MAUI Hybrid) using C# and XAML.</description>
-    <copyright>Copyright (c) 2025, Userware. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2026, Userware. All rights reserved.</copyright>
     <tags>silverlight wpf webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
     <icon>images\OpenSilver_icon.png</icon>
 
     <dependencies>
-      <group targetFramework="net8.0-windows7.0">
-        <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
-        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
-        <dependency id="Microsoft.AspNetCore.Components.WebView" version="8.0.15" />
-        <dependency id="MahApps.Metro" version="2.4.11" />
-        <dependency id="System.Text.Json" version="9.0.0" />
-        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
-      </group>
-
-      <group targetFramework="net9.0-windows7.0">
-        <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
-        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
-        <dependency id="Microsoft.AspNetCore.Components.WebView" version="9.0.4" />
-        <dependency id="MahApps.Metro" version="2.4.11" />
-        <dependency id="System.Text.Json" version="9.0.0" />
-        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
-      </group>
-
       <group targetFramework="net10.0-windows7.0">
         <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
         <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
@@ -40,16 +22,22 @@
         <dependency id="System.Text.Json" version="9.0.0" />
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
+
+      <group targetFramework="net11.0-windows7.0">
+        <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
+        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
+        <dependency id="Microsoft.AspNetCore.Components.WebView" version="11.0.0-rc.1.26425.128" />
+        <dependency id="MahApps.Metro" version="2.4.11" />
+        <dependency id="System.Text.Json" version="9.0.0" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
     </dependencies>
 
     <frameworkReferences>
-      <group targetFramework="net8.0-windows7.0">
-        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
-      </group>
-      <group targetFramework="net9.0-windows7.0">
-        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
-      </group>
       <group targetFramework="net10.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+      </group>
+      <group targetFramework="net11.0-windows7.0">
         <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
       </group>
     </frameworkReferences>
@@ -63,14 +51,11 @@
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net8.0-windows/OpenSilver.Simulator.dll" target="lib/net8.0-windows7.0" />
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net8.0-windows/OpenSilver.Simulator.xml" target="lib/net8.0-windows7.0" />
-
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net9.0-windows/OpenSilver.Simulator.dll" target="lib/net9.0-windows7.0" />
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net9.0-windows/OpenSilver.Simulator.xml" target="lib/net9.0-windows7.0" />
-
     <file src="../../src/Simulator/Simulator/bin/$Configuration$/net10.0-windows/OpenSilver.Simulator.dll" target="lib/net10.0-windows7.0" />
     <file src="../../src/Simulator/Simulator/bin/$Configuration$/net10.0-windows/OpenSilver.Simulator.xml" target="lib/net10.0-windows7.0" />
+
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net11.0-windows/OpenSilver.Simulator.dll" target="lib/net11.0-windows7.0" />
+    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net11.0-windows/OpenSilver.Simulator.xml" target="lib/net11.0-windows7.0" />
 
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
