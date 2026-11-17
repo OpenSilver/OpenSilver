@@ -160,7 +160,7 @@ namespace System.Windows.Controls
         // events on the borders of the control.
         // There is no way right now to differentiate the Background and BorderBrush
         // as they are both defined on the same DOM element.
-        internal sealed override bool EnablePointerEventsCore => Background is not null;
+        internal override bool EnablePointerEventsCore => Background is not null;
 
         private int _progressiveRenderingChunkSize;
 

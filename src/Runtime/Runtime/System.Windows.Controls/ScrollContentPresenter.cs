@@ -13,23 +13,41 @@
 
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
+using OpenSilver;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls
 {
     /// <summary>
     /// Displays the content of a <see cref="ScrollViewer"/> control.
     /// </summary>
-    public sealed class ScrollContentPresenter : ContentPresenter, IScrollInfo
+    public sealed class ScrollContentPresenter : ContentPresenter, IScrollInfo, INativeScrollInfo
     {
-        private IScrollInfo _scrollInfo;
+        private readonly NativeScrollData _nativeScrollData = new();
         private ScrollData _scrollData;
+        private IScrollInfo _scrollInfo;
+
+        static ScrollContentPresenter()
+        {
+            NativeScrolling.IsEnabledProperty.OverrideMetadata(
+                typeof(ScrollContentPresenter),
+                new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits, OnIsNativeScrollingEnabledChanged));
+
+            NativeScrolling.UseNativeScrollBarsProperty.OverrideMetadata(
+                typeof(ScrollContentPresenter),
+                new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits, OnUseNativeScrollBarsChanged));
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollContentPresenter"/> class.
         /// </summary>
-        public ScrollContentPresenter() { }
+        public ScrollContentPresenter()
+        {
+            IsVisibleChanged += OnIsVisibleChanged;
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="ScrollViewer"/> element that controls scrolling
@@ -60,6 +78,7 @@ namespace System.Windows.Controls
                 {
                     _scrollData._canHorizontallyScroll = value;
                     InvalidateMeasure();
+                    UpdateNativeScrolling();
                 }
             }
         }
@@ -80,6 +99,7 @@ namespace System.Windows.Controls
                 {
                     _scrollData._canVerticallyScroll = value;
                     InvalidateMeasure();
+                    UpdateNativeScrolling();
                 }
             }
         }
@@ -106,6 +126,7 @@ namespace System.Windows.Controls
             if (_scrollData._canHorizontallyScroll && !DoubleUtil.AreClose(_scrollData._offset.X, newValue))
             {
                 _scrollData._offset.X = newValue;
+                _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
                 InvalidateArrange();
             }
         }
@@ -132,6 +153,7 @@ namespace System.Windows.Controls
             if (_scrollData._canVerticallyScroll && !DoubleUtil.AreClose(_scrollData._offset.Y, newValue))
             {
                 _scrollData._offset.Y = newValue;
+                _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
                 InvalidateArrange();
             }
         }
@@ -283,6 +305,8 @@ namespace System.Windows.Controls
                 _scrollInfo = null;
                 _scrollData = null;
             }
+
+            UpdateNativeScrolling();
         }
 
         /// <summary>
@@ -300,6 +324,280 @@ namespace System.Windows.Controls
         private bool IsScrollClient => _scrollInfo == this;
 
         private ScrollData EnsureScrollData() => _scrollData ??= new ScrollData();
+
+        bool INativeScrollInfo.IsNativeScrolling => IsNativeScrolling;
+
+        bool INativeScrollInfo.CanNativelyScroll => IsNativeScrolling && (_nativeScrollData._appliedCanScrollX || _nativeScrollData._appliedCanScrollY);
+
+        Vector INativeScrollInfo.NativeOffset => IsNativeScrolling ? GetKnownNativeOffset() : default;
+
+        internal bool IsNativeScrolling => _nativeScrollData._isNative;
+
+        internal override bool EnablePointerEventsCore => IsNativeScrolling;
+
+        internal override HtmlElementReference ChildrenHost =>
+            _nativeScrollData._contentHost.IsConnected ? _nativeScrollData._contentHost : OuterDiv;
+
+        protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
+        {
+            HtmlElementReference div = base.CreateDomElement(parent);
+
+            if (NativeScrolling.UseNativeScrolling)
+            {
+                _nativeScrollData._contentHost = NativeScrollManager.CreateContentHost(div);
+            }
+
+            return div;
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+
+            UpdateNativeScrolling();
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            base.INTERNAL_OnDetachedFromVisualTree();
+
+            // The DOM is recreated when the element is attached again.
+            _nativeScrollData._contentHost = default;
+            _nativeScrollData._appliedMode = null;
+            _nativeScrollData._nativeExtent = default;
+            _nativeScrollData._nativeOffset = NativeScrollData.UnknownOffset;
+        }
+
+        private static void OnIsNativeScrollingEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ScrollContentPresenter)d).UpdateNativeScrolling();
+        }
+
+        private static void OnUseNativeScrollBarsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ScrollContentPresenter)d).InvalidateMeasure();
+        }
+
+        // Applies the scrolling mode to the DOM: native when this presenter scrolls its content
+        // (and native scrolling is allowed), managed otherwise.
+        internal void UpdateNativeScrolling()
+        {
+            if (!_nativeScrollData._contentHost.IsConnected)
+            {
+                SetIsNative(false);
+                return;
+            }
+
+            NativeScrollManager.Mode mode = GetNativeScrollingMode();
+            bool canScrollX = false;
+            bool canScrollY = false;
+            bool useNativeScrollBars = false;
+
+            switch (mode)
+            {
+                case NativeScrollManager.Mode.Native:
+                    // The browser takes over touches along the axes it can scroll (even when the content fits),
+                    // so the axes along which there is nothing to scroll are left to the application.
+                    // The arranged viewport is used, as the measured one can differ and toggling the axes rewrites
+                    // the scroll offset, which would interrupt an inertial scroll.
+                    canScrollX = _scrollData._canHorizontallyScroll && DoubleUtil.GreaterThan(_scrollData._extent.Width, _nativeScrollData._arrangedViewport.Width);
+                    canScrollY = _scrollData._canVerticallyScroll && DoubleUtil.GreaterThan(_scrollData._extent.Height, _nativeScrollData._arrangedViewport.Height);
+                    useNativeScrollBars = _scrollInfo.ScrollOwner is { AllowsNativeScrollBars: true };
+                    break;
+
+                case NativeScrollManager.Mode.Managed:
+                    // Same condition as ScrollViewer's touch panning: when no scrollbar is visible, touches
+                    // must be left to outer (possibly native) scrollers.
+                    if (_scrollInfo.ScrollOwner is ScrollViewer sv)
+                    {
+                        canScrollX = sv.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
+                        canScrollY = sv.ComputedVerticalScrollBarVisibility == Visibility.Visible;
+                    }
+                    break;
+            }
+
+            if (_nativeScrollData._appliedMode == mode &&
+                _nativeScrollData._appliedCanScrollX == canScrollX &&
+                _nativeScrollData._appliedCanScrollY == canScrollY &&
+                _nativeScrollData._appliedNativeScrollBars == useNativeScrollBars)
+            {
+                return;
+            }
+
+            if (_nativeScrollData._appliedMode != mode)
+            {
+                _nativeScrollData._isNativeOffsetRequested = false;
+            }
+
+            _nativeScrollData._appliedMode = mode;
+            _nativeScrollData._appliedCanScrollX = canScrollX;
+            _nativeScrollData._appliedCanScrollY = canScrollY;
+            _nativeScrollData._appliedNativeScrollBars = useNativeScrollBars;
+
+            NativeScrollManager.SetMode(OuterDiv, mode, canScrollX, canScrollY, useNativeScrollBars: useNativeScrollBars);
+
+            _nativeScrollData._nativeExtent = default;
+            _nativeScrollData._nativeOffset = NativeScrollData.UnknownOffset;
+
+            SetIsNative(mode == NativeScrollManager.Mode.Native);
+            InvalidateArrange();
+        }
+
+        private NativeScrollManager.Mode GetNativeScrollingMode()
+        {
+            if (_scrollInfo is null)
+            {
+                return NativeScrollManager.Mode.None;
+            }
+
+            if (IsScrollClient)
+            {
+                return NativeScrolling.GetIsEnabled(this) ? NativeScrollManager.Mode.Native : NativeScrollManager.Mode.Managed;
+            }
+
+            // The content scrolls itself. If it does so natively, touch panning must reach it.
+            return _scrollInfo is INativeScrollInfo { IsNativeScrolling: true } ?
+                NativeScrollManager.Mode.None :
+                NativeScrollManager.Mode.Managed;
+        }
+
+        private void SetIsNative(bool value)
+        {
+            if (IsNativeScrolling == value)
+            {
+                return;
+            }
+
+            _nativeScrollData._isNative = value;
+
+            // The scroller must be hit-testable for the browser to scroll it when the pointer is over
+            // an area that is not covered by the content.
+            CoerceIsHitTestable();
+
+            // The ScrollBars of the template are collapsed while the platform scrollbars are used. Ignored
+            // while the ScrollViewer is measured, as it checks the mode again afterwards.
+            if (_scrollInfo?.ScrollOwner is { AllowsNativeScrollBars: true } sv)
+            {
+                sv.InvalidateMeasure();
+            }
+        }
+
+        private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            // Browsers drop the scroll position of elements that are not rendered (display: none).
+            if (IsNativeScrolling && (bool)e.NewValue)
+            {
+                _nativeScrollData._nativeOffset = NativeScrollData.UnknownOffset;
+                InvalidateArrange();
+            }
+        }
+
+        private Vector GetKnownNativeOffset() =>
+            new(double.IsNaN(_nativeScrollData._nativeOffset.X) ? 0.0 : _nativeScrollData._nativeOffset.X,
+                double.IsNaN(_nativeScrollData._nativeOffset.Y) ? 0.0 : _nativeScrollData._nativeOffset.Y);
+
+        void INativeScrollInfo.OnNativeScroll(double x, double y) => OnNativeScroll(x, y);
+
+        private void OnNativeScroll(double x, double y)
+        {
+            if (!IsNativeScrolling || !IsScrollClient)
+            {
+                return;
+            }
+
+            _nativeScrollData._nativeOffset = new Vector(x, y);
+
+            // An offset set in C# and not yet written to the DOM wins over the scroll that preceded it.
+            if (_nativeScrollData._isNativeOffsetRequested)
+            {
+                return;
+            }
+
+            _scrollData._offset = new Vector(
+                _scrollData._canHorizontallyScroll ? SnapNativeOffset(x, _scrollData._extent.Width, _scrollData._viewport.Width) : _scrollData._offset.X,
+                _scrollData._canVerticallyScroll ? SnapNativeOffset(y, _scrollData._extent.Height, _scrollData._viewport.Height) : _scrollData._offset.Y);
+
+            // The content is already at the right place: only the ScrollViewer needs to be updated.
+            if (CoerceOffsets())
+            {
+                ScrollOwner?.InvalidateScrollInfo();
+            }
+        }
+
+        // The browser reports offsets in device pixels (and Safari reports overscroll), so offsets
+        // close to the bounds are snapped to them for VerticalOffset == ScrollableHeight to hold.
+        internal static double SnapNativeOffset(double offset, double extent, double viewport)
+        {
+            double max = Math.Max(0.0, extent - viewport);
+            if (offset < 1.0)
+            {
+                return 0.0;
+            }
+            if (offset > max - 1.0)
+            {
+                return max;
+            }
+            return offset;
+        }
+
+        private void ArrangeNative(Rect childRect)
+        {
+            Debug.Assert(IsNativeScrolling && IsScrollClient);
+
+            Size extent = childRect.Size;
+            if (!DoubleUtil.AreClose(_nativeScrollData._nativeExtent, extent))
+            {
+                _nativeScrollData._nativeExtent = extent;
+                NativeScrollManager.SetExtent(OuterDiv, extent.Width, extent.Height);
+            }
+
+            // Only offsets requested in C# are written: offsets coerced during layout are also coerced by
+            // the browser, and writing them could interrupt an ongoing (inertial) scroll with a stale value.
+            if (!_nativeScrollData._isNativeOffsetRequested && !IsNativeOffsetUnknown)
+            {
+                return;
+            }
+
+            // Written after layout, once the DOM size of this presenter and of its content are up to
+            // date, otherwise the browser would clamp the offset.
+            if (!_nativeScrollData._isNativeOffsetSyncPending)
+            {
+                _nativeScrollData._isNativeOffsetSyncPending = true;
+                LayoutUpdated += OnLayoutUpdatedSyncNativeOffset;
+            }
+        }
+
+        private void OnLayoutUpdatedSyncNativeOffset(object sender, EventArgs e)
+        {
+            LayoutUpdated -= OnLayoutUpdatedSyncNativeOffset;
+            _nativeScrollData._isNativeOffsetSyncPending = false;
+
+            bool isRequested = _nativeScrollData._isNativeOffsetRequested;
+            _nativeScrollData._isNativeOffsetRequested = false;
+
+            if (!IsNativeScrolling || !IsScrollClient || !OuterDiv.IsConnected || (!isRequested && !IsNativeOffsetUnknown))
+            {
+                return;
+            }
+
+            Vector offset = _scrollData._computedOffset;
+            if (Math.Abs(offset.X - _nativeScrollData._nativeOffset.X) < 1.0 && Math.Abs(offset.Y - _nativeScrollData._nativeOffset.Y) < 1.0)
+            {
+                return;
+            }
+
+            _nativeScrollData._nativeOffset = offset;
+            NativeScrollManager.ScrollTo(OuterDiv, offset.X, offset.Y);
+        }
+
+        private bool IsNativeOffsetUnknown => double.IsNaN(_nativeScrollData._nativeOffset.X);
+
+        void INativeScrollInfo.HandleNativeMouseWheel(MouseWheelEventArgs e)
+        {
+            Debug.Assert(IsNativeScrolling);
+
+            NativeScrollManager.HandleMouseWheel(OuterDiv, e);
+        }
 
         protected override Size MeasureOverride(Size constraint)
         {
@@ -336,6 +634,11 @@ namespace System.Windows.Controls
             if (IsScrollClient)
             {
                 UpdateExtents(arrangeSize, _scrollData._extent);
+
+                _nativeScrollData._arrangedViewport = arrangeSize;
+
+                // The content can be resized without the ScrollViewer being measured again.
+                UpdateNativeScrolling();
             }
 
             int count = VisualChildrenCount;
@@ -346,7 +649,8 @@ namespace System.Windows.Controls
                 {
                     var childRect = new Rect(child.DesiredSize);
 
-                    if (IsScrollClient)
+                    // In native mode, the browser offsets the content.
+                    if (IsScrollClient && !IsNativeScrolling)
                     {
                         childRect.X = -HorizontalOffset;
                         childRect.Y = -VerticalOffset;
@@ -357,14 +661,24 @@ namespace System.Windows.Controls
                     childRect.Height = Math.Max(childRect.Height, arrangeSize.Height);
 
                     child.Arrange(childRect);
+
+                    if (IsNativeScrolling)
+                    {
+                        ArrangeNative(childRect);
+                    }
                 }
+            }
+            else if (IsNativeScrolling)
+            {
+                ArrangeNative(new Rect(arrangeSize));
             }
 
             return arrangeSize;
         }
 
         /// <inheritdoc />
-        protected override Geometry GetLayoutClip(Size layoutSlotSize) => new RectangleGeometry(new Rect(RenderSize));
+        protected override Geometry GetLayoutClip(Size layoutSlotSize) =>
+            IsNativeScrolling ? null : new RectangleGeometry(new Rect(RenderSize));
 
         private void UpdateExtents(Size viewport, Size extents)
         {
@@ -678,6 +992,23 @@ namespace System.Windows.Controls
             internal Vector _computedOffset;
             internal Size _viewport;
             internal Size _extent;
+        }
+
+        private sealed class NativeScrollData
+        {
+            internal static readonly Vector UnknownOffset = new(double.NaN, double.NaN);
+
+            internal HtmlElementReference _contentHost;
+            internal NativeScrollManager.Mode? _appliedMode;
+            internal bool _appliedCanScrollX;
+            internal bool _appliedCanScrollY;
+            internal bool _appliedNativeScrollBars;
+            internal bool _isNative;
+            internal Size _nativeExtent;
+            internal Size _arrangedViewport = new(double.PositiveInfinity, double.PositiveInfinity);
+            internal Vector _nativeOffset;
+            internal bool _isNativeOffsetRequested;
+            internal bool _isNativeOffsetSyncPending;
         }
     }
 }

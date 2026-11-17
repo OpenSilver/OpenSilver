@@ -187,6 +187,7 @@ window._openSilverRuntime = (function () {
                     const element = document.getElementById(id);
                     const transform = new DOMMatrix([1 / window.devicePixelRatio, 0, 0, 1 / window.devicePixelRatio, 0, 0])
                         .multiplySelf(new DOMMatrix(userTransform));
+                    const unfreeze = osjs.nativeScroll.freeze(element);
                     htmlToImage.toPixelData(element, {
                         width: width,
                         height: height,
@@ -199,11 +200,13 @@ window._openSilverRuntime = (function () {
                         },
                     }).then(
                         function (pixels) {
+                            unfreeze();
                             const bufferId = _id++;
                             _pixelBuffers.set(bufferId, new Int32Array(pixels.buffer));
                             onSuccess(bufferId, width, height);
                         },
                         function (error) {
+                            unfreeze();
                             onError(error.message);
                         },
                     );

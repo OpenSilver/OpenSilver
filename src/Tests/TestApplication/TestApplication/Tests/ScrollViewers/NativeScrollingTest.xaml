@@ -1,0 +1,202 @@
+<sdk:Page x:Class="TestApplication.Tests.ScrollViewers.NativeScrollingTest"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+           xmlns:os="clr-namespace:OpenSilver;assembly=OpenSilver">
+    <sdk:Page.Resources>
+        <Style x:Key="Title" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Margin" Value="0,20,0,4"/>
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Foreground" Value="#555"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="MaxWidth" Value="700"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="Box" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+    </sdk:Page.Resources>
+
+    <StackPanel Margin="10">
+        <TextBlock x:Name="FeatureText" Style="{StaticResource Hint}"/>
+        <TextBlock Style="{StaticResource Hint}" Text="Expected everywhere: wheel and touch scrolling feel like a regular web page (smooth wheel, inertia on touch), the scrollbars follow the content, and scrolling chains to the page when a ScrollViewer reaches its end."/>
+
+        <!-- 1. Basic -->
+        <TextBlock Style="{StaticResource Title}" Text="1. Basic vertical list, offsets and commands"/>
+        <TextBlock Style="{StaticResource Hint}" Text="Press Ctrl+F and search 'FIND-ME-NATIVE-SCROLL': the browser must scroll the list to row 150 and the scrollbar and readout must follow. Buttons must scroll instantly. Toggling 'Native' must keep the offset. Hiding then showing must keep the offset."/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <Button Content="Top" Click="Top_Click" Margin="0,0,4,0"/>
+            <Button Content="V=1000" Click="Offset1000_Click" Margin="0,0,4,0"/>
+            <Button Content="End" Click="End_Click" Margin="0,0,4,0"/>
+            <Button Content="LineDown" Click="LineDown_Click" Margin="0,0,4,0"/>
+            <Button Content="PageDown" Click="PageDown_Click" Margin="0,0,4,0"/>
+            <Button Content="Row 200 into view" Click="BringIntoView_Click" Margin="0,0,4,0"/>
+            <CheckBox x:Name="NativeCheckBox" Content="Native" IsChecked="True" Click="Native_Click" VerticalAlignment="Center" Margin="4,0"/>
+            <CheckBox x:Name="VisibleCheckBox" Content="Visible" IsChecked="True" Click="Visible_Click" VerticalAlignment="Center" Margin="4,0"/>
+        </StackPanel>
+        <TextBlock x:Name="BasicReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <Border Style="{StaticResource Box}" Height="202">
+            <ScrollViewer x:Name="BasicScrollViewer" Width="300" Height="200" ScrollChanged="BasicScrollViewer_ScrollChanged">
+                <StackPanel x:Name="BasicPanel"/>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 2. Visibility matrix -->
+        <TextBlock Style="{StaticResource Title}" Text="2. Scrollbar visibility matrix"/>
+        <TextBlock Style="{StaticResource Hint}" Text="Disabled: no scrolling on that axis and the content is measured to the viewport. Hidden: scrollable with wheel/touch/keyboard but no scrollbar. Auto: scrollbar only when needed (resize with the slider)."/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <TextBlock Text="Horizontal:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+            <ComboBox x:Name="HorizontalVisibilityComboBox" Width="100" SelectionChanged="VisibilityComboBox_SelectionChanged"/>
+            <TextBlock Text="Vertical:" VerticalAlignment="Center" Margin="12,0,4,0"/>
+            <ComboBox x:Name="VerticalVisibilityComboBox" Width="100" SelectionChanged="VisibilityComboBox_SelectionChanged"/>
+            <TextBlock Text="Content size:" VerticalAlignment="Center" Margin="12,0,4,0"/>
+            <Slider x:Name="ContentSizeSlider" Width="150" Minimum="100" Maximum="800" Value="600" ValueChanged="ContentSizeSlider_ValueChanged"/>
+        </StackPanel>
+        <TextBlock x:Name="MatrixReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <Border Style="{StaticResource Box}">
+            <ScrollViewer x:Name="MatrixScrollViewer" Width="250" Height="150" ScrollChanged="MatrixScrollViewer_ScrollChanged">
+                <Grid x:Name="MatrixContent" Width="600" Height="600">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="LightYellow" Offset="0"/>
+                            <GradientStop Color="SkyBlue" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <TextBlock Text="Top-left" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <TextBlock Text="Top-right" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                    <TextBlock Text="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock Text="Bottom-left" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                    <TextBlock Text="Bottom-right" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 3. Nested -->
+        <TextBlock Style="{StaticResource Title}" Text="3. Nested ScrollViewers"/>
+        <TextBlock Style="{StaticResource Hint}" Text="Wheel/touch over an inner ScrollViewer scrolls it first and chains to the outer one at its ends. Horizontal swipes on the horizontal strip scroll the strip; vertical swipes on it scroll the outer ScrollViewer."/>
+        <Border Style="{StaticResource Box}">
+            <ScrollViewer Width="320" Height="220">
+                <StackPanel x:Name="NestedPanel" Margin="4">
+                    <TextBlock Text="Outer content (top)" Height="60"/>
+                    <ScrollViewer Height="70" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="HorizontalStrip" Orientation="Horizontal"/>
+                    </ScrollViewer>
+                    <TextBlock Text="Outer content (middle)" Height="60"/>
+                    <Border BorderBrush="Gray" BorderThickness="1">
+                        <ScrollViewer Height="100">
+                            <StackPanel x:Name="InnerVerticalPanel"/>
+                        </ScrollViewer>
+                    </Border>
+                    <TextBlock Text="Outer content (bottom)" Height="300"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 4. Interactive content -->
+        <TextBlock Style="{StaticResource Title}" Text="4. Interactive content inside a scrolled ScrollViewer"/>
+        <TextBlock Style="{StaticResource Hint}" Text="Scroll first, then: the button must count clicks, the slider and the thumb must drag (touch too, without scrolling), the TextBox must accept text and select with the mouse, the ComboBox drop-down must open next to the ComboBox, and clicking the blue area must report coordinates relative to it (independent of the scroll offset). A touch pan starting on the button must scroll and not click."/>
+        <TextBlock x:Name="InteractionReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <Border Style="{StaticResource Box}">
+            <ScrollViewer Width="320" Height="220">
+                <StackPanel Margin="4">
+                    <TextBlock Text="(scroll down)" Height="150"/>
+                    <Button x:Name="CounterButton" Content="Click me (0)" Click="CounterButton_Click" HorizontalAlignment="Left"/>
+                    <Slider x:Name="InnerSlider" Width="200" Maximum="100" HorizontalAlignment="Left" Margin="0,8" ValueChanged="InnerSlider_ValueChanged"/>
+                    <TextBox Width="250" Height="60" AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left"
+                             VerticalScrollBarVisibility="Auto" Text="Type here. This TextBox has its own scrolling: add lines until it scrolls."/>
+                    <CheckBox Content="CheckBox" Margin="0,8"/>
+                    <ComboBox Width="150" HorizontalAlignment="Left" SelectedIndex="0">
+                        <ComboBoxItem Content="Item 1"/>
+                        <ComboBoxItem Content="Item 2"/>
+                        <ComboBoxItem Content="Item 3"/>
+                    </ComboBox>
+                    <Canvas Width="250" Height="80" Background="#EEE" HorizontalAlignment="Left" Margin="0,8">
+                        <Thumb x:Name="DragThumb" Width="30" Height="30" Canvas.Left="10" Canvas.Top="25" DragDelta="DragThumb_DragDelta"/>
+                        <TextBlock Text="Drag the thumb" Canvas.Left="60" Canvas.Top="30"/>
+                    </Canvas>
+                    <Border x:Name="ClickArea" Width="250" Height="80" Background="LightBlue" HorizontalAlignment="Left"
+                            MouseLeftButtonDown="ClickArea_MouseLeftButtonDown">
+                        <TextBlock Text="Click here" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="(end)" Height="150"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 5. ListBox -->
+        <TextBlock Style="{StaticResource Title}" Text="5. ListBox (StackPanel) and virtualized ListBoxes (VirtualizingStackPanel)"/>
+        <TextBlock Style="{StaticResource Hint}" Text="All lists scroll natively (smooth wheel, inertia on touch, scrollbar drag) and select with click/tap and the arrow keys, PageUp/PageDown, Home/End (the selected item is fully scrolled into view). Virtualized lists keep item-based offsets (V is an item index) and only realize the items around the viewport: Ctrl+F finds the visible ones. In the variable-height list, scrolling up from the middle must not make the visible items jump, and the top of the list must be reached exactly. Inserting or removing an item at the top shifts the list by one item."/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <Button Content="Into view: 500" Click="VirtualizedIntoView_Click" Margin="0,0,4,0"/>
+            <Button Content="V=600" Click="VirtualizedOffset_Click" Margin="0,0,4,0"/>
+            <Button Content="Insert at 0" Click="VirtualizedInsert_Click" Margin="0,0,4,0"/>
+            <Button Content="Remove at 0" Click="VirtualizedRemove_Click" Margin="0,0,4,0"/>
+            <CheckBox x:Name="VirtualizedNativeCheckBox" Content="Native" IsChecked="True" Click="VirtualizedNative_Click" VerticalAlignment="Center" Margin="4,0"/>
+        </StackPanel>
+        <TextBlock x:Name="VirtualizedReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <StackPanel x:Name="ListBoxes" Orientation="Horizontal">
+            <ListBox x:Name="NativeListBox" Width="200" Height="150" Margin="0,0,12,0"/>
+            <ListBox x:Name="VirtualizedListBox" Width="200" Height="150" Margin="0,0,12,0">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+            <ListBox x:Name="VariableListBox" Width="200" Height="150">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Height="{Binding Height}" Background="{Binding Brush}" Width="150">
+                            <TextBlock Text="{Binding Text}" VerticalAlignment="Center" Margin="4,0"/>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+        <TextBlock Text="Horizontal virtualized ListBox:" Margin="0,8,0,4"/>
+        <ListBox x:Name="HorizontalListBox" Width="500" Height="60" HorizontalAlignment="Left"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+
+        <!-- 6. Opt-out -->
+        <TextBlock Style="{StaticResource Title}" Text="6. Opt-out (os:NativeScrolling.IsEnabled=False on a container)"/>
+        <TextBlock Style="{StaticResource Hint}" Text="Uses the previous (managed) scrolling. Touch panning works through the C# pan logic."/>
+        <Border Style="{StaticResource Box}" os:NativeScrolling.IsEnabled="False">
+            <ScrollViewer Width="300" Height="120">
+                <StackPanel x:Name="OptOutPanel"/>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 7. Heavy content -->
+        <TextBlock Style="{StaticResource Title}" Text="7. Heavy content (performance)"/>
+        <TextBlock Style="{StaticResource Hint}" Text="Compare touch scrolling on a low-end phone with 'Native' checked and unchecked. Native scrolling should run at the display refresh rate and keep inertia."/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <Button Content="Generate 2000 rows" Click="Generate_Click"/>
+            <CheckBox x:Name="HeavyNativeCheckBox" Content="Native" IsChecked="True" Click="HeavyNative_Click" VerticalAlignment="Center" Margin="8,0"/>
+            <TextBlock x:Name="HeavyReadout" VerticalAlignment="Center" FontFamily="Consolas"/>
+        </StackPanel>
+        <Border Style="{StaticResource Box}">
+            <ScrollViewer x:Name="HeavyScrollViewer" Width="350" Height="300" ScrollChanged="HeavyScrollViewer_ScrollChanged">
+                <StackPanel x:Name="HeavyPanel"/>
+            </ScrollViewer>
+        </Border>
+
+        <TextBlock Text="(end of page)" Height="200"/>
+    </StackPanel>
+</sdk:Page>

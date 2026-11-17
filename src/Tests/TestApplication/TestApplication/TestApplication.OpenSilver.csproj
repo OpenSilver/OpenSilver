@@ -273,6 +273,9 @@
     <Compile Include="Tests\ScrollViewerTest.xaml.cs">
       <DependentUpon>ScrollViewerTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\ScrollViewers\NativeScrollingTest.xaml.cs">
+      <DependentUpon>NativeScrollingTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\ShadowDropEffectTest.xaml.cs">
       <DependentUpon>ShadowDropEffectTest.xaml</DependentUpon>
     </Compile>
@@ -626,6 +629,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="Tests\ScrollViewerTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Tests\ScrollViewers\NativeScrollingTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>

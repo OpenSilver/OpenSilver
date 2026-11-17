@@ -435,7 +435,6 @@ namespace Microsoft.Expression.Interactivity.Layout
             this.relativePosition = positionInElementCoordinates;
 
             this.AssociatedObject.CaptureMouse();
-            AssociatedObject.AllowScrollOnTouchMove = false;
 
             this.AssociatedObject.MouseMove += this.OnMouseMove;
             this.AssociatedObject.LostMouseCapture += this.OnLostMouseCapture;
@@ -461,7 +460,6 @@ namespace Microsoft.Expression.Interactivity.Layout
             this.AssociatedObject.MouseMove -= this.OnMouseMove;
             this.AssociatedObject.LostMouseCapture -= this.OnLostMouseCapture;
             this.AssociatedObject.RemoveHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonUp));
-            AssociatedObject.ClearValue(UIElement.AllowScrollOnTouchMoveProperty);
         }
 
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -551,6 +549,8 @@ namespace Microsoft.Expression.Interactivity.Layout
         protected override void OnAttached()
         {
             this.AssociatedObject.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonDown), false /* handledEventsToo */);
+            // Touch panning is decided by the browser when the touch starts, before any drag begins.
+            this.AssociatedObject.AllowScrollOnTouchMove = false;
         }
 
         /// <summary>
@@ -560,6 +560,7 @@ namespace Microsoft.Expression.Interactivity.Layout
         protected override void OnDetaching()
         {
             this.AssociatedObject.RemoveHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonDown));
+            this.AssociatedObject.ClearValue(UIElement.AllowScrollOnTouchMoveProperty);
         }
     }
 }

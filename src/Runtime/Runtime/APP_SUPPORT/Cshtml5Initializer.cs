@@ -57,6 +57,7 @@ public static class Cshtml5Initializer
         var imageErrorCallback = JavaScriptCallback.Create(Image.OnErrorNative);
         var resizeObserverSizeChangedCallback = JavaScriptCallback.Create(ResizeObserver.OnSizeChangedNative);
         var hyperlinkClickCallback = JavaScriptCallback.Create(Hyperlink.OnClickNative);
+        var nativeScrollCallback = JavaScriptCallback.Create(NativeScrollManager.OnScrollNative);
 
         OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
             $"""
@@ -72,7 +73,8 @@ public static class Cshtml5Initializer
               {OpenSilver.Interop.GetVariableStringForJS(imageLoadCallback)},
               {OpenSilver.Interop.GetVariableStringForJS(imageErrorCallback)},
               {OpenSilver.Interop.GetVariableStringForJS(resizeObserverSizeChangedCallback)},
-              {OpenSilver.Interop.GetVariableStringForJS(hyperlinkClickCallback)})
+              {OpenSilver.Interop.GetVariableStringForJS(hyperlinkClickCallback)},
+              {OpenSilver.Interop.GetVariableStringForJS(nativeScrollCallback)})
             """);
     }
 }

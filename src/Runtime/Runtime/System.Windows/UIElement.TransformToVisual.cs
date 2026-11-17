@@ -144,6 +144,13 @@ public partial class UIElement
             m.Translate(g.VisualOffset.X, g.VisualOffset.Y);
 
             g = GetVisualAncestor(g);
+
+            // Natively scrolled content is arranged at (0, 0) and shifted by the browser.
+            if (g is INativeScrollInfo { IsNativeScrolling: true } nsi)
+            {
+                Vector offset = nsi.NativeOffset;
+                m.Translate(-offset.X, -offset.Y);
+            }
         }
 
         if (g != ancestor)

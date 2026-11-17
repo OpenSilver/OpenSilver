@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace System.Windows.Controls;
 /// <summary>
 /// Arranges and virtualizes content on a single line that is oriented either horizontally or vertically.
 /// </summary>
-public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
+public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 {
     // Scrolling and virtualization data.  Only used when this is the scrolling panel (IsScrolling is true).
     // When VSP is in pixel mode _scrollData is in units of pixels.  Otherwise the units are logical.
@@ -38,10 +39,28 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     // It is kept alive (not recycled) by the virtualization cleanup until the scroll has settled.
     private FrameworkElement _bringIntoViewContainer;
 
+    static VirtualizingStackPanel()
+    {
+        BackgroundProperty.OverrideMetadata(
+            typeof(VirtualizingStackPanel),
+            new PropertyMetadata(null, OnBackgroundChanged));
+
+        NativeScrolling.IsEnabledProperty.OverrideMetadata(
+            typeof(VirtualizingStackPanel),
+            new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits, OnIsNativeScrollingEnabledChanged));
+
+        NativeScrolling.UseNativeScrollBarsProperty.OverrideMetadata(
+            typeof(VirtualizingStackPanel),
+            new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits, OnUseNativeScrollBarsChanged));
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="VirtualizingStackPanel"/> class.
     /// </summary>
-    public VirtualizingStackPanel() { }
+    public VirtualizingStackPanel()
+    {
+        IsVisibleChanged += OnIsVisibleChanged;
+    }
 
     /// <summary>
     /// The current virtualization mode of the <see cref="VirtualizingStackPanel"/> (whether it is 
@@ -207,7 +226,9 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
     private static void OnOrientationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        ((VirtualizingStackPanel)sender).ResetScrolling();
+        var vsp = (VirtualizingStackPanel)sender;
+        vsp.ResetScrolling();
+        vsp.UpdateNativeScrolling();
     }
 
     /// <summary>
@@ -242,6 +263,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             {
                 ResetScrolling();
                 _scrollData._scrollOwner = value;
+                UpdateNativeScrolling();
             }
         }
     }
@@ -262,6 +284,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             {
                 _scrollData._allowHorizontal = value;
                 InvalidateMeasure();
+                UpdateNativeScrolling();
             }
         }
     }
@@ -282,6 +305,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             {
                 _scrollData._allowVertical = value;
                 InvalidateMeasure();
+                UpdateNativeScrolling();
             }
         }
     }
@@ -384,6 +408,19 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         if (IsItemsHost)
         {
+            UpdateNativeScrolling();
+
+            if (IsNativeScrolling)
+            {
+                Size desiredSize = MeasureItemsHostNative(constraint);
+                if (!IsNativeExtentTooLarge())
+                {
+                    return desiredSize;
+                }
+
+                FallBackToManagedScrolling();
+            }
+
             return MeasureItemsHost(constraint);
         }
         else
@@ -1000,7 +1037,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         if (IsItemsHost)
         {
-            return ArrangeItemsHost(arrangeSize);
+            return IsNativeScrolling ? ArrangeItemsHostNative(arrangeSize) : ArrangeItemsHost(arrangeSize);
         }
         else
         {
@@ -1163,6 +1200,8 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
     {
         base.OnItemsChanged(sender, args);
+
+        OnItemsChangedNative(args);
 
         bool resetMaximumDesiredSize = false;
 
@@ -1446,6 +1485,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
             // Store the new offset
             _scrollData._offset.X = scrollX;
+            _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
 
             // Report the change in offset
             OnViewportOffsetChanged(oldViewportOffset, _scrollData._offset);
@@ -1471,6 +1511,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
             // Store the new offset
             _scrollData._offset.Y = scrollY;
+            _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
 
             // Report the change in offset
             OnViewportOffsetChanged(oldViewportOffset, _scrollData._offset);
@@ -1537,6 +1578,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         {
             Vector oldOffset = _scrollData._offset;
             _scrollData._offset = newOffset;
+            _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
 
             OnViewportOffsetChanged(oldOffset, newOffset);
 
@@ -1627,6 +1669,11 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     // Adjusts the offset in the stacking (logical/item) direction to bring the child at childIndex into view.
     private void MakeVisibleLogicalHelper(int childIndex, Rect r, ref Vector newOffset, ref Rect newRect)
     {
+        if (MakeVisibleNative(childIndex, r, ref newOffset, ref newRect))
+        {
+            return;
+        }
+
         bool fHorizontal = Orientation == Orientation.Horizontal;
         int firstChildInView;
         int viewportSize;
@@ -1707,6 +1754,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     private void ResetScrolling()
     {
         InvalidateMeasure();
+        ResetNativeScrolling();
 
         // Clear scrolling data.  Because of thrash (being disconnected & reconnected, &c...), we may
         if (IsScrolling)

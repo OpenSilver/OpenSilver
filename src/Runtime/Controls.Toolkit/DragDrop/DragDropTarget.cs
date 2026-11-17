@@ -68,6 +68,7 @@ namespace System.Windows.Controls
         private SW.DragDropEffects _lastGiveFeedbackEffects;
 
         private readonly DragHelper _dragHelper;
+        private DragInitializer _dragInitializer;
 
         /// <summary>
         /// A value indicating whether an item was dropped on the drag source.
@@ -744,11 +745,23 @@ namespace System.Windows.Controls
 
         #endregion public event QueryContinueDrag
 
+        static DragDropTarget()
+        {
+            // The browser decides whether a touch pans when it starts, so dragging items by touch requires
+            // panning to be disabled upfront rather than when the drag starts.
+            AllowScrollOnTouchMoveProperty.OverrideMetadata(
+                typeof(DragDropTarget<TItemsControlType, TItemContainerType>),
+                new PropertyMetadata(false));
+        }
+
         /// <summary>
         /// Initializes a new instance of the ItemsControlDragAdorner class.
         /// </summary>
         protected DragDropTarget()
         {
+            // Native scrollers would take over touches before the drag starts.
+            SetCurrentValue(OpenSilver.NativeScrolling.IsEnabledProperty, false);
+
             SW.DragEventHandler raiseIndicatingInsertionLocationEvent =
                 (_, args) =>
                 {
@@ -865,7 +878,9 @@ namespace System.Windows.Controls
                 {
                     var originalSource = (UIElement)e.OriginalSource;
                     var offset = GetOffset(e, originalSource);
-                    new DragInitializer(this, originalSource, offset);
+                    // A touch taken over by the browser (pointercancel) never raises MouseLeftButtonUp.
+                    _dragInitializer?.UnSubscribeFromEvents();
+                    _dragInitializer = new DragInitializer(this, originalSource, offset);
                 }),
                 true);
         }
@@ -1531,7 +1546,7 @@ namespace System.Windows.Controls
                 }
             }
 
-            private void UnSubscribeFromEvents()
+            public void UnSubscribeFromEvents()
             {
                 _rootVisual.RemoveHandler(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnMouseLeftButtonUp));
                 _rootVisual.MouseMove -= new MouseEventHandler(OnMouseMove);
