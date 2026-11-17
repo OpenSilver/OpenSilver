@@ -23,6 +23,8 @@ using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls;
 
+using State = (NativeScrollManager.Mode Mode, bool CanScrollX, bool CanScrollY, bool IsOpaque, bool UseNativeScrollBars);
+
 // Native scrolling: when the panel is the scrolling panel of a ScrollViewer, its DOM element is the
 // browser scroller and its content host is sized to the (estimated) pixel size of all the items.
 // Realized containers are positioned at their pixel offset, computed from the sizes measured so far
@@ -38,55 +40,28 @@ namespace System.Windows.Controls;
 // close to the viewport, by moving the content and the scroll offset together.
 public partial class VirtualizingStackPanel : INativeScrollInfo
 {
-    private static readonly Vector UnknownOffset = new(double.NaN, double.NaN);
+    private readonly NativeScrollData _nativeScrollData = new();
 
-    // Size of the realized area before and after the viewport, and minimum margin left before more
-    // containers are realized, relatively to the size of the viewport.
-    private const double NativeCacheLength = 0.5;
-    private const double NativeCacheMargin = 0.25;
+    bool INativeScrollInfo.IsNativeScrolling => IsNativeScrolling;
 
-    // Browsers limit the size of elements (about 17.9 million pixels in Firefox, 33.5 million in Chrome
-    // and Safari, less when zoomed in). Longer lists are scrolled by the managed code.
-    internal const double MaxNativeExtent = 10_000_000;
+    bool INativeScrollInfo.CanNativelyScroll => IsNativeScrolling && _nativeScrollData._appliedNativeState is { } state && (state.CanScrollX || state.CanScrollY);
 
-    private HtmlElementReference _contentHost;
-    private (NativeScrollManager.Mode Mode, bool CanScrollX, bool CanScrollY, bool IsOpaque, bool UseNativeScrollBars)? _appliedNativeState;
-    private bool _isNative;
-    private bool _isNativeExtentTooLarge;
-    private ItemSizeCache _itemSizes;
-    private Size _nativeExtent;
-    private Size _arrangedSize = new(double.PositiveInfinity, double.PositiveInfinity);
-    private Vector _nativeOffset = UnknownOffset;
-    private Vector _nativeTargetOffset;
-    private double _nativeShift;
-    private double _nativeScrollAdjustment;
-    private bool _isNativeOffsetRequested;
-    private bool _isNativeOffsetSyncPending;
-    private double _nativeViewportSize;
-    private int _realizedFirstIndex;
-    private int _realizedLastIndex = -1;
-    private double _realizedStart;
-    private double _realizedEnd;
+    Vector INativeScrollInfo.NativeOffset => IsNativeScrolling ? GetKnownNativeOffset() : default;
 
-    bool INativeScrollInfo.IsNativeScrolling => _isNative;
+    internal bool IsNativeScrolling => _nativeScrollData._isNative;
 
-    bool INativeScrollInfo.CanNativelyScroll => _isNative && _appliedNativeState is { } state && (state.CanScrollX || state.CanScrollY);
+    internal override bool EnablePointerEventsCore => IsNativeScrolling || Background is not null;
 
-    Vector INativeScrollInfo.NativeOffset => _isNative ? GetKnownNativeOffset() : default;
-
-    internal bool IsNativeScrolling => _isNative;
-
-    internal override bool EnablePointerEventsCore => _isNative || Background is not null;
-
-    internal override HtmlElementReference ChildrenHost => _contentHost.IsConnected ? _contentHost : OuterDiv;
+    internal override HtmlElementReference ChildrenHost =>
+        _nativeScrollData._contentHost.IsConnected ? _nativeScrollData._contentHost : OuterDiv;
 
     protected internal override HtmlElementReference CreateDomElement(HtmlElementReference parent)
     {
         HtmlElementReference div = base.CreateDomElement(parent);
 
-        if (Features.Scrolling.UseNativeScrolling)
+        if (NativeScrolling.UseNativeScrolling)
         {
-            _contentHost = NativeScrollManager.CreateContentHost(div);
+            _nativeScrollData._contentHost = NativeScrollManager.CreateContentHost(div);
         }
 
         return div;
@@ -104,22 +79,37 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         base.INTERNAL_OnDetachedFromVisualTree();
 
         // The DOM is recreated when the element is attached again.
-        _contentHost = default;
-        _appliedNativeState = null;
-        _nativeExtent = default;
-        _nativeOffset = UnknownOffset;
-        _nativeShift = 0.0;
-        _nativeScrollAdjustment = 0.0;
+        _nativeScrollData._contentHost = default;
+        _nativeScrollData._appliedNativeState = null;
+        _nativeScrollData._nativeExtent = default;
+        _nativeScrollData._nativeOffset = NativeScrollData.UnknownOffset;
+        _nativeScrollData._nativeShift = 0.0;
+        _nativeScrollData._nativeScrollAdjustment = 0.0;
     }
 
     /// <inheritdoc />
-    protected override Geometry GetLayoutClip(Size layoutSlotSize) => _isNative ? null : base.GetLayoutClip(layoutSlotSize);
+    protected override Geometry GetLayoutClip(Size layoutSlotSize) => IsNativeScrolling ? null : base.GetLayoutClip(layoutSlotSize);
+
+    private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((VirtualizingStackPanel)d).UpdateNativeScrolling();
+    }
+
+    private static void OnIsNativeScrollingEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((VirtualizingStackPanel)d).UpdateNativeScrolling();
+    }
+
+    private static void OnUseNativeScrollBarsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((VirtualizingStackPanel)d).UpdateNativeScrolling();
+    }
 
     // Natively scrolled when this panel scrolls the items of an ItemsControl (and native scrolling is
     // allowed). Otherwise, the ScrollContentPresenter of the ScrollViewer uses the managed scrolling.
     internal void UpdateNativeScrolling()
     {
-        if (!_contentHost.IsConnected)
+        if (!_nativeScrollData._contentHost.IsConnected)
         {
             SetIsNative(false);
             return;
@@ -128,37 +118,37 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         bool isNative = IsItemsHost &&
             IsScrolling &&
             (Orientation == Orientation.Horizontal ? CanHorizontallyScroll : CanVerticallyScroll) &&
-            !_isNativeExtentTooLarge &&
+            !_nativeScrollData._isNativeExtentTooLarge &&
             NativeScrolling.GetIsEnabled(this);
 
         // The browser takes over touches along the axes it can scroll (even when the items fit), so the
         // axes along which there is nothing to scroll are left to the application.
-        var state = isNative ?
+        State state = isNative ?
             (NativeScrollManager.Mode.Native,
-             CanHorizontallyScroll && DoubleUtil.GreaterThan(_nativeExtent.Width, _arrangedSize.Width),
-             CanVerticallyScroll && DoubleUtil.GreaterThan(_nativeExtent.Height, _arrangedSize.Height),
+             CanHorizontallyScroll && DoubleUtil.GreaterThan(_nativeScrollData._nativeExtent.Width, _nativeScrollData._arrangedSize.Width),
+             CanVerticallyScroll && DoubleUtil.GreaterThan(_nativeScrollData._nativeExtent.Height, _nativeScrollData._arrangedSize.Height),
              Background is not null,
              ScrollOwner is { AllowsNativeScrollBars: true }) :
             (NativeScrollManager.Mode.None, false, false, false, false);
 
-        if (_appliedNativeState == state)
+        if (_nativeScrollData._appliedNativeState == state)
         {
             return;
         }
 
-        bool modeChanged = _appliedNativeState?.Mode != state.Item1;
-        _appliedNativeState = state;
+        bool modeChanged = _nativeScrollData._appliedNativeState?.Mode != state.Mode;
+        _nativeScrollData._appliedNativeState = state;
 
-        NativeScrollManager.SetMode(OuterDiv, state.Item1, state.Item2, state.Item3, state.Item4, state.Item5);
+        NativeScrollManager.SetMode(OuterDiv, state.Mode, state.CanScrollX, state.CanScrollY, state.IsOpaque, state.UseNativeScrollBars);
 
         if (modeChanged)
         {
-            _nativeExtent = default;
-            _nativeOffset = UnknownOffset;
-            _nativeShift = 0.0;
-            _nativeScrollAdjustment = 0.0;
-            _isNativeOffsetRequested = false;
-            _realizedLastIndex = -1;
+            _nativeScrollData._nativeExtent = default;
+            _nativeScrollData._nativeOffset = NativeScrollData.UnknownOffset;
+            _nativeScrollData._nativeShift = 0.0;
+            _nativeScrollData._nativeScrollAdjustment = 0.0;
+            _nativeScrollData._isNativeOffsetRequested = false;
+            _nativeScrollData._realizedLastIndex = -1;
         }
 
         SetIsNative(isNative);
@@ -166,12 +156,12 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
     private void SetIsNative(bool value)
     {
-        if (_isNative == value)
+        if (IsNativeScrolling == value)
         {
             return;
         }
 
-        _isNative = value;
+        _nativeScrollData._isNative = value;
 
         // The scroller must be hit-testable for the browser to scroll it when the pointer is over
         // an area that is not covered by the items.
@@ -188,49 +178,50 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         // Browsers drop the scroll position of elements that are not rendered (display: none).
-        if (_isNative && (bool)e.NewValue)
+        if (IsNativeScrolling && (bool)e.NewValue)
         {
-            _nativeOffset = UnknownOffset;
+            _nativeScrollData._nativeOffset = NativeScrollData.UnknownOffset;
             InvalidateMeasure();
         }
     }
 
     private Vector GetKnownNativeOffset() =>
-        new(double.IsNaN(_nativeOffset.X) ? 0.0 : _nativeOffset.X, double.IsNaN(_nativeOffset.Y) ? 0.0 : _nativeOffset.Y);
+        new(double.IsNaN(_nativeScrollData._nativeOffset.X) ? 0.0 : _nativeScrollData._nativeOffset.X,
+            double.IsNaN(_nativeScrollData._nativeOffset.Y) ? 0.0 : _nativeScrollData._nativeOffset.Y);
 
-    private bool IsNativeOffsetUnknown => double.IsNaN(_nativeOffset.X);
+    private bool IsNativeOffsetUnknown => double.IsNaN(_nativeScrollData._nativeOffset.X);
 
     // The shift is ignored: the extent grows to the total size when the shift is resolved, and the
     // mode must not change during a scroll.
-    private bool IsNativeExtentTooLarge() => _itemSizes is not null && _itemSizes.TotalSize > MaxNativeExtent;
+    private bool IsNativeExtentTooLarge() => _nativeScrollData._itemSizes?.TotalSize > NativeScrollData.MaxNativeExtent;
 
     // Called during measure. The logical offset is kept, so the same items remain visible.
     private void FallBackToManagedScrolling()
     {
-        _isNativeExtentTooLarge = true;
-        _itemSizes = null;
+        _nativeScrollData._isNativeExtentTooLarge = true;
+        _nativeScrollData._itemSizes = null;
         UpdateNativeScrolling();
-        Debug.Assert(!_isNative);
+        Debug.Assert(!IsNativeScrolling);
     }
 
     void INativeScrollInfo.HandleNativeMouseWheel(MouseWheelEventArgs e)
     {
-        Debug.Assert(_isNative);
+        Debug.Assert(IsNativeScrolling);
 
         NativeScrollManager.HandleMouseWheel(OuterDiv, e);
     }
 
     void INativeScrollInfo.OnNativeScroll(double x, double y)
     {
-        if (!_isNative || !IsScrolling)
+        if (!IsNativeScrolling || !IsScrolling)
         {
             return;
         }
 
-        _nativeOffset = new Vector(x, y);
+        _nativeScrollData._nativeOffset = new Vector(x, y);
 
         // An offset set in C# and not yet written to the DOM wins over the scroll that preceded it.
-        if (_isNativeOffsetRequested || _nativeScrollAdjustment != 0.0 || _itemSizes is null)
+        if (_nativeScrollData._isNativeOffsetRequested || _nativeScrollData._nativeScrollAdjustment != 0.0 || _nativeScrollData._itemSizes is null)
         {
             return;
         }
@@ -247,25 +238,25 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     private void UpdateNativeScrollData()
     {
         bool isHorizontal = Orientation == Orientation.Horizontal;
-        ItemSizeCache sizes = _itemSizes;
-        double viewport = _nativeViewportSize;
+        ItemSizeCache sizes = _nativeScrollData._itemSizes;
+        double viewport = _nativeScrollData._nativeViewportSize;
 
         double position = ScrollContentPresenter.SnapNativeOffset(
-            isHorizontal ? _nativeOffset.X : _nativeOffset.Y,
-            sizes.TotalSize + _nativeShift,
+            isHorizontal ? _nativeScrollData._nativeOffset.X : _nativeScrollData._nativeOffset.Y,
+            sizes.TotalSize + _nativeScrollData._nativeShift,
             viewport);
 
         double crossOffset = ScrollContentPresenter.SnapNativeOffset(
-            isHorizontal ? _nativeOffset.Y : _nativeOffset.X,
+            isHorizontal ? _nativeScrollData._nativeOffset.Y : _nativeScrollData._nativeOffset.X,
             isHorizontal ? _scrollData._extent.Height : _scrollData._extent.Width,
             isHorizontal ? _scrollData._viewport.Height : _scrollData._viewport.Width);
 
-        SetNativeScrollData(isHorizontal, position - _nativeShift, viewport, crossOffset, _scrollData._viewport, _scrollData._extent);
+        SetNativeScrollData(isHorizontal, position - _nativeScrollData._nativeShift, viewport, crossOffset, _scrollData._viewport, _scrollData._extent);
     }
 
     private void SetNativeScrollData(bool isHorizontal, double position, double viewportSize, double crossOffset, Size viewport, Size extent)
     {
-        ItemSizeCache sizes = _itemSizes;
+        ItemSizeCache sizes = _nativeScrollData._itemSizes;
         double logicalOffset = GetLogicalPosition(sizes, position);
         double logicalViewport = double.IsInfinity(viewportSize) ?
             sizes.Count :
@@ -293,9 +284,14 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     // a minimal scroll is computed in pixels.
     private bool MakeVisibleNative(int childIndex, Rect r, ref Vector newOffset, ref Rect newRect)
     {
-        ItemSizeCache sizes = _itemSizes;
-        double viewport = _nativeViewportSize;
-        if (!_isNative || sizes is null || childIndex < 0 || childIndex >= sizes.Count || double.IsInfinity(viewport))
+        if (!IsNativeScrolling)
+        {
+            return false;
+        }
+
+        ItemSizeCache sizes = _nativeScrollData._itemSizes;
+        double viewport = _nativeScrollData._nativeViewportSize;
+        if (sizes is null || childIndex < 0 || childIndex >= sizes.Count || double.IsInfinity(viewport))
         {
             return false;
         }
@@ -364,33 +360,33 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
     private bool IsNativeViewportRealized()
     {
-        if (_realizedLastIndex < _realizedFirstIndex)
+        if (_nativeScrollData._realizedLastIndex < _nativeScrollData._realizedFirstIndex)
         {
             return false;
         }
 
-        double viewport = _nativeViewportSize;
+        double viewport = _nativeScrollData._nativeViewportSize;
         if (double.IsInfinity(viewport))
         {
             return true;
         }
 
-        double position = Orientation == Orientation.Horizontal ? _nativeOffset.X : _nativeOffset.Y;
-        double margin = viewport * NativeCacheMargin;
+        double position = Orientation == Orientation.Horizontal ? _nativeScrollData._nativeOffset.X : _nativeScrollData._nativeOffset.Y;
+        double margin = viewport * NativeScrollData.NativeCacheMargin;
 
         // The shift is resolved when the beginning of the list gets close.
-        if (_nativeShift != 0.0 && position <= viewport * NativeCacheLength)
+        if (_nativeScrollData._nativeShift != 0.0 && position <= viewport * NativeScrollData.NativeCacheLength)
         {
             return false;
         }
 
-        return (_realizedFirstIndex == 0 || _realizedStart <= position - margin) &&
-            (_realizedLastIndex >= _itemSizes.Count - 1 || _realizedEnd >= position + viewport + margin);
+        return (_nativeScrollData._realizedFirstIndex == 0 || _nativeScrollData._realizedStart <= position - margin) &&
+            (_nativeScrollData._realizedLastIndex >= _nativeScrollData._itemSizes.Count - 1 || _nativeScrollData._realizedEnd >= position + viewport + margin);
     }
 
     private Size MeasureItemsHostNative(Size constraint)
     {
-        Debug.Assert(_isNative && IsScrolling);
+        Debug.Assert(IsNativeScrolling && IsScrolling);
 
         // Ensure we always touch ItemContainerGenerator as by accessing this property
         // we hook up to some events on it.
@@ -402,15 +398,15 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
         SetVirtualizationState(owner);
 
-        ItemSizeCache sizes = _itemSizes ??= new ItemSizeCache();
+        ItemSizeCache sizes = _nativeScrollData._itemSizes ??= new ItemSizeCache();
         sizes.SetCount(itemCount);
 
         double viewportSize = isHorizontal ? constraint.Width : constraint.Height;
-        double cacheLength = double.IsInfinity(viewportSize) ? 0.0 : viewportSize * NativeCacheLength;
+        double cacheLength = double.IsInfinity(viewportSize) ? 0.0 : viewportSize * NativeScrollData.NativeCacheLength;
 
-        bool isRequested = _isNativeOffsetRequested || IsNativeOffsetUnknown;
+        bool isRequested = _nativeScrollData._isNativeOffsetRequested || IsNativeOffsetUnknown;
         double position = 0.0;
-        double shift = isRequested ? 0.0 : _nativeShift;
+        double shift = isRequested ? 0.0 : _nativeScrollData._nativeShift;
         int first = 0;
         int last = -1;
 
@@ -436,14 +432,16 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
             }
             else
             {
-                position = isHorizontal ? _nativeOffset.X : _nativeOffset.Y;
+                position = isHorizontal ? _nativeScrollData._nativeOffset.X : _nativeScrollData._nativeOffset.Y;
                 anchor = sizes.IndexAt(position - shift);
 
                 // When scrolling backward, the items realized before must not move while visible.
-                if (anchor < _realizedFirstIndex && _realizedFirstIndex <= _realizedLastIndex &&
-                    _realizedLastIndex < itemCount && _realizedStart < position + viewportSize)
+                if (anchor < _nativeScrollData._realizedFirstIndex &&
+                    _nativeScrollData._realizedFirstIndex <= _nativeScrollData._realizedLastIndex &&
+                    _nativeScrollData._realizedLastIndex < itemCount &&
+                    _nativeScrollData._realizedStart < position + viewportSize)
                 {
-                    anchor = _realizedFirstIndex;
+                    anchor = _nativeScrollData._realizedFirstIndex;
                 }
             }
 
@@ -554,7 +552,7 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
                 // The content and the scroll offset are moved together, so this is not visible.
                 if (!isRequested)
                 {
-                    _nativeScrollAdjustment -= shift;
+                    _nativeScrollData._nativeScrollAdjustment -= shift;
                 }
 
                 position -= shift;
@@ -566,19 +564,19 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
                 position = Math.Max(0.0, Math.Min(position, sizes.TotalSize + shift - viewportSize));
             }
 
-            _realizedStart = sizes.GetPosition(first) + shift;
-            _realizedEnd = sizes.GetPosition(last + 1) + shift;
+            _nativeScrollData._realizedStart = sizes.GetPosition(first) + shift;
+            _nativeScrollData._realizedEnd = sizes.GetPosition(last + 1) + shift;
         }
 
-        _nativeShift = shift;
-        _nativeViewportSize = viewportSize;
-        _realizedFirstIndex = first;
-        _realizedLastIndex = last;
+        _nativeScrollData._nativeShift = shift;
+        _nativeScrollData._nativeViewportSize = viewportSize;
+        _nativeScrollData._realizedFirstIndex = first;
+        _nativeScrollData._realizedLastIndex = last;
 
         // Offsets that are written to the DOM element after layout.
         if (isRequested)
         {
-            _nativeTargetOffset = isHorizontal ?
+            _nativeScrollData._nativeTargetOffset = isHorizontal ?
                 new Vector(position, _scrollData._offset.Y) :
                 new Vector(_scrollData._offset.X, position);
         }
@@ -586,11 +584,11 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         {
             if (isHorizontal)
             {
-                _nativeOffset.X = position;
+                _nativeScrollData._nativeOffset.X = position;
             }
             else
             {
-                _nativeOffset.Y = position;
+                _nativeScrollData._nativeOffset.Y = position;
             }
         }
 
@@ -599,15 +597,15 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
         double crossOffset;
         if (isHorizontal)
         {
-            crossOffset = isRequested ? _scrollData._offset.Y : _nativeOffset.Y;
+            crossOffset = isRequested ? _scrollData._offset.Y : _nativeScrollData._nativeOffset.Y;
             crossOffset = ScrollContentPresenter.CoerceOffset(crossOffset, extent.Height, viewport.Height);
-            _nativeTargetOffset.Y = crossOffset;
+            _nativeScrollData._nativeTargetOffset.Y = crossOffset;
         }
         else
         {
-            crossOffset = isRequested ? _scrollData._offset.X : _nativeOffset.X;
+            crossOffset = isRequested ? _scrollData._offset.X : _nativeScrollData._nativeOffset.X;
             crossOffset = ScrollContentPresenter.CoerceOffset(crossOffset, extent.Width, viewport.Width);
-            _nativeTargetOffset.X = crossOffset;
+            _nativeScrollData._nativeTargetOffset.X = crossOffset;
         }
 
         double snappedPosition = isRequested ?
@@ -642,12 +640,12 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
     private Size ArrangeItemsHostNative(Size arrangeSize)
     {
-        Debug.Assert(_isNative);
+        Debug.Assert(IsNativeScrolling);
 
         bool isHorizontal = Orientation == Orientation.Horizontal;
         List<UIElement> children = UnsafeGetChildren();
         IItemContainerGenerator generator = ItemContainerGenerator;
-        ItemSizeCache sizes = _itemSizes;
+        ItemSizeCache sizes = _nativeScrollData._itemSizes;
 
         int previousIndex = -2;
         double position = 0.0;
@@ -663,7 +661,7 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
             // Containers are sorted by index, and usually contiguous.
             position = index == previousIndex + 1 ?
                 position + sizes.GetSize(previousIndex) :
-                sizes.GetPosition(index) + _nativeShift;
+                sizes.GetPosition(index) + _nativeScrollData._nativeShift;
             previousIndex = index;
 
             Size desiredSize = child.DesiredSize;
@@ -674,25 +672,25 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
         if (OuterDiv.IsConnected)
         {
-            double stackExtent = Math.Max(0.0, (sizes?.TotalSize ?? 0.0) + _nativeShift);
+            double stackExtent = Math.Max(0.0, (sizes?.TotalSize ?? 0.0) + _nativeScrollData._nativeShift);
             Size extent = isHorizontal ?
                 new(stackExtent, Math.Max(arrangeSize.Height, _scrollData._extent.Height)) :
                 new(Math.Max(arrangeSize.Width, _scrollData._extent.Width), stackExtent);
 
-            if (!DoubleUtil.AreClose(_nativeExtent, extent))
+            if (!DoubleUtil.AreClose(_nativeScrollData._nativeExtent, extent))
             {
-                _nativeExtent = extent;
+                _nativeScrollData._nativeExtent = extent;
                 NativeScrollManager.SetExtent(OuterDiv, extent.Width, extent.Height);
             }
 
-            _arrangedSize = arrangeSize;
+            _nativeScrollData._arrangedSize = arrangeSize;
             UpdateNativeScrolling();
 
             // Written after layout, once the DOM size of this panel and of its content are up to
             // date, otherwise the browser would clamp the offset.
-            if ((_isNativeOffsetRequested || IsNativeOffsetUnknown || _nativeScrollAdjustment != 0.0) && !_isNativeOffsetSyncPending)
+            if ((_nativeScrollData._isNativeOffsetRequested || IsNativeOffsetUnknown || _nativeScrollData._nativeScrollAdjustment != 0.0) && !_nativeScrollData._isNativeOffsetSyncPending)
             {
-                _isNativeOffsetSyncPending = true;
+                _nativeScrollData._isNativeOffsetSyncPending = true;
                 LayoutUpdated += OnLayoutUpdatedSyncNativeOffset;
             }
         }
@@ -703,24 +701,24 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     private void OnLayoutUpdatedSyncNativeOffset(object sender, EventArgs e)
     {
         LayoutUpdated -= OnLayoutUpdatedSyncNativeOffset;
-        _isNativeOffsetSyncPending = false;
+        _nativeScrollData._isNativeOffsetSyncPending = false;
 
-        bool isRequested = _isNativeOffsetRequested || IsNativeOffsetUnknown;
-        double adjustment = _nativeScrollAdjustment;
-        _isNativeOffsetRequested = false;
-        _nativeScrollAdjustment = 0.0;
+        bool isRequested = _nativeScrollData._isNativeOffsetRequested || IsNativeOffsetUnknown;
+        double adjustment = _nativeScrollData._nativeScrollAdjustment;
+        _nativeScrollData._isNativeOffsetRequested = false;
+        _nativeScrollData._nativeScrollAdjustment = 0.0;
 
-        if (!_isNative || !OuterDiv.IsConnected)
+        if (!IsNativeScrolling || !OuterDiv.IsConnected)
         {
             return;
         }
 
         if (isRequested)
         {
-            Vector offset = _nativeTargetOffset;
-            if (IsNativeOffsetUnknown || Math.Abs(offset.X - _nativeOffset.X) >= 1.0 || Math.Abs(offset.Y - _nativeOffset.Y) >= 1.0)
+            Vector offset = _nativeScrollData._nativeTargetOffset;
+            if (IsNativeOffsetUnknown || Math.Abs(offset.X - _nativeScrollData._nativeOffset.X) >= 1.0 || Math.Abs(offset.Y - _nativeScrollData._nativeOffset.Y) >= 1.0)
             {
-                _nativeOffset = offset;
+                _nativeScrollData._nativeOffset = offset;
                 NativeScrollManager.ScrollTo(OuterDiv, offset.X, offset.Y);
             }
         }
@@ -740,15 +738,15 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
     private void OnItemsChangedNative(ItemsChangedEventArgs args)
     {
         // The indices of the realized range are not valid anymore.
-        _realizedLastIndex = -1;
+        _nativeScrollData._realizedLastIndex = -1;
 
         if (args.Action == NotifyCollectionChangedAction.Reset)
         {
             // The new items may fit in the size limit of the browser.
-            _isNativeExtentTooLarge = false;
+            _nativeScrollData._isNativeExtentTooLarge = false;
         }
 
-        ItemSizeCache sizes = _itemSizes;
+        ItemSizeCache sizes = _nativeScrollData._itemSizes;
         if (sizes is null)
         {
             return;
@@ -781,9 +779,44 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
     private void ResetNativeScrolling()
     {
-        _itemSizes = null;
-        _isNativeExtentTooLarge = false;
-        _nativeShift = 0.0;
-        _isNativeOffsetRequested = _isNative;
+        _nativeScrollData._itemSizes = null;
+        _nativeScrollData._isNativeExtentTooLarge = false;
+        _nativeScrollData._nativeShift = 0.0;
+        _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
+    }
+
+    // Helper class to hold native scrolling data.
+    // This class exists to reduce working set when native scrolling is not used.
+    private sealed class NativeScrollData
+    {
+        internal static readonly Vector UnknownOffset = new(double.NaN, double.NaN);
+
+        // Size of the realized area before and after the viewport, and minimum margin left before more
+        // containers are realized, relatively to the size of the viewport.
+        internal const double NativeCacheLength = 0.5;
+        internal const double NativeCacheMargin = 0.25;
+
+        // Browsers limit the size of elements (about 17.9 million pixels in Firefox, 33.5 million in Chrome
+        // and Safari, less when zoomed in). Longer lists are scrolled by the managed code.
+        internal const double MaxNativeExtent = 10_000_000;
+
+        internal HtmlElementReference _contentHost;
+        internal State? _appliedNativeState;
+        internal bool _isNative;
+        internal bool _isNativeExtentTooLarge;
+        internal ItemSizeCache _itemSizes;
+        internal Size _nativeExtent;
+        internal Size _arrangedSize = new(double.PositiveInfinity, double.PositiveInfinity);
+        internal Vector _nativeOffset = UnknownOffset;
+        internal Vector _nativeTargetOffset;
+        internal double _nativeShift;
+        internal double _nativeScrollAdjustment;
+        internal bool _isNativeOffsetRequested;
+        internal bool _isNativeOffsetSyncPending;
+        internal double _nativeViewportSize;
+        internal int _realizedFirstIndex;
+        internal int _realizedLastIndex = -1;
+        internal double _realizedStart;
+        internal double _realizedEnd;
     }
 }

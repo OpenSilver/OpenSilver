@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using System.Collections.Generic;
@@ -37,6 +38,21 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     // The container that a BringIndexIntoView operation realized and is trying to scroll into view.
     // It is kept alive (not recycled) by the virtualization cleanup until the scroll has settled.
     private FrameworkElement _bringIntoViewContainer;
+
+    static VirtualizingStackPanel()
+    {
+        BackgroundProperty.OverrideMetadata(
+            typeof(VirtualizingStackPanel),
+            new PropertyMetadata(null, OnBackgroundChanged));
+
+        NativeScrolling.IsEnabledProperty.OverrideMetadata(
+            typeof(VirtualizingStackPanel),
+            new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits, OnIsNativeScrollingEnabledChanged));
+
+        NativeScrolling.UseNativeScrollBarsProperty.OverrideMetadata(
+            typeof(VirtualizingStackPanel),
+            new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits, OnUseNativeScrollBarsChanged));
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VirtualizingStackPanel"/> class.
@@ -393,7 +409,8 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         if (IsItemsHost)
         {
             UpdateNativeScrolling();
-            if (_isNative)
+
+            if (IsNativeScrolling)
             {
                 Size desiredSize = MeasureItemsHostNative(constraint);
                 if (!IsNativeExtentTooLarge())
@@ -1020,7 +1037,7 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         if (IsItemsHost)
         {
-            return _isNative ? ArrangeItemsHostNative(arrangeSize) : ArrangeItemsHost(arrangeSize);
+            return IsNativeScrolling ? ArrangeItemsHostNative(arrangeSize) : ArrangeItemsHost(arrangeSize);
         }
         else
         {
@@ -1468,7 +1485,7 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
             // Store the new offset
             _scrollData._offset.X = scrollX;
-            _isNativeOffsetRequested = _isNative;
+            _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
 
             // Report the change in offset
             OnViewportOffsetChanged(oldViewportOffset, _scrollData._offset);
@@ -1494,7 +1511,7 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
             // Store the new offset
             _scrollData._offset.Y = scrollY;
-            _isNativeOffsetRequested = _isNative;
+            _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
 
             // Report the change in offset
             OnViewportOffsetChanged(oldViewportOffset, _scrollData._offset);
@@ -1561,7 +1578,7 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         {
             Vector oldOffset = _scrollData._offset;
             _scrollData._offset = newOffset;
-            _isNativeOffsetRequested = _isNative;
+            _nativeScrollData._isNativeOffsetRequested = _nativeScrollData._isNative;
 
             OnViewportOffsetChanged(oldOffset, newOffset);
 

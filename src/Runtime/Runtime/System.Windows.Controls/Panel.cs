@@ -277,11 +277,6 @@ namespace System.Windows.Controls
 
             // Update pointer events
             panel.CoerceIsHitTestable();
-
-            if (panel is VirtualizingStackPanel vsp)
-            {
-                vsp.UpdateNativeScrolling();
-            }
         }
 
         private void OnBackgroundChanged(object sender, EventArgs e)

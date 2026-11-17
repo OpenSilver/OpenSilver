@@ -23,12 +23,23 @@ namespace OpenSilver;
 /// scroll their content natively, and whether they show the platform scrollbars.
 /// </summary>
 /// <remarks>
-/// Native scrolling is enabled globally through <see cref="Features.Scrolling.UseNativeScrolling"/>.
+/// Native scrolling is enabled globally through <see cref="UseNativeScrolling"/>.
 /// The IsEnabled property is inherited, so setting it to false on a container opts out every ScrollViewer
 /// below it.
 /// </remarks>
 public static class NativeScrolling
 {
+    /// <summary>
+    /// When enabled, <see cref="ScrollViewer"/> lets the browser scroll its content natively (touch panning 
+    /// with inertia, smooth wheel scrolling, find-in-page, etc.), while the ScrollViewer API and the 
+    /// scrollbars defined in its template keep working as in Silverlight. The default value is true.
+    /// </summary>
+    /// <remarks>
+    /// Changing this value only affects ScrollViewers that are loaded afterwards. Use <see cref="IsEnabledProperty"/> 
+    /// to opt out a specific part of the visual tree.
+    /// </remarks>
+    public static bool UseNativeScrolling { get; set; } = true;
+
     /// <summary>
     /// Identifies the IsEnabled attached property.
     /// </summary>
@@ -37,7 +48,7 @@ public static class NativeScrolling
             "IsEnabled",
             typeof(bool),
             typeof(NativeScrolling),
-            new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits, OnIsEnabledChanged));
+            new FrameworkPropertyMetadata(BooleanBoxes.TrueBox, FrameworkPropertyMetadataOptions.Inherits));
 
     /// <summary>
     /// Gets a value that indicates whether native scrolling is allowed for the specified element
@@ -68,21 +79,7 @@ public static class NativeScrolling
     public static void SetIsEnabled(DependencyObject element, bool value)
     {
         ArgumentNullException.ThrowIfNull(element);
-        element.SetValueInternal(IsEnabledProperty, BooleanBoxes.Box(value));
-    }
-
-    private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        switch (d)
-        {
-            case ScrollContentPresenter scp:
-                scp.UpdateNativeScrolling();
-                break;
-
-            case VirtualizingStackPanel vsp:
-                vsp.UpdateNativeScrolling();
-                break;
-        }
+        element.SetValueInternal(IsEnabledProperty, value);
     }
 
     /// <summary>
@@ -93,7 +90,7 @@ public static class NativeScrolling
             "UseNativeScrollBars",
             typeof(bool),
             typeof(NativeScrolling),
-            new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, FrameworkPropertyMetadataOptions.Inherits, OnUseNativeScrollBarsChanged));
+            new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, FrameworkPropertyMetadataOptions.Inherits));
 
     /// <summary>
     /// Gets a value that indicates whether natively scrolled <see cref="ScrollViewer"/> elements show the
@@ -142,21 +139,6 @@ public static class NativeScrolling
     public static void SetUseNativeScrollBars(DependencyObject element, bool value)
     {
         ArgumentNullException.ThrowIfNull(element);
-        element.SetValueInternal(UseNativeScrollBarsProperty, BooleanBoxes.Box(value));
-    }
-
-    private static void OnUseNativeScrollBarsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        switch (d)
-        {
-            // Also updates its ScrollContentPresenter.
-            case ScrollViewer sv:
-                sv.InvalidateMeasure();
-                break;
-
-            case VirtualizingStackPanel vsp:
-                vsp.UpdateNativeScrolling();
-                break;
-        }
+        element.SetValueInternal(UseNativeScrollBarsProperty, value);
     }
 }

@@ -22,7 +22,7 @@ namespace TestApplication.Tests.ScrollViewers
         {
             InitializeComponent();
 
-            FeatureText.Text = $"Features.Scrolling.UseNativeScrolling = {Features.Scrolling.UseNativeScrolling}";
+            FeatureText.Text = $"Features.Scrolling.UseNativeScrolling = {NativeScrolling.UseNativeScrolling}";
 
             for (int i = 0; i < 300; i++)
             {

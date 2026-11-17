@@ -1809,7 +1809,6 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(BooleanBoxes.TrueBox)
                 {
-                    // Native scrollers are panned by the browser, which decides when the touch starts.
                     MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetTouchAction((bool)newValue ? string.Empty : "none"),
                 });
 

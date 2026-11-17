@@ -122,21 +122,6 @@ namespace System.Windows.Controls
         /// </summary>
         internal ScrollBar ElementVerticalScrollBar { get; private set; }
 
-        // The platform scrollbars replace the ScrollBars of the template. They are only used when they overlay
-        // the content, as they would otherwise reduce the viewport computed by the layout, and they cannot be
-        // hidden along a single axis.
-        internal bool AllowsNativeScrollBars =>
-            OpenSilver.NativeScrolling.GetUseNativeScrollBars(this) &&
-            CanUseNativeScrollBar(HorizontalScrollBarVisibility, ElementHorizontalScrollBar) &&
-            CanUseNativeScrollBar(VerticalScrollBarVisibility, ElementVerticalScrollBar) &&
-            NativeScrollManager.HasOverlayScrollBars;
-
-        private bool UsesNativeScrollBars => AllowsNativeScrollBars && ScrollInfo is INativeScrollInfo { IsNativeScrolling: true };
-
-        private static bool CanUseNativeScrollBar(ScrollBarVisibility visibility, ScrollBar templateScrollBar) =>
-            visibility == ScrollBarVisibility.Disabled ||
-            (visibility != ScrollBarVisibility.Hidden && templateScrollBar is not null);
-
         /// <summary>
         /// Gets or sets the element that implements the <see cref="IScrollInfo"/> interface and provides 
         /// values for scrolling properties of this <see cref="ScrollViewer"/>.
@@ -920,6 +905,21 @@ namespace System.Windows.Controls
 
             e.Handled = true;
         }
+
+        // The platform scrollbars replace the ScrollBars of the template. They are only used when they overlay
+        // the content, as they would otherwise reduce the viewport computed by the layout, and they cannot be
+        // hidden along a single axis.
+        internal bool AllowsNativeScrollBars =>
+            OpenSilver.NativeScrolling.GetUseNativeScrollBars(this) &&
+            CanUseNativeScrollBar(HorizontalScrollBarVisibility, ElementHorizontalScrollBar) &&
+            CanUseNativeScrollBar(VerticalScrollBarVisibility, ElementVerticalScrollBar) &&
+            NativeScrollManager.HasOverlayScrollBars;
+
+        private bool UsesNativeScrollBars => AllowsNativeScrollBars && ScrollInfo is INativeScrollInfo { IsNativeScrolling: true };
+
+        private static bool CanUseNativeScrollBar(ScrollBarVisibility visibility, ScrollBar templateScrollBar) =>
+            visibility == ScrollBarVisibility.Disabled ||
+            (visibility != ScrollBarVisibility.Hidden && templateScrollBar is not null);
 
         internal void MakeVisible(UIElement child, Rect rect) => EnqueueCommand(Commands.MakeVisible, 0, new MakeVisibleParams(child, rect));
 

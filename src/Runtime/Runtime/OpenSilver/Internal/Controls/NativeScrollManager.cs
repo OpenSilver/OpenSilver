@@ -35,15 +35,6 @@ internal static class NativeScrollManager
         Scrolled = 2,
     }
 
-    public static HtmlElementReference CreateContentHost(HtmlElementReference scroller)
-    {
-        Debug.Assert(scroller.IsConnected);
-
-        string id = INTERNAL_HtmlDomManager.NewId();
-        Interop.ExecuteJavaScriptVoidAsync($"osjs.nativeScroll.createHost('{scroller.Uid}','{id}')");
-        return new HtmlElementReference(id);
-    }
-
     private static bool? _hasOverlayScrollBars;
 
     // Overlay scrollbars (mobile devices, macOS, ...) take no space, so the platform scrollbars do not
@@ -54,21 +45,32 @@ internal static class NativeScrollManager
         set => _hasOverlayScrollBars = value;
     }
 
-    // An opaque scroller is hit-testable by itself (it has a background): the pointer is not routed
-    // to the elements underneath when it is over an area not covered by the content.
-    public static void SetMode(HtmlElementReference scroller, Mode mode, bool canScrollX, bool canScrollY,
-        bool isOpaque = false, bool useNativeScrollBars = false)
+    internal static HtmlElementReference CreateContentHost(HtmlElementReference scroller)
     {
         Debug.Assert(scroller.IsConnected);
 
-        string options = useNativeScrollBars ? $",{ToJs(isOpaque)},true" : isOpaque ? ",true" : string.Empty;
-        Interop.ExecuteJavaScriptVoidAsync(
-            $"osjs.nativeScroll.setMode('{scroller.Uid}',{(int)mode},{ToJs(canScrollX)},{ToJs(canScrollY)}{options})");
+        string id = INTERNAL_HtmlDomManager.NewId();
+        Interop.ExecuteJavaScriptVoidAsync($"osjs.nativeScroll.createHost('{scroller.Uid}','{id}')");
+        return new HtmlElementReference(id);
     }
 
-    private static string ToJs(bool value) => value ? "true" : "false";
+    // An opaque scroller is hit-testable by itself (it has a background): the pointer is not routed
+    // to the elements underneath when it is over an area not covered by the content.
+    internal static void SetMode(
+        HtmlElementReference scroller,
+        Mode mode,
+        bool canScrollX,
+        bool canScrollY,
+        bool isOpaque = false,
+        bool useNativeScrollBars = false)
+    {
+        Debug.Assert(scroller.IsConnected);
 
-    public static void SetExtent(HtmlElementReference scroller, double width, double height)
+        Interop.ExecuteJavaScriptVoidAsync(
+            $"osjs.nativeScroll.setMode('{scroller.Uid}',{(int)mode},{ToJs(canScrollX)},{ToJs(canScrollY)},{ToJs(isOpaque)},{ToJs(useNativeScrollBars)})");
+    }
+
+    internal static void SetExtent(HtmlElementReference scroller, double width, double height)
     {
         Debug.Assert(scroller.IsConnected);
 
@@ -76,7 +78,7 @@ internal static class NativeScrollManager
             $"osjs.nativeScroll.setExtent('{scroller.Uid}',{width.ToInvariantString()},{height.ToInvariantString()})");
     }
 
-    public static void ScrollTo(HtmlElementReference scroller, double x, double y)
+    internal static void ScrollTo(HtmlElementReference scroller, double x, double y)
     {
         Debug.Assert(scroller.IsConnected);
 
@@ -86,7 +88,7 @@ internal static class NativeScrollManager
 
     // Relative to the current offset of the DOM element, which can be ahead of the last offset
     // reported to C# while the user is scrolling.
-    public static void ScrollBy(HtmlElementReference scroller, double dx, double dy)
+    internal static void ScrollBy(HtmlElementReference scroller, double dx, double dy)
     {
         Debug.Assert(scroller.IsConnected);
 
@@ -96,7 +98,7 @@ internal static class NativeScrollManager
 
     // The browser scrolls with its own (smooth) wheel behavior. At the limits, the event keeps
     // bubbling so that outer ScrollViewers can scroll.
-    public static void HandleMouseWheel(HtmlElementReference scroller, MouseWheelEventArgs e)
+    internal static void HandleMouseWheel(HtmlElementReference scroller, MouseWheelEventArgs e)
     {
         switch (OnWheel(scroller, e))
         {
@@ -132,4 +134,6 @@ internal static class NativeScrollManager
             scroller.OnNativeScroll(scrollLeft, scrollTop);
         }
     }
+
+    private static string ToJs(bool value) => value ? "true" : "false";
 }

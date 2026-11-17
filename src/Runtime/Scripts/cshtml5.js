@@ -317,7 +317,7 @@ Object.defineProperty(window, 'osjs', {
                     },
                     // An opaque scroller is hit-testable by itself: the pointer is not routed to the elements
                     // underneath when it is over an area not covered by the content.
-                    setMode: function (id, mode, canScrollX, canScrollY, opaque = false, scrollbars = false) {
+                    setMode: function (id, mode, canScrollX, canScrollY, opaque, scrollbars) {
                         const scroller = document.getElementById(id);
                         const state = getState(scroller);
                         if (!state) return;
@@ -1028,9 +1028,7 @@ Object.defineProperty(window, 'osjs', {
                 _callbacks.imageError = imageErrorCallback;
                 _callbacks.resizeObserverSizeChange = resizeObserverSizeChangeCallback;
                 _callbacks.hyperlinkClick = hyperlinkClickCallback;
-                if (nativeScrollCallback) {
-                    _callbacks.nativeScroll = nativeScrollCallback;
-                }
+                _callbacks.nativeScroll = nativeScrollCallback;
             },
             getRef: function (id) {
                 return _jsObjRef.get(id);
