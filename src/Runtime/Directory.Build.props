@@ -1,6 +1,6 @@
 <Project>
   <Import Project="..\Directory.Build.props" />
-
+  
   <PropertyGroup>
     <GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
     <OpenSilverGenerateAssemblyInfo>true</OpenSilverGenerateAssemblyInfo>

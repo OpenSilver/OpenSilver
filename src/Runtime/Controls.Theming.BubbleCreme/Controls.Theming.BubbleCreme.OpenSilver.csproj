@@ -3,7 +3,6 @@
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
     <AssemblyName>OpenSilver.Controls.Theming.BubbleCreme</AssemblyName>
     <RootNamespace>System.Windows.Controls.Theming</RootNamespace>

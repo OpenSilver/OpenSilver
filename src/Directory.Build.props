@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <BeforeMicrosoftNETSdkTargets>$(MSBuildThisFileDirectory)DefaultTargetFramework.targets</BeforeMicrosoftNETSdkTargets>
     <OpenSilverDependencyVersion>3.3.0</OpenSilverDependencyVersion>
     <OpenSilverPkgDirectory>$(MSBuildThisFileDirectory)packages\OpenSilver.$(OpenSilverDependencyVersion)\</OpenSilverPkgDirectory>
     <OpenSilverWasmPkgDirectory>$(MSBuildThisFileDirectory)packages\OpenSilver.WebAssembly.$(OpenSilverDependencyVersion)\</OpenSilverWasmPkgDirectory>
