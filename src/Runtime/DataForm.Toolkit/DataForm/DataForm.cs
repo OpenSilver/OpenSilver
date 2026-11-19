@@ -24,7 +24,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using OpenSilver.Internal;
-using resources = OpenSilver.Internal.Controls.Data.DataForm.Toolkit.Resources;
+using Res = OpenSilver.Internal.Controls.Data.DataForm.Toolkit.Resources;
 
 namespace System.Windows.Controls
 {
@@ -404,7 +404,7 @@ namespace System.Windows.Controls
                 else
                 {
                     dataForm.SetValueNoCallback(e.Property, e.OldValue);
-                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, resources.DataForm_CannotChangeCurrency, "AutoCommit", "ItemsSource", "ICollectionView"));
+                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, Res.DataForm_CannotChangeCurrency, "AutoCommit", "ItemsSource", "ICollectionView"));
                 }
             }
         }
@@ -3507,7 +3507,7 @@ namespace System.Windows.Controls
                 }
                 else
                 {
-                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, resources.DataForm_CannotCancelBeginEditWhenInAutoEdit, "BeginEdit", "AutoEdit"));
+                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, Res.DataForm_CannotCancelBeginEditWhenInAutoEdit, "BeginEdit", "AutoEdit"));
                 }
             }
 

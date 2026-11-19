@@ -931,7 +931,7 @@ namespace System.Windows.Controls
 
         #region Protected Methods
 
-        [Obsolete(Helper.ObsoleteMemberMessage + "Use ItemsControl.OnItemsPanelChanged instead.", true)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage + "Use ItemsControl.OnItemsPanelChanged instead.", true)]
         protected virtual void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
         {
             throw new NotSupportedException();

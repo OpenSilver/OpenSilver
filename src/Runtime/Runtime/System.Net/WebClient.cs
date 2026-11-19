@@ -164,7 +164,9 @@ namespace OpenSilver.Compatibility
             if (Interop.IsRunningInTheSimulator)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
                 var netStandardWebClient = new System.Net.WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
                 return netStandardWebClient.DownloadString(address);
             }
             
@@ -217,7 +219,9 @@ namespace OpenSilver.Compatibility
             if (Interop.IsRunningInTheSimulator)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
                 var netStandardWebClient = new System.Net.WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
                 netStandardWebClient.DownloadStringCompleted += (s, e) =>
                  {
                      OnDownloadStringCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
@@ -268,7 +272,9 @@ namespace OpenSilver.Compatibility
             if (Interop.IsRunningInTheSimulator)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
                 var netStandardWebClient = new System.Net.WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
                 return netStandardWebClient.DownloadStringTaskAsync(address);
             }
 
@@ -424,7 +430,9 @@ namespace OpenSilver.Compatibility
         {
             if (Interop.IsRunningInTheSimulator)
             {
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
                 var netStandardWebClient = new System.Net.WebClient();
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
                 if (isAsync)
                 {
                     netStandardWebClient.UploadStringCompleted += (s, e) =>

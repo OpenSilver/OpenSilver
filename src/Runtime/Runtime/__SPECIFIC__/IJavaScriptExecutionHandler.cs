@@ -39,7 +39,7 @@ public interface INativeMethods : IJavaScriptExecutionHandler
     void WriteableImage_TransferBytes(string id, Span<byte> bytes, int width, int height);
 }
 
-[Obsolete(Helper.ObsoleteMemberMessage, true)]
+[Obsolete(Obsoletions.ObsoleteMemberMessage, true)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IWebAssemblyExecutionHandler : IJavaScriptExecutionHandler
 {

@@ -305,7 +305,7 @@ namespace System.Windows.Controls
                 }
                 else
                 {
-                    if (item != null && DateTime.Compare(this[index], item) != 0 && Calendar.IsValidDateSelection(_owner, item))
+                    if (DateTime.Compare(this[index], item) != 0 && Calendar.IsValidDateSelection(_owner, item))
                     {
                         object removedItem = this[index];
                         base.SetItem(index, item);

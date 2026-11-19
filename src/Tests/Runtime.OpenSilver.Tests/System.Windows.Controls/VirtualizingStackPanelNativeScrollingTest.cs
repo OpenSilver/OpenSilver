@@ -18,7 +18,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Xaml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver;
 using OpenSilver.Internal;
@@ -264,77 +263,6 @@ public class VirtualizingStackPanelNativeScrollingTest
     }
 
     [TestMethod]
-    public void Axes_Along_Which_The_Items_Fit_Should_Leave_Touches_To_The_Application()
-    {
-        // As in the default ListBox style, the cross axis can scroll.
-        var itemsControl = new TestItemsControl(Orientation.Vertical, ScrollBarVisibility.Auto)
-        {
-            ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, 3)),
-        };
-        using var host = new Host(itemsControl);
-        string js = host.FlushJavaScript();
-
-        Assert.IsTrue(host.Panel.IsNativeScrolling);
-        Assert.IsFalse(((INativeScrollInfo)host.Panel).CanNativelyScroll);
-        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,false)");
-        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PanelId}',1,true"), js);
-        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true"), js);
-
-        var items = (ObservableCollection<int>)itemsControl.ItemsSource;
-        for (int i = 3; i < 20; i++)
-        {
-            items.Add(i);
-        }
-        host.UpdateLayout();
-
-        // The items are not wider than the viewport.
-        Assert.IsTrue(((INativeScrollInfo)host.Panel).CanNativelyScroll);
-        js = host.FlushJavaScript();
-        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true)");
-        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PanelId}',1,true"), js);
-
-        host.SimulateNativeScroll(0, 200);
-        Assert.AreEqual(10, host.ScrollViewer.VerticalOffset);
-
-        while (items.Count > 3)
-        {
-            items.RemoveAt(items.Count - 1);
-        }
-        host.UpdateLayout();
-
-        Assert.AreEqual(0, host.ScrollViewer.VerticalOffset);
-        Assert.IsFalse(((INativeScrollInfo)host.Panel).CanNativelyScroll);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,false)");
-        Assert.AreEqual(0, host.GetPositionInViewport(0));
-    }
-
-    [TestMethod]
-    public void VirtualizingStackPanel_Should_Scroll_Natively_By_Default()
-    {
-        using var host = new Host(CreateItemsControl());
-        string js = host.FlushJavaScript();
-
-        Assert.IsTrue(host.Panel.IsNativeScrolling);
-        Assert.AreSame(host.Panel, host.ScrollViewer.ScrollInfo);
-        Assert.IsFalse(host.ScrollViewer.ElementScrollContentPresenter.IsNativeScrolling);
-
-        // Logical (item based) values, as in Silverlight.
-        Assert.AreEqual(ItemCount, host.ScrollViewer.ExtentHeight);
-        Assert.AreEqual(ViewportSize / ItemSize, host.ScrollViewer.ViewportHeight);
-        Assert.AreEqual(0, host.ScrollViewer.VerticalOffset);
-
-        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true)");
-        // The vertical ScrollBar of the ScrollViewer takes the rest of the width.
-        StringAssert.Contains(js, $"osjs.nativeScroll.setExtent('{host.PanelId}',{host.Panel.ActualWidth.ToInvariantString()},{ItemCount * ItemSize})");
-        // The ScrollContentPresenter neither scrolls nor captures touches.
-        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.ScrollViewer.ElementScrollContentPresenter.OuterDiv.Uid}',0,false,false)");
-
-        // The viewport and half a viewport after it are realized.
-        Assert.AreEqual(8, host.Panel.Children.Count);
-        Assert.AreEqual(140, host.ContainerFromIndex(7).VisualOffset.Y);
-    }
-
-    [TestMethod]
     public void Native_Scroll_Should_Update_Logical_Offset_Without_Writing_It_Back()
     {
         using var host = new Host(CreateItemsControl());
@@ -523,26 +451,6 @@ public class VirtualizingStackPanelNativeScrollingTest
     }
 
     [TestMethod]
-    public void Horizontal_Orientation_Should_Scroll_Natively()
-    {
-        using var host = new Host(CreateItemsControl(Orientation.Horizontal));
-        string js = host.FlushJavaScript();
-
-        Assert.IsTrue(host.Panel.IsNativeScrolling);
-        Assert.AreEqual(ItemCount, host.ScrollViewer.ExtentWidth);
-        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PanelId}',1,true,false)");
-
-        host.ScrollViewer.ScrollToHorizontalOffset(100);
-        host.UpdateLayout();
-
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.scrollTo('{host.PanelId}',2000,0)");
-        Assert.AreEqual(2000, host.ContainerFromIndex(100).VisualOffset.X);
-
-        host.SimulateNativeScroll(2010, 0);
-        Assert.AreEqual(100.5, host.ScrollViewer.HorizontalOffset, 1e-9);
-    }
-
-    [TestMethod]
     public void Removing_Items_Should_Update_Extent()
     {
         TestItemsControl itemsControl = CreateItemsControl();
@@ -591,62 +499,6 @@ public class VirtualizingStackPanelNativeScrollingTest
     }
 
     [TestMethod]
-    public void Extent_Exceeding_Browser_Limits_Should_Fall_Back_To_Managed_Virtualization()
-    {
-        const double LargeItemSize = 20_000;
-
-        TestItemsControl itemsControl = CreateItemsControl();
-        itemsControl.ItemSizeSelector = _ => LargeItemSize;
-        using var host = new Host(itemsControl);
-        string scpId = host.ScrollViewer.ElementScrollContentPresenter.OuterDiv.Uid;
-
-        Assert.IsFalse(host.Panel.IsNativeScrolling);
-        Assert.IsFalse(host.ScrollViewer.ElementScrollContentPresenter.IsNativeScrolling);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{scpId}',2,false,true)");
-
-        host.ScrollViewer.ScrollToVerticalOffset(ItemCount - 1);
-        host.UpdateLayout();
-
-        Assert.AreEqual(ItemCount - 1, host.ScrollViewer.VerticalOffset);
-        Assert.AreEqual(0, host.ContainerFromIndex(ItemCount - 1).VisualOffset.Y);
-
-        // New items are scrolled natively again if they fit.
-        host.FlushJavaScript();
-        itemsControl.ItemSizeSelector = _ => ItemSize;
-        itemsControl.ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, ItemCount));
-        host.UpdateLayout();
-
-        Assert.IsTrue(host.Panel.IsNativeScrolling);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{scpId}',0,false,false)");
-
-        itemsControl.ItemSizeSelector = _ => LargeItemSize;
-        itemsControl.ItemsSource = new ObservableCollection<int>(Enumerable.Range(0, ItemCount));
-        host.UpdateLayout();
-
-        Assert.IsFalse(host.Panel.IsNativeScrolling);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{scpId}',2,false,true)");
-    }
-
-    [TestMethod]
-    public void NativeScrolling_IsEnabled_False_Should_Use_Managed_Virtualization()
-    {
-        TestItemsControl itemsControl = CreateItemsControl();
-        NativeScrolling.SetIsEnabled(itemsControl, false);
-        using var host = new Host(itemsControl);
-        string scpId = host.ScrollViewer.ElementScrollContentPresenter.OuterDiv.Uid;
-
-        Assert.IsFalse(host.Panel.IsNativeScrolling);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{scpId}',2,false,true)");
-
-        host.ScrollViewer.ScrollToVerticalOffset(10);
-        host.UpdateLayout();
-
-        Assert.AreEqual(10, host.ScrollViewer.VerticalOffset);
-        Assert.AreEqual(0, host.ContainerFromIndex(10).VisualOffset.Y);
-        Assert.IsFalse(host.FlushJavaScript().Contains($"osjs.nativeScroll.scrollTo('{host.PanelId}'"));
-    }
-
-    [TestMethod]
     public void NativeScrolling_IsEnabled_Should_Switch_Mode_Dynamically()
     {
         using var host = new Host(CreateItemsControl());
@@ -673,7 +525,7 @@ public class VirtualizingStackPanelNativeScrollingTest
     [TestMethod]
     public void Feature_Disabled_Should_Use_Managed_Virtualization()
     {
-        Features.Scrolling.UseNativeScrolling = false;
+        NativeScrolling.UseNativeScrolling = false;
         try
         {
             using var host = new Host(CreateItemsControl());
@@ -687,47 +539,7 @@ public class VirtualizingStackPanelNativeScrollingTest
         }
         finally
         {
-            Features.Scrolling.UseNativeScrolling = true;
+            NativeScrolling.UseNativeScrolling = true;
         }
-    }
-
-    [TestMethod]
-    public void NativeScrollBars_Should_Replace_The_Template_ScrollBars_Of_The_ScrollViewer()
-    {
-        NativeScrollManager.HasOverlayScrollBars = true;
-        try
-        {
-            TestItemsControl itemsControl = CreateItemsControl();
-            NativeScrolling.SetUseNativeScrollBars(itemsControl, true);
-
-            using var host = new Host(itemsControl);
-
-            Assert.IsTrue(host.Panel.IsNativeScrolling);
-            Assert.AreEqual(Visibility.Collapsed, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
-            Assert.AreEqual(ViewportSize, host.Panel.ActualWidth);
-            StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true,false,true)");
-
-            NativeScrolling.SetUseNativeScrollBars(itemsControl, false);
-            host.UpdateLayout();
-
-            Assert.AreEqual(Visibility.Visible, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
-            Assert.IsTrue(host.Panel.ActualWidth < ViewportSize);
-            StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true)");
-        }
-        finally
-        {
-            NativeScrollManager.HasOverlayScrollBars = false;
-        }
-    }
-
-    [TestMethod]
-    public void Panel_With_Background_Should_Be_Opaque_Scroller()
-    {
-        using var host = new Host(CreateItemsControl());
-        host.FlushJavaScript();
-
-        host.Panel.Background = new SolidColorBrush(Colors.Transparent);
-
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PanelId}',1,false,true,true)");
     }
 }

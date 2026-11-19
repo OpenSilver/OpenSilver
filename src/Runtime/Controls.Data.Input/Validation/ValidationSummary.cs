@@ -17,7 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Automation.Peers;
 using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
-using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
+using Res = OpenSilver.Internal.Controls.Data.Input.Resources;
 
 namespace System.Windows.Controls
 {
@@ -87,9 +87,9 @@ namespace System.Windows.Controls
             this.Loaded += new RoutedEventHandler(this.ValidationSummary_Loaded);
             if (DesignerProperties.IsInDesignTool)
             {
-                this.Errors.Add(new ValidationSummaryItem(resources.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
-                this.Errors.Add(new ValidationSummaryItem(resources.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
-                this.Errors.Add(new ValidationSummaryItem(resources.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
+                this.Errors.Add(new ValidationSummaryItem(Res.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
+                this.Errors.Add(new ValidationSummaryItem(Res.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
+                this.Errors.Add(new ValidationSummaryItem(Res.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
             }
         }
 
@@ -695,7 +695,7 @@ namespace System.Windows.Controls
 
         internal string GetHeaderString()
         {
-            string errorString = this._displayedErrors.Count == 1 ? resources.ValidationSummaryHeaderError : String.Format(CultureInfo.InvariantCulture, resources.ValidationSummaryHeaderErrors, this._displayedErrors.Count);
+            string errorString = this._displayedErrors.Count == 1 ? Res.ValidationSummaryHeaderError : String.Format(CultureInfo.InvariantCulture, Res.ValidationSummaryHeaderErrors, this._displayedErrors.Count);
             return errorString;
         }
 

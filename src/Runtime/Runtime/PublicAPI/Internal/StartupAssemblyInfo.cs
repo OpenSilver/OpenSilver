@@ -35,15 +35,15 @@ public static class StartupAssemblyInfo
     public static string StartupAssemblyShortName { get; private set; }
 
     // This is populated at the startup of the application // (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static string OutputRootPath;
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static string OutputAppFilesPath;
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static string OutputLibrariesPath;
 

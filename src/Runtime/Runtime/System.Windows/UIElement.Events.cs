@@ -1686,11 +1686,11 @@ namespace System.Windows
 
         internal virtual HtmlElementReference GetFocusTarget() => OuterDiv;
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void INTERNAL_AttachToDomEvents() { }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void INTERNAL_DetachFromDomEvents() { }
     }

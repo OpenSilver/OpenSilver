@@ -19,8 +19,6 @@ namespace OpenSilver.Internal;
 
 internal static class Helper
 {
-    public const string ObsoleteMemberMessage = "Deprecated. It will be removed in a future release.";
-
     /// <summary>
     /// Check whether xxxTemplate property is set on the given element.
     /// Only explicit local values or resource references count;  data-bound or templated values don't count.

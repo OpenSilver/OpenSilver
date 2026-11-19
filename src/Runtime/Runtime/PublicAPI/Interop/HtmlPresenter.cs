@@ -140,7 +140,7 @@ namespace CSHTML5.Native.Html.Controls
             set => SetValue(UseShadowDomProperty, value);
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object DomElement
         {

@@ -167,7 +167,7 @@ public sealed class BitmapImage : BitmapSource
 
     private void OnUriSourceChanged() => UriSourceChanged?.Invoke(this, EventArgs.Empty);
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public string INTERNAL_NameOfAssemblyThatSetTheSourceUri; // Useful to convert relative URI to absolute URI.
 }

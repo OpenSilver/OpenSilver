@@ -16,7 +16,6 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.11" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2739.15" />
     <PackageReference Include="Microsoft.Web.WebView2.DevToolsProtocolExtension" Version="1.0.2271" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net10.0-windows'">
@@ -24,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net11.0-windows'">
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="11.0.0-rc.1.26425.128" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -256,7 +256,7 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
 
     // The following property is used during the "InsertImplicitNodes" step of the compilation,
     // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public IUIElement ContentPropertyUsefulOnlyDuringTheCompilation
     {
@@ -264,7 +264,7 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
         set { SetValueInternal(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
     }
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
         DependencyProperty.Register(

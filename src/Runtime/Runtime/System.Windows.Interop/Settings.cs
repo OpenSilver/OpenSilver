@@ -67,7 +67,7 @@ public class Settings
     public InheritanceBehavior DefaultResourceLookupMode { get; set; }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
     public TimeSpan ScrollDebounce
     {
         get => ScrollBar.DefaultDebounceInterval;
@@ -129,7 +129,7 @@ public class Settings
 
     public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public TimeSpan PopupMoveDelay
     {

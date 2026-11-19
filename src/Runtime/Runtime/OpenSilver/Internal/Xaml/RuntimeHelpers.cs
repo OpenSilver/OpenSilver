@@ -148,7 +148,7 @@ namespace OpenSilver.Internal.Xaml
             return Application.GetXamlComponentLoaderType(componentUri);
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
@@ -157,7 +157,7 @@ namespace OpenSilver.Internal.Xaml
             NameScope.SetNameScope(dependencyObject, new NameScope());
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterName(DependencyObject dependencyObject, string name, object scopedElement)
         {
@@ -182,7 +182,7 @@ namespace OpenSilver.Internal.Xaml
             return (T)Delegate.CreateDelegate(typeof(T), firstArgument, methodInfo);
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterEventHandler(string handlerName, string eventName, object target, object firstArgument)
         {
@@ -201,7 +201,7 @@ namespace OpenSilver.Internal.Xaml
             }
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterAttachedEventHandler(string handlerName, Type ownerType, string eventName, object target, object firstArgument)
         {
@@ -289,7 +289,7 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use RuntimeHelpers.SetTemplatedParent(IFrameworkElement, DependencyObject) instead.", true)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use RuntimeHelpers.SetTemplatedParent(IFrameworkElement, DependencyObject) instead.", true)]
         public static void SetTemplatedParent(IFrameworkElement element, IFrameworkElement templatedParent)
         {
             Debug.Assert(element is not null);
@@ -303,7 +303,7 @@ namespace OpenSilver.Internal.Xaml
             return new XamlContext();
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
         {
@@ -423,7 +423,7 @@ namespace OpenSilver.Internal.Xaml
             return false;
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void XamlContext_SetAnimationContext(XamlContext context, Timeline timeline)
         {

@@ -5258,10 +5258,8 @@ namespace System.Windows.Controls
             for (int cellIndex = 0; cellIndex < e.ClipboardRowContent.Count; cellIndex++)
             {
                 DataGridClipboardCellContent cellContent = e.ClipboardRowContent[cellIndex];
-                if (cellContent != null)
-                {
-                    text.Append(cellContent.Content);
-                }
+                text.Append(cellContent.Content);
+
                 if (cellIndex < e.ClipboardRowContent.Count - 1)
                 {
                     text.Append('\t');

@@ -20,8 +20,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -47,6 +49,8 @@ namespace System.Xaml
 		{
 		}
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete(Obsoletions.LegacyFormatterImplMessage, DiagnosticId = Obsoletions.LegacyFormatterImplDiagId)]
 		protected XamlXmlWriterException (SerializationInfo info, StreamingContext context)
 			: base (info, context)
 		{

@@ -1770,19 +1770,19 @@ namespace System.Windows.Controls.Primitives
 
         #region Obsolete
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void ApplySelectedIndex(int index) { }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void ManageSelectedIndex_Changed(DependencyPropertyChangedEventArgs e) { }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void OnSelectedItemChanged(object selectedItem) { }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void NotifyItemMouseEnter(SelectorItem item) { }
 

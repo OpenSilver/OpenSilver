@@ -22,9 +22,6 @@
     <Compile Include="..\Runtime\System.Windows.Controls\IUpdateVisualState.cs">
       <Link>Common\IUpdateVisualState.cs</Link>
     </Compile>
-    <Compile Include="..\Runtime\System.Runtime.CompilerServices\IsExternalInit.cs">
-      <Link>System.Runtime.CompilerServices\IsExternalInit.cs</Link>
-    </Compile>
     <Compile Include="BusyIndicator\BusyIndicator.cs" />
     <Compile Include="Common\EnumerableExtensions.cs" />
     <Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">

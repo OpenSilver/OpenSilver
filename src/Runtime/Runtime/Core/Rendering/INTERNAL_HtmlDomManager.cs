@@ -43,7 +43,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         internal static bool SyncRenderingWithLayout { get; set; } = false;
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static object GetApplicationRootDomElement() => Application.Current?.GetRootDiv();
 

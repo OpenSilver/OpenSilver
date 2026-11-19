@@ -592,7 +592,7 @@ public abstract class Geometry : DependencyObject
             Size = (uint)size,
         };
 
-        MemoryMarshal.Write(data.SerializedData, ref pPathGeometry);
+        MemoryMarshal.Write(data.SerializedData, in pPathGeometry);
 
         return data;
     }

@@ -287,7 +287,7 @@ public sealed class VisualBrush : TileBrush
 
         private TaskCompletionSource<string> RequestSnapshot(UIElement element)
         {
-            var tcs = new TaskCompletionSource<string>(TaskContinuationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             string pixelRatio = _visualBrush.PixelRatio.ToInvariantString();
 

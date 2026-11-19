@@ -255,15 +255,16 @@ public class WindowHost : ContentControl
     {
         
         _hasChromeOverride = windowChrome != null;
-        Thickness resizeThickness = new Thickness(8);
+        Thickness resizeThickness;
         if (_hasChromeOverride)
         {
             _dragAreaPart?.Visibility = Visibility.Visible;
-            resizeThickness = windowChrome.ResizeBorderThickness != null ? windowChrome.ResizeBorderThickness : resizeThickness;
+            resizeThickness = windowChrome.ResizeBorderThickness;
         }
         else
         {
             _dragAreaPart?.Visibility = Visibility.Collapsed;
+            resizeThickness = new Thickness(8);
         }
         ApplyWindowStyle();
         UpdateResizeBorderThickness(resizeThickness);

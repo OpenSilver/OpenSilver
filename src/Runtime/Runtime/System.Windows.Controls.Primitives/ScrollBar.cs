@@ -1035,7 +1035,7 @@ namespace System.Windows.Controls.Primitives
         internal static TimeSpan DefaultDebounceInterval { get; set; } = TimeSpan.Zero;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
         public static readonly DependencyProperty DebounceProperty =
             DependencyProperty.RegisterAttached(
                 nameof(Debounce),
@@ -1044,7 +1044,7 @@ namespace System.Windows.Controls.Primitives
                 new PropertyMetadata((TimeSpan?)null));
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
         public TimeSpan Debounce
         {
             get => (TimeSpan?)GetValue(DebounceProperty) ?? DefaultDebounceInterval;
@@ -1090,7 +1090,7 @@ namespace System.Windows.Controls.Primitives
 #pragma warning restore CS0618 // Type or member is obsolete
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
         public static TimeSpan GetDebounce(FrameworkElement fe)
         {
             ArgumentNullException.ThrowIfNull(fe);
@@ -1099,7 +1099,7 @@ namespace System.Windows.Controls.Primitives
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use ScrollViewer.IsDeferredScrollingEnabled instead.")]
         public static void SetDebounce(FrameworkElement fe, TimeSpan debounce)
         {
             ArgumentNullException.ThrowIfNull(fe);

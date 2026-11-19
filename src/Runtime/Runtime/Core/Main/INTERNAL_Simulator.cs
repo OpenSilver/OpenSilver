@@ -62,7 +62,7 @@ namespace DotNetForHtml5.Core
             }
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static dynamic WebClientFactory { get; set; }
 

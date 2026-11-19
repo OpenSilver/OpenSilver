@@ -16,7 +16,7 @@ using OpenSilver.Internal;
 
 namespace System.Windows
 {
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public enum WhenToCallPropertyChangedEnum
     {

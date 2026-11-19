@@ -566,7 +566,6 @@ namespace System.Windows.Controls.Primitives
         {
             if (Owner != null)
             {
-                Debug.Assert(Owner.DisplayDate != null, "The Owner Calendar's DisplayDate should not be null!");
                 _currentMonth = Owner.DisplayDateInternal;
             }
             else
@@ -574,17 +573,14 @@ namespace System.Windows.Controls.Primitives
                 _currentMonth = DateTime.Today;
             }
 
-            if (_currentMonth != null)
-            {
-                SetMonthModeHeaderButton();
-                SetMonthModePreviousButton(_currentMonth);
-                SetMonthModeNextButton(_currentMonth);
+            SetMonthModeHeaderButton();
+            SetMonthModePreviousButton(_currentMonth);
+            SetMonthModeNextButton(_currentMonth);
 
-                if (MonthView != null)
-                {
-                    SetDayTitles();
-                    SetCalendarDayButtons(_currentMonth);
-                }
+            if (MonthView != null)
+            {
+                SetDayTitles();
+                SetCalendarDayButtons(_currentMonth);
             }
         }
 
@@ -851,7 +847,6 @@ namespace System.Windows.Controls.Primitives
                         childButton.IsCalendarButtonFocused = false;
                     }
 
-                    Debug.Assert(Owner.DisplayDateInternal != null, "The Owner Calendar's DisplayDateInternal should not be null!");
                     childButton.IsSelected = (DateTimeHelper.CompareYearMonth(day, Owner.DisplayDateInternal) == 0);
 
                     if (DateTimeHelper.CompareYearMonth(day, Owner.DisplayDateRangeStart) < 0 || DateTimeHelper.CompareYearMonth(day, Owner.DisplayDateRangeEnd) > 0)
@@ -934,7 +929,6 @@ namespace System.Windows.Controls.Primitives
         {
             if (Owner != null)
             {
-                Debug.Assert(Owner.SelectedMonth != null, "The Owner Calendar's SelectedMonth should not be null!");
                 _currentMonth = (DateTime)Owner.SelectedMonth;
             }
             else
@@ -942,16 +936,13 @@ namespace System.Windows.Controls.Primitives
                 _currentMonth = DateTime.Today;
             }
 
-            if (_currentMonth != null)
-            {
-                SetYearModeHeaderButton();
-                SetYearModePreviousButton();
-                SetYearModeNextButton();
+            SetYearModeHeaderButton();
+            SetYearModePreviousButton();
+            SetYearModeNextButton();
 
-                if (YearView != null)
-                {
-                    SetMonthButtonsForYearMode();
-                }
+            if (YearView != null)
+            {
+                SetMonthButtonsForYearMode();
             }
         }
 
@@ -1085,7 +1076,6 @@ namespace System.Windows.Controls.Primitives
 
             if (Owner != null)
             {
-                Debug.Assert(Owner.SelectedYear != null, "The owning Calendar's selected year should not be null!");
                 selectedYear = Owner.SelectedYear;
                 _currentMonth = (DateTime)Owner.SelectedMonth;
             }
@@ -1095,19 +1085,16 @@ namespace System.Windows.Controls.Primitives
                 selectedYear = DateTime.Today;
             }
 
-            if (_currentMonth != null)
+            int decade = DateTimeHelper.DecadeOfDate(selectedYear);
+            int decadeEnd = DateTimeHelper.EndOfDecade(selectedYear);
+
+            SetDecadeModeHeaderButton(decade, decadeEnd);
+            SetDecadeModePreviousButton(decade);
+            SetDecadeModeNextButton(decadeEnd);
+
+            if (YearView != null)
             {
-                int decade = DateTimeHelper.DecadeOfDate(selectedYear);
-                int decadeEnd = DateTimeHelper.EndOfDecade(selectedYear);
-
-                SetDecadeModeHeaderButton(decade, decadeEnd);
-                SetDecadeModePreviousButton(decade);
-                SetDecadeModeNextButton(decadeEnd);
-
-                if (YearView != null)
-                {
-                    SetYearButtons(decade, decadeEnd);
-                }
+                SetYearButtons(decade, decadeEnd);
             }
         }
 
@@ -1242,7 +1229,6 @@ namespace System.Windows.Controls.Primitives
                     if (b.IsEnabled && !b.IsBlackout)
                     {
                         DateTime selectedDate = (DateTime)b.DataContext;
-                        Debug.Assert(selectedDate != null, "selectedDate should not be null!");
                         _isMouseLeftButtonDown = true;
                         // null check is added for unit tests
                         if (e != null)
@@ -1474,22 +1460,16 @@ namespace System.Windows.Controls.Primitives
                 {
                     if (Owner.DisplayMode == CalendarMode.Month)
                     {
-                        if (Owner.DisplayDate != null)
-                        {
-                            d = Owner.DisplayDateInternal;
-                            Owner.SelectedMonth = new DateTime(d.Year, d.Month, 1);
-                        }
+                        d = Owner.DisplayDateInternal;
+                        Owner.SelectedMonth = new DateTime(d.Year, d.Month, 1);
                         Owner.DisplayMode = CalendarMode.Year;
                     }
                     else
                     {
                         Debug.Assert(Owner.DisplayMode == CalendarMode.Year, "The Owner Calendar's DisplayMode should be Year!");
 
-                        if (Owner.SelectedMonth != null)
-                        {
-                            d = Owner.SelectedMonth;
-                            Owner.SelectedYear = new DateTime(d.Year, d.Month, 1);
-                        }
+                        d = Owner.SelectedMonth;
+                        Owner.SelectedYear = new DateTime(d.Year, d.Month, 1);
                         Owner.DisplayMode = CalendarMode.Decade;
                     }
                 }

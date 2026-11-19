@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -57,6 +58,7 @@ public class ResourceReferenceKeyNotFoundException : InvalidOperationException
     /// The context at the time the exception was thrown.
     /// </param>
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Obsoletions.LegacyFormatterImplMessage, DiagnosticId = Obsoletions.LegacyFormatterImplDiagId)]
     protected ResourceReferenceKeyNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
         Key = info.GetValue(nameof(Key), typeof(object));
@@ -80,6 +82,7 @@ public class ResourceReferenceKeyNotFoundException : InvalidOperationException
     /// The context at the time the exception was thrown.
     /// </param>
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Obsoletions.LegacyFormatterImplMessage, DiagnosticId = Obsoletions.LegacyFormatterImplDiagId)]
     public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         base.GetObjectData(info, context);

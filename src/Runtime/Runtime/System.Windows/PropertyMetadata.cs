@@ -554,7 +554,7 @@ namespace System.Windows
         /// <summary>
         /// Determines if the callback method should be called when the element is added to the visual tree.
         /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public WhenToCallPropertyChangedEnum CallPropertyChangedWhenLoadedIntoVisualTree
         {

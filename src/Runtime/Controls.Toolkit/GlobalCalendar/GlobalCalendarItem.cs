@@ -503,7 +503,6 @@ namespace System.Windows.Controls.Primitives
         {
             if (Owner != null)
             {
-                Debug.Assert(Owner.DisplayDate != null, "The Owner GlobalCalendar's DisplayDate should not be null!");
                 _currentMonth = Owner.DisplayDateInternal;
             }
             else
@@ -511,17 +510,14 @@ namespace System.Windows.Controls.Primitives
                 _currentMonth = DateTime.Today;
             }
 
-            if (_currentMonth != null)
-            {
-                SetMonthModeHeaderButton();
-                SetMonthModePreviousButton(_currentMonth);
-                SetMonthModeNextButton(_currentMonth);
+            SetMonthModeHeaderButton();
+            SetMonthModePreviousButton(_currentMonth);
+            SetMonthModeNextButton(_currentMonth);
 
-                if (MonthView != null)
-                {
-                    SetDayTitles();
-                    SetCalendarDayButtons(_currentMonth);
-                }
+            if (MonthView != null)
+            {
+                SetDayTitles();
+                SetCalendarDayButtons(_currentMonth);
             }
         }
 
@@ -789,7 +785,6 @@ namespace System.Windows.Controls.Primitives
                         childButton.IsCalendarButtonFocused = false;
                     }
 
-                    Debug.Assert(Owner.DisplayDateInternal != null, "The Owner GlobalCalendar's DisplayDateInternal should not be null!");
                     childButton.IsSelected = info.GetMonthDifference(day, Owner.DisplayDateInternal) == 0;
 
                     if (info.GetMonthDifference(day, Owner.DisplayDateRangeStart) < 0 ||
@@ -877,7 +872,6 @@ namespace System.Windows.Controls.Primitives
         {
             if (Owner != null)
             {
-                Debug.Assert(Owner.SelectedMonth != null, "The Owner GlobalCalendar's SelectedMonth should not be null!");
                 _currentMonth = (DateTime)Owner.SelectedMonth;
             }
             else
@@ -885,16 +879,13 @@ namespace System.Windows.Controls.Primitives
                 _currentMonth = DateTime.Today;
             }
 
-            if (_currentMonth != null)
-            {
-                SetYearModeHeaderButton();
-                SetYearModePreviousButton();
-                SetYearModeNextButton();
+            SetYearModeHeaderButton();
+            SetYearModePreviousButton();
+            SetYearModeNextButton();
 
-                if (YearView != null)
-                {
-                    SetMonthButtonsForYearMode();
-                }
+            if (YearView != null)
+            {
+                SetMonthButtonsForYearMode();
             }
         }
 
@@ -1029,7 +1020,6 @@ namespace System.Windows.Controls.Primitives
 
             if (Owner != null)
             {
-                Debug.Assert(Owner.SelectedYear != null, "The owning GlobalCalendar's selected year should not be null!");
                 selectedYear = Owner.SelectedYear;
                 _currentMonth = (DateTime)Owner.SelectedMonth;
             }
@@ -1040,19 +1030,16 @@ namespace System.Windows.Controls.Primitives
             }
 
             CalendarInfo info = Info;
-            if (_currentMonth != null)
+            int decade = info.GetDecadeStart(selectedYear);
+            int decadeEnd = info.GetDecadeEnd(selectedYear);
+
+            SetDecadeModeHeaderButton(decade, decadeEnd);
+            SetDecadeModePreviousButton(decade);
+            SetDecadeModeNextButton(decadeEnd);
+
+            if (YearView != null)
             {
-                int decade = info.GetDecadeStart(selectedYear);
-                int decadeEnd = info.GetDecadeEnd(selectedYear);
-
-                SetDecadeModeHeaderButton(decade, decadeEnd);
-                SetDecadeModePreviousButton(decade);
-                SetDecadeModeNextButton(decadeEnd);
-
-                if (YearView != null)
-                {
-                    SetYearButtons(decade, decadeEnd);
-                }
+                SetYearButtons(decade, decadeEnd);
             }
         }
 
@@ -1186,7 +1173,6 @@ namespace System.Windows.Controls.Primitives
                     if (b.IsEnabled && !b.IsBlackout)
                     {
                         DateTime selectedDate = GlobalCalendarExtensions.GetDate(b);
-                        Debug.Assert(selectedDate != null, "selectedDate should not be null!");
                         _isMouseLeftButtonDown = true;
                         // null check is added for unit tests
                         if (e != null)
@@ -1420,22 +1406,16 @@ namespace System.Windows.Controls.Primitives
                 {
                     if (Owner.DisplayMode == CalendarMode.Month)
                     {
-                        if (Owner.DisplayDate != null)
-                        {
-                            d = Owner.DisplayDateInternal;
-                            Owner.SelectedMonth = Info.GetFirstDayInMonth(d);
-                        }
+                        d = Owner.DisplayDateInternal;
+                        Owner.SelectedMonth = Info.GetFirstDayInMonth(d);
                         Owner.DisplayMode = CalendarMode.Year;
                     }
                     else
                     {
                         Debug.Assert(Owner.DisplayMode == CalendarMode.Year, "The Owner GlobalCalendar's DisplayMode should be Year!");
 
-                        if (Owner.SelectedMonth != null)
-                        {
-                            d = Owner.SelectedMonth;
-                            Owner.SelectedYear = Info.GetFirstDayInMonth(d);
-                        }
+                        d = Owner.SelectedMonth;
+                        Owner.SelectedYear = Info.GetFirstDayInMonth(d);
                         Owner.DisplayMode = CalendarMode.Decade;
                     }
                 }

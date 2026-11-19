@@ -20,8 +20,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -56,6 +58,8 @@ namespace System.Xaml
 		public XamlMember DuplicateMember { get; set; }
 		public XamlType ParentType { get; set; }
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete(Obsoletions.LegacyFormatterImplMessage, DiagnosticId = Obsoletions.LegacyFormatterImplDiagId)]
 		protected XamlDuplicateMemberException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
@@ -63,6 +67,8 @@ namespace System.Xaml
 			ParentType = (XamlType)info.GetValue("type", typeof(XamlType));
 		}
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete(Obsoletions.LegacyFormatterImplMessage, DiagnosticId = Obsoletions.LegacyFormatterImplDiagId)]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);

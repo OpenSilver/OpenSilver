@@ -18,7 +18,7 @@ using System.ComponentModel;
 namespace CSHTML5.Internal
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Activator instead.")]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use System.Activator instead.")]
     public static class TypeInstantiationHelper
     {
         /// <summary>

@@ -427,7 +427,7 @@ namespace System.Windows
         /// </summary>
         /// <param name="args">Event data for the event.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use OnStartup(StartupEventArgs) instead.")]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use OnStartup(StartupEventArgs) instead.")]
         protected virtual void OnLaunched(LaunchActivatedEventArgs args)
         {
         }
@@ -893,11 +893,11 @@ namespace System.Windows
             }
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static event EventHandler INTERNAL_Reloaded;
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void INTERNAL_RaiseReloadedEvent()
         {
@@ -1019,7 +1019,7 @@ namespace System.Windows
         /// to ensure correction functioning of the application.
         /// </summary>
         /// <param name="entryPoint"></param>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RunApplication(Action entryPoint) => entryPoint();
     }

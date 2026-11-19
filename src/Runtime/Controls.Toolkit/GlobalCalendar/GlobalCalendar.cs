@@ -496,14 +496,11 @@ namespace System.Windows.Controls
             GlobalCalendar c = d as GlobalCalendar;
             Debug.Assert(c != null, "c should not be null!");
 
-            if (c.DisplayDate != null)
-            {
-                int i = c.Info.GetMonthDifference(c.DisplayDateInternal, DateTime.Today);
+            int i = c.Info.GetMonthDifference(c.DisplayDateInternal, DateTime.Today);
 
-                if (i > -2 && i < 2)
-                {
-                    c.UpdateMonths();
-                }
+            if (i > -2 && i < 2)
+            {
+                c.UpdateMonths();
             }
         }
         #endregion IsTodayHighlighted
@@ -2108,7 +2105,7 @@ namespace System.Windows.Controls
         /// </summary>
         internal void OnNextClick()
         {
-            if (DisplayMode == CalendarMode.Month && DisplayDate != null)
+            if (DisplayMode == CalendarMode.Month)
             {
                 DateTime? d = Info.AddMonths(Info.GetFirstDayInMonth(DisplayDate), 1);
                 if (d.HasValue)
@@ -2152,7 +2149,7 @@ namespace System.Windows.Controls
         /// </summary>
         internal void OnPreviousClick()
         {
-            if (DisplayMode == CalendarMode.Month && DisplayDate != null)
+            if (DisplayMode == CalendarMode.Month)
             {
                 DateTime? d = Info.AddMonths(Info.GetFirstDayInMonth(DisplayDate), -1);
                 if (d.HasValue)
@@ -2316,7 +2313,7 @@ namespace System.Windows.Controls
         {
             if (DisplayMode == CalendarMode.Month)
             {
-                if (LastSelectedDate.HasValue && DisplayDateInternal != null)
+                if (LastSelectedDate.HasValue)
                 {
                     // If a blackout day is inactive, when clicked on it, the
                     // previous inactive day which is not a blackout day can get
@@ -2621,24 +2618,21 @@ namespace System.Windows.Controls
             {
                 case CalendarMode.Month:
                     {
-                        if (DisplayDate != null)
-                        {
-                            DateTime? selectedDate = new DateTime(DisplayDateInternal.Year, DisplayDateInternal.Month, 1);
+                        DateTime? selectedDate = new DateTime(DisplayDateInternal.Year, DisplayDateInternal.Month, 1);
 
-                            if (Info.GetMonthDifference(DateTime.MaxValue, selectedDate.Value) > 0)
-                            {
-                                // since DisplayDate is not equal to
-                                // DateTime.MaxValue we are sure selectedDate is\
-                                // not null
-                                selectedDate = Info.AddMonths(selectedDate.Value, 1).Value;
-                                selectedDate = Info.AddDays(selectedDate.Value, -1).Value;
-                            }
-                            else
-                            {
-                                selectedDate = DateTime.MaxValue;
-                            }
-                            ProcessSelection(shift, selectedDate, null);
+                        if (Info.GetMonthDifference(DateTime.MaxValue, selectedDate.Value) > 0)
+                        {
+                            // since DisplayDate is not equal to
+                            // DateTime.MaxValue we are sure selectedDate is\
+                            // not null
+                            selectedDate = Info.AddMonths(selectedDate.Value, 1).Value;
+                            selectedDate = Info.AddDays(selectedDate.Value, -1).Value;
                         }
+                        else
+                        {
+                            selectedDate = DateTime.MaxValue;
+                        }
+                        ProcessSelection(shift, selectedDate, null);
                         break;
                     }
                 case CalendarMode.Year:
@@ -2766,7 +2760,7 @@ namespace System.Windows.Controls
                             focusDate = c.DisplayDate;
                             c.LastSelectedDate = c.DisplayDate;
                         }
-                        Debug.Assert(focusDate != null, "focusDate should not be null!");
+
                         c.FocusButton = c.FindDayButtonFromDay(focusDate);
 
                         if (c.FocusButton != null)

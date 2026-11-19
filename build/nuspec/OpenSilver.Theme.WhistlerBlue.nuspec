@@ -13,15 +13,15 @@
     <tags>silverlight wpf webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
     <icon>images\OpenSilver_icon.png</icon>
     <dependencies>
-      <group targetFramework=".NETStandard2.0">
+      <group targetFramework=".NET10.0">
         <dependency id="OpenSilver" version="$OpenSilverPackageVersion$" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <!-- OpenSilver runtime -->
-    <file src="../../src/Runtime/Controls.Theming.WhistlerBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.WhistlerBlue.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.WhistlerBlue.dll" />
-    <file src="../../src/Runtime/Controls.Theming.WhistlerBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.WhistlerBlue.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.WhistlerBlue.xml" />
+    <file src="../../src/Runtime/Controls.Theming.WhistlerBlue/bin/$Configuration$/net10.0/OpenSilver.Controls.Theming.WhistlerBlue.dll" target="lib/net10.0/OpenSilver.Controls.Theming.WhistlerBlue.dll" />
+    <file src="../../src/Runtime/Controls.Theming.WhistlerBlue/bin/$Configuration$/net10.0/OpenSilver.Controls.Theming.WhistlerBlue.xml" target="lib/net10.0/OpenSilver.Controls.Theming.WhistlerBlue.xml" />
 
     <!-- OpenSilver icon -->
     <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />

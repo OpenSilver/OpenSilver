@@ -44,9 +44,6 @@
     <Compile Include="..\Runtime\OpenSilver\Internal\WeakEvent.cs">
       <Link>Common\WeakEvent.cs</Link>
     </Compile>
-    <Compile Include="..\Runtime\System.Runtime.CompilerServices\IsExternalInit.cs">
-      <Link>System.Runtime.CompilerServices\IsExternalInit.cs</Link>
-    </Compile>
     <Compile Include="DomainUpDown\DomainUpDown.cs" />
     <Compile Include="DomainUpDown\DomainUpDownAutomationPeer.cs" />
     <Compile Include="DomainUpDown\InvalidInputAction.cs" />

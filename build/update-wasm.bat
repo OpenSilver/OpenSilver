@@ -65,6 +65,8 @@ ECHO.
 ECHO %ESC%[95mCopying Wasm DLLs.%ESC%[0m
 ECHO.
 
+IF NOT EXIST "%WASM_DIR%\lib\net10.0-browser" MKDIR "%WASM_DIR%\lib\net10.0-browser"
+IF NOT EXIST "%WASM_DIR%\lib\net11.0-browser" MKDIR "%WASM_DIR%\lib\net11.0-browser"
 COPY "%SRC_DIR%\WebAssembly\OpenSilver.WebAssembly\bin\%CFG%\net10.0-browser\OpenSilver.WebAssembly.dll" "%WASM_DIR%\lib\net10.0-browser"
 COPY "%SRC_DIR%\WebAssembly\OpenSilver.WebAssembly\bin\%CFG%\net11.0-browser\OpenSilver.WebAssembly.dll" "%WASM_DIR%\lib\net11.0-browser"
 

@@ -30,7 +30,7 @@ public static class Cshtml5Initializer
     public static void Initialize(INativeMethods nativeMethods) => Initialize((IJavaScriptExecutionHandler)nativeMethods);
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use Cshtml5Initializer.Initialize(IWebAssemblyExecutionHandler2) instead.", true)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use Cshtml5Initializer.Initialize(IWebAssemblyExecutionHandler2) instead.", true)]
     public static void Initialize(IWebAssemblyExecutionHandler executionHandler)
     {
         Initialize((IJavaScriptExecutionHandler)executionHandler);

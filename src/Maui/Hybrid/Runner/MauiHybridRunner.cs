@@ -125,10 +125,21 @@ namespace OpenSilver.MauiHybrid.Runner
 
         private async Task StartJsAsync()
         {
-            var res = await jsRuntime.InvokeAsync<bool>(StartAsyncJsMethod);
-            if (!res)
+            bool started = false;
+            Exception? exception = null;
+
+            try
             {
-                throw new InvalidOperationException("An unexpected error occurred. Please check the browser console for more details.");
+                started = await jsRuntime.InvokeAsync<bool>(StartAsyncJsMethod);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            if (!started)
+            {
+                throw new InvalidOperationException("An unexpected error occurred. Please check the browser console for more details.", exception);
             }
         }
 

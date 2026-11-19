@@ -133,7 +133,7 @@ public abstract class BitmapSource : ImageSource
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use BitmapSource.SetSource(Stream) instead.")]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use BitmapSource.SetSource(Stream) instead.")]
     public Stream INTERNAL_StreamSource
     {
         get => _streamSource;
@@ -141,11 +141,11 @@ public abstract class BitmapSource : ImageSource
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64Image class instead.")]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use the Base64Image class instead.")]
     public string INTERNAL_DataURL { get; private set; }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     public string INTERNAL_StreamAsBase64String
     {
         get
@@ -164,6 +164,6 @@ public abstract class BitmapSource : ImageSource
     /// </summary>
     /// <param name="dataUrl">The image encoded in "data URL" format.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64Image class instead.")]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage + " Use the Base64Image class instead.")]
     public void SetSource(string dataUrl) => INTERNAL_DataURL = dataUrl;
 }

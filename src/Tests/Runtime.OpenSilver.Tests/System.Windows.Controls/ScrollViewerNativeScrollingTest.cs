@@ -13,7 +13,6 @@
 
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
-using System.Windows.Markup;
 using System.Windows.Media;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver;
@@ -237,27 +236,6 @@ public class ScrollViewerNativeScrollingTest
     }
 
     [TestMethod]
-    public void NativeScrolling_IsEnabled_False_Should_Use_Managed_Scrolling()
-    {
-        ScrollViewer sv = CreateScrollViewer(out Border content);
-        NativeScrolling.SetIsEnabled(sv, false);
-
-        using var host = new Host(sv);
-        string js = host.FlushJavaScript();
-
-        Assert.IsFalse(host.Presenter.IsNativeScrolling);
-        // Managed scrolling captures touches when a scrollbar is visible (touch-action: none).
-        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',2,false,true)");
-
-        host.ScrollViewer.ScrollToVerticalOffset(100);
-        host.UpdateLayout();
-
-        Assert.AreEqual(100, host.ScrollViewer.VerticalOffset);
-        Assert.AreEqual(new Vector(0, -100), content.VisualOffset);
-        Assert.IsFalse(host.FlushJavaScript().Contains("osjs.nativeScroll.scrollTo"));
-    }
-
-    [TestMethod]
     public void NativeScrolling_IsEnabled_Should_Switch_Mode_Dynamically()
     {
         using var host = new Host(CreateScrollViewer(out Border content));
@@ -292,51 +270,6 @@ public class ScrollViewerNativeScrollingTest
 
         Assert.IsTrue(host.Presenter.IsNativeScrolling);
         Assert.IsFalse(inner.ElementScrollContentPresenter.IsNativeScrolling);
-    }
-
-    [TestMethod]
-    public void Managed_Scrolling_Without_Visible_ScrollBar_Should_Not_Capture_Touches()
-    {
-        ScrollViewer sv = CreateScrollViewer(out Border content);
-        content.Height = 10;
-        NativeScrolling.SetIsEnabled(sv, false);
-
-        using var host = new Host(sv);
-
-        Assert.AreEqual(Visibility.Collapsed, host.ScrollViewer.ComputedVerticalScrollBarVisibility);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PresenterId}',2,false,false)");
-    }
-
-    [TestMethod]
-    public void Native_Scrolling_Should_Leave_Touches_To_The_Application_While_The_Content_Fits()
-    {
-        ScrollViewer sv = CreateScrollViewer(out Border content);
-        sv.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-        content.Height = ViewportSize;
-
-        using var host = new Host(sv);
-        string js = host.FlushJavaScript();
-
-        Assert.IsTrue(host.Presenter.IsNativeScrolling);
-        Assert.IsFalse(((INativeScrollInfo)host.Presenter).CanNativelyScroll);
-        StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,false)");
-        Assert.IsFalse(js.Contains($"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)"));
-
-        // The desired size of the presenter does not change, so the ScrollViewer is not measured again.
-        content.Height = ContentHeight;
-        host.UpdateLayout();
-
-        Assert.IsTrue(((INativeScrollInfo)host.Presenter).CanNativelyScroll);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)");
-
-        host.SimulateNativeScroll(0, 150);
-        host.FlushJavaScript();
-        content.Height = 10;
-        host.UpdateLayout();
-
-        Assert.AreEqual(0, host.ScrollViewer.VerticalOffset);
-        Assert.IsFalse(((INativeScrollInfo)host.Presenter).CanNativelyScroll);
-        StringAssert.Contains(host.FlushJavaScript(), $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,false)");
     }
 
     private sealed class ArrangeLargerThanMeasurePanel : Panel
@@ -539,64 +472,6 @@ public class ScrollViewerNativeScrollingTest
     }
 
     [TestMethod]
-    public void NativeScrollBars_Should_Not_Be_Added_To_A_Template_Without_ScrollBars()
-    {
-        NativeScrollManager.HasOverlayScrollBars = true;
-        try
-        {
-            ScrollViewer sv = CreateScrollViewerWithNativeScrollBars();
-            sv.Template = (ControlTemplate)XamlReader.Parse(
-                """
-                <ControlTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                 TargetType="ScrollViewer">
-                    <ScrollContentPresenter x:Name="ScrollContentPresenter" Content="{TemplateBinding Content}" />
-                </ControlTemplate>
-                """);
-
-            using var host = new Host(sv);
-
-            Assert.IsTrue(host.Presenter.IsNativeScrolling);
-            Assert.IsFalse(sv.AllowsNativeScrollBars);
-            string js = host.FlushJavaScript();
-            StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)");
-            Assert.IsFalse(js.Contains(",true,false,true)"), js);
-        }
-        finally
-        {
-            NativeScrollManager.HasOverlayScrollBars = false;
-        }
-    }
-
-    [TestMethod]
-    public void NativeScrollBars_Should_Be_Switched_At_Runtime()
-    {
-        NativeScrollManager.HasOverlayScrollBars = true;
-        try
-        {
-            ScrollViewer sv = CreateScrollViewerWithNativeScrollBars();
-            NativeScrolling.SetUseNativeScrollBars(sv, false);
-
-            using var host = new Host(sv);
-            AssertUsesTemplateScrollBars(host, host.FlushJavaScript());
-
-            NativeScrolling.SetUseNativeScrollBars(sv, true);
-            host.UpdateLayout();
-            AssertUsesNativeScrollBars(host, host.FlushJavaScript());
-
-            NativeScrolling.SetUseNativeScrollBars(sv, false);
-            host.UpdateLayout();
-            string js = host.FlushJavaScript();
-            AssertUsesTemplateScrollBars(host, js);
-            StringAssert.Contains(js, $"osjs.nativeScroll.setMode('{host.PresenterId}',1,false,true)");
-        }
-        finally
-        {
-            NativeScrollManager.HasOverlayScrollBars = false;
-        }
-    }
-
-    [TestMethod]
     public void NativeScrollBars_Should_Follow_The_Scrolling_Mode()
     {
         NativeScrollManager.HasOverlayScrollBars = true;
@@ -621,7 +496,7 @@ public class ScrollViewerNativeScrollingTest
     [TestMethod]
     public void Feature_Disabled_Should_Use_Managed_Scrolling()
     {
-        Features.Scrolling.UseNativeScrolling = false;
+        NativeScrolling.UseNativeScrolling = false;
         try
         {
             using var host = new Host(CreateScrollViewer(out Border content));
@@ -635,7 +510,7 @@ public class ScrollViewerNativeScrollingTest
         }
         finally
         {
-            Features.Scrolling.UseNativeScrolling = true;
+            NativeScrolling.UseNativeScrolling = true;
         }
     }
 

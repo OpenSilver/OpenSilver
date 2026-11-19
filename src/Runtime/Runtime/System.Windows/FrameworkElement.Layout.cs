@@ -1419,7 +1419,7 @@ public partial class FrameworkElement
     /// <summary>
     /// Identifies the <see cref="CustomLayout"/> dependency property.
     /// </summary>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static readonly DependencyProperty CustomLayoutProperty =
         DependencyProperty.Register(
@@ -1431,7 +1431,7 @@ public partial class FrameworkElement
     /// <summary>
     /// Enable or disable measure/arrange layout system in a sub part
     /// </summary>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public bool CustomLayout
     {
@@ -1442,7 +1442,7 @@ public partial class FrameworkElement
     /// <summary>
     /// Identifies the <see cref="IsAutoWidthOnCustomLayout"/> dependency property.
     /// </summary>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static readonly DependencyProperty IsAutoWidthOnCustomLayoutProperty =
         DependencyProperty.Register(
@@ -1454,7 +1454,7 @@ public partial class FrameworkElement
     /// <summary>
     /// Gets or sets the Auto Width to the root of CustomLayout
     /// </summary>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public bool? IsAutoWidthOnCustomLayout
     {
@@ -1465,7 +1465,7 @@ public partial class FrameworkElement
     /// <summary>
     /// Identifies the <see cref="IsAutoHeightOnCustomLayout"/> dependency property.
     /// </summary>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static readonly DependencyProperty IsAutoHeightOnCustomLayoutProperty =
         DependencyProperty.Register(
@@ -1477,7 +1477,7 @@ public partial class FrameworkElement
     /// <summary>
     /// Gets or sets the Auto Height to the root of CustomLayout
     /// </summary>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public bool? IsAutoHeightOnCustomLayout
     {
@@ -1485,11 +1485,11 @@ public partial class FrameworkElement
         set => SetValueInternal(IsAutoHeightOnCustomLayoutProperty, value);
     }
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     protected virtual void OnAfterApplyHorizontalAlignmentAndWidth() { }
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     protected virtual void OnAfterApplyVerticalAlignmentAndWidth() { }
 }

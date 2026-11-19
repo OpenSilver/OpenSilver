@@ -12,11 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.JSInterop" Version="3.1.28" />
-    <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.0" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.5" />
-    <PackageReference Include="System.Text.Json" Version="8.0.6" />
+    <PackageReference Include="Microsoft.JSInterop" Version="10.0.0" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="10.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +53,7 @@
     <Compile Include="OpenSilver\Internal\Media\Geometry\Core\Utils.cs" />
     <Compile Include="OpenSilver\Internal\Media\PathStreamGeometryContext.cs" />
     <Compile Include="OpenSilver\Internal\Media\wgx_core_types.cs" />
+    <Compile Include="OpenSilver\Internal\Obsoletions.cs" />
     <Compile Include="OpenSilver\Internal\StyleTriggerStorage.cs" />
     <Compile Include="OpenSilver\Internal\TemplateTriggerStorage.cs" />
     <Compile Include="OpenSilver\Internal\TriggerStorage.cs" />
@@ -486,10 +484,6 @@
     <Compile Include="PublicAPI\Interop\OnCallBackImpl.cs" />
     <Compile Include="PublicAPI\Interop\OnCallbackSimulator.cs" />
     <Compile Include="System.Collections.Generic\PriorityQueue.cs" />
-    <Compile Include="System.Runtime.CompilerServices\DefaultInterpolatedStringHandler.cs" />
-    <Compile Include="System.Runtime.CompilerServices\InterpolatedStringHandlerAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\IsExternalInit.cs" />
-    <Compile Include="System.Runtime.CompilerServices\CallerArgumentExpressionAttribute.cs" />
     <Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\PollingDuplexMode.cs" />
     <Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\PollingDuplexHttpBinding.cs" />
     <Compile Include="System.ServiceModel\WORKINPROGRESS\PollingDuplexHttpSecurity.cs" />
@@ -748,7 +742,6 @@
     <Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
     <Compile Include="System.Collections.Generic\WORKINPROGRESS\SynchronizedReadOnlyCollection.cs" />
     <Compile Include="System.ComponentModel\ICollectionViewFactory.cs" />
-    <Compile Include="System.Reflection\ICustomTypeProvider.cs" />
     <Compile Include="System.Windows\ApplicationServiceContext.cs" />
     <Compile Include="System.Windows\DataFormats.cs" />
     <Compile Include="System.Windows\DependencyObjectCollection_1.cs" />

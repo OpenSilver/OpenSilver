@@ -72,7 +72,7 @@ namespace System.Windows.Controls.DataVisualization
             }
             UnitValue unitValue = (UnitValue)obj;
 
-            if ((Object.ReferenceEquals(unitValue.Value, this.Value) || Object.Equals(unitValue.Value, this.Value)) && unitValue.Unit == this.Unit)
+            if (Object.Equals(unitValue.Value, this.Value) && unitValue.Unit == this.Unit)
             {
                 return true;
             }

@@ -20,7 +20,7 @@ using Microsoft.JSInterop;
 
 namespace DotNetForHtml5
 {
-    [Obsolete(Helper.ObsoleteMemberMessage, true)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage, true)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class JavaScriptExecutionHandler : IJavaScriptExecutionHandler
     {

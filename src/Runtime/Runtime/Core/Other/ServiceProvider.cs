@@ -60,7 +60,7 @@ namespace System
         /// <summary>
         /// Gets or sets the List of UIElement that are parents of the element.
         /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> Parents => _parents ??= new List<object>(0);
 

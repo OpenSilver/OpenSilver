@@ -567,7 +567,7 @@ public partial class Control : FrameworkElement, IInternalControl
     /// </returns>
     public new bool Focus() => base.Focus();
 
-    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [Obsolete(Obsoletions.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public new bool UseSystemFocusVisuals
     {

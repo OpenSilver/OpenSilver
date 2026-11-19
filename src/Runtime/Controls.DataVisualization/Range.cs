@@ -174,10 +174,6 @@ namespace System.Windows.Controls.DataVisualization
         public override bool Equals(object obj)
         {
             Range<T> range = (Range<T>)obj;
-            if (range == null)
-            {
-                return false;
-            }
             return this == range;
         }
 

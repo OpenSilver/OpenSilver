@@ -292,7 +292,7 @@ namespace CSHTML5.Internal
 
         private static string GetDocumentURI() => OpenSilver.Interop.ExecuteJavaScriptString("window.location.href");
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [Obsolete(Obsoletions.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static string GetJavaScriptCallingAssembly()
         {

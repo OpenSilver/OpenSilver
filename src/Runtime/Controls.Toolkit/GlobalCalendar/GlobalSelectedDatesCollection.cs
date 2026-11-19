@@ -306,7 +306,7 @@ namespace System.Windows.Controls
                 }
                 else
                 {
-                    if (item != null && _owner.Info.Compare(this[index], item) != 0 && GlobalCalendar.IsValidDateSelection(_owner, item))
+                    if (_owner.Info.Compare(this[index], item) != 0 && GlobalCalendar.IsValidDateSelection(_owner, item))
                     {
                         object removedItem = this[index];
                         base.SetItem(index, item);
