@@ -118,7 +118,7 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
 
         dependencyProperty = null;
 
-        Type sourceType = source.GetType();
+        Type sourceType = TypeHelper.GetReflectionType(source);
 
         if (GetPropertyInfo(sourceType, _propertyName) is PropertyInfo propertyInfo)
         {
