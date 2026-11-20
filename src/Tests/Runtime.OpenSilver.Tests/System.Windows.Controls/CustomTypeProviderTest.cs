@@ -56,7 +56,7 @@ namespace System.Windows.Controls.Tests
             };
             var comparer = new SortFieldComparer(sortFields, CultureInfo.InvariantCulture);
 
-            Assert.IsTrue(comparer.Compare(new DynamicRow("a"), new DynamicRow("b")) < 0);
+            Assert.IsLessThan(0, comparer.Compare(new DynamicRow("a"), new DynamicRow("b")));
         }
 
         [TestMethod]
@@ -96,7 +96,7 @@ namespace System.Windows.Controls.Tests
 
             IList<string> headers = MeasureGrid(rows);
 
-            Assert.AreEqual(0, headers.Count);
+            Assert.IsEmpty(headers);
         }
 
         [TestMethod]
@@ -177,7 +177,7 @@ namespace System.Windows.Controls.Tests
 
                 public static CustomElementType Instance { get; } = new CustomElementType();
 
-                public override PropertyInfo[] GetProperties(BindingFlags bindingAttr) => Array.Empty<PropertyInfo>();
+                public override PropertyInfo[] GetProperties(BindingFlags bindingAttr) => [];
 
                 protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers) => null;
             }
@@ -225,10 +225,10 @@ namespace System.Windows.Controls.Tests
             {
                 if ((bindingAttr & (BindingFlags.Public | BindingFlags.Instance)) == (BindingFlags.Public | BindingFlags.Instance))
                 {
-                    return new PropertyInfo[] { _title };
+                    return [_title];
                 }
 
-                return Array.Empty<PropertyInfo>();
+                return [];
             }
 
             protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
@@ -267,15 +267,15 @@ namespace System.Windows.Controls.Tests
 
             public override MemberTypes MemberType => MemberTypes.Property;
 
-            public override MethodInfo[] GetAccessors(bool nonPublic) => Array.Empty<MethodInfo>();
+            public override MethodInfo[] GetAccessors(bool nonPublic) => [];
 
-            public override object[] GetCustomAttributes(bool inherit) => Array.Empty<object>();
+            public override object[] GetCustomAttributes(bool inherit) => [];
 
-            public override object[] GetCustomAttributes(Type attributeType, bool inherit) => Array.Empty<object>();
+            public override object[] GetCustomAttributes(Type attributeType, bool inherit) => [];
 
             public override MethodInfo GetGetMethod(bool nonPublic) => null;
 
-            public override ParameterInfo[] GetIndexParameters() => Array.Empty<ParameterInfo>();
+            public override ParameterInfo[] GetIndexParameters() => [];
 
             public override MethodInfo GetSetMethod(bool nonPublic) => null;
 

@@ -1335,8 +1335,6 @@ namespace System.Windows.Data
                 // has synthetic properties (via ICustomTypeDescriptor or
                 // TypeDescriptorProvider), they don't show up on the type -
                 // only on the item.
-                // A null custom type has no synthetic properties. Use the item itself,
-                // matching Silverlight. WPF calls GetProperties on the null type.
                 if (item is ICustomTypeProvider provider && provider.GetCustomType() is Type customType)
                 {
                     properties = customType.GetProperties();
