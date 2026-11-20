@@ -1,5 +1,3 @@
-extern alias opensilver;
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -157,7 +155,7 @@ namespace System.Windows.Controls.Tests
             public new Size MeasureOverride(Size availableSize) => base.MeasureOverride(availableSize);
         }
 
-        private sealed class CustomElement : DependencyObject, opensilver::System.Reflection.ICustomTypeProvider
+        private sealed class CustomElement : DependencyObject, ICustomTypeProvider
         {
             public static readonly DependencyProperty CaptionProperty =
                 DependencyProperty.Register(nameof(Caption), typeof(string), typeof(CustomElement), null);
@@ -192,14 +190,14 @@ namespace System.Windows.Controls.Tests
             public int Age { get; set; }
         }
 
-        private sealed class ClrRow : opensilver::System.Reflection.ICustomTypeProvider
+        private sealed class ClrRow : ICustomTypeProvider
         {
             public string Label { get; set; }
 
             public Type GetCustomType() => null;
         }
 
-        private sealed class DynamicRow : opensilver::System.Reflection.ICustomTypeProvider
+        private sealed class DynamicRow : ICustomTypeProvider
         {
             public DynamicRow(string title)
             {

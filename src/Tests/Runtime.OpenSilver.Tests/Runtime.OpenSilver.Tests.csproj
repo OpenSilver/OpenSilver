@@ -18,9 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Runtime\Runtime\Runtime.OpenSilver.csproj">
-      <Aliases>global,opensilver</Aliases>
-    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
     <ProjectReference Include="..\..\Runtime\Browser\Browser.OpenSilver.csproj" />
     <ProjectReference Include="..\..\Runtime\Controls.Data\Controls.Data.OpenSilver.csproj" />
   </ItemGroup>

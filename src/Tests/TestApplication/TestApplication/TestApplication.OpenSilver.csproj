@@ -21,9 +21,7 @@
     <ProjectReference Include="..\..\..\Runtime\Controls.Toolkit\Controls.Toolkit.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Controls\Controls.OpenSilver.csproj" />
     <ProjectReference Include="..\..\..\Runtime\Data\Data.OpenSilver.csproj" />
-    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj">
-      <Aliases>global,opensilver</Aliases>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
   <ItemGroup>

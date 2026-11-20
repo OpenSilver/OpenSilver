@@ -1,5 +1,3 @@
-extern alias opensilver;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -90,7 +88,7 @@ namespace TestApplication.Tests.DataGrids
 
         private void OnReloadOriginalClick(object sender, RoutedEventArgs e) => Load(OriginalType);
 
-        private sealed class DynamicRow : opensilver::System.Reflection.ICustomTypeProvider, INotifyPropertyChanged
+        private sealed class DynamicRow : ICustomTypeProvider, INotifyPropertyChanged
         {
             private readonly DynamicRowType _type;
             private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
