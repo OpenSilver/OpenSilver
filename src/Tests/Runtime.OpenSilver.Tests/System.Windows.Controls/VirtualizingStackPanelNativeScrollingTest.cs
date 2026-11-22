@@ -299,6 +299,52 @@ public class VirtualizingStackPanelNativeScrollingTest
     }
 
     [TestMethod]
+    public void Panel_Should_Fit_The_Viewport_After_A_Measure_With_An_Unbounded_Height()
+    {
+        // As during the first layout pass of an application, before the size of the window is known.
+        TestItemsControl itemsControl = CreateItemsControl(itemCount: 100);
+        itemsControl.Height = double.NaN;
+        using var host = new Host(itemsControl);
+
+        itemsControl.Height = ViewportSize;
+        host.UpdateLayout();
+
+        Assert.AreEqual(ViewportSize, host.Panel.ActualHeight);
+        host.SimulateNativeScroll(0, double.MaxValue);
+        Assert.AreEqual(100 - ViewportSize / ItemSize, host.ScrollViewer.VerticalOffset, 1e-9);
+    }
+
+    [TestMethod]
+    public void Panel_Should_Fit_The_Viewport_When_It_Shrinks()
+    {
+        TestItemsControl itemsControl = CreateItemsControl();
+        itemsControl.Height = 2 * ViewportSize;
+        using var host = new Host(itemsControl);
+
+        itemsControl.Height = ViewportSize;
+        host.UpdateLayout();
+
+        Assert.AreEqual(ViewportSize, host.Panel.ActualHeight);
+        host.SimulateNativeScroll(0, double.MaxValue);
+        Assert.AreEqual(ItemCount - ViewportSize / ItemSize, host.ScrollViewer.VerticalOffset, 1e-9);
+    }
+
+    [TestMethod]
+    public void Horizontal_Panel_Should_Fit_The_Viewport_When_It_Shrinks()
+    {
+        TestItemsControl itemsControl = CreateItemsControl(Orientation.Horizontal);
+        itemsControl.Width = 2 * ViewportSize;
+        using var host = new Host(itemsControl);
+
+        itemsControl.Width = ViewportSize;
+        host.UpdateLayout();
+
+        Assert.AreEqual(ViewportSize, host.Panel.ActualWidth);
+        host.SimulateNativeScroll(double.MaxValue, 0);
+        Assert.AreEqual(ItemCount - ViewportSize / ItemSize, host.ScrollViewer.HorizontalOffset, 1e-9);
+    }
+
+    [TestMethod]
     public void ScrollToVerticalOffset_Should_Write_Pixel_Offset()
     {
         using var host = new Host(CreateItemsControl());
