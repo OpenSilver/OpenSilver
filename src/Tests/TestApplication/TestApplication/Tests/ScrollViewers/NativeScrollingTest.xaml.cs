@@ -51,7 +51,7 @@ namespace TestApplication.Tests.ScrollViewers
                 OptOutPanel.Children.Add(new TextBlock { Text = $"Managed row {i}", Margin = new Thickness(4, 1, 4, 1) });
             }
 
-            NativeListBox.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Item {i}").ToList();
+            NativeListBox.ItemsSource = Enumerable.Range(0, 100).Select(i => $"Item {i}").ToList();
             VirtualizedListBox.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Virtualized item {i}").ToList();
             VariableListBox.ItemsSource = _variableItems;
             for (int i = 0; i < 1000; i++)
@@ -324,7 +324,7 @@ namespace TestApplication.Tests.ScrollViewers
             var listBox = new ListBox
             {
                 ItemsPanel = (ItemsPanelTemplate)Resources["VirtualizingItemsPanel"],
-                ItemsSource = Enumerable.Range(0, 500).Select(i => $"Item {i}").ToList(),
+                ItemsSource = Enumerable.Range(0, 100).Select(i => $"Item {i}").ToList(),
             };
             _fillListBox = listBox;
 

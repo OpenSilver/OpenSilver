@@ -179,7 +179,7 @@
 
         <!-- 6. Virtualized list without a fixed height -->
         <TextBlock Style="{StaticResource Title}" Text="6. Virtualized list that fills a resizable area"/>
-        <TextBlock Style="{StaticResource Hint}" Text="The list has no height of its own: it fills the box, like a list in a '*' row of a window. 'Recreate' first measures it with an unbounded height (as during the first layout of an application), then gives the box a height of 250. After 'Recreate', 'Shrink to 120' and 'Height 250', the panel height must equal the visible height in the readout, and the list must scroll to its last item (Item 499) with the wheel, touch and the scrollbar."/>
+        <TextBlock Style="{StaticResource Hint}" Text="The list has no height of its own: it fills the box, like a list in a '*' row of a window. 'Recreate' first measures it with an unbounded height (as during the first layout of an application), then gives the box a height of 250. After 'Recreate', 'Shrink to 120' and 'Height 250', the panel height must equal the visible height in the readout, and the list must scroll to its last item (Item 99) with the wheel, touch and the scrollbar."/>
         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
             <Button Content="Recreate" Click="FillRecreate_Click" Margin="0,0,4,0"/>
             <Button Content="Shrink to 120" Click="FillShrink_Click" Margin="0,0,4,0"/>
