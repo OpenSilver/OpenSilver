@@ -632,7 +632,7 @@ public class WindowHost : ContentControl
 
     private Size GetAvailableSize()
     {
-        if (_window.WindowState == WindowState.Maximized)
+        if (_window.FillsViewport)
         {
             Window viewport = Application.Current?.MainWindow;
             if (viewport is not null)
