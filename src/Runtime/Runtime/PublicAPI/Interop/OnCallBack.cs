@@ -55,7 +55,10 @@ namespace CSHTML5.Internal
             }
 
             object result = jsCallback.Invoke(idWhereCallbackArgsAreStored, callbackArgsObject);
-            return returnValue ? result : null;
+
+            // On the Mono WebAssembly interpreter, the value returned for a void callback is sometimes a stale
+            // reference to an object used during the call rather than null, and Blazor then fails to serialize it.
+            return returnValue && jsCallback.ReturnsValue ? result : null;
         }
 
         private static void CheckIsRunningInBrowser()
