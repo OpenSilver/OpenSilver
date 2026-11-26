@@ -17,6 +17,8 @@ using OpenSilver.Internal.Controls;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows;
 
@@ -35,9 +37,9 @@ public partial class UIElement
     /// <exception cref="InvalidOperationException">
     /// The visual objects are not related.
     /// </exception>
-    public GeneralTransform TransformToVisual(UIElement visual) => new MatrixTransform(InternalTransformToVisual(visual));
+    public GeneralTransform TransformToVisual(UIElement visual) => CreateGeneralTransform(InternalTransformToVisual(visual));
 
-    internal Matrix InternalTransformToVisual(UIElement visual)
+    internal Matrix3D InternalTransformToVisual(UIElement visual)
     {
         if (visual is null)
         {
@@ -49,15 +51,14 @@ public partial class UIElement
             return TransformToVisualNative(visual);
         }
 
-        TrySimpleTransformToAncestor(ancestor, false, out Matrix m0);
+        TrySimpleTransformToAncestor(ancestor, false, out Matrix3D m0);
 
         // combine the transforms
         // if both transforms are simple Matrix transforms, just multiply them and
         // return the result.
-        if (visual.TrySimpleTransformToAncestor(ancestor, true, out Matrix m1))
+        if (visual.TrySimpleTransformToAncestor(ancestor, true, out Matrix3D m1))
         {
-            MatrixUtil.MultiplyMatrix(ref m0, ref m1);
-            return m0;
+            return m0 * m1;
         }
 
         return m0;
@@ -76,11 +77,11 @@ public partial class UIElement
     /// <exception cref="InvalidOperationException">
     /// The visual objects are not related.
     /// </exception>
-    public GeneralTransform TransformToAncestor(UIElement ancestor) => new MatrixTransform(InternalTransformToAncestor(ancestor));
+    public GeneralTransform TransformToAncestor(UIElement ancestor) => CreateGeneralTransform(InternalTransformToAncestor(ancestor));
 
-    internal Matrix InternalTransformToAncestor(UIElement ancestor)
+    internal Matrix3D InternalTransformToAncestor(UIElement ancestor)
     {
-        TrySimpleTransformToAncestor(ancestor, false, out Matrix m);
+        TrySimpleTransformToAncestor(ancestor, false, out Matrix3D m);
         return m;
     }
 
@@ -104,19 +105,30 @@ public partial class UIElement
     {
         ArgumentNullException.ThrowIfNull(descendant);
 
-        return new MatrixTransform(InternalTransformToDescendant(descendant));
+        return CreateGeneralTransform(InternalTransformToDescendant(descendant));
     }
 
-    internal Matrix InternalTransformToDescendant(UIElement descendant)
+    internal Matrix3D InternalTransformToDescendant(UIElement descendant)
     {
         Debug.Assert(descendant is not null);
-        descendant.TrySimpleTransformToAncestor(this, true, out Matrix m);
+        descendant.TrySimpleTransformToAncestor(this, true, out Matrix3D m);
         return m;
     }
 
-    private bool TrySimpleTransformToAncestor(UIElement ancestor, bool inverse, out Matrix simpleTransform)
+    private static GeneralTransform CreateGeneralTransform(Matrix3D transform)
+    {
+        if (Matrix3DUtil.TryGetAffineMatrix(transform, out Matrix matrix))
+        {
+            return new MatrixTransform(matrix);
+        }
+
+        return new Matrix3DTransform(transform);
+    }
+
+    private bool TrySimpleTransformToAncestor(UIElement ancestor, bool inverse, out Matrix3D simpleTransform)
     {
         UIElement g = this;
+        Matrix3D m3D = Matrix3D.Identity;
         Matrix m = Matrix.Identity;
 
         // This while loop will walk up the visual tree until we encounter the ancestor.
@@ -124,6 +136,11 @@ public partial class UIElement
 
         while (g != ancestor)
         {
+            if (g is null)
+            {
+                throw new InvalidOperationException(inverse ? Strings.UIElement_NotADescendant : Strings.UIElement_NotAnAncestor);
+            }
+
             // In SL/WPF borders are only visual effects and do not directly affect the layout.
             // Borders have to take them into account during the Arrange phase, so the offset
             // created by the BorderThickness is taking into account when computing VisualOffset.
@@ -137,8 +154,16 @@ public partial class UIElement
 
             if (g.VisualTransform is Transform transform)
             {
-                Matrix cm = transform.Matrix;
-                MatrixUtil.MultiplyMatrix(ref m, ref cm);
+                if (transform.IsAffine)
+                {
+                    Matrix cm = transform.Matrix;
+                    MatrixUtil.MultiplyMatrix(ref m, ref cm);
+                }
+                else
+                {
+                    m3D *= Matrix3DUtil.FromMatrix(m) * transform.Matrix3D;
+                    m = Matrix.Identity;
+                }
             }
 
             m.Translate(g.VisualOffset.X, g.VisualOffset.Y);
@@ -153,27 +178,22 @@ public partial class UIElement
             }
         }
 
-        if (g != ancestor)
-        {
-            throw new InvalidOperationException(inverse ? Strings.UIElement_NotADescendant : Strings.UIElement_NotAnAncestor);
-        }
+        m3D *= Matrix3DUtil.FromMatrix(m);
 
         if (inverse)
         {
-            if (!m.HasInverse)
+            if (!Matrix3DUtil.TryInvert(m3D, out m3D))
             {
-                simpleTransform = new Matrix();
+                simpleTransform = new Matrix3D();
                 return false; // inversion failed, so simple transform failed.
             }
-
-            m.Invert();
         }
 
-        simpleTransform = m;
+        simpleTransform = m3D;
         return true; // simple transform succeeded
     }
 
-    private bool TryGetBorderOffsets(UIElement uie, out Point offsets)
+    private static bool TryGetBorderOffsets(UIElement uie, out Point offsets)
     {
         if (uie is IBorderElement border)
         {
@@ -186,21 +206,21 @@ public partial class UIElement
         return false;
     }
 
-    private Matrix TransformToVisualNative(UIElement otherVisual)
+    private Matrix3D TransformToVisualNative(UIElement otherVisual)
     {
         Debug.Assert(otherVisual is not null);
 
         if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this) ||
             !INTERNAL_VisualTreeManager.IsElementInVisualTree(otherVisual))
         {
-            return Matrix.Identity;
+            return Matrix3D.Identity;
         }
 
         Vector offets = Vector.Parse(
             OpenSilver.Interop.ExecuteJavaScriptString(
                 $"osjs.transformToVisual('{OuterDiv.Uid}', '{otherVisual.OuterDiv.Uid}')"));
 
-        return new Matrix(1, 0, 0, 1, offets.X, offets.Y);
+        return Matrix3DUtil.CreateTranslation(offets.X, offets.Y, 0);
     }
 
     private void SetVisualFlagsToRoot(VisualFlags flag, bool value)

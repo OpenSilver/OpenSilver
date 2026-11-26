@@ -907,8 +907,8 @@ public sealed class KeyboardNavigation
 
             if (VisualTreeHelper.GetVisualRoot(uiElement) is UIElement rootVisual)
             {
-                Matrix transform = uiElement.InternalTransformToAncestor(rootVisual);
-                return Rect.Transform(new Rect(uiElement.RenderSize), transform);
+                var transform = uiElement.InternalTransformToAncestor(rootVisual);
+                return Matrix3DUtil.TransformBounds(transform, new Rect(uiElement.RenderSize));
             }
         }
 

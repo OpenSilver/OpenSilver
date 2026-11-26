@@ -1267,7 +1267,7 @@ public partial class FrameworkElement
                 }
             }
 
-            VisualTransform = t;
+            VisualTransform = CreateVisualTransform(t);
             AreTransformsClean = true;
         }
 

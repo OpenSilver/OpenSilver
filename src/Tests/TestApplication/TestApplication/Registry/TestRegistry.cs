@@ -49,6 +49,7 @@ namespace TestApplication
             Tests.Add(new Test("Binding", "Binding"));
             Tests.Add(new Test("Transform", "Transform"));
             Tests.Add(new Test("LayoutTransform", "LayoutTransform"));
+            Tests.Add(new Test("Projection", "Projection"));
 
             TestCategory animations = new TestCategory("Animations");
             animations.Add(new Test("Animation", "Animations/Animation"));

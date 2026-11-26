@@ -165,6 +165,7 @@ internal static class StoryboardPathResolver
             nameof(RotateTransform) => GetKnownRotateTransformProperty(propertyName),
             nameof(CompositeTransform) => GetKnownCompositeTransformProperty(propertyName),
             nameof(TransformGroup) => GetKnownTransformGroupProperty(propertyName),
+            nameof(PlaneProjection) => GetKnownPlaneProjectionProperty(propertyName),
             _ => null,
         };
     }
@@ -177,6 +178,7 @@ internal static class StoryboardPathResolver
             nameof(UIElement.OpacityMask) => UIElement.OpacityMaskProperty,
             nameof(UIElement.Visibility) => UIElement.VisibilityProperty,
             nameof(UIElement.RenderTransform) => UIElement.RenderTransformProperty,
+            nameof(UIElement.Projection) => UIElement.ProjectionProperty,
             _ => null,
         };
     }
@@ -407,6 +409,26 @@ internal static class StoryboardPathResolver
         return name switch
         {
             nameof(TransformGroup.Children) => TransformGroup.ChildrenProperty,
+            _ => null,
+        };
+    }
+
+    private static DependencyProperty GetKnownPlaneProjectionProperty(string name)
+    {
+        return name switch
+        {
+            nameof(PlaneProjection.RotationX) => PlaneProjection.RotationXProperty,
+            nameof(PlaneProjection.RotationY) => PlaneProjection.RotationYProperty,
+            nameof(PlaneProjection.RotationZ) => PlaneProjection.RotationZProperty,
+            nameof(PlaneProjection.CenterOfRotationX) => PlaneProjection.CenterOfRotationXProperty,
+            nameof(PlaneProjection.CenterOfRotationY) => PlaneProjection.CenterOfRotationYProperty,
+            nameof(PlaneProjection.CenterOfRotationZ) => PlaneProjection.CenterOfRotationZProperty,
+            nameof(PlaneProjection.LocalOffsetX) => PlaneProjection.LocalOffsetXProperty,
+            nameof(PlaneProjection.LocalOffsetY) => PlaneProjection.LocalOffsetYProperty,
+            nameof(PlaneProjection.LocalOffsetZ) => PlaneProjection.LocalOffsetZProperty,
+            nameof(PlaneProjection.GlobalOffsetX) => PlaneProjection.GlobalOffsetXProperty,
+            nameof(PlaneProjection.GlobalOffsetY) => PlaneProjection.GlobalOffsetYProperty,
+            nameof(PlaneProjection.GlobalOffsetZ) => PlaneProjection.GlobalOffsetZProperty,
             _ => null,
         };
     }

@@ -1597,8 +1597,8 @@ namespace System.Windows.Controls
                                 // portion of the new rect.
                                 rcNew.Intersect(new Rect(visi.RenderSize));
 
-                                Matrix t = visi.InternalTransformToAncestor(this);
-                                rcNew.Transform(t);
+                                var t = visi.InternalTransformToAncestor(this);
+                                rcNew = Matrix3DUtil.TransformBounds(t, rcNew);
                             }
 
                             BringIntoView(rcNew);

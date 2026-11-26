@@ -1,0 +1,280 @@
+<sdk:Page x:Class="TestApplication.Tests.ProjectionTest"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          mc:Ignorable="d"
+          xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <sdk:Page.Resources>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,30,0,2" />
+        </Style>
+        <Style x:Key="Description" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF555555" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="MaxWidth" Value="1000" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <Style x:Key="Mono" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style x:Key="SmallButton" TargetType="Button">
+            <Setter Property="Margin" Value="0,0,5,5" />
+            <Setter Property="Padding" Value="8,3" />
+        </Style>
+        <Style x:Key="Stage" TargetType="Border">
+            <Setter Property="Background" Value="#FFF4F4F4" />
+            <Setter Property="BorderBrush" Value="#FFCCCCCC" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Storyboard x:Key="SpinStoryboard">
+            <DoubleAnimation Storyboard.TargetName="SpinProjection" Storyboard.TargetProperty="RotationX"
+                             From="0" To="360" Duration="0:0:7" RepeatBehavior="Forever" />
+            <DoubleAnimation Storyboard.TargetName="SpinProjection" Storyboard.TargetProperty="RotationY"
+                             From="0" To="360" Duration="0:0:5" RepeatBehavior="Forever" />
+            <DoubleAnimation Storyboard.TargetName="SpinProjection" Storyboard.TargetProperty="RotationZ"
+                             From="0" To="360" Duration="0:0:11" RepeatBehavior="Forever" />
+        </Storyboard>
+        <Storyboard x:Key="DoorStoryboard">
+            <DoubleAnimation Storyboard.TargetName="DoorProjection" Storyboard.TargetProperty="RotationY"
+                             From="0" To="-75" Duration="0:0:1.2" AutoReverse="True" RepeatBehavior="Forever">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="ZoomStoryboard">
+            <DoubleAnimation Storyboard.TargetName="ZoomTile"
+                             Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetZ)"
+                             From="-1200" To="500" Duration="0:0:2" AutoReverse="True" RepeatBehavior="Forever">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="CrawlStoryboard">
+            <DoubleAnimation Storyboard.TargetName="CrawlProjection" Storyboard.TargetProperty="LocalOffsetY"
+                             From="280" To="-560" Duration="0:0:21" RepeatBehavior="Forever" />
+        </Storyboard>
+    </sdk:Page.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+    <StackPanel Margin="10">
+        <TextBlock Text="Projection" FontSize="24" FontWeight="Bold" />
+        <TextBlock Style="{StaticResource Description}"
+                   Text="PlaneProjection and Matrix3DProjection give a 3D effect to any element, which stays interactive: clicks, text input, popups and coordinates follow the projection." />
+
+        <!-- ================================================================ -->
+        <TextBlock Style="{StaticResource SectionTitle}" Text="1. Playground" />
+        <TextBlock Style="{StaticResource Description}"
+                   Text="The sliders change the PlaneProjection of the card, the presets animate them. The card stays usable under any projection, and the red dot, placed with GetPosition(card), must stay exactly under the mouse." />
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Width="280">
+                <StackPanel x:Name="PlaygroundSlidersPanel" />
+                <StackPanel x:Name="PlaygroundPresetsPanel" Margin="0,8,0,0" />
+            </StackPanel>
+
+            <Border Style="{StaticResource Stage}" Width="480" Height="400" Margin="15,0">
+                <Grid>
+                    <Rectangle Width="260" Height="190" Stroke="#FFAAAAAA" StrokeDashArray="4 3"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Border x:Name="PlaygroundCard" Width="260" Height="190"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Background="#FF4A90D9" BorderBrush="#FF1C4F80" BorderThickness="3" CornerRadius="8"
+                            MouseMove="OnPlaygroundMouseMove" MouseLeave="OnPlaygroundMouseLeave">
+                        <Border.Projection>
+                            <PlaneProjection x:Name="PlaygroundProjection" />
+                        </Border.Projection>
+                        <Grid>
+                            <StackPanel Margin="14">
+                                <TextBlock Text="I am projected" Foreground="White" FontSize="18" FontWeight="Bold" />
+                                <TextBox Text="Editable text" Margin="0,8,0,0" />
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <Button x:Name="PlaygroundButton" Content="Click me" Click="OnPlaygroundButtonClick" Width="90" />
+                                    <ComboBox SelectedIndex="0" Width="110" Margin="8,0,0,0">
+                                        <ComboBoxItem Content="Red" />
+                                        <ComboBoxItem Content="Green" />
+                                        <ComboBoxItem Content="Blue" />
+                                        <ComboBoxItem Content="Yellow" />
+                                    </ComboBox>
+                                </StackPanel>
+                                <Slider Minimum="0" Maximum="100" Value="40" Margin="0,8,0,0" />
+                            </StackPanel>
+                            <Canvas IsHitTestVisible="False">
+                                <Ellipse x:Name="PlaygroundMouseDot" Width="10" Height="10" Fill="Red" Stroke="White"
+                                         StrokeThickness="1.5" Visibility="Collapsed" />
+                            </Canvas>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <StackPanel Width="300">
+                <TextBlock Text="GetPosition(card)" FontWeight="Bold" />
+                <TextBlock x:Name="PlaygroundMouseText" Text="-" Style="{StaticResource Mono}" />
+                <TextBlock Text="Button clicks" FontWeight="Bold" Margin="0,12,0,0" />
+                <TextBlock x:Name="PlaygroundClicksText" Text="0" Style="{StaticResource Mono}" />
+                <TextBlock Text="PlaneProjection.ProjectionMatrix" FontWeight="Bold" Margin="0,12,0,0" />
+                <TextBlock x:Name="PlaygroundMatrixText" Style="{StaticResource Mono}" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- ================================================================ -->
+        <TextBlock Style="{StaticResource SectionTitle}" Text="2. Flip cards" />
+        <TextBlock Style="{StaticResource Description}"
+                   Text="Click a card to flip it, each card has its own animation. The front turns until it is seen edge-on, where it disappears (it leaves no line), then the back arrives from the opposite edge." />
+        <StackPanel x:Name="FlipCardsPanel" Orientation="Horizontal" />
+
+        <!-- ================================================================ -->
+        <TextBlock Style="{StaticResource SectionTitle}" Text="3. Cover flow" />
+        <TextBlock Style="{StaticResource Description}"
+                   Text="Click a cover (or use the buttons) to bring it to the front. The others rotate and move back, and the drawing order follows the distance to the selected cover." />
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+            <Button Style="{StaticResource SmallButton}" Content="◀ Previous" Click="OnCoverFlowPreviousClick" />
+            <Button Style="{StaticResource SmallButton}" Content="Next ▶" Click="OnCoverFlowNextClick" />
+        </StackPanel>
+        <Border Style="{StaticResource Stage}" HorizontalAlignment="Left" Background="#FF1E1E28">
+            <Canvas x:Name="CoverFlowCanvas" Width="980" Height="260">
+                <Canvas.Clip>
+                    <RectangleGeometry Rect="0,0,980,260" />
+                </Canvas.Clip>
+            </Canvas>
+        </Border>
+
+        <!-- ================================================================ -->
+        <TextBlock Style="{StaticResource SectionTitle}" Text="4. In motion" />
+        <TextBlock Style="{StaticResource Description}"
+                   Text="PlaneProjection properties can be animated like any other (Storyboard). Rotation around the three axes, a door on its hinge (CenterOfRotationX=0), a zoom in depth (GlobalOffsetZ, the tile disappears when it goes behind the camera), and text scrolling in a tilted plane (LocalOffsetY)." />
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+            <Button Style="{StaticResource SmallButton}" Content="Start" Click="OnStartAnimationsClick" />
+            <Button Style="{StaticResource SmallButton}" Content="Stop" Click="OnStopAnimationsClick" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Border Style="{StaticResource Stage}" Width="220" Height="220" Margin="0,0,15,0">
+                <Border Width="120" Height="120" Background="#FF27AE60" CornerRadius="10">
+                    <Border.Projection>
+                        <PlaneProjection x:Name="SpinProjection" />
+                    </Border.Projection>
+                    <TextBlock Text="X Y Z" Foreground="White" FontSize="22" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </Border>
+            <Border Style="{StaticResource Stage}" Width="220" Height="220" Margin="0,0,15,0">
+                <Border Width="110" Height="170" Background="#FF8E44AD" CornerRadius="4">
+                    <Border.Projection>
+                        <PlaneProjection x:Name="DoorProjection" CenterOfRotationX="0" />
+                    </Border.Projection>
+                    <Ellipse Width="12" Height="12" Fill="Gold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+                </Border>
+            </Border>
+            <Border Style="{StaticResource Stage}" Width="220" Height="220" Margin="0,0,15,0">
+                <Border x:Name="ZoomTile" Width="100" Height="100" Background="#FFE67E22" CornerRadius="50">
+                    <Border.Projection>
+                        <PlaneProjection />
+                    </Border.Projection>
+                    <TextBlock Text="Zoom" Foreground="White" FontSize="18" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </Border>
+            <Border Width="460" Height="220" Background="Black">
+                <Border.Clip>
+                    <RectangleGeometry Rect="0,0,460,220" />
+                </Border.Clip>
+                <Grid>
+                    <StackPanel x:Name="CrawlPanel" Width="380" VerticalAlignment="Top" HorizontalAlignment="Center">
+                        <StackPanel.Projection>
+                            <PlaneProjection x:Name="CrawlProjection" RotationX="-60" LocalOffsetY="280" />
+                        </StackPanel.Projection>
+                        <TextBlock Text="Chapter I" Foreground="Gold" FontSize="22" HorizontalAlignment="Center" />
+                        <TextBlock Text="LOREM IPSUM" Foreground="Gold" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" />
+                        <TextBlock Foreground="Gold" FontSize="20" TextWrapping="Wrap" TextAlignment="Center"
+                                   Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- ================================================================ -->
+        <TextBlock Style="{StaticResource SectionTitle}" Text="5. Matrix3DProjection and nested projections" />
+        <TextBlock Style="{StaticResource Description}"
+                   Text="On the left, a Matrix3DProjection built like in the Silverlight documentation (centering, rotation, moving away, perspective, back to pixels). On the right, a projected child inside a projected parent: both projections are combined, and the content of the child stays clickable." />
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Width="240" Margin="0,0,15,0">
+                <TextBlock x:Name="MatrixAngleText" Text="Angle = 40°" />
+                <Slider x:Name="MatrixAngleSlider" Minimum="-80" Maximum="80" Value="40" ValueChanged="OnMatrixAngleChanged" />
+                <TextBlock Text="ProjectionMatrix" FontWeight="Bold" Margin="0,10,0,0" />
+                <TextBlock x:Name="MatrixText" Style="{StaticResource Mono}" />
+            </StackPanel>
+            <Border Style="{StaticResource Stage}" Width="300" Height="260" Margin="0,0,15,0">
+                <Border x:Name="MatrixTile" Width="220" Height="160" Background="#FF16A085" CornerRadius="6">
+                    <Border.Projection>
+                        <Matrix3DProjection />
+                    </Border.Projection>
+                    <TextBlock Text="Matrix3DProjection" Foreground="White" FontSize="18" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </Border>
+            <Border Style="{StaticResource Stage}" Width="380" Height="260">
+                <Border Width="300" Height="200" Background="#FF2C3E50" CornerRadius="6" Padding="10">
+                    <Border.Projection>
+                        <PlaneProjection RotationY="35" />
+                    </Border.Projection>
+                    <StackPanel>
+                        <TextBlock Text="Parent: RotationY = 35" Foreground="White" />
+                        <Border Width="200" Height="120" Margin="0,10,0,0" Background="#FFC0392B" CornerRadius="6">
+                            <Border.Projection>
+                                <PlaneProjection RotationX="-40" />
+                            </Border.Projection>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="Child: RotationX = -40" Foreground="White" />
+                                <Button x:Name="NestedButton" Content="Click me (0)" Click="OnNestedButtonClick" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </StackPanel>
+
+        <!-- ================================================================ -->
+        <TextBlock Style="{StaticResource SectionTitle}" Text="6. Controls and popups in a projected plane" />
+        <TextBlock Style="{StaticResource Description}"
+                   Text="The ComboBox drop-down and the Popup open in the plane of the panel. The Popup can be moved with its handle, within that plane. The ToolTip, which is not in the visual tree, appears near the mouse without projection." />
+        <Border Style="{StaticResource Stage}" Width="520" Height="340" HorizontalAlignment="Left">
+            <Border Width="300" Height="240" Background="#FFFDEBD0" BorderBrush="#FFE67E22" BorderThickness="2" CornerRadius="6" Padding="10">
+                <Border.Projection>
+                    <PlaneProjection RotationX="20" RotationY="-30" />
+                </Border.Projection>
+                <StackPanel>
+                    <ComboBox SelectedIndex="0">
+                        <ComboBoxItem Content="First" />
+                        <ComboBoxItem Content="Second" />
+                        <ComboBoxItem Content="Third" />
+                        <ComboBoxItem Content="Fourth" />
+                        <ComboBoxItem Content="Fifth" />
+                    </ComboBox>
+                    <TextBox Text="Select this text" Margin="0,6,0,0" />
+                    <Button Content="Hover me (ToolTip)" ToolTipService.ToolTip="ToolTip of a projected button" Margin="0,6,0,0" />
+                    <CheckBox x:Name="ProjectedPopupCheckBox" Content="Open the Popup" Margin="0,6,0,0"
+                              Checked="OnProjectedPopupChanged" Unchecked="OnProjectedPopupChanged" />
+                    <Popup x:Name="ProjectedPopup" HorizontalOffset="60" VerticalOffset="-10">
+                        <Border Background="#FFFFF3B0" BorderBrush="Black" BorderThickness="1" Padding="6" Width="160">
+                            <StackPanel>
+                                <Thumb Height="14" Cursor="SizeAll" DragDelta="OnProjectedPopupDragDelta" />
+                                <TextBlock Text="Popup (drag me)" FontWeight="Bold" Margin="0,4,0,0" />
+                                <Button Content="Close" Click="OnCloseProjectedPopupClick" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <TextBlock Height="40" />
+    </StackPanel>
+    </ScrollViewer>
+</sdk:Page>

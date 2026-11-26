@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -199,7 +200,8 @@ namespace System.Windows.Controls.Primitives
                 IsDragging = true;
 
                 _transformToOriginal = GetTransformToOriginal();
-                _origin = _previousPosition = _transformToOriginal.Transform(e.GetPosition(null));
+                Point position = e.GetPosition(null);
+                _origin = _previousPosition = TransformToOriginal(position, position);
 
                 // Raise the DragStarted event 
                 bool success = false;
@@ -219,22 +221,31 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        private Matrix GetTransformToOriginal()
+        private Matrix3D GetTransformToOriginal()
         {
-            Matrix transform = Parent switch
+            var transform = Parent switch
             {
                 Popup => InternalTransformToAncestor(null),
                 UIElement parent => parent.InternalTransformToAncestor(null),
-                _ => Matrix.Identity,
+                _ => Matrix3D.Identity,
             };
 
-            if (transform.HasInverse)
+            if (transform.InvertCore())
             {
-                transform.Invert();
                 return transform;
             }
 
-            return Matrix.Identity;
+            return Matrix3D.Identity;
+        }
+
+        private Point TransformToOriginal(Point position, Point fallback)
+        {
+            if (Matrix3DUtil.TryTransform(_transformToOriginal, position, out Point result))
+            {
+                return result;
+            }
+
+            return fallback;
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -285,7 +296,7 @@ namespace System.Windows.Controls.Primitives
 
             if (IsDragging)
             {
-                Point position = _transformToOriginal.Transform(e.GetPosition(null));
+                Point position = TransformToOriginal(e.GetPosition(null), _previousPosition);
 
                 if (position != _previousPosition)
                 {
@@ -403,6 +414,6 @@ namespace System.Windows.Controls.Primitives
         /// </summary> 
         private Point _previousPosition;
 
-        private Matrix _transformToOriginal;
+        private Matrix3D _transformToOriginal;
     }
 }

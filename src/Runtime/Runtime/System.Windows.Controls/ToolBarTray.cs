@@ -683,8 +683,9 @@ public class ToolBarTray : FrameworkElement
 
     private Point TransformPointToToolBar(ToolBar toolBar, Point point)
     {
-        Matrix transform = InternalTransformToDescendant(toolBar);
-        return transform.Transform(point);
+        var transform = InternalTransformToDescendant(toolBar);
+        Matrix3DUtil.TryTransform(transform, point, out Point p);
+        return p;
     }
 
     private void ShrinkToolBars(List<ToolBar> band, int startIndex, int endIndex, double shrinkAmount)

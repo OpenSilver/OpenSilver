@@ -14,6 +14,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows.Media.Media3D;
 using OpenSilver.Internal;
 
 namespace System.Windows.Media
@@ -63,6 +64,19 @@ namespace System.Windows.Media
         public abstract Matrix Value { get; }
 
         internal Matrix Matrix => _matrix ??= Value;
+
+        /// <summary>
+        /// Gets the transformation as a flattened <see cref="Media3D.Matrix3D"/> (see
+        /// <see cref="Matrix3DUtil.Flatten(Media3D.Matrix3D)"/>).
+        /// </summary>
+        internal virtual Matrix3D Matrix3D => Matrix3DUtil.FromMatrix(Matrix);
+
+        /// <summary>
+        /// Gets a value indicating whether <see cref="Matrix"/> exactly represents this transform.
+        /// Otherwise, <see cref="Matrix3D"/> contains a perspective that <see cref="Matrix"/> only
+        /// approximates.
+        /// </summary>
+        internal virtual bool IsAffine => true;
 
         internal static Matrix ToMatrix(Transform transform)
         {

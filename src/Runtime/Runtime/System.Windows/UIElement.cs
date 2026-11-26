@@ -20,6 +20,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 using OpenSilver;
 
 namespace System.Windows
@@ -949,6 +950,67 @@ namespace System.Windows
             }
         }
 
+        #endregion
+
+        #region Projection
+
+        /// <summary>
+        /// Identifies the <see cref="Projection"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ProjectionProperty =
+            DependencyProperty.Register(
+                nameof(Projection),
+                typeof(Projection),
+                typeof(UIElement),
+                new PropertyMetadata(null, OnProjectionChanged));
+
+        /// <summary>
+        /// Gets or sets the perspective projection (3-D effect) to apply when rendering this
+        /// <see cref="UIElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The perspective projection to apply when rendering this <see cref="UIElement"/>.
+        /// The default is null (no perspective applied).
+        /// </returns>
+        public Projection Projection
+        {
+            get => (Projection)GetValue(ProjectionProperty);
+            set => SetValueInternal(ProjectionProperty, value);
+        }
+
+        private static void OnProjectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uie = (UIElement)d;
+
+            if (!uie.NeverMeasured && !uie.NeverArranged)
+            {
+                uie.InvalidateArrange();
+                uie.AreTransformsClean = false;
+            }
+        }
+
+        /// <summary>
+        /// Combines the projection of this element, if any, with the 2D transform computed during
+        /// arrange. Must be called during arrange, once <see cref="RenderSize"/> is set.
+        /// </summary>
+        /// <remarks>
+        /// A <see cref="ProjectedTransform"/> is created even for an identity projection, so that
+        /// it becomes effective as soon as one of its properties changes.
+        /// </remarks>
+        internal Transform CreateVisualTransform(Transform transform)
+        {
+            if (Projection is Projection projection)
+            {
+                return new ProjectedTransform(projection, transform, RenderSize);
+            }
+
+            return transform;
+        }
+
+        #endregion
+
+        #region VisualTransform
+
         private static readonly DependencyProperty VisualTransformProperty =
             DependencyProperty.Register(
                 nameof(VisualTransform),
@@ -969,10 +1031,12 @@ namespace System.Windows
         {
             var uie = (UIElement)d;
 
-            if (uie._weakVisualTransformChangedEventToken != null)
+            uie._weakVisualTransformChangedEventToken?.Dispose();
+            uie._weakVisualTransformChangedEventToken = null;
+
+            if (e.OldValue is ProjectedTransform oldProjectedTransform)
             {
-                uie._weakVisualTransformChangedEventToken.Dispose();
-                uie._weakVisualTransformChangedEventToken = null;
+                oldProjectedTransform.Detach();
             }
 
             if (e.NewValue is Transform newTransform)

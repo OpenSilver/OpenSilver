@@ -18,6 +18,8 @@ using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Controls.Primitives;
 
@@ -97,7 +99,7 @@ internal sealed class PopupRoot : FrameworkElement
 
     internal void SetPosition(double x, double y) => _transformLayer.SetPosition(x, y);
 
-    internal Matrix Transform
+    internal Matrix3D Transform
     {
         get => _transformLayer.Transform;
         set => _transformLayer.Transform = value;
@@ -198,7 +200,7 @@ internal sealed class PopupRoot : FrameworkElement
 
         private readonly TransformGroup _renderTransform;
         private readonly MatrixTransform _translateTransform;
-        private readonly MatrixTransform _transform;
+        private readonly Matrix3DTransform _transform;
         private UIElement _child;
 
         public TransformLayer()
@@ -208,10 +210,10 @@ internal sealed class PopupRoot : FrameworkElement
             _renderTransform.Children.CanBeInheritanceContext = false;
 
             _translateTransform = new MatrixTransform();
-            _transform = new MatrixTransform();
+            _transform = new Matrix3DTransform(Matrix3D.Identity);
 
-            _renderTransform.Children.Add(_transform);
             _renderTransform.Children.Add(_translateTransform);
+            _renderTransform.Children.Add(_transform);
 
             CoerceValue(RenderTransformProperty);
         }
@@ -261,10 +263,10 @@ internal sealed class PopupRoot : FrameworkElement
             return finalSize;
         }
 
-        internal Matrix Transform
+        internal Matrix3D Transform
         {
-            get => _transform.Matrix;
-            set => _transform.Matrix = value;
+            get => _transform.Matrix3D;
+            set => _transform.SetMatrix3D(value);
         }
 
         internal void SetPosition(double x, double y) => _translateTransform.Matrix = Matrix.CreateTranslation(x, y);

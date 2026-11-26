@@ -493,11 +493,11 @@ namespace System.Windows
                     t.Children.Add(new TranslateTransform(finalRect.Width * origin.X, finalRect.Height * origin.Y));
                 }
 
-                VisualTransform = t;
+                VisualTransform = CreateVisualTransform(t);
             }
             else
             {
-                VisualTransform = null;
+                VisualTransform = CreateVisualTransform(null);
             }
         }
 

@@ -256,20 +256,6 @@ namespace System.Windows
                                         typeof(UIElement), 
                                         null);
 
-		[OpenSilver.NotImplemented]
-        public Projection Projection
-        {
-            get { return (Projection)GetValue(ProjectionProperty); }
-            set { SetValueInternal(ProjectionProperty, value); }
-        }
-
-		[OpenSilver.NotImplemented]
-        public static readonly DependencyProperty ProjectionProperty =
-            DependencyProperty.Register(nameof(Projection), 
-                                        typeof(Projection), 
-                                        typeof(UIElement), 
-                                        null);
-
         /// <summary>
         /// When overridden in a derived class, participates in rendering operations that are directed by 
         /// the layout system. The rendering instructions for this element are not used directly when this 

@@ -1552,8 +1552,8 @@ public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         }
 
         // Compute the child's rect relative to (0,0) in our coordinate space.
-        Matrix childTransform = visual.InternalTransformToAncestor(this);
-        rectangle.Transform(childTransform);
+        var childTransform = visual.InternalTransformToAncestor(this);
+        rectangle = Matrix3DUtil.TransformBounds(childTransform, rectangle);
 
         // We can't do any work unless we're scrolling.
         if (!IsScrolling)

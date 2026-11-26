@@ -226,13 +226,12 @@ public abstract class MouseDevice : InputDevice
 
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(relativeTo))
         {
-            Matrix m = relativeTo.InternalTransformToAncestor(null);
-            if (m.HasInverse)
-            {
-                m.Invert();
-            }
+            var m = relativeTo.InternalTransformToAncestor(null);
 
-            return m.Transform(origin);
+            if (m.InvertCore() && Matrix3DUtil.TryTransform(m, origin, out Point position))
+            {
+                return position;
+            }
         }
 
         return new Point(0.0, 0.0);

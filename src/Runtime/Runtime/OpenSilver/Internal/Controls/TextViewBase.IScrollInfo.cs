@@ -211,8 +211,8 @@ internal partial class TextViewBase : IScrollInfo
             }
 
             // Compute the child's rect relative to (0,0) in our coordinate space.
-            Matrix childTransform = visual.InternalTransformToAncestor(owner);
-            rectangle.Transform(childTransform);
+            var childTransform = visual.InternalTransformToAncestor(owner);
+            rectangle = Matrix3DUtil.TransformBounds(childTransform, rectangle);
 
             // Initialize the viewport.
             var viewport = new Rect(HorizontalOffset, VerticalOffset, ViewportWidth, ViewportHeight);

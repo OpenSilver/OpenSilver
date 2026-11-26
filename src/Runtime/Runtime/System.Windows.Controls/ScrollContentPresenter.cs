@@ -857,9 +857,9 @@ namespace System.Windows.Controls
             }
 
             // Compute the child's rect relative to (0,0) in our coordinate space.
-            Matrix childTransform = visual.InternalTransformToAncestor(this);
+            var childTransform = visual.InternalTransformToAncestor(this);
 
-            rectangle.Transform(childTransform);
+            rectangle = Matrix3DUtil.TransformBounds(childTransform, rectangle);
 
             if (!IsScrollClient || (!throwOnError && rectangle.IsEmpty))
             {

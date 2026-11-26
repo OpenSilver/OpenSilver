@@ -11,17 +11,18 @@
 *  
 \*====================================================================================*/
 
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Markup;
-using System.Diagnostics;
-using System.Windows.Automation.Peers;
-using System.Windows.Input;
-using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Automation.Peers;
+using System.Windows.Input;
+using System.Windows.Markup;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -543,76 +544,96 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        private void UpdateTransform()
+        private Matrix3D GetPopupTransform()
         {
-            Matrix transform;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                transform = InternalTransformToAncestor(null);
-                transform.OffsetX = transform.OffsetY = 0;
-            }
-            else if (GetValue(RenderTransformProperty) is Transform popupTransform)
-            {
-                transform = popupTransform.Matrix;
-            }
-            else
-            {
-                transform = Matrix.Identity;
+                return InternalTransformToAncestor(null);
             }
 
-            _popupRoot.Transform = transform;
+            return GetLocalTransform();
+        }
+
+        private Matrix3D GetLocalTransform()
+        {
+            Matrix3D m = Matrix3D.Identity;
+
+            if (Projection is Projection projection)
+            {
+                m *= Matrix3DUtil.Flatten(projection.GetProjectionMatrix(new Size(0, 0)));
+            }
+
+            if (LayoutTransform is Transform layoutTransform)
+            {
+                m *= layoutTransform.Matrix3D;
+            }
+
+            if (RenderTransform is Transform renderTransform)
+            {
+                m *= renderTransform.Matrix3D;
+            }
+
+            return m;
         }
 
         private void UpdatePosition()
         {
             if (_popupRoot is null || !_popupRoot.IsOpen) return;
 
-            UpdateTransform();
+            Matrix3D transform = GetPopupTransform();
+            _popupRoot.Transform = transform;
 
-            Point offset;
-            PlacementMode placement = Placement;
+            var placement = new PlacementContext(this, transform);
 
-            if (IsAbsolutePlacementMode(placement))
+            Point position;
+            PlacementMode placementMode = Placement;
+
+            if (!placement.IsValid)
             {
-                offset = PerformAbsolutePlacement(placement);
+                // The popup is not visible (seen edge-on, for instance).
+                position = new Point(HorizontalOffset, VerticalOffset);
+            }
+            else if (IsAbsolutePlacementMode(placementMode))
+            {
+                position = PerformAbsolutePlacement(placementMode, placement);
             }
             else if (PlacementTarget is FrameworkElement target && INTERNAL_VisualTreeManager.IsElementInVisualTree(target))
             {
-                offset = PerformRelativePlacement(target, placement);
+                position = PerformRelativePlacement(target, placementMode, placement);
             }
             else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 // In Silverlight, when a popup is in the visual tree, it always position the Child relative
                 // to the popup's top left corner.
-                offset = InternalTransformToAncestor(null).Transform(new Point(HorizontalOffset, VerticalOffset));
+                position = new Point(HorizontalOffset, VerticalOffset);
             }
             else
             {
                 // Nothing worked, use absolute placement
-                offset = PerformAbsolutePlacement(PlacementMode.Absolute);
+                position = PerformAbsolutePlacement(PlacementMode.Absolute, placement);
             }
 
-            _popupRoot.SetPosition(offset.X, offset.Y);
+            _popupRoot.SetPosition(position.X, position.Y);
         }
 
         private static bool IsAbsolutePlacementMode(PlacementMode placement)
         {
-            return placement == PlacementMode.Absolute
-                || placement == PlacementMode.Mouse
-                || placement == PlacementMode.MousePoint;
+            return placement == PlacementMode.Absolute ||
+                   placement == PlacementMode.Mouse ||
+                   placement == PlacementMode.MousePoint;
         }
 
         private static bool IsRelativePlacementMode(PlacementMode placement)
         {
-            return placement == PlacementMode.Relative
-                || placement == PlacementMode.Bottom
-                || placement == PlacementMode.Center
-                || placement == PlacementMode.Right
-                || placement == PlacementMode.Left
-                || placement == PlacementMode.Top;
+            return placement == PlacementMode.Relative ||
+                   placement == PlacementMode.Bottom ||
+                   placement == PlacementMode.Center ||
+                   placement == PlacementMode.Right ||
+                   placement == PlacementMode.Left ||
+                   placement == PlacementMode.Top;
         }
 
-        private Point PerformAbsolutePlacement(PlacementMode placement)
+        private Point PerformAbsolutePlacement(PlacementMode placement, in PlacementContext context)
         {
             Debug.Assert(IsAbsolutePlacementMode(placement));
 
@@ -621,163 +642,210 @@ namespace System.Windows.Controls.Primitives
                 return new Point(HorizontalOffset, VerticalOffset);
             }
 
-            Point offset;
+            Point anchor;
 
             switch (placement)
             {
                 case PlacementMode.Absolute:
-                    offset = new Point(0, 0);
+                    anchor = new Point(0, 0);
                     break;
                 case PlacementMode.Mouse:
-                    offset = Mouse.GetPosition(null);
-                    offset.Y += _cursorOffsetY;
+                    anchor = Mouse.GetPosition(null);
+                    anchor.Y += _cursorOffsetY;
                     break;
                 case PlacementMode.MousePoint:
-                    offset = Mouse.GetPosition(null);
+                    anchor = Mouse.GetPosition(null);
                     break;
                 default:
                     Debug.Assert(false, $"Unexpected absolute placement mode: '{placement}'.");
-                    offset = new Point(0, 0);
+                    anchor = new Point(0, 0);
                     break;
             }
 
-            offset.Offset(HorizontalOffset, VerticalOffset);
+            anchor.Offset(HorizontalOffset, VerticalOffset);
 
-            if (StaysWithinScreenBounds)
-            {
-                var root = Application.Current.Host.Content;
-                var interestPoints = InterestPointsFromRect(new Rect(child.RenderSize), _popupRoot.Transform);
-                var childBounds = GetBounds(interestPoints);
-                childBounds.Offset(interestPoints.TopLeft.X + offset.X, interestPoints.TopLeft.Y + offset.Y);
-
-                offset = PutInScreenBounds(offset, new Size(root.ActualWidth, root.ActualHeight), childBounds);
-            }
-
-            return offset;
-        }
-
-        private Point PerformRelativePlacement(UIElement placementTarget, PlacementMode placement)
-        {
-            Debug.Assert(IsRelativePlacementMode(placement));
-
-            if (Child is not UIElement child)
+            if (!context.TryAnchorToLocal(anchor, out Point position))
             {
                 return new Point(HorizontalOffset, VerticalOffset);
             }
 
-            var root = Application.Current.Host.Content;
-            Size windowBounds = new(root.ActualWidth, root.ActualHeight);
-            InterestPoints targetInterestPoints = InterestPointsFromRect(
-                new Rect(HorizontalOffset, VerticalOffset, placementTarget.RenderSize.Width, placementTarget.RenderSize.Height),
-                placementTarget.InternalTransformToAncestor(null));
-            InterestPoints childInterestPoints = InterestPointsFromRect(new Rect(child.RenderSize), _popupRoot.Transform);
+            if (StaysWithinScreenBounds)
+            {
+                position = PutInScreenBounds(position, child.RenderSize, GetWindowSize(), context);
+            }
 
-            Point offset = GetCandidateOffset(placement, targetInterestPoints, childInterestPoints);
-            Rect childBounds = GetBounds(childInterestPoints);
+            return position;
+        }
 
-            Rect candidateBounds = Rect.Offset(childBounds, childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
+        private Point PerformRelativePlacement(UIElement placementTarget, PlacementMode placement, in PlacementContext context)
+        {
+            Debug.Assert(IsRelativePlacementMode(placement));
 
-            if (candidateBounds.Y + candidateBounds.Height > windowBounds.Height)
+            var offsets = new Point(HorizontalOffset, VerticalOffset);
+
+            if (Child is not UIElement child || !context.TryGetTargetInterestPoints(placementTarget, offsets, out InterestPoints target))
+            {
+                return offsets;
+            }
+
+            Size windowSize = GetWindowSize();
+            Size childSize = child.RenderSize;
+
+            Point position = GetCandidatePosition(placement, target, childSize);
+            Rect candidateBounds = context.GetBounds(position, childSize);
+
+            if (candidateBounds.Bottom > windowSize.Height)
             {
                 if (placement == PlacementMode.Bottom)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Top, targetInterestPoints, childInterestPoints);
+                    position = GetCandidatePosition(PlacementMode.Top, target, childSize);
                 }
             }
-            else if (candidateBounds.Y < 0)
+            else if (candidateBounds.Top < 0)
             {
                 if (placement == PlacementMode.Top)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Bottom, targetInterestPoints, childInterestPoints);
+                    position = GetCandidatePosition(PlacementMode.Bottom, target, childSize);
                 }
             }
 
-            candidateBounds = Rect.Offset(childBounds, childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
+            candidateBounds = context.GetBounds(position, childSize);
 
-            if (candidateBounds.X + candidateBounds.Width > windowBounds.Width)
+            if (candidateBounds.Right > windowSize.Width)
             {
                 if (placement == PlacementMode.Right)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Left, targetInterestPoints, childInterestPoints);
+                    position = GetCandidatePosition(PlacementMode.Left, target, childSize);
                 }
             }
-            else if (candidateBounds.X < 0)
+            else if (candidateBounds.Left < 0)
             {
                 if (placement == PlacementMode.Left)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Right, targetInterestPoints, childInterestPoints);
+                    position = GetCandidatePosition(PlacementMode.Right, target, childSize);
                 }
             }
 
             if (StaysWithinScreenBounds)
             {
-                offset = PutInScreenBounds(
-                    offset,
-                    windowBounds,
-                    Rect.Offset(childBounds, childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y));
+                position = PutInScreenBounds(position, childSize, windowSize, context);
             }
 
-            return offset;
+            return position;
 
-            static Point GetCandidateOffset(PlacementMode placement, InterestPoints targetInterestPoints, InterestPoints childInterestPoints)
+            static Point GetCandidatePosition(PlacementMode placement, InterestPoints target, Size childSize)
             {
-                Point offset;
-
                 switch (placement)
                 {
                     case PlacementMode.Relative:
-                        offset = targetInterestPoints.TopLeft;
-                        break;
+                        return target.TopLeft;
                     case PlacementMode.Top:
-                        offset = new Point(
-                            targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X,
-                            targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.BottomLeft.Y);
-                        break;
+                        return new Point(target.TopLeft.X, target.TopLeft.Y - childSize.Height);
                     case PlacementMode.Bottom:
-                        offset = new Point(targetInterestPoints.BottomLeft.X, targetInterestPoints.BottomLeft.Y);
-                        break;
+                        return target.BottomLeft;
                     case PlacementMode.Left:
-                        offset = new Point(
-                            targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.TopRight.X,
-                            targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.TopRight.Y);
-                        break;
+                        return new Point(target.TopLeft.X - childSize.Width, target.TopLeft.Y);
                     case PlacementMode.Right:
-                        offset = targetInterestPoints.TopRight;
-                        break;
+                        return target.TopRight;
                     case PlacementMode.Center:
-                        offset = targetInterestPoints.Center - new Vector(childInterestPoints.Width / 2, childInterestPoints.Height / 2);
-                        break;
+                        return new Point(target.Center.X - childSize.Width / 2, target.Center.Y - childSize.Height / 2);
                     default:
                         Debug.Assert(false, $"Unexpected relative placement mode: '{placement}'.");
-                        offset = new Point(0, 0);
-                        break;
+                        return new Point(0, 0);
                 }
-
-                return offset;
             }
         }
 
-        private static Point PutInScreenBounds(Point offset, Size windowBounds, Rect childBounds)
+        // With a projection, the bounds of the child are not a translation of the bounds at another
+        // position, so the position is corrected iteratively: the corner of the child that overflows
+        // is moved onto the edge of the window. In 2D, the correction of each axis is exact.
+        private static Point PutInScreenBounds(Point position, Size childSize, Size windowSize, in PlacementContext context)
         {
-            if (childBounds.Y + childBounds.Height > windowBounds.Height)
+            for (int i = 0; i < 6; i++)
             {
-                offset.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
-            }
-            else if (childBounds.Y < 0)
-            {
-                offset.Y -= childBounds.Y;
+                Rect childBounds = context.GetBounds(position, childSize);
+                if (childBounds.IsEmpty)
+                {
+                    break;
+                }
+
+                double dx = 0, dy = 0;
+
+                if (childBounds.Bottom > windowSize.Height)
+                {
+                    dy = windowSize.Height - childBounds.Bottom;
+                }
+                else if (childBounds.Top < 0)
+                {
+                    dy = -childBounds.Top;
+                }
+
+                if (childBounds.Right > windowSize.Width)
+                {
+                    dx = windowSize.Width - childBounds.Right;
+                }
+                else if (childBounds.Left < 0)
+                {
+                    dx = -childBounds.Left;
+                }
+
+                if (dx == 0 && dy == 0)
+                {
+                    break;
+                }
+
+                // One axis at a time, since the overflowing corners may differ.
+                if (Math.Abs(dx) >= Math.Abs(dy))
+                {
+                    dy = 0;
+                }
+                else
+                {
+                    dx = 0;
+                }
+
+                Vector corner = GetOverflowingCorner(position, childSize, dx, dy, context);
+                if (!context.TryLocalToRoot(position + corner, out Point point) ||
+                    !context.TryRootToLocal(new Point(point.X + dx, point.Y + dy), out point))
+                {
+                    break;
+                }
+
+                position = point - corner;
             }
 
-            if (childBounds.X + childBounds.Width > windowBounds.Width)
-            {
-                offset.X -= childBounds.X + childBounds.Width - windowBounds.Width;
-            }
-            else if (childBounds.X < 0)
-            {
-                offset.X -= childBounds.X;
-            }
+            return position;
 
-            return offset;
+            static Vector GetOverflowingCorner(Point position, Size childSize, double dx, double dy, in PlacementContext context)
+            {
+                Vector best = default;
+                double bestOverflow = double.NegativeInfinity;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    var corner = new Vector((i & 1) * childSize.Width, (i >> 1) * childSize.Height);
+                    if (!context.TryLocalToRoot(position + corner, out Point point))
+                    {
+                        // The bounds are clipped by the camera plane.
+                        return default;
+                    }
+
+                    double overflow = dx != 0 ? -Math.Sign(dx) * point.X : -Math.Sign(dy) * point.Y;
+                    if (overflow > bestOverflow)
+                    {
+                        best = corner;
+                        bestOverflow = overflow;
+                    }
+                }
+
+                return best;
+            }
+        }
+
+        private static Size GetWindowSize()
+        {
+            var root = Application.Current.Host.Content;
+            return new Size(root.ActualWidth, root.ActualHeight);
         }
 
         private struct InterestPoints
@@ -786,37 +854,69 @@ namespace System.Windows.Controls.Primitives
             public Point TopRight;
             public Point BottomLeft;
             public Point BottomRight;
-
-            public Point Center => new(TopLeft.X + (Width / 2), TopLeft.Y + (Height / 2));
-            public double Width => TopRight.X - TopLeft.X;
-            public double Height => BottomLeft.Y - TopLeft.Y;
+            public Point Center;
         }
 
-        private static InterestPoints InterestPointsFromRect(Rect rect, Matrix transform)
+        private readonly struct PlacementContext
         {
-            return new InterestPoints
+            private readonly Matrix3D _transform;
+            private readonly Matrix3D _inverse;
+            private readonly Vector _anchorOffset;
+
+            public PlacementContext(Popup popup, Matrix3D transform)
             {
-                TopLeft = transform.Transform(rect.TopLeft),
-                TopRight = transform.Transform(rect.TopRight),
-                BottomLeft = transform.Transform(rect.BottomLeft),
-                BottomRight = transform.Transform(rect.BottomRight),
-            };
-        }
+                _transform = transform;
+                IsValid = Matrix3DUtil.TryInvert(transform, out _inverse);
 
-        // Gets the smallest rectangle that contains all points in the list
-        private static Rect GetBounds(InterestPoints interestPoints)
-        {
-            Point topLeft = interestPoints.TopLeft;
-            Point topRight = interestPoints.TopRight;
-            Point bottomLeft = interestPoints.BottomLeft;
-            Point bottomRight = interestPoints.BottomRight;
+                // When the popup is not in the visual tree, the image of its origin by its transform
+                // is added to the placement anchors.
+                if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(popup) &&
+                    Matrix3DUtil.TryTransform(transform, new Point(), out Point origin))
+                {
+                    _anchorOffset = (Vector)origin;
+                }
+            }
 
-            double left = Math.Min(Math.Min(topLeft.X, topRight.X), Math.Min(bottomLeft.X, bottomRight.X));
-            double right = Math.Max(Math.Max(topLeft.X, topRight.X), Math.Max(bottomLeft.X, bottomRight.X));
-            double top = Math.Min(Math.Min(topLeft.Y, topRight.Y), Math.Min(bottomLeft.Y, bottomRight.Y));
-            double bottom = Math.Max(Math.Max(topLeft.Y, topRight.Y), Math.Max(bottomLeft.Y, bottomRight.Y));
+            /// <summary>
+            /// Gets a value indicating whether the coordinate space of the popup can be computed
+            /// from the root.
+            /// </summary>
+            public bool IsValid { get; }
 
-            return new Rect(left, top, right - left, bottom - top);
+            /// <summary>
+            /// Converts a placement anchor from the root to the coordinate space of the popup.
+            /// </summary>
+            public bool TryAnchorToLocal(Point anchor, out Point result)
+                => TryRootToLocal(anchor + _anchorOffset, out result);
+
+            public bool TryRootToLocal(Point point, out Point result)
+                => Matrix3DUtil.TryTransform(_inverse, point, out result);
+
+            public bool TryLocalToRoot(Point point, out Point result)
+                => Matrix3DUtil.TryTransform(_transform, point, out result);
+
+            /// <summary>
+            /// Gets the visible bounds, in the root, of the child at the specified position.
+            /// </summary>
+            public Rect GetBounds(Point position, Size childSize)
+                => Matrix3DUtil.TransformBounds(_transform, new Rect(position, childSize));
+
+            public bool TryGetTargetInterestPoints(UIElement target, Point offsets, out InterestPoints interestPoints)
+            {
+                interestPoints = new();
+
+                Matrix3D transform = target.InternalTransformToAncestor(null);
+                var rect = new Rect(offsets, target.RenderSize);
+
+                return TryToLocal(transform, rect.TopLeft, ref interestPoints.TopLeft) &&
+                       TryToLocal(transform, rect.TopRight, ref interestPoints.TopRight) &&
+                       TryToLocal(transform, rect.BottomLeft, ref interestPoints.BottomLeft) &&
+                       TryToLocal(transform, rect.BottomRight, ref interestPoints.BottomRight) &&
+                       TryToLocal(transform, new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), ref interestPoints.Center);
+            }
+
+            private bool TryToLocal(Matrix3D transform, Point point, ref Point result)
+                => Matrix3DUtil.TryTransform(transform, point, out Point anchor) && TryAnchorToLocal(anchor, out result);
         }
 
         private void ShowPopupRootIfNotAlreadyVisible()

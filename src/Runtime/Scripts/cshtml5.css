@@ -82,6 +82,7 @@ body {
     z-index: 0;
     outline: none;
     transform-origin: 0% 0%;
+    transform-style: flat;
 }
 
 .opensilver-native-scroller {

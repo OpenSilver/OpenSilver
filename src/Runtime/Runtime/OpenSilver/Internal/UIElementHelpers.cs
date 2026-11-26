@@ -17,6 +17,7 @@ using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Windows;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Media;
@@ -258,11 +259,41 @@ internal static class UIElementHelpers
 
     internal static void SetTransform(this UIElement uie, Transform transform)
     {
-        uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Transform, transform switch
+        if (transform is null || Transform.IsIdentityTransform(transform))
         {
-            Transform when !Transform.IsIdentityTransform(transform) => MatrixTransform.MatrixToHtmlString(transform.Matrix),
-            _ => string.Empty,
-        });
+            uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Transform, string.Empty);
+            return;
+        }
+
+        if (transform.IsAffine)
+        {
+            uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Transform, MatrixTransform.MatrixToHtmlString(transform.Matrix));
+        }
+        else
+        {
+            uie.OuterDiv.SetCssStyleProperty(CssPropertyNames.Transform, Matrix3DToHtmlString(transform.Matrix3D));
+        }
+    }
+
+    private static string Matrix3DToHtmlString(Matrix3D m)
+    {
+        string m11 = m.M11.ToInvariantString();
+        string m12 = m.M12.ToInvariantString();
+        string m13 = m.M13.ToInvariantString();
+        string m14 = m.M14.ToInvariantString();
+        string m21 = m.M21.ToInvariantString();
+        string m22 = m.M22.ToInvariantString();
+        string m23 = m.M23.ToInvariantString();
+        string m24 = m.M24.ToInvariantString();
+        string m31 = m.M31.ToInvariantString();
+        string m32 = m.M32.ToInvariantString();
+        string m33 = m.M33.ToInvariantString();
+        string m34 = m.M34.ToInvariantString();
+        string offsetX = m.OffsetX.ToInvariantString();
+        string offsetY = m.OffsetY.ToInvariantString();
+        string offsetZ = m.OffsetZ.ToInvariantString();
+        string m44 = m.M44.ToInvariantString();
+        return $"matrix3d({m11},{m12},{m13},{m14},{m21},{m22},{m23},{m24},{m31},{m32},{m33},{m34},{offsetX},{offsetY},{offsetZ},{m44})";
     }
 
     internal static void SetZIndex(this UIElement uie, int value)
