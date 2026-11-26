@@ -206,18 +206,12 @@ public class Window : ContentControl, IResizeObserverListener
     {
         get
         {
-            if (OuterDiv.IsConnected)
+            if (_overlayDiv.IsConnected)
             {
-                HtmlElementReference sizeReference = _overlayDiv.IsConnected ? _overlayDiv : OuterDiv;
-                if (!sizeReference.IsConnected)
-                {
-                    return new Rect(0, 0, 0, 0);
-                }
-                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{sizeReference.Uid}', 'offsetWidth')");
-                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{sizeReference.Uid}', 'offsetHeight')");
+                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{_overlayDiv.Uid}', 'offsetWidth')");
+                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{_overlayDiv.Uid}', 'offsetHeight')");
                 return new Rect(0, 0, width, height);
             }
-
             return new Rect(0, 0, 0, 0);
         }
     }
@@ -412,9 +406,17 @@ public class Window : ContentControl, IResizeObserverListener
         return base.ArrangeOverride(Bounds.Size);
     }
 
+    private bool _fillViewportBeforeFullScreen;
+
+    /// <summary>
+    /// True when the window is laid out at the viewport size: when maximized, and during the first
+    /// layout of a window about to be shown full screen.
+    /// </summary>
+    internal bool FillsViewport => WindowState == WindowState.Maximized || _fillViewportBeforeFullScreen;
+
     private Size GetSecondaryWindowConstraintSize(Size availableSize)
     {
-        if (WindowState == WindowState.Maximized)
+        if (FillsViewport)
         {
             // Regular maximize fills the available space (the WindowHost).
             return availableSize;
@@ -1158,7 +1160,18 @@ public class Window : ContentControl, IResizeObserverListener
 
         RootDomElement = _overlayDiv;
 
-        _windowHost.Show(_overlayDiv);
+        // A window about to be shown full screen is not measured at its content size, which would
+        // require an infinite size (and realize all the items of virtualized lists).
+        bool fillViewport = ShouldBeFullScreen;
+        _fillViewportBeforeFullScreen = fillViewport;
+        try
+        {
+            _windowHost.Show(_overlayDiv);
+        }
+        finally
+        {
+            _fillViewportBeforeFullScreen = false;
+        }
 
         // Determine display mode before positioning
         UpdateFullScreenMode();
@@ -1173,9 +1186,18 @@ public class Window : ContentControl, IResizeObserverListener
                 MaximizeSecondaryWindow(WindowState.Normal);
             }
         }
-        else if (!_isFullScreen)
+        else
         {
-            ApplyStartupLocation();
+            if (fillViewport)
+            {
+                // Not shown full screen after all (e.g. a Loaded handler opened another window).
+                _windowHost.SetLayoutSize();
+            }
+
+            if (!_isFullScreen)
+            {
+                ApplyStartupLocation();
+            }
         }
 
         // If another window exists and is in full-screen mode, it should exit full-screen.
@@ -1800,14 +1822,15 @@ public class Window : ContentControl, IResizeObserverListener
 
     internal bool IsMainWindow => this == Application.Current?.MainWindow;
 
+    private bool ShouldBeFullScreen => IsMainWindow && Application.Current?.Windows.Count <= 1;
+
     /// <summary>
     /// Enters or exits full-screen mode based on whether this is the sole window
     /// and no explicit window properties have been set.
     /// </summary>
     internal void UpdateFullScreenMode()
     {
-        bool shouldBeFullScreen = IsMainWindow
-            && Application.Current?.Windows.Count <= 1;
+        bool shouldBeFullScreen = ShouldBeFullScreen;
 
         if (shouldBeFullScreen && !_isFullScreen)
         {

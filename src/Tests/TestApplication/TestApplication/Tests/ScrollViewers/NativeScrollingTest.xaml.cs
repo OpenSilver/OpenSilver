@@ -51,7 +51,7 @@ namespace TestApplication.Tests.ScrollViewers
                 OptOutPanel.Children.Add(new TextBlock { Text = $"Managed row {i}", Margin = new Thickness(4, 1, 4, 1) });
             }
 
-            NativeListBox.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Item {i}").ToList();
+            NativeListBox.ItemsSource = Enumerable.Range(0, 100).Select(i => $"Item {i}").ToList();
             VirtualizedListBox.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Virtualized item {i}").ToList();
             VariableListBox.ItemsSource = _variableItems;
             for (int i = 0; i < 1000; i++)
@@ -92,6 +92,8 @@ namespace TestApplication.Tests.ScrollViewers
             VerticalVisibilityComboBox.SelectedItem = ScrollBarVisibility.Auto;
 
             UpdateBasicReadout();
+
+            Loaded += (o, e) => RecreateFillList();
         }
 
         private static string Describe(ScrollViewer sv) =>
@@ -313,5 +315,55 @@ namespace TestApplication.Tests.ScrollViewers
             NativeScrolling.SetIsEnabled(ListBoxes, VirtualizedNativeCheckBox.IsChecked == true);
             NativeScrolling.SetIsEnabled(HorizontalListBox, VirtualizedNativeCheckBox.IsChecked == true);
         }
+
+        private ListBox _fillListBox;
+        private int _fillFirstLayoutCount;
+
+        private void RecreateFillList()
+        {
+            var listBox = new ListBox
+            {
+                ItemsPanel = (ItemsPanelTemplate)Resources["VirtualizingItemsPanel"],
+                ItemsSource = Enumerable.Range(0, 100).Select(i => $"Item {i}").ToList(),
+            };
+            _fillListBox = listBox;
+
+            // Without a height, the box is measured with an unbounded height by the StackPanel of the page.
+            FillHost.Height = double.NaN;
+            FillHost.Child = listBox;
+
+            EventHandler onLayoutUpdated = null;
+            onLayoutUpdated = (o, e) =>
+            {
+                if (FindDescendant<VirtualizingStackPanel>(listBox) is not VirtualizingStackPanel panel || panel.ActualHeight == 0)
+                {
+                    return;
+                }
+
+                listBox.LayoutUpdated -= onLayoutUpdated;
+                _fillFirstLayoutCount = panel.Children.Count;
+                FindDescendant<ScrollViewer>(listBox).ScrollChanged += (s, args) => UpdateFillReadout();
+                panel.SizeChanged += (s, args) => UpdateFillReadout();
+                FillHost.Height = 250;
+            };
+            listBox.LayoutUpdated += onLayoutUpdated;
+        }
+
+        private void UpdateFillReadout()
+        {
+            var sv = FindDescendant<ScrollViewer>(_fillListBox);
+            var presenter = FindDescendant<ScrollContentPresenter>(_fillListBox);
+            var panel = FindDescendant<VirtualizingStackPanel>(_fillListBox);
+            FillReadout.Text =
+                $"Panel height={panel.ActualHeight:0.#} Visible height={presenter.ActualHeight:0.#} " +
+                $"V={sv.VerticalOffset:0.##}/{sv.ScrollableHeight:0.##} n={panel.Children.Count} " +
+                $"(first layout: n={_fillFirstLayoutCount})";
+        }
+
+        private void FillRecreate_Click(object sender, RoutedEventArgs e) => RecreateFillList();
+
+        private void FillShrink_Click(object sender, RoutedEventArgs e) => FillHost.Height = 120;
+
+        private void FillGrow_Click(object sender, RoutedEventArgs e) => FillHost.Height = 250;
     }
 }

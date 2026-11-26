@@ -21,6 +21,9 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
+        <ItemsPanelTemplate x:Key="VirtualizingItemsPanel">
+            <VirtualizingStackPanel/>
+        </ItemsPanelTemplate>
     </sdk:Page.Resources>
 
     <StackPanel Margin="10">
@@ -174,8 +177,19 @@
             </ListBox.ItemsPanel>
         </ListBox>
 
-        <!-- 6. Opt-out -->
-        <TextBlock Style="{StaticResource Title}" Text="6. Opt-out (os:NativeScrolling.IsEnabled=False on a container)"/>
+        <!-- 6. Virtualized list without a fixed height -->
+        <TextBlock Style="{StaticResource Title}" Text="6. Virtualized list that fills a resizable area"/>
+        <TextBlock Style="{StaticResource Hint}" Text="The list has no height of its own: it fills the box, like a list in a '*' row of a window. 'Recreate' first measures it with an unbounded height (as during the first layout of an application), then gives the box a height of 250. After 'Recreate', 'Shrink to 120' and 'Height 250', the panel height must equal the visible height in the readout, and the list must scroll to its last item (Item 99) with the wheel, touch and the scrollbar."/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <Button Content="Recreate" Click="FillRecreate_Click" Margin="0,0,4,0"/>
+            <Button Content="Shrink to 120" Click="FillShrink_Click" Margin="0,0,4,0"/>
+            <Button Content="Height 250" Click="FillGrow_Click" Margin="0,0,4,0"/>
+        </StackPanel>
+        <TextBlock x:Name="FillReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <Border x:Name="FillHost" Style="{StaticResource Box}" Width="250" Height="250"/>
+
+        <!-- 7. Opt-out -->
+        <TextBlock Style="{StaticResource Title}" Text="7. Opt-out (os:NativeScrolling.IsEnabled=False on a container)"/>
         <TextBlock Style="{StaticResource Hint}" Text="Uses the previous (managed) scrolling. Touch panning works through the C# pan logic."/>
         <Border Style="{StaticResource Box}" os:NativeScrolling.IsEnabled="False">
             <ScrollViewer Width="300" Height="120">
@@ -183,8 +197,8 @@
             </ScrollViewer>
         </Border>
 
-        <!-- 7. Heavy content -->
-        <TextBlock Style="{StaticResource Title}" Text="7. Heavy content (performance)"/>
+        <!-- 8. Heavy content -->
+        <TextBlock Style="{StaticResource Title}" Text="8. Heavy content (performance)"/>
         <TextBlock Style="{StaticResource Hint}" Text="Compare touch scrolling on a low-end phone with 'Native' checked and unchecked. Native scrolling should run at the display refresh rate and keep inertia."/>
         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
             <Button Content="Generate 2000 rows" Click="Generate_Click"/>

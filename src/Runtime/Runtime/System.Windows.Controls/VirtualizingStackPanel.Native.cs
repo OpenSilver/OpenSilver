@@ -615,8 +615,10 @@ public partial class VirtualizingStackPanel : INativeScrollInfo
 
         stackDesiredSize.Width = Math.Min(stackDesiredSize.Width, constraint.Width);
         stackDesiredSize.Height = Math.Min(stackDesiredSize.Height, constraint.Height);
-        _scrollData._maxDesiredSize.Width = Math.Max(stackDesiredSize.Width, _scrollData._maxDesiredSize.Width);
-        _scrollData._maxDesiredSize.Height = Math.Max(stackDesiredSize.Height, _scrollData._maxDesiredSize.Height);
+        // The panel is the browser's scroller. Arranged larger than the viewport, it would leave part
+        // of the content out of the scroll range, so a size from a larger constraint must not be kept.
+        _scrollData._maxDesiredSize.Width = Math.Min(Math.Max(stackDesiredSize.Width, _scrollData._maxDesiredSize.Width), constraint.Width);
+        _scrollData._maxDesiredSize.Height = Math.Min(Math.Max(stackDesiredSize.Height, _scrollData._maxDesiredSize.Height), constraint.Height);
 
         return _scrollData._maxDesiredSize;
     }
