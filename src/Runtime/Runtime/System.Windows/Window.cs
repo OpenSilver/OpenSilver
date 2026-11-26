@@ -206,16 +206,13 @@ public class Window : ContentControl, IResizeObserverListener
     {
         get
         {
-            // The overlay exists from Show, before the first layout creates OuterDiv, and that
-            // layout needs this size for a window shown maximized or full screen.
-            HtmlElementReference sizeReference = _overlayDiv.IsConnected ? _overlayDiv : OuterDiv;
-            if (!sizeReference.IsConnected)
+            if (_overlayDiv.IsConnected)
             {
-                return new Rect(0, 0, 0, 0);
+                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{_overlayDiv.Uid}', 'offsetWidth')");
+                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{_overlayDiv.Uid}', 'offsetHeight')");
+                return new Rect(0, 0, width, height);
             }
-            double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{sizeReference.Uid}', 'offsetWidth')");
-            double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"osjs.getProp('{sizeReference.Uid}', 'offsetHeight')");
-            return new Rect(0, 0, width, height);
+            return new Rect(0, 0, 0, 0);
         }
     }
 
