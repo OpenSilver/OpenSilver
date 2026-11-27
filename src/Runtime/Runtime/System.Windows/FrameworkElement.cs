@@ -1516,7 +1516,10 @@ namespace System.Windows
         /// <inheritdoc />
         protected override void OnGotFocus(RoutedEventArgs e)
         {
-            if (IsKeyboardFocused)
+            // An element pressed with the mouse is already visible under the pointer. Bringing it entirely
+            // into view would scroll the content away from the pointer when the press starts a drag or a
+            // selection (unlike WPF, but like browsers).
+            if (IsKeyboardFocused && !InputManager.Current.IsPressedWithin(this))
             {
                 BringIntoView();
             }

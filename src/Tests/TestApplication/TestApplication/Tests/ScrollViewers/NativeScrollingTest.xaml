@@ -61,7 +61,7 @@
             <TextBlock Text="Content size:" VerticalAlignment="Center" Margin="12,0,4,0"/>
             <Slider x:Name="ContentSizeSlider" Width="150" Minimum="100" Maximum="800" Value="600" ValueChanged="ContentSizeSlider_ValueChanged"/>
         </StackPanel>
-        <TextBlock x:Name="MatrixReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <TextBlock x:Name="MatrixReadout" FontFamily="Consolas" Margin="0,0,0,4" Text="(not scrolled yet)"/>
         <Border Style="{StaticResource Box}">
             <ScrollViewer x:Name="MatrixScrollViewer" Width="250" Height="150" ScrollChanged="MatrixScrollViewer_ScrollChanged">
                 <Grid x:Name="MatrixContent" Width="600" Height="600">
@@ -104,7 +104,7 @@
         <!-- 4. Interactive content -->
         <TextBlock Style="{StaticResource Title}" Text="4. Interactive content inside a scrolled ScrollViewer"/>
         <TextBlock Style="{StaticResource Hint}" Text="Scroll first, then: the button must count clicks, the slider and the thumb must drag (touch too, without scrolling), the TextBox must accept text and select with the mouse, the ComboBox drop-down must open next to the ComboBox, and clicking the blue area must report coordinates relative to it (independent of the scroll offset). A touch pan starting on the button must scroll and not click."/>
-        <TextBlock x:Name="InteractionReadout" FontFamily="Consolas" Margin="0,0,0,4"/>
+        <TextBlock x:Name="InteractionReadout" FontFamily="Consolas" Margin="0,0,0,4" Text="(no interaction yet)"/>
         <Border Style="{StaticResource Box}">
             <ScrollViewer Width="320" Height="220">
                 <StackPanel Margin="4">

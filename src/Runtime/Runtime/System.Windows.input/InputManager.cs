@@ -120,6 +120,11 @@ public sealed class InputManager : DispatcherObject
     }
 
     private readonly EventQueue _eventQueue = new();
+
+    // Set for the whole processing of a press, because the focus events that the press causes are
+    // queued and raised only when the processing ends.
+    private UIElement _pressedElement;
+
     private readonly BrowserKeyboardDevice _primaryKeyboardDevice;
     private readonly BrowserMouseDevice _primaryMouseDevice;
 
@@ -257,24 +262,44 @@ public sealed class InputManager : DispatcherObject
 
     private void ProcessPointerInput(string id, int eventId, object jsEventArg, bool isTouchEvent, double pageX, double pageY, int keyModifiers)
     {
-        using (DisableProcessing())
+        UIElement uie = INTERNAL_HtmlDomManager.GetElementById(id);
+        EVENTS eventType = (EVENTS)eventId;
+
+        UIElement pressedElement = _pressedElement;
+        if (eventType is EVENTS.POINTER_LEFT_DOWN or EVENTS.POINTER_RIGHT_DOWN or EVENTS.POINTER_MIDDLE_DOWN)
         {
-            UIElement uie = INTERNAL_HtmlDomManager.GetElementById(id);
-            EVENTS eventType = (EVENTS)eventId;
+            _pressedElement = uie;
+        }
 
-            if (uie is not null)
+        try
+        {
+            using (DisableProcessing())
             {
-                ActiveWindow = uie.ParentWindow;
+                if (uie is not null)
+                {
+                    ActiveWindow = uie.ParentWindow;
+                }
+
+                UpdateMostRecentDevice(eventType);
+
+                _primaryMouseDevice.ProcessInput(
+                    uie,
+                    eventType,
+                    new PointerCallbackParameters(isTouchEvent, pageX, pageY, (ModifierKeys)keyModifiers, jsEventArg));
             }
-
-            UpdateMostRecentDevice(eventType);
-
-            _primaryMouseDevice.ProcessInput(
-                uie,
-                eventType,
-                new PointerCallbackParameters(isTouchEvent, pageX, pageY, (ModifierKeys)keyModifiers, jsEventArg));
+        }
+        finally
+        {
+            _pressedElement = pressedElement;
         }
     }
+
+    /// <summary>
+    /// Indicates whether <paramref name="element"/> is, or contains, the element under the pointer of the
+    /// mouse button press being processed.
+    /// </summary>
+    internal bool IsPressedWithin(UIElement element) =>
+        _pressedElement is UIElement pressed && (pressed == element || pressed.IsDescendantOf(element));
 
     private void UpdateMostRecentDevice(EVENTS eventType)
     {
